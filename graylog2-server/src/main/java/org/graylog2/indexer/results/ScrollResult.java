@@ -133,7 +133,7 @@ public class ScrollResult extends IndexQueryResult {
         LOG.debug("[{}] clearScroll for query successful: {}", queryHash, result.isSucceeded());
     }
 
-    public class ScrollChunk {
+    public static class ScrollChunk {
 
         private final List<ResultMessage> resultMessages;
         private List<String> fields;

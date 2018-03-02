@@ -80,7 +80,7 @@ public class StreamRouterEngineTest {
         final StreamMock stream = getStreamMock("test");
         final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
 
-        assertEquals(engine.getStreams(), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.getStreams());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class StreamRouterEngineTest {
         // With field in the message.
         message.addField("testfield", "testvalue");
 
-        assertEquals(engine.match(message), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
     }
 
     @Test
@@ -158,7 +158,7 @@ public class StreamRouterEngineTest {
         // With matching value for field.
         message.addField("testfield", "testvalue");
 
-        assertEquals(engine.match(message), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class StreamRouterEngineTest {
         // With matching value for field.
         message.addField("testfield", "hello testvalue");
 
-        assertEquals(engine.match(message), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
     }
 
     @Test
@@ -212,7 +212,7 @@ public class StreamRouterEngineTest {
         // With greater value.
         message.addField("testfield", "2");
 
-        assertEquals(engine.match(message), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class StreamRouterEngineTest {
         // With smaller value.
         message.addField("testfield", "2");
 
-        assertEquals(engine.match(message), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
     }
 
     @Test
@@ -266,7 +266,7 @@ public class StreamRouterEngineTest {
         // With matching value.
         message.addField("testfield", "testvalue");
 
-        assertEquals(engine.match(message), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
     }
 
     @Test
@@ -307,7 +307,7 @@ public class StreamRouterEngineTest {
         message3.addField("testfield1", "testvalue");
         message3.addField("testfield2", "testvalue2");
 
-        assertEquals(engine.match(message3), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message3));
     }
 
     @Test
@@ -351,7 +351,7 @@ public class StreamRouterEngineTest {
         message2.addField("testfield1", "testvalue");
         message2.addField("testfield2", "testvalue2");
 
-        assertEquals(engine.match(message2), Lists.newArrayList(stream1));
+        assertEquals(Lists.newArrayList(stream1), engine.match(message2));
 
         // With testfield1, matching testfield2 and matching testfield3 in the message.
         final Message message3 = getMessage();
@@ -363,13 +363,13 @@ public class StreamRouterEngineTest {
 
         assertTrue(match.contains(stream1));
         assertTrue(match.contains(stream2));
-        assertEquals(match.size(), 2);
+        assertEquals(2, match.size());
 
         // With matching testfield3 in the message.
         final Message message4 = getMessage();
         message4.addField("testfield3", "testvalue3");
 
-        assertEquals(engine.match(message4), Lists.newArrayList(stream2));
+        assertEquals(Lists.newArrayList(stream2), engine.match(message4));
     }
 
     @Test
@@ -410,7 +410,7 @@ public class StreamRouterEngineTest {
         final Message message3 = getMessage();
         message3.addField("testfield1", "testvalue");
 
-        assertEquals(engine.match(message3), Lists.newArrayList(stream));
+        assertEquals(Lists.newArrayList(stream), engine.match(message3));
 
         // With testfield2 in the message.
         final Message message4 = getMessage();

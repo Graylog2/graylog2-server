@@ -131,7 +131,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -470,16 +469,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void regexMatch() {
-        try {
-            final Rule rule = parser.parseRule(ruleForTest(), false);
-            final Message message = evaluateRule(rule);
-            assertNotNull(message);
-            assertTrue(message.hasField("matched_regex"));
-            assertTrue(message.hasField("group_1"));
-            assertThat((String) message.getField("named_group")).isEqualTo("cd.e");
-        } catch (ParseException e) {
-            Assert.fail("Should parse");
-        }
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertNotNull(message);
+        assertTrue(message.hasField("matched_regex"));
+        assertTrue(message.hasField("group_1"));
+        assertThat((String) message.getField("named_group")).isEqualTo("cd.e");
     }
 
     @Test

@@ -30,9 +30,9 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class MetricUtilsTest {
@@ -58,12 +58,9 @@ public class MetricUtilsTest {
             fail("Should not have thrown: " + e.getMessage());
         }
 
-        try {
-            //noinspection unused
-            final Counter somename = MetricUtils.safelyRegister(metricRegistry, "somename", new Counter());
-        } catch (Exception e) {
-            assertTrue("Registering a metric with a different metric type fails on using it", e instanceof ClassCastException);
-        }
+        assertThatExceptionOfType(ClassCastException.class)
+                .describedAs("Registering a metric with a different metric type fails on using it")
+                .isThrownBy(() -> MetricUtils.safelyRegister(metricRegistry, "somename", new Counter()));
     }
 
     @Test

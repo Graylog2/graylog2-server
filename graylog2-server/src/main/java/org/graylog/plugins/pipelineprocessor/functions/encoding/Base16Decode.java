@@ -37,6 +37,7 @@ public class Base16Decode extends BaseEncodingSingleArgStringFunction {
         return ENCODING_NAME;
     }
 
+    @Override
     protected String getName() {
         return NAME;
     }

@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -197,6 +198,7 @@ public class CountsIT extends ElasticsearchBase {
 
         try {
             counts.total(indexSet);
+            fail("Expected IndexNotFoundException");
         } catch (IndexNotFoundException e) {
             final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
             assertThat(e)

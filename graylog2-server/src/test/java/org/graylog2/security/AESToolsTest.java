@@ -30,7 +30,7 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "1234567890123456", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "1234567890123456", Hex.encodeHexString(iv));
-        Assert.assertEquals(decrypt, "I am secret");
+        Assert.assertEquals("I am secret", decrypt);
     }
 
 }

@@ -150,7 +150,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
 
-    private static final Set<String> EVENT_TYPES = ImmutableSet.<String>builder()
+    private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
             .add(ALARM_CALLBACK_DELETE)
             .add(ALARM_CALLBACK_UPDATE)

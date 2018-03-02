@@ -145,6 +145,7 @@ public class MessageTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testAddStringFields() throws Exception {
         final Map<String, String> map = Maps.newHashMap();
 
@@ -158,6 +159,7 @@ public class MessageTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testAddLongFields() throws Exception {
         final Map<String, Long> map = Maps.newHashMap();
 
@@ -171,6 +173,7 @@ public class MessageTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testAddDoubleFields() throws Exception {
         final Map<String, Double> map = Maps.newHashMap();
 
@@ -460,6 +463,7 @@ public class MessageTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testGetValidationErrorsWithEmptyMessage() throws Exception {
         final Message message = new Message("", "source", Tools.nowUTC());
 
@@ -467,6 +471,7 @@ public class MessageTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testGetValidationErrorsWithNullMessage() throws Exception {
         final Message message = new Message(null, "source", Tools.nowUTC());
 

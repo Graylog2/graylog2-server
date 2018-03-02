@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -94,14 +93,14 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.inject.Inject;
 
 import static com.google.common.collect.ImmutableSortedSet.orderedBy;
 import static java.util.Comparator.comparingInt;
@@ -276,7 +275,7 @@ public class PipelineRuleParser {
         private final Set<String> definedVars = Sets.newHashSet();
 
         // this is true for nested field accesses
-        private Stack<Boolean> isIdIsFieldAccess = new Stack<>();
+        private ArrayDeque<Boolean> isIdIsFieldAccess = new ArrayDeque<>();
 
         public RuleAstBuilder(ParseContext parseContext) {
             this.parseContext = parseContext;
@@ -348,7 +347,7 @@ public class PipelineRuleParser {
                                 params.stream()
                                         .filter(p -> !p.optional())
                                         .map(p -> givenArguments.containsKey(p.name()) ? null : p)
-                                        .filter(p -> p != null)
+                                        .filter(Objects::nonNull)
                                         .collect(toList());
                         for (ParameterDescriptor param : missingParams) {
                             parseContext.addError(new MissingRequiredParam(ctx, function, param));
@@ -664,7 +663,7 @@ public class PipelineRuleParser {
         }
     }
 
-    private class RuleTypeAnnotator extends RuleLangBaseListener {
+    private static class RuleTypeAnnotator extends RuleLangBaseListener {
         private final ParseContext parseContext;
 
         public RuleTypeAnnotator(ParseContext parseContext) {
@@ -727,8 +726,9 @@ public class PipelineRuleParser {
         }
     }
 
-    private class RuleTypeChecker extends RuleLangBaseListener {
+    private static class RuleTypeChecker extends RuleLangBaseListener {
         private final ParseContext parseContext;
+        @SuppressWarnings("JdkObsolete")
         StringBuffer sb = new StringBuffer();
 
         public RuleTypeChecker(ParseContext parseContext) {
@@ -959,7 +959,7 @@ public class PipelineRuleParser {
         }
     }
 
-    private class PipelineAstBuilder extends RuleLangBaseListener {
+    private static class PipelineAstBuilder extends RuleLangBaseListener {
         private final ParseContext parseContext;
 
         public PipelineAstBuilder(ParseContext parseContext) {

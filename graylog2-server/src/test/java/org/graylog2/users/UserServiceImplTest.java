@@ -133,6 +133,7 @@ public class UserServiceImplTest {
 
         final String id = userService.save(user);
         final DBObject query = BasicDBObjectBuilder.start("_id", new ObjectId(id)).get();
+        @SuppressWarnings("deprecation")
         final DBObject dbObject = mongoConnection.getDatabase().getCollection(UserImpl.COLLECTION_NAME).findOne(query);
         assertThat(dbObject.get("username")).isEqualTo("TEST");
         assertThat(dbObject.get("full_name")).isEqualTo("TEST");

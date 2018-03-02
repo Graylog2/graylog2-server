@@ -37,6 +37,7 @@ public class Base64Decode extends BaseEncodingSingleArgStringFunction {
         return ENCODING_NAME;
     }
 
+    @Override
     protected String getName() {
         return NAME;
     }

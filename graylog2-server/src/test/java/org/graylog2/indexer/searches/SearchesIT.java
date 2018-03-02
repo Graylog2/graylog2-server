@@ -91,8 +91,7 @@ public class SearchesIT extends ElasticsearchBase {
 
     private static final String INDEX_NAME = "graylog_0";
     private static final String STREAM_ID = "000000000000000000000001";
-    private static final SortedSet<IndexRange> INDEX_RANGES = ImmutableSortedSet
-            .orderedBy(new IndexRangeComparator())
+    private static final ImmutableSortedSet<IndexRange> INDEX_RANGES = ImmutableSortedSet.orderedBy(new IndexRangeComparator())
             .add(new IndexRange() {
                 @Override
                 public String indexName() {

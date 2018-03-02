@@ -97,7 +97,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private static final String TLS_CLIENT_AUTH_DISABLED = "disabled";
     private static final String TLS_CLIENT_AUTH_OPTIONAL = "optional";
     private static final String TLS_CLIENT_AUTH_REQUIRED = "required";
-    private static final Map<String, String> TLS_CLIENT_AUTH_OPTIONS = ImmutableMap.of(
+    private static final ImmutableMap<String, String> TLS_CLIENT_AUTH_OPTIONS = ImmutableMap.of(
             TLS_CLIENT_AUTH_DISABLED, TLS_CLIENT_AUTH_DISABLED,
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
             TLS_CLIENT_AUTH_REQUIRED, TLS_CLIENT_AUTH_REQUIRED);

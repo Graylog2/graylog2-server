@@ -24,10 +24,10 @@ public class MatchingTypeTest {
 
     @Test
     public void testValueOfOrDefault() throws Exception {
-        assertEquals(Stream.MatchingType.valueOfOrDefault("AND"), Stream.MatchingType.AND);
-        assertEquals(Stream.MatchingType.valueOfOrDefault("OR"), Stream.MatchingType.OR);
-        assertEquals(Stream.MatchingType.valueOfOrDefault(null), Stream.MatchingType.DEFAULT);
-        assertEquals(Stream.MatchingType.valueOfOrDefault(""), Stream.MatchingType.DEFAULT);
+        assertEquals(Stream.MatchingType.AND, Stream.MatchingType.valueOfOrDefault("AND"));
+        assertEquals(Stream.MatchingType.OR, Stream.MatchingType.valueOfOrDefault("OR"));
+        assertEquals(Stream.MatchingType.DEFAULT, Stream.MatchingType.valueOfOrDefault(null));
+        assertEquals(Stream.MatchingType.DEFAULT, Stream.MatchingType.valueOfOrDefault(""));
     }
 
     @Test(expected = IllegalArgumentException.class)

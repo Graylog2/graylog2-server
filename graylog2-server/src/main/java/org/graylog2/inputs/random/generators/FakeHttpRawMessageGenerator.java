@@ -38,16 +38,16 @@ public class FakeHttpRawMessageGenerator {
     private static final Random RANDOM = new Random();
     private static final int MAX_WEIGHT = 50;
 
-    private static final List<Resource> GET_RESOURCES = ImmutableList.of(
+    private static final ImmutableList<Resource> GET_RESOURCES = ImmutableList.of(
             new Resource("/login", "LoginController", "login", 10),
             new Resource("/users", "UsersController", "index", 2),
             new Resource("/posts", "PostsController", "index", 40),
             new Resource("/posts/45326", "PostsController", "show", 12),
             new Resource("/posts/45326/edit", "PostsController", "edit", 1));
 
-    private static final Map<String, Resource> RESOURCE_MAP = Maps.uniqueIndex(GET_RESOURCES, Resource::getResource);
+    private static final ImmutableMap<String, Resource> RESOURCE_MAP = Maps.uniqueIndex(GET_RESOURCES, Resource::getResource);
 
-    private static final List<UserId> USER_IDS = ImmutableList.of(
+    private static final ImmutableList<UserId> USER_IDS = ImmutableList.of(
             new UserId(9001, 10),
             new UserId(54351, 1),
             new UserId(74422, 5),

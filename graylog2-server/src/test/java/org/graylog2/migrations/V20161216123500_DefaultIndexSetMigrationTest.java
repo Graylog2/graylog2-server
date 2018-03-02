@@ -76,6 +76,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void upgradeCreatesDefaultIndexSet() throws Exception {
         final RotationStrategyConfig rotationStrategyConfig = mock(RotationStrategyConfig.class);
         final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);

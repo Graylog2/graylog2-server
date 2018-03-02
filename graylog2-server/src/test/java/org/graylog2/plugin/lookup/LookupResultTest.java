@@ -28,7 +28,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LookupResultTest {
-    private static final Map<Object, Object> MULTI_VALUE = ImmutableMap.of(
+    private static final ImmutableMap<Object, Object> MULTI_VALUE = ImmutableMap.of(
             "int", 42,
             "bool", true,
             "string", "Foobar"

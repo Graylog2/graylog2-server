@@ -119,7 +119,7 @@ public class EvaluationContext {
         return evalErrors == null ? Collections.emptyList() : Collections.unmodifiableList(evalErrors);
     }
 
-    public class TypedValue {
+    public static class TypedValue {
         private final Class type;
         private final Object value;
 

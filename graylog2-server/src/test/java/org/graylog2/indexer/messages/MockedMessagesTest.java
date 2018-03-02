@@ -47,7 +47,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MockedMessagesTest {
-    public class MockedBulkResult extends BulkResult {
+    public static class MockedBulkResult extends BulkResult {
         MockedBulkResult() {
             super((ObjectMapper)null);
         }

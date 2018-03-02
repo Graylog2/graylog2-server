@@ -83,7 +83,7 @@ public class SearchQueryParser {
     public static final SearchQueryOperator DEFAULT_OPERATOR = SearchQueryOperators.REGEXP;
 
     // We parse all date strings in UTC because we store and show all dates in UTC as well.
-    private static final List<DateTimeFormatter> DATE_TIME_FORMATTERS = ImmutableList.of(
+    private static final ImmutableList<DateTimeFormatter> DATE_TIME_FORMATTERS = ImmutableList.of(
             DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC(),
             DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC(),
             ISODateTimeFormat.dateTimeParser().withOffsetParsed().withZoneUTC()

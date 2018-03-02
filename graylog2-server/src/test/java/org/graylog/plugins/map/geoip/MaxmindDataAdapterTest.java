@@ -49,7 +49,7 @@ public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
     private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
 
-    private static final Map<DatabaseType, String> DB_PATH = ImmutableMap.of(
+    private static final ImmutableMap<DatabaseType, String> DB_PATH = ImmutableMap.of(
             DatabaseType.MAXMIND_CITY, GEO_LITE2_CITY_MMDB,
             DatabaseType.MAXMIND_COUNTRY, GEO_LITE2_COUNTRY_MMDB
     );

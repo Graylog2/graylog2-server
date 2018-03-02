@@ -22,16 +22,14 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
-@SuppressWarnings("unchecked")
 public class CsvConverterTest {
-
     @Test
-    public void testConfigHandling() {
+    public void testConfigHandling() throws ConfigurationException {
         Map<String, Object> configMap = Maps.newHashMap();
         assertConfigException(configMap);
 
@@ -43,22 +41,24 @@ public class CsvConverterTest {
 
         // the rest of the fields have defaults
         configMap.put("column_header", "field1");
-        assertNoConfigException(configMap);
 
+        CsvConverter csvConverter = new CsvConverter(configMap);
+        assertNotNull(csvConverter);
     }
-
 
     @Test
     public void testSuccessfulConversion() throws ConfigurationException {
         Map<String, Object> configMap = Maps.newHashMap();
         configMap.put("column_header", "f1,f2");
         CsvConverter csvConverter = new CsvConverter(configMap);
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) csvConverter.convert("\"content1\",\"cont\\\\ent3\"");
         assertEquals("content1", result.get("f1"));
         assertEquals("cont\\ent3", result.get("f2"));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testEdgeCases() throws ConfigurationException {
         Map<String, Object> configMap = Maps.newHashMap();
         configMap.put("column_header", "f1,f2");
@@ -79,23 +79,7 @@ public class CsvConverterTest {
         assertNull("Unbalanced quoting does not work", result);
     }
 
-    private void assertNoConfigException(Map<String, Object> configMap) {
-        CsvConverter csvConverter = null;
-        try {
-            csvConverter = new CsvConverter(configMap);
-        } catch (ConfigurationException e) {
-            fail();
-        }
-        assertNotNull(csvConverter);
-    }
-
     private void assertConfigException(Map<String, Object> configMap) {
-        ConfigurationException configurationException = null;
-        try {
-            new CsvConverter(configMap);
-        } catch (ConfigurationException e) {
-            configurationException = e;
-        }
-        assertNotNull("Config exception expected", configurationException);
+        assertThatExceptionOfType(ConfigurationException.class).isThrownBy(() -> new CsvConverter(configMap));
     }
 }

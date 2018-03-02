@@ -54,7 +54,7 @@ public class OutputRouterTest {
 
         final Collection<MessageOutput> messageOutputs = outputRouter.getOutputsForMessage(message);
 
-        assertEquals(messageOutputs.size(), 1);
+        assertEquals(1, messageOutputs.size());
         assertTrue(messageOutputs.contains(defaultMessageOutput));
     }
 
@@ -65,7 +65,7 @@ public class OutputRouterTest {
 
         final Collection<MessageOutput> messageOutputs = outputRouter.getMessageOutputsForStream(stream);
 
-        assertEquals(messageOutputs.size(), 0);
+        assertEquals(0, messageOutputs.size());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class OutputRouterTest {
 
         final Collection<MessageOutput> messageOutputs = outputRouter.getMessageOutputsForStream(stream);
 
-        assertEquals(messageOutputs.size(), 1);
+        assertEquals(1, messageOutputs.size());
         assertTrue(messageOutputs.contains(messageOutput));
     }
 
@@ -105,7 +105,7 @@ public class OutputRouterTest {
 
         final Collection<MessageOutput> messageOutputs = outputRouter.getMessageOutputsForStream(stream);
 
-        assertEquals(messageOutputs.size(), 2);
+        assertEquals(2, messageOutputs.size());
         assertTrue(messageOutputs.contains(messageOutput1));
         assertTrue(messageOutputs.contains(messageOutput2));
     }
@@ -126,7 +126,7 @@ public class OutputRouterTest {
         final Collection<MessageOutput> messageOutputs = outputRouter.getOutputsForMessage(message);
 
         // Verification
-        assertEquals(messageOutputs.size(), 2);
+        assertEquals(2, messageOutputs.size());
         assertTrue(messageOutputs.contains(defaultMessageOutput));
         assertTrue(messageOutputs.contains(messageOutput));
     }
@@ -148,7 +148,7 @@ public class OutputRouterTest {
 
         final Collection<MessageOutput> result = outputRouter.getOutputsForMessage(message);
 
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
         assertTrue(result.contains(defaultMessageOutput));
         assertTrue(result.contains(messageOutput1));
         assertTrue(result.contains(messageOutput2));
@@ -169,7 +169,7 @@ public class OutputRouterTest {
 
         final Collection<MessageOutput> result = outputRouter.getOutputsForMessage(message);
 
-        assertEquals(result.size(), 2);
+        assertEquals(2, result.size());
         assertTrue(result.contains(defaultMessageOutput));
         assertTrue(result.contains(messageOutput));
     }

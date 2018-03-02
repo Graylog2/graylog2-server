@@ -154,7 +154,7 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
         final AlarmCallbackConfiguration alarmCallbackConfiguration = this.alarmCallbackConfigurationService.create(streamId, request, userId);
 
         assertNotNull(alarmCallbackConfiguration);
-        assertEquals(alarmCallbackConfiguration.getStreamId(), streamId);
+        assertEquals(streamId, alarmCallbackConfiguration.getStreamId());
         assertEquals("Create should not save the object", 0, alarmCallbackConfigurationService.count());
     }
 
