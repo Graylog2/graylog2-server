@@ -30,6 +30,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Set;
 
+import static com.google.common.collect.ImmutableSet.of;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -145,5 +146,54 @@ public class IndexFieldTypesServiceTest {
 
         assertThat(dbService.streamForIndexSet("abc").findFirst().orElse(null)).isEqualTo(savedDto1);
         assertThat(dbService.streamForIndexSet("xyz").toArray()).containsExactly(savedDto2, savedDto3);
+    }
+
+    @Test
+    public void streamForFieldNames() throws Exception {
+        dbService.save(createDto("graylog_0", "abc", Collections.emptySet()));
+        dbService.save(createDto("graylog_1", "xyz", Collections.emptySet()));
+        dbService.save(createDto("graylog_2", "xyz", Collections.emptySet()));
+        dbService.save(createDto("graylog_3", "xyz", of(
+                FieldTypeDTO.create("yolo1", "text")
+        )));
+
+        assertThat(dbService.streamForFieldNames(of()).count()).isEqualTo(0);
+        assertThat(dbService.streamForFieldNames(of("message")).count()).isEqualTo(4);
+        assertThat(dbService.streamForFieldNames(of("message", "yolo_1")).count()).isEqualTo(4);
+        assertThat(dbService.streamForFieldNames(of("yolo1")).count()).isEqualTo(1);
+        assertThat(dbService.streamForFieldNames(of("source")).count()).isEqualTo(4);
+        assertThat(dbService.streamForFieldNames(of("source", "non-existent")).count()).isEqualTo(4);
+        assertThat(dbService.streamForFieldNames(of("non-existent")).count()).isEqualTo(0);
+        assertThat(dbService.streamForFieldNames(of("non-existent", "yolo1")).count()).isEqualTo(1);
+    }
+
+    @Test
+    public void streamForFieldNamesAndIndices() throws Exception {
+        dbService.save(createDto("graylog_0", "abc", Collections.emptySet()));
+        dbService.save(createDto("graylog_1", "xyz", Collections.emptySet()));
+        dbService.save(createDto("graylog_2", "xyz", Collections.emptySet()));
+        dbService.save(createDto("graylog_3", "xyz", of(
+                FieldTypeDTO.create("yolo1", "text")
+        )));
+
+        assertThat(dbService.streamForFieldNamesAndIndices(
+                of(),
+                of()
+        ).count()).isEqualTo(0);
+
+        assertThat(dbService.streamForFieldNamesAndIndices(
+                of("message"),
+                of("graylog_1")
+        ).count()).isEqualTo(1);
+
+        assertThat(dbService.streamForFieldNamesAndIndices(
+                of("message", "yolo1"),
+                of("graylog_1", "graylog_3")
+        ).count()).isEqualTo(2);
+
+        assertThat(dbService.streamForFieldNamesAndIndices(
+                of("message", "yolo1"),
+                of("graylog_1", "graylog_3", "graylog_0")
+        ).count()).isEqualTo(3);
     }
 }

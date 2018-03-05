@@ -27,6 +27,7 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -35,6 +36,7 @@ import java.util.stream.Stream;
  * Manages the "index_field_Types" MongoDB collection.
  */
 public class IndexFieldTypesService {
+    private static final String FIELDS_FIELD_NAMES = String.format(Locale.US, "%s.%s", IndexFieldTypesDTO.FIELD_FIELDS, FieldTypeDTO.FIELD_NAME);
 
     private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
 
@@ -51,7 +53,7 @@ public class IndexFieldTypesService {
                 IndexFieldTypesDTO.FIELD_INDEX_SET_ID, 1
         )), new BasicDBObject("unique", true));
         this.db.createIndex(new BasicDBObject(IndexFieldTypesDTO.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
-        this.db.createIndex(new BasicDBObject(String.format(Locale.US, "%s.%s", IndexFieldTypesDTO.FIELD_FIELDS, FieldTypeDTO.FIELD_NAME), 1));
+        this.db.createIndex(new BasicDBObject(FIELDS_FIELD_NAMES, 1));
     }
 
     public Optional<IndexFieldTypesDTO> get(String idOrIndexName) {
@@ -99,6 +101,19 @@ public class IndexFieldTypesService {
 
     public Stream<IndexFieldTypesDTO> streamForIndexSet(String indexSetId) {
         return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId)));
+    }
+
+    public Stream<IndexFieldTypesDTO> streamForFieldNames(Collection<String> fieldNames) {
+        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)));
+    }
+
+    public Stream<IndexFieldTypesDTO> streamForFieldNamesAndIndices(Collection<String> fieldNames, Collection<String> indexNames) {
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.in(IndexFieldTypesDTO.FIELD_INDEX_NAME, indexNames),
+                DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)
+        );
+
+        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(query));
     }
 
     public Stream<IndexFieldTypesDTO> streamAll() {
