@@ -36,22 +36,12 @@ public class Dashboard {
     @NotNull
     private List<DashboardWidget> dashboardWidgets = Collections.emptyList();
 
-    private List<WidgetPosition> positions;
-
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public List<WidgetPosition> getPositions() {
-        return this.positions;
-    }
-
-    public void setPositions(List<WidgetPosition> widgetPositions) {
-        this.positions = widgetPositions;
     }
 
     public String getDescription() {

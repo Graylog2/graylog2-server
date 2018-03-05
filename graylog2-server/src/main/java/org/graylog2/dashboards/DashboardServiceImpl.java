@@ -113,9 +113,13 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         final List<WidgetPosition> widgetPositions = new ArrayList<>();
 
         for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
-            widgetPositions.add(WidgetPosition.create(position.id(), position.width(), position.height(),
-                    position.col(), position.row())
-            );
+            widgetPositions.add(WidgetPosition.builder()
+                    .id(position.id())
+                    .width(position.width())
+                    .height(position.height())
+                    .col(position.col())
+                    .row(position.row())
+                    .build());
         }
 
         dashboard.setPositions(widgetPositions);

@@ -16,18 +16,36 @@
  */
 package org.graylog2.dashboards.widgets;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
 public abstract class WidgetPosition {
 
     public abstract String id();
-    public abstract Integer width();
-    public abstract Integer height();
-    public abstract Integer col();
-    public abstract Integer row();
+    public abstract int width();
+    public abstract int height();
+    public abstract int col();
+    public abstract int row();
 
-    public static WidgetPosition create(String id, Integer width, Integer height, Integer col, Integer row) {
-        return new AutoValue_WidgetPosition(id, width, height, col, row);
+    public static Builder builder() {
+        return new AutoValue_WidgetPosition.Builder();
+    }
+
+    public abstract Builder toBuilder();
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract WidgetPosition build();
+
+        public abstract Builder id(String id);
+        public abstract Builder width(int width);
+        public abstract Builder height(int height);
+        public abstract Builder col(int col);
+        public abstract Builder row(int row);
     }
 }

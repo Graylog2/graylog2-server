@@ -88,10 +88,10 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     @Test
     public void doMigrateOneDashboardsPositions() throws Exception {
         final List<WidgetPosition> oldPositions = new ArrayList<>(1);
-        oldPositions.add(WidgetPosition.create("my-position-id", 5, 4,2,2 ));
+        oldPositions.add(WidgetPosition.builder().id("my-position-id").width(5).height(4).col(2).row(2).build());
 
         final List<WidgetPosition> newPositions = new ArrayList<>(1);
-        newPositions.add(WidgetPosition.create("my-position-id", 10,8,3,3 ));
+        newPositions.add(WidgetPosition.builder().id("my-position-id").width(10).height(8).col(3).row(3).build());
 
         final Dashboard dashboard = mock(Dashboard.class, Mockito.RETURNS_DEEP_STUBS);
         when(dashboard.getPositions()).thenReturn(oldPositions);

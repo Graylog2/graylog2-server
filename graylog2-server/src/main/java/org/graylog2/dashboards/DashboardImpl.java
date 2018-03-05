@@ -89,11 +89,18 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         final List<WidgetPosition> result = new ArrayList<>(positions.size());
         for ( String positionId : positions.keySet() ) {
             final BasicDBObject position = (BasicDBObject) positions.get(positionId);
-            final Integer width = parseInt(position.get("width").toString());
-            final Integer height = parseInt(position.get("height").toString());
-            final Integer col = parseInt(position.get("col").toString());
-            final Integer row = parseInt(position.get("row").toString());
-            result.add(WidgetPosition.create(positionId, width, height, col, row));
+            final int width = parseInt(position.get("width").toString());
+            final int height = parseInt(position.get("height").toString());
+            final int col = parseInt(position.get("col").toString());
+            final int row = parseInt(position.get("row").toString());
+            final WidgetPosition widgetPosition = WidgetPosition.builder()
+                    .id(positionId)
+                    .width(width)
+                    .height(height)
+                    .col(col)
+                    .row(row)
+                    .build();
+            result.add(widgetPosition);
         }
         return result;
     }
@@ -103,9 +110,9 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         if (widgetPositions == null) {
             return;
         }
-        final Map<String, Map<String, Object>> positions = new HashMap<>(widgetPositions.size());
+        final Map<String, Map<String, Integer>> positions = new HashMap<>(widgetPositions.size());
         for (WidgetPosition widgetPosition : widgetPositions) {
-            Map<String, Object> position = new HashMap<>(4);
+            Map<String, Integer> position = new HashMap(4);
             position.put("width", widgetPosition.width());
             position.put("height", widgetPosition.height());
             position.put("col", widgetPosition.col());

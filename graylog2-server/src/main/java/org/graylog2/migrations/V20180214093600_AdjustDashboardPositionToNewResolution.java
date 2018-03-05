@@ -80,7 +80,13 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
                 Integer newHeight = position.height() * 2;
                 Integer newCol = adjustPosition(position.col());
                 Integer newRow = adjustPosition(position.row());
-                widgetPositions.add(WidgetPosition.create(position.id(), newWidth, newHeight, newCol, newRow));
+                widgetPositions.add(WidgetPosition.builder()
+                        .id(position.id())
+                        .width(newWidth)
+                        .height(newHeight)
+                        .col(newCol)
+                        .row( newRow)
+                        .build());
             }
             try {
                 dashboard.setPositions(widgetPositions);
