@@ -118,13 +118,15 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
             assertThat(dto.indexSetId()).isEqualTo(indexSetId);
             assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
             assertThat(dto.id()).isNull();
-            assertThat(dto.fields())
-                    .contains(FieldTypeDTO.create("message", "text"))
-                    .contains(FieldTypeDTO.create("full_message", "text"))
-                    .contains(FieldTypeDTO.create("source", "text"))
-                    .contains(FieldTypeDTO.create("http_status", "keyword"))
-                    .contains(FieldTypeDTO.create("http_response_time", "long"))
-                    .contains(FieldTypeDTO.create("timestamp", "date"));
+            assertThat(dto.fields()).containsOnly(
+                    FieldTypeDTO.create("message", "text"),
+                    FieldTypeDTO.create("full_message", "text"),
+                    FieldTypeDTO.create("source", "text"),
+                    FieldTypeDTO.create("http_status", "keyword"),
+                    FieldTypeDTO.create("http_response_time", "long"),
+                    FieldTypeDTO.create("timestamp", "date"),
+                    FieldTypeDTO.create("streams", "keyword")
+            );
         } finally {
             deleteIndex(INDEX_NAME);
             deleteIndex("graylog_1");
@@ -143,13 +145,15 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
             assertThat(dto.indexSetId()).isEqualTo(indexSetId);
             assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
             assertThat(dto.id()).isNull();
-            assertThat(dto.fields())
-                    .contains(FieldTypeDTO.create("message", "text"))
-                    .contains(FieldTypeDTO.create("full_message", "text"))
-                    .contains(FieldTypeDTO.create("source", "text"))
-                    .contains(FieldTypeDTO.create("http_status", "keyword"))
-                    .contains(FieldTypeDTO.create("http_response_time", "long"))
-                    .contains(FieldTypeDTO.create("timestamp", "date"));
+            assertThat(dto.fields()).containsOnly(
+                    FieldTypeDTO.create("message", "text"),
+                    FieldTypeDTO.create("full_message", "text"),
+                    FieldTypeDTO.create("source", "text"),
+                    FieldTypeDTO.create("http_status", "keyword"),
+                    FieldTypeDTO.create("http_response_time", "long"),
+                    FieldTypeDTO.create("timestamp", "date"),
+                    FieldTypeDTO.create("streams", "keyword")
+            );
         } finally {
             deleteIndex(INDEX_NAME);
             deleteIndex("graylog_1");

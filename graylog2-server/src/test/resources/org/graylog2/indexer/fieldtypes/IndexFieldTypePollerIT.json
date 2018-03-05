@@ -35,6 +35,9 @@
             "timestamp": "2015-01-02 01:00:00.000",
             "http_status": "GET",
             "http_response_time": 12,
+            "nested": {
+              "key": "very nested"
+            },
             "streams": [
               "000000000000000000000001"
             ]

@@ -19,6 +19,7 @@ package org.graylog2.indexer.fieldtypes;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.mapping.GetMapping;
@@ -122,7 +123,10 @@ public class IndexFieldTypePoller {
         final Spliterator<Map.Entry<String, JsonNode>> fieldSpliterator = Spliterators.spliteratorUnknownSize(properties.fields(), Spliterator.IMMUTABLE);
 
         final Set<FieldTypeDTO> fieldsMap = StreamSupport.stream(fieldSpliterator, false)
-                .map(field -> FieldTypeDTO.create(field.getKey(), field.getValue().path("type").asText()))
+                .map(field -> Maps.immutableEntry(field.getKey(), field.getValue().path("type").asText()))
+                // The "type" value is empty if we deal with a nested data type
+                .filter(field -> !field.getValue().isEmpty())
+                .map(field -> FieldTypeDTO.create(field.getKey(), field.getValue()))
                 .collect(Collectors.toSet());
 
         return Optional.of(IndexFieldTypesDTO.create(indexSetId, indexName, fieldsMap));
