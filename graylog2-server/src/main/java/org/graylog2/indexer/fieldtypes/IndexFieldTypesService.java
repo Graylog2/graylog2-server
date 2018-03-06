@@ -100,11 +100,11 @@ public class IndexFieldTypesService {
     }
 
     public Stream<IndexFieldTypesDTO> streamForIndexSet(String indexSetId) {
-        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId)));
+        return streamQuery(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId));
     }
 
     public Stream<IndexFieldTypesDTO> streamForFieldNames(Collection<String> fieldNames) {
-        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)));
+        return streamQuery(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames));
     }
 
     public Stream<IndexFieldTypesDTO> streamForFieldNamesAndIndices(Collection<String> fieldNames, Collection<String> indexNames) {
@@ -113,10 +113,14 @@ public class IndexFieldTypesService {
                 DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)
         );
 
-        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(query));
+        return streamQuery(query);
     }
 
     public Stream<IndexFieldTypesDTO> streamAll() {
-        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find());
+        return streamQuery(DBQuery.empty());
+    }
+
+    private Stream<IndexFieldTypesDTO> streamQuery(DBQuery.Query query) {
+        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(query));
     }
 }
