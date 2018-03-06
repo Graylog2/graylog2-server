@@ -85,6 +85,7 @@ public class StreamFaultManager {
                 .addType(Notification.Type.STREAM_PROCESSING_DISABLED)
                 .addSeverity(Notification.Severity.URGENT)
                 .addDetail("stream_id", stream.getId())
+                .addDetail("stream_title", stream.getTitle())
                 .addDetail("fault_count", streamFaultCount);
 
         notificationService.publishIfFirst(notification);
