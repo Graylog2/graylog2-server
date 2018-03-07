@@ -108,7 +108,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
 
     @Override
     public void setPositions(List<WidgetPosition> widgetPositions) {
-        checkNotNull(widgetPositions, "widgetPositions must be given")
+        checkNotNull(widgetPositions, "widgetPositions must be given");
         final Map<String, Map<String, Integer>> positions = new HashMap<>(widgetPositions.size());
         for (WidgetPosition widgetPosition : widgetPositions) {
             Map<String, Integer> position = new HashMap(4);
