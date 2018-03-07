@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
@@ -76,6 +77,9 @@ public abstract class IndexSetUpdateRequest {
     @JsonProperty("index_optimization_disabled")
     public abstract boolean indexOptimizationDisabled();
 
+    @JsonProperty("field_type_refresh_interval")
+    public abstract Duration fieldTypeRefreshInterval();
+
     @JsonCreator
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static IndexSetUpdateRequest create(@JsonProperty("title") @NotBlank String title,
@@ -88,10 +92,11 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                                @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
                                                @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
-                                               @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
+                                               @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
+                                               @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval) {
         return new AutoValue_IndexSetUpdateRequest(title, description, isWritable, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
-                indexOptimizationMaxNumSegments, indexOptimizationDisabled);
+                indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval);
     }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
@@ -106,7 +111,8 @@ public abstract class IndexSetUpdateRequest {
                 indexSet.retentionStrategyClass(),
                 indexSet.retentionStrategy(),
                 indexSet.indexOptimizationMaxNumSegments(),
-                indexSet.indexOptimizationDisabled());
+                indexSet.indexOptimizationDisabled(),
+                indexSet.fieldTypeRefreshInterval());
 
     }
 
@@ -130,6 +136,7 @@ public abstract class IndexSetUpdateRequest {
                 .indexTemplateName(oldConfig.indexTemplateName())
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
+                .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .build();
     }
 }

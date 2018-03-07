@@ -34,6 +34,9 @@ const IndexSetDetails = React.createClass({
 
             <dt>Replicas:</dt>
             <dd>{indexSet.replicas}</dd>
+
+            <dt>Field type refresh interval:</dt>
+            <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
           </dl>
         </Col>
 
