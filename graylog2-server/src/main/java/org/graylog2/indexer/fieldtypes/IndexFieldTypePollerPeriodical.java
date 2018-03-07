@@ -29,6 +29,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.plugin.periodical.Periodical;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +176,12 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private void schedule(final IndexSet indexSet) {
         final String indexSetId = indexSet.getConfig().id();
         final String indexSetTitle = indexSet.getConfig().title();
+        final Duration refreshInterval = indexSet.getConfig().fieldTypeRefreshInterval();
 
+        if (Duration.ZERO.equals(refreshInterval)) {
+            LOG.debug("Skipping index set with ZERO refresh interval <{}/{}>", indexSetTitle, indexSetId);
+            return;
+        }
         if (!indexSet.getConfig().isWritable()) {
             LOG.debug("Skipping non-writable index set <{}/{}>", indexSetTitle, indexSetId);
             return;
@@ -184,7 +190,8 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         // Make sure there is no existing polling job running for this index set
         cancel(futures.get(indexSetId));
 
-        LOG.debug("Schedule index field type updating for index set <{}/{}>", indexSetId, indexSetTitle);
+        LOG.debug("Schedule index field type updating for index set <{}/{}> every {} ms", indexSetId, indexSetTitle,
+                refreshInterval.getMillis());
         final ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
             try {
                 // Only check the active write index on a regular basis, the others don't change anymore
@@ -201,7 +208,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             } catch (Exception e) {
                 LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId);
             }
-        }, 0, 5, TimeUnit.SECONDS); // TODO: Hardcoded period, take from the index set config
+        }, 0, refreshInterval.getMillis(), TimeUnit.MILLISECONDS);
 
         futures.put(indexSetId, future);
     }
