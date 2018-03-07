@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Integer.parseInt;
 
 @CollectionName("dashboards")
@@ -107,9 +108,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
 
     @Override
     public void setPositions(List<WidgetPosition> widgetPositions) {
-        if (widgetPositions == null) {
-            return;
-        }
+        checkNotNull(widgetPositions, "widgetPositions must be given")
         final Map<String, Map<String, Integer>> positions = new HashMap<>(widgetPositions.size());
         for (WidgetPosition widgetPosition : widgetPositions) {
             Map<String, Integer> position = new HashMap(4);
@@ -119,7 +118,9 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
             position.put("row", widgetPosition.row());
             positions.put(widgetPosition.id(), position);
         }
-        getFields().put(DashboardImpl.EMBEDDED_POSITIONS, positions);
+        Map<String, Object> fields = getFields();
+        checkNotNull(fields, "No fields found!");
+        fields.put(DashboardImpl.EMBEDDED_POSITIONS, positions);
     }
 
     @Override

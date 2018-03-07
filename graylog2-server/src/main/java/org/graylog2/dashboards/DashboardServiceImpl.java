@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class DashboardServiceImpl extends PersistedServiceImpl implements DashboardService {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
     private final DashboardWidgetCreator dashboardWidgetCreator;
@@ -110,7 +112,10 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
 
     @Override
     public void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException {
-        final List<WidgetPosition> widgetPositions = new ArrayList<>();
+        checkNotNull(dashboard, "dashboard must be given");
+        checkNotNull(positions, "positions must be given");
+
+        final List<WidgetPosition> widgetPositions = new ArrayList<>(positions.positions().size());
 
         for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
             widgetPositions.add(WidgetPosition.builder()

@@ -16,8 +16,6 @@
  */
 package org.graylog2.migrations;
 
-import com.google.common.collect.Maps;
-
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
@@ -66,7 +64,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
             return;
         }
 
-        Map<String, String> dashboardIds = Maps.newHashMap();
+        Map<String, String> dashboardIds = new HashMap();
         for (Dashboard dashboard : dashboardService.all()) {
             final List<WidgetPosition> oldPositions = dashboard.getPositions();
             if (oldPositions.isEmpty()) {
