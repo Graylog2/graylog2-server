@@ -112,11 +112,11 @@ public class IndexFieldTypePoller {
         final JsonNode properties = result.getJsonObject()
                 .path(indexName)
                 .path("mappings")
-                .path("message")
+                .path("message") // TODO: Hardcoded index type name
                 .path("properties");
 
         if (properties.isMissingNode()) {
-            LOG.info("Invalid mapping response: {}", result.getJsonString());
+            LOG.error("Invalid mapping response: {}", result.getJsonString());
             return Optional.empty();
         }
 
