@@ -2,10 +2,10 @@
   "compilerOptions" : {
     "target": "es5",
     "sourceMap" : true,
-    "lib": ["es5", "es6", "dom"]
+    "lib": ["es5", "es6", "dom"],
+    "types": ["node"]
   },
   "include": [
     "src/**/*.ts",
-    "node_modules/@types/node/index.d.ts"
   ]
 }
