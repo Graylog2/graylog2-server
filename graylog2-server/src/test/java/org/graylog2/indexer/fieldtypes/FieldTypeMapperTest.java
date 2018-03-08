@@ -55,5 +55,7 @@ public class FieldTypeMapperTest {
         assertMapping("date", "date", "enumerable");
         assertMapping("boolean", "boolean", "enumerable");
         assertMapping("binary", "binary");
+        assertMapping("geo_point", "geo-point");
+        assertMapping("ip", "ip", "enumerable");
     }
 }

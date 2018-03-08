@@ -45,6 +45,8 @@ public class FieldTypeMapper {
     private static final FieldTypes.Type DATE_TYPE = createType("date", of(PROP_ENUMERABLE));
     private static final FieldTypes.Type BOOLEAN_TYPE = createType("boolean", of(PROP_ENUMERABLE));
     private static final FieldTypes.Type BINARY_TYPE = createType("binary", of());
+    private static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of());
+    private static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE));
 
     /**
      * A map from Elasticsearch types to Graylog logical types.
@@ -64,6 +66,8 @@ public class FieldTypeMapper {
             .put("date", DATE_TYPE)
             .put("boolean", BOOLEAN_TYPE)
             .put("binary", BINARY_TYPE)
+            .put("geo_point", GEO_POINT_TYPE)
+            .put("ip", IP_TYPE)
             .build();
 
     /**
