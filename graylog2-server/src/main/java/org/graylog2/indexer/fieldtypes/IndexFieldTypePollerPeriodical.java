@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.primitives.Ints;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -58,6 +59,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final Indices indices;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
+    private final com.github.joschi.jadconfig.util.Duration periodicalInterval;
     private final ScheduledExecutorService scheduler;
     private final ConcurrentMap<String, ScheduledFuture<?>> futures = new ConcurrentHashMap<>();
 
@@ -70,6 +72,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final MongoIndexSet.Factory mongoIndexSetFactory,
                                           final Cluster cluster,
                                           final EventBus eventBus,
+                                          @Named("index_field_type_periodical_interval") final com.github.joschi.jadconfig.util.Duration periodicalInterval,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
         this.dbService = dbService;
@@ -77,6 +80,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.indices = indices;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
+        this.periodicalInterval = periodicalInterval;
         this.scheduler = scheduler;
 
         eventBus.register(this);
@@ -259,7 +263,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     @Override
     public int getPeriodSeconds() {
         // This doesn't need to run very often because it's only running some maintenance tasks
-        return 3600; // TODO: Make configurable
+        return Ints.saturatedCast(periodicalInterval.toSeconds());
     }
 
     @Override
