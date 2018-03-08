@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -34,9 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DashboardServiceImpl extends PersistedServiceImpl implements DashboardService {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
@@ -107,20 +112,22 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
 
     @Override
     public void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException {
-        Map<String, Map<String, Object>> map = Maps.newHashMap();
+        checkNotNull(dashboard, "dashboard must be given");
+        checkNotNull(positions, "positions must be given");
+
+        final List<WidgetPosition> widgetPositions = new ArrayList<>(positions.positions().size());
 
         for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
-            Map<String, Object> x = Maps.newHashMap();
-            x.put("col", position.col());
-            x.put("row", position.row());
-            x.put("height", position.height());
-            x.put("width", position.width());
-
-            map.put(position.id(), x);
+            widgetPositions.add(WidgetPosition.builder()
+                    .id(position.id())
+                    .width(position.width())
+                    .height(position.height())
+                    .col(position.col())
+                    .row(position.row())
+                    .build());
         }
 
-        dashboard.getFields().put(DashboardImpl.EMBEDDED_POSITIONS, map);
-
+        dashboard.setPositions(widgetPositions);
         save(dashboard);
     }
 

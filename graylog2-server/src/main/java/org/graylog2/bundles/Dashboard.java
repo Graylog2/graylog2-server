@@ -18,6 +18,7 @@ package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
