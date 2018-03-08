@@ -29,6 +29,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.shared.jackson.SizeSerializer;
@@ -56,11 +57,13 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                                 @JacksonSubTypes Set<NamedType> subtypes) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
+        final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
+                .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
