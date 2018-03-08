@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 public class VersionTest {
     @Test
-    public void testGetName() throws Exception {
+    public void testGetName() {
         assertEquals("0.20.0", Version.from(0, 20, 0).toString());
         assertEquals("1.0.0", Version.from(1, 0, 0).toString());
         assertEquals("1.2.3", Version.from(1, 2, 3).toString());
@@ -34,7 +34,7 @@ public class VersionTest {
     }
 
     @Test
-    public void testEquals() throws Exception {
+    public void testEquals() {
         assertTrue(Version.from(0, 20, 0).equals(Version.from(0, 20, 0)));
         assertTrue(Version.from(0, 20, 0, "preview.1").equals(Version.from(0, 20, 0, "preview.1")));
         assertTrue(Version.from(1, 2, 3).equals(Version.from(1, 2, 3)));
@@ -48,41 +48,7 @@ public class VersionTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
-    public void testGreaterMinor() throws Exception {
-        Version v = Version.from(0, 20, 0);
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0)));
-        assertTrue(v.greaterMinor(Version.from(0, 18, 2)));
-        assertTrue(v.greaterMinor(Version.from(0, 19, 9001)));
-
-        assertFalse(v.greaterMinor(Version.from(0, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 0, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 0, 9001)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 1, 0)));
-        assertFalse(v.greaterMinor(Version.from(3, 2, 1)));
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0, "rc.1")));
-
-        v = Version.from(1, 5, 0);
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0)));
-        assertTrue(v.greaterMinor(Version.from(1, 0, 0)));
-        assertTrue(v.greaterMinor(Version.from(0, 19, 9001)));
-
-        assertFalse(v.greaterMinor(Version.from(1, 6, 0)));
-        assertFalse(v.greaterMinor(Version.from(3, 0, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 5, 9001)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 5)));
-        assertFalse(v.greaterMinor(Version.from(3, 2, 1)));
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0, "rc.1")));
-    }
-
-    @Test
-    public void testSameOrHigher() throws Exception {
+    public void testSameOrHigher() {
         Version v = Version.from(0, 20, 2);
 
         assertTrue(v.sameOrHigher(Version.from(0, 19, 0)));

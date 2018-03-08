@@ -32,32 +32,6 @@ import static java.util.Objects.requireNonNull;
 public class Version implements Comparable<Version> {
     private static final Logger LOG = LoggerFactory.getLogger(Version.class);
 
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final int major;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final int minor;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final int patch;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final String additional;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final String abbrevCommitSha;
-
     private final com.github.zafarkhaja.semver.Version version;
 
     /**
@@ -65,40 +39,8 @@ public class Version implements Comparable<Version> {
      */
     public static final Version CURRENT_CLASSPATH = fromClasspathProperties(Version.from(0, 0, 0, "unknown"));
 
-    /**
-     * @deprecated Use {@link #Version(com.github.zafarkhaja.semver.Version)} or {@link #from(int, int, int)}
-     */
-    @Deprecated
-    public Version(int major, int minor, int patch) {
-        this(buildSemVer(major, minor, patch, null, null));
-    }
-
-    /**
-     * @deprecated Use {@link #Version(com.github.zafarkhaja.semver.Version)} or {@link #from(int, int, int, String)}
-     */
-    @Deprecated
-    public Version(int major, int minor, int patch, String additional) {
-        this(buildSemVer(major, minor, patch, additional, null));
-    }
-
-    /**
-     * @deprecated Use {@link #Version(com.github.zafarkhaja.semver.Version)}
-     */
-    @Deprecated
-    public Version(int major, int minor, int patch, String additional, String abbrevCommitSha) {
-        this(buildSemVer(major, minor, patch, additional, abbrevCommitSha));
-    }
-
     public Version(com.github.zafarkhaja.semver.Version version) {
         this.version = requireNonNull(version);
-
-        // Deprecated
-        this.major = version.getMajorVersion();
-        this.minor = version.getMinorVersion();
-        this.patch = version.getPatchVersion();
-        this.additional = version.getPreReleaseVersion();
-        this.abbrevCommitSha = version.getBuildMetadata();
-
     }
 
     /**
@@ -262,16 +204,6 @@ public class Version implements Comparable<Version> {
     @Override
     public String toString() {
         return version.toString();
-    }
-
-    /**
-     * Check if this version is higher than the passed other version. Only taking major and minor version number in account.
-     *
-     * @param other {@link Version} to compare
-     */
-    @Deprecated
-    public boolean greaterMinor(Version other) {
-        return other.major < this.major || other.major == this.major && other.minor < this.minor;
     }
 
     /**
