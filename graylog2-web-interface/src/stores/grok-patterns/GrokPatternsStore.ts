@@ -33,7 +33,13 @@ const GrokPatternsStore = {
 
   savePattern(pattern: GrokPattern, callback: () => void) {
     var failCallback = (error) => {
-      UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + error.message,
+      console.log(error.additional.body.message);
+      let err_message = error.message;
+      if (error.additional.body && error.additional.body.message) {
+        err_message = error.additional.body.message.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
+        err_message = `<br/><code>${err_message}</code>`;
+      }
+      UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + err_message,
         "Could not save Grok pattern");
     };
 

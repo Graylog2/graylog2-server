@@ -35,5 +35,4 @@ public abstract class GrokPatternList {
 
     @JsonCreator
     public static GrokPatternList create(@JsonProperty("patterns") Collection<GrokPattern> patternList) {return new AutoValue_GrokPatternList(patternList);}
-    
 }

@@ -22,6 +22,7 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.GrokPatternsChangedEvent;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,6 +31,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import scala.collection.parallel.ParIterableLike;
 
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -159,6 +162,19 @@ public class GrokResourceTest {
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
         assertThat(subscriber.events).isEmpty();
+    }
+
+    @Test
+    public void testPatternWithSampleData() throws Exception {
+        final String sampleData = "1.2.3.4";
+        final GrokPattern grokPattern = GrokPattern.create("IP", "\\d.\\d.\\d.\\d");
+        final GrokPatternTestRequest grokPatternTestRequest = GrokPatternTestRequest.create(grokPattern, sampleData);
+        final Map<String, Object> expectedReturn = Collections.singletonMap("IP", "1.2.3.4");
+
+        when(grokPatternService.match(grokPattern, sampleData)).thenReturn(expectedReturn);
+        final Response response = grokResource.testPattern(grokPatternTestRequest);
+        assertThat(response.hasEntity()).isTrue();
+        assertThat(response.getEntity()).isEqualTo(expectedReturn);
     }
 
     static class GrokPatternsChangedEventSubscriber {

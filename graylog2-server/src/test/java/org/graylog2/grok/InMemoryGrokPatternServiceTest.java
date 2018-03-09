@@ -23,7 +23,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -130,4 +132,13 @@ public class InMemoryGrokPatternServiceTest {
         assertThat(service.loadAll()).isEmpty();
     }
 
+    @Test
+    public void match() throws Exception {
+        final String name = "IP";
+        final String sampleData = "1.2.3.4";
+        final Map<String, Object> expectedResult = Collections.singletonMap("IP", "1.2.3.4");
+        GrokPattern grokPattern = GrokPattern.create(name, "\\d.\\d.\\d.\\d");
+        final Map<String, Object> result = service.match(grokPattern, sampleData);
+        assertThat(result).isEqualTo(expectedResult);
+    }
 }
