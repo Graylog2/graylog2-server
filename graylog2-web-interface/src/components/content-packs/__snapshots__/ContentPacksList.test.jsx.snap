@@ -1,0 +1,2159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPacksList /> should render with content-packs 1`] = `
+<div>
+  <div
+    className="row-sm row"
+  >
+    <div
+      className="col-md-5"
+    >
+      <div
+        className="filter"
+      >
+        <form
+          className="form-inline"
+          onSubmit={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <div
+            className="form-group"
+          >
+            <label
+              className="control-label"
+              htmlFor="content-packs-filter"
+            >
+              Filter
+            </label>
+            <div
+              className="typeahead-wrapper"
+            >
+              <input
+                className="form-control"
+                id="content-packs-filter"
+                label="Filter"
+                onKeyPress={undefined}
+                placeholder=""
+                type="text"
+                value={undefined}
+              />
+              
+            </div>
+          </div>
+          <button
+            className="btn btn-default"
+            disabled={false}
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+            type="submit"
+          >
+            Filter
+          </button>
+          <button
+            className="btn btn-default"
+            disabled={true}
+            onClick={[Function]}
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+            type="button"
+          >
+            Reset
+          </button>
+        </form>
+        <ul
+          className="pill-list"
+        />
+      </div>
+    </div>
+    <div
+      className="col-md-5"
+    >
+      <ul
+        className="pagination pagination-sm pagination-pagination pager"
+      >
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="First"
+            >
+              «
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Previous"
+            >
+              ‹
+            </span>
+          </a>
+        </li>
+        <li
+          className="active"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            1
+          </a>
+        </li>
+        <li
+          className=""
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            2
+          </a>
+        </li>
+        <li
+          className=""
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            <span
+              aria-label="Next"
+            >
+              ›
+            </span>
+          </a>
+        </li>
+        <li
+          className=""
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            <span
+              aria-label="Last"
+            >
+              »
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div
+      className="text-right col-md-2"
+    >
+      <span>
+        Show: 
+        <select
+          onChange={[Function]}
+          value={10}
+        >
+          <option>
+            10
+          </option>
+          <option>
+            25
+          </option>
+          <option>
+            50
+          </option>
+          <option>
+            100
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div>
+    <div
+      className="list-group"
+    >
+      <span
+        className="listGroupHeader list-group-item"
+      >
+        <div
+          className="headerWrapper"
+        >
+          
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                UFW Grok Patterns
+              </a>
+               
+              <small>
+                Version: 
+                1.0
+              </small>
+              <span
+                className="badge installed"
+              >
+                installed
+              </span>
+              <span
+                className="badge edited"
+              >
+                edited
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-1"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-1"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            Grok Patterns to extract informations from UFW logfiles
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                Rails Log Patterns
+              </a>
+               
+              <small>
+                Version: 
+                2.1
+              </small>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-2"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-2"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            Patterns to retreive rails production logs
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                Backup Content Pack
+              </a>
+               
+              <small>
+                Version: 
+                3.0
+              </small>
+              <span
+                className="badge installed"
+              >
+                installed
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-3"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-3"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                SSH Archive
+              </a>
+               
+              <small>
+                Version: 
+                3.4
+              </small>
+              <span
+                className="badge error"
+              >
+                error
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-4"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-4"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            A crypted backup over ssh.
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                FTP Backup
+              </a>
+               
+              <small>
+                Version: 
+                1.0
+              </small>
+              <span
+                className="badge installed"
+              >
+                installed
+              </span>
+              <span
+                className="badge updatable"
+              >
+                updatable
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            <button
+              className="btn btn-sm btn-primary"
+              disabled={false}
+              type="button"
+            >
+              Update
+            </button>
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-5"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-5"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            Fast but insecure backup
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                UFW Grok Patterns
+              </a>
+               
+              <small>
+                Version: 
+                1.0
+              </small>
+              <span
+                className="badge installed"
+              >
+                installed
+              </span>
+              <span
+                className="badge edited"
+              >
+                edited
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-6"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-6"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            Grok Patterns to extract informations from UFW logfiles
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                Rails Log Patterns
+              </a>
+               
+              <small>
+                Version: 
+                2.1
+              </small>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-7"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-7"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            Patterns to retreive rails production logs
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                Backup Content Pack
+              </a>
+               
+              <small>
+                Version: 
+                3.0
+              </small>
+              <span
+                className="badge installed"
+              >
+                installed
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-8"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-8"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                SSH Archive
+              </a>
+               
+              <small>
+                Version: 
+                3.4
+              </small>
+              <span
+                className="badge error"
+              >
+                error
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-9"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-9"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            A crypted backup over ssh.
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              >
+                FTP Backup
+              </a>
+               
+              <small>
+                Version: 
+                1.0
+              </small>
+              <span
+                className="badge installed"
+              >
+                installed
+              </span>
+              <span
+                className="badge updatable"
+              >
+                updatable
+              </span>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            <button
+              className="btn btn-sm btn-primary"
+              disabled={false}
+              type="button"
+            >
+              Update
+            </button>
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-10"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-10"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Remove
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Uninstall
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-12"
+          >
+            Fast but insecure backup
+             
+          </div>
+        </div>
+      </span>
+    </div>
+  </div>
+  <div
+    className="row-sm row"
+  >
+    <div
+      className="col-md-5"
+    />
+    <div
+      className="col-md-5"
+    >
+      <ul
+        className="pagination pagination-sm pagination-pagination pager"
+      >
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="First"
+            >
+              «
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Previous"
+            >
+              ‹
+            </span>
+          </a>
+        </li>
+        <li
+          className="active"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            1
+          </a>
+        </li>
+        <li
+          className=""
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            2
+          </a>
+        </li>
+        <li
+          className=""
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            <span
+              aria-label="Next"
+            >
+              ›
+            </span>
+          </a>
+        </li>
+        <li
+          className=""
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+          >
+            <span
+              aria-label="Last"
+            >
+              »
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div
+      className="text-right col-md-2"
+    >
+      <span>
+        Show: 
+        <select
+          onChange={[Function]}
+          value={10}
+        >
+          <option>
+            10
+          </option>
+          <option>
+            25
+          </option>
+          <option>
+            50
+          </option>
+          <option>
+            100
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPacksList /> should render with empty content-packs 1`] = `
+<div>
+  <div
+    className="row-sm row"
+  >
+    <div
+      className="col-md-5"
+    >
+      <div
+        className="filter"
+      >
+        <form
+          className="form-inline"
+          onSubmit={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <div
+            className="form-group"
+          >
+            <label
+              className="control-label"
+              htmlFor="content-packs-filter"
+            >
+              Filter
+            </label>
+            <div
+              className="typeahead-wrapper"
+            >
+              <input
+                className="form-control"
+                id="content-packs-filter"
+                label="Filter"
+                onKeyPress={undefined}
+                placeholder=""
+                type="text"
+                value={undefined}
+              />
+              
+            </div>
+          </div>
+          <button
+            className="btn btn-default"
+            disabled={false}
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+            type="submit"
+          >
+            Filter
+          </button>
+          <button
+            className="btn btn-default"
+            disabled={true}
+            onClick={[Function]}
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+            type="button"
+          >
+            Reset
+          </button>
+        </form>
+        <ul
+          className="pill-list"
+        />
+      </div>
+    </div>
+    <div
+      className="col-md-5"
+    >
+      <ul
+        className="pagination pagination-sm pagination-pagination pager"
+      >
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="First"
+            >
+              «
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Previous"
+            >
+              ‹
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Next"
+            >
+              ›
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Last"
+            >
+              »
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div
+      className="text-right col-md-2"
+    >
+      <span>
+        Show: 
+        <select
+          onChange={[Function]}
+          value={10}
+        >
+          <option>
+            10
+          </option>
+          <option>
+            25
+          </option>
+          <option>
+            50
+          </option>
+          <option>
+            100
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div>
+    <div
+      className="list-group"
+    >
+      <span
+        className="listGroupHeader list-group-item"
+      >
+        <div
+          className="headerWrapper"
+        >
+          
+        </div>
+      </span>
+    </div>
+  </div>
+  <div
+    className="row-sm row"
+  >
+    <div
+      className="col-md-5"
+    />
+    <div
+      className="col-md-5"
+    >
+      <ul
+        className="pagination pagination-sm pagination-pagination pager"
+      >
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="First"
+            >
+              «
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Previous"
+            >
+              ‹
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Next"
+            >
+              ›
+            </span>
+          </a>
+        </li>
+        <li
+          className="disabled"
+          style={undefined}
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
+          >
+            <span
+              aria-label="Last"
+            >
+              »
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div
+      className="text-right col-md-2"
+    >
+      <span>
+        Show: 
+        <select
+          onChange={[Function]}
+          value={10}
+        >
+          <option>
+            10
+          </option>
+          <option>
+            25
+          </option>
+          <option>
+            50
+          </option>
+          <option>
+            100
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+</div>
+`;
