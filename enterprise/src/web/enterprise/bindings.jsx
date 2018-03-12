@@ -17,7 +17,8 @@ export default {
     { path: extendedSearchPath, component: ExtendedSearchPage },
   ],
   navigation: [
-    { path: extendedSearchPath, description: 'Extended Search' },
+    // Disabling navigation for extended search for now to avoid confusing alpha testers.
+    // { path: extendedSearchPath, description: 'Extended Search' },
   ],
   enterpriseWidgets: [
     {
