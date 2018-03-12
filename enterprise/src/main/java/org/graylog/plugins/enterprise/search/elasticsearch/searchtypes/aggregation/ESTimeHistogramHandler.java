@@ -17,12 +17,18 @@ import org.joda.time.DateTime;
 import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 public class ESTimeHistogramHandler implements ESAggregationSpecHandler<TimeHistogramGroup, DateHistogramAggregation> {
+    private final MetricSubAggregationConverter subAggregationConverter;
+
+    @Inject
+    public ESTimeHistogramHandler(MetricSubAggregationConverter subAggregationConverter) {
+        this.subAggregationConverter = subAggregationConverter;
+    }
 
     @Nonnull
     @Override
@@ -56,12 +62,12 @@ public class ESTimeHistogramHandler implements ESAggregationSpecHandler<TimeHist
                     final DateTime bucketTime = DateTime.parse(bucket.getTimeAsString());
                     findMinMax(minMax, bucketTime);
 
-                    final List<Object> metrics = convertSubAggregations(aggregationSpec.metrics(), searchTypeHandler, queryContext, bucket);
+                    final List<Object> metrics = subAggregationConverter.convert(aggregationSpec.metrics(), searchTypeHandler, queryContext, bucket);
                     metrics.add(ImmutableMap.of("count", bucket.getCount()));
                     return TimeHistogramGroup.Bucket.builder()
                             .key(bucketTime)
                             .metrics(metrics)
-                            .groups(convertSubAggregations(aggregationSpec.groups(), searchTypeHandler, queryContext, bucket))
+                            .groups(subAggregationConverter.convert(aggregationSpec.groups(), searchTypeHandler, queryContext, bucket))
                             .build();
                 }).collect(Collectors.toList());
 
@@ -74,18 +80,6 @@ public class ESTimeHistogramHandler implements ESAggregationSpecHandler<TimeHist
             timerange = AbsoluteRange.create(minMax[0], minMax[1]);
         }
         return TimeHistogramGroup.Result.create(buckets, timerange);
-    }
-
-    private List<Object> convertSubAggregations(List<? extends AggregationSpec> specs, ESAggregation searchTypeHandler, ESGeneratedQueryContext queryContext, DateHistogramAggregation.DateHistogram bucket) {
-        return specs.stream()
-                .map((Function<AggregationSpec,Object>) aggSpec -> {
-                    final ESAggregationSpecHandler<? extends AggregationSpec, ? extends Aggregation> handler = searchTypeHandler.handlerForType(aggSpec.type());
-                    final Aggregation subAggregationResult = handler.extractAggregationFromResult(aggSpec, bucket, queryContext);
-                    return handler.handleResult(aggSpec,
-                            subAggregationResult, searchTypeHandler,
-                            queryContext);
-                })
-                .collect(Collectors.toList());
     }
 
     // TODO ugh
