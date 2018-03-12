@@ -1,0 +1,49 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Hello world 1",
+            "timestamp": "2015-01-01 01:00:00.000",
+            "http_status": "GET",
+            "http_response_time": 32,
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        },
+        {
+          "index": {
+            "indexName": "graylog_1",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Hello world 2",
+            "timestamp": "2015-01-02 01:00:00.000",
+            "http_status": "GET",
+            "http_response_time": 12,
+            "nested": {
+              "key": "very nested"
+            },
+            "streams": [
+              "000000000000000000000001"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

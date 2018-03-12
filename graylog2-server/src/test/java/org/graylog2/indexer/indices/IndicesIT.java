@@ -450,4 +450,29 @@ public class IndicesIT extends ElasticsearchBase {
             indicesReopenedEvents.add(event);
         }
     }
+
+    @Test
+    public void getIndices() throws Exception {
+        final IndexSet indexSet = new TestIndexSet(indexSetConfig.toBuilder().indexPrefix("indices_it").build());
+        final String index1 = createRandomIndex("indices_it_");
+        final String index2 = createRandomIndex("indices_it_");
+
+        try {
+            closeIndex(index2);
+
+            assertThat(indices.getIndices(indexSet))
+                    .containsOnly(index1, index2);
+            assertThat(indices.getIndices(indexSet, "open", "close"))
+                    .containsOnly(index1, index2);
+            assertThat(indices.getIndices(indexSet, "open"))
+                    .containsOnly(index1);
+            assertThat(indices.getIndices(indexSet, "close"))
+                    .containsOnly(index2);
+        } finally {
+            deleteIndex(index1);
+            deleteIndex(index2);
+        }
+
+        assertThat(indices.getIndices(indexSet)).isEmpty();
+    }
 }

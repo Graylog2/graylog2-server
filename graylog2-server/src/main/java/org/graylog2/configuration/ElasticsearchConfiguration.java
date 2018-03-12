@@ -104,6 +104,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 20;
 
+    @Parameter(value = "index_field_type_periodical_interval", validator = PositiveDurationValidator.class)
+    private Duration indexFieldTypePeriodicalInterval = Duration.hours(1L);
+
     public boolean isDisableVersionCheck() {
         return disableVersionCheck;
     }
@@ -187,5 +190,9 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
+    }
+
+    public Duration getIndexFieldTypePeriodicalInterval() {
+        return indexFieldTypePeriodicalInterval;
     }
 }

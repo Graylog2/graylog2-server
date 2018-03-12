@@ -46,6 +46,7 @@ import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
+import org.graylog2.indexer.fieldtypes.FieldTypesModule;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
@@ -119,6 +120,7 @@ public class ServerBindings extends Graylog2Module {
         bindSearchResponseDecorators();
         install(new GrokModule());
         install(new LookupModule());
+        install(new FieldTypesModule());
     }
 
     private void bindProviders() {

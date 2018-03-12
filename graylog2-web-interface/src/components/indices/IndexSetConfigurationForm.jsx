@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Spinner, TimeUnitInput } from 'components/common';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
@@ -89,7 +89,36 @@ const IndexSetConfigurationForm = React.createClass({
     this._updateConfig('retention_strategy_class', strategy);
     this._updateConfig('retention_strategy', data);
   },
+  _onFieldTypeRefreshIntervalChange(value, unit) {
+    let interval;
+    switch (unit) {
+      case 'NANOSECONDS':
+        interval = value / 1000.0 / 1000.0;
+        break;
+      case 'MICROSECONDS':
+        interval = value / 1000.0;
+        break;
+      case 'MILLISECONDS':
+        interval = value;
+        break;
+      case 'SECONDS':
+        interval = value * 1000;
+        break;
+      case 'MINUTES':
+        interval = value * 1000 * 60;
+        break;
+      case 'HOURS':
+        interval = value * 1000 * 60 * 60;
+        break;
+      case 'DAYS':
+        interval = value * 1000 * 60 * 60 * 24;
+        break;
+      default:
+        throw new Error(`Invalid field type refresh interval unit: ${unit}`);
+    }
 
+    this._updateConfig('field_type_refresh_interval', interval);
+  },
   render() {
     const indexSet = this.props.indexSet;
     const validationErrors = this.state.validationErrors;
@@ -217,6 +246,13 @@ const IndexSetConfigurationForm = React.createClass({
                        onChange={this._onDisableOptimizationClick}
                        checked={indexSet.index_optimization_disabled}
                        help="Disable Elasticsearch index optimization (force merge) after rotation." />
+                <TimeUnitInput id="field-type-refresh-interval"
+                               label="Field type refresh interval"
+                               help="How often the field type information for the active write index will be updated."
+                               value={indexSet.field_type_refresh_interval / 1000.0}
+                               unit="SECONDS"
+                               required
+                               update={this._onFieldTypeRefreshIntervalChange} />
               </Col>
             </Row>
             <Row>

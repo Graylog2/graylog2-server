@@ -19,6 +19,8 @@ package org.graylog2.indexer.indices.jobs;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.system.jobs.SystemJob;
@@ -38,6 +40,8 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
+    private final IndexFieldTypesService indexFieldTypesService;
+    private final IndexFieldTypePoller indexFieldTypePoller;
     private final String indexName;
 
     @Inject
@@ -45,11 +49,15 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
                                                 CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                                                 IndexSetRegistry indexSetRegistry,
                                                 Indices indices,
+                                                IndexFieldTypesService indexFieldTypesService,
+                                                IndexFieldTypePoller indexFieldTypePoller,
                                                 @Assisted String indexName) {
         this.setIndexReadOnlyJobFactory = setIndexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
+        this.indexFieldTypesService = indexFieldTypesService;
+        this.indexFieldTypePoller = indexFieldTypePoller;
         this.indexName = indexName;
     }
 
@@ -64,6 +72,12 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
         final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexSetRegistry.getAll(), indexName);
         createNewSingleIndexRangeJob.execute();
 
+        // Update field type information again to make sure we got the latest state
+        indexSetRegistry.getForIndex(indexName)
+                .ifPresent(indexSet -> {
+                    indexFieldTypePoller.pollIndex(indexName, indexSet.getConfig().id())
+                            .ifPresent(indexFieldTypesService::upsert);
+                });
     }
 
     @Override
