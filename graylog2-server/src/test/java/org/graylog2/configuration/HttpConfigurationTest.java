@@ -62,7 +62,7 @@ public class HttpConfigurationTest {
     }
 
     @Test
-    @Ignore
+    @Ignore // Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)
     public void testHttpBindAddressIsIPv6AddressWithoutBrackets() throws RepositoryException, ValidationException {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Possible bracketless IPv6 literal: 2001:db8::1");
@@ -73,7 +73,7 @@ public class HttpConfigurationTest {
     }
 
     @Test
-    @Ignore
+    @Ignore // Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)
     public void testHttpBindAddressIsInvalidIPv6Address() throws RepositoryException, ValidationException {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("Possible bracketless IPv6 literal: ff$$::1");
@@ -93,7 +93,7 @@ public class HttpConfigurationTest {
     }
 
     @Test
-    @Ignore
+    @Ignore // Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)
     public void testHttpBindAddressIsInvalidIPv4Address() throws RepositoryException, ValidationException {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("1234.5.6.7: ");
@@ -104,7 +104,7 @@ public class HttpConfigurationTest {
     }
 
     @Test
-    @Ignore
+    @Ignore // Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)
     public void testHttpBindAddressIsInvalidHostName() throws RepositoryException, ValidationException {
         expectedException.expect(ValidationException.class);
         expectedException.expectMessage("this-does-not-exist-42: ");
