@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.util.Collections;
 import java.util.List;
@@ -84,9 +83,6 @@ public abstract class ValuesGroup implements GroupSpec {
         @JsonProperty
         public abstract List<Object> groups();
 
-        @JsonProperty
-        public abstract long count();
-
         public static Builder builder() {
             return new AutoValue_ValuesGroup_Bucket.Builder();
         }
@@ -98,8 +94,6 @@ public abstract class ValuesGroup implements GroupSpec {
             public abstract Builder metrics(List<Object> metrics);
 
             public abstract Builder groups(List<Object> groups);
-
-            public abstract Builder count(long count);
 
             public abstract Bucket build();
         }

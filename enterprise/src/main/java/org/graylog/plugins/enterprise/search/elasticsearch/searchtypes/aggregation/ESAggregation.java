@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
     private static final Logger LOG = LoggerFactory.getLogger(ESAggregation.class);
@@ -40,10 +41,12 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
         // our generation methods as needed
         // the top level aggregations we'll ask directly to generate themselves
         searchType.aggregations().forEach(aggSpec -> {
-            final AggregationBuilder aggregation = handlerForType(aggSpec.type())
+            final Optional<AggregationBuilder> aggregation = handlerForType(aggSpec.type())
                     .createAggregation(namer.nextName(), aggSpec, this, queryContext);
-            LOG.debug("Adding top level aggregation {}: {}", aggregation.getName(), aggregation.getType());
-            searchSourceBuilder.aggregation(aggregation);
+            aggregation.ifPresent(agg -> {
+                LOG.debug("Adding top level aggregation {}: {}", agg.getName(), agg.getType());
+                searchSourceBuilder.aggregation(agg);
+            });
         });
     }
 
@@ -61,12 +64,12 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
         final ImmutableList.Builder<Object> groups = ImmutableList.builder();
         searchType.metrics().forEach(aggSpec -> {
             final ESAggregationSpecHandler<? extends AggregationSpec, ? extends io.searchbox.core.search.aggregation.Aggregation> handler = handlerForType(aggSpec.type());
-            final Object result = handler.handleResult(aggSpec, handler.extractAggregationFromResult(aggSpec, queryResult.getAggregations(), queryContext), this, queryContext);
+            final Object result = handler.handleResult(aggSpec, queryResult, handler.extractAggregationFromResult(aggSpec, queryResult.getAggregations(), queryContext), this, queryContext);
             metrics.add(result);
         });
         searchType.groups().forEach(aggSpec -> {
             final ESAggregationSpecHandler<? extends AggregationSpec, ? extends io.searchbox.core.search.aggregation.Aggregation> handler = handlerForType(aggSpec.type());
-            final Object result = handler.handleResult(aggSpec, handler.extractAggregationFromResult(aggSpec, queryResult.getAggregations(), queryContext), this, queryContext);
+            final Object result = handler.handleResult(aggSpec, queryResult, handler.extractAggregationFromResult(aggSpec, queryResult.getAggregations(), queryContext), this, queryContext);
             groups.add(result);
         });
         return new Aggregation.Result() {

@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.aggregation;
 
+import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import io.searchbox.core.search.aggregation.SumAggregation;
@@ -12,19 +13,20 @@ import org.graylog.plugins.enterprise.search.searchtypes.aggregation.SumMetric;
 import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 public class ESSumMetricHandler implements ESAggregationSpecHandler<SumMetric, SumAggregation> {
 
     @Nonnull
     @Override
-    public AggregationBuilder doCreateAggregation(String name, SumMetric metricSpec, ESAggregation aggregationSearchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, SumMetric metricSpec, ESAggregation aggregationSearchTypeHandler, ESGeneratedQueryContext queryContext) {
         final SumAggregationBuilder field = AggregationBuilders.sum(name).field(metricSpec.field());
         queryContext.recordAggregationType(metricSpec, name, SumAggregation.class);
-        return field;
+        return Optional.of(field);
     }
 
     @Override
-    public SumMetric.Result doHandleResult(SumMetric aggregationSpec, SumAggregation sumAggregation, ESAggregation searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public SumMetric.Result doHandleResult(SumMetric aggregationSpec, SearchResult queryResult, SumAggregation sumAggregation, ESAggregation searchTypeHandler, ESGeneratedQueryContext queryContext) {
         return SumMetric.Result.create(sumAggregation.getSum());
     }
 
