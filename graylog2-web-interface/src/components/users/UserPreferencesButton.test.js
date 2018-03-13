@@ -2,6 +2,13 @@ import React from 'react';
 
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 
+const e = () => {
+  const enzyme = require('enzyme');
+  const Adapter = require('enzyme-adapter-react-15');
+  enzyme.configure({ adapter: new Adapter() });
+  return enzyme;
+};
+
 describe('UserPreferencesButton', function () {
   beforeEach(() => {
     jest.resetModules();
@@ -17,7 +24,7 @@ describe('UserPreferencesButton', function () {
 
     const UserPreferencesButton = require('components/users/UserPreferencesButton');
     const userName = 'Full';
-    const instance = require('enzyme').mount(<UserPreferencesButton userName={userName} />);
+    const instance = e().mount(<UserPreferencesButton userName={userName} />);
 
     expect(instance).toMatchSnapshot();
     expect(instance.find('button')).toBeDefined();

@@ -36,7 +36,7 @@ describe('<TokenList />', () => {
       onCreate={createFn}
       onDelete={deleteFn}
     />);
-    wrapper.find('#create-token-input').simulate('change', { target: { value: 'hans' } });
+    wrapper.find('input#create-token-input').simulate('change', { target: { value: 'hans' } });
     wrapper.find('form').at(0).simulate('submit');
     expect(createFn.mock.calls.length).toBe(1);
 
@@ -49,7 +49,7 @@ describe('<TokenList />', () => {
       tokens={tokens}
     />);
     expect(wrapper.find('span[children="beef2001"]').length).toEqual(0);
-    wrapper.find('#hide-tokens').at(0).simulate('change', { target: { checked: false } });
+    wrapper.find('input#hide-tokens').simulate('change', { target: { checked: false } });
     expect(wrapper.find('span[children="beef2001"]').length).toEqual(1);
   });
 });
