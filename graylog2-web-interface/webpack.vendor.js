@@ -17,6 +17,7 @@ process.env.BABEL_ENV = TARGET;
 console.error('Building vendor bundle.');
 
 const webpackConfig = {
+  mode: 'development',
   name: 'vendor',
   entry: {
     vendor: vendorModules,
@@ -53,15 +54,16 @@ const webpackConfig = {
           js: jsfiles,
           css: cssfiles,
           chunks: chunks
-        }
+        },
       });
-    } })
+    } }),
   ],
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
 if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
+    mode: 'production',
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),

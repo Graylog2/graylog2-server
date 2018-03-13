@@ -38,7 +38,7 @@
     "babel-preset-env": "^1.6.1",
     "eslint": "^4.3.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
-    "html-webpack-plugin": "^2.22.0",
+    "html-webpack-plugin": "github:webpack-contrib/html-webpack-plugin",
     "javascript-natural-sort": "^0.7.1",
     "jquery": "^3.3.1",
     "moment": "2.21.0",
@@ -52,9 +52,9 @@
     "react-router": "^2.8.1",
     "react-router-bootstrap": "0.23.2",
     "reflux": "^0.2.12",
-    "webpack": "^3.4.1",
+    "webpack": "^4.1.1",
     "webpack-cleanup-plugin": "^0.5.0",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.0.0",

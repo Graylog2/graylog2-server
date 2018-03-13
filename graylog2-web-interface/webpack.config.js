@@ -99,6 +99,7 @@ const webpackConfig = {
 if (TARGET === 'start') {
   console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
+    mode: 'development',
     devtool: 'eval',
     output: {
       path: BUILD_PATH,
@@ -119,6 +120,7 @@ if (TARGET === 'build') {
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
   module.exports = merge(webpackConfig, {
+    mode: 'production',
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
