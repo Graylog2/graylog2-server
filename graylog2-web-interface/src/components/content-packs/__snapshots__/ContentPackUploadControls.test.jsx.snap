@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackUploadControls /> should render 1`] = `
+<span>
+  <button
+    className="btn btn-lg btn-info"
+    disabled={false}
+    id="upload-content-pack-button"
+    onClick={[Function]}
+    type="button"
+  >
+    Upload
+  </button>
+</span>
+`;
