@@ -38,6 +38,7 @@ import ExportExtractorsPage from 'pages/ExportExtractorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
 import RolesPage from 'pages/RolesPage';
 import ContentPacksPage from 'pages/ContentPacksPage';
+import ShowContentPackPage from 'pages/ShowContentPackPage';
 import ExportContentPackPage from 'pages/ExportContentPackPage';
 import UsersPage from 'pages/UsersPage';
 import CreateUsersPage from 'pages/CreateUsersPage';
@@ -120,6 +121,7 @@ class AppRouter extends React.Component {
               <Route path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage} />
               <Route path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage} />
               <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage} />
+              <Route path={Routes.SYSTEM.CONTENTPACKS.show(':contentPackId')} component={ShowContentPackPage} />
               <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage} />
               <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage} />
               <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage} />
