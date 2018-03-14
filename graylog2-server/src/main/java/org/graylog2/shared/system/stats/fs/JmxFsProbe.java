@@ -17,10 +17,11 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.configuration.GraylogDataDir;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +30,8 @@ public class JmxFsProbe implements FsProbe {
     private final Set<File> locations;
 
     @Inject
-    public JmxFsProbe(@Named("message_journal_dir") File journalDirectory) {
-        this.locations = ImmutableSet.of(journalDirectory);
+    public JmxFsProbe(@GraylogDataDir("message_journal_dir") Path journalDirectory) {
+        this.locations = ImmutableSet.of(journalDirectory.toFile());
     }
 
     @Override

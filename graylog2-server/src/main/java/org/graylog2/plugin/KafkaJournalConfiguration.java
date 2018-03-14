@@ -21,10 +21,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
+import org.graylog2.configuration.GraylogDataDir;
 import org.joda.time.Duration;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 public class KafkaJournalConfiguration {
@@ -32,7 +34,7 @@ public class KafkaJournalConfiguration {
     public KafkaJournalConfiguration() { }
 
     @JsonCreator
-    public KafkaJournalConfiguration(@NotNull @JsonProperty("directory") File messageJournalDir,
+    public KafkaJournalConfiguration(@NotNull @JsonProperty("directory") Path messageJournalDir,
                                      @JsonProperty("segment_size") long messageJournalSegmentSize,
                                      @JsonProperty("segment_age") Duration messageJournalSegmentAge,
                                      @JsonProperty("max_size") long messageJournalMaxSize,
@@ -49,8 +51,9 @@ public class KafkaJournalConfiguration {
     }
 
     @Parameter(value = "message_journal_dir", required = true)
+    @GraylogDataDir
     @JsonProperty("directory")
-    private File messageJournalDir = new File("data/journal");
+    private Path messageJournalDir = Paths.get("journal");
 
     @Parameter("message_journal_segment_size")
     @JsonProperty("segment_size")
@@ -78,10 +81,6 @@ public class KafkaJournalConfiguration {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
-
-    public File getMessageJournalDir() {
-        return messageJournalDir;
-    }
 
     public Size getMessageJournalSegmentSize() {
         return messageJournalSegmentSize;

@@ -21,7 +21,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -46,6 +45,7 @@ import kafka.server.BrokerState;
 import kafka.server.RunningAsBroker;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.Time;
+import org.graylog2.configuration.GraylogDataDir;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
@@ -72,6 +72,7 @@ import java.io.SyncFailedException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -143,6 +144,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final LogRetentionCleaner logRetentionCleaner;
     private final long maxSegmentSize;
     private final int maxMessageSize;
+    private final File journalDirectory;
 
     private long nextReadOffset = 0L;
     private ScheduledFuture<?> checkpointFlusherFuture;
@@ -156,7 +158,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final int throttleThresholdPercentage;
 
     @Inject
-    public KafkaJournal(@Named("message_journal_dir") File journalDirectory,
+    public KafkaJournal(@GraylogDataDir("message_journal_dir") Path journalDirectoryPath,
                         @Named("scheduler") ScheduledExecutorService scheduler,
                         @Named("message_journal_segment_size") Size segmentSize,
                         @Named("message_journal_segment_age") Duration segmentAge,
@@ -173,6 +175,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.maxSegmentSize = segmentSize.toBytes();
         // Max message size should not be bigger than max segment size.
         this.maxMessageSize = Ints.saturatedCast(maxSegmentSize);
+        this.journalDirectory = journalDirectoryPath.toFile();
 
         this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
         this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
@@ -235,6 +238,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         SECONDS.toMillis(15L),
                         false,
                         "MD5");
+
+        final File journalDirectory = journalDirectoryPath.toFile();
 
         if (!journalDirectory.exists() && !journalDirectory.mkdirs()) {
             LOG.error("Cannot create journal directory at {}, please check the permissions", journalDirectory.getAbsolutePath());
@@ -752,6 +757,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         throttleState.set(state);
     }
 
+    public File getJournalDirectory() {
+        return journalDirectory;
+    }
 
     public class OffsetFileFlusher implements Runnable {
         @Override

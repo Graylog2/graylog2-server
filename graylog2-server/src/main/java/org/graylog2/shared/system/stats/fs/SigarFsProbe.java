@@ -17,6 +17,7 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.configuration.GraylogDataDir;
 import org.graylog2.shared.system.stats.SigarService;
 import org.hyperic.sigar.FileSystem;
 import org.hyperic.sigar.FileSystemMap;
@@ -25,8 +26,8 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +38,9 @@ public class SigarFsProbe implements FsProbe {
     private final Map<File, FileSystem> sigarFileSystems = new HashMap<>();
 
     @Inject
-    public SigarFsProbe(SigarService sigarService, @Named("message_journal_dir") File journalDirectory) {
+    public SigarFsProbe(SigarService sigarService, @GraylogDataDir("message_journal_dir") Path journalDirectory) {
         this.sigarService = sigarService;
-        this.locations = ImmutableSet.of(journalDirectory);
+        this.locations = ImmutableSet.of(journalDirectory.toFile());
     }
 
     @Override
