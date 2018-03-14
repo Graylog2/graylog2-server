@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
@@ -52,6 +54,12 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
+
+    @Parameter(value = "bin_path", required = true)
+    private Path binPath = Paths.get("bin");
+
+    @Parameter(value = "data_dir", required = true)
+    private Path dataDir = Paths.get("data");
 
     @Parameter(value = "plugin_dir")
     private String pluginDir = "plugin";
@@ -127,6 +135,14 @@ public abstract class BaseConfiguration {
 
     public WaitStrategy getInputBufferWaitStrategy() {
         return getWaitStrategy(inputBufferWaitStrategy, "inputbuffer_wait_strategy");
+    }
+
+    public Path getBinPath() {
+        return binPath;
+    }
+
+    public Path getDataDir() {
+        return dataDir;
     }
 
     public String getPluginDir() {
