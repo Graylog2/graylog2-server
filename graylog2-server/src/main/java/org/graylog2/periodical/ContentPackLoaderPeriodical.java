@@ -25,6 +25,7 @@ import com.mongodb.MongoException;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.bundles.ConfigurationBundle;
 import org.graylog2.bundles.ContentPackLoaderConfig;
+import org.graylog2.configuration.GraylogDataDir;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.users.UserService;
@@ -62,7 +63,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
                                        ClusterConfigService clusterConfigService,
                                        UserService userService,
                                        @Named("content_packs_loader_enabled") boolean contentPacksLoaderEnabled,
-                                       @Named("content_packs_dir") Path contentPacksDir,
+                                       @GraylogDataDir("content_packs_dir") Path contentPacksDir,
                                        @Named("content_packs_auto_load") Set<String> contentPacksAutoLoad) {
         this.objectMapper = objectMapper;
         this.bundleService = bundleService;

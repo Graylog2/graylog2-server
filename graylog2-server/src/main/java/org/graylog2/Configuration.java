@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.configuration.GraylogDataDir;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -140,7 +141,8 @@ public class Configuration extends BaseConfiguration {
     private boolean contentPacksLoaderEnabled = true;
 
     @Parameter(value = "content_packs_dir", validators = DirectoryPathReadableValidator.class)
-    private Path contentPacksDir = Paths.get("data", "contentpacks");
+    @GraylogDataDir
+    private Path contentPacksDir = Paths.get("contentpacks");
 
     @Parameter(value = "content_packs_auto_load", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoLoad = Collections.emptySet();
@@ -278,10 +280,6 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isContentPacksLoaderEnabled() {
         return contentPacksLoaderEnabled;
-    }
-
-    public Path getContentPacksDir() {
-        return contentPacksDir;
     }
 
     public Set<String> getContentPacksAutoLoad() {
