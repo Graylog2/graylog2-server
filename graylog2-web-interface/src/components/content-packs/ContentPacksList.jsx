@@ -3,9 +3,10 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
-import { Row, Col, Badge, Button, DropdownButton, MenuItem, Pagination } from 'react-bootstrap';
+import { Row, Col, Button, DropdownButton, MenuItem, Pagination } from 'react-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import ControlledTableList from 'components/common/ControlledTableList';
+import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 
 import ContentPacksListStyle from './ContentPacksList.css';
 
@@ -16,13 +17,6 @@ class ContentPacksList extends React.Component {
 
   static defaultProps = {
     contentPacks: [],
-  };
-
-  static styleMap = {
-    installed: ContentPacksListStyle.installed,
-    updatable: ContentPacksListStyle.updatable,
-    edited: ContentPacksListStyle.edited,
-    error: ContentPacksListStyle.error,
   };
 
   constructor(props) {
@@ -42,26 +36,21 @@ class ContentPacksList extends React.Component {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
   }
 
-  _badges(item) {
-    return item.states.map((state) => {
-      return (<Badge key={state} bsClass={`badge ${ContentPacksList.styleMap[state]}`}>{state}</Badge>);
-    });
-  }
-
   _formatItems(items) {
     const begin = (this.state.pageSize * (this.state.currentPage - 1));
     const end = begin + this.state.pageSize;
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => {
-      const badges = this._badges(item);
       const updateButton = item.states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
       return (
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.LIST}>{item.title}</Link> <small>Version: {item.version}</small>{badges}</h3>
+              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.title}</Link> <small>Version: {item.version}</small>
+                <ContentPackStatus states={item.states} />
+              </h3>
             </Col>
             <Col md={3} className="text-right">
               {updateButton}

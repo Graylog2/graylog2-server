@@ -2,8 +2,6 @@ import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
-import Reflux from 'reflux';
-
 import Routes from 'routing/Routes';
 
 import { DocumentTitle, PageHeader } from 'components/common';
