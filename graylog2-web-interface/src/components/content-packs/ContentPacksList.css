@@ -1,24 +1,3 @@
-:local(.installed) {
-    margin-left: 4px;
-    background: #8DC63F;
-}
-
-:local(.updatable) {
-    margin-left: 4px;
-    background: #9e1f63;
-}
-
-:local(.edited) {
-    margin-left: 4px;
-    background: #f89406;
-}
-
-:local(.error) {
-    margin-left: 4px;
-    background: #a94442;
-}
-
 :local(.pager) {
     margin: auto;
 }
-
