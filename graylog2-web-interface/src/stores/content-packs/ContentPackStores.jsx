@@ -19,8 +19,38 @@ const ContentPackStores = Reflux.createStore({
       { id: '14', title: 'SSH Archive', summary: 'A crypted backup over ssh.', version: '3.4', states: ['error'] },
       { id: '15', title: 'FTP Backup', summary: 'Fast but insecure backup', version: '1.0', states: ['installed', 'updatable'], },
     ];
+    this.readme = `
+# Active Directory Auditing Content Pack
+
+Tested with nxLog/Windows 2008R2 Domain Controllers/Graylog 1.2
+
+This content pack provides several useful dashboards for auditing Active Directory events:
+
+*   DNS Object Summary - DNS Creations, Deletions
+*   Group Object Summary - Group Creations, Modifications, Deletions, Membership Changes
+*   User Object Summary - Account Creations, Deletions, Modifications, Lockouts, Unlocks
+*   Computer Object Summary - (in progress)
+*   Logon Summary - Failed Authentication Attempts, Interactive Logins
+`;
+
+    this.contentPack = { id: '1', title: 'UFW Grok Patterns', summary: 'Grok Patterns to extract informations from UFW logfiles',
+      version: '1.0', states: ['installed', 'edited'], vendor: 'graylog.org <info@graylog.org>',
+      description: this.readme,
+      url: "https://github.com/graylog2/graylog2-server",
+      constraints: [
+        {type: "Server", name: "graylog", version: "3.0", fullfilled: true},
+      ],
+    };
   },
 
+  get(contentPackId) {
+    const promise = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(this.contentPack);
+      }, 300);
+    });
+    return promise;
+  },
   list() {
     const promise = new Promise((resolve) => {
       setTimeout(() => {
