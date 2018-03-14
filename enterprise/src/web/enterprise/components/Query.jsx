@@ -18,17 +18,6 @@ import MessageList from 'enterprise/components/widgets/MessageList';
 
 import style from 'pages/ShowDashboardPage.css';
 
-const _extractFields = (queryResult) => {
-  if (!queryResult) {
-    return null;
-  }
-  // TODO this requires that each query actually has a message list available.
-  const searchTypes = queryResult.searchTypes;
-  // TODO how do we deal with multiple lists? is that even useful?
-  const messagesSearchType = _.find(searchTypes, t => t.type === 'messages');
-  return messagesSearchType !== undefined ? messagesSearchType.fields : [];
-};
-
 const _onPositionsChange = (positions, view) => {
   const newPositions = {};
   positions.forEach(({ col, height, row, width, id}) => {
@@ -38,7 +27,7 @@ const _onPositionsChange = (positions, view) => {
   ViewsActions.update(updatedView.get('id'), updatedView);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields) => {
   const widgets = {};
   const data = {};
 
@@ -53,17 +42,16 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view) => {
     }
   });
   const config = { widgets, data, positions: view.get('positions') };
-  return <WidgetGrid locked={false} widgets={config} onPositionsChange={positions => _onPositionsChange(positions, view)} />;
+  return <WidgetGrid fields={fields} locked={false} widgets={config} onPositionsChange={positions => _onPositionsChange(positions, view)} />;
 };
 
 const _extractMessages = (searchTypes) => {
   return new Immutable.Map(searchTypes).find(searchType => searchType.type.toLocaleUpperCase() === 'MESSAGES');
 };
 
-const Query = ({ onToggleMessages, showMessages, results, view, widgetMapping, widgets, query }) => {
+const Query = ({ fields, onToggleMessages, showMessages, results, view, widgetMapping, widgets, query }) => {
   if (results) {
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view);
-    const fields = _extractFields(results);
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields);
     const queryId = query.get('id');
     const selectedFields = query.get('fields');
     const messages = _extractMessages(results.searchTypes);
@@ -97,6 +85,7 @@ const Query = ({ onToggleMessages, showMessages, results, view, widgetMapping, w
 };
 
 Query.propTypes = {
+  fields: PropTypes.arrayOf(PropTypes.string).isRequired,
   onToggleMessages: PropTypes.func.isRequired,
   results: PropTypes.object.isRequired,
   showMessages: PropTypes.bool.isRequired,

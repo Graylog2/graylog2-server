@@ -23,6 +23,7 @@ const _generateSeries = (results) => {
 
 export default function Histogram(props) {
   return (<Plot data={_generateSeries(props.data.results)}
+                style={{ position: 'absolute' }}
                 fit
                 layout={{
                   margin: {

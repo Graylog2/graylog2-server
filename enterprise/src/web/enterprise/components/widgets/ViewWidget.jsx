@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { WidgetFooter, WidgetHeader } from 'components/widgets';
-
 export default React.createClass({
   propTypes: {
     title: PropTypes.string.isRequired,
@@ -38,8 +36,6 @@ export default React.createClass({
 
     return (
       <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'hidden' }} data-widget-id={this.props.widgetId}>
-        <WidgetHeader title={`${this.props.title}`} calculatedAt={calculatedAt} />
-
         {this.props.children}
       </div>
     );

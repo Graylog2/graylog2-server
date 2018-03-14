@@ -7,6 +7,7 @@ import { ReactGridContainer } from 'components/common';
 import style from 'pages/ShowDashboardPage.css';
 import ViewWidget from 'enterprise/components/widgets/ViewWidget';
 import { widgetDefinition } from 'enterprise/logic/Widget';
+import AggregationBuilder from './aggregationbuilder/AggregationBuilder';
 
 export default class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
@@ -64,12 +65,14 @@ export default class WidgetGrid extends React.Component {
         returnedWidgets.widgets.push(
           <div key={widgetId} className={style.widgetContainer}>
             <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange}>
-              <VisComponent id={widgetId}
-                            config={config}
-                            data={widgetData}
-                            height={height}
-                            width={width}
-                            computationTimeRange={computationTimeRange} />
+              <AggregationBuilder fields={this.props.fields}>
+                <VisComponent id={widgetId}
+                              config={config}
+                              data={widgetData}
+                              height={height}
+                              width={width}
+                              computationTimeRange={computationTimeRange} />
+              </AggregationBuilder>
             </ViewWidget>
           </div>,
         );
