@@ -8,6 +8,7 @@ import Routes from 'routing/Routes';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
+import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackStores from 'stores/content-packs/ContentPackStores';
 
 class ContentPacksPage extends React.Component {
@@ -19,7 +20,10 @@ class ContentPacksPage extends React.Component {
     super(props);
     this.state = {
       contentPack: undefined,
+      selectedVersion: undefined,
     };
+
+    this._onVersionChanged = this._onVersionChanged.bind(this);
   }
 
   componentDidMount() {
@@ -28,8 +32,13 @@ class ContentPacksPage extends React.Component {
 
   _loadContentPack() {
     ContentPackStores.get(this.props.params.contentPackId).then((contentPack) => {
-      this.setState({ contentPack: contentPack });
+      const versions = Object.keys(contentPack);
+      this.setState({ contentPack: contentPack, selectedVersion: versions[0] });
     });
+  }
+
+  _onVersionChanged(newVersion) {
+    this.setState({ selectedVersion: newVersion });
   }
 
   render() {
@@ -37,7 +46,7 @@ class ContentPacksPage extends React.Component {
       return (<Spinner />);
     }
 
-    const { contentPack } = this.state;
+    const { contentPack, selectedVersion } = this.state;
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -62,10 +71,11 @@ class ContentPacksPage extends React.Component {
             <Col md={6} className="content">
               <div id="content-pack-versions">
                 <h2>Versions</h2>
+                <ContentPackVersions versions={Object.keys(contentPack)} onChange={this._onVersionChanged} />
               </div>
             </Col>
             <Col md={6} className="content">
-              <ContentPackDetails contentPack={contentPack} />
+              <ContentPackDetails contentPack={contentPack[selectedVersion]} />
             </Col>
           </Row>
         </span>
