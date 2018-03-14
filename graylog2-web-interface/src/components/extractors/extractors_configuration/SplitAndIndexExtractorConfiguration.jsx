@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
@@ -10,29 +11,37 @@ import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
-const SplitAndIndexExtractorConfiguration = React.createClass({
+const SplitAndIndexExtractorConfiguration = createReactClass({
+  displayName: 'SplitAndIndexExtractorConfiguration',
+
   propTypes: {
     configuration: PropTypes.object.isRequired,
     exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
+
   getInitialState() {
     return {
       trying: false,
       configuration: this._getEffectiveConfiguration(this.props.configuration),
     };
   },
+
   componentDidMount() {
     this.props.onChange(this.state.configuration);
   },
+
   componentWillReceiveProps(nextProps) {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   },
+
   DEFAULT_CONFIGURATION: { index: 1 },
+
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
   },
+
   _onChange(key) {
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
@@ -41,6 +50,7 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
       this.props.onChange(newConfig);
     };
   },
+
   _onTryClick() {
     this.setState({ trying: true });
 
@@ -59,10 +69,12 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
 
     promise.finally(() => this.setState({ trying: false }));
   },
+
   _isTryButtonDisabled() {
     const configuration = this.state.configuration;
     return this.state.trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1 || !this.props.exampleMessage;
   },
+
   render() {
     const splitByHelpMessage = (
       <span>

@@ -1,15 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const SourceType = React.createClass({
-  propTypes: {
+class SourceType extends React.Component {
+  static propTypes = {
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     onSelect: PropTypes.func.isRequired,
-  },
-  _onChange(event) {
+  };
+
+  _onChange = (event) => {
     this.props.onSelect(event.target.id, event.target.value);
-  },
+  };
+
   render() {
     return (
       <label className="radio">
@@ -18,7 +20,7 @@ const SourceType = React.createClass({
         {this.props.name}
       </label>
     );
-  },
-});
+  }
+}
 
 export default SourceType;

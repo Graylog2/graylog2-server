@@ -13,31 +13,28 @@ import { ContentPackMarker } from 'components/common';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LUTTableEntry = React.createClass({
-
-  propTypes: {
+class LUTTableEntry extends React.Component {
+  static propTypes = {
     table: PropTypes.object.isRequired,
     cache: PropTypes.object.isRequired,
     dataAdapter: PropTypes.object.isRequired,
     errors: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      errors: {
-        table: null,
-        cache: null,
-        dataAdapter: null,
-      },
-    };
-  },
+  static defaultProps = {
+    errors: {
+      table: null,
+      cache: null,
+      dataAdapter: null,
+    },
+  };
 
-  _onDelete() {
+  _onDelete = () => {
 // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete lookup table "${this.props.table.title}"?`)) {
       LookupTablesActions.delete(this.props.table.id).then(() => LookupTablesActions.reloadPage());
     }
-  },
+  };
 
   render() {
     return (<tbody>
@@ -66,9 +63,8 @@ const LUTTableEntry = React.createClass({
         </td>
       </tr>
     </tbody>);
-  },
-
-});
+  }
+}
 
 export default LUTTableEntry;
 

@@ -4,11 +4,12 @@ import { Input } from 'components/bootstrap';
 
 import { QueryConfiguration, QuickValuesConfiguration } from 'components/widgets/configurations';
 
-const QuickValuesWidgetEditConfiguration = React.createClass({
-  propTypes: {
+class QuickValuesWidgetEditConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
+
   render() {
     return (
       <fieldset>
@@ -33,7 +34,7 @@ const QuickValuesWidgetEditConfiguration = React.createClass({
                help="Include a table with quantitative information." />
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default QuickValuesWidgetEditConfiguration;

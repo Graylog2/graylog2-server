@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -8,14 +9,18 @@ const InputStatesStore = StoreProvider.getStore('InputStates');
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
 
-const InputsPage = React.createClass({
+const InputsPage = createReactClass({
+  displayName: 'InputsPage',
   mixins: [Reflux.connect(CurrentUserStore)],
+
   componentDidMount() {
     this.interval = setInterval(InputStatesStore.list, 2000);
   },
+
   componentWillUnmount() {
     clearInterval(this.interval);
   },
+
   render() {
     return (
       <DocumentTitle title="Inputs">

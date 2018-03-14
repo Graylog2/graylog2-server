@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 
-const MongoDbPasswordConfig = React.createClass({
-  propTypes: {
+class MongoDbPasswordConfig extends React.Component {
+  static propTypes = {
     config: PropTypes.object,
-  },
+  };
+
   render() {
     return (
       <DocumentTitle title="Password Authenticator">
@@ -17,7 +18,7 @@ const MongoDbPasswordConfig = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default MongoDbPasswordConfig;

@@ -3,31 +3,30 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 
-const EditOutputButton = React.createClass({
-  propTypes: {
+class EditOutputButton extends React.Component {
+  static propTypes = {
     output: PropTypes.object,
     disabled: PropTypes.bool,
     getTypeDefinition: PropTypes.func.isRequired,
     onUpdate: PropTypes.func,
-  },
-  getInitialState() {
-    return {
-      typeDefinition: undefined,
-      typeName: undefined,
-      configurationForm: '',
-    };
-  },
+  };
 
-  handleClick() {
+  state = {
+    typeDefinition: undefined,
+    typeName: undefined,
+    configurationForm: '',
+  };
+
+  handleClick = () => {
     this.props.getTypeDefinition(this.props.output.type, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
       this.refs.configurationForm.open();
     });
-  },
+  };
 
-  _handleSubmit(data) {
+  _handleSubmit = (data) => {
     this.props.onUpdate(this.props.output, data);
-  },
+  };
 
   render() {
     const typeDefinition = this.state.typeDefinition;
@@ -53,7 +52,7 @@ const EditOutputButton = React.createClass({
         {configurationForm}
       </span>
     );
-  },
-});
+  }
+}
 
 export default EditOutputButton;

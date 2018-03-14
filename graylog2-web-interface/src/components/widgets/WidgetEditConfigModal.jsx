@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Input } from 'components/bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -11,7 +12,9 @@ import FormsUtils from 'util/FormsUtils';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
-const WidgetEditConfigModal = React.createClass({
+const WidgetEditConfigModal = createReactClass({
+  displayName: 'WidgetEditConfigModal',
+
   propTypes: {
     onModalHidden: PropTypes.func,
     onUpdate: PropTypes.func.isRequired,
@@ -222,6 +225,7 @@ const WidgetEditConfigModal = React.createClass({
 
     return null;
   },
+
   render() {
     return (
       <BootstrapModalForm ref="editModal"

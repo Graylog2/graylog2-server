@@ -9,8 +9,8 @@ import SearchUtils from 'util/SearchUtils';
 
 import style from './QuickValuesOptionsForm.css';
 
-const QuickValuesOptionsForm = React.createClass({
-  propTypes: {
+class QuickValuesOptionsForm extends React.Component {
+  static propTypes = {
     limit: PropTypes.number.isRequired,
     tableSize: PropTypes.number.isRequired,
     order: PropTypes.string.isRequired,
@@ -22,50 +22,46 @@ const QuickValuesOptionsForm = React.createClass({
     isHistogram: PropTypes.bool.isRequired,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      disableStackedFields: false,
-    };
-  },
+  static defaultProps = {
+    disableStackedFields: false,
+  };
 
-  getInitialState() {
-    return {
-      limit: this.props.limit,
-      tableSize: this.props.tableSize,
-      order: this.props.order,
-      stackedFields: this.props.stackedFields,
-      interval: this.props.interval,
-    };
-  },
+  state = {
+    limit: this.props.limit,
+    tableSize: this.props.tableSize,
+    order: this.props.order,
+    stackedFields: this.props.stackedFields,
+    interval: this.props.interval,
+  };
 
-  _changeConfig(key, value) {
+  _changeConfig = (key, value) => {
     const state = _.cloneDeep(this.state);
     state[key] = value;
     this.setState(state);
-  },
+  };
 
-  _onChange(event) {
+  _onChange = (event) => {
     this._changeConfig(event.target.name, FormsUtils.getValueFromInput(event.target));
-  },
+  };
 
-  _onStackedFieldChange(values) {
+  _onStackedFieldChange = (values) => {
     this._changeConfig('stackedFields', values);
-  },
+  };
 
-  _onIntervalChange(value) {
+  _onIntervalChange = (value) => {
     this._changeConfig('interval', value);
-  },
+  };
 
-  _onCancel() {
+  _onCancel = () => {
     this.props.onCancel();
-  },
+  };
 
-  _onSave(e) {
+  _onSave = (e) => {
     e.preventDefault();
     this.props.onSave(this.state);
-  },
+  };
 
   render() {
     const fieldOptions = this.props.stackedFieldsOptions
@@ -160,7 +156,7 @@ const QuickValuesOptionsForm = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default QuickValuesOptionsForm;

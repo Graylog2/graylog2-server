@@ -1,19 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const QuickValuesHistogramWidgetCreateConfiguration = React.createClass({
-  propTypes: {
+class QuickValuesHistogramWidgetCreateConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialConfiguration() {
+  getInitialConfiguration = () => {
     return {};
-  },
+  };
 
   render() {
     return null;
-  },
-});
+  }
+}
 
 export default QuickValuesHistogramWidgetCreateConfiguration;

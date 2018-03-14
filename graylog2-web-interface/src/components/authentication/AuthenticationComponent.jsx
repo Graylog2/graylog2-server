@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Alert, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -19,7 +20,8 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
 
-const AuthenticationComponent = React.createClass({
+const AuthenticationComponent = createReactClass({
+  displayName: 'AuthenticationComponent',
 
   propTypes: {
     location: PropTypes.object.isRequired,

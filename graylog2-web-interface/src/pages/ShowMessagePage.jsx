@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import MessageShow from 'components/search/MessageShow';
@@ -17,12 +18,16 @@ const InputsStore = StoreProvider.getStore('Inputs');
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 
-const ShowMessagePage = React.createClass({
+const ShowMessagePage = createReactClass({
+  displayName: 'ShowMessagePage',
+
   propTypes: {
     params: PropTypes.object,
     searchConfig: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(NodesStore), Reflux.listenTo(InputsStore, '_formatInput')],
+
   getInitialState() {
     return {
       streams: undefined,
@@ -30,6 +35,7 @@ const ShowMessagePage = React.createClass({
       message: undefined,
     };
   },
+
   componentDidMount() {
     MessagesActions.loadMessage.triggerPromise(this.props.params.index, this.props.params.messageId).then((message) => {
       this.setState({ message: message });
@@ -44,14 +50,17 @@ const ShowMessagePage = React.createClass({
     });
     NodesActions.list.triggerPromise();
   },
+
   _formatInput(state) {
     const input = {};
     input[state.input.id] = state.input;
     this.setState({ inputs: Immutable.Map(input) });
   },
+
   _isLoaded() {
     return this.state.message && this.state.streams && this.state.nodes && this.state.inputs;
   },
+
   render() {
     if (this._isLoaded()) {
       return (

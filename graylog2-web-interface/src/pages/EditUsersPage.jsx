@@ -11,36 +11,38 @@ import UserForm from 'components/users/UserForm';
 
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
-const EditUsersPage = React.createClass({
-  propTypes: {
+class EditUsersPage extends React.Component {
+  static propTypes = {
     params: PropTypes.object.isRequired,
-  },
-  getInitialState() {
-    return {
-      user: undefined,
-    };
-  },
+  };
+
+  state = {
+    user: undefined,
+  };
+
   componentDidMount() {
     this._loadUser(this.props.params.username);
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.params.username !== nextProps.params.username) {
       this._loadUser(nextProps.params.username);
     }
-  },
+  }
 
-  _loadUser(username) {
+  _loadUser = (username) => {
     UsersStore.load(username).then((user) => {
       this.setState({ user: user });
     });
-  },
-  _resetStartpage() {
+  };
+
+  _resetStartpage = () => {
     if (window.confirm('Are you sure you want to reset the start page?')) {
       const username = this.props.params.username;
       StartpageStore.set(username).then(() => this._loadUser(username));
     }
-  },
+  };
+
   render() {
     if (!this.state.user) {
       return <Spinner />;
@@ -74,7 +76,7 @@ const EditUsersPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default EditUsersPage;

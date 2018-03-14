@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
@@ -15,7 +16,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 
-const IndexSetsComponent = React.createClass({
+const IndexSetsComponent = createReactClass({
+  displayName: 'IndexSetsComponent',
   mixins: [Reflux.connect(IndexSetsStore)],
 
   componentDidMount() {
@@ -31,8 +33,8 @@ const IndexSetsComponent = React.createClass({
 
   // Stores the current page and page size to be able to reload the current page
   currentPageNo: 1,
-  currentPageSize: 10,
 
+  currentPageSize: 10,
   PAGE_SIZE: 10,
 
   _onChangePaginatedList(page, size) {

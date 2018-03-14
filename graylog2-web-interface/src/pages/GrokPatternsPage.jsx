@@ -3,14 +3,14 @@ import React from 'react';
 import GrokPatterns from 'components/grok-patterns/GrokPatterns';
 import { DocumentTitle } from 'components/common';
 
-const GrokPatternsPage = React.createClass({
+class GrokPatternsPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Grok patterns">
         <GrokPatterns />
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default GrokPatternsPage;

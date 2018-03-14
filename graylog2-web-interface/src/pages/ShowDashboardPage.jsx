@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -27,10 +28,13 @@ import Widget from 'components/widgets/Widget';
 
 import style from './ShowDashboardPage.css';
 
-const ShowDashboardPage = React.createClass({
+const ShowDashboardPage = createReactClass({
+  displayName: 'ShowDashboardPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
 
   getInitialState() {
@@ -40,6 +44,7 @@ const ShowDashboardPage = React.createClass({
       streamIds: null,
     };
   },
+
   componentDidMount() {
     this.loadData();
     this.listenTo(WidgetsStore, this.removeWidget);
@@ -56,6 +61,7 @@ const ShowDashboardPage = React.createClass({
     // eslint-disable-next-line react/no-did-mount-set-state
     this.setState({ forceUpdateInBackground: this.state.currentUser.preferences.updateUnfocussed });
   },
+
   componentWillUnmount() {
     if (this.loadInterval) {
       clearInterval(this.loadInterval);
@@ -64,9 +70,11 @@ const ShowDashboardPage = React.createClass({
       this.promise.cancel();
     }
   },
+
   DASHBOARDS_EDIT: 'dashboards:edit',
   DEFAULT_HEIGHT: 2,
   DEFAULT_WIDTH: 4,
+
   loadData() {
     const dashboardId = this.props.params.dashboardId;
     this.promise = DashboardsStore.get(dashboardId)
@@ -88,14 +96,17 @@ const ShowDashboardPage = React.createClass({
         }
       });
   },
+
   shouldUpdate() {
     return Boolean(this.state.forceUpdateInBackground || this.state.focus);
   },
+
   removeWidget(props) {
     if (props.delete) {
       this.loadData();
     }
   },
+
   emptyDashboard() {
     return (
       <Row className="content">
@@ -108,6 +119,7 @@ const ShowDashboardPage = React.createClass({
       </Row>
     );
   },
+
   _defaultWidgetDimensions(widget) {
     const dimensions = { col: 0, row: 0 };
 
@@ -122,12 +134,15 @@ const ShowDashboardPage = React.createClass({
 
     return dimensions;
   },
+
   _dashboardIsEmpty(dashboard) {
     return dashboard.widgets.length === 0;
   },
+
   _validDimension(dimension) {
     return Number.isInteger(dimension) && dimension > 0;
   },
+
   formatDashboard(dashboard) {
     if (this._dashboardIsEmpty(dashboard)) {
       return this.emptyDashboard();
@@ -172,18 +187,22 @@ const ShowDashboardPage = React.createClass({
       </Row>
     );
   },
+
   _unlockDashboard(event) {
     event.preventDefault();
     if (this.state.locked) {
       this._toggleUnlock();
     }
   },
+
   _toggleUnlock() {
     this.setState({ locked: !this.state.locked });
   },
+
   _onPositionsChange(newPositions) {
     DashboardsActions.updatePositions(this.state.dashboard, newPositions);
   },
+
   _toggleFullscreen() {
     const element = document.documentElement;
     if (element.requestFullscreen) {
@@ -196,11 +215,13 @@ const ShowDashboardPage = React.createClass({
       element.msRequestFullscreen();
     }
   },
+
   _toggleUpdateInBackground() {
     const forceUpdate = !this.state.forceUpdateInBackground;
     this.setState({ forceUpdateInBackground: forceUpdate });
     UserNotification.success(`Graphs will be updated ${forceUpdate ? 'even' : 'only'} when the browser is in the ${forceUpdate ? 'background' : 'foreground'}`, '');
   },
+
   render() {
     if (!this.state.dashboard) {
       return <Spinner />;

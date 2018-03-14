@@ -5,33 +5,38 @@ import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import FormUtils from 'util/FormsUtils';
 
-const CSVConverterConfiguration = React.createClass({
-  propTypes: {
+class CSVConverterConfiguration extends React.Component {
+  static propTypes = {
     type: PropTypes.string.isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
+
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
-  },
-  _getConverterObject(configuration) {
+  }
+
+  _getConverterObject = (configuration) => {
     return { type: this.props.type, config: configuration || this.props.configuration };
-  },
-  _toggleConverter(event) {
+  };
+
+  _toggleConverter = (event) => {
     let converter;
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
     this.props.onChange(this.props.type, converter);
-  },
-  _onChange(key) {
+  };
+
+  _onChange = (key) => {
     return (event) => {
       const newConfig = this.props.configuration;
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(this.props.type, this._getConverterObject(newConfig));
     };
-  },
+  };
+
   render() {
     const separatorHelpMessage = (
       <span>
@@ -110,7 +115,7 @@ const CSVConverterConfiguration = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default CSVConverterConfiguration;

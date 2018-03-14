@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
@@ -17,19 +18,25 @@ import PageHeader from 'components/common/PageHeader';
 import DashboardList from './DashboardList';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 
-const DashboardListPage = React.createClass({
+const DashboardListPage = createReactClass({
+  displayName: 'DashboardListPage',
+
   propTypes: {
     permissions: PropTypes.arrayOf(PropTypes.string),
   },
+
   mixins: [Reflux.connect(DashboardsStore, 'dashboards'), PermissionsMixin],
+
   getInitialState() {
     return {
       dashboardsLoaded: false,
     };
   },
+
   componentDidMount() {
     DashboardsActions.list();
   },
+
   render() {
     const { dashboards } = this.state.dashboards;
     const filteredDashboards = dashboards;

@@ -4,32 +4,30 @@ import React from 'react';
 import { AlertCondition } from 'components/alertconditions';
 import { EntityList, PaginatedList } from 'components/common';
 
-const AlertConditionsList = React.createClass({
-  propTypes: {
+class AlertConditionsList extends React.Component {
+  static propTypes = {
     alertConditions: PropTypes.array.isRequired,
     streams: PropTypes.array.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      currentPage: 0,
-    };
-  },
+  state = {
+    currentPage: 0,
+  };
 
-  PAGE_SIZE: 10,
+  PAGE_SIZE = 10;
 
-  _onChangePaginatedList(currentPage) {
+  _onChangePaginatedList = (currentPage) => {
     this.setState({ currentPage: currentPage - 1 });
-  },
+  };
 
-  _paginatedConditions() {
+  _paginatedConditions = () => {
     return this.props.alertConditions.slice(this.state.currentPage * this.PAGE_SIZE, (this.state.currentPage + 1) * this.PAGE_SIZE);
-  },
+  };
 
-  _formatCondition(condition) {
+  _formatCondition = (condition) => {
     const stream = this.props.streams.find(s => s.alert_conditions.find(c => c.id === condition.id));
     return <AlertCondition key={condition.id} alertCondition={condition} stream={stream} />;
-  },
+  };
 
   render() {
     const alertConditions = this.props.alertConditions;
@@ -42,7 +40,7 @@ const AlertConditionsList = React.createClass({
                     items={this._paginatedConditions().map(condition => this._formatCondition(condition))} />
       </PaginatedList>
     );
-  },
-});
+  }
+}
 
 export default AlertConditionsList;

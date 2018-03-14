@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Row, Col } from 'react-bootstrap';
@@ -17,7 +18,9 @@ import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
-const IndexSetConfigurationPage = React.createClass({
+const IndexSetConfigurationPage = createReactClass({
+  displayName: 'IndexSetConfigurationPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,

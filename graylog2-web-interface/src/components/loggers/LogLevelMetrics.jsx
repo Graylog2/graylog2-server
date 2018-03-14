@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col } from 'react-bootstrap';
 import lodash from 'lodash';
@@ -10,21 +11,28 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
-const LogLevelMetrics = React.createClass({
+const LogLevelMetrics = createReactClass({
+  displayName: 'LogLevelMetrics',
+
   propTypes: {
     nodeId: PropTypes.string.isRequired,
     loglevel: PropTypes.string.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   componentDidMount() {
     MetricsActions.add(this.props.nodeId, this._metricName());
   },
+
   componentWillUnmount() {
     MetricsActions.remove(this.props.nodeId, this._metricName());
   },
+
   _metricName() {
     return `org.apache.logging.log4j.core.Appender.${this.props.loglevel}`;
   },
+
   render() {
     const { loglevel, nodeId } = this.props;
     const { metrics } = this.state;

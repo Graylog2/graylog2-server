@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-const MaxmindAdapterDocumentation = React.createClass({
+class MaxmindAdapterDocumentation extends React.Component {
   render() {
     const cityFields = `{
     "city": { "geoname_id": 5375480, "names": { "en": "Mountain View" } },
@@ -57,7 +57,7 @@ const MaxmindAdapterDocumentation = React.createClass({
 
       <p>For a complete documentation of the fields, please see MaxMind's <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">developer documentation</a></p>
     </div>);
-  },
-});
+  }
+}
 
 export default MaxmindAdapterDocumentation;

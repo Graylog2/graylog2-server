@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import FieldHelpers from './FieldHelpers';
 
 import FormsUtils from 'util/FormsUtils';
 
-const NumberField = React.createClass({
+const NumberField = createReactClass({
+  displayName: 'NumberField',
+
   propTypes: {
     autoFocus: PropTypes.bool,
     field: PropTypes.object.isRequired,
@@ -13,11 +16,14 @@ const NumberField = React.createClass({
     typeName: PropTypes.string.isRequired,
     value: PropTypes.any,
   },
+
   MAX_SAFE_INTEGER: (Number.MAX_SAFE_INTEGER !== undefined ? Number.MAX_SAFE_INTEGER : Math.pow(2, 53) - 1),
   MIN_SAFE_INTEGER: (Number.MIN_SAFE_INTEGER !== undefined ? Number.MIN_SAFE_INTEGER : -1 * (Math.pow(2, 53) - 1)),
+
   _getDefaultValidationSpecs() {
     return { min: this.MIN_SAFE_INTEGER, max: this.MAX_SAFE_INTEGER };
   },
+
   mapValidationAttribute(attribute) {
     switch (attribute.toLocaleUpperCase()) {
       case 'ONLY_NEGATIVE': return { min: this.MIN_SAFE_INTEGER, max: -1 };
@@ -26,6 +32,7 @@ const NumberField = React.createClass({
       default: return this._getDefaultValidationSpecs();
     }
   },
+
   validationSpec(field) {
     const validationAttributes = field.attributes.map(this.mapValidationAttribute);
     if (validationAttributes.length > 0) {
@@ -36,10 +43,12 @@ const NumberField = React.createClass({
 
     return this._getDefaultValidationSpecs();
   },
+
   handleChange(evt) {
     const numericValue = FormsUtils.getValueFromInput(evt.target);
     this.props.onChange(this.props.title, numericValue);
   },
+
   render() {
     const typeName = this.props.typeName;
     const field = this.props.field;

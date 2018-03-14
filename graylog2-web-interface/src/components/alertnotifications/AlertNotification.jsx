@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -14,13 +15,16 @@ import { EntityListItem, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
-const AlertNotification = React.createClass({
+const AlertNotification = createReactClass({
+  displayName: 'AlertNotification',
+
   propTypes: {
     alertNotification: PropTypes.object.isRequired,
     stream: PropTypes.object,
     onNotificationUpdate: PropTypes.func,
     onNotificationDelete: PropTypes.func,
   },
+
   mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   getInitialState() {

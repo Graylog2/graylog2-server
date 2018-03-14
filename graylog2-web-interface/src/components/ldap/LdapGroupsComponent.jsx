@@ -14,20 +14,18 @@ import StoreProvider from 'injection/StoreProvider';
 const RolesStore = StoreProvider.getStore('Roles');
 const LdapGroupsStore = StoreProvider.getStore('LdapGroups');
 
-const LdapGroupsComponent = React.createClass({
-  propTypes: {
+class LdapGroupsComponent extends React.Component {
+  static propTypes = {
     onCancel: PropTypes.func.isRequired,
     onShowConfig: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      groups: Immutable.Set.of(),
-      roles: Immutable.Set.of(),
-      mapping: Immutable.Map(),
-      groupsErrorMessage: null,
-    };
-  },
+  state = {
+    groups: Immutable.Set.of(),
+    roles: Immutable.Set.of(),
+    mapping: Immutable.Map(),
+    groupsErrorMessage: null,
+  };
 
   componentDidMount() {
     LdapGroupsActions.loadMapping.triggerPromise().then(mapping => this.setState({ mapping: Immutable.Map(mapping) }));
@@ -41,9 +39,9 @@ const LdapGroupsComponent = React.createClass({
         },
       );
     RolesStore.loadRoles().then(roles => this.setState({ roles: Immutable.Set(roles) }));
-  },
+  }
 
-  _updateMapping(event) {
+  _updateMapping = (event) => {
     const role = event.target.value;
     const group = event.target.getAttribute('data-group');
     if (role === '') {
@@ -51,21 +49,21 @@ const LdapGroupsComponent = React.createClass({
     } else {
       this.setState({ mapping: this.state.mapping.set(group, role) });
     }
-  },
+  };
 
-  _saveMapping(event) {
+  _saveMapping = (event) => {
     event.preventDefault();
     LdapGroupsActions.saveMapping(this.state.mapping.toJS());
-  },
+  };
 
-  _onShowConfig(event) {
+  _onShowConfig = (event) => {
     event.preventDefault();
     this.props.onShowConfig();
-  },
+  };
 
-  _isLoading() {
+  _isLoading = () => {
     return !(this.state.mapping && this.state.groups && this.state.roles);
-  },
+  };
 
   render() {
     if (this._isLoading()) {
@@ -128,7 +126,7 @@ const LdapGroupsComponent = React.createClass({
         </Row>
       </form>
     );
-  },
-});
+  }
+}
 
 export default LdapGroupsComponent;

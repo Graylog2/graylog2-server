@@ -2,31 +2,33 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
-const EditPatternModal = React.createClass({
-  propTypes: {
+class EditPatternModal extends React.Component {
+  static propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     pattern: PropTypes.string,
     create: PropTypes.bool,
     savePattern: PropTypes.func.isRequired,
     validPatternName: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {
-      id: this.props.id,
-      name: this.props.name,
-      pattern: this.props.pattern,
-      error: false,
-      error_message: '',
-    };
-  },
-  openModal() {
+  };
+
+  state = {
+    id: this.props.id,
+    name: this.props.name,
+    pattern: this.props.pattern,
+    error: false,
+    error_message: '',
+  };
+
+  openModal = () => {
     this.refs.modal.open();
-  },
-  _onPatternChange(event) {
+  };
+
+  _onPatternChange = (event) => {
     this.setState({ pattern: event.target.value });
-  },
-  _onNameChange(event) {
+  };
+
+  _onNameChange = (event) => {
     const name = event.target.value;
 
     if (!this.props.validPatternName(name)) {
@@ -34,26 +36,31 @@ const EditPatternModal = React.createClass({
     } else {
       this.setState({ name: name, error: false, error_message: '' });
     }
-  },
-  _getId(prefixIdName) {
+  };
+
+  _getId = (prefixIdName) => {
     return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
-  },
-  _closeModal() {
+  };
+
+  _closeModal = () => {
     this.refs.modal.close();
-  },
-  _saved() {
+  };
+
+  _saved = () => {
     this._closeModal();
     if (this.props.create) {
       this.setState({ name: '', pattern: '' });
     }
-  },
-  _save() {
+  };
+
+  _save = () => {
     const pattern = this.state;
 
     if (!pattern.error) {
       this.props.savePattern(pattern, this._saved);
     }
-  },
+  };
+
   render() {
     let triggerButtonContent;
     if (this.props.create) {
@@ -90,7 +97,7 @@ const EditPatternModal = React.createClass({
         </BootstrapModalForm>
       </span>
     );
-  },
-});
+  }
+}
 
 export default EditPatternModal;

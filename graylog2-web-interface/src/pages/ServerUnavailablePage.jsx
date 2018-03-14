@@ -7,30 +7,28 @@ import URLUtils from 'util/URLUtils';
 
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 
-const ServerUnavailablePage = React.createClass({
-  propTypes: {
+class ServerUnavailablePage extends React.Component {
+  static propTypes = {
     server: PropTypes.object,
-  },
+  };
 
-  getInitialState() {
-    return {
-      showDetails: false,
-    };
-  },
+  state = {
+    showDetails: false,
+  };
 
   componentDidMount() {
     disconnectedStyle.use();
-  },
+  }
 
   componentWillUnmount() {
     disconnectedStyle.unuse();
-  },
+  }
 
-  _toggleDetails() {
+  _toggleDetails = () => {
     this.setState({ showDetails: !this.state.showDetails });
-  },
+  };
 
-  _formatErrorMessage() {
+  _formatErrorMessage = () => {
     if (!this.state.showDetails) {
       return null;
     }
@@ -86,7 +84,7 @@ const ServerUnavailablePage = React.createClass({
         </Well>
       </div>
     );
-  },
+  };
 
   render() {
     return (
@@ -117,7 +115,7 @@ const ServerUnavailablePage = React.createClass({
         </Modal>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default ServerUnavailablePage;

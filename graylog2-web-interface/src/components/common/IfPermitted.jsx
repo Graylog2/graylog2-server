@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -11,7 +12,9 @@ import PermissionsMixin from 'util/PermissionsMixin';
  * Wrapper component that renders its children only if the current user fulfills certain permissions.
  * Current user's permissions are fetched from the server.
  */
-const IfPermitted = React.createClass({
+const IfPermitted = createReactClass({
+  displayName: 'IfPermitted',
+
   propTypes: {
     /** Children to render if user has permissions. */
     children: PropTypes.node.isRequired,
@@ -23,12 +26,15 @@ const IfPermitted = React.createClass({
     /** This flag controls which permissions the user must fulfill: (all, at least one). */
     anyPermissions: PropTypes.bool,
   },
+
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+
   getDefaultProps() {
     return {
       anyPermissions: false,
     };
   },
+
   _checkPermissions() {
     if (this.props.anyPermissions) {
       return this.isAnyPermitted(this.state.currentUser.permissions, this.props.permissions);
@@ -36,6 +42,7 @@ const IfPermitted = React.createClass({
 
     return this.isPermitted(this.state.currentUser.permissions, this.props.permissions);
   },
+
   render() {
     if (this.state.currentUser && this._checkPermissions()) {
       return React.Children.count(this.props.children) > 1 ? <span>{this.props.children}</span> : this.props.children;

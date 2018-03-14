@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { ButtonGroup, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -17,7 +18,9 @@ import { EditDashboardModal } from 'components/dashboard';
 
 import style from './AddToDashboardMenu.css';
 
-const AddToDashboardMenu = React.createClass({
+const AddToDashboardMenu = createReactClass({
+  displayName: 'AddToDashboardMenu',
+
   propTypes: {
     widgetType: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
@@ -59,6 +62,7 @@ const AddToDashboardMenu = React.createClass({
     this.setState({ selectedDashboard: dashboardId });
     this.refs.widgetModal.open();
   },
+
   _saveWidget(title, configuration) {
     let widgetConfig = Immutable.Map(this.props.configuration);
     let searchParams = Immutable.Map(SearchStore.getOriginalSearchParams());
@@ -118,9 +122,11 @@ const AddToDashboardMenu = React.createClass({
       .then(() => this.refs.widgetModal.saved())
       .finally(() => this.setState({ loading: false }));
   },
+
   _createNewDashboard() {
     this.refs.createDashboardModal.open();
   },
+
   _renderLoadingDashboardsMenu() {
     return (
       <DropdownButton bsStyle={this.props.bsStyle}
@@ -132,6 +138,7 @@ const AddToDashboardMenu = React.createClass({
       </DropdownButton>
     );
   },
+
   _renderDashboardMenu() {
     let dashboards = Immutable.List();
 
@@ -156,6 +163,7 @@ const AddToDashboardMenu = React.createClass({
       </DropdownButton>
     );
   },
+
   _renderNoDashboardsMenu() {
     const canCreateDashboard = this.isPermitted(this.props.permissions, ['dashboards:create']);
     let option;
@@ -179,6 +187,7 @@ const AddToDashboardMenu = React.createClass({
       </div>
     );
   },
+
   render() {
     let addToDashboardMenu;
     if (this.state.writableDashboards === undefined) {

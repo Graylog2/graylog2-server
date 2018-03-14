@@ -2,6 +2,8 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import {
   BooleanField,
@@ -12,7 +14,9 @@ import {
   TitleField,
 } from 'components/configurationforms';
 
-const ConfigurationForm = React.createClass({
+const ConfigurationForm = createReactClass({
+  displayName: 'ConfigurationForm',
+
   propTypes: {
     cancelAction: PropTypes.func,
     children: PropTypes.node,
@@ -32,15 +36,18 @@ const ConfigurationForm = React.createClass({
       values: {},
     };
   },
+
   getInitialState() {
     return this._copyStateFromProps(this.props);
   },
+
   componentWillReceiveProps(props) {
     const newState = this._copyStateFromProps(props);
     const values = this.state ? this.state.values : {};
     newState.values = $.extend(newState.values, values);
     this.setState(newState);
   },
+
   getValue() {
     const data = {};
     const values = this.state.values;
@@ -57,6 +64,7 @@ const ConfigurationForm = React.createClass({
 
     return data;
   },
+
   _copyStateFromProps(props) {
     const effectiveTitleValue = (this.state && this.state.titleValue !== undefined ? this.state.titleValue : props.titleValue);
     const defaultValues = {};
@@ -73,32 +81,39 @@ const ConfigurationForm = React.createClass({
       titleValue: effectiveTitleValue,
     };
   },
+
   _sortByOptionality(x1, x2) {
     return (this.state.configFields[x1].is_optional - this.state.configFields[x2].is_optional);
   },
+
   _save() {
     const data = this.getValue();
 
     this.props.submitAction(data);
     this.refs.modal.close();
   },
+
   open() {
     this.refs.modal.open();
   },
+
   _closeModal() {
     this.setState($.extend(this.getInitialState(), { titleValue: this.props.titleValue }));
     if (this.props.cancelAction) {
       this.props.cancelAction();
     }
   },
+
   _handleTitleChange(field, value) {
     this.setState({ titleValue: value });
   },
+
   _handleChange(field, value) {
     const values = this.state.values;
     values[field] = value;
     this.setState({ values: values });
   },
+
   _renderConfigField(configField, key, autoFocus) {
     const value = this.state.values[key];
     const typeName = this.props.typeName;
@@ -124,6 +139,7 @@ const ConfigurationForm = React.createClass({
         return null;
     }
   },
+
   render() {
     const typeName = this.props.typeName;
     const title = this.props.title;

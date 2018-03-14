@@ -5,39 +5,45 @@ import { Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
-const InputDropdown = React.createClass({
-  propTypes: {
+class InputDropdown extends React.Component {
+  static propTypes = {
     inputs: PropTypes.object,
     title: PropTypes.string,
     preselectedInputId: PropTypes.string,
     onLoadMessage: PropTypes.func,
     disabled: PropTypes.bool,
-  },
-  getInitialState() {
-    return {
-      selectedInput: this.props.preselectedInputId || this.PLACEHOLDER,
-    };
-  },
-  PLACEHOLDER: 'placeholder',
-  _formatInput(input) {
+  };
+
+  PLACEHOLDER = 'placeholder';
+
+  _formatInput = (input) => {
     return <option key={input.id} value={input.id}>{input.title} ({input.type})</option>;
-  },
-  _sortByTitle(input1, input2) {
+  };
+
+  _sortByTitle = (input1, input2) => {
     return input1.title.localeCompare(input2.title);
-  },
-  _onLoadMessage() {
+  };
+
+  _onLoadMessage = () => {
     this.props.onLoadMessage(this.state.selectedInput);
-  },
-  _formatStaticInput(input) {
+  };
+
+  _formatStaticInput = (input) => {
     return (
       <Input id={`${input.type}-select`} type="select" style={{ float: 'left', width: 400, marginRight: 10 }} disabled>
         <option>{`${input.title} (${input.type})`}</option>
       </Input>
     );
-  },
-  onSelectedInputChange(event) {
+  };
+
+  onSelectedInputChange = (event) => {
     this.setState({ selectedInput: event.target.value });
-  },
+  };
+
+  state = {
+    selectedInput: this.props.preselectedInputId || this.PLACEHOLDER,
+  };
+
   render() {
     const { selectedInput } = this.state;
     // When an input is pre-selected, show a static dropdown
@@ -79,7 +85,7 @@ const InputDropdown = React.createClass({
     }
 
     return <Spinner />;
-  },
-});
+  }
+}
 
 export default InputDropdown;

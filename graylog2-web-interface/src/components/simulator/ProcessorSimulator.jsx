@@ -16,25 +16,26 @@ import SimulatorStore from 'stores/simulator/SimulatorStore';
 
 const DEFAULT_STREAM_ID = '000000000000000000000001';
 
-const ProcessorSimulator = React.createClass({
-  propTypes: {
+class ProcessorSimulator extends React.Component {
+  static propTypes = {
     streams: PropTypes.array.isRequired,
-  },
+  };
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
     // The default stream could not be present in a system. In that case we fallback to the first available stream.
-    this.defaultStream = this.props.streams.find(s => s.id === DEFAULT_STREAM_ID) || this.props.streams[0];
+    this.defaultStream = props.streams.find(s => s.id === DEFAULT_STREAM_ID) || props.streams[0];
 
-    return {
+    this.state = {
       message: undefined,
       stream: this.defaultStream,
       simulation: undefined,
       loading: false,
       error: undefined,
     };
-  },
+  }
 
-  _onMessageLoad(message, options) {
+  _onMessageLoad = (message, options) => {
     this.setState({ message: message, simulation: undefined, loading: true, error: undefined });
 
     SimulatorActions.simulate
@@ -47,9 +48,9 @@ const ProcessorSimulator = React.createClass({
           this.setState({ loading: false, error: error });
         }
       );
-  },
+  };
 
-  _getFormattedStreams(streams) {
+  _getFormattedStreams = (streams) => {
     if (!streams) {
       return [];
     }
@@ -59,12 +60,12 @@ const ProcessorSimulator = React.createClass({
         return { value: s.id, label: s.title };
       })
       .sort((s1, s2) => naturalSort(s1.label, s2.label));
-  },
+  };
 
-  _onStreamSelect(selectedStream) {
+  _onStreamSelect = (selectedStream) => {
     const stream = this.props.streams.find(s => s.id.toLowerCase() === selectedStream.toLowerCase());
     this.setState({ stream: stream });
-  },
+  };
 
   render() {
     if (this.props.streams.length === 0) {
@@ -122,7 +123,7 @@ const ProcessorSimulator = React.createClass({
                            error={this.state.error} />
       </div>
     );
-  },
-});
+  }
+}
 
 export default ProcessorSimulator;

@@ -6,8 +6,8 @@ import React from 'react';
  * should not use this component directly, but through `DataTable`. Look at the `DataTable`
  * section for a usage example.
  */
-const DataTableElement = React.createClass({
-  propTypes: {
+class DataTableElement extends React.Component {
+  static propTypes = {
     /** Element to be formatted. */
     element: PropTypes.any,
     /**
@@ -17,10 +17,11 @@ const DataTableElement = React.createClass({
     formatter: PropTypes.func.isRequired,
     /** Element index. */
     index: PropTypes.number,
-  },
+  };
+
   render() {
     return this.props.formatter(this.props.element, this.props.index);
-  },
-});
+  }
+}
 
 export default DataTableElement;

@@ -3,21 +3,23 @@ import React from 'react';
 
 import { EditDashboardModal } from 'components/dashboard';
 
-const EditDashboardModalTrigger = React.createClass({
-  propTypes: {
+class EditDashboardModalTrigger extends React.Component {
+  static propTypes = {
     action: PropTypes.string.isRequired,
-  },
-  getDefaultProps() {
-    return {
-      action: 'create',
-    };
-  },
-  _isCreateModal() {
+  };
+
+  static defaultProps = {
+    action: 'create',
+  };
+
+  _isCreateModal = () => {
     return this.props.action === 'create';
-  },
-  openModal() {
+  };
+
+  openModal = () => {
     this.refs.modal.open();
-  },
+  };
+
   render() {
     let triggerButtonContent;
 
@@ -36,7 +38,7 @@ const EditDashboardModalTrigger = React.createClass({
         <EditDashboardModal ref="modal" {...this.props} />
       </span>
     );
-  },
-});
+  }
+}
 
 export default EditDashboardModalTrigger;

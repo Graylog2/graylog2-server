@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -19,7 +20,8 @@ const StreamsStore = StoreProvider.getStore('Streams');
 
 import Routes from 'routing/Routes';
 
-const ProcessingTimelineComponent = React.createClass({
+const ProcessingTimelineComponent = createReactClass({
+  displayName: 'ProcessingTimelineComponent',
   mixins: [Reflux.connect(PipelinesStore), Reflux.connect(PipelineConnectionsStore)],
 
   componentDidMount() {

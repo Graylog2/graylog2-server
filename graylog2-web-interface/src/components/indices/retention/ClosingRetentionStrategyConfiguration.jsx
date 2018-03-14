@@ -2,20 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
-const ClosingRetentionStrategyConfiguration = React.createClass({
-  propTypes: {
+class ClosingRetentionStrategyConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     jsonSchema: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      max_number_of_indices: this.props.config.max_number_of_indices,
-    };
-  },
+  state = {
+    max_number_of_indices: this.props.config.max_number_of_indices,
+  };
 
-  _onInputUpdate(field) {
+  _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
       update[field] = e.target.value;
@@ -23,7 +21,7 @@ const ClosingRetentionStrategyConfiguration = React.createClass({
       this.setState(update);
       this.props.updateConfig(update);
     };
-  },
+  };
 
   render() {
     return (
@@ -39,7 +37,7 @@ const ClosingRetentionStrategyConfiguration = React.createClass({
         </fieldset>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ClosingRetentionStrategyConfiguration;

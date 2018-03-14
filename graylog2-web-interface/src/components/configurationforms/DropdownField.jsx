@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import FieldHelpers from 'components/configurationforms/FieldHelpers';
 
-const DropdownField = React.createClass({
-  propTypes: {
+class DropdownField extends React.Component {
+  static propTypes = {
     autoFocus: PropTypes.bool.isRequired,
     field: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -15,32 +15,34 @@ const DropdownField = React.createClass({
     value: PropTypes.any,
     addPlaceholder: PropTypes.bool,
     disabled: PropTypes.bool,
-  },
-  getDefaultProps() {
-    return {
-      addPlaceholder: false,
-    };
-  },
-  getInitialState() {
-    return {
-      typeName: this.props.typeName,
-      field: this.props.field,
-      title: this.props.title,
-      value: this.props.value,
-    };
-  },
+  };
+
+  static defaultProps = {
+    addPlaceholder: false,
+  };
+
+  state = {
+    typeName: this.props.typeName,
+    field: this.props.field,
+    title: this.props.title,
+    value: this.props.value,
+  };
+
   componentWillReceiveProps(props) {
     this.setState(props);
-  },
-  _formatOption(value, key, disabled) {
+  }
+
+  _formatOption = (value, key, disabled) => {
     return (
       <option key={`${this.state.typeName}-${this.state.title}-${key}`} value={key} id={key} disabled={disabled}>{value}</option>
     );
-  },
-  handleChange(evt) {
+  };
+
+  handleChange = (evt) => {
     this.props.onChange(this.state.title, evt.target.value);
     this.setState({ value: evt.target.value });
-  },
+  };
+
   render() {
     const field = this.state.field;
     const options = $.map(field.additional_info.values, this._formatOption);
@@ -64,7 +66,7 @@ const DropdownField = React.createClass({
         <p className="help-block">{field.description}</p>
       </div>
     );
-  },
-});
+  }
+}
 
 export default DropdownField;

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router';
@@ -12,16 +13,20 @@ import SupportLink from 'components/support/SupportLink';
 import { DocumentTitle, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 
-const StreamOutputsPage = React.createClass({
+const StreamOutputsPage = createReactClass({
+  displayName: 'StreamOutputsPage',
   mixins: [Reflux.connect(CurrentUserStore)],
+
   getInitialState() {
     return { stream: undefined };
   },
+
   componentDidMount() {
     StreamsStore.get(this.props.params.streamId, (stream) => {
       this.setState({ stream: stream });
     });
   },
+
   render() {
     if (!this.state.stream) {
       return <Spinner />;

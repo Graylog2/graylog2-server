@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Row, Col } from 'react-bootstrap';
@@ -17,7 +18,8 @@ import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-const IndexSetCreationPage = React.createClass({
+const IndexSetCreationPage = createReactClass({
+  displayName: 'IndexSetCreationPage',
   mixins: [Reflux.connect(IndexSetsStore), Reflux.connect(IndicesConfigurationStore)],
 
   getInitialState() {

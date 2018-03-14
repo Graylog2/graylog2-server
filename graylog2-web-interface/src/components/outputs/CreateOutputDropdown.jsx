@@ -3,19 +3,16 @@ import $ from 'jquery';
 
 import { ConfigurationForm } from 'components/configurationforms';
 
-const CreateOutputDropdown = React.createClass({
-  PLACEHOLDER: 'placeholder',
-  getInitialState() {
-    return {
-      typeDefinition: [],
-      typeName: this.PLACEHOLDER,
-    };
-  },
+class CreateOutputDropdown extends React.Component {
+  PLACEHOLDER = 'placeholder';
+
   componentDidMount() {
     this.loadData();
-  },
-  loadData() {
-  },
+  }
+
+  loadData = () => {
+  };
+
   render() {
     const outputTypes = $.map(this.props.types, this._formatOutputType);
     return (
@@ -35,22 +32,30 @@ const CreateOutputDropdown = React.createClass({
                                    submitAction={this.props.onSubmit} />
       </div>
     );
-  },
-  _openModal(evt) {
+  }
+
+  _openModal = (evt) => {
     if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '') {
       this.refs.configurationForm.open();
     }
-  },
-  _formatOutputType(type, typeName) {
+  };
+
+  _formatOutputType = (type, typeName) => {
     return (<option key={typeName} value={typeName}>{type.name}</option>);
-  },
-  _onTypeChange(evt) {
+  };
+
+  _onTypeChange = (evt) => {
     const outputType = evt.target.value;
     this.setState({ typeName: evt.target.value });
     this.props.getTypeDefinition(outputType, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
     });
-  },
-});
+  };
+
+  state = {
+    typeDefinition: [],
+    typeName: this.PLACEHOLDER,
+  };
+}
 
 export default CreateOutputDropdown;

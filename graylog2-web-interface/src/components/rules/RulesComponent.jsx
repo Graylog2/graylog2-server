@@ -4,10 +4,10 @@ import React from 'react';
 import { Spinner } from 'components/common';
 import RuleList from './RuleList';
 
-const RulesComponent = React.createClass({
-  propTypes: {
+class RulesComponent extends React.Component {
+  static propTypes = {
     rules: PropTypes.array,
-  },
+  };
 
   render() {
     if (!this.props.rules) {
@@ -19,7 +19,7 @@ const RulesComponent = React.createClass({
         <RuleList rules={this.props.rules} />
       </div>
     );
-  },
-});
+  }
+}
 
 export default RulesComponent;

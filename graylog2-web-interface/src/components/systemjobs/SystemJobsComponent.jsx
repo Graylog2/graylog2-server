@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
@@ -11,16 +12,20 @@ const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';
 
-const SystemJobsComponent = React.createClass({
+const SystemJobsComponent = createReactClass({
+  displayName: 'SystemJobsComponent',
   mixins: [Reflux.connect(SystemJobsStore)],
+
   componentDidMount() {
     SystemJobsActions.list();
 
     this.interval = setInterval(SystemJobsActions.list, 2000);
   },
+
   componentWillUnmount() {
     clearInterval(this.interval);
   },
+
   render() {
     if (!this.state.jobs) {
       return <Spinner />;

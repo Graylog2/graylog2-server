@@ -13,8 +13,8 @@ import Typeahead from 'typeahead.js';
  * **Note** There are a few quirks around this component and it will be
  * refactored soon.
  */
-const TypeAheadInput = React.createClass({
-  propTypes: {
+class TypeAheadInput extends React.Component {
+  static propTypes = {
     /** ID to use in the input field. */
     id: PropTypes.string.isRequired,
     /** Label to use for the input field. */
@@ -51,36 +51,39 @@ const TypeAheadInput = React.createClass({
      *
      */
     onSuggestionSelected: PropTypes.func,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      displayKey: 'suggestion',
-    };
-  },
+  static defaultProps = {
+    displayKey: 'suggestion',
+  };
 
   componentDidMount() {
     this._updateTypeahead(this.props);
-  },
+  }
+
   componentWillReceiveProps(newProps) {
     this._destroyTypeahead();
     this._updateTypeahead(newProps);
-  },
+  }
+
   componentWillUnmount() {
     this._destroyTypeahead();
-  },
+  }
 
-  getValue() {
+  getValue = () => {
     return $(this.fieldInput).typeahead('val');
-  },
-  clear() {
+  };
+
+  clear = () => {
     $(this.fieldInput).typeahead('val', '');
-  },
-  _destroyTypeahead() {
+  };
+
+  _destroyTypeahead = () => {
     $(this.fieldInput).typeahead('destroy');
     $(this.fieldFormGroup).off('typeahead:select typeahead:autocomplete');
-  },
-  _updateTypeahead(props) {
+  };
+
+  _updateTypeahead = (props) => {
     this.fieldInput = this.refs.fieldInput.getInputDOMNode();
     this.fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
 
@@ -115,7 +118,8 @@ const TypeAheadInput = React.createClass({
         props.onSuggestionSelected(event, suggestion);
       }
     });
-  },
+  };
+
   render() {
     return (<Input id={this.props.id}
                    type="text"
@@ -123,7 +127,7 @@ const TypeAheadInput = React.createClass({
                    wrapperClassName="typeahead-wrapper"
                    label={this.props.label}
                    onKeyPress={this.props.onKeyPress} />);
-  },
-});
+  }
+}
 
 export default TypeAheadInput;

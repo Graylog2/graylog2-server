@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import $ from 'jquery';
 import Reflux from 'reflux';
 
@@ -14,7 +15,8 @@ import CombinedProvider from '../../injection/CombinedProvider';
 const { WidgetsStore, WidgetsActions } = CombinedProvider.get('Widgets');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const Widget = React.createClass({
+const Widget = createReactClass({
+  displayName: 'Widget',
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   propTypes: {
@@ -24,6 +26,7 @@ const Widget = React.createClass({
     locked: PropTypes.bool.isRequired,
     streamIds: PropTypes.object,
   },
+
   getInitialState() {
     this.widgetPlugin = this._getWidgetPlugin(this.props.widget.type);
     return {
@@ -35,6 +38,7 @@ const Widget = React.createClass({
       width: undefined,
     };
   },
+
   componentDidMount() {
     this._loadValue();
     this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
@@ -47,12 +51,15 @@ const Widget = React.createClass({
     // is going to be called n times on the same widget, resulting in a single widget being updated n times.
     $(window).on('resize', this._onResize);
   },
+
   componentWillReceiveProps(nextProps) {
     this.widgetPlugin = this._getWidgetPlugin(nextProps.widget.type);
   },
+
   componentDidUpdate() {
     this._calculateWidgetSize();
   },
+
   componentWillUnmount() {
     clearInterval(this.loadValueInterval);
     $(window).off('resize', this._onResize);
@@ -69,9 +76,11 @@ const Widget = React.createClass({
   _isBoundToStream() {
     return ('stream_id' in this.props.widget.config) && (this.props.widget.config.stream_id !== null);
   },
+
   _getWidgetNode() {
     return this.node;
   },
+
   _loadValue() {
     if (this.state.deleted || (this.state.result !== undefined && !this.props.shouldUpdate)) {
       return;
@@ -107,9 +116,11 @@ const Widget = React.createClass({
       });
     });
   },
+
   _onResize() {
     this.eventsThrottler.throttle(this._calculateWidgetSize, undefined, this.props.widget.id);
   },
+
   _calculateWidgetSize() {
     const $widgetNode = $(this._getWidgetNode());
     if (!$widgetNode) { return; }
@@ -121,6 +132,7 @@ const Widget = React.createClass({
       this.setState({ height: availableHeight, width: availableWidth });
     }
   },
+
   _getVisualization() {
     if (this.props.widget.type === '') {
       return null;
@@ -152,6 +164,7 @@ const Widget = React.createClass({
       locked: !this.props.locked, // widget should be locked when dashboard is unlocked and widgets can be moved
     });
   },
+
   _getTimeRange() {
     const config = this.props.widget.config;
     const rangeType = config.timerange.type;
@@ -176,6 +189,7 @@ const Widget = React.createClass({
 
     return timeRange;
   },
+
   replayUrl() {
     const config = this.props.widget.config;
     if (this._isBoundToStream()) {
@@ -184,24 +198,29 @@ const Widget = React.createClass({
 
     return Routes.search(config.query, this._getTimeRange(), config.interval);
   },
+
   _showConfig() {
     this.configModal.open();
   },
+
   _showEditConfig() {
     this.editModal.open();
   },
+
   updateWidget(newWidgetData) {
     const realNewWidgetData = newWidgetData;
     realNewWidgetData.id = this.props.widget.id;
 
     WidgetsStore.updateWidget(this.props.dashboardId, realNewWidgetData);
   },
+
   deleteWidget() {
     if (window.confirm(`Do you really want to delete "${this.props.widget.description}"?`)) {
       this.setState({ deleted: true });
       WidgetsActions.removeWidget(this.props.dashboardId, this.props.widget.id);
     }
   },
+
   render() {
     if (this.state.deleted) {
       return <span />;

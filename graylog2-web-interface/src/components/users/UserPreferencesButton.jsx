@@ -4,13 +4,15 @@ import { Button } from 'react-bootstrap';
 
 import UserPreferencesModal from 'components/users/UserPreferencesModal';
 
-const UserPreferencesButton = React.createClass({
-  propTypes: {
+class UserPreferencesButton extends React.Component {
+  static propTypes = {
     userName: PropTypes.string.isRequired,
-  },
-  onClick() {
+  };
+
+  onClick = () => {
     this.refs.userPreferencesModal.openModal();
-  },
+  };
+
   render() {
     return (
       <span>
@@ -18,7 +20,7 @@ const UserPreferencesButton = React.createClass({
         <UserPreferencesModal ref="userPreferencesModal" userName={this.props.userName} />
       </span>
     );
-  },
-});
+  }
+}
 
 export default UserPreferencesButton;

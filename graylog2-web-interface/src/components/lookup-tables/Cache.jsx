@@ -8,11 +8,10 @@ import { ContentPackMarker } from 'components/common';
 
 import Styles from './ConfigSummary.css';
 
-const Cache = React.createClass({
-
-  propTypes: {
+class Cache extends React.Component {
+  static propTypes = {
     cache: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     const plugins = {};
@@ -53,8 +52,7 @@ const Cache = React.createClass({
         <Col md={6} />
       </Row>
     );
-  },
-
-});
+  }
+}
 
 export default Cache;

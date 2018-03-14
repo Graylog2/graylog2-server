@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
@@ -16,7 +17,9 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
-const EditAlertConditionPage = React.createClass({
+const EditAlertConditionPage = createReactClass({
+  displayName: 'EditAlertConditionPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

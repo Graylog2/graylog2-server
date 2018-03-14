@@ -5,27 +5,25 @@ import { Row, Col, Button, Alert } from 'react-bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
 const LdapActions = ActionsProvider.getActions('Ldap');
 
-const TestLdapConnection = React.createClass({
-  propTypes: {
+class TestLdapConnection extends React.Component {
+  static propTypes = {
     ldapSettings: PropTypes.object.isRequired,
     ldapUri: PropTypes.object.isRequired,
     disabled: PropTypes.bool,
-  },
+  };
 
-  getInitialState() {
-    return {
-      serverConnectionStatus: {},
-    };
-  },
+  state = {
+    serverConnectionStatus: {},
+  };
 
   componentWillReceiveProps(nextProps) {
     // Reset connection status if ldapSettings changed
     if (JSON.stringify(this.props.ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({ serverConnectionStatus: {} });
     }
-  },
+  }
 
-  _testServerConnection() {
+  _testServerConnection = () => {
     LdapActions.testServerConnection.triggerPromise(this.props.ldapSettings)
       .then(
         (result) => {
@@ -46,9 +44,9 @@ const TestLdapConnection = React.createClass({
       );
 
     this.setState({ serverConnectionStatus: { loading: true } });
-  },
+  };
 
-  _getServerConnectionStyle() {
+  _getServerConnectionStyle = () => {
     if (this.state.serverConnectionStatus.success) {
       return 'success';
     }
@@ -57,7 +55,7 @@ const TestLdapConnection = React.createClass({
     }
 
     return 'info';
-  },
+  };
 
   render() {
     const serverConnectionStatus = this.state.serverConnectionStatus;
@@ -87,7 +85,7 @@ const TestLdapConnection = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default TestLdapConnection;

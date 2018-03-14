@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router';
@@ -13,13 +14,16 @@ import RulesStore from 'stores/rules/RulesStore';
 
 import Routes from 'routing/Routes';
 
-const StageForm = React.createClass({
+const StageForm = createReactClass({
+  displayName: 'StageForm',
+
   propTypes: {
     stage: PropTypes.object,
     create: PropTypes.bool,
     save: PropTypes.func.isRequired,
     validateStage: PropTypes.func.isRequired,
   },
+
   mixins: [Reflux.connect(RulesStore)],
 
   getDefaultProps() {

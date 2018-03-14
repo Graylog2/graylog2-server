@@ -7,14 +7,14 @@ const PreferencesStore = StoreProvider.getStore('Preferences');
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
-const UserPreferencesModal = React.createClass({
-  propTypes: {
+class UserPreferencesModal extends React.Component {
+  static propTypes = {
     userName: PropTypes.string.isRequired,
-  },
-  getInitialState() {
-    return { preferences: [] };
-  },
-  _onPreferenceChanged(event) {
+  };
+
+  state = { preferences: [] };
+
+  _onPreferenceChanged = (event) => {
     const name = event.target.name;
     const preferenceToChange = this.state.preferences.filter(preference => preference.name === name)[0];
     // TODO: we need the type of the preference to set it properly
@@ -22,16 +22,19 @@ const UserPreferencesModal = React.createClass({
       preferenceToChange.value = event.target.value;
       this.setState({ preferences: this.state.preferences });
     }
-  },
-  _save() {
+  };
+
+  _save = () => {
     PreferencesStore.saveUserPreferences(this.state.preferences, this.refs.modal.close);
-  },
-  openModal() {
+  };
+
+  openModal = () => {
     PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
       this.setState({ preferences: preferences });
       this.refs.modal.open();
     });
-  },
+  };
+
   render() {
     let shouldAutoFocus = true;
 
@@ -63,7 +66,7 @@ const UserPreferencesModal = React.createClass({
         <div>{formattedPreferences}</div>
       </BootstrapModalForm>
     );
-  },
-});
+  }
+}
 
 export default UserPreferencesModal;

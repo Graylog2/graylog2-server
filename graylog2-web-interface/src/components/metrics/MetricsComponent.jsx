@@ -4,31 +4,26 @@ import { Col, Row } from 'react-bootstrap';
 
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
 
-const MetricsComponent = React.createClass({
-  propTypes: {
+class MetricsComponent extends React.Component {
+  static propTypes = {
     names: PropTypes.arrayOf(PropTypes.object).isRequired,
     namespace: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
     filter: PropTypes.string,
-  },
+  };
 
-  getInitialState() {
-    return { filter: this.props.filter };
-  },
+  static defaultProps = { filter: '' };
+  state = { filter: this.props.filter };
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.filter !== this.props.filter) {
       this.setState({ filter: nextProps.filter });
     }
-  },
+  }
 
-  getDefaultProps() {
-    return { filter: '' };
-  },
-
-  onFilterChange(nextFilter) {
+  onFilterChange = (nextFilter) => {
     this.setState({ filter: nextFilter });
-  },
+  };
 
   render() {
     const { filter } = this.state;
@@ -48,7 +43,7 @@ const MetricsComponent = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default MetricsComponent;

@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
-const MeterDetails = React.createClass({
-  propTypes: {
+class MeterDetails extends React.Component {
+  static propTypes = {
     metric: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     const meter = this.props.metric.metric;
     return (
@@ -22,7 +23,7 @@ const MeterDetails = React.createClass({
         <dd><span className="number-format">{numeral(meter.rate.fifteen_minute).format('0,0.[00]')}</span> {meter.rate_unit}</dd>
       </dl>
     );
-  },
-});
+  }
+}
 
 export default MeterDetails;

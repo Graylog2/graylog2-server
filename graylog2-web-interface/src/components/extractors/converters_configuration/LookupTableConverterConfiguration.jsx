@@ -12,18 +12,16 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LookupTableConverterConfiguration = React.createClass({
-  propTypes: {
+class LookupTableConverterConfiguration extends React.Component {
+  static propTypes = {
     type: PropTypes.string.isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      lookupTables: undefined,
-    };
-  },
+  state = {
+    lookupTables: undefined,
+  };
 
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
@@ -32,34 +30,34 @@ const LookupTableConverterConfiguration = React.createClass({
     LookupTablesActions.searchPaginated(1, 10000, null).then((result) => {
       this.setState({ lookupTables: result.lookup_tables });
     });
-  },
+  }
 
-  _getConverterObject(configuration) {
+  _getConverterObject = (configuration) => {
     return { type: this.props.type, config: configuration || this.props.configuration };
-  },
+  };
 
-  _toggleConverter(event) {
+  _toggleConverter = (event) => {
     let converter;
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
     this.props.onChange(this.props.type, converter);
-  },
+  };
 
-  _updateConfigValue(key, value) {
+  _updateConfigValue = (key, value) => {
     const newConfig = this.props.configuration;
     newConfig[key] = value;
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
-  },
+  };
 
-  _onChange(key) {
+  _onChange = (key) => {
     return event => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
-  },
+  };
 
-  _onSelect(key) {
+  _onSelect = (key) => {
     return value => this._updateConfigValue(key, value);
-  },
+  };
 
   render() {
     if (!this.state.lookupTables) {
@@ -107,7 +105,7 @@ const LookupTableConverterConfiguration = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default LookupTableConverterConfiguration;

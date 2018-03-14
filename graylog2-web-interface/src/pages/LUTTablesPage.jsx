@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -14,7 +15,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LUTTablesPage = React.createClass({
+const LUTTablesPage = createReactClass({
+  displayName: 'LUTTablesPage',
+
   propTypes: {
     // eslint-disable-next-line react/no-unused-prop-types
     params: PropTypes.object.isRequired,

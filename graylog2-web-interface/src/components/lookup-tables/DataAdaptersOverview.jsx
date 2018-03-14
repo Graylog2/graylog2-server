@@ -14,30 +14,29 @@ import Styles from './Overview.css';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
-const DataAdaptersOverview = React.createClass({
-
-  propTypes: {
+class DataAdaptersOverview extends React.Component {
+  static propTypes = {
     dataAdapters: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
     errorStates: PropTypes.object.isRequired,
-  },
+  };
 
-  _onPageChange(newPage, newPerPage) {
+  _onPageChange = (newPage, newPerPage) => {
     LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage,
       this.props.pagination.query);
-  },
+  };
 
-  _onSearch(query, resetLoadingStateCb) {
+  _onSearch = (query, resetLoadingStateCb) => {
     LookupTableDataAdaptersActions
       .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
       .then(resetLoadingStateCb);
-  },
+  };
 
-  _onReset() {
+  _onReset = () => {
     LookupTableDataAdaptersActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
-  },
+  };
 
-  _helpPopover() {
+  _helpPopover = () => {
     return (
       <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
         <p><strong>Available search fields</strong></p>
@@ -80,7 +79,7 @@ const DataAdaptersOverview = React.createClass({
         </p>
       </Popover>
     );
-  },
+  };
 
   render() {
     if (!this.props.dataAdapters) {
@@ -125,7 +124,7 @@ const DataAdaptersOverview = React.createClass({
         </Col>
       </Row>
     </div>);
-  },
-});
+  }
+}
 
 export default DataAdaptersOverview;

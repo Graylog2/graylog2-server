@@ -14,8 +14,8 @@ import SortableListItem from './SortableListItem';
  * using a different array or object to keep the sorting state can still
  * use it.
  */
-const SortableList = React.createClass({
-  propTypes: {
+class SortableList extends React.Component {
+  static propTypes = {
     /** Specifies if dragging and dropping is disabled or not. */
     disableDragging: PropTypes.bool,
     /**
@@ -30,22 +30,21 @@ const SortableList = React.createClass({
      * The function will receive the newly sorted list as an argument.
      */
     onMoveItem: PropTypes.func,
-  },
-  getDefaultProps() {
-    return {
-      disableDragging: false,
-    };
-  },
+  };
 
-  getInitialState() {
-    return {
-      items: this.props.items,
-    };
-  },
+  static defaultProps = {
+    disableDragging: false,
+  };
+
+  state = {
+    items: this.props.items,
+  };
+
   componentWillReceiveProps(nextProps) {
     this.setState({ items: nextProps.items });
-  },
-  _moveItem(dragIndex, hoverIndex) {
+  }
+
+  _moveItem = (dragIndex, hoverIndex) => {
     const sortedItems = this.state.items;
     const tempItem = sortedItems[dragIndex];
     sortedItems[dragIndex] = sortedItems[hoverIndex];
@@ -54,7 +53,8 @@ const SortableList = React.createClass({
     if (typeof this.props.onMoveItem === 'function') {
       this.props.onMoveItem(sortedItems);
     }
-  },
+  };
+
   render() {
     const formattedItems = this.state.items.map((item, idx) => {
       return (
@@ -72,8 +72,8 @@ const SortableList = React.createClass({
         {formattedItems}
       </ListGroup>
     );
-  },
-});
+  }
+}
 
 
 export default DragDropContext(HTML5Backend)(SortableList);

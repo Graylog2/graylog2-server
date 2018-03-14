@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
 
@@ -17,12 +18,16 @@ import { Spinner } from 'components/common';
  *
  * All this information will be obtained from the `NodesStore`.
  */
-const LinkToNode = React.createClass({
+const LinkToNode = createReactClass({
+  displayName: 'LinkToNode',
+
   propTypes: {
     /** Node ID that will be used to generate the link. */
     nodeId: PropTypes.string.isRequired,
   },
+
   mixins: [Reflux.connect(NodesStore)],
+
   render() {
     if (!this.state.nodes) {
       return <Spinner />;

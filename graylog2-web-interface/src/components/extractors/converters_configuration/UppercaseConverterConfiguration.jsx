@@ -4,26 +4,30 @@ import { Input } from 'components/bootstrap';
 
 import FormUtils from 'util/FormsUtils';
 
-const UppercaseConverterConfiguration = React.createClass({
-  propTypes: {
+class UppercaseConverterConfiguration extends React.Component {
+  static propTypes = {
     type: PropTypes.string.isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
+
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
-  },
-  _getConverterObject() {
+  }
+
+  _getConverterObject = () => {
     return { type: this.props.type, config: this.props.configuration };
-  },
-  _toggleConverter(event) {
+  };
+
+  _toggleConverter = (event) => {
     let converter;
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
     this.props.onChange(this.props.type, converter);
-  },
+  };
+
   render() {
     return (
       <div className="xtrc-converter">
@@ -35,7 +39,7 @@ const UppercaseConverterConfiguration = React.createClass({
                onChange={this._toggleConverter} />
       </div>
     );
-  },
-});
+  }
+}
 
 export default UppercaseConverterConfiguration;

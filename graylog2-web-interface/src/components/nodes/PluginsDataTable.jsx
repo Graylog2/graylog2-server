@@ -4,14 +4,16 @@ import { Alert } from 'react-bootstrap';
 
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 
-const PluginsDataTable = React.createClass({
-  propTypes: {
+class PluginsDataTable extends React.Component {
+  static propTypes = {
     plugins: PropTypes.array,
-  },
-  _headerCellFormatter(header) {
+  };
+
+  _headerCellFormatter = (header) => {
     return <th>{header}</th>;
-  },
-  _pluginInfoFormatter(plugin) {
+  };
+
+  _pluginInfoFormatter = (plugin) => {
     return (
       <tr key={plugin.name}>
         <td className="limited">{plugin.name}</td>
@@ -24,7 +26,8 @@ const PluginsDataTable = React.createClass({
         </td>
       </tr>
     );
-  },
+  };
+
   render() {
     if (!this.props.plugins) {
       return <Spinner text="Loading plugins on this node..." />;
@@ -48,7 +51,7 @@ const PluginsDataTable = React.createClass({
                  filterLabel="Filter"
                  filterKeys={[]} />
     );
-  },
-});
+  }
+}
 
 export default PluginsDataTable;

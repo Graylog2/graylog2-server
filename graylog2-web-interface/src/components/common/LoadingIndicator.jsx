@@ -13,21 +13,19 @@ import loadingIndicatorStyle from './LoadingIndicator.css';
  * Use this component when you want to load something in the background, but still provide some feedback that
  * an action is happening.
  */
-const LoadingIndicator = React.createClass({
-  propTypes: {
+class LoadingIndicator extends React.Component {
+  static propTypes = {
     /** Text to display while the indicator is shown. */
     text: PropTypes.string,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      text: 'Loading...',
-    };
-  },
+  static defaultProps = {
+    text: 'Loading...',
+  };
 
   render() {
     return <Alert bsStyle="info" className={loadingIndicatorStyle.loadingIndicator}><Spinner text={this.props.text} /></Alert>;
-  },
-});
+  }
+}
 
 export default LoadingIndicator;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Alert, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
@@ -11,7 +12,9 @@ import SimulationTrace from './SimulationTrace';
 
 import NumberUtils from 'util/NumberUtils';
 
-const SimulationResults = React.createClass({
+const SimulationResults = createReactClass({
+  displayName: 'SimulationResults',
+
   propTypes: {
     stream: PropTypes.object.isRequired,
     originalMessage: PropTypes.object,

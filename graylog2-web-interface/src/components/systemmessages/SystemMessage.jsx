@@ -4,10 +4,11 @@ import moment from 'moment';
 
 import { LinkToNode } from 'components/common';
 
-const SystemMessage = React.createClass({
-  propTypes: {
+class SystemMessage extends React.Component {
+  static propTypes = {
     message: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     const message = this.props.message;
     return (
@@ -19,7 +20,7 @@ const SystemMessage = React.createClass({
         <td>{message.content}</td>
       </tr>
     );
-  },
-});
+  }
+}
 
 export default SystemMessage;

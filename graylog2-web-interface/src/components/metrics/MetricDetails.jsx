@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
@@ -8,17 +9,23 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
-const MetricDetails = React.createClass({
+const MetricDetails = createReactClass({
+  displayName: 'MetricDetails',
+
   propTypes: {
     metric: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   componentDidMount() {
     MetricsActions.add(this.props.nodeId, this.props.metric.full_name);
   },
+
   componentWillUnmount() {
     MetricsActions.remove(this.props.nodeId, this.props.metric.full_name);
   },
+
   _formatDetailsForType(type, metric) {
     switch (type) {
       case 'Counter':
@@ -35,6 +42,7 @@ const MetricDetails = React.createClass({
         return <i>Invalid metric type: {type}</i>;
     }
   },
+
   render() {
     const metricName = this.props.metric.full_name;
     const nodeId = this.props.nodeId;

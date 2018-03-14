@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { TimeUnit } from 'components/common';
 
-const GuavaCacheSummary = React.createClass({
-  propTypes: {
+class GuavaCacheSummary extends React.Component {
+  static propTypes = {
     cache: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     const config = this.props.cache.config;
@@ -17,7 +17,7 @@ const GuavaCacheSummary = React.createClass({
       <dt>Expire after write</dt>
       <dd><TimeUnit value={config.expire_after_write} unit={config.expire_after_write_unit} /></dd>
     </dl>);
-  },
-});
+  }
+}
 
 export default GuavaCacheSummary;

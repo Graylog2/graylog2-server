@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
@@ -11,7 +12,9 @@ const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 import UIUtils from 'util/UIUtils';
 
-const FieldGraphs = React.createClass({
+const FieldGraphs = createReactClass({
+  displayName: 'FieldGraphs',
+
   propTypes: {
     from: PropTypes.any.isRequired,
     to: PropTypes.any.isRequired,
@@ -19,7 +22,9 @@ const FieldGraphs = React.createClass({
     stream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
+
   mixins: [PureRenderMixin],
+
   getInitialState() {
     this.notifyOnNewGraphs = false;
 
@@ -28,6 +33,7 @@ const FieldGraphs = React.createClass({
       stackedGraphs: Immutable.fromJS(FieldGraphsStore.stackedGraphs.toJS()),
     };
   },
+
   componentDidMount() {
     this.initialFieldGraphs = this.state.fieldGraphs;
     this.notifyOnNewGraphs = true;
@@ -41,16 +47,20 @@ const FieldGraphs = React.createClass({
       }
     };
   },
+
   componentWillUnmount() {
     FieldGraphsStore.resetStore();
   },
+
   addField(field) {
     const streamId = this.props.stream ? this.props.stream.id : undefined;
     FieldGraphsStore.newFieldGraph(field, { interval: this.props.resolution, streamid: streamId });
   },
+
   deleteFieldGraph(graphId) {
     FieldGraphsStore.deleteGraph(graphId);
   },
+
   render() {
     const fieldGraphs = this.state.fieldGraphs
       .sortBy(graph => graph.createdAt)

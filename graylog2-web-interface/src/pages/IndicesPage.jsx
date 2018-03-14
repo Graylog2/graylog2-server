@@ -9,7 +9,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexSetsComponent } from 'components/indices';
 
-const IndicesPage = React.createClass({
+class IndicesPage extends React.Component {
   render() {
     const pageHeader = (
       <PageHeader title="Indices & Index Sets">
@@ -45,7 +45,7 @@ const IndicesPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default IndicesPage;

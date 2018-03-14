@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
@@ -19,17 +20,21 @@ import ActionsProvider from 'injection/ActionsProvider';
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
-const AppWithSearchBar = React.createClass({
+const AppWithSearchBar = createReactClass({
+  displayName: 'AppWithSearchBar',
+
   propTypes: {
     children: PropTypes.element.isRequired,
     location: PropTypes.object,
     params: PropTypes.object,
   },
+
   mixins: [
     Reflux.connect(CurrentUserStore),
     Reflux.connect(SavedSearchesStore),
     Reflux.connect(ConfigurationsStore),
   ],
+
   getInitialState() {
     return {
       forceFetch: false,
@@ -38,20 +43,25 @@ const AppWithSearchBar = React.createClass({
       searchesClusterConfig: undefined,
     };
   },
+
   componentDidMount() {
     SavedSearchesActions.list.triggerPromise();
     ConfigurationActions.listSearchesClusterConfig();
     this._loadStream(this.props.params.streamId);
   },
+
   componentWillReceiveProps(nextProps) {
     this._loadStream(nextProps.params.streamId);
   },
+
   componentWillUnmount() {
     SearchStore.unload();
   },
+
   _resetForceFetch() {
     this.setState({ forceFetch: false });
   },
+
   _loadStream(streamId) {
     if (streamId) {
       StreamsStore.get(streamId, stream => this.setState({ stream: stream }, this._updateSearchParams));
@@ -59,6 +69,7 @@ const AppWithSearchBar = React.createClass({
       this.setState({ stream: undefined }, this._updateSearchParams);
     }
   },
+
   _updateSearchParams() {
     SearchStore.searchInStream = this.state.stream;
     SearchStore.load();
@@ -66,21 +77,26 @@ const AppWithSearchBar = React.createClass({
       this.refs.searchBar.reload();
     }
   },
+
   _isLoading() {
     return !this.state.savedSearches || !this.state.searchesClusterConfig || (this.props.params.streamId && !this.state.stream);
   },
+
   _decorateChildren(children) {
     return React.Children.map(children, (child) => {
       return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig, forceFetch: this.state.forceFetch });
     });
   },
+
   _searchBarShouldDisplayRefreshControls() {
     // Hide refresh controls on sources page
     return this.props.location.pathname !== Routes.SOURCES;
   },
+
   _onExecuteSearch() {
     this.setState({ forceFetch: true }, this._resetForceFetch);
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

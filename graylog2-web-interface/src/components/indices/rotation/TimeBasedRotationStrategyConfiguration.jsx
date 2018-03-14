@@ -3,20 +3,18 @@ import React from 'react';
 import { Input } from 'components/bootstrap';
 import moment from 'moment';
 
-const TimeBasedRotationStrategyConfiguration = React.createClass({
-  propTypes: {
+class TimeBasedRotationStrategyConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     jsonSchema: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      rotation_period: this.props.config.rotation_period,
-    };
-  },
+  state = {
+    rotation_period: this.props.config.rotation_period,
+  };
 
-  _onPeriodUpdate(field) {
+  _onPeriodUpdate = (field) => {
     return () => {
       const update = {};
       let period = this.refs[field].getValue().toUpperCase();
@@ -34,23 +32,23 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
         this.props.updateConfig(update);
       }
     };
-  },
+  };
 
-  _isValidPeriod(duration) {
+  _isValidPeriod = (duration) => {
     const check = duration || this.state.rotation_period;
     return moment.duration(check).asMilliseconds() >= 3600000;
-  },
+  };
 
-  _validationState() {
+  _validationState = () => {
     if (this._isValidPeriod()) {
       return undefined;
     }
     return 'error';
-  },
+  };
 
-  _formatDuration() {
+  _formatDuration = () => {
     return this._isValidPeriod() ? moment.duration(this.state.rotation_period).humanize() : 'invalid (min 1 hour)';
-  },
+  };
 
   render() {
     return (
@@ -67,7 +65,7 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
                required />
       </div>
     );
-  },
-});
+  }
+}
 
 export default TimeBasedRotationStrategyConfiguration;

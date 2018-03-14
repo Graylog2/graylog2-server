@@ -6,15 +6,15 @@ import SearchUtils from 'util/SearchUtils';
 
 import { QueryConfiguration, QuickValuesConfiguration } from 'components/widgets/configurations';
 
-const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
-  propTypes: {
+class QuickValuesHistogramWidgetEditConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
 
-  _onIntervalChange(value) {
+  _onIntervalChange = (value) => {
     this.props.onChange('interval', value);
-  },
+  };
 
   render() {
     const intervalOptions = SearchUtils.histogramIntervals().map((i) => {
@@ -33,7 +33,7 @@ const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
         </FormGroup>
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default QuickValuesHistogramWidgetEditConfiguration;

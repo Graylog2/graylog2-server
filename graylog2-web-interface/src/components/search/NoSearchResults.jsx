@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Col, Row } from 'react-bootstrap';
 
 import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
@@ -11,7 +12,9 @@ import DocsHelper from 'util/DocsHelper';
 import StoreProvider from 'injection/StoreProvider';
 const SearchStore = StoreProvider.getStore('Search');
 
-const NoSearchResults = React.createClass({
+const NoSearchResults = createReactClass({
+  displayName: 'NoSearchResults',
+
   propTypes: {
     builtQuery: PropTypes.string,
     histogram: PropTypes.object.isRequired,

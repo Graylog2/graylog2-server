@@ -15,21 +15,22 @@ import {
 
 import ExtractorUtils from 'util/ExtractorUtils';
 
-const EditExtractorConfiguration = React.createClass({
-  propTypes: {
+class EditExtractorConfiguration extends React.Component {
+  static propTypes = {
     extractorType: PropTypes.oneOf(ExtractorUtils.EXTRACTOR_TYPES).isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     exampleMessage: PropTypes.string,
-  },
-  getInitialState() {
-    return {
-      extractorPreview: undefined,
-    };
-  },
-  _onExtractorPreviewLoad(extractorPreviewNode) {
+  };
+
+  state = {
+    extractorPreview: undefined,
+  };
+
+  _onExtractorPreviewLoad = (extractorPreviewNode) => {
     this.setState({ extractorPreview: extractorPreviewNode });
-  },
+  };
+
   render() {
     let extractorConfiguration;
 
@@ -117,7 +118,7 @@ const EditExtractorConfiguration = React.createClass({
         {extractorPreview}
       </div>
     );
-  },
-});
+  }
+}
 
 export default EditExtractorConfiguration;

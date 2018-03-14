@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col, Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -11,15 +12,19 @@ import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal'
 import DataTable from 'components/common/DataTable';
 import IfPermitted from 'components/common/IfPermitted';
 
-const GrokPatterns = React.createClass({
+const GrokPatterns = createReactClass({
+  displayName: 'GrokPatterns',
+
   getInitialState() {
     return {
       patterns: [],
     };
   },
+
   componentDidMount() {
     this.loadData();
   },
+
   loadData() {
     GrokPatternsStore.loadPatterns((patterns) => {
       if (this.isMounted()) {
@@ -29,21 +34,25 @@ const GrokPatterns = React.createClass({
       }
     });
   },
+
   validPatternName(name) {
     // Check if patterns already contain a pattern with the given name.
     return !this.state.patterns.some(pattern => pattern.name === name);
   },
+
   savePattern(pattern, callback) {
     GrokPatternsStore.savePattern(pattern, () => {
       callback();
       this.loadData();
     });
   },
+
   confirmedRemove(pattern) {
     if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
       GrokPatternsStore.deletePattern(pattern, this.loadData);
     }
   },
+
   _headerCellFormatter(header) {
     let formattedHeaderCell;
 
@@ -60,6 +69,7 @@ const GrokPatterns = React.createClass({
 
     return formattedHeaderCell;
   },
+
   _patternFormatter(pattern) {
     return (
       <tr key={pattern.id}>
@@ -85,6 +95,7 @@ const GrokPatterns = React.createClass({
       </tr>
     );
   },
+
   render() {
     const headers = ['Name', 'Pattern', 'Actions'];
     const filterKeys = ['name'];

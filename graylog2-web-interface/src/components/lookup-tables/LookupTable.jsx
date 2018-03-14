@@ -13,48 +13,45 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LookupTable = React.createClass({
-
-  propTypes: {
+class LookupTable extends React.Component {
+  static propTypes = {
     table: PropTypes.object.isRequired,
     cache: PropTypes.object.isRequired,
     dataAdapter: PropTypes.object.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      lookupKey: null,
-      lookupResult: null,
-      purgeKey: null,
-    };
-  },
+  state = {
+    lookupKey: null,
+    lookupResult: null,
+    purgeKey: null,
+  };
 
-  _onChange(event) {
+  _onChange = (event) => {
     this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
-  },
+  };
 
-  _onChangePurgeKey(event) {
+  _onChangePurgeKey = (event) => {
     this.setState({ purgeKey: FormsUtils.getValueFromInput(event.target) });
-  },
+  };
 
-  _onPurgeKey(e) {
+  _onPurgeKey = (e) => {
     e.preventDefault();
     if (this.state.purgeKey && this.state.purgeKey.length > 0) {
       LookupTablesActions.purgeKey(this.props.table, this.state.purgeKey);
     }
-  },
+  };
 
-  _onPurgeAll(e) {
+  _onPurgeAll = (e) => {
     e.preventDefault();
     LookupTablesActions.purgeAll(this.props.table);
-  },
+  };
 
-  _lookupKey(e) {
+  _lookupKey = (e) => {
     e.preventDefault();
     LookupTablesActions.lookup(this.props.table.name, this.state.lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });
-  },
+  };
 
   render() {
     return (
@@ -130,8 +127,7 @@ const LookupTable = React.createClass({
         </Col>
       </Row>
     );
-  },
-
-});
+  }
+}
 
 export default LookupTable;

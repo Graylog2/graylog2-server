@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 import RolesComponent from 'components/users/RolesComponent';
 import { DocumentTitle } from 'components/common';
 
-const RolesPage = React.createClass({
+class RolesPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Roles">
@@ -15,7 +15,7 @@ const RolesPage = React.createClass({
         </Row>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default RolesPage;

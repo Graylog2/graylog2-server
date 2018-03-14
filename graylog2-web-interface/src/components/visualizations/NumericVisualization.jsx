@@ -15,8 +15,8 @@ const TREND_ICON_COLOR = '#E3E5E5';
 const TREND_ICON_GOOD_COLOR = '#8DC63F';
 const TREND_ICON_BAD_COLOR = '#BE1E2D';
 
-const NumericVisualization = React.createClass({
-  propTypes: {
+class NumericVisualization extends React.Component {
+  static propTypes = {
     id: PropTypes.string.isRequired,
     config: PropTypes.object.isRequired,
     data: PropTypes.oneOfType([
@@ -26,41 +26,39 @@ const NumericVisualization = React.createClass({
     height: PropTypes.number,
     width: PropTypes.number,
     onRenderComplete: PropTypes.func,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      onRenderComplete: () => {
-      },
-    };
-  },
+  static defaultProps = {
+    onRenderComplete: () => {
+    },
+  };
 
-  getInitialState() {
-    return {
-      currentNumber: undefined,
-      previousNumber: undefined,
-    };
-  },
+  state = {
+    currentNumber: undefined,
+    previousNumber: undefined,
+  };
+
   componentDidMount() {
     this._updateData(this.props.data, this.props.onRenderComplete);
-  },
+  }
+
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
       return;
     }
     this._updateData(nextProps.data, this.props.onRenderComplete);
-  },
+  }
 
-  DEFAULT_VALUE_FONT_SIZE: '60px',
-  NUMBER_OF_INDICATORS: 3,
-  PERCENTAGE_PER_INDICATOR: 30,
+  DEFAULT_VALUE_FONT_SIZE = '60px';
+  NUMBER_OF_INDICATORS = 3;
+  PERCENTAGE_PER_INDICATOR = 30;
 
-  _updateData(data, renderCallback) {
+  _updateData = (data, renderCallback) => {
     const state = this._normalizeStateFromProps(data);
     this.setState(state, renderCallback);
-  },
+  };
 
-  _normalizeStateFromProps(props) {
+  _normalizeStateFromProps = (props) => {
     let state = {};
     if (typeof props === 'object') {
       const normalizedNowNumber = NumberUtils.normalizeNumber(props.now);
@@ -74,8 +72,9 @@ const NumericVisualization = React.createClass({
       state = { currentNumber: props };
     }
     return state;
-  },
-  _calculatePercentage(nowNumber, previousNumber) {
+  };
+
+  _calculatePercentage = (nowNumber, previousNumber) => {
     let percentage;
     if (previousNumber === 0 || isNaN(previousNumber)) {
       let factor = 0;
@@ -91,8 +90,9 @@ const NumericVisualization = React.createClass({
     }
 
     return percentage;
-  },
-  _calculateFontSize() {
+  };
+
+  _calculateFontSize = () => {
     if (typeof this.props.data === 'undefined') {
       return this.DEFAULT_VALUE_FONT_SIZE;
     }
@@ -124,11 +124,13 @@ const NumericVisualization = React.createClass({
     }
 
     return fontSize;
-  },
-  _formatData() {
+  };
+
+  _formatData = () => {
     return String(NumberUtils.formatNumber(this.state.currentNumber));
-  },
-  _isIndicatorActive(index, trendIndicatorType) {
+  };
+
+  _isIndicatorActive = (index, trendIndicatorType) => {
     if ((this.state.percentage === 0) ||
       (this.state.currentNumber >= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.HIGHER) ||
       (this.state.currentNumber <= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.LOWER)) {
@@ -141,8 +143,9 @@ const NumericVisualization = React.createClass({
       index = Math.abs(index - (this.NUMBER_OF_INDICATORS - 1));
     }
     return Math.abs(this.state.percentage) >= this.PERCENTAGE_PER_INDICATOR * index;
-  },
-  _getStrokeColor(index, trendIndicatorType) {
+  };
+
+  _getStrokeColor = (index, trendIndicatorType) => {
     const indicatorIsActive = this._isIndicatorActive(index, trendIndicatorType);
     if (!indicatorIsActive) {
       return TREND_ICON_COLOR;
@@ -154,22 +157,26 @@ const NumericVisualization = React.createClass({
     const activeStroke = trendIndicatorType === TrendIndicatorType.HIGHER ? higherStroke : lowerStroke;
 
     return activeStroke;
-  },
-  _getHigherStrokeColor(index) {
+  };
+
+  _getHigherStrokeColor = (index) => {
     return this._getStrokeColor(index, TrendIndicatorType.HIGHER);
-  },
-  _getLowerStrokeColor(index) {
+  };
+
+  _getLowerStrokeColor = (index) => {
     return this._getStrokeColor(index, TrendIndicatorType.LOWER);
-  },
+  };
+
   // We need to set some attributes in the DOM elements that React v0.14 does not support.
   // This is a hack to workaround it as suggested in https://github.com/facebook/react/pull/5210
-  _setAttribute(attribute, value) {
+  _setAttribute = (attribute, value) => {
     return (node) => {
       if (node) {
         node.setAttribute(attribute, value);
       }
     };
-  },
+  };
+
   render() {
     const { id, config, width, height } = this.props;
 
@@ -202,7 +209,7 @@ const NumericVisualization = React.createClass({
         </svg>
       </div>
     );
-  },
-});
+  }
+}
 
 export default NumericVisualization;

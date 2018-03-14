@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
 import { AutoAffix } from 'react-overlays';
@@ -26,7 +27,9 @@ import ApiRoutes from 'routing/ApiRoutes';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-const SearchSidebar = React.createClass({
+const SearchSidebar = createReactClass({
+  displayName: 'SearchSidebar',
+
   propTypes: {
     builtQuery: PropTypes.any,
     currentSavedSearch: PropTypes.string,

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Input } from 'components/bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -9,7 +10,9 @@ import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 import StringUtils from 'util/StringUtils';
 
-const WidgetCreationModal = React.createClass({
+const WidgetCreationModal = createReactClass({
+  displayName: 'WidgetCreationModal',
+
   propTypes: {
     fields: PropTypes.array,
     onConfigurationSaved: PropTypes.func.isRequired,

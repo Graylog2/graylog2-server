@@ -12,22 +12,24 @@ StoreProvider.getStore('IndexRanges'); // To make IndexRangesActions work.
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
-const IndexDetails = React.createClass({
-  propTypes: {
+class IndexDetails extends React.Component {
+  static propTypes = {
     index: PropTypes.object.isRequired,
     indexName: PropTypes.string.isRequired,
     indexRange: PropTypes.object.isRequired,
     indexSetId: PropTypes.string.isRequired,
     isDeflector: PropTypes.bool.isRequired,
-  },
+  };
+
   componentDidMount() {
     IndicesActions.subscribe(this.props.indexName);
-  },
+  }
+
   componentWillUnmount() {
     IndicesActions.unsubscribe(this.props.indexName);
-  },
+  }
 
-  _formatActionButtons() {
+  _formatActionButtons = () => {
     if (this.props.isDeflector) {
       return (
         <span>
@@ -44,28 +46,32 @@ const IndexDetails = React.createClass({
         <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>Delete index</Button>
       </span>
     );
-  },
-  _onRecalculateIndex() {
+  };
+
+  _onRecalculateIndex = () => {
     if (window.confirm(`Really recalculate the index ranges for index ${this.props.indexName}?`)) {
       IndexRangesActions.recalculateIndex(this.props.indexName).then(() => {
         IndicesActions.list(this.props.indexSetId);
       });
     }
-  },
-  _onCloseIndex() {
+  };
+
+  _onCloseIndex = () => {
     if (window.confirm(`Really close index ${this.props.indexName}?`)) {
       IndicesActions.close(this.props.indexName).then(() => {
         IndicesActions.list(this.props.indexSetId);
       });
     }
-  },
-  _onDeleteIndex() {
+  };
+
+  _onDeleteIndex = () => {
     if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
       IndicesActions.delete(this.props.indexName).then(() => {
         IndicesActions.list(this.props.indexSetId);
       });
     }
-  },
+  };
+
   render() {
     if (!this.props.index || !this.props.index.all_shards) {
       return <Spinner />;
@@ -95,7 +101,7 @@ const IndexDetails = React.createClass({
         {this._formatActionButtons()}
       </div>
     );
-  },
-});
+  }
+}
 
 export default IndexDetails;

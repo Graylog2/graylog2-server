@@ -5,10 +5,10 @@ import { ConfigurationWell } from 'components/configurationforms';
 import GracePeriodSummary from 'components/alertconditions/GracePeriodSummary';
 import BacklogSummary from 'components/alertconditions/BacklogSummary';
 
-const GenericAlertConditionSummary = React.createClass({
-  propTypes: {
+class GenericAlertConditionSummary extends React.Component {
+  static propTypes = {
     alertCondition: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     const alertCondition = this.props.alertCondition;
@@ -22,7 +22,7 @@ const GenericAlertConditionSummary = React.createClass({
         <ConfigurationWell configuration={alertCondition.parameters} />
       </span>
     );
-  },
-});
+  }
+}
 
 export default GenericAlertConditionSummary;

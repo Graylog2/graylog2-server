@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import PermissionsMixin from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
@@ -10,7 +12,9 @@ const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 import UserNotification from 'util/UserNotification';
 
-const StreamRule = React.createClass({
+const StreamRule = createReactClass({
+  displayName: 'StreamRule',
+
   propTypes: {
     matchData: PropTypes.array,
     onDelete: PropTypes.func,
@@ -20,11 +24,14 @@ const StreamRule = React.createClass({
     streamRule: PropTypes.object.isRequired,
     streamRuleTypes: PropTypes.array.isRequired,
   },
+
   mixins: [PermissionsMixin],
+
   _onEdit(event) {
     event.preventDefault();
     this.refs.streamRuleForm.open();
   },
+
   _onDelete(event) {
     event.preventDefault();
     if (window.confirm('Do you really want to delete this stream rule?')) {
@@ -36,6 +43,7 @@ const StreamRule = React.createClass({
       });
     }
   },
+
   _onSubmit(streamRuleId, data) {
     StreamRulesStore.update(this.props.stream.id, streamRuleId, data, () => {
       if (this.props.onSubmit) {
@@ -44,6 +52,7 @@ const StreamRule = React.createClass({
       UserNotification.success('Stream rule has been successfully updated.', 'Success');
     });
   },
+
   _formatActionItems() {
     return (
       <span>
@@ -56,9 +65,11 @@ const StreamRule = React.createClass({
       </span>
     );
   },
+
   _getMatchDataClassNames() {
     return (this.props.matchData.rules[this.props.streamRule.id] ? 'alert-success' : 'alert-danger');
   },
+
   render() {
     const streamRule = this.props.streamRule;
     const streamRuleTypes = this.props.streamRuleTypes;

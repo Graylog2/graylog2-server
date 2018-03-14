@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
 
@@ -17,20 +18,27 @@ function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
 }
 
-const NodeInputsPage = React.createClass({
+const NodeInputsPage = createReactClass({
+  displayName: 'NodeInputsPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
+
   componentDidMount() {
     this.interval = setInterval(InputStatesStore.list, 2000);
   },
+
   componentWillUnmount() {
     clearInterval(this.interval);
   },
+
   _isLoading() {
     return !this.state.node;
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

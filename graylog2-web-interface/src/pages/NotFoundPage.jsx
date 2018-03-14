@@ -4,14 +4,14 @@ import { DocumentTitle } from 'components/common';
 
 import style from '!style/useable!css!./NotFoundPage.css';
 
-const NotFoundPage = React.createClass({
+class NotFoundPage extends React.Component {
   componentDidMount() {
     style.use();
-  },
+  }
 
   componentWillUnmount() {
     style.unuse();
-  },
+  }
 
   render() {
     return (
@@ -27,7 +27,7 @@ const NotFoundPage = React.createClass({
         </Row>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default NotFoundPage;

@@ -17,21 +17,22 @@ import { Spinner } from 'components/common';
 
 import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
 
-const EditRolesForm = React.createClass({
-  propTypes: {
+class EditRolesForm extends React.Component {
+  static propTypes = {
     user: PropTypes.object.isRequired,
-  },
-  getInitialState() {
-    return {
-      newRoles: null,
-    };
-  },
+  };
+
+  state = {
+    newRoles: null,
+  };
+
   componentDidMount() {
     RolesStore.loadRoles().then((roles) => {
       this.setState({ roles: roles.sort((r1, r2) => r1.name.localeCompare(r2.name)) });
     });
-  },
-  _updateRoles(evt) {
+  }
+
+  _updateRoles = (evt) => {
     evt.preventDefault();
     if (confirm(`Really update roles for "${this.props.user.username}"?`)) {
       const roles = this.refs.roles.getValue().filter(value => value !== '');
@@ -44,14 +45,17 @@ const EditRolesForm = React.createClass({
         UserNotification.error('Updating roles failed.', 'Error!');
       });
     }
-  },
-  _onCancel() {
+  };
+
+  _onCancel = () => {
     history.push(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
-  },
-  _onValueChange(newRoles) {
+  };
+
+  _onValueChange = (newRoles) => {
     const roles = newRoles.split(',');
     this.setState({ newRoles: roles });
-  },
+  };
+
   render() {
     const user = this.props.user;
     if (!this.state.roles) {
@@ -110,7 +114,7 @@ const EditRolesForm = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default EditRolesForm;

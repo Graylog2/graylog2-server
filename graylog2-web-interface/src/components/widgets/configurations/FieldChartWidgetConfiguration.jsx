@@ -6,11 +6,12 @@ import { QueryConfiguration } from 'components/widgets/configurations';
 import StoreProvider from 'injection/StoreProvider';
 const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
-const FieldChartWidgetConfiguration = React.createClass({
-  propTypes: {
+class FieldChartWidgetConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
+
   render() {
     return (
       <fieldset>
@@ -33,7 +34,7 @@ const FieldChartWidgetConfiguration = React.createClass({
         </Input>
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default FieldChartWidgetConfiguration;

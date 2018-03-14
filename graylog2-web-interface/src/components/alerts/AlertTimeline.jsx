@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner, Timestamp } from 'components/common';
@@ -11,7 +12,9 @@ import style from './AlertTimeline.css';
 const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
-const AlertTimeline = React.createClass({
+const AlertTimeline = createReactClass({
+  displayName: 'AlertTimeline',
+
   propTypes: {
     alert: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,

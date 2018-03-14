@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
@@ -12,7 +13,9 @@ import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
-const AlarmCallbackHistoryOverview = React.createClass({
+const AlarmCallbackHistoryOverview = createReactClass({
+  displayName: 'AlarmCallbackHistoryOverview',
+
   propTypes: {
     alertId: PropTypes.string.isRequired,
     streamId: PropTypes.string.isRequired,
@@ -25,9 +28,11 @@ const AlarmCallbackHistoryOverview = React.createClass({
       <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.availableNotifications} />
     );
   },
+
   _isLoading() {
     return !(this.state.histories && this.state.availableNotifications);
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

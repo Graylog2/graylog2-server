@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { IfPermitted } from 'components/common';
@@ -9,7 +10,9 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';
 const StartpageStore = StoreProvider.getStore('Startpage');
 
-const StreamControls = React.createClass({
+const StreamControls = createReactClass({
+  displayName: 'StreamControls',
+
   propTypes: {
     stream: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
@@ -20,33 +23,42 @@ const StreamControls = React.createClass({
     onUpdate: PropTypes.func.isRequired,
     isDefaultStream: PropTypes.bool,
   },
+
   mixins: [PermissionsMixin],
+
   getInitialState() {
     return {};
   },
+
   _onDelete(_, event) {
     event.preventDefault();
     this.props.onDelete(this.props.stream);
   },
+
   _onEdit(_, event) {
     event.preventDefault();
     this.refs.streamForm.open();
   },
+
   _onClone(_, event) {
     event.preventDefault();
     this.refs.cloneForm.open();
   },
+
   _onCloneSubmit(_, stream) {
     this.props.onClone(this.props.stream.id, stream);
   },
+
   _onQuickAdd(_, event) {
     event.preventDefault();
     this.props.onQuickAdd(this.props.stream.id);
   },
+
   _setStartpage(_, event) {
     event.preventDefault();
     StartpageStore.set(this.props.user.username, 'stream', this.props.stream.id);
   },
+
   render() {
     const stream = this.props.stream;
 

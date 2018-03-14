@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -10,11 +11,14 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 import { AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 
-const AlertCondition = React.createClass({
+const AlertCondition = createReactClass({
+  displayName: 'AlertCondition',
+
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object,
   },
+
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   _onDelete() {

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Badge, Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
@@ -25,7 +26,9 @@ import InactiveNavItem from './InactiveNavItem';
 
 import badgeStyles from 'components/bootstrap/Badge.css';
 
-const Navigation = React.createClass({
+const Navigation = createReactClass({
+  displayName: 'Navigation',
+
   propTypes: {
     requestPath: PropTypes.string.isRequired,
     loginName: PropTypes.string.isRequired,
@@ -38,6 +41,7 @@ const Navigation = React.createClass({
   componentDidMount() {
     this.interval = setInterval(NotificationsStore.list, this.POLL_INTERVAL);
   },
+
   componentWillUnmount() {
     clearInterval(this.interval);
   },

@@ -17,8 +17,8 @@ import fetch from 'logic/rest/FetchProvider';
  * Component that renders an input offering auto-completion for message fields.
  * Fields are loaded from the Graylog server in the background.
  */
-const TypeAheadFieldInput = React.createClass({
-  propTypes: {
+class TypeAheadFieldInput extends React.Component {
+  static propTypes = {
     /** ID of the input. */
     id: PropTypes.string.isRequired,
     /**
@@ -35,7 +35,8 @@ const TypeAheadFieldInput = React.createClass({
      * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#custom-events
      */
     onChange: PropTypes.func,
-  },
+  };
+
   componentDidMount() {
     if (this.refs.fieldInput) {
       const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
@@ -70,7 +71,8 @@ const TypeAheadFieldInput = React.createClass({
         }
       });
     }
-  },
+  }
+
   componentWillUnmount() {
     if (this.refs.fieldInput) {
       const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
@@ -78,9 +80,9 @@ const TypeAheadFieldInput = React.createClass({
       const fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
       $(fieldFormGroup).off('typeahead:change typeahead:selected');
     }
-  },
+  }
 
-  _getFilteredProps() {
+  _getFilteredProps = () => {
     let props = Immutable.fromJS(this.props);
 
     ['valueLink', 'onChange'].forEach((key) => {
@@ -90,7 +92,7 @@ const TypeAheadFieldInput = React.createClass({
     });
 
     return props.toJS();
-  },
+  };
 
   render() {
     return (
@@ -101,7 +103,7 @@ const TypeAheadFieldInput = React.createClass({
              defaultValue={this.props.valueLink ? this.props.valueLink.value : null}
              {...this._getFilteredProps()} />
     );
-  },
-});
+  }
+}
 
 export default TypeAheadFieldInput;

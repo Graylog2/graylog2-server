@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Col, Row } from 'react-bootstrap';
 
 import { Pluralize } from 'components/common';
 
-const SimulationChanges = React.createClass({
+const SimulationChanges = createReactClass({
+  displayName: 'SimulationChanges',
+
   propTypes: {
     originalMessage: PropTypes.object.isRequired,
     simulationResults: PropTypes.object.isRequired,

@@ -4,18 +4,19 @@ import { ControlLabel, FormGroup } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { MultiSelect } from 'components/common';
 
-const QuickValuesConfiguration = React.createClass({
-  propTypes: {
+class QuickValuesConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     isHistogram: PropTypes.bool,
-  },
-  getDefaultProps() {
-    return { isHistogram: false };
-  },
-  _onStackedFieldChange(values) {
+  };
+
+  static defaultProps = { isHistogram: false };
+
+  _onStackedFieldChange = (values) => {
     this.props.onChange('stacked_fields', values);
-  },
+  };
+
   render() {
     let dataTableLimitForm;
     if (!this.props.isHistogram) {
@@ -64,7 +65,7 @@ const QuickValuesConfiguration = React.createClass({
         </FormGroup>
       </div>
     );
-  },
-});
+  }
+}
 
 export default QuickValuesConfiguration;

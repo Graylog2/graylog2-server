@@ -4,11 +4,11 @@ import { Alert, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { EntityListItem } from 'components/common';
 
-const UnknownAlertNotification = React.createClass({
-  propTypes: {
+class UnknownAlertNotification extends React.Component {
+  static propTypes = {
     alertNotification: PropTypes.object.isRequired,
     onDelete: PropTypes.func.isRequired,
-  },
+  };
 
   render() {
     const notification = this.props.alertNotification;
@@ -34,7 +34,7 @@ const UnknownAlertNotification = React.createClass({
                       actions={actions}
                       contentRow={content} />
     );
-  },
-});
+  }
+}
 
 export default UnknownAlertNotification;

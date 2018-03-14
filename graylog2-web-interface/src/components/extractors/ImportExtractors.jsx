@@ -8,11 +8,12 @@ const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import UserNotification from 'util/UserNotification';
 
-const ImportExtractors = React.createClass({
-  propTypes: {
+class ImportExtractors extends React.Component {
+  static propTypes = {
     input: PropTypes.object.isRequired,
-  },
-  _onSubmit(event) {
+  };
+
+  _onSubmit = (event) => {
     event.preventDefault();
     try {
       const parsedExtractors = JSON.parse(this.refs.extractorsInput.getValue());
@@ -22,7 +23,8 @@ const ImportExtractors = React.createClass({
       UserNotification.error(`There was an error while parsing extractors. Are they in JSON format? ${error}`,
         'Could not import extractors');
     }
-  },
+  };
+
   render() {
     return (
       <Row className="content">
@@ -43,7 +45,7 @@ const ImportExtractors = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default ImportExtractors;

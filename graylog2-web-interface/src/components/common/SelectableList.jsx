@@ -16,8 +16,8 @@ import { Select } from 'components/common';
  * This component also allows to select the same option many times, and
  * it accepts both arrays of strings and objects as selected options.
  */
-const SelectableList = React.createClass({
-  propTypes: {
+class SelectableList extends React.Component {
+  static propTypes = {
     /** Options to display in the input. See `Select`'s `options` prop for more information. */
     options: PropTypes.array,
     /** Specifies whether `selectedOptions` contains strings or objects. */
@@ -41,31 +41,29 @@ const SelectableList = React.createClass({
     onChange: PropTypes.func,
     /** Specifies if the input should receive the input focus or not. */
     autoFocus: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      selectedOptionsType: 'string',
-      displayKey: 'label',
-      idKey: 'value',
-    };
-  },
+  static defaultProps = {
+    selectedOptionsType: 'string',
+    displayKey: 'label',
+    idKey: 'value',
+  };
 
   componentWillReceiveProps(nextProps) {
     if (this.props.selectedOptions !== nextProps.selectedOptions) {
       this.refs.select.clearValue();
     }
-  },
+  }
 
-  _getOptionId(option) {
+  _getOptionId = (option) => {
     return (typeof option === 'string' ? option : option[this.props.idKey]);
-  },
+  };
 
-  _getOptionDisplayValue(option) {
+  _getOptionDisplayValue = (option) => {
     return (typeof option === 'string' ? option : option[this.props.displayKey]);
-  },
+  };
 
-  _onAddOption(option) {
+  _onAddOption = (option) => {
     if (option === '') {
       return;
     }
@@ -80,16 +78,16 @@ const SelectableList = React.createClass({
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(newSelectedOptions);
     }
-  },
+  };
 
-  _onRemoveOption(optionIndex) {
+  _onRemoveOption = (optionIndex) => {
     return () => {
       const newSelectedOptions = this.props.selectedOptions.filter((_, idx) => idx !== optionIndex);
       if (typeof this.props.onChange === 'function') {
         this.props.onChange(newSelectedOptions);
       }
     };
-  },
+  };
 
   render() {
     const formattedOptions = this.props.selectedOptions.map((option, idx) => {
@@ -110,7 +108,7 @@ const SelectableList = React.createClass({
         }
       </div>
     );
-  },
-});
+  }
+}
 
 export default SelectableList;

@@ -3,8 +3,8 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Timestamp } from 'components/common';
 
-const WidgetFooter = React.createClass({
-  propTypes: {
+class WidgetFooter extends React.Component {
+  static propTypes = {
     locked: PropTypes.bool.isRequired,
     onDelete: PropTypes.func.isRequired,
     onEditConfig: PropTypes.func.isRequired,
@@ -14,19 +14,23 @@ const WidgetFooter = React.createClass({
     errorMessage: PropTypes.string,
     calculatedAt: PropTypes.string,
     replayDisabled: PropTypes.bool,
-  },
-  _showConfig(e) {
+  };
+
+  _showConfig = (e) => {
     e.preventDefault();
     this.props.onShowConfig();
-  },
-  _editConfig(e) {
+  };
+
+  _editConfig = (e) => {
     e.preventDefault();
     this.props.onEditConfig();
-  },
-  _delete(e) {
+  };
+
+  _delete = (e) => {
     e.preventDefault();
     this.props.onDelete();
-  },
+  };
+
   render() {
     let loadErrorElement;
 
@@ -90,7 +94,7 @@ const WidgetFooter = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default WidgetFooter;

@@ -1,14 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const BootstrapAccordionGroup = React.createClass({
-  propTypes: {
+class BootstrapAccordionGroup extends React.Component {
+  static propTypes = {
     name: PropTypes.string,
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
-  },
+  };
+
   render() {
     let name;
     let id;
@@ -32,7 +33,7 @@ const BootstrapAccordionGroup = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default BootstrapAccordionGroup;

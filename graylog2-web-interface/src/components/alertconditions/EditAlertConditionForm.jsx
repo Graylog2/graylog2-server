@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
@@ -11,7 +12,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const EditAlertConditionForm = React.createClass({
+const EditAlertConditionForm = createReactClass({
+  displayName: 'EditAlertConditionForm',
+
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,

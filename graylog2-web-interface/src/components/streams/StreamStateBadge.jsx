@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Label } from 'react-bootstrap';
 
-const StreamStateBadge = React.createClass({
-  propTypes: {
+class StreamStateBadge extends React.Component {
+  static propTypes = {
     stream: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     if (this.props.stream.is_default) {
       return <Label bsStyle="primary">Default</Label>;
@@ -16,7 +17,7 @@ const StreamStateBadge = React.createClass({
     }
 
     return <Label bsStyle="warning">Stopped</Label>;
-  },
-});
+  }
+}
 
 export default StreamStateBadge;

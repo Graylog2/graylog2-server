@@ -8,14 +8,14 @@ import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
-const ConfigurationBundlePreview = React.createClass({
-  propTypes: {
+class ConfigurationBundlePreview extends React.Component {
+  static propTypes = {
     sourceTypeId: PropTypes.string,
     sourceTypeDescription: PropTypes.string,
     onDelete: PropTypes.func.isRequired,
-  },
+  };
 
-  _confirmDeletion() {
+  _confirmDeletion = () => {
     if (window.confirm('You are about to delete this content pack, are you sure?')) {
       ConfigurationBundlesActions.delete(this.props.sourceTypeId).then(() => {
         UserNotification.success('Bundle deleted successfully.', 'Success');
@@ -24,14 +24,16 @@ const ConfigurationBundlePreview = React.createClass({
         UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
       });
     }
-  },
-  _onApply() {
+  };
+
+  _onApply = () => {
     ConfigurationBundlesActions.apply(this.props.sourceTypeId).then(() => {
       UserNotification.success('Bundle applied successfully.', 'Success');
     }, () => {
       UserNotification.error('Applying bundle failed, please check your logs for more information.', 'Error');
     });
-  },
+  };
+
   render() {
     let preview = 'Select a content pack from the list to see its preview.';
     let applyAction = '';
@@ -57,7 +59,7 @@ const ConfigurationBundlePreview = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ConfigurationBundlePreview;

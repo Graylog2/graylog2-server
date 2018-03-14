@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const BacklogSummary = React.createClass({
-  propTypes: {
+class BacklogSummary extends React.Component {
+  static propTypes = {
     alertCondition: PropTypes.object.isRequired,
-  },
-  _formatMessageCount(count) {
+  };
+
+  _formatMessageCount = (count) => {
     if (count === 0) {
       return 'Not including any messages';
     }
@@ -15,13 +16,14 @@ const BacklogSummary = React.createClass({
     }
 
     return `Including last ${count} messages`;
-  },
+  };
+
   render() {
     const backlog = this.props.alertCondition.parameters.backlog;
     return (
       <span>{this._formatMessageCount(backlog)} in alert notification.</span>
     );
-  },
-});
+  }
+}
 
 export default BacklogSummary;

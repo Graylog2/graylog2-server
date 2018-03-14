@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -7,8 +8,10 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 
-const SystemOutputsPage = React.createClass({
+const SystemOutputsPage = createReactClass({
+  displayName: 'SystemOutputsPage',
   mixins: [Reflux.connect(CurrentUserStore)],
+
   render() {
     return (
       <DocumentTitle title="Outputs">

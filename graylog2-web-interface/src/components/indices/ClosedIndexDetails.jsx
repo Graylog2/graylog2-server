@@ -7,19 +7,22 @@ const IndicesActions = ActionsProvider.getActions('Indices');
 
 import { IndexRangeSummary } from 'components/indices';
 
-const ClosedIndexDetails = React.createClass({
-  propTypes: {
+class ClosedIndexDetails extends React.Component {
+  static propTypes = {
     indexName: PropTypes.string.isRequired,
     indexRange: PropTypes.object,
-  },
-  _onReopen() {
+  };
+
+  _onReopen = () => {
     IndicesActions.reopen(this.props.indexName);
-  },
-  _onDeleteIndex() {
+  };
+
+  _onDeleteIndex = () => {
     if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
       IndicesActions.delete(this.props.indexName);
     }
-  },
+  };
+
   render() {
     const { indexRange } = this.props;
     return (
@@ -34,7 +37,7 @@ const ClosedIndexDetails = React.createClass({
         <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>Delete index</Button>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ClosedIndexDetails;

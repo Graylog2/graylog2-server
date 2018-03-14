@@ -13,14 +13,14 @@ import RuleHelper from './RuleHelper';
 
 import Routes from 'routing/Routes';
 
-const Rule = React.createClass({
-  propTypes: {
+class Rule extends React.Component {
+  static propTypes = {
     rule: PropTypes.object,
     usedInPipelines: PropTypes.array,
     create: PropTypes.bool,
     onSave: PropTypes.func.isRequired,
     validateRule: PropTypes.func.isRequired,
-  },
+  };
 
   render() {
     let title;
@@ -70,7 +70,7 @@ const Rule = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default Rule;

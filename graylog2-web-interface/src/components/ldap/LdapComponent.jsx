@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col, Button, Panel } from 'react-bootstrap';
 import URI from 'urijs';
@@ -130,7 +131,8 @@ const HelperText = {
   },
 };
 
-const LdapComponent = React.createClass({
+const LdapComponent = createReactClass({
+  displayName: 'LdapComponent',
   mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange', '_onLdapSettingsChange')],
 
   propTypes: {

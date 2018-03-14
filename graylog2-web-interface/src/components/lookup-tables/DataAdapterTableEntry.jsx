@@ -14,25 +14,22 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
-const DataAdapterTableEntry = React.createClass({
-
-  propTypes: {
+class DataAdapterTableEntry extends React.Component {
+  static propTypes = {
     adapter: PropTypes.object.isRequired,
     error: PropTypes.string,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      error: null,
-    };
-  },
+  static defaultProps = {
+    error: null,
+  };
 
-  _onDelete() {
+  _onDelete = () => {
 // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete data adapter "${this.props.adapter.title}"?`)) {
       LookupTableDataAdaptersActions.delete(this.props.adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
     }
-  },
+  };
 
   render() {
     return (
@@ -60,9 +57,8 @@ const DataAdapterTableEntry = React.createClass({
         </tr>
       </tbody>
     );
-  },
-
-});
+  }
+}
 
 export default DataAdapterTableEntry;
 

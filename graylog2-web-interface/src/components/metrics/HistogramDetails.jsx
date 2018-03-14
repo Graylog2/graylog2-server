@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
-const HistogramDetails = React.createClass({
-  propTypes: {
+class HistogramDetails extends React.Component {
+  static propTypes = {
     metric: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     const histogram = this.props.metric.metric;
     return (
@@ -28,7 +29,7 @@ const HistogramDetails = React.createClass({
         <dd><span className="number-format">{numeral(histogram.count).format('0,0')}</span></dd>
       </dl>
     );
-  },
-});
+  }
+}
 
 export default HistogramDetails;

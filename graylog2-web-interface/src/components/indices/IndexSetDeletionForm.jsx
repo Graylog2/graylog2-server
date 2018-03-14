@@ -9,20 +9,18 @@ import naturalSort from 'javascript-natural-sort';
 import CombinedProvider from 'injection/CombinedProvider';
 const { StreamsStore } = CombinedProvider.get('Streams');
 
-const IndexSetDeletionForm = React.createClass({
-  propTypes: {
+class IndexSetDeletionForm extends React.Component {
+  static propTypes = {
     indexSet: PropTypes.object.isRequired,
     onDelete: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      assignedStreams: undefined,
-      deleteIndices: true,
-    };
-  },
+  state = {
+    assignedStreams: undefined,
+    deleteIndices: true,
+  };
 
-  _onModalOpen() {
+  _onModalOpen = () => {
     StreamsStore.load((streams) => {
       const assignedStreams = [];
 
@@ -34,29 +32,29 @@ const IndexSetDeletionForm = React.createClass({
 
       this.setState({ assignedStreams: assignedStreams });
     });
-  },
+  };
 
-  _onRemoveClick(e) {
+  _onRemoveClick = (e) => {
     this.setState({ deleteIndices: e.target.checked });
-  },
+  };
 
-  open() {
+  open = () => {
     this.refs[`index-set-deletion-modal-${this.props.indexSet.id}`].open();
-  },
+  };
 
-  close() {
+  close = () => {
     this.refs[`index-set-deletion-modal-${this.props.indexSet.id}`].close();
-  },
+  };
 
-  _isLoading() {
+  _isLoading = () => {
     return !this.state.assignedStreams;
-  },
+  };
 
-  _isDeletable() {
+  _isDeletable = () => {
     return !this._isLoading() && this.state.assignedStreams.length < 1 && !this.props.indexSet.default;
-  },
+  };
 
-  _modalContent() {
+  _modalContent = () => {
     if (this._isLoading()) {
       return <Spinner text="Loading assigned streams..." />;
     }
@@ -111,15 +109,15 @@ const IndexSetDeletionForm = React.createClass({
         </Col>
       </Row>
     );
-  },
+  };
 
-  _onDelete(e) {
+  _onDelete = (e) => {
     e.preventDefault();
 
     if (this._isDeletable()) {
       this.props.onDelete(this.props.indexSet, this.state.deleteIndices);
     }
-  },
+  };
 
   render() {
     return (
@@ -132,7 +130,7 @@ const IndexSetDeletionForm = React.createClass({
         {this._modalContent()}
       </BootstrapModalForm>
     );
-  },
-});
+  }
+}
 
 export default IndexSetDeletionForm;

@@ -8,8 +8,8 @@ import { Spinner } from 'components/common';
  * supports a loading state, adding children next to the form, and
  * styles customization.
  */
-const SearchForm = React.createClass({
-  propTypes: {
+class SearchForm extends React.Component {
+  static propTypes = {
     /**
      * Callback when a search was submitted. The function receives the query
      * and a callback to reset the loading state of the form as arguments.
@@ -51,56 +51,52 @@ const SearchForm = React.createClass({
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]),
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      placeholder: 'Enter search query...',
-      wrapperClass: 'search',
-      queryWidth: 'auto',
-      topMargin: 15,
-      buttonLeftMargin: 5,
-      searchBsStyle: 'default',
-      searchButtonLabel: 'Search',
-      resetButtonLabel: 'Reset',
-      loadingLabel: 'Loading...',
-    };
-  },
+  static defaultProps = {
+    placeholder: 'Enter search query...',
+    wrapperClass: 'search',
+    queryWidth: 'auto',
+    topMargin: 15,
+    buttonLeftMargin: 5,
+    searchBsStyle: 'default',
+    searchButtonLabel: 'Search',
+    resetButtonLabel: 'Reset',
+    loadingLabel: 'Loading...',
+  };
 
-  getInitialState() {
-    return {
-      isLoading: false,
-    };
-  },
+  state = {
+    isLoading: false,
+  };
 
   componentWillReceiveProps() {
     this._resetLoadingState();
-  },
+  }
 
-  _setLoadingState() {
+  _setLoadingState = () => {
     if (this.props.useLoadingState) {
       this.setState({ isLoading: true });
     }
-  },
+  };
 
-  _resetLoadingState() {
+  _resetLoadingState = () => {
     if (this.props.useLoadingState) {
       this.setState({ isLoading: false });
     }
-  },
+  };
 
-  _onSearch(e) {
+  _onSearch = (e) => {
     e.preventDefault();
 
     this._setLoadingState();
     this.props.onSearch(this.refs.query.value, this._resetLoadingState);
-  },
+  };
 
-  _onReset() {
+  _onReset = () => {
     this._resetLoadingState();
     this.refs.query.value = '';
     this.props.onReset();
-  },
+  };
 
   render() {
     return (
@@ -136,7 +132,7 @@ const SearchForm = React.createClass({
         </form>
       </div>
     );
-  },
-});
+  }
+}
 
 export default SearchForm;

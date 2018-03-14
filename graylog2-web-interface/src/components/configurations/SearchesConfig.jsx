@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, Row, Col } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
@@ -11,7 +12,9 @@ import {} from 'moment-duration-format';
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
-const SearchesConfig = React.createClass({
+const SearchesConfig = createReactClass({
+  displayName: 'SearchesConfig',
+
   propTypes: {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,

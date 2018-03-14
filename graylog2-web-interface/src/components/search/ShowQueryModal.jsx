@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import { Modal } from 'react-bootstrap';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { ClipboardButton } from 'components/common';
 
-const ShowQueryModal = React.createClass({
+const ShowQueryModal = createReactClass({
+  displayName: 'ShowQueryModal',
+
   propTypes: {
     builtQuery: PropTypes.string,
   },

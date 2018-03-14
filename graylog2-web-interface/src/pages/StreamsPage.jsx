@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
@@ -19,24 +20,30 @@ const IndexSetsStore = StoreProvider.getStore('IndexSets');
 import ActionsProvider from 'injection/ActionsProvider';
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
-const StreamsPage = React.createClass({
+const StreamsPage = createReactClass({
+  displayName: 'StreamsPage',
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
+
   getInitialState() {
     return {
       indexSets: undefined,
     };
   },
+
   componentDidMount() {
     IndexSetsActions.list(false);
   },
+
   _isLoading() {
     return !this.state.currentUser || !this.state.indexSets;
   },
+
   _onSave(_, stream) {
     StreamsStore.save(stream, () => {
       UserNotification.success('Stream has been successfully created.', 'Success');
     });
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

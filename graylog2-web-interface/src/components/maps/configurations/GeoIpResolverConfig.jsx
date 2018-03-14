@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, Select } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import ObjectUtils from 'util/ObjectUtils';
 
-const GeoIpResolverConfig = React.createClass({
+const GeoIpResolverConfig = createReactClass({
+  displayName: 'GeoIpResolverConfig',
+
   propTypes: {
     config: PropTypes.object,
     updateConfig: PropTypes.func.isRequired,

@@ -9,22 +9,22 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
-const AlertDetails = React.createClass({
-  propTypes: {
+class AlertDetails extends React.Component {
+  static propTypes = {
     alert: PropTypes.object.isRequired,
     condition: PropTypes.object,
     conditionType: PropTypes.object,
     stream: PropTypes.object.isRequired,
-  },
+  };
 
   componentDidMount() {
     this._loadData();
-  },
+  }
 
-  _loadData() {
+  _loadData = () => {
     AlertNotificationsActions.available();
     AlarmCallbackHistoryActions.list(this.props.alert.stream_id, this.props.alert.id);
-  },
+  };
 
   render() {
     const alert = this.props.alert;
@@ -61,7 +61,7 @@ const AlertDetails = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default AlertDetails;

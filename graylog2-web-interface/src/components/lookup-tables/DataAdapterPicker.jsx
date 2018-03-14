@@ -6,22 +6,19 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
-const DataAdapterPicker = React.createClass({
-
-  propTypes: {
+class DataAdapterPicker extends React.Component {
+  static propTypes = {
     onSelect: PropTypes.func.isRequired,
     selectedId: PropTypes.string,
     dataAdapters: PropTypes.array,
     pagination: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      selectedId: null,
-      dataAdapters: [],
-      pagination: {},
-    };
-  },
+  static defaultProps = {
+    selectedId: null,
+    dataAdapters: [],
+    pagination: {},
+  };
 
   render() {
     const adapterPlugins = {};
@@ -51,7 +48,7 @@ const DataAdapterPicker = React.createClass({
         </Input>
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default DataAdapterPicker;

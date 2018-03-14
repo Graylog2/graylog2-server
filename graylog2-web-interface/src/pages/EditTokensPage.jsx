@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import TokenList from 'components/users/TokenList';
@@ -10,7 +11,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 const UsersStore = StoreProvider.getStore('Users');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const EditTokensPage = React.createClass({
+const EditTokensPage = createReactClass({
+  displayName: 'EditTokensPage',
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   propTypes: {

@@ -13,39 +13,38 @@ import Styles from './Overview.css';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LookupTablesOverview = React.createClass({
-
-  propTypes: {
+class LookupTablesOverview extends React.Component {
+  static propTypes = {
     tables: PropTypes.arrayOf(PropTypes.object).isRequired,
     caches: PropTypes.objectOf(PropTypes.object).isRequired,
     dataAdapters: PropTypes.objectOf(PropTypes.object).isRequired,
     pagination: PropTypes.object.isRequired,
     errorStates: PropTypes.object.isRequired,
-  },
+  };
 
-  _onPageChange(newPage, newPerPage) {
+  _onPageChange = (newPage, newPerPage) => {
     LookupTablesActions.searchPaginated(newPage, newPerPage, this.props.pagination.query);
-  },
+  };
 
-  _onSearch(query, resetLoadingStateCb) {
+  _onSearch = (query, resetLoadingStateCb) => {
     LookupTablesActions
       .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
       .then(resetLoadingStateCb);
-  },
+  };
 
-  _onReset() {
+  _onReset = () => {
     LookupTablesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
-  },
+  };
 
-  _lookupName(id, map) {
+  _lookupName = (id, map) => {
     const empty = { title: 'None' };
     if (!map) {
       return empty;
     }
     return map[id] || empty;
-  },
+  };
 
-  _lookupAdapterError(table) {
+  _lookupAdapterError = (table) => {
     if (this.props.errorStates.dataAdapters && this.props.dataAdapters) {
       const adapter = this.props.dataAdapters[table.data_adapter_id];
       if (!adapter) {
@@ -54,9 +53,9 @@ const LookupTablesOverview = React.createClass({
       return this.props.errorStates.dataAdapters[adapter.name];
     }
     return null;
-  },
+  };
 
-  _helpPopover() {
+  _helpPopover = () => {
     return (
       <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
         <p><strong>Available search fields</strong></p>
@@ -99,7 +98,7 @@ const LookupTablesOverview = React.createClass({
         </p>
       </Popover>
     );
-  },
+  };
 
   render() {
     const lookupTables = this.props.tables.map((table) => {
@@ -151,7 +150,7 @@ const LookupTablesOverview = React.createClass({
         </Col>
       </Row>
     </div>);
-  },
-});
+  }
+}
 
 export default LookupTablesOverview;

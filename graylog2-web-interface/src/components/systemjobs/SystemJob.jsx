@@ -6,15 +6,16 @@ import { LinkToNode, Timestamp } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
-const SystemJob = React.createClass({
-  _onCancel(job) {
+class SystemJob extends React.Component {
+  _onCancel = (job) => {
     return (e) => {
       e.preventDefault();
       if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
         SystemJobsActions.cancelJob(job.id);
       }
     };
-  },
+  };
+
   render() {
     const job = this.props.job;
     const progress = job.percent_complete < 100 ?
@@ -35,7 +36,7 @@ const SystemJob = React.createClass({
         {progress}
       </div>
     );
-  },
-});
+  }
+}
 
 export default SystemJob;

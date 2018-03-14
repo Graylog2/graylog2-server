@@ -13,12 +13,13 @@ const SystemShutdownStore = StoreProvider.getStore('SystemShutdown');
 
 import Routes from 'routing/Routes';
 
-const NodesActions = React.createClass({
-  propTypes: {
+class NodesActions extends React.Component {
+  static propTypes = {
     node: PropTypes.object.isRequired,
     systemOverview: PropTypes.object.isRequired,
-  },
-  _toggleMessageProcessing() {
+  };
+
+  _toggleMessageProcessing = () => {
     if (confirm(`You are about to ${this.props.systemOverview.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`)) {
       if (this.props.systemOverview.is_processing) {
         SystemProcessingStore.pause(this.props.node.node_id);
@@ -26,19 +27,22 @@ const NodesActions = React.createClass({
         SystemProcessingStore.resume(this.props.node.node_id);
       }
     }
-  },
-  _changeLBStatus(status) {
+  };
+
+  _changeLBStatus = (status) => {
     return () => {
       if (confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
         SystemLoadBalancerStore.override(this.props.node.node_id, status);
       }
     };
-  },
-  _shutdown() {
+  };
+
+  _shutdown = () => {
     if (prompt('Do you really want to shutdown this node? Confirm by typing "SHUTDOWN".') === 'SHUTDOWN') {
       SystemShutdownStore.shutdown(this.props.node.node_id);
     }
-  },
+  };
+
   render() {
     const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname().toString();
     return (
@@ -95,7 +99,7 @@ const NodesActions = React.createClass({
         </DropdownButton>
       </div>
     );
-  },
-});
+  }
+}
 
 export default NodesActions;

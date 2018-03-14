@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const TimeRangeOptionsSummary = React.createClass({
-  propTypes: {
+class TimeRangeOptionsSummary extends React.Component {
+  static propTypes = {
     options: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     let timerangeOptionsSummary = null;
@@ -24,7 +24,7 @@ const TimeRangeOptionsSummary = React.createClass({
         {timerangeOptionsSummary}
       </dl>
     );
-  },
-});
+  }
+}
 
 export default TimeRangeOptionsSummary;

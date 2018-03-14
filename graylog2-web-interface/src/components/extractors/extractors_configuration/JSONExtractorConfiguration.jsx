@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
@@ -9,25 +10,31 @@ const ToolsStore = StoreProvider.getStore('Tools');
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
-const JSONExtractorConfiguration = React.createClass({
+const JSONExtractorConfiguration = createReactClass({
+  displayName: 'JSONExtractorConfiguration',
+
   propTypes: {
     configuration: PropTypes.object.isRequired,
     exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
+
   getInitialState() {
     return {
       trying: false,
       configuration: this._getEffectiveConfiguration(this.props.configuration),
     };
   },
+
   componentDidMount() {
     this.props.onChange(this.state.configuration);
   },
+
   componentWillReceiveProps(nextProps) {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   },
+
   DEFAULT_CONFIGURATION: {
     list_separator: ', ',
     key_separator: '_',
@@ -36,9 +43,11 @@ const JSONExtractorConfiguration = React.createClass({
     replace_key_whitespace: false,
     key_whitespace_replacement: '_',
   },
+
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
   },
+
   _onChange(key) {
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
@@ -47,6 +56,7 @@ const JSONExtractorConfiguration = React.createClass({
       this.props.onChange(newConfig);
     };
   },
+
   _onTryClick() {
     this.setState({ trying: true });
 
@@ -70,9 +80,11 @@ const JSONExtractorConfiguration = React.createClass({
 
     promise.finally(() => this.setState({ trying: false }));
   },
+
   _isTryButtonDisabled() {
     return this.state.trying || !this.props.exampleMessage;
   },
+
   render() {
     return (
       <div>

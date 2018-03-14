@@ -11,29 +11,29 @@ import history from 'util/History';
 
 import RuleFormStyle from './RuleForm.css';
 
-const RuleForm = React.createClass({
-  propTypes: {
+class RuleForm extends React.Component {
+  static propTypes = {
     rule: PropTypes.object,
     usedInPipelines: PropTypes.array,
     create: PropTypes.bool,
     onSave: PropTypes.func.isRequired,
     validateRule: PropTypes.func.isRequired,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      rule: {
-        id: '',
-        title: '',
-        description: '',
-        source: '',
-      },
-    };
-  },
+  static defaultProps = {
+    rule: {
+      id: '',
+      title: '',
+      description: '',
+      source: '',
+    },
+  };
 
-  getInitialState() {
-    const rule = this.props.rule;
-    return {
+  constructor(props) {
+    super(props);
+    const rule = props.rule;
+
+    this.state = {
       // when editing, take the rule that's been passed in
       rule: {
         id: rule.id,
@@ -43,22 +43,22 @@ const RuleForm = React.createClass({
       },
       parseErrors: [],
     };
-  },
+  }
 
   componentWillUnmount() {
     if (this.parseTimer !== undefined) {
       clearTimeout(this.parseTimer);
       this.parseTimer = undefined;
     }
-  },
+  }
 
-  parseTimer: undefined,
+  parseTimer = undefined;
 
-  _setParseErrors(errors) {
+  _setParseErrors = (errors) => {
     this.setState({ parseErrors: errors });
-  },
+  };
 
-  _onSourceChange(value) {
+  _onSourceChange = (value) => {
     // don't try to parse the previous value, gets reset below
     if (this.parseTimer !== undefined) {
       clearTimeout(this.parseTimer);
@@ -71,44 +71,44 @@ const RuleForm = React.createClass({
       // have the caller validate the rule after typing stopped for a while. usually this will mean send to server to parse
       this.parseTimer = setTimeout(() => this.props.validateRule(rule, this._setParseErrors), 500);
     }
-  },
+  };
 
-  _onDescriptionChange(event) {
+  _onDescriptionChange = (event) => {
     const rule = this.state.rule;
     rule.description = event.target.value;
     this.setState({ rule });
-  },
+  };
 
-  _onTitleChange(event) {
+  _onTitleChange = (event) => {
     const rule = this.state.rule;
     rule.title = event.target.value;
     this.setState({ rule });
-  },
+  };
 
-  _getId(prefixIdName) {
+  _getId = (prefixIdName) => {
     return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
-  },
+  };
 
-  _goBack() {
+  _goBack = () => {
     history.goBack();
-  },
+  };
 
-  _saved() {
+  _saved = () => {
     history.push(Routes.SYSTEM.PIPELINES.RULES);
-  },
+  };
 
-  _save() {
+  _save = () => {
     if (this.state.parseErrors.length === 0) {
       this.props.onSave(this.state.rule, this._saved);
     }
-  },
+  };
 
-  _submit(event) {
+  _submit = (event) => {
     event.preventDefault();
     this._save();
-  },
+  };
 
-  _formatPipelinesUsingRule() {
+  _formatPipelinesUsingRule = () => {
     if (this.props.usedInPipelines.length === 0) {
       return 'This rule is not being used in any pipelines.';
     }
@@ -124,7 +124,7 @@ const RuleForm = React.createClass({
     });
 
     return <ul className={RuleFormStyle.usedInPipelines}>{formattedPipelines}</ul>;
-  },
+  };
 
   render() {
     let pipelinesUsingRule;
@@ -179,7 +179,7 @@ const RuleForm = React.createClass({
         </Row>
       </form>
     );
-  },
-});
+  }
+}
 
 export default RuleForm;

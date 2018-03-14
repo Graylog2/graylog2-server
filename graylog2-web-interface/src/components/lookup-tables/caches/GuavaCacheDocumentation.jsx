@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-const GuavaCacheDocumentation = React.createClass({
+class GuavaCacheDocumentation extends React.Component {
   render() {
     return (<div>
       <p>The in-memory cache maintains recently used values from data adapters.</p>
@@ -35,7 +35,7 @@ const GuavaCacheDocumentation = React.createClass({
       </p>
 
     </div>);
-  },
-});
+  }
+}
 
 export default GuavaCacheDocumentation;

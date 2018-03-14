@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -10,20 +11,27 @@ const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { Spinner } from 'components/common';
 
-const StreamThroughput = React.createClass({
+const StreamThroughput = createReactClass({
+  displayName: 'StreamThroughput',
+
   propTypes: {
     streamId: PropTypes.string.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   componentWillMount() {
     MetricsActions.addGlobal(this._metricName());
   },
+
   componentWillUnmount() {
     MetricsActions.removeGlobal(this._metricName());
   },
+
   _metricName() {
     return `org.graylog2.plugin.streams.Stream.${this.props.streamId}.incomingMessages.1-sec-rate`;
   },
+
   _calculateThroughput() {
     return Object.keys(this.state.metrics)
       .map((nodeId) => {
@@ -32,6 +40,7 @@ const StreamThroughput = React.createClass({
       })
       .reduce((throughput1, throughput2) => throughput1 + throughput2, 0);
   },
+
   render() {
     if (!this.state.metrics) {
       return <Spinner />;

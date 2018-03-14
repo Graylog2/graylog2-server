@@ -1,26 +1,33 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import moment from 'moment';
 
 import { Timestamp } from 'components/common';
 
 import DateTime from 'logic/datetimes/DateTime';
 
-const SystemInformation = React.createClass({
+const SystemInformation = createReactClass({
+  displayName: 'SystemInformation',
+
   propTypes: {
     node: PropTypes.object.isRequired,
     systemInformation: PropTypes.object.isRequired,
     jvmInformation: PropTypes.object,
   },
+
   getInitialState() {
     return { time: moment() };
   },
+
   componentDidMount() {
     this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
   },
+
   componentWillUnmount() {
     clearTimeout(this.interval);
   },
+
   render() {
     const systemInformation = this.props.systemInformation;
     let jvmInformation;

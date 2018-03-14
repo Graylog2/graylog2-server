@@ -4,22 +4,26 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 
-const MessageFieldExtractorActions = React.createClass({
-  propTypes: {
+class MessageFieldExtractorActions extends React.Component {
+  static propTypes = {
     fieldName: PropTypes.string.isRequired,
     message: PropTypes.object.isRequired,
-  },
+  };
+
   componentWillMount() {
     this._refreshExtractorRoutes(this.props);
-  },
+  }
+
   componentWillReceiveProps(nextProps) {
     this._refreshExtractorRoutes(nextProps);
-  },
-  _refreshExtractorRoutes(props) {
+  }
+
+  _refreshExtractorRoutes = (props) => {
     this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(props.message.source_node_id,
       props.message.source_input_id, props.fieldName, props.message.index, props.message.id);
-  },
-  _formatExtractorMenuItem(extractorType) {
+  };
+
+  _formatExtractorMenuItem = (extractorType) => {
     return (
       <LinkContainer to={this.newExtractorRoutes[extractorType]}>
         <MenuItem key={`menu-item-${extractorType}`}>
@@ -27,7 +31,8 @@ const MessageFieldExtractorActions = React.createClass({
         </MenuItem>
       </LinkContainer>
     );
-  },
+  };
+
   render() {
     const messageField = this.props.message.fields[this.props.fieldName];
     if (typeof messageField === 'string') {
@@ -56,7 +61,7 @@ const MessageFieldExtractorActions = React.createClass({
         </DropdownButton>
       </div>
     );
-  },
-});
+  }
+}
 
 export default MessageFieldExtractorActions;

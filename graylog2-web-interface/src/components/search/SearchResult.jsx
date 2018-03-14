@@ -13,8 +13,8 @@ const SearchStore = StoreProvider.getStore('Search');
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import {} from 'components/field-analyzers'; // Make sure to load all field analyzer plugins!
 
-const SearchResult = React.createClass({
-  propTypes: {
+class SearchResult extends React.Component {
+  static propTypes = {
     query: PropTypes.string,
     builtQuery: PropTypes.string,
     result: PropTypes.object.isRequired,
@@ -28,34 +28,23 @@ const SearchResult = React.createClass({
     searchConfig: PropTypes.object.isRequired,
     loadingSearch: PropTypes.bool,
     forceFetch: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      query: '*',
-      builtQuery: '',
-      formattedHistogram: [],
-      searchInStream: null,
-      streams: Immutable.Map({}),
-      inputs: Immutable.Map({}),
-      nodes: Immutable.Map({}),
-    };
-  },
-
-  getInitialState() {
-    return {
-      selectedFields: this.sortFields(SearchStore.fields),
-      showAllFields: false,
-      shouldHighlight: true,
-      savedSearch: SearchStore.savedSearch,
-    };
-  },
+  static defaultProps = {
+    query: '*',
+    builtQuery: '',
+    formattedHistogram: [],
+    searchInStream: null,
+    streams: Immutable.Map({}),
+    inputs: Immutable.Map({}),
+    nodes: Immutable.Map({}),
+  };
 
   componentDidUpdate() {
     this._resetSelectedFields();
-  },
+  }
 
-  onFieldToggled(fieldName) {
+  onFieldToggled = (fieldName) => {
     const currentFields = this.state.selectedFields;
     let newFieldSet;
     if (currentFields.contains(fieldName)) {
@@ -64,23 +53,23 @@ const SearchResult = React.createClass({
       newFieldSet = currentFields.add(fieldName);
     }
     this.updateSelectedFields(newFieldSet);
-  },
+  };
 
   // Reset selected fields if saved search changed
-  _resetSelectedFields() {
+  _resetSelectedFields = () => {
     if (this.state.savedSearch !== SearchStore.savedSearch) {
       this.setState({
         savedSearch: SearchStore.savedSearch,
         selectedFields: this.sortFields(SearchStore.fields),
       });
     }
-  },
+  };
 
-  togglePageFields() {
+  togglePageFields = () => {
     this.setState({ showAllFields: !this.state.showAllFields });
-  },
+  };
 
-  predefinedFieldSelection(setName) {
+  predefinedFieldSelection = (setName) => {
     if (setName === 'none') {
       this.updateSelectedFields(Immutable.Set());
     } else if (setName === 'all') {
@@ -88,18 +77,19 @@ const SearchResult = React.createClass({
     } else if (setName === 'default') {
       this.updateSelectedFields(Immutable.Set(['message', 'source']));
     }
-  },
+  };
 
-  updateSelectedFields(fieldSelection) {
+  updateSelectedFields = (fieldSelection) => {
     const selectedFields = this.sortFields(fieldSelection);
     SearchStore.fields = selectedFields;
     this.setState({ selectedFields: selectedFields });
-  },
-  _fields() {
-    return this.props.result[this.state.showAllFields ? 'all_fields' : 'fields'];
-  },
+  };
 
-  sortFields(fieldSet) {
+  _fields = () => {
+    return this.props.result[this.state.showAllFields ? 'all_fields' : 'fields'];
+  };
+
+  sortFields = (fieldSet) => {
     let newFieldSet = fieldSet;
     let sortedFields = Immutable.OrderedSet();
 
@@ -109,18 +99,18 @@ const SearchResult = React.createClass({
     newFieldSet = newFieldSet.delete('source');
     const remainingFieldsSorted = newFieldSet.sort((field1, field2) => field1.toLowerCase().localeCompare(field2.toLowerCase()));
     return sortedFields.concat(remainingFieldsSorted);
-  },
+  };
 
-  addFieldAnalyzer(ref, field) {
+  addFieldAnalyzer = (ref, field) => {
     this.refs[ref].addField(field);
-  },
+  };
 
-  _fieldAnalyzers(filter) {
+  _fieldAnalyzers = (filter) => {
     return PluginStore.exports('fieldAnalyzers')
       .filter(analyzer => filter !== undefined ? filter(analyzer) : true);
-  },
+  };
 
-  _fieldAnalyzerComponents(filter) {
+  _fieldAnalyzerComponents = (filter) => {
     // Get params used in the last executed search.
     const searchParams = SearchStore.getOriginalSearchURLParams().toJS();
     const rangeParams = {};
@@ -148,19 +138,26 @@ const SearchResult = React.createClass({
           fields: this.props.result.all_fields,
         });
       });
-  },
+  };
 
-  _shouldRenderAboveHistogram(analyzer) {
+  _shouldRenderAboveHistogram = (analyzer) => {
     return analyzer.displayPriority > 0;
-  },
+  };
 
-  _shouldRenderBelowHistogram(analyzer) {
+  _shouldRenderBelowHistogram = (analyzer) => {
     return analyzer.displayPriority <= 0;
-  },
+  };
 
-  _toggleShouldHighlight() {
+  _toggleShouldHighlight = () => {
     this.setState({ shouldHighlight: !this.state.shouldHighlight });
-  },
+  };
+
+  state = {
+    selectedFields: this.sortFields(SearchStore.fields),
+    showAllFields: false,
+    shouldHighlight: true,
+    savedSearch: SearchStore.savedSearch,
+  };
 
   render() {
     const anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
@@ -230,7 +227,7 @@ const SearchResult = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default SearchResult;

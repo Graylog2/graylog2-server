@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -15,8 +16,10 @@ const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
-const CreateAlertNotificationInput = React.createClass({
+const CreateAlertNotificationInput = createReactClass({
+  displayName: 'CreateAlertNotificationInput',
   mixins: [Reflux.connect(AlertNotificationsStore)],
+
   getInitialState() {
     return {
       streams: undefined,
@@ -54,12 +57,15 @@ const CreateAlertNotificationInput = React.createClass({
       () => this.refs.configurationForm.open(),
     );
   },
+
   _openForm() {
     this.refs.configurationForm.open();
   },
+
   _resetForm() {
     this.setState({ type: this.PLACEHOLDER });
   },
+
   _formatNotificationForm(type) {
     const typeDefinition = this.state.availableNotifications[type];
     return (

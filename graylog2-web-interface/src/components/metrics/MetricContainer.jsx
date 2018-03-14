@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import TimeHelper from 'util/TimeHelper';
@@ -12,12 +13,15 @@ const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
-const MetricContainer = React.createClass({
+const MetricContainer = createReactClass({
+  displayName: 'MetricContainer',
+
   propTypes: {
     name: PropTypes.string.isRequired,
     zeroOnMissing: PropTypes.bool,
     children: PropTypes.node.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
 
   getDefaultProps() {

@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Timestamp } from 'components/common';
 
-const RestApiOverview = React.createClass({
-  propTypes: {
+class RestApiOverview extends React.Component {
+  static propTypes = {
     node: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     return (
       <dl className="system-rest">
@@ -15,7 +16,7 @@ const RestApiOverview = React.createClass({
         <dd><Timestamp dateTime={this.props.node.last_seen} relative /></dd>
       </dl>
     );
-  },
-});
+  }
+}
 
 export default RestApiOverview;

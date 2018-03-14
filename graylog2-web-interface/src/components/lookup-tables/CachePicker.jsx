@@ -6,22 +6,19 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
-const CachePicker = React.createClass({
-
-  propTypes: {
+class CachePicker extends React.Component {
+  static propTypes = {
     onSelect: PropTypes.func.isRequired,
     selectedId: PropTypes.string,
     caches: PropTypes.array,
     pagination: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      selectedId: null,
-      caches: [],
-      pagination: {},
-    };
-  },
+  static defaultProps = {
+    selectedId: null,
+    caches: [],
+    pagination: {},
+  };
 
   render() {
     const cachePlugins = {};
@@ -51,7 +48,7 @@ const CachePicker = React.createClass({
         </Input>
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default CachePicker;

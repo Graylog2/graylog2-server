@@ -9,8 +9,8 @@ import SupportLink from 'components/support/SupportLink';
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = React.createClass({
-  propTypes: {
+class PageHeader extends React.Component {
+  static propTypes = {
     /** Page header heading. */
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
     /**
@@ -26,13 +26,13 @@ const PageHeader = React.createClass({
     experimental: PropTypes.bool,
     /** Specifies if the page header is children of a content `Row` or not. */
     subpage: PropTypes.bool,
-  },
-  getDefaultProps() {
-    return {
-      experimental: false,
-      subpage: false,
-    };
-  },
+  };
+
+  static defaultProps = {
+    experimental: false,
+    subpage: false,
+  };
+
   render() {
     const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
 
@@ -84,7 +84,7 @@ const PageHeader = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default PageHeader;

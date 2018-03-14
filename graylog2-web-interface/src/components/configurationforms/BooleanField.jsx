@@ -4,15 +4,16 @@ import FieldHelpers from './FieldHelpers';
 
 import FormsUtils from 'util/FormsUtils';
 
-const BooleanField = React.createClass({
-  propTypes: {
+class BooleanField extends React.Component {
+  static propTypes = {
     autoFocus: PropTypes.bool,
     field: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     typeName: PropTypes.string.isRequired,
     value: PropTypes.any,
-  },
+  };
+
   render() {
     const field = this.props.field;
     const typeName = this.props.typeName;
@@ -35,11 +36,12 @@ const BooleanField = React.createClass({
         <p className="help-block">{field.description}</p>
       </div>
     );
-  },
-  handleChange(event) {
+  }
+
+  handleChange = (event) => {
     const newValue = FormsUtils.getValueFromInput(event.target);
     this.props.onChange(this.props.title, newValue);
-  },
-});
+  };
+}
 
 export default BooleanField;

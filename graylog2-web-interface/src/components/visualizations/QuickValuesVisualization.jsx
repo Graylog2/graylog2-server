@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
 import crossfilter from 'crossfilter';
@@ -22,7 +23,9 @@ require('bootstrap/js/tooltip');
 
 const SearchStore = StoreProvider.getStore('Search');
 
-const QuickValuesVisualization = React.createClass({
+const QuickValuesVisualization = createReactClass({
+  displayName: 'QuickValuesVisualization',
+
   DEFAULT_CONFIG: {
     show_pie_chart: true,
     show_data_table: true,
@@ -30,6 +33,7 @@ const QuickValuesVisualization = React.createClass({
     limit: 5,
     sort_order: 'desc',
   },
+
   propTypes: {
     id: PropTypes.string.isRequired,
     field: PropTypes.string.isRequired,
@@ -50,6 +54,7 @@ const QuickValuesVisualization = React.createClass({
     onRenderComplete: PropTypes.func,
     limitHeight: PropTypes.bool,
   },
+
   getDefaultProps() {
     return {
       config: this.DEFAULT_CONFIG,
@@ -83,6 +88,7 @@ const QuickValuesVisualization = React.createClass({
       termsMapping: {},
     };
   },
+
   componentDidMount() {
     this.disableTransitions = dc.disableTransitions;
     dc.disableTransitions = !this.props.interactive;
@@ -91,6 +97,7 @@ const QuickValuesVisualization = React.createClass({
     this._renderDataTable(this.props);
     this._renderPieChart(this.props);
   },
+
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
       return;
@@ -175,6 +182,7 @@ const QuickValuesVisualization = React.createClass({
       }, this.drawData);
     }
   },
+
   _getAddToSearchButton(term) {
     const addToSearchButton = document.createElement('button');
     addToSearchButton.className = 'btn btn-xs btn-default';
@@ -184,6 +192,7 @@ const QuickValuesVisualization = React.createClass({
 
     return addToSearchButton.outerHTML;
   },
+
   _getFieldName(i) {
     if (this.props.fields.length === 0) {
       // calculate the fields from the data props
@@ -194,6 +203,7 @@ const QuickValuesVisualization = React.createClass({
       return this.props.fields[i];
     }
   },
+
   _getDataTableColumns() {
     function formatTimestamp(timestamp) {
       return new DateTime(Number(timestamp)).toString(DateTime.Formats.TIMESTAMP);
@@ -235,6 +245,7 @@ const QuickValuesVisualization = React.createClass({
 
     return columns;
   },
+
   _getSortOrder(sortOrder) {
     switch (sortOrder) {
       case 'desc': return d3.descending;
@@ -242,6 +253,7 @@ const QuickValuesVisualization = React.createClass({
       default: return d3.descending;
     }
   },
+
   _groupOrderFunc(sortOrder) {
     return (d) => {
       if (sortOrder === 'asc') {
@@ -251,6 +263,7 @@ const QuickValuesVisualization = React.createClass({
       }
     };
   },
+
   _renderDataTable(props) {
     const tableDomNode = this._table;
     const limit = this._getConfig('limit', props.config);
@@ -285,6 +298,7 @@ const QuickValuesVisualization = React.createClass({
 
     this.dataTable.render();
   },
+
   _renderPieChart(props) {
     const graphDomNode = this._graph;
 
@@ -326,11 +340,13 @@ const QuickValuesVisualization = React.createClass({
 
     this.pieChart.render();
   },
+
   _formatGraphTooltip(d) {
     const valueText = `${d.data.key}: ${NumberUtils.formatNumber(d.value)}`;
 
     return `<div class="datapoint-info">${valueText}</div>`;
   },
+
   _setPieChartSize(newSize) {
     this.pieChart
       .width(newSize)
@@ -339,6 +355,7 @@ const QuickValuesVisualization = React.createClass({
 
     this.triggerRender = true;
   },
+
   _resizeVisualization(width, height, showDataTable) {
     let computedSize;
 
@@ -355,18 +372,21 @@ const QuickValuesVisualization = React.createClass({
       }
     }
   },
+
   _clearDataFilters() {
     if (this.pieChart !== undefined) {
       this.filters = this.pieChart.filters();
       this.pieChart.filterAll();
     }
   },
+
   _restoreDataFilters() {
     if (this.pieChart !== undefined) {
       this.filters.forEach(filter => this.pieChart.filter(filter));
       this.filters = [];
     }
   },
+
   drawData() {
     if (this.shouldUpdateData) {
       this._clearDataFilters();
@@ -385,9 +405,11 @@ const QuickValuesVisualization = React.createClass({
       }
     }
   },
+
   _getTotalMessagesWithField() {
     return this.state.total - this.state.missing;
   },
+
   _getAnalysisInformation() {
     const analysisInformation = [`Found <em>${NumberUtils.formatNumber(this._getTotalMessagesWithField())}</em> messages with field <em>${this.props.field}</em>`];
 
@@ -402,6 +424,7 @@ const QuickValuesVisualization = React.createClass({
 
     return <span dangerouslySetInnerHTML={{ __html: `${analysisInformation.join(',')}.` }} />;
   },
+
   render() {
     const { horizontal, displayAnalysisInformation, height, id, displayAddToSearchButton, limitHeight } = this.props;
     let pieChartClassName;

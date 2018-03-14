@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -19,11 +20,15 @@ const ExtractorsStore = StoreProvider.getStore('Extractors');
 const InputsStore = StoreProvider.getStore('Inputs');
 const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
 
-const EditExtractorsPage = React.createClass({
+const EditExtractorsPage = createReactClass({
+  displayName: 'EditExtractorsPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(ExtractorsStore), Reflux.connect(InputsStore)],
+
   getInitialState() {
     return {
       extractor: undefined,
@@ -31,6 +36,7 @@ const EditExtractorsPage = React.createClass({
       exampleMessage: undefined,
     };
   },
+
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
     ExtractorsActions.get.triggerPromise(this.props.params.inputId, this.props.params.extractorId);
@@ -43,9 +49,11 @@ const EditExtractorsPage = React.createClass({
         }
       });
   },
+
   _isLoading() {
     return !(this.state.input && this.state.extractor && this.state.exampleMessage);
   },
+
   _extractorSaved() {
     let url;
     if (this.state.input.global) {
@@ -56,6 +64,7 @@ const EditExtractorsPage = React.createClass({
 
     history.push(url);
   },
+
   render() {
     // TODO:
     // - Redirect when extractor or input were deleted

@@ -14,34 +14,28 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
-const DataAdapterForm = React.createClass({
-  propTypes: {
+class DataAdapterForm extends React.Component {
+  static propTypes = {
     type: PropTypes.string.isRequired,
     saved: PropTypes.func.isRequired,
     create: PropTypes.bool,
     dataAdapter: PropTypes.object,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      create: true,
-      dataAdapter: {
-        id: undefined,
-        title: '',
-        description: '',
-        name: '',
-        config: {},
-      },
-      validate: null,
-      validationErrors: {},
-    };
-  },
-
-  getInitialState() {
-    return this._initialState(this.props.dataAdapter);
-  },
+  static defaultProps = {
+    create: true,
+    dataAdapter: {
+      id: undefined,
+      title: '',
+      description: '',
+      name: '',
+      config: {},
+    },
+    validate: null,
+    validationErrors: {},
+  };
 
   componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.dataAdapter, nextProps.dataAdapter)) {
@@ -49,16 +43,16 @@ const DataAdapterForm = React.createClass({
       return;
     }
     this.setState(this._initialState(nextProps.dataAdapter));
-  },
+  }
 
   componentDidMount() {
     if (!this.props.create) {
       // Validate when mounted to immediately show errors for invalid objects
       this._validate(this.props.dataAdapter);
     }
-  },
+  }
 
-  _initialState(dataAdapter) {
+  _initialState = (dataAdapter) => {
     const adapter = ObjectUtils.clone(dataAdapter);
 
     return {
@@ -73,30 +67,30 @@ const DataAdapterForm = React.createClass({
         config: adapter.config,
       },
     };
-  },
+  };
 
   componentWillUnmount() {
     this._clearTimer();
-  },
+  }
 
-  validationCheckTimer: undefined,
+  validationCheckTimer = undefined;
 
-  _clearTimer() {
+  _clearTimer = () => {
     if (this.validationCheckTimer !== undefined) {
       clearTimeout(this.validationCheckTimer);
       this.validationCheckTimer = undefined;
     }
-  },
+  };
 
-  _validate(adapter) {
+  _validate = (adapter) => {
     // first cancel outstanding validation timer, we have new data
     this._clearTimer();
     if (this.props.validate) {
       this.validationCheckTimer = setTimeout(() => this.props.validate(adapter), 500);
     }
-  },
+  };
 
-  _onChange(event) {
+  _onChange = (event) => {
     const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
     dataAdapter[event.target.name] = FormsUtils.getValueFromInput(event.target);
     let generateAdapterName = this.state.generateAdapterName;
@@ -110,23 +104,23 @@ const DataAdapterForm = React.createClass({
     }
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter, generateAdapterName: generateAdapterName });
-  },
+  };
 
-  _onConfigChange(event) {
+  _onConfigChange = (event) => {
     const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
     dataAdapter.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
-  },
+  };
 
-  _updateConfig(newConfig) {
+  _updateConfig = (newConfig) => {
     const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
     dataAdapter.config = newConfig;
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
-  },
+  };
 
-  _save(event) {
+  _save = (event) => {
     if (event) {
       event.preventDefault();
     }
@@ -141,20 +135,20 @@ const DataAdapterForm = React.createClass({
     promise.then(() => {
       this.props.saved();
     });
-  },
+  };
 
-  _sanitizeTitle(title) {
+  _sanitizeTitle = (title) => {
     return title.trim().replace(/\W+/g, '-').toLowerCase();
-  },
+  };
 
-  _validationState(fieldName) {
+  _validationState = (fieldName) => {
     if (this.props.validationErrors[fieldName]) {
       return 'error';
     }
     return null;
-  },
+  };
 
-  _validationMessage(fieldName, defaultText) {
+  _validationMessage = (fieldName, defaultText) => {
     if (this.props.validationErrors[fieldName]) {
       return (<div>
         <span>{defaultText}</span>
@@ -163,7 +157,9 @@ const DataAdapterForm = React.createClass({
       </div>);
     }
     return <span>{defaultText}</span>;
-  },
+  };
+
+  state = this._initialState(this.props.dataAdapter);
 
   render() {
     const adapter = this.state.dataAdapter;
@@ -253,7 +249,7 @@ const DataAdapterForm = React.createClass({
         {documentationColumn}
       </Row>
     );
-  },
-});
+  }
+}
 
 export default DataAdapterForm;

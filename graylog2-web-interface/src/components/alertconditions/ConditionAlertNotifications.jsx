@@ -9,31 +9,29 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
-const ConditionAlertNotifications = React.createClass({
-  propTypes: {
+class ConditionAlertNotifications extends React.Component {
+  static propTypes = {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      conditionNotifications: undefined,
-    };
-  },
+  state = {
+    conditionNotifications: undefined,
+  };
 
   componentDidMount() {
     this._loadData();
-  },
+  }
 
-  _loadData() {
+  _loadData = () => {
     AlertNotificationsActions.available();
     AlarmCallbacksActions.list(this.props.stream.id)
       .then(callbacks => this.setState({ conditionNotifications: callbacks }));
-  },
+  };
 
-  _isLoading() {
+  _isLoading = () => {
     return !this.state.conditionNotifications;
-  },
+  };
 
   render() {
     if (this._isLoading()) {
@@ -60,7 +58,7 @@ const ConditionAlertNotifications = React.createClass({
                                 onNotificationUpdate={this._loadData} onNotificationDelete={this._loadData} />
       </div>
     );
-  },
-});
+  }
+}
 
 export default ConditionAlertNotifications;

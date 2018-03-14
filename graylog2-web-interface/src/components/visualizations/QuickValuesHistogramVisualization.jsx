@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
 import crossfilter from 'crossfilter';
@@ -15,11 +16,14 @@ import D3Utils from 'util/D3Utils';
 /*
  * A stacked bar chart visualization to draw QuickValues over time based on dc.js.
  */
-const QuickValuesHistogramVisualization = React.createClass({
+const QuickValuesHistogramVisualization = createReactClass({
+  displayName: 'QuickValuesHistogramVisualization',
+
   DEFAULT_CONFIG: {
     limit: 5,
     sort_order: 'desc',
   },
+
   DEFAULT_HEIGHT: 220,
 
   // dc.js is modifying the margins passed into the graph so make sure this is immutable

@@ -10,21 +10,21 @@ import FormsUtils from 'util/FormsUtils';
 import StoreProvider from 'injection/StoreProvider';
 const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
-const StackedChartWidgetConfiguration = React.createClass({
-  propTypes: {
+class StackedChartWidgetConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
 
-  _setSeriesSetting(seriesNo, key, value) {
+  _setSeriesSetting = (seriesNo, key, value) => {
     const newSeries = ObjectUtils.clone(this.props.config.series);
     newSeries[seriesNo][key] = value;
     this.props.onChange('series', newSeries);
-  },
+  };
 
-  _bindSeriesValue(event) {
+  _bindSeriesValue = (event) => {
     this._setSeriesSetting(event.target.getAttribute('data-series'), event.target.name, FormsUtils.getValueFromInput(event.target));
-  },
+  };
 
   render() {
     const controls = [];
@@ -76,7 +76,7 @@ const StackedChartWidgetConfiguration = React.createClass({
         {controls}
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default StackedChartWidgetConfiguration;

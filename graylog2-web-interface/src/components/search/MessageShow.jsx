@@ -5,33 +5,32 @@ import Immutable from 'immutable';
 import MessageDetail from './MessageDetail';
 import StringUtils from 'util/StringUtils';
 
-const MessageShow = React.createClass({
-  propTypes: {
+class MessageShow extends React.Component {
+  static propTypes = {
     message: PropTypes.object,
     inputs: PropTypes.object,
     streams: PropTypes.object,
     nodes: PropTypes.object,
-  },
-
-  getInitialState() {
-    return this._getImmutableProps(this.props);
-  },
+  };
 
   componentWillReceiveProps(nextProps) {
     this.setState(this._getImmutableProps(nextProps));
-  },
+  }
 
-  _getImmutableProps(props) {
+  _getImmutableProps = (props) => {
     return {
       streams: props.streams ? Immutable.Map(props.streams) : props.streams,
       nodes: props.nodes ? Immutable.Map(props.nodes) : props.nodes,
     };
-  },
+  };
 
-  renderForDisplay(fieldName) {
+  renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.
     return StringUtils.stringify(this.props.message.fields[fieldName]);
-  },
+  };
+
+  state = this._getImmutableProps(this.props);
+
   render() {
     return (
       <Row className="content">
@@ -45,7 +44,7 @@ const MessageShow = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default MessageShow;

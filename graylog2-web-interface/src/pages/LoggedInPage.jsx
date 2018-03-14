@@ -1,10 +1,10 @@
 import React from 'react';
 import AppRouter from 'routing/AppRouter';
 
-const LoggedInPage = React.createClass({
+class LoggedInPage extends React.Component {
   render() {
     return <AppRouter />;
-  },
-});
+  }
+}
 
 export default LoggedInPage;

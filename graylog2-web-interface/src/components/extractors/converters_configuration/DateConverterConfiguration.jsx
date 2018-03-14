@@ -9,34 +9,39 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import FormUtils from 'util/FormsUtils';
 
-const DateConverterConfiguration = React.createClass({
-  propTypes: {
+class DateConverterConfiguration extends React.Component {
+  static propTypes = {
     type: PropTypes.string.isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
+
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
-  },
-  _getConverterObject(configuration) {
+  }
+
+  _getConverterObject = (configuration) => {
     return { type: this.props.type, config: configuration || this.props.configuration };
-  },
-  _toggleConverter(event) {
+  };
+
+  _toggleConverter = (event) => {
     let converter;
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
     this.props.onChange(this.props.type, converter);
-  },
-  _onChange(key) {
+  };
+
+  _onChange = (key) => {
     return (data) => {
       const newConfig = this.props.configuration;
       // data can be an event or a value, we need to check its type :sick:
       newConfig[key] = typeof data === 'object' ? FormUtils.getValueFromInput(data.target) : data;
       this.props.onChange(this.props.type, this._getConverterObject(newConfig));
     };
-  },
+  };
+
   render() {
     const dateFormatHelpMessage = (
       <span>
@@ -109,7 +114,7 @@ const DateConverterConfiguration = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default DateConverterConfiguration;

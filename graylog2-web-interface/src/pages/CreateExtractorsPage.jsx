@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -21,12 +22,16 @@ import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
 
-const CreateExtractorsPage = React.createClass({
+const CreateExtractorsPage = createReactClass({
+  displayName: 'CreateExtractorsPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(InputsStore)],
+
   getInitialState() {
     const { query } = this.props.location;
 
@@ -40,14 +45,17 @@ const CreateExtractorsPage = React.createClass({
       exampleId: query.example_id,
     };
   },
+
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
     MessagesActions.loadMessage.triggerPromise(this.state.exampleIndex, this.state.exampleId)
       .then(message => this.setState({ exampleMessage: message }));
   },
+
   _isLoading() {
     return !(this.state.input && this.state.exampleMessage);
   },
+
   _extractorSaved() {
     let url;
     if (this.state.input.global) {
@@ -58,6 +66,7 @@ const CreateExtractorsPage = React.createClass({
 
     history.push(url);
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

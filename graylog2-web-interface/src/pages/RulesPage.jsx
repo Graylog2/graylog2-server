@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -15,10 +16,13 @@ import RulesActions from 'actions/rules/RulesActions';
 
 import Routes from 'routing/Routes';
 
-const RulesPage = React.createClass({
+const RulesPage = createReactClass({
+  displayName: 'RulesPage',
+
   mixins: [
     Reflux.connect(RulesStore),
   ],
+
   componentDidMount() {
     RulesActions.list();
   },

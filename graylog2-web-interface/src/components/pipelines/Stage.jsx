@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
@@ -11,7 +12,9 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
 
-const Stage = React.createClass({
+const Stage = createReactClass({
+  displayName: 'Stage',
+
   propTypes: {
     stage: PropTypes.object.isRequired,
     pipeline: PropTypes.object.isRequired,
@@ -19,6 +22,7 @@ const Stage = React.createClass({
     onUpdate: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
   },
+
   mixins: [Reflux.connect(RulesStore)],
 
   _ruleHeaderFormatter(header) {

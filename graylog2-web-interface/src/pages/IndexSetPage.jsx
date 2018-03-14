@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Alert, Button, Row, Col, Panel } from 'react-bootstrap';
@@ -20,7 +21,9 @@ const { IndexerOverviewStore, IndexerOverviewActions } = CombinedProvider.get('I
 
 import Routes from 'routing/Routes';
 
-const IndexSetPage = React.createClass({
+const IndexSetPage = createReactClass({
+  displayName: 'IndexSetPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -11,22 +12,29 @@ const InputsActions = ActionsProvider.getActions('Inputs');
 import StoreProvider from 'injection/StoreProvider';
 const InputsStore = StoreProvider.getStore('Inputs');
 
-const ExportExtractorsPage = React.createClass({
+const ExportExtractorsPage = createReactClass({
+  displayName: 'ExportExtractorsPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(InputsStore)],
+
   getInitialState() {
     return {
       input: undefined,
     };
   },
+
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
   },
+
   _isLoading() {
     return !this.state.input;
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

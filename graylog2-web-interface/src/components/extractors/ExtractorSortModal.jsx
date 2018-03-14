@@ -8,27 +8,32 @@ import SortableList from 'components/common/SortableList';
 import ActionsProvider from 'injection/ActionsProvider';
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
-const ExtractorSortModal = React.createClass({
-  propTypes: {
+class ExtractorSortModal extends React.Component {
+  static propTypes = {
     input: PropTypes.object.isRequired,
     extractors: PropTypes.array.isRequired,
-  },
-  open() {
+  };
+
+  open = () => {
     this.refs.modal.open();
-  },
-  close() {
+  };
+
+  close = () => {
     this.refs.modal.close();
-  },
-  _updateSorting(newSorting) {
+  };
+
+  _updateSorting = (newSorting) => {
     this.sortedExtractors = newSorting;
-  },
-  _saveSorting() {
+  };
+
+  _saveSorting = () => {
     if (!this.sortedExtractors) {
       this.close();
     }
     const promise = ExtractorsActions.order.triggerPromise(this.props.input.id, this.sortedExtractors);
     promise.then(() => this.close());
-  },
+  };
+
   render() {
     return (
       <BootstrapModalWrapper ref="modal">
@@ -51,7 +56,7 @@ const ExtractorSortModal = React.createClass({
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
-  },
-});
+  }
+}
 
 export default ExtractorSortModal;

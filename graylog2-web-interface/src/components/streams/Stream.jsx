@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import StreamThroughput from './StreamThroughput';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
@@ -20,7 +21,9 @@ import Routes from 'routing/Routes';
 
 import style from './Stream.css';
 
-const Stream = React.createClass({
+const Stream = createReactClass({
+  displayName: 'Stream',
+
   propTypes() {
     return {
       stream: PropTypes.object.isRequired,
@@ -30,6 +33,7 @@ const Stream = React.createClass({
       indexSets: PropTypes.array.isRequired,
     };
   },
+
   mixins: [PermissionsMixin],
 
   getInitialState() {
@@ -60,6 +64,7 @@ const Stream = React.createClass({
       </span>
     );
   },
+
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
@@ -68,23 +73,27 @@ const Stream = React.createClass({
       });
     }
   },
+
   _onResume() {
     this.setState({ loading: true });
     StreamsStore.resume(this.props.stream.id, response => response)
       .finally(() => this.setState({ loading: false }));
   },
+
   _onUpdate(streamId, stream) {
     StreamsStore.update(streamId, stream, (response) => {
       UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
       return response;
     });
   },
+
   _onClone(streamId, stream) {
     StreamsStore.cloneStream(streamId, stream, (response) => {
       UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
       return response;
     });
   },
+
   _onPause() {
     if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
       this.setState({ loading: true });
@@ -92,12 +101,15 @@ const Stream = React.createClass({
         .finally(() => this.setState({ loading: false }));
     }
   },
+
   _onQuickAdd() {
     this.refs.quickAddStreamRuleForm.open();
   },
+
   _onSaveStreamRule(streamRuleId, streamRule) {
     StreamRulesStore.create(this.props.stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
   },
+
   render() {
     const stream = this.props.stream;
     const permissions = this.props.permissions;

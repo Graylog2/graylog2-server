@@ -9,26 +9,28 @@ import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
-const ExtractorsListItem = React.createClass({
-  propTypes: {
+class ExtractorsListItem extends React.Component {
+  static propTypes = {
     extractor: PropTypes.object.isRequired,
     inputId: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
-  },
-  getInitialState() {
-    return {
-      showDetails: false,
-    };
-  },
-  _toggleDetails() {
+  };
+
+  state = {
+    showDetails: false,
+  };
+
+  _toggleDetails = () => {
     this.setState({ showDetails: !this.state.showDetails });
-  },
-  _deleteExtractor() {
+  };
+
+  _deleteExtractor = () => {
     if (window.confirm(`Really remove extractor "${this.props.extractor.title}?"`)) {
       ExtractorsActions.delete.triggerPromise(this.props.inputId, this.props.extractor);
     }
-  },
-  _formatExtractorSubtitle() {
+  };
+
+  _formatExtractorSubtitle = () => {
     return (
       <span>
         Trying to extract data from <em>{this.props.extractor.source_field}</em> into{' '}
@@ -37,8 +39,9 @@ const ExtractorsListItem = React.createClass({
         leaving the original intact.
       </span>
     );
-  },
-  _formatCondition() {
+  };
+
+  _formatCondition = () => {
     if (this.props.extractor.condition_type === 'none') {
       return <div />;
     }
@@ -55,8 +58,9 @@ const ExtractorsListItem = React.createClass({
         </ul>
       </div>
     );
-  },
-  _formatActions() {
+  };
+
+  _formatActions = () => {
     const actions = [];
 
     actions.push(
@@ -73,14 +77,16 @@ const ExtractorsListItem = React.createClass({
     actions.push(<Button key={'delete-extractor-'} bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
 
     return actions;
-  },
-  _formatOptions(options) {
+  };
+
+  _formatOptions = (options) => {
     const attributes = Object.keys(options);
     return attributes.map((attribute) => {
       return <li key={`${attribute}-${this.props.extractor.id}`}>{attribute}: {options[attribute]}</li>;
     });
-  },
-  _formatConfiguration(extractorConfig) {
+  };
+
+  _formatConfiguration = (extractorConfig) => {
     let formattedOptions = this._formatOptions(extractorConfig);
     if (formattedOptions.length === 0) {
       formattedOptions = <li>No configuration options</li>;
@@ -94,16 +100,18 @@ const ExtractorsListItem = React.createClass({
         </ul>
       </div>
     );
-  },
-  _formatConverter(key, converter) {
+  };
+
+  _formatConverter = (key, converter) => {
     return (
       <li key={`converter-${key}`}>
         {converter.type}
         {converter.config && <ul>{this._formatOptions(converter.config)}</ul>}
       </li>
     );
-  },
-  _formatConverters(converters) {
+  };
+
+  _formatConverters = (converters) => {
     const converterKeys = Object.keys(converters);
     const formattedConverters = converterKeys.map(converterKey => this._formatConverter(converterKey, converters[converterKey]));
     if (formattedConverters.length === 0) {
@@ -118,8 +126,9 @@ const ExtractorsListItem = React.createClass({
         </ul>
       </div>
     );
-  },
-  _formatTimingMetrics(timing) {
+  };
+
+  _formatTimingMetrics = (timing) => {
     return (
       <dl className="metric-def metric-timer">
         <dt>95th percentile:</dt>
@@ -144,8 +153,9 @@ const ExtractorsListItem = React.createClass({
         <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
       </dl>
     );
-  },
-  _formatMetrics(metrics) {
+  };
+
+  _formatMetrics = (metrics) => {
     let totalRate;
     if (metrics.total.rate) {
       totalRate = (
@@ -218,8 +228,9 @@ const ExtractorsListItem = React.createClass({
         </Row>
       </div>
     );
-  },
-  _formatDetails() {
+  };
+
+  _formatDetails = () => {
     return (
       <div>
         <Col md={8}>
@@ -237,7 +248,8 @@ const ExtractorsListItem = React.createClass({
         </Col>
       </div>
     );
-  },
+  };
+
   render() {
     return (
       <EntityListItem key={`entry-list-${this.props.extractor.id}`}
@@ -247,7 +259,7 @@ const ExtractorsListItem = React.createClass({
                       actions={this._formatActions()}
                       contentRow={this.state.showDetails ? this._formatDetails() : null} />
     );
-  },
-});
+  }
+}
 
 export default ExtractorsListItem;

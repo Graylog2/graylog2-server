@@ -7,10 +7,11 @@ import { ExternalLink } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-const HelpMenu = React.createClass({
-  propTypes: {
+class HelpMenu extends React.Component {
+  static propTypes = {
     active: PropTypes.bool.isRequired,
-  },
+  };
+
   render() {
     return (
       <NavDropdown title="Help" id="help-menu-dropdown" active={this.props.active}>
@@ -22,7 +23,7 @@ const HelpMenu = React.createClass({
         </MenuItem>
       </NavDropdown>
     );
-  },
-});
+  }
+}
 
 export default HelpMenu;

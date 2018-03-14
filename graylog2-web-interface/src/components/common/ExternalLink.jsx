@@ -5,8 +5,8 @@ import _ from 'lodash';
 /**
  * Component that renders a link to an external resource.
  */
-const ExternalLink = React.createClass({
-  propTypes: {
+class ExternalLink extends React.Component {
+  static propTypes = {
     /** Link to the external location. If this is not defined, the component does not render a `<a />` element but only the text and the icon. */
     href: PropTypes.string,
     /** Text for the link. (should be one line) */
@@ -17,16 +17,14 @@ const ExternalLink = React.createClass({
     iconClass: PropTypes.string,
     /** Class name for the link. Can be used to change the styling of the link. */
     className: PropTypes.string,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      href: '',
-      target: '_blank',
-      iconClass: 'fa-external-link',
-      className: '',
-    };
-  },
+  static defaultProps = {
+    href: '',
+    target: '_blank',
+    iconClass: 'fa-external-link',
+    className: '',
+  };
 
   render() {
     const content = (
@@ -47,7 +45,7 @@ const ExternalLink = React.createClass({
         {content}
       </a>
     );
-  },
-});
+  }
+}
 
 export default ExternalLink;

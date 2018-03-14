@@ -7,27 +7,31 @@ const SystemMessagesStore = StoreProvider.getStore('SystemMessages');
 import { Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
 
-const SystemMessagesComponent = React.createClass({
-  getInitialState() {
-    return { currentPage: 1 };
-  },
+class SystemMessagesComponent extends React.Component {
+  state = { currentPage: 1 };
+
   componentDidMount() {
     this.loadMessages(this.state.currentPage);
     this.interval = setInterval(() => { this.loadMessages(this.state.currentPage); }, 1000);
-  },
+  }
+
   componentWillUnmount() {
     clearInterval(this.interval);
-  },
-  PER_PAGE: 30,
-  loadMessages(page) {
+  }
+
+  PER_PAGE = 30;
+
+  loadMessages = (page) => {
     SystemMessagesStore.all(page).then((response) => {
       this.setState(response);
     });
-  },
-  _onSelected(selectedPage) {
+  };
+
+  _onSelected = (selectedPage) => {
     this.setState({ currentPage: selectedPage });
     this.loadMessages(selectedPage);
-  },
+  };
+
   render() {
     let content;
     if (this.state.total && this.state.messages) {
@@ -66,7 +70,7 @@ const SystemMessagesComponent = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default SystemMessagesComponent;

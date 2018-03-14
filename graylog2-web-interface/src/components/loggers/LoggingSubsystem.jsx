@@ -5,12 +5,12 @@ import lodash from 'lodash';
 
 import { LogLevelDropdown } from 'components/loggers';
 
-const LoggingSubsystem = React.createClass({
-  propTypes: {
+class LoggingSubsystem extends React.Component {
+  static propTypes = {
     name: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
     subsystem: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     return (
@@ -27,7 +27,7 @@ const LoggingSubsystem = React.createClass({
         </Col>
       </div>
     );
-  },
-});
+  }
+}
 
 export default LoggingSubsystem;

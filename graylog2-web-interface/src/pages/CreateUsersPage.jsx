@@ -12,20 +12,18 @@ const UsersStore = StoreProvider.getStore('Users');
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import NewUserForm from 'components/users/NewUserForm';
 
-const CreateUsersPage = React.createClass({
-  getInitialState() {
-    return {
-      roles: undefined,
-    };
-  },
+class CreateUsersPage extends React.Component {
+  state = {
+    roles: undefined,
+  };
 
   componentDidMount() {
     RolesStore.loadRoles().then((roles) => {
       this.setState({ roles: roles });
     });
-  },
+  }
 
-  _onSubmit(r) {
+  _onSubmit = (r) => {
     const request = r;
     request.permissions = [];
     delete request['session-timeout-never'];
@@ -35,11 +33,11 @@ const CreateUsersPage = React.createClass({
     }, () => {
       UserNotification.error('Failed to create user!', 'Error!');
     });
-  },
+  };
 
-  _onCancel() {
+  _onCancel = () => {
     history.push(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
-  },
+  };
 
   render() {
     if (!this.state.roles) {
@@ -62,7 +60,7 @@ const CreateUsersPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default CreateUsersPage;

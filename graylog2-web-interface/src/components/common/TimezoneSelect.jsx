@@ -14,8 +14,8 @@ import Select from 'components/common/Select';
  * the `Select` input behaves. Check the `Select` documentation for more
  * information.
  */
-const TimezoneSelect = React.createClass({
-  propTypes: {
+class TimezoneSelect extends React.Component {
+  static propTypes = {
     /**
      * Function that will be called when the selected timezone changes. The
      * function will receive the new time zone identifier as argument. See
@@ -23,17 +23,17 @@ const TimezoneSelect = React.createClass({
      * a list of time zone identifiers.
      */
     onChange: PropTypes.func,
-  },
+  };
 
-  getValue() {
+  getValue = () => {
     return this.refs.timezone.getValue();
-  },
+  };
 
   // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  _UNCLASSIFIED_AREA: 'Unclassified',
+  _UNCLASSIFIED_AREA = 'Unclassified';
 
-  _formatTimezones() {
+  _formatTimezones = () => {
     const timezones = {};
     // Group time zones by area
     moment.tz.names().forEach((timezone) => {
@@ -66,13 +66,15 @@ const TimezoneSelect = React.createClass({
       });
 
     return labels;
-  },
-  _renderOption(option) {
+  };
+
+  _renderOption = (option) => {
     if (!option.disabled) {
       return <span key={option.value} title={option.value}>&nbsp; {option.label}</span>;
     }
     return <span key={option.value} title={option.value}>{option.label}</span>;
-  },
+  };
+
   render() {
     const timezones = this._formatTimezones();
     const { onChange, ...otherProps } = this.props;
@@ -84,7 +86,7 @@ const TimezoneSelect = React.createClass({
               options={timezones}
               optionRenderer={this._renderOption} />
     );
-  },
-});
+  }
+}
 
 export default TimezoneSelect;

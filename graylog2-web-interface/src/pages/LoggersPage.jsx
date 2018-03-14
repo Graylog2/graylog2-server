@@ -3,7 +3,7 @@ import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { LoggerOverview } from 'components/loggers';
 
-const LoggersPage = React.createClass({
+class LoggersPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Logging">
@@ -19,7 +19,7 @@ const LoggersPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default LoggersPage;

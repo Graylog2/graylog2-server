@@ -1,7 +1,7 @@
 import React from 'react';
 import { Panel } from 'react-bootstrap';
 
-const CopyInputExtractorConfiguration = React.createClass({
+class CopyInputExtractorConfiguration extends React.Component {
   render() {
     return (
       <div className="form-group">
@@ -12,6 +12,7 @@ const CopyInputExtractorConfiguration = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
 export default CopyInputExtractorConfiguration;

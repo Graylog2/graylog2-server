@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import $ from 'jquery';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
@@ -31,7 +32,9 @@ const SUPPORTED_RANGES_IN_SECS = [hoursToSeconds(1), daysToSeconds(1), daysToSec
 
 let SCREEN_RESOLUTION = $(window).width();
 
-const SourceOverview = React.createClass({
+const SourceOverview = createReactClass({
+  displayName: 'SourceOverview',
+
   getInitialState() {
     this.sourcesData = crossfilter();
     this.filterDimension = this.sourcesData.dimension(d => d.name);

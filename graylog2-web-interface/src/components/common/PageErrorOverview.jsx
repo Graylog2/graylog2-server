@@ -9,20 +9,21 @@ import style from '!style/useable!css!pages/NotFoundPage.css';
  * only when the page would make no sense if the information is not available (i.e. a node page where we
  * can't reach the node).
  */
-const PageErrorOverview = React.createClass({
-  propTypes: {
+class PageErrorOverview extends React.Component {
+  static propTypes = {
     /** Array of errors that prevented the original page to load. */
     errors: PropTypes.array.isRequired,
-  },
+  };
+
   componentDidMount() {
     style.use();
-  },
+  }
 
   componentWillUnmount() {
     style.unuse();
-  },
+  }
 
-  _formatErrors(errors) {
+  _formatErrors = (errors) => {
     const formattedErrors = errors ? errors.map(error => <li key={`key-${error.toString()}`}>{error.toString()}</li>) : [];
     return (
       <ul>
@@ -30,7 +31,8 @@ const PageErrorOverview = React.createClass({
         <li>Check your Graylog logs for more information.</li>
       </ul>
     );
-  },
+  };
+
   render() {
     return (
       <Row className="jumbotron-container">
@@ -43,7 +45,7 @@ const PageErrorOverview = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default PageErrorOverview;

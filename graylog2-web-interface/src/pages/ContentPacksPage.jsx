@@ -7,7 +7,7 @@ import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationBundles from 'components/source-tagging/ConfigurationBundles';
 
-const ContentPacksPage = React.createClass({
+class ContentPacksPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Content packs">
@@ -39,7 +39,7 @@ const ContentPacksPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default ContentPacksPage;

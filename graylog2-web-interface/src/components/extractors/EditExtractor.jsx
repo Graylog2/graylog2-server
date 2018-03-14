@@ -16,34 +16,33 @@ import FormUtils from 'util/FormsUtils';
 import StoreProvider from 'injection/StoreProvider';
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const EditExtractor = React.createClass({
-  propTypes: {
+class EditExtractor extends React.Component {
+  static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']).isRequired,
     extractor: PropTypes.object.isRequired,
     inputId: PropTypes.string.isRequired,
     exampleMessage: PropTypes.string,
     onSave: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {
-      updatedExtractor: this.props.extractor,
-      conditionTestResult: undefined,
-      exampleMessage: this.props.exampleMessage,
-    };
-  },
+  };
+
+  state = {
+    updatedExtractor: this.props.extractor,
+    conditionTestResult: undefined,
+    exampleMessage: this.props.exampleMessage,
+  };
 
   componentWillReceiveProps(nextProps) {
     if (this.props.exampleMessage !== nextProps.exampleMessage) {
       this._updateExampleMessage(nextProps.exampleMessage);
     }
-  },
+  }
 
-  _updateExampleMessage(nextExample) {
+  _updateExampleMessage = (nextExample) => {
     this.setState({ exampleMessage: nextExample });
-  },
+  };
 
   // Ensures the target field only contains alphanumeric characters and underscores
-  _onTargetFieldChange(event) {
+  _onTargetFieldChange = (event) => {
     const value = event.target.value;
     const newValue = value.replace(/[^\w\d_]/g, '');
 
@@ -52,8 +51,9 @@ const EditExtractor = React.createClass({
     }
 
     this._onFieldChange('target_field')(event);
-  },
-  _onFieldChange(key) {
+  };
+
+  _onFieldChange = (key) => {
     return (event) => {
       const nextState = {};
       const updatedExtractor = this.state.updatedExtractor;
@@ -67,13 +67,15 @@ const EditExtractor = React.createClass({
 
       this.setState(nextState);
     };
-  },
-  _onConfigurationChange(newConfiguration) {
+  };
+
+  _onConfigurationChange = (newConfiguration) => {
     const updatedExtractor = this.state.updatedExtractor;
     updatedExtractor.extractor_config = newConfiguration;
     this.setState({ updatedExtractor: updatedExtractor });
-  },
-  _onConverterChange(converterType, newConverter) {
+  };
+
+  _onConverterChange = (converterType, newConverter) => {
     const updatedExtractor = this.state.updatedExtractor;
     const previousConverter = updatedExtractor.converters.filter(converter => converter.type === converterType)[0];
 
@@ -88,17 +90,20 @@ const EditExtractor = React.createClass({
     }
 
     this.setState({ updatedExtractor: updatedExtractor });
-  },
-  _testCondition() {
+  };
+
+  _testCondition = () => {
     const updatedExtractor = this.state.updatedExtractor;
     const tester = (updatedExtractor.condition_type === 'string' ? ToolsStore.testContainsString : ToolsStore.testRegex);
     const promise = tester(updatedExtractor.condition_value, this.state.exampleMessage);
     promise.then(result => this.setState({ conditionTestResult: result.matched }));
-  },
-  _tryButtonDisabled() {
+  };
+
+  _tryButtonDisabled = () => {
     return this.state.updatedExtractor.condition_value === '' || this.state.updatedExtractor.condition_value === undefined || !this.state.exampleMessage;
-  },
-  _getExtractorConditionControls() {
+  };
+
+  _getExtractorConditionControls = () => {
     if (!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none') {
       return <div />;
     }
@@ -146,14 +151,15 @@ const EditExtractor = React.createClass({
         </Input>
       </div>
     );
-  },
-  _saveExtractor(event) {
+  };
+
+  _saveExtractor = (event) => {
     event.preventDefault();
     ExtractorsActions.save.triggerPromise(this.props.inputId, this.state.updatedExtractor)
       .then(() => this.props.onSave());
-  },
+  };
 
-  _staticField(label, text) {
+  _staticField = (label, text) => {
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} md={2}>
@@ -164,7 +170,7 @@ const EditExtractor = React.createClass({
         </Col>
       </FormGroup>
     );
-  },
+  };
 
   render() {
     const conditionTypeHelpMessage = 'Extracting only from messages that match a certain condition helps you ' +
@@ -308,7 +314,7 @@ const EditExtractor = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default EditExtractor;
