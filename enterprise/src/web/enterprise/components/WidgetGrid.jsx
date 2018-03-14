@@ -7,7 +7,8 @@ import { ReactGridContainer } from 'components/common';
 import style from 'pages/ShowDashboardPage.css';
 import ViewWidget from 'enterprise/components/widgets/ViewWidget';
 import { widgetDefinition } from 'enterprise/logic/Widget';
-import AggregationBuilder from './aggregationbuilder/AggregationBuilder';
+import CurrentWidgetsActions from '../actions/CurrentWidgetsActions';
+import CUrrentWidgetsStore from '../stores/CurrentWidgetsStore';
 
 export default class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
@@ -33,6 +34,11 @@ export default class WidgetGrid extends React.Component {
 
   state = {
     widgetDimensions: {},
+  };
+
+  // TODO: Move to better place.
+  _onWidgetConfigChange = (widgetId, config) => {
+    CurrentWidgetsActions.updateConfig(widgetId, config);
   };
 
   _onWidgetSizeChange = (widgetId, dimensions) => {
@@ -65,14 +71,14 @@ export default class WidgetGrid extends React.Component {
         returnedWidgets.widgets.push(
           <div key={widgetId} className={style.widgetContainer}>
             <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange}>
-              <AggregationBuilder fields={this.props.fields}>
-                <VisComponent id={widgetId}
-                              config={config}
-                              data={widgetData}
-                              height={height}
-                              width={width}
-                              computationTimeRange={computationTimeRange} />
-              </AggregationBuilder>
+              <VisComponent id={widgetId}
+                            config={config}
+                            data={widgetData}
+                            fields={this.props.fields}
+                            height={height}
+                            width={width}
+                            onChange={newWidgetConfig => this._onWidgetConfigChange(widgetId, newWidgetConfig)}
+                            computationTimeRange={computationTimeRange} />
             </ViewWidget>
           </div>,
         );

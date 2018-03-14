@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import AggregationControls from './AggregationControls';
 import EditModeToggleButton from './EditModeToggleButton';
 import FullSizeContainer from './FullSizeContainer';
+import DataTable from '../datatable/DataTable';
 
 export default class AggregationBuilder extends React.Component {
   static defaultProps = {
@@ -11,30 +12,34 @@ export default class AggregationBuilder extends React.Component {
   };
 
   static propTypes = {
-    children: PropTypes.element.isRequired,
     editing: PropTypes.bool,
+    fields: PropTypes.object.isRequired,
   };
+
+  static _visualizationForType(type) {
+    return DataTable;
+  }
 
   constructor(props) {
     super(props);
     this.state = {
       editing: props.editing,
     };
-    this._toggleEditMode = this._toggleEditMode.bind(this);
   }
 
-  _toggleEditMode() {
+  _toggleEditMode = () => {
     this.setState(state => ({ editing: !state.editing }));
-  }
+  };
 
   render() {
+    const VisComponent = AggregationBuilder._visualizationForType();
     const children = (
       <FullSizeContainer>
-        {this.props.children}
+        <VisComponent {...this.props} />
       </FullSizeContainer>
     );
     const content = this.state.editing ? (
-      <AggregationControls fields={this.props.fields}>
+      <AggregationControls fields={this.props.fields} onChange={this.props.onChange} {...this.props.config}>
         {children}
       </AggregationControls>
     ) : children;

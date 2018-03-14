@@ -8,12 +8,13 @@ import styles from './Value.css';
 const Value = ({ children, field, value, queryId }) => {
   const element = children || value;
   const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
-    return (<MenuItem eventKey={{ action: valueAction.type, field }}
+    return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
+                      eventKey={{ action: valueAction.type, field }}
                       onSelect={event => valueAction.handler(queryId, event.field)}>{valueAction.title}</MenuItem>);
   });
 
   return (
-    <Dropdown componentClass="span">
+    <Dropdown componentClass="span" id={`value-${field}-${value}-action-dropdown`}>
       <span className={styles.dropdowntoggle} bsRole="toggle">{element}</span>
       <Dropdown.Menu style={{ paddingLeft: '5px', paddingRight: '5px', minWidth: 'max-content', color: '#666666' }}>
         <div style={{ marginBottom: '10px' }}>
@@ -39,9 +40,9 @@ const Value = ({ children, field, value, queryId }) => {
 };
 
 Value.propTypes = {
-  children: PropTypes.element,
+  children: PropTypes.node.isRequired,
   field: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.node.isRequired,
   queryId: PropTypes.string.isRequired,
 };
 

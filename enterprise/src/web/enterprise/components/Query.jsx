@@ -20,7 +20,7 @@ import style from 'pages/ShowDashboardPage.css';
 
 const _onPositionsChange = (positions, view) => {
   const newPositions = {};
-  positions.forEach(({ col, height, row, width, id}) => {
+  positions.forEach(({ col, height, row, width, id }) => {
     newPositions[id] = { col, height, row, width };
   });
   const updatedView = new Immutable.Map(view).set('positions', newPositions);
@@ -38,7 +38,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields)
     const widgetData = (widgetMapping[widgetDef.get('id')] || []).map(searchTypeId => searchTypes[searchTypeId]);
     if (widgetData) {
       widgets[widget.id] = widget;
-      data[widget.id] = dataTransformer(widgetData);
+      data[widget.id] = dataTransformer(widgetData, widgetDef.toJS());
     }
   });
   const config = { widgets, data, positions: view.get('positions') };
@@ -85,7 +85,7 @@ const Query = ({ fields, onToggleMessages, showMessages, results, view, widgetMa
 };
 
 Query.propTypes = {
-  fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+  fields: PropTypes.object.isRequired,
   onToggleMessages: PropTypes.func.isRequired,
   results: PropTypes.object.isRequired,
   showMessages: PropTypes.bool.isRequired,

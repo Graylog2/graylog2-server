@@ -6,6 +6,10 @@ import DataTable from 'enterprise/components/datatable/DataTable';
 import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
 import FieldHistogramTransformer from 'enterprise/logic/searchresulttransformers/FieldHistogramTransformer';
+import AggregationHandler from './logic/searchtypes/AggregationHandler';
+import AggregationTransformer from './logic/searchresulttransformers/AggregationTransformer';
+import AggregationBuilder from './components/aggregationbuilder/AggregationBuilder';
+import AggregationConfigGenerator from './logic/searchtypes/aggregation/AggregationConfigGenerator';
 
 const extendedSearchPath = '/extendedsearch';
 
@@ -33,8 +37,8 @@ export default {
     {
       type: 'SEARCH_RESULT_CHART2',
       displayName: 'Search result graph',
-      defaultHeight: 1,
-      defaultWidth: 2,
+      defaultHeight: 2,
+      defaultWidth: 4,
       visualizationComponent: Histogram,
       searchResultTransformer: data => data.find(d => d && d.type && d.type.toLocaleUpperCase() === 'DATE_HISTOGRAM'),
       searchTypes: () => [{ type: 'messages' }, { type: 'date_histogram' }],
@@ -80,16 +84,11 @@ export default {
     {
       type: 'AGGREGATION',
       displayName: 'Results',
-      defaultHeight: 3,
-      defaultWidth: 2,
-      visualizationComponent: DataTable,
-      searchResultTransformer: (results) => results,
-      searchTypes: config => [{
-        type: 'group_by',
-        config: {
-          fields: config.fields,
-        },
-      }],
+      defaultHeight: 4,
+      defaultWidth: 4,
+      visualizationComponent: AggregationBuilder,
+      searchResultTransformer: AggregationTransformer,
+      searchTypes: AggregationConfigGenerator,
     },
   ],
   searchTypes: [
@@ -115,6 +114,13 @@ export default {
         limit: 150,
         operation: 'COUNT',
         order: 'ASC',
+      },
+    },
+    {
+      type: 'aggregation',
+      handler: AggregationHandler,
+      defaults: {
+        groups: [],
       },
     },
   ],

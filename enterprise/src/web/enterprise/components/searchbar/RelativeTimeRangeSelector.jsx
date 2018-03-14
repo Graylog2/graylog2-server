@@ -53,7 +53,7 @@ export default function RelativeTimeRangeSelector({ config, value, onChange }) {
 RelativeTimeRangeSelector.propTypes = {
   config: PropTypes.shape({
     relative_timerange_options: PropTypes.object.isRequired,
-    query_time_range_limit: PropTypes.object.isRequired,
+    query_time_range_limit: PropTypes.string.isRequired,
   }).isRequired,
   value: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,

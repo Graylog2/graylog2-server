@@ -4,4 +4,5 @@ export default Reflux.createActions([
   'create',
   'remove',
   'update',
+  'updateConfig',
 ]);

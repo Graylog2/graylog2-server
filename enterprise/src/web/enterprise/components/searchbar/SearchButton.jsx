@@ -13,7 +13,7 @@ SearchButton.defaultProps = {
 };
 
 SearchButton.propTypes = {
-  running: PropTypes.boolean,
+  running: PropTypes.bool,
 };
 
 export default SearchButton;

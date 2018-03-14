@@ -43,6 +43,10 @@ export default Reflux.createStore({
     this.widgets = this.widgets.setIn([viewId, queryId, widgetId], widget);
     this._trigger();
   },
+  updateConfig(viewId, queryId, widgetId, config) {
+    this.widgets = this.widgets.setIn([viewId, queryId, widgetId, 'config'], config);
+    this._trigger();
+  },
   _trigger() {
     if (this.selectedView) {
       this.trigger(this.widgets.get(this.selectedView, new Immutable.Map()));

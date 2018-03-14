@@ -35,7 +35,7 @@ export default React.createClass({
     const calculatedAt = moment().toISOString();
 
     return (
-      <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'hidden' }} data-widget-id={this.props.widgetId}>
+      <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'scroll' }} data-widget-id={this.props.widgetId}>
         {this.props.children}
       </div>
     );

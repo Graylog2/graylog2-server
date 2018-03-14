@@ -27,7 +27,7 @@ const MessageList = React.createClass({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
     config: PropTypes.shape({
-      fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+      fields: PropTypes.arrayOf(PropTypes.string),
       pageSize: PropTypes.number,
     }).isRequired,
   },
@@ -41,7 +41,7 @@ const MessageList = React.createClass({
     };
   },
   componentDidMount() {
-    ConfigurationActions.listSearchesClusterConfig();
+    return ConfigurationActions.listSearchesClusterConfig();
   },
   _columnStyle(fieldName) {
     const selectedFields = Immutable.OrderedSet(this.props.config.fields);
@@ -79,7 +79,7 @@ const MessageList = React.createClass({
         };
       });
     const selectedFields = this.state.queries.getIn([this.state.currentViewStore.selectedQuery, 'fields']);
-    const selectedColumns = this._fieldColumns(selectedFields);
+    const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
     return (
       <span>
         <MessageTablePaginator currentPage={Number(this.state.currentPage)}
@@ -99,7 +99,7 @@ const MessageList = React.createClass({
                       return (
                         <th key={selectedFieldName}
                           style={this._columnStyle(selectedFieldName)}>
-                          <Field interactive name={selectedFieldName} queryId="FIXME" />
+                          <Field interactive name={selectedFieldName} queryId="FIXME" viewId="FIXME"/>
                         </th>
                       );
                     })}
@@ -115,7 +115,7 @@ const MessageList = React.createClass({
                       expanded={this.state.expandedMessages.contains(`${message.index}-${message.id}`)}
                       toggleDetail={this._toggleMessageDetail}
                       inputs={new Immutable.Map()}
-                      streams={new Immutable.List()}
+                      streams={new Immutable.Map()}
                       allStreams={new Immutable.List()}
                       allStreamsLoaded
                       nodes={new Immutable.Map()}

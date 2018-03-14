@@ -15,6 +15,7 @@ export default class AggregationControls extends React.Component {
     children: PropTypes.element.isRequired,
     columnPivots: PropTypes.arrayOf(PropTypes.string),
     fields: FieldList.isRequired,
+    onChange: PropTypes.func.isRequired,
     rowPivots: PropTypes.arrayOf(PropTypes.string),
     series: PropTypes.arrayOf(PropTypes.string),
     sort: PropTypes.arrayOf(PropTypes.string),
@@ -37,24 +38,30 @@ export default class AggregationControls extends React.Component {
     this._onSeriesChange = this._onSeriesChange.bind(this);
     this._onSortChange = this._onSortChange.bind(this);
 
-    const { children, fields, ...rest } = props;
+    const { children, fields, onChange, ...rest } = props;
     this.state = rest;
   }
 
   _onColumnPivotChange(columnPivots) {
-    this.setState({ columnPivots: columnPivots.split(',') });
+    this.setState(state => this._mutateStateAndPropagate(state, { columnPivots: columnPivots.split(',') }));
   }
 
   _onRowPivotChange(rowPivots) {
-    this.setState({ rowPivots: rowPivots.split(',') });
+    this.setState(state => this._mutateStateAndPropagate(state, { rowPivots: rowPivots.split(',') }));
   }
 
   _onSeriesChange(series) {
-    this.setState({ series: series.split(',') });
+    this.setState(state => this._mutateStateAndPropagate(state, { series: series.split(',') }));
   }
 
   _onSortChange(sort) {
-    this.setState({ sort: sort.split(',') });
+    this.setState(state => this._mutateStateAndPropagate(state, { sort: sort.split(',') }));
+  }
+
+  _mutateStateAndPropagate(state, stateDelta) {
+    const newState = Object.assign({}, state, stateDelta);
+    this.props.onChange(newState);
+    return newState;
   }
 
   render() {
@@ -80,10 +87,10 @@ export default class AggregationControls extends React.Component {
           </Col>
         </Row>
         <Row style={{ height: '100%' }}>
-          <Col md={2}>
+          <Col md={3}>
             <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={this.state.series.join(',')} />
           </Col>
-          <Col md={10} style={{ height: '100%' }}>
+          <Col md={9} style={{ height: '100%' }}>
             {children}
           </Col>
         </Row>

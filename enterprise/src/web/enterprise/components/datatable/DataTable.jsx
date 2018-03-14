@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import naturalSort from 'javascript-natural-sort';
 
+import expandRows from 'enterprise/logic/ExpandRows';
 import DataTableEntry from './DataTableEntry';
 import Field from '../Field';
 
@@ -14,8 +15,8 @@ const DataTable = React.createClass({
         PropTypes.shape({
           rows: PropTypes.arrayOf(PropTypes.object),
         }),
-      ]).isRequired,
-      fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+      ]),
+      fields: PropTypes.arrayOf(PropTypes.string),
     }).isRequired,
   },
   _extractAllFieldnames(data) {
@@ -28,12 +29,10 @@ const DataTable = React.createClass({
   },
   render() {
     const { config, data } = this.props;
+    const { rowPivots, series } = config;
     const rows = data[0] ? data[0].results : [];
-    const fields = new Immutable.OrderedSet(config.fields).merge(this._extractAllFieldnames(rows));
-    const sortedRows = new Immutable.List(rows)
-      .sort((row1, row2) => {
-        return fields.map(field => naturalSort(row1[field], row2[field])).find(value => value !== 0) || 0;
-      });
+    const fields = new Immutable.OrderedSet(rowPivots).merge(series.filter(s => s !== 'count()')).merge(this._extractAllFieldnames(rows));
+    const sortedRows = expandRows(rowPivots.slice(), series, rows);
     return (
       <div className="messages-container">
         <table className="table table-condensed messages">

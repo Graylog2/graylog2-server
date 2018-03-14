@@ -10,12 +10,13 @@ const Field = ({ children, interactive, name, queryId, viewId }) => {
   const element = children || name;
   if (interactive) {
     const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
-      return (<MenuItem eventKey={{ action: fieldAction.type, field: name }}
-                       onSelect={({ field }) => fieldAction.handler(viewId, queryId, field)}>{fieldAction.title}</MenuItem>);
+      return (<MenuItem key={`${name}-action-${fieldAction.type}`}
+                        eventKey={{ action: fieldAction.type, field: name }}
+                        onSelect={({ field }) => fieldAction.handler(viewId, queryId, field)}>{fieldAction.title}</MenuItem>);
     });
 
     return (
-      <Dropdown>
+      <Dropdown id={`field-${name}-action-dropdown`}>
         <span className={styles.dropdowntoggle} bsRole="toggle">{element}<span className="caret" /></span>
         <Dropdown.Menu style={{ paddingLeft: '5px', paddingRight: '5px', minWidth: 'max-content', color: '#666666' }}>
           <div style={{ marginBottom: '10px' }}>
@@ -45,15 +46,15 @@ const Field = ({ children, interactive, name, queryId, viewId }) => {
 };
 
 Field.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.node,
   interactive: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
-  onToggleSelected: PropTypes.func.isRequired,
-  selected: PropTypes.bool.isRequired,
   queryId: PropTypes.string.isRequired,
+  viewId: PropTypes.string.isRequired,
 };
 
 Field.defaultProps = {
+  children: null,
   interactive: false,
 };
 

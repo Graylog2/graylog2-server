@@ -6,6 +6,7 @@ import { searchTypeDefinition } from 'enterprise/logic/SearchType';
 
 export default class SearchRequest {
   constructor(queries, widgets) {
+    this.id = uuid();
     this.widgetMapping = new Immutable.Map();
     this.searchRequest = {
       queries: queries.map((query, id) => {
@@ -40,7 +41,7 @@ export default class SearchRequest {
                   id: searchTypeId,
                   type: searchType.type,
                 });
-          }),
+          }).toJS(),
         };
       }).valueSeq().toJS(),
     };

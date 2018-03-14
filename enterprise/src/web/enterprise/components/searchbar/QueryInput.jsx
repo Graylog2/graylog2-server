@@ -105,12 +105,14 @@ class QueryInput extends Component {
 }
 
 QueryInput.propTypes = {
-  result: PropTypes.object.isRequired,
+  result: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
 };
 
-QueryInput.defaultProps = {};
+QueryInput.defaultProps = {
+  result: {},
+};
 
 export default QueryInput;

@@ -9,7 +9,8 @@ export default function (viewId, queryId, field) {
     title: `Values of field ${field}`,
     type: 'AGGREGATION',
     config: {
-      fields: [field],
+      rowPivots: [field],
+      series: ['count()'],
     },
   };
   WidgetActions.create(viewId, queryId, newWidget);

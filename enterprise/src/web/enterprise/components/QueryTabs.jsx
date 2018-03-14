@@ -26,6 +26,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
     <span>
       <span className="pull-right"><DebugOverlay /></span>
       <Tabs
+        id="QueryTabs"
         activeKey={selectedQuery}
         animation={false}
         onSelect={onSelect}>
