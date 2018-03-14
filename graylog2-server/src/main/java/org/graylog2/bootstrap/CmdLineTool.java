@@ -47,6 +47,7 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.graylog2.configuration.ConfigurationPathParametersModule;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
@@ -174,7 +175,9 @@ public abstract class CmdLineTool implements CliCommand {
             dumpDefaultConfigAndExit();
         }
 
-        final NamedConfigParametersModule configModule = readConfiguration(configFile);
+        final List<Object> configBeans = readConfigurationBeans(configFile);
+        final NamedConfigParametersModule configModule = new NamedConfigParametersModule(configBeans);
+        final ConfigurationPathParametersModule configurationPathParametersModule = new ConfigurationPathParametersModule(configBeans);
 
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
@@ -190,7 +193,7 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(configModule, pluginBindings, binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
+        injector = setupInjector(configModule, configurationPathParametersModule, pluginBindings, binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug reports.)");
@@ -333,7 +336,7 @@ public abstract class CmdLineTool implements CliCommand {
         return sb.toString();
     }
 
-    protected NamedConfigParametersModule readConfiguration(final String configFile) {
+    private List<Object> readConfigurationBeans(final String configFile) {
         final List<Object> beans = getCommandConfigurationBeans();
         for (Object bean : beans) {
             jadConfig.addConfigurationBean(bean);
@@ -343,7 +346,7 @@ public abstract class CmdLineTool implements CliCommand {
         LOG.debug("Loading configuration from config file: {}", configFile);
         processConfiguration(jadConfig);
 
-        return new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
+        return jadConfig.getConfigurationBeans();
     }
 
     private void processConfiguration(JadConfig jadConfig) {
@@ -362,10 +365,11 @@ public abstract class CmdLineTool implements CliCommand {
         return Lists.newArrayList();
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, Module... otherModules) {
+    protected Injector setupInjector(NamedConfigParametersModule configModule, ConfigurationPathParametersModule configurationPathParametersModule, Module... otherModules) {
         try {
             final ImmutableList.Builder<Module> modules = ImmutableList.builder();
             modules.add(configModule);
+            modules.add(configurationPathParametersModule);
             modules.addAll(getSharedBindingsModules());
             modules.addAll(getCommandBindings());
             modules.addAll(Arrays.asList(otherModules));

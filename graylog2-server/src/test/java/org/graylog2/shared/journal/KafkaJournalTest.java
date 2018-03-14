@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -78,12 +79,14 @@ public class KafkaJournalTest {
     private ServerStatus serverStatus;
     private ScheduledThreadPoolExecutor scheduler;
     private File journalDirectory;
+    private Path journalDirectoryPath;
 
     @Before
     public void setUp() throws IOException {
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.prestartCoreThread();
         journalDirectory = temporaryFolder.newFolder();
+        journalDirectoryPath = journalDirectory.toPath();
 
         final File nodeId = temporaryFolder.newFile("node-id");
         Files.write(UUID.randomUUID().toString(), nodeId, StandardCharsets.UTF_8);
@@ -104,7 +107,7 @@ public class KafkaJournalTest {
 
     @Test
     public void writeAndRead() throws IOException {
-        final Journal journal = new KafkaJournal(journalDirectory,
+        final Journal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 Size.megabytes(100L),
                 Duration.standardHours(1),
@@ -129,7 +132,7 @@ public class KafkaJournalTest {
 
     @Test
     public void readAtLeastOne() throws Exception {
-        final Journal journal = new KafkaJournal(journalDirectory,
+        final Journal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 Size.megabytes(100L),
                 Duration.standardHours(1),
@@ -185,7 +188,7 @@ public class KafkaJournalTest {
     @Test
     public void maxSegmentSize() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 segmentSize,
                 Duration.standardHours(1),
@@ -217,7 +220,7 @@ public class KafkaJournalTest {
     @Test
     public void maxMessageSize() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 segmentSize,
                 Duration.standardHours(1),
@@ -257,7 +260,7 @@ public class KafkaJournalTest {
     @Test
     public void segmentRotation() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 segmentSize,
                 Duration.standardHours(1),
@@ -286,7 +289,7 @@ public class KafkaJournalTest {
     @Test
     public void segmentSizeCleanup() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 segmentSize,
                 Duration.standardHours(1),
@@ -322,7 +325,7 @@ public class KafkaJournalTest {
         DateTimeUtils.setCurrentMillisProvider(clock);
         try {
             final Size segmentSize = Size.kilobytes(1L);
-            final KafkaJournal journal = new KafkaJournal(journalDirectory,
+            final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
                     scheduler,
                     segmentSize,
                     Duration.standardHours(1),
@@ -376,7 +379,7 @@ public class KafkaJournalTest {
     @Test
     public void segmentCommittedCleanup() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 segmentSize,
                 Duration.standardHours(1),
@@ -427,7 +430,7 @@ public class KafkaJournalTest {
         assumeTrue(fileLock.tryLock());
 
         try {
-            new KafkaJournal(journalDirectory,
+            new KafkaJournal(journalDirectoryPath,
                 scheduler,
                 Size.megabytes(100L),
                 Duration.standardHours(1),
@@ -453,7 +456,7 @@ public class KafkaJournalTest {
         serverStatus.running();
 
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
             scheduler,
             segmentSize,
             Duration.standardSeconds(1L),
@@ -476,7 +479,7 @@ public class KafkaJournalTest {
         serverStatus.throttle();
 
         final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+        final KafkaJournal journal = new KafkaJournal(journalDirectoryPath,
             scheduler,
             segmentSize,
             Duration.standardSeconds(1L),
