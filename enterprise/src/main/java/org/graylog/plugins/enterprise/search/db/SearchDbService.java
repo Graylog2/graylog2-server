@@ -34,7 +34,6 @@ public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
 
     @Inject
-    @SuppressWarnings("unchecked")
     protected SearchDbService(MongoConnection mongoConnection,
                              MongoJackObjectMapperProvider mapper) {
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),

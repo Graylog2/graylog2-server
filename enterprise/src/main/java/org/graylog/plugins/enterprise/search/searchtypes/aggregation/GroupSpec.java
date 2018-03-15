@@ -19,6 +19,7 @@ import java.util.Objects;
 public interface GroupSpec extends AggregationSpec {
     String TYPE_FIELD = "type";
 
+    @Override
     String type();
 
     @JsonProperty

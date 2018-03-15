@@ -21,6 +21,7 @@ public abstract class MessageList implements SearchType {
     @Override
     public abstract String type();
 
+    @Override
     @Nullable
     @JsonProperty
     public abstract String id();
@@ -92,6 +93,7 @@ public abstract class MessageList implements SearchType {
         @JsonProperty
         public abstract String id();
 
+        @Override
         @JsonProperty
         public String type() {
             return NAME;

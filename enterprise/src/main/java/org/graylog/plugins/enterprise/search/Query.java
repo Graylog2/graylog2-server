@@ -96,10 +96,12 @@ public abstract class Query {
                 // copy all existing search types, we'll update them by id if necessary below
                 Map<String, SearchType> updatedSearchTypes = Maps.newHashMap(searchTypesIndex);
 
+                @SuppressWarnings("unchecked")
                 Map<String, Object> searchTypeStates = (Map<String, Object>) state.get("search_types");
                 for (Map.Entry<String, Object> stateEntry : searchTypeStates.entrySet()) {
                     final String id = stateEntry.getKey();
                     final SearchType searchType = searchTypesIndex.get(id);
+                    @SuppressWarnings("unchecked")
                     final SearchType updatedSearchType = searchType.applyExecutionContext(objectMapper, (Map<String, Object>) stateEntry.getValue());
                     updatedSearchTypes.put(id, updatedSearchType);
                 }

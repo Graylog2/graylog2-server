@@ -20,6 +20,7 @@ import java.util.Optional;
 public interface ESAggregationSpecHandler<SPEC_TYPE extends AggregationSpec, AGGREGATION_RESULT extends Aggregation>
         extends AggregationSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResult, AGGREGATION_RESULT, ESAggregation, ESGeneratedQueryContext> {
 
+    @Override
     @Nonnull
     Optional<AggregationBuilder> doCreateAggregation(String name, SPEC_TYPE aggregationSpec, ESAggregation searchTypeHandler, ESGeneratedQueryContext queryContext);
 

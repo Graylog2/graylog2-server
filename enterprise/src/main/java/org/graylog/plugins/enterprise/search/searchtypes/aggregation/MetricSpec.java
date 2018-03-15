@@ -16,6 +16,7 @@ import java.util.Objects;
 public interface MetricSpec extends AggregationSpec {
     String TYPE_FIELD = "type";
 
+    @Override
     String type();
 
     @JsonAutoDetect
