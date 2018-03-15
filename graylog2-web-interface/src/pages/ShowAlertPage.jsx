@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Label, Tooltip } from 'react-bootstrap';
@@ -18,7 +19,9 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 
 import style from './ShowAlertPage.css';
 
-const ShowAlertPage = React.createClass({
+const ShowAlertPage = createReactClass({
+  displayName: 'ShowAlertPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

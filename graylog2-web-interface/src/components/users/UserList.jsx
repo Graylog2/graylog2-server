@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -14,7 +15,9 @@ import { DataTable, Spinner, Timestamp } from 'components/common';
 
 import UserListStyle from '!style!css!./UserList.css';
 
-const UserList = React.createClass({
+const UserList = createReactClass({
+  displayName: 'UserList',
+
   propTypes: {
     currentUsername: PropTypes.string.isRequired,
     currentUser: PropTypes.object.isRequired,
@@ -28,6 +31,7 @@ const UserList = React.createClass({
       roles: undefined,
     };
   },
+
   componentDidMount() {
     this.loadUsers();
     RolesStore.loadRoles().done((roles) => {
@@ -43,9 +47,11 @@ const UserList = React.createClass({
       });
     });
   },
+
   _hasAdminRole(user) {
     return this.isPermitted(user.permissions, ['*']);
   },
+
   deleteUser(username) {
     const promise = UsersStore.deleteUser(username);
 
@@ -53,6 +59,7 @@ const UserList = React.createClass({
       this.loadUsers();
     });
   },
+
   _deleteUserFunction(username) {
     return () => {
       if (window.confirm(`Do you really want to delete user ${username}?`)) {
@@ -60,6 +67,7 @@ const UserList = React.createClass({
       }
     };
   },
+
   _headerCellFormatter(header) {
     let formattedHeaderCell;
 
@@ -91,6 +99,7 @@ const UserList = React.createClass({
 
     return formattedHeaderCell;
   },
+
   _userInfoFormatter(user) {
     const rowClass = user.username === this.props.currentUsername ? 'active' : null;
     let userBadge = null;
@@ -182,6 +191,7 @@ const UserList = React.createClass({
       </tr>
     );
   },
+
   render() {
     const filterKeys = ['username', 'full_name', 'email', 'client_address'];
     const headers = ['', 'Name', 'Username', 'Email Address', 'Client Address', 'Role', 'Actions'];

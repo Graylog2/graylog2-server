@@ -3,20 +3,21 @@ import React from 'react';
 
 import MultiSelect from 'components/common/MultiSelect';
 
-const RolesSelect = React.createClass({
-  propTypes: {
+class RolesSelect extends React.Component {
+  static propTypes = {
     userRoles: PropTypes.arrayOf(PropTypes.string),
     availableRoles: PropTypes.array.isRequired,
     onValueChange: PropTypes.func,
-  },
-  getDefaultProps() {
-    return {
-      userRoles: [],
-    };
-  },
-  getValue() {
+  };
+
+  static defaultProps = {
+    userRoles: [],
+  };
+
+  getValue = () => {
     return this.refs.select.getValue().split(',');
-  },
+  };
+
   render() {
     const rolesValue = this.props.userRoles.join(',');
     const rolesOptions = this.props.availableRoles.map((role) => {
@@ -31,7 +32,7 @@ const RolesSelect = React.createClass({
         placeholder="Choose roles..."
       />
     );
-  },
-});
+  }
+}
 
 export default RolesSelect;

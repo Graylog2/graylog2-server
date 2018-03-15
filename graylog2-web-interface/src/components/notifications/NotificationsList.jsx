@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Alert, Row, Col } from 'react-bootstrap';
 
@@ -8,8 +9,10 @@ const NotificationsStore = StoreProvider.getStore('Notifications');
 import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 
-const NotificationsList = React.createClass({
+const NotificationsList = createReactClass({
+  displayName: 'NotificationsList',
   mixins: [Reflux.connect(NotificationsStore)],
+
   _formatNotificationCount(count) {
     if (count === 0) {
       return 'is no notification';
@@ -20,6 +23,7 @@ const NotificationsList = React.createClass({
 
     return `are ${count} notifications`;
   },
+
   render() {
     if (!this.state.notifications) {
       return <Spinner />;

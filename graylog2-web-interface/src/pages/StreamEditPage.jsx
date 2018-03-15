@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Alert, Row, Col } from 'react-bootstrap';
 
@@ -10,11 +11,14 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const StreamsStore = StoreProvider.getStore('Streams');
 
-const StreamEditPage = React.createClass({
+const StreamEditPage = createReactClass({
+  displayName: 'StreamEditPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(CurrentUserStore)],
 
   componentDidMount() {

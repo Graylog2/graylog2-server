@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
@@ -7,8 +8,10 @@ const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 
 import { Spinner } from 'components/common';
 
-const GlobalThroughput = React.createClass({
+const GlobalThroughput = createReactClass({
+  displayName: 'GlobalThroughput',
   mixins: [Reflux.connect(GlobalThroughputStore)],
+
   render() {
     if (!this.state.throughput) {
       return <Spinner />;

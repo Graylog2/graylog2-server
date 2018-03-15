@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -15,8 +16,10 @@ const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards'
 const { RolesStore } = CombinedProvider.get('Roles');
 
 
-export default React.createClass({
+export default createReactClass({
+  displayName: 'RolesComponent',
   mixins: [Reflux.connect(DashboardsStore, 'dashboards')],
+
   getInitialState() {
     return {
       roles: Immutable.Set(),
@@ -25,6 +28,7 @@ export default React.createClass({
       streams: Immutable.List(),
     };
   },
+
   componentDidMount() {
     this.loadRoles();
     StreamsStore.load(streams => this.setState({ streams: Immutable.List(streams) }));
@@ -41,9 +45,11 @@ export default React.createClass({
   _showCreateRole() {
     this.setState({ showEditRole: true });
   },
+
   _showEditRole(role) {
     this.setState({ showEditRole: true, editRole: role });
   },
+
   _deleteRole(role) {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete role ${role.name}?`)) {
@@ -56,6 +62,7 @@ export default React.createClass({
       });
     }
   },
+
   _saveRole(initialName, role) {
     if (initialName === null) {
       RolesStore.createRole(role).then(this._clearEditRole).then(this.loadRoles);
@@ -63,6 +70,7 @@ export default React.createClass({
       RolesStore.updateRole(initialName, role).then(this._clearEditRole).then(this.loadRoles);
     }
   },
+
   _clearEditRole() {
     this.setState({ showEditRole: false, editRole: null });
   },

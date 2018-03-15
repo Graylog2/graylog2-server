@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -7,8 +8,10 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 import { DocumentTitle, PageHeader } from 'components/common';
 import { NodesList } from 'components/nodes';
 
-const NodesPage = React.createClass({
+const NodesPage = createReactClass({
+  displayName: 'NodesPage',
   mixins: [Reflux.connect(CurrentUserStore)],
+
   render() {
     return (
       <DocumentTitle title="Nodes">

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, Row, Col, Alert } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -12,7 +13,9 @@ import PipelineConnectionsList from './PipelineConnectionsList';
 
 import Routes from 'routing/Routes';
 
-const Pipeline = React.createClass({
+const Pipeline = createReactClass({
+  displayName: 'Pipeline',
+
   propTypes: {
     pipeline: PropTypes.object.isRequired,
     connections: PropTypes.array.isRequired,

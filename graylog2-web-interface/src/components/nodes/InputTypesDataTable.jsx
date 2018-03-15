@@ -4,14 +4,16 @@ import { Alert } from 'react-bootstrap';
 
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 
-const InputTypesDataTable = React.createClass({
-  propTypes: {
+class InputTypesDataTable extends React.Component {
+  static propTypes = {
     inputDescriptions: PropTypes.object,
-  },
-  _headerCellFormatter(header) {
+  };
+
+  _headerCellFormatter = (header) => {
     return <th>{header}</th>;
-  },
-  _inputTypeFormatter(inputType) {
+  };
+
+  _inputTypeFormatter = (inputType) => {
     return (
       <tr key={inputType.type}>
         <td className="limited">{inputType.name}</td>
@@ -23,7 +25,8 @@ const InputTypesDataTable = React.createClass({
         </td>
       </tr>
     );
-  },
+  };
+
   render() {
     if (!this.props.inputDescriptions) {
       return <Spinner text="Loading input types..." />;
@@ -53,7 +56,7 @@ const InputTypesDataTable = React.createClass({
                  filterLabel="Filter"
                  filterKeys={[]} />
     );
-  },
-});
+  }
+}
 
 export default InputTypesDataTable;

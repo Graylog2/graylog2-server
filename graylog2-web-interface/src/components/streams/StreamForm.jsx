@@ -8,35 +8,29 @@ import FormsUtils from 'util/FormsUtils';
 
 const { IndexSetsActions } = CombinedProvider.get('IndexSets');
 
-const StreamForm = React.createClass({
-  propTypes: {
+class StreamForm extends React.Component {
+  static propTypes = {
     onSubmit: PropTypes.func.isRequired,
     stream: PropTypes.object.isRequired,
     title: PropTypes.string.isRequired,
     indexSets: PropTypes.array.isRequired,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      stream: {
-        title: '',
-        description: '',
-        remove_matches_from_default_stream: false,
-      },
-    };
-  },
+  static defaultProps = {
+    stream: {
+      title: '',
+      description: '',
+      remove_matches_from_default_stream: false,
+    },
+  };
 
-  getInitialState() {
-    return this._getValuesFromProps(this.props);
-  },
+  modal = undefined;
 
-  modal: undefined,
-
-  _resetValues() {
+  _resetValues = () => {
     this.setState(this._getValuesFromProps(this.props));
-  },
+  };
 
-  _getValuesFromProps(props) {
+  _getValuesFromProps = (props) => {
     let defaultIndexSetId = props.stream.index_set_id;
     if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
       const defaultIndexSet = props.indexSets.find(indexSet => indexSet.default);
@@ -51,9 +45,9 @@ const StreamForm = React.createClass({
       removeMatchesFromDefaultStream: props.stream.remove_matches_from_default_stream,
       indexSetId: defaultIndexSetId,
     };
-  },
+  };
 
-  _onSubmit() {
+  _onSubmit = () => {
     this.props.onSubmit(this.props.stream.id,
       {
         title: this.state.title,
@@ -62,33 +56,35 @@ const StreamForm = React.createClass({
         index_set_id: this.state.indexSetId,
       });
     this.modal.close();
-  },
+  };
 
-  open() {
+  open = () => {
     this._resetValues();
     IndexSetsActions.list(false);
     this.modal.open();
-  },
+  };
 
-  close() {
+  close = () => {
     this.modal.close();
-  },
+  };
 
-  _formatSelectOptions() {
+  _formatSelectOptions = () => {
     return this.props.indexSets.filter(indexSet => indexSet.writable).map((indexSet) => {
       return { value: indexSet.id, label: indexSet.title };
     });
-  },
+  };
 
-  _onIndexSetSelect(selection) {
+  _onIndexSetSelect = (selection) => {
     this.setState({ indexSetId: selection });
-  },
+  };
 
-  handleChange(event) {
+  handleChange = (event) => {
     const change = {};
     change[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState(change);
-  },
+  };
+
+  state = this._getValuesFromProps(this.props);
 
   render() {
     const { title, description, removeMatchesFromDefaultStream, indexSetId } = this.state;
@@ -143,7 +139,7 @@ const StreamForm = React.createClass({
                help={<span>Remove messages that match this stream from the &lsquo;All messages&rsquo; stream which is assigned to every message by default.</span>} />
       </BootstrapModalForm>
     );
-  },
-});
+  }
+}
 
 export default StreamForm;

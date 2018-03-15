@@ -4,16 +4,16 @@ import {Col, Panel, Row} from "react-bootstrap";
 
 import {ContactUs} from "components/support";
 
-const SearchExecutionError = React.createClass({
-  propTypes: {
+class SearchExecutionError extends React.Component {
+  static propTypes = {
     error: PropTypes.object.isRequired,
-  },
+  };
 
-  _getFormattedErrorDetails(details) {
+  _getFormattedErrorDetails = (details) => {
       return details.map(function(detail) {
           return <li><code>{detail}</code></li>
       });
-  },
+  };
 
   render() {
     const error = this.props.error;
@@ -47,7 +47,7 @@ const SearchExecutionError = React.createClass({
         <ContactUs />
       </div>
     );
-  },
-});
+  }
+}
 
 export default SearchExecutionError;

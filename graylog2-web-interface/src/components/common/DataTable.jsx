@@ -8,8 +8,8 @@ import DataTableElement from './DataTableElement';
  * decide exactly how the data should be rendered. It optionally adds a filter
  * input to the data table by using the the `TypeAheadDataFilter` component.
  */
-const DataTable = React.createClass({
-  propTypes: {
+class DataTable extends React.Component {
+  static propTypes = {
     /** Adds a custom children element next to the data filter input. */
     children: PropTypes.node,
     /** Adds a custom class to the table element. */
@@ -53,31 +53,31 @@ const DataTable = React.createClass({
      * The main reason to disable this is if the table is clipping a dropdown menu or another component in a table edge.
      */
     useResponsiveTable: PropTypes.bool,
-  },
-  getDefaultProps() {
-    return {
-      filterSuggestions: [],
-      displayKey: 'value',
-      noDataText: 'No data available.',
-      rowClassName: '',
-      useResponsiveTable: true,
-    };
-  },
-  getInitialState() {
-    return {
-      headers: this.props.headers,
-      rows: this.props.rows,
-      filteredRows: this.props.rows,
-    };
-  },
+  };
+
+  static defaultProps = {
+    filterSuggestions: [],
+    displayKey: 'value',
+    noDataText: 'No data available.',
+    rowClassName: '',
+    useResponsiveTable: true,
+  };
+
+  state = {
+    headers: this.props.headers,
+    rows: this.props.rows,
+    filteredRows: this.props.rows,
+  };
+
   componentWillReceiveProps(newProps) {
     this.setState({
       headers: newProps.headers,
       rows: newProps.rows,
       filteredRows: newProps.rows,
     });
-  },
-  getFormattedHeaders() {
+  }
+
+  getFormattedHeaders = () => {
     let i = 0;
     const formattedHeaders = this.state.headers.map((header) => {
       const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={this.props.headerCellFormatter} />;
@@ -86,8 +86,9 @@ const DataTable = React.createClass({
     });
 
     return <tr>{formattedHeaders}</tr>;
-  },
-  getFormattedDataRows() {
+  };
+
+  getFormattedDataRows = () => {
     let i = 0;
     let sortedDataRows = this.state.filteredRows;
     if (this.props.sortByKey) {
@@ -102,10 +103,12 @@ const DataTable = React.createClass({
     });
 
     return formattedDataRows;
-  },
-  filterDataRows(filteredRows) {
+  };
+
+  filterDataRows = (filteredRows) => {
     this.setState({ filteredRows });
-  },
+  };
+
   render() {
     let filter;
     if (this.props.filterKeys.length !== 0) {
@@ -158,7 +161,7 @@ const DataTable = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default DataTable;

@@ -6,8 +6,8 @@ import StringUtils from 'util/StringUtils';
 /**
  * Component that will render a singular or plural text depending on a given value.
  */
-const Pluralize = React.createClass({
-  propTypes: {
+class Pluralize extends React.Component {
+  static propTypes = {
     /** Singular form of the word. */
     singular: PropTypes.string.isRequired,
     /** Plural form of the word. */
@@ -17,10 +17,11 @@ const Pluralize = React.createClass({
       PropTypes.number,
       PropTypes.string,
     ]).isRequired,
-  },
+  };
+
   render() {
     return <span>{StringUtils.pluralize(this.props.value, this.props.singular, this.props.plural)}</span>;
-  },
-});
+  }
+}
 
 export default Pluralize;

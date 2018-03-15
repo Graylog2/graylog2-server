@@ -4,21 +4,22 @@ import { Alert, Collapse } from 'react-bootstrap';
 
 import StreamRuleList from 'components/streamrules//StreamRuleList';
 
-const CollapsibleStreamRuleList = React.createClass({
-  propTypes: {
+class CollapsibleStreamRuleList extends React.Component {
+  static propTypes = {
     permissions: PropTypes.array.isRequired,
     stream: PropTypes.object.isRequired,
     streamRuleTypes: PropTypes.array.isRequired,
-  },
-  getInitialState() {
-    return {
-      expanded: false,
-    };
-  },
-  _onHandleToggle(e) {
+  };
+
+  state = {
+    expanded: false,
+  };
+
+  _onHandleToggle = (e) => {
     e.preventDefault();
     this.setState({ expanded: !this.state.expanded });
-  },
+  };
+
   render() {
     const text = this.state.expanded ? 'Hide' : 'Show';
 
@@ -34,7 +35,7 @@ const CollapsibleStreamRuleList = React.createClass({
         </Collapse>
       </span>
     );
-  },
-});
+  }
+}
 
 export default CollapsibleStreamRuleList;

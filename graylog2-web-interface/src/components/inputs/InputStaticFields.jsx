@@ -5,25 +5,28 @@ import { Button } from 'react-bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 
-const InputStaticFields = React.createClass({
-  propTypes: {
+class InputStaticFields extends React.Component {
+  static propTypes = {
     input: PropTypes.object.isRequired,
-  },
-  _deleteStaticField(fieldName) {
+  };
+
+  _deleteStaticField = (fieldName) => {
     return () => {
       if (window.confirm(`Are you sure you want to remove static field '${fieldName}' from '${this.props.input.title}'?`)) {
         InputStaticFieldsStore.destroy(this.props.input, fieldName);
       }
     };
-  },
-  _deleteButton(fieldName) {
+  };
+
+  _deleteButton = (fieldName) => {
     return (
       <Button bsStyle="link" bsSize="xsmall" style={{ verticalAlign: 'baseline' }} onClick={this._deleteStaticField(fieldName)}>
         <i className="fa fa-remove" />
       </Button>
     );
-  },
-  _formatStaticFields(staticFields) {
+  };
+
+  _formatStaticFields = (staticFields) => {
     const formattedFields = [];
     const staticFieldNames = Object.keys(staticFields);
 
@@ -36,7 +39,8 @@ const InputStaticFields = React.createClass({
     });
 
     return formattedFields;
-  },
+  };
+
   render() {
     const staticFieldNames = Object.keys(this.props.input.static_fields);
     if (staticFieldNames.length === 0) {
@@ -51,7 +55,7 @@ const InputStaticFields = React.createClass({
         </ul>
       </div>
     );
-  },
-});
+  }
+}
 
 export default InputStaticFields;

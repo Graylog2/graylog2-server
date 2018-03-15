@@ -1,14 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const ConfigurationWell = React.createClass({
-  propTypes: {
+class ConfigurationWell extends React.Component {
+  static propTypes = {
     id: PropTypes.string,
     configuration: PropTypes.any,
     typeDefinition: PropTypes.object,
-  },
-  PASSWORD_PLACEHOLDER: '********',
-  _formatRegularField(value, key) {
+  };
+
+  PASSWORD_PLACEHOLDER = '********';
+
+  _formatRegularField = (value, key) => {
     let finalValue;
     if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
       finalValue = <i>{'<empty>'}</i>;
@@ -17,11 +19,13 @@ const ConfigurationWell = React.createClass({
     }
 
     return (<li key={`${this.props.id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
-  },
-  _formatPasswordField(value, key) {
+  };
+
+  _formatPasswordField = (value, key) => {
     return (<li key={`${this.props.id}-${key}`}><div className="key">{key}:</div> <div className="value">{this.PASSWORD_PLACEHOLDER}</div></li>);
-  },
-  _formatConfiguration(id, config, typeDefinition) {
+  };
+
+  _formatConfiguration = (id, config, typeDefinition) => {
     if (!config) {
       return ('');
     }
@@ -43,14 +47,15 @@ const ConfigurationWell = React.createClass({
         {formattedItems}
       </ul>
     );
-  },
+  };
+
   render() {
     return (
       <div className="well well-small configuration-well react-configuration-well">
         {this._formatConfiguration(this.props.id, this.props.configuration, this.props.typeDefinition)}
       </div>
     );
-  },
-});
+  }
+}
 
 export default ConfigurationWell;

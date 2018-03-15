@@ -1,9 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import { MessageFieldDescription } from 'components/search';
 
-const MessageField = React.createClass({
+const MessageField = createReactClass({
+  displayName: 'MessageField',
+
   propTypes: {
     customFieldActions: PropTypes.node,
     disableFieldActions: PropTypes.bool,
@@ -12,18 +16,23 @@ const MessageField = React.createClass({
     renderForDisplay: PropTypes.func.isRequired,
     value: PropTypes.any.isRequired,
   },
+
   SPECIAL_FIELDS: ['full_message', 'level'],
+
   _isAdded(key) {
     const decorationStats = this.props.message.decoration_stats;
     return decorationStats && decorationStats.added_fields && decorationStats.added_fields[key] !== undefined;
   },
+
   _isChanged(key) {
     const decorationStats = this.props.message.decoration_stats;
     return decorationStats && decorationStats.changed_fields && decorationStats.changed_fields[key] !== undefined;
   },
+
   _isDecorated(key) {
     return this._isAdded(key) || this._isChanged(key);
   },
+
   render() {
     let innerValue = this.props.value;
     const key = this.props.fieldName;

@@ -5,14 +5,14 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 
-const AlertsHeaderToolbar = React.createClass({
-  propTypes: {
+class AlertsHeaderToolbar extends React.Component {
+  static propTypes = {
     active: PropTypes.string.isRequired,
-  },
+  };
 
-  _isActive(active, route) {
+  _isActive = (active, route) => {
     return active === route ? 'active' : '';
-  },
+  };
 
   render() {
     const { active } = this.props;
@@ -30,7 +30,7 @@ const AlertsHeaderToolbar = React.createClass({
         </LinkContainer>
       </ButtonToolbar>
     );
-  },
-});
+  }
+}
 
 export default AlertsHeaderToolbar;

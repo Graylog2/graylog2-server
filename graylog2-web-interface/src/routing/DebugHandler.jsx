@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DebugHandler = React.createClass({
+class DebugHandler extends React.Component {
   render() {
     return (
       <div>
@@ -8,7 +8,7 @@ const DebugHandler = React.createClass({
         {this.props.location.pathname}
       </div>
     );
-  },
-});
+  }
+}
 
 export default DebugHandler;

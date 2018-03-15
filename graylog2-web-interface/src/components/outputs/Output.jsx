@@ -6,34 +6,38 @@ import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner } from 'components/common';
 
-const Output = React.createClass({
-  propTypes: {
+class Output extends React.Component {
+  static propTypes = {
     streamId: PropTypes.string,
     output: PropTypes.object.isRequired,
     types: PropTypes.object.isRequired,
     getTypeDefinition: PropTypes.func.isRequired,
     removeOutputFromStream: PropTypes.func.isRequired,
     removeOutputGlobally: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {};
-  },
+  };
+
+  state = {};
+
   componentDidMount() {
     if (!this._typeNotAvailable()) {
       this.props.getTypeDefinition(this.props.output.type, (typeDefinition) => {
         this.setState({ typeDefinition: typeDefinition });
       });
     }
-  },
-  _onDeleteFromStream() {
+  }
+
+  _onDeleteFromStream = () => {
     this.props.removeOutputFromStream(this.props.output.id, this.props.streamId);
-  },
-  _onDeleteGlobally() {
+  };
+
+  _onDeleteGlobally = () => {
     this.props.removeOutputGlobally(this.props.output.id);
-  },
-  _typeNotAvailable() {
+  };
+
+  _typeNotAvailable = () => {
     return (this.props.types[this.props.output.type] === undefined);
-  },
+  };
+
   render() {
     if (!this._typeNotAvailable() && !this.state.typeDefinition) {
       return <Spinner />;
@@ -111,7 +115,7 @@ const Output = React.createClass({
         </Col>
       </div>
     );
-  },
-});
+  }
+}
 
 export default Output;

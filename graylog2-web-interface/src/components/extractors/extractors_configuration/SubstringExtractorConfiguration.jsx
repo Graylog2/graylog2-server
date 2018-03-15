@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
@@ -10,29 +11,37 @@ import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
-const SubstringExtractorConfiguration = React.createClass({
+const SubstringExtractorConfiguration = createReactClass({
+  displayName: 'SubstringExtractorConfiguration',
+
   propTypes: {
     configuration: PropTypes.object.isRequired,
     exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
+
   getInitialState() {
     return {
       trying: false,
       configuration: this._getEffectiveConfiguration(this.props.configuration),
     };
   },
+
   componentDidMount() {
     this.props.onChange(this.state.configuration);
   },
+
   componentWillReceiveProps(nextProps) {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   },
+
   DEFAULT_CONFIGURATION: { begin_index: 0, end_index: 1 },
+
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
   },
+
   _onChange(key) {
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
@@ -41,6 +50,7 @@ const SubstringExtractorConfiguration = React.createClass({
       this.props.onChange(newConfig);
     };
   },
+
   _verifySubstringInputs() {
     const beginIndex = this.refs.beginIndex.getInputDOMNode();
     const endIndex = this.refs.endIndex.getInputDOMNode();
@@ -60,6 +70,7 @@ const SubstringExtractorConfiguration = React.createClass({
       this._onChange('begin_index')({ target: beginIndex });
     }
   },
+
   _onTryClick() {
     this.setState({ trying: true });
 
@@ -83,10 +94,12 @@ const SubstringExtractorConfiguration = React.createClass({
       promise.finally(() => this.setState({ trying: false }));
     }
   },
+
   _isTryButtonDisabled() {
     const configuration = this.state.configuration;
     return this.state.trying || configuration.begin_index === undefined || configuration.begin_index < 0 || configuration.end_index === undefined || configuration.end_index < 0 || !this.props.exampleMessage;
   },
+
   render() {
     const endIndexHelpMessage = (
       <span>

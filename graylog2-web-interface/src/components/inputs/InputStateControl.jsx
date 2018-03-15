@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
@@ -10,10 +11,13 @@ function inputStateFilter(state) {
   return state.inputStates ? state.inputStates[this.props.input.id] : undefined;
 }
 
-const InputStateControl = React.createClass({
+const InputStateControl = createReactClass({
+  displayName: 'InputStateControl',
+
   propTypes: {
     input: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connectFilter(InputStatesStore, 'inputState', inputStateFilter)],
 
   getInitialState() {

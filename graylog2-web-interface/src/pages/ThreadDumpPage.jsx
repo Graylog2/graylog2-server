@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
@@ -16,17 +17,23 @@ function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
 }
 
-const ThreadDumpPage = React.createClass({
+const ThreadDumpPage = createReactClass({
+  displayName: 'ThreadDumpPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
+
   componentDidMount() {
     ClusterOverviewStore.threadDump(this.props.params.nodeId).then(threadDump => this.setState({ threadDump: threadDump }));
   },
+
   _isLoading() {
     return !this.state.node;
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

@@ -4,17 +4,17 @@ import React from 'react';
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
 
-const StreamRuleList = React.createClass({
-  propTypes: {
+class StreamRuleList extends React.Component {
+  static propTypes = {
     matchData: PropTypes.object,
     onSubmit: PropTypes.func,
     onDelete: PropTypes.func,
     permissions: PropTypes.array.isRequired,
     stream: PropTypes.object.isRequired,
     streamRuleTypes: PropTypes.array.isRequired,
-  },
+  };
 
-  _formatStreamRules(streamRules) {
+  _formatStreamRules = (streamRules) => {
     if (streamRules && streamRules.length > 0) {
       return streamRules.map((streamRule) => {
         return (
@@ -25,7 +25,8 @@ const StreamRuleList = React.createClass({
       });
     }
     return <li>No rules defined.</li>;
-  },
+  };
+
   render() {
     if (this.props.stream) {
       const streamRules = this._formatStreamRules(this.props.stream.rules);
@@ -38,7 +39,7 @@ const StreamRuleList = React.createClass({
     return (
       <Spinner />
     );
-  },
-});
+  }
+}
 
 export default StreamRuleList;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NoopRetentionStrategySummary = React.createClass({
+class NoopRetentionStrategySummary extends React.Component {
   render() {
     return (
       <div>
@@ -10,7 +10,7 @@ const NoopRetentionStrategySummary = React.createClass({
         </dl>
       </div>
     );
-  },
-});
+  }
+}
 
 export default NoopRetentionStrategySummary;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
@@ -12,25 +13,31 @@ import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import resultHistogram from 'legacy/result-histogram';
 
 // Hue-manatee. We tried to be sorry, but aren't.
-const LegacyHistogram = React.createClass({
+const LegacyHistogram = createReactClass({
+  displayName: 'LegacyHistogram',
+
   propTypes: {
     formattedHistogram: PropTypes.array.isRequired,
     histogram: PropTypes.object.isRequired,
     stream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
+
   getInitialState() {
     return {};
   },
+
   componentDidMount() {
     this._renderHistogram(this.props.formattedHistogram);
     window.addEventListener('resize', this._onResize);
   },
+
   componentDidUpdate(prevProps) {
     if (JSON.stringify(this.props.formattedHistogram) !== JSON.stringify(prevProps.formattedHistogram)) {
       this._updateHistogram(this.props.formattedHistogram, prevProps.formattedHistogram);
     }
   },
+
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
   },
@@ -48,15 +55,18 @@ const LegacyHistogram = React.createClass({
     resultHistogram.setData(histogram, this.props.stream);
     resultHistogram.drawResultGraph();
   },
+
   _updateHistogram(histogram) {
     resultHistogram.updateData(histogram);
   },
+
   _resolutionChanged(newResolution) {
     return (event) => {
       event.preventDefault();
       SearchStore.resolution = newResolution;
     };
   },
+
   _getFirstHistogramValue() {
     if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
       return null;
@@ -64,6 +74,7 @@ const LegacyHistogram = React.createClass({
 
     return this.props.histogram.histogram_boundaries.from;
   },
+
   render() {
     if (SearchStore.resolution === undefined) {
       SearchStore.resolution = this.props.histogram.interval;

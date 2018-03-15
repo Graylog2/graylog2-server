@@ -1,9 +1,12 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-const PluginList = React.createClass({
+const PluginList = createReactClass({
+  displayName: 'PluginList',
+
   componentDidMount() {
     this.style.use();
   },

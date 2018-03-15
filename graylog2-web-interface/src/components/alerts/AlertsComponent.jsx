@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 import Promise from 'bluebird';
@@ -11,7 +12,8 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 import { Alert } from 'components/alerts';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
 
-const AlertsComponent = React.createClass({
+const AlertsComponent = createReactClass({
+  displayName: 'AlertsComponent',
   mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
 
   getInitialState() {

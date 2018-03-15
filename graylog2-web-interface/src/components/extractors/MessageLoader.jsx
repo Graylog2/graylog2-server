@@ -8,33 +8,33 @@ import StoreProvider from 'injection/StoreProvider';
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 
-const MessageLoader = React.createClass({
-  propTypes: {
+class MessageLoader extends React.Component {
+  static propTypes = {
     hidden: PropTypes.bool,
     hideText: PropTypes.bool,
     onMessageLoaded: PropTypes.func,
-  },
-  getDefaultProps() {
-    return {
-      hidden: true,
-    };
-  },
-  getInitialState() {
-    return ({
-      hidden: this.props.hidden,
-      loading: false,
-    });
-  },
+  };
 
-  toggleMessageForm() {
+  static defaultProps = {
+    hidden: true,
+  };
+
+  state = {
+    hidden: this.props.hidden,
+    loading: false,
+  };
+
+  toggleMessageForm = () => {
     this.setState({ hidden: !this.state.hidden }, this._focusMessageLoaderForm);
-  },
-  _focusMessageLoaderForm() {
+  };
+
+  _focusMessageLoaderForm = () => {
     if (!this.state.hidden) {
       this.refs.messageId.focus();
     }
-  },
-  loadMessage(event) {
+  };
+
+  loadMessage = (event) => {
     const messageId = this.refs.messageId.value;
     const index = this.refs.index.value;
     if (messageId === '' || index === '') {
@@ -46,12 +46,14 @@ const MessageLoader = React.createClass({
     promise.finally(() => this.setState({ loading: false }));
 
     event.preventDefault();
-  },
-  submit(messageId, index) {
+  };
+
+  submit = (messageId, index) => {
     this.refs.messageId.value = messageId;
     this.refs.index.value = index;
     this.refs.submitButton.click();
-  },
+  };
+
   render() {
     let explanatoryText;
     if (!this.props.hideText) {
@@ -79,7 +81,7 @@ const MessageLoader = React.createClass({
         {this.state.hidden ? null : loadMessageForm}
       </div>
     );
-  },
-});
+  }
+}
 
 export default MessageLoader;

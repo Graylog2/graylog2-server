@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Timestamp } from 'components/common';
 
-const IndexerFailure = React.createClass({
-  propTypes: {
+class IndexerFailure extends React.Component {
+  static propTypes = {
     failure: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     const failure = this.props.failure;
     return (
@@ -16,7 +17,7 @@ const IndexerFailure = React.createClass({
         <td>{failure.message}</td>
       </tr>
     );
-  },
-});
+  }
+}
 
 export default IndexerFailure;

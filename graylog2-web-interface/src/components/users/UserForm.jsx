@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 import Routes from 'routing/Routes';
@@ -24,17 +25,22 @@ import TimeoutInput from 'components/users/TimeoutInput';
 import EditRolesForm from 'components/users/EditRolesForm';
 import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
 
-const UserForm = React.createClass({
+const UserForm = createReactClass({
+  displayName: 'UserForm',
+
   propTypes: {
     user: PropTypes.object.isRequired,
   },
+
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore)],
+
   getInitialState() {
     return {
       streams: undefined,
       user: this._getUserStateFromProps(this.props),
     };
   },
+
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
       this.setState({
@@ -69,12 +75,14 @@ const UserForm = React.createClass({
       return { value: item.id, label: item.title };
     });
   },
+
   formatSelectedOptions(permissions, permission, collection) {
     return collection
       .filter(item => this.isPermitted(permissions, [`${permission}:${item.id}`]))
       .map(item => item.id)
       .join(',');
   },
+
   _onPasswordChange() {
     const passwordField = this.refs.password.getInputDOMNode();
     const passwordConfirmField = this.refs.password_repeat.getInputDOMNode();

@@ -1,9 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import NumberUtils from 'util/NumberUtils';
 
-const SimulationTrace = React.createClass({
+const SimulationTrace = createReactClass({
+  displayName: 'SimulationTrace',
+
   propTypes: {
     simulationResults: PropTypes.object.isRequired,
   },

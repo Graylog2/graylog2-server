@@ -8,7 +8,7 @@ import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import { GraylogClusterOverview } from 'components/cluster';
 
-const SystemOverviewPage = React.createClass({
+class SystemOverviewPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="System overview">
@@ -39,7 +39,7 @@ const SystemOverviewPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default SystemOverviewPage;

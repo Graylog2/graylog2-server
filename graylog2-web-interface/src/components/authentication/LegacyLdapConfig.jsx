@@ -11,28 +11,26 @@ const { LdapActions } = CombinedProvider.get('Ldap');
 
 import Routes from 'routing/Routes';
 
-const LegacyLdapConfig = React.createClass({
-  getInitialState() {
-    return {
-      showSettings: true,
-    };
-  },
+class LegacyLdapConfig extends React.Component {
+  state = {
+    showSettings: true,
+  };
 
   componentDidMount() {
     LdapActions.loadSettings();
-  },
+  }
 
-  _toggleButton() {
+  _toggleButton = () => {
     this.setState({ showSettings: !this.state.showSettings });
-  },
+  };
 
-  _onSettingsCancel() {
+  _onSettingsCancel = () => {
     this._toggleButton();
-  },
+  };
 
-  _onCancel() {
+  _onCancel = () => {
     history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
-  },
+  };
 
   render() {
     const toggleButtonText = this.state.showSettings ? 'LDAP Group Mapping' : 'LDAP Settings';
@@ -57,7 +55,7 @@ const LegacyLdapConfig = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default LegacyLdapConfig;

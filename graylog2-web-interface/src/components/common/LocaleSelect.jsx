@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from "react";
+import createReactClass from 'create-react-class';
 import Reflux from "reflux";
 
 import Select from "components/common/Select";
@@ -11,15 +12,19 @@ const SystemStore = StoreProvider.getStore('System');
  * Component that renders a form input with all available locale settings. It also makes easy to filter
  * values to quickly find the locale needed.
  */
-const LocaleSelect = React.createClass({
+const LocaleSelect = createReactClass({
+  displayName: 'LocaleSelect',
   mixins: [Reflux.connect(SystemStore)],
+
   propTypes: {
     /** Function to call when the input changes. It will receive the new locale value as argument. */
     onChange: PropTypes.func,
   },
+
   getValue() {
     return this.refs.locale.getValue();
   },
+
   _formatLocales(locales) {
     const sortedLocales = Object.values(locales)
         .filter(locale => locale['language_tag'] !== 'und')
@@ -41,9 +46,11 @@ const LocaleSelect = React.createClass({
 
     return [{value: 'und', label:'Default locale'}].concat(sortedLocales);
   },
+
   _renderOption(option) {
       return <span key={option.value} title="{option.value} [{option.value}]">{option.label} [{option.value}]</span>;
   },
+
   render() {
     if (!this.state.locales) {
       return <Spinner />;

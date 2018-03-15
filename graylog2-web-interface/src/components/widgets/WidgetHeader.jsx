@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const WidgetHeader = React.createClass({
-  propTypes: {
+class WidgetHeader extends React.Component {
+  static propTypes = {
     title: PropTypes.string.isRequired,
-  },
+  };
+
   render() {
 
     return (
@@ -15,7 +16,7 @@ const WidgetHeader = React.createClass({
         <div className="clearfix" />
       </div>
     );
-  },
-});
+  }
+}
 
 export default WidgetHeader;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -32,7 +33,9 @@ function filterConnections(state) {
   return state.connections.filter(c => c.pipeline_ids && c.pipeline_ids.includes(this.props.params.pipelineId));
 }
 
-const PipelineDetailsPage = React.createClass({
+const PipelineDetailsPage = createReactClass({
+  displayName: 'PipelineDetailsPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

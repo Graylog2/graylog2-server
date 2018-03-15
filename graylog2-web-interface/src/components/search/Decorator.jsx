@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
@@ -18,12 +19,16 @@ import PermissionsMixin from 'util/PermissionsMixin';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
-const Decorator = React.createClass({
+const Decorator = createReactClass({
+  displayName: 'Decorator',
+
   propTypes: {
     decorator: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
   componentDidMount() {
     DecoratorsActions.available();
   },
@@ -33,9 +38,11 @@ const Decorator = React.createClass({
       DecoratorsActions.remove(this.props.decorator.id);
     }
   },
+
   _handleEditClick() {
     this.refs.editForm.open();
   },
+
   _handleSubmit(data) {
     DecoratorsActions.update(this.props.decorator.id, {
       type: data.type,
@@ -44,11 +51,13 @@ const Decorator = React.createClass({
       stream: this.props.decorator.stream,
     });
   },
+
   _decoratorTypeNotPresent() {
     return {
       name: 'Unknown decorator type',
     };
   },
+
   // Attempts to resolve ID values in the decorator configuration against the type definition.
   // This allows users to see actual names for entities in drop-downs, instead of their IDs.
   _resolveConfigurationIds(config) {
@@ -68,6 +77,7 @@ const Decorator = React.createClass({
 
     return Object.assign({}, config, resolvedConfig);
   },
+
   _formatActionsMenu() {
     const permissions = this.state.currentUser.permissions;
     const decorator = this.props.decorator;
@@ -80,6 +90,7 @@ const Decorator = React.createClass({
       </DropdownButton>
     );
   },
+
   render() {
     if (!this.state.types || !this.state.currentUser) {
       return <Spinner />;

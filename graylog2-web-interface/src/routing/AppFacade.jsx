@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
 import LoadingPage from 'react-proxy?name=LoadingPage!pages/LoadingPage';
@@ -18,7 +19,8 @@ import 'toastr/toastr.less';
 import 'rickshaw/rickshaw.css';
 import 'stylesheets/graylog2.less';
 
-const AppFacade = React.createClass({
+const AppFacade = createReactClass({
+  displayName: 'AppFacade',
   mixins: [Reflux.connect(SessionStore), Reflux.connect(ServerAvailabilityStore), Reflux.connect(CurrentUserStore)],
 
   componentDidMount() {

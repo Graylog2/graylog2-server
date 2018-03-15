@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col, Button, Panel } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
@@ -8,7 +9,9 @@ import ObjectUtils from 'util/ObjectUtils';
 import ActionsProvider from 'injection/ActionsProvider';
 const LdapActions = ActionsProvider.getActions('Ldap');
 
-const TestLdapLogin = React.createClass({
+const TestLdapLogin = createReactClass({
+  displayName: 'TestLdapLogin',
+
   propTypes: {
     ldapSettings: PropTypes.object.isRequired,
     disabled: PropTypes.bool,

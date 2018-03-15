@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactSelect from 'react-select';
 import lodash from 'lodash';
 
@@ -19,7 +20,9 @@ const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propType
  * https://github.com/JedWatson/react-select/tree/v1.0.0#usage
  * for more information about the accepted props.
  */
-const Select = React.createClass({
+const Select = createReactClass({
+  displayName: 'Select',
+
   propTypes: {
     /**
      * Callback when selected option changes. It receives the value of the
@@ -72,32 +75,39 @@ const Select = React.createClass({
       allowCreate: false,
     };
   },
+
   getInitialState() {
     return {
       value: this.props.value,
     };
   },
+
   componentDidMount() {
     this.reactSelectStyles.use();
     this.reactSelectSmStyles.use();
   },
+
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
   },
+
   componentWillUnmount() {
     this.reactSelectStyles.unuse();
     this.reactSelectSmStyles.unuse();
   },
+
   getValue() {
     return this.state.value;
   },
+
   clearValue() {
     // Clear value needs an event, so we just give it one :grumpy:
     // As someone said: "This can't do any more harm that we already do"
     this._select.clearValue(new CustomEvent('fake'));
   },
+
   // This helps us emulate the behaviour of react-select < 1.0:
   //  - On simple selects it returns the value
   //  - On multi selects it returns all selected values split by a delimiter (',' by default)
@@ -109,6 +119,7 @@ const Select = React.createClass({
     }
     return '';
   },
+
   _onChange(selectedOption) {
     const value = this._extractOptionValue(selectedOption);
     this.setState({ value: value });
@@ -122,6 +133,7 @@ const Select = React.createClass({
       this.props.onValueChange(value);
     }
   },
+
   _select: undefined,
   reactSelectStyles: require('!style/useable!css!react-select/dist/react-select.css'),
   reactSelectSmStyles: require('!style/useable!css!./Select.css'),
@@ -140,6 +152,7 @@ const Select = React.createClass({
       return option || predicate;
     });
   },
+
   render() {
     const { allowCreate, displayKey, size, onReactSelectChange, multi } = this.props;
     const value = this.state.value;

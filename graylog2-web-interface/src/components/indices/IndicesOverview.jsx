@@ -5,15 +5,16 @@ import naturalSort from 'javascript-natural-sort';
 
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
 
-const IndicesOverview = React.createClass({
-  propTypes: {
+class IndicesOverview extends React.Component {
+  static propTypes = {
     closedIndices: PropTypes.array.isRequired,
     deflector: PropTypes.object.isRequired,
     indexDetails: PropTypes.object.isRequired,
     indices: PropTypes.object.isRequired,
     indexSetId: PropTypes.string.isRequired,
-  },
-  _formatIndex(indexName, index) {
+  };
+
+  _formatIndex = (indexName, index) => {
     const indexSummary = this.props.indices[indexName];
     const indexRange = indexSummary && indexSummary.range ? indexSummary.range : null;
     return (
@@ -32,8 +33,9 @@ const IndicesOverview = React.createClass({
         </Col>
       </Row>
     );
-  },
-  _formatClosedIndex(indexName, index) {
+  };
+
+  _formatClosedIndex = (indexName, index) => {
     const indexRange = index.range;
     return (
       <Row key={`index-summary-${indexName}`} className="content index-description">
@@ -46,7 +48,8 @@ const IndicesOverview = React.createClass({
         </Col>
       </Row>
     );
-  },
+  };
+
   render() {
     const indices = Object.keys(this.props.indices).map((indexName) => {
       return !this.props.indices[indexName].is_closed ?
@@ -57,7 +60,7 @@ const IndicesOverview = React.createClass({
         {indices.sort((index1, index2) => naturalSort(index2.key, index1.key))}
       </span>
     );
-  },
-});
+  }
+}
 
 export default IndicesOverview;

@@ -3,6 +3,7 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Input } from 'components/bootstrap';
 
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
@@ -10,7 +11,9 @@ import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 import CombinedProvider from 'injection/CombinedProvider';
 const { DashboardsActions } = CombinedProvider.get('Dashboards');
 
-const EditDashboardModal = React.createClass({
+const EditDashboardModal = createReactClass({
+  displayName: 'EditDashboardModal',
+
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     description: PropTypes.string,
@@ -18,6 +21,7 @@ const EditDashboardModal = React.createClass({
     onSaved: PropTypes.func,
     title: PropTypes.string,
   },
+
   getInitialState() {
     return {
       id: this.props.id,
@@ -25,11 +29,13 @@ const EditDashboardModal = React.createClass({
       title: this.props.title,
     };
   },
+
   getDefaultProps() {
     return {
       action: 'create',
     };
   },
+
   render() {
     return (
       <BootstrapModalForm ref="modal"
@@ -43,12 +49,15 @@ const EditDashboardModal = React.createClass({
       </BootstrapModalForm>
     );
   },
+
   close() {
     this.refs.modal.close();
   },
+
   open() {
     this.refs.modal.open();
   },
+
   _save() {
     let promise;
 
@@ -85,12 +94,15 @@ const EditDashboardModal = React.createClass({
       });
     }
   },
+
   _onDescriptionChange(event) {
     this.setState({ description: event.target.value });
   },
+
   _onTitleChange(event) {
     this.setState({ title: event.target.value });
   },
+
   _isCreateModal() {
     return this.props.action === 'create';
   },

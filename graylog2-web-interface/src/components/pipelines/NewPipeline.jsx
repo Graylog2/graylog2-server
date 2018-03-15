@@ -7,22 +7,22 @@ import PipelineDetails from './PipelineDetails';
 
 import Routes from 'routing/Routes';
 
-const NewPipeline = React.createClass({
-  propTypes: {
+class NewPipeline extends React.Component {
+  static propTypes = {
     onChange: PropTypes.func.isRequired,
-  },
+  };
 
-  _onChange(newPipeline) {
+  _onChange = (newPipeline) => {
     this.props.onChange(newPipeline, this._goToPipeline);
-  },
+  };
 
-  _goToPipeline(pipeline) {
+  _goToPipeline = (pipeline) => {
     history.push(Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id));
-  },
+  };
 
-  _goBack() {
+  _goBack = () => {
     history.goBack();
-  },
+  };
 
   render() {
     return (
@@ -35,7 +35,7 @@ const NewPipeline = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default NewPipeline;

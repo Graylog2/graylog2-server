@@ -5,8 +5,8 @@ import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 
-const GuavaCacheFieldSet = React.createClass({
-  propTypes: {
+class GuavaCacheFieldSet extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
@@ -14,26 +14,26 @@ const GuavaCacheFieldSet = React.createClass({
     validationState: PropTypes.func.isRequired,
 // eslint-disable-next-line react/no-unused-prop-types
     validationMessage: PropTypes.func.isRequired,
-  },
+  };
 
-  _update(value, unit, enabled, name) {
+  _update = (value, unit, enabled, name) => {
     const config = ObjectUtils.clone(this.props.config);
     config[name] = enabled ? value : 0;
     config[`${name}_unit`] = unit;
     this.props.updateConfig(config);
-  },
+  };
 
-  updateAfterAccess(value, unit, enabled) {
+  updateAfterAccess = (value, unit, enabled) => {
     this._update(value, unit, enabled, 'expire_after_access');
-  },
+  };
 
-  updateAfterWrite(value, unit, enabled) {
+  updateAfterWrite = (value, unit, enabled) => {
     this._update(value, unit, enabled, 'expire_after_write');
-  },
+  };
 
-  updateRefresh(value, unit, enabled) {
+  updateRefresh = (value, unit, enabled) => {
     this._update(value, unit, enabled, 'refresh_after_write');
-  },
+  };
 
   render() {
     const config = this.props.config;
@@ -67,7 +67,7 @@ const GuavaCacheFieldSet = React.createClass({
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
     </fieldset>);
-  },
-});
+  }
+}
 
 export default GuavaCacheFieldSet;

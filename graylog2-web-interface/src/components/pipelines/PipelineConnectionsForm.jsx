@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
@@ -9,7 +10,9 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 import Routes from 'routing/Routes';
 
-const PipelineConnectionsForm = React.createClass({
+const PipelineConnectionsForm = createReactClass({
+  displayName: 'PipelineConnectionsForm',
+
   propTypes: {
     pipeline: PropTypes.object.isRequired,
     connections: PropTypes.array.isRequired,

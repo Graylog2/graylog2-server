@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
@@ -14,7 +15,9 @@ import StoreProvider from 'injection/StoreProvider';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const App = React.createClass({
+const App = createReactClass({
+  displayName: 'App',
+
   propTypes: {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
@@ -24,6 +27,7 @@ const App = React.createClass({
   },
 
   mixins: [Reflux.connect(CurrentUserStore)],
+
   render() {
     if (!this.state.currentUser) {
       return <Spinner />;

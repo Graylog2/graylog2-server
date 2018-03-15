@@ -2,16 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import MessageLoader from './MessageLoader';
 
-const ExtractorExampleMessage = React.createClass({
-  propTypes: {
+class ExtractorExampleMessage extends React.Component {
+  static propTypes = {
     field: PropTypes.string.isRequired,
     example: PropTypes.string,
     onExampleLoad: PropTypes.func,
-  },
-  _onExampleLoad(message) {
+  };
+
+  _onExampleLoad = (message) => {
     const newExample = message.fields[this.props.field];
     this.props.onExampleLoad(newExample);
-  },
+  };
+
   render() {
     const originalMessage = <span id="xtrc-original-example" style={{ display: 'none' }}>{this.props.example}</span>;
     let messagePreview;
@@ -38,7 +40,7 @@ const ExtractorExampleMessage = React.createClass({
         <MessageLoader onMessageLoaded={this._onExampleLoad} />
       </div>
     );
-  },
-});
+  }
+}
 
 export default ExtractorExampleMessage;

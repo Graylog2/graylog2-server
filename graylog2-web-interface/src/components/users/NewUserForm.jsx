@@ -12,43 +12,41 @@ const UsersStore = StoreProvider.getStore('Users');
 
 import ValidationsUtils from 'util/ValidationsUtils';
 
-const NewUserForm = React.createClass({
-  propTypes: {
+class NewUserForm extends React.Component {
+  static propTypes = {
     roles: PropTypes.array.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      users: [],
-      newRoles: null,
-    };
-  },
+  state = {
+    users: [],
+    newRoles: null,
+  };
 
   componentDidMount() {
     UsersStore.loadUsers().then((users) => {
       this.setState({ users });
     });
-  },
+  }
 
-  _onUsernameChange(event) {
+  _onUsernameChange = (event) => {
     const usernameField = this.refs.username.getInputDOMNode();
     const usernameExists = this.state.users.some(user => user.username === event.target.value);
 
     ValidationsUtils.setFieldValidity(usernameField, usernameExists, 'Username is already taken');
-  },
+  };
 
-  _onPasswordChange() {
+  _onPasswordChange = () => {
     const passwordField = this.refs.password;
     const passwordConfirmField = this.refs.password_repeat;
 
     if (passwordField.value !== '' && passwordConfirmField.value !== '') {
       ValidationsUtils.setFieldValidity(passwordConfirmField, passwordField.value !== passwordConfirmField.value, 'Passwords do not match');
     }
-  },
+  };
 
-  _onSubmit(evt) {
+  _onSubmit = (evt) => {
     evt.preventDefault();
     const result = {};
     Object.keys(this.refs).forEach((ref) => {
@@ -58,12 +56,12 @@ const NewUserForm = React.createClass({
     });
 
     this.props.onSubmit(result);
-  },
+  };
 
-  _onValueChange(newRoles) {
+  _onValueChange = (newRoles) => {
     const roles = newRoles.split(',');
     this.setState({ newRoles: roles });
-  },
+  };
 
   render() {
     const rolesHelp = (
@@ -144,7 +142,7 @@ const NewUserForm = React.createClass({
         </div>
       </form>
     );
-  },
-});
+  }
+}
 
 export default NewUserForm;

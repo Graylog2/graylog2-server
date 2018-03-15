@@ -15,8 +15,8 @@ import MessageFieldSearchActions from './MessageFieldSearchActions';
 
 import { DecoratedMessageFieldMarker } from 'components/search';
 
-const MessageFieldDescription = React.createClass({
-  propTypes: {
+class MessageFieldDescription extends React.Component {
+  static propTypes = {
     message: PropTypes.object.isRequired,
     fieldName: PropTypes.string.isRequired,
     fieldValue: PropTypes.any.isRequired,
@@ -24,37 +24,42 @@ const MessageFieldDescription = React.createClass({
     disableFieldActions: PropTypes.bool,
     customFieldActions: PropTypes.node,
     isDecorated: PropTypes.bool,
-  },
-  getInitialState() {
-    return {
-      messageTerms: Immutable.List(),
-    };
-  },
-  loadTerms(field) {
+  };
+
+  state = {
+    messageTerms: Immutable.List(),
+  };
+
+  loadTerms = (field) => {
     return () => {
       const promise = MessagesActions.fieldTerms.triggerPromise(this.props.message.index, this.props.message.fields[field]);
       promise.then(terms => this._onTermsLoaded(terms));
     };
-  },
-  _onTermsLoaded(terms) {
+  };
+
+  _onTermsLoaded = (terms) => {
     this.setState({ messageTerms: Immutable.fromJS(terms) });
-  },
-  _shouldShowTerms() {
+  };
+
+  _shouldShowTerms = () => {
     return this.state.messageTerms.size !== 0;
-  },
-  addFieldToSearchBar(event) {
+  };
+
+  addFieldToSearchBar = (event) => {
     event.preventDefault();
     SearchStore.addSearchTerm(this.props.fieldName, this.props.fieldValue);
-  },
-  _getFormattedTerms() {
+  };
+
+  _getFormattedTerms = () => {
     const termsMarkup = [];
     this.state.messageTerms.forEach((term, idx) => {
       termsMarkup.push(<span key={idx} className="message-terms">{term}</span>);
     });
 
     return termsMarkup;
-  },
-  _getFormattedFieldActions() {
+  };
+
+  _getFormattedFieldActions = () => {
     if (this.props.disableFieldActions) {
       return null;
     }
@@ -72,7 +77,8 @@ const MessageFieldDescription = React.createClass({
     }
 
     return fieldActions;
-  },
+  };
+
   render() {
     const className = this.props.fieldName === 'message' || this.props.fieldName === 'full_message' ? 'message-field' : '';
 
@@ -88,7 +94,7 @@ const MessageFieldDescription = React.createClass({
         {this.props.isDecorated && <DecoratedMessageFieldMarker />}
       </dd>
     );
-  },
-});
+  }
+}
 
 export default MessageFieldDescription;

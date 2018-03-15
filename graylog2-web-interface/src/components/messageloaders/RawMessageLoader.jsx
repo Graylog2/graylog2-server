@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
 
@@ -18,7 +19,9 @@ const MessagesStore = StoreProvider.getStore('Messages');
 const CodecTypesStore = StoreProvider.getStore('CodecTypes');
 const InputsStore = StoreProvider.getStore('Inputs');
 
-const RawMessageLoader = React.createClass({
+const RawMessageLoader = createReactClass({
+  displayName: 'RawMessageLoader',
+
   propTypes: {
     onMessageLoaded: PropTypes.func.isRequired,
     inputIdSelector: PropTypes.bool,

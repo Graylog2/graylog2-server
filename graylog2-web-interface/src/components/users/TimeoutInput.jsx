@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
-const TimeoutInput = React.createClass({
+const TimeoutInput = createReactClass({
+  displayName: 'TimeoutInput',
+
   propTypes: {
     controlSize: PropTypes.number,
     labelSize: PropTypes.number,
@@ -20,6 +23,7 @@ const TimeoutInput = React.createClass({
       controlSize: 10,
     };
   },
+
   getInitialState() {
     const unit = this._estimateUnit(this.props.value);
     return {
@@ -28,16 +32,19 @@ const TimeoutInput = React.createClass({
       unit: unit,
     };
   },
+
   getValue() {
     if (this.state.sessionTimeoutNever) {
       return -1;
     }
     return (this.refs.timeout.value * this.refs.session_timeout_unit.getValue());
   },
+
   MS_DAY: 24 * 60 * 60 * 1000,
   MS_HOUR: 60 * 60 * 1000,
   MS_MINUTE: 60 * 1000,
   MS_SECOND: 1000,
+
   _estimateUnit(value) {
     if (value === 0) {
       return this.MS_SECOND;
@@ -57,20 +64,25 @@ const TimeoutInput = React.createClass({
 
     return this.MS_SECOND;
   },
+
   _onClick(evt) {
     this.setState({ sessionTimeoutNever: evt.target.checked }, this._notifyChange);
   },
+
   _onChangeValue(evt) {
     this.setState({ value: evt.target.value }, this._notifyChange);
   },
+
   _onChangeUnit(evt) {
     this.setState({ unit: evt.target.value }, this._notifyChange);
   },
+
   _notifyChange() {
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(this.getValue());
     }
   },
+
   render() {
     return (
       <span>

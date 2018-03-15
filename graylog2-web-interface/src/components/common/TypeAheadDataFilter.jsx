@@ -13,8 +13,8 @@ import { TypeAheadInput } from 'components/common';
  * **Note** There are a few quirks around this component and it will be
  * refactored soon.
  */
-const TypeAheadDataFilter = React.createClass({
-  propTypes: {
+class TypeAheadDataFilter extends React.Component {
+  static propTypes = {
     /** ID to use in the filter input field. */
     id: PropTypes.string,
     /**
@@ -63,30 +63,33 @@ const TypeAheadDataFilter = React.createClass({
      * input field.
      */
     searchInKeys: PropTypes.array,
-  },
-  getInitialState() {
-    return {
-      filterText: '',
-      filters: Immutable.OrderedSet(),
-      filterByKey: `${this.props.filterBy}s`,
-    };
-  },
-  _onSearchTextChanged(event) {
+  };
+
+  state = {
+    filterText: '',
+    filters: Immutable.OrderedSet(),
+    filterByKey: `${this.props.filterBy}s`,
+  };
+
+  _onSearchTextChanged = (event) => {
     event.preventDefault();
     this.setState({ filterText: this.refs.typeAheadInput.getValue() }, this.filterData);
-  },
-  _onFilterAdded(event, suggestion) {
+  };
+
+  _onFilterAdded = (event, suggestion) => {
     this.setState({
       filters: this.state.filters.add(suggestion[this.props.displayKey]),
       filterText: '',
     }, this.filterData);
     this.refs.typeAheadInput.clear();
-  },
-  _onFilterRemoved(event) {
+  };
+
+  _onFilterRemoved = (event) => {
     event.preventDefault();
     this.setState({ filters: this.state.filters.delete(event.target.getAttribute('data-target')) }, this.filterData);
-  },
-  _matchFilters(datum) {
+  };
+
+  _matchFilters = (datum) => {
     return this.state.filters.every((filter) => {
       let dataToFilter = datum[this.state.filterByKey];
 
@@ -98,8 +101,9 @@ const TypeAheadDataFilter = React.createClass({
 
       return dataToFilter.indexOf(filter.toLocaleLowerCase()) !== -1;
     }, this);
-  },
-  _matchStringSearch(datum) {
+  };
+
+  _matchStringSearch = (datum) => {
     return this.props.searchInKeys.some((searchInKey) => {
       const key = datum[searchInKey];
       const value = this.state.filterText;
@@ -119,12 +123,14 @@ const TypeAheadDataFilter = React.createClass({
       }
       return containsFilter(key, value);
     }, this);
-  },
-  _resetFilters() {
+  };
+
+  _resetFilters = () => {
     this.refs.typeAheadInput.clear();
     this.setState({ filterText: '', filters: Immutable.OrderedSet() }, this.filterData);
-  },
-  filterData() {
+  };
+
+  filterData = () => {
     if (typeof this.props.filterData === 'function') {
       return this.props.filterData(this.props.data);
     }
@@ -134,7 +140,8 @@ const TypeAheadDataFilter = React.createClass({
     }, this);
 
     this.props.onDataFiltered(filteredData);
-  },
+  };
+
   render() {
     const filters = this.state.filters.map((filter) => {
       return (
@@ -178,7 +185,7 @@ const TypeAheadDataFilter = React.createClass({
         </ul>
       </div>
     );
-  },
-});
+  }
+}
 
 export default TypeAheadDataFilter;

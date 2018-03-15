@@ -4,11 +4,12 @@ import React from 'react';
 import { ShardRouting } from 'components/indices';
 import naturalSort from 'javascript-natural-sort';
 
-const ShardRoutingOverview = React.createClass({
-  propTypes: {
+class ShardRoutingOverview extends React.Component {
+  static propTypes = {
     routing: PropTypes.array.isRequired,
     indexName: PropTypes.string.isRequired,
-  },
+  };
+
   render() {
     const { indexName, routing } = this.props;
     return (
@@ -30,7 +31,7 @@ const ShardRoutingOverview = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ShardRoutingOverview;

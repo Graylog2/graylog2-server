@@ -4,17 +4,17 @@ import { Input } from 'components/bootstrap';
 
 import { QueryConfiguration } from 'components/widgets/configurations';
 
-const CountWidgetEditConfiguration = React.createClass({
-  propTypes: {
+class CountWidgetEditConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     showQueryConfig: PropTypes.bool,
-  },
-  getDefaultProps() {
-    return {
-      showQueryConfig: true,
-    };
-  },
+  };
+
+  static defaultProps = {
+    showQueryConfig: true,
+  };
+
   render() {
     return (
       <fieldset>
@@ -39,7 +39,7 @@ const CountWidgetEditConfiguration = React.createClass({
                help="Use green colour when trend goes down." />
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default CountWidgetEditConfiguration;

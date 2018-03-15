@@ -11,27 +11,28 @@ import FormUtils from 'util/FormsUtils';
 import StoreProvider from 'injection/StoreProvider';
 const ToolsStore = StoreProvider.getStore('Tools');
 
-const GrokExtractorConfiguration = React.createClass({
-  propTypes: {
+class GrokExtractorConfiguration extends React.Component {
+  static propTypes = {
     configuration: PropTypes.object.isRequired,
     exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {
-      trying: false,
-    };
-  },
-  _onChange(key) {
+  };
+
+  state = {
+    trying: false,
+  };
+
+  _onChange = (key) => {
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
       const newConfig = this.props.configuration;
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(newConfig);
     };
-  },
-  _onTryClick() {
+  };
+
+  _onTryClick = () => {
     this.setState({ trying: true });
 
     const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.configuration.named_captures_only, this.props.exampleMessage);
@@ -52,10 +53,12 @@ const GrokExtractorConfiguration = React.createClass({
     });
 
     promise.finally(() => this.setState({ trying: false }));
-  },
-  _isTryButtonDisabled() {
+  };
+
+  _isTryButtonDisabled = () => {
     return this.state.trying || !this.props.configuration.grok_pattern || !this.props.exampleMessage;
-  },
+  };
+
   render() {
     const helpMessage = (
       <span>
@@ -95,7 +98,7 @@ const GrokExtractorConfiguration = React.createClass({
         </Input>
       </div>
     );
-  },
-});
+  }
+}
 
 export default GrokExtractorConfiguration;

@@ -3,10 +3,11 @@ import React from 'react';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
-const DecoratedMessageFieldMarker = React.createClass({
-  propTypes: {
+class DecoratedMessageFieldMarker extends React.Component {
+  static propTypes = {
     className: PropTypes.string,
-  },
+  };
+
   render() {
     const classNames = [DecoratorStyles.decoratorMarker];
     if (this.props.className) {
@@ -14,7 +15,7 @@ const DecoratedMessageFieldMarker = React.createClass({
     }
 
     return <small className={classNames.join(' ')}>(decorated)</small>;
-  },
-});
+  }
+}
 
 export default DecoratedMessageFieldMarker;

@@ -12,29 +12,26 @@ import Styles from './ConfigSummary.css';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
-const DataAdapter = React.createClass({
-
-  propTypes: {
+class DataAdapter extends React.Component {
+  static propTypes = {
     dataAdapter: PropTypes.object.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      lookupKey: null,
-      lookupResult: null,
-    };
-  },
+  state = {
+    lookupKey: null,
+    lookupResult: null,
+  };
 
-  _onChange(event) {
+  _onChange = (event) => {
     this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
-  },
+  };
 
-  _lookupKey(e) {
+  _lookupKey = (e) => {
     e.preventDefault();
     LookupTableDataAdaptersActions.lookup(this.props.dataAdapter.name, this.state.lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });
-  },
+  };
 
   render() {
     const plugins = {};
@@ -97,8 +94,7 @@ const DataAdapter = React.createClass({
         </Col>
       </Row>
     );
-  },
-
-});
+  }
+}
 
 export default DataAdapter;

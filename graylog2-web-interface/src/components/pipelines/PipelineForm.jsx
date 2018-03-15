@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col, Button } from 'react-bootstrap';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 
-const PipelineForm = React.createClass({
+const PipelineForm = createReactClass({
+  displayName: 'PipelineForm',
+
   propTypes: {
     pipeline: PropTypes.object,
     create: PropTypes.bool,

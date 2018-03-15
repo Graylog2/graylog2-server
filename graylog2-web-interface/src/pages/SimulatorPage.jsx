@@ -12,22 +12,20 @@ const StreamsStore = StoreProvider.getStore('Streams');
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-const SimulatorPage = React.createClass({
-  getInitialState() {
-    return {
-      streams: undefined,
-    };
-  },
+class SimulatorPage extends React.Component {
+  state = {
+    streams: undefined,
+  };
 
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
       this.setState({ streams: streams });
     });
-  },
+  }
 
-  _isLoading() {
+  _isLoading = () => {
     return !this.state.streams;
-  },
+  };
 
   render() {
     let content;
@@ -72,7 +70,7 @@ const SimulatorPage = React.createClass({
         </div>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default SimulatorPage;

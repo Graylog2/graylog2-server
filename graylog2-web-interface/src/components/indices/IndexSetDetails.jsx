@@ -6,18 +6,18 @@ import { IndicesConfiguration } from 'components/indices';
 
 const style = require('!style/useable!css!./IndexSetDetails.css');
 
-const IndexSetDetails = React.createClass({
-  propTypes: {
+class IndexSetDetails extends React.Component {
+  static propTypes = {
     indexSet: PropTypes.object.isRequired,
-  },
+  };
 
   componentDidMount() {
     style.use();
-  },
+  }
 
   componentWillUnmount() {
     style.unuse();
-  },
+  }
 
   render() {
     const indexSet = this.props.indexSet;
@@ -45,7 +45,7 @@ const IndexSetDetails = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default IndexSetDetails;

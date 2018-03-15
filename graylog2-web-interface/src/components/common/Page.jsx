@@ -7,8 +7,8 @@ import { Pager } from 'react-bootstrap';
  *
  * @deprecated Please use `Pager.Item` directly, as this abstraction doesn't provide much value at the moment.
  */
-const Page = React.createClass({
-  propTypes: {
+class Page extends React.Component {
+  static propTypes = {
     /** href the page should link to. */
     href: PropTypes.string,
     /** Page name or number. */
@@ -22,7 +22,8 @@ const Page = React.createClass({
     isDisabled: PropTypes.bool,
     /** Specifies if the current page is selected or not. */
     isActive: PropTypes.bool,
-  },
+  };
+
   render() {
     let className = '';
     if (this.props.isActive) {
@@ -37,7 +38,7 @@ const Page = React.createClass({
         {this.props.page}
       </Pager.Item>
     );
-  },
-});
+  }
+}
 
 export default Page;

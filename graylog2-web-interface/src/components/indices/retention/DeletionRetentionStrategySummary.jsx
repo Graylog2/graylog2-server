@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const DeletionRetentionStrategySummary = React.createClass({
-  propTypes: {
+class DeletionRetentionStrategySummary extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     return (
@@ -17,7 +17,7 @@ const DeletionRetentionStrategySummary = React.createClass({
         </dl>
       </div>
     );
-  },
-});
+  }
+}
 
 export default DeletionRetentionStrategySummary;

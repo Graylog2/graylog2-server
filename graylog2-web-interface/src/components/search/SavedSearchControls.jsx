@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -11,29 +12,37 @@ const SavedSearchesStore = StoreProvider.getStore('SavedSearches');
 import ActionsProvider from 'injection/ActionsProvider';
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
-const SavedSearchControls = React.createClass({
+const SavedSearchControls = createReactClass({
+  displayName: 'SavedSearchControls',
+
   propTypes: {
     currentSavedSearch: PropTypes.string, // saved search ID
     pullRight: PropTypes.bool,
   },
+
   mixins: [Reflux.listenTo(SavedSearchesStore, '_updateTitle')],
+
   getInitialState() {
     return {
       title: '',
       error: false,
     };
   },
+
   componentDidMount() {
     this._updateTitle();
   },
+
   componentDidUpdate(prevProps) {
     if (prevProps.currentSavedSearch !== this.props.currentSavedSearch) {
       this._updateTitle();
     }
   },
+
   _isSearchSaved() {
     return this.props.currentSavedSearch !== undefined;
   },
+
   _updateTitle() {
     if (!this._isSearchSaved()) {
       if (this.state.title !== '') {
@@ -47,12 +56,15 @@ const SavedSearchControls = React.createClass({
       this.setState({ title: currentSavedSearch.title, error: false });
     }
   },
+
   _openModal() {
     this.refs.saveSearchModal.open();
   },
+
   _hide() {
     this.refs.saveSearchModal.close();
   },
+
   _save() {
     if (this.state.error) {
       return;
@@ -66,18 +78,22 @@ const SavedSearchControls = React.createClass({
     }
     promise.then(() => this._hide());
   },
+
   _deleteSavedSearch(_, event) {
     event.preventDefault();
     if (window.confirm('Do you really want to delete this saved search?')) {
       SavedSearchesActions.delete(this.props.currentSavedSearch);
     }
   },
+
   _titleChanged() {
     this.setState({ error: !SavedSearchesStore.isValidTitle(this.props.currentSavedSearch, this.refs.title.getValue()) });
   },
+
   _getNewSavedSearchButtons() {
     return <Button bsStyle="success" bsSize="small" onClick={this._openModal}>Save search criteria</Button>;
   },
+
   _getEditSavedSearchControls() {
     return (
       <DropdownButton bsSize="small" title="Saved search" id="saved-search-actions-dropdown" pullRight={this.props.pullRight}>
@@ -87,6 +103,7 @@ const SavedSearchControls = React.createClass({
       </DropdownButton>
     );
   },
+
   render() {
     return (
       <div style={{ display: 'inline-block' }}>

@@ -10,19 +10,17 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import styles from './Alert.css';
 
-const Alert = React.createClass({
-  propTypes: {
+class Alert extends React.Component {
+  static propTypes = {
     alert: PropTypes.object.isRequired,
     alertConditions: PropTypes.array.isRequired,
     streams: PropTypes.array.isRequired,
     conditionTypes: PropTypes.object.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      showAlarmCallbackHistory: false,
-    };
-  },
+  state = {
+    showAlarmCallbackHistory: false,
+  };
 
   render() {
     const alert = this.props.alert;
@@ -92,7 +90,7 @@ const Alert = React.createClass({
                       description={alertTime}
                       contentRow={content} />
     );
-  },
-});
+  }
+}
 
 export default Alert;

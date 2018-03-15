@@ -69,7 +69,7 @@ import RulesPage from 'pages/RulesPage';
 import RuleDetailsPage from 'pages/RuleDetailsPage';
 import EnterprisePage from 'pages/EnterprisePage';
 
-const AppRouter = React.createClass({
+class AppRouter extends React.Component {
   render() {
     const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
       return <Route key={pluginRoute.component.displayName} path={URLUtils.appPrefixed(pluginRoute.path)} component={pluginRoute.component} />;
@@ -167,7 +167,7 @@ const AppRouter = React.createClass({
         </Route>
       </Router>
     );
-  },
-});
+  }
+}
 
 export default AppRouter;

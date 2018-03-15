@@ -7,8 +7,8 @@ import { Alert } from 'react-bootstrap';
  * action buttons, etc. You need to use this component alongside `EntityListItem` in order to get a similar
  * look and feel among different entities.
  */
-const EntityList = React.createClass({
-  propTypes: {
+class EntityList extends React.Component {
+  static propTypes = {
     /** bsStyle to use when there are no items in the list. */
     bsNoItemsStyle: PropTypes.oneOf(['info', 'success', 'warning']),
     /** Text to show when there are no items in the list. */
@@ -18,13 +18,13 @@ const EntityList = React.createClass({
     ]),
     /** Array of `EntityListItem` that will be shown.  */
     items: PropTypes.array.isRequired,
-  },
-  getDefaultProps() {
-    return {
-      bsNoItemsStyle: 'info',
-      noItemsText: 'No items available',
-    };
-  },
+  };
+
+  static defaultProps = {
+    bsNoItemsStyle: 'info',
+    noItemsText: 'No items available',
+  };
+
   render() {
     if (this.props.items.length === 0) {
       return (
@@ -40,7 +40,7 @@ const EntityList = React.createClass({
         {this.props.items}
       </ul>
     );
-  },
-});
+  }
+}
 
 export default EntityList;

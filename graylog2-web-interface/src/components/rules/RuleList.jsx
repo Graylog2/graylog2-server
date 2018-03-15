@@ -12,24 +12,24 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
 
-const RuleList = React.createClass({
-  propTypes: {
+class RuleList extends React.Component {
+  static propTypes = {
     rules: PropTypes.array.isRequired,
-  },
+  };
 
-  _delete(rule) {
+  _delete = (rule) => {
     return () => {
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
         RulesActions.delete(rule);
       }
     };
-  },
+  };
 
-  _headerCellFormatter(header) {
+  _headerCellFormatter = (header) => {
     return <th>{header}</th>;
-  },
+  };
 
-  _ruleInfoFormatter(rule) {
+  _ruleInfoFormatter = (rule) => {
     const actions = [
       <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={this._delete(rule)} title="Delete rule">
         Delete
@@ -63,7 +63,8 @@ const RuleList = React.createClass({
         <td className="actions">{actions}</td>
       </tr>
     );
-  },
+  };
+
   render() {
     const filterKeys = ['title', 'description'];
     const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
@@ -88,7 +89,7 @@ const RuleList = React.createClass({
         </DataTable>
       </div>
     );
-  },
-});
+  }
+}
 
 export default RuleList;

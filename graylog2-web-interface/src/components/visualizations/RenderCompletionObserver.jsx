@@ -1,24 +1,24 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const RenderCompletionObserver = React.createClass({
-  propTypes: {
+class RenderCompletionObserver extends React.Component {
+  static propTypes = {
     onRenderComplete: PropTypes.func.isRequired,
     children: PropTypes.oneOfType([
       PropTypes.element,
       PropTypes.arrayOf(PropTypes.element),
     ]).isRequired,
-  },
+  };
 
-  _renderComplete: false,
+  _renderComplete = false;
 
-  _handleRenderComplete() {
+  _handleRenderComplete = () => {
     if (this._renderComplete) {
       return;
     }
     this._renderComplete = true;
     this.props.onRenderComplete();
-  },
+  };
 
   render() {
     return (
@@ -28,7 +28,7 @@ const RenderCompletionObserver = React.createClass({
         })}
       </div>
     );
-  },
-});
+  }
+}
 
 export default RenderCompletionObserver;

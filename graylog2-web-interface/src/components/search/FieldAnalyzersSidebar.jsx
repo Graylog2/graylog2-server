@@ -5,8 +5,8 @@ import { Input } from 'components/bootstrap';
 
 import { DecoratedSidebarMessageField, SidebarMessageField } from 'components/search';
 
-const FieldAnalyzersSidebar = React.createClass({
-  propTypes: {
+class FieldAnalyzersSidebar extends React.Component {
+  static propTypes = {
     fields: PropTypes.array,
     fieldAnalyzers: PropTypes.array,
     onFieldAnalyzer: PropTypes.func,
@@ -21,33 +21,31 @@ const FieldAnalyzersSidebar = React.createClass({
     showHighlightToggle: PropTypes.bool,
     togglePageFields: PropTypes.func,
     toggleShouldHighlight: PropTypes.func,
-  },
+  };
 
-  getInitialState() {
-    return {
-      fieldFilter: '',
-      maxFieldsHeight: 1000,
-    };
-  },
+  state = {
+    fieldFilter: '',
+    maxFieldsHeight: 1000,
+  };
 
   componentDidMount() {
     this._updateHeight();
     window.addEventListener('scroll', this._updateHeight);
-  },
+  }
 
   componentDidUpdate(prevProps) {
     if (this.props.showAllFields !== prevProps.showAllFields || this.props.maximumHeight !== prevProps.maximumHeight) {
       this._updateHeight();
     }
-  },
+  }
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this._updateHeight);
-  },
+  }
 
-  MINIMUM_FIELDS_HEIGHT: 50,
+  MINIMUM_FIELDS_HEIGHT = 50;
 
-  _updateHeight() {
+  _updateHeight = () => {
     const fieldsContainer = ReactDOM.findDOMNode(this.refs.fields);
 
     const footer = ReactDOM.findDOMNode(this.refs.footer);
@@ -70,37 +68,41 @@ const FieldAnalyzersSidebar = React.createClass({
       highlightToggleMargins;
 
     this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
-  },
+  };
 
-  _filterFields(event) {
+  _filterFields = (event) => {
     this.setState({ fieldFilter: event.target.value });
-  },
+  };
 
-  _showAllFields(event) {
+  _showAllFields = (event) => {
     event.preventDefault();
     if (!this.props.showAllFields) {
       this.props.togglePageFields();
     }
-  },
-  _showPageFields(event) {
+  };
+
+  _showPageFields = (event) => {
     event.preventDefault();
     if (this.props.showAllFields) {
       this.props.togglePageFields();
     }
-  },
+  };
 
-  _updateFieldSelection(setName) {
+  _updateFieldSelection = (setName) => {
     this.props.predefinedFieldSelection(setName);
-  },
-  _updateFieldSelectionToDefault() {
+  };
+
+  _updateFieldSelectionToDefault = () => {
     this._updateFieldSelection('default');
-  },
-  _updateFieldSelectionToAll() {
+  };
+
+  _updateFieldSelectionToAll = () => {
     this._updateFieldSelection('all');
-  },
-  _updateFieldSelectionToNone() {
+  };
+
+  _updateFieldSelectionToNone = () => {
     this._updateFieldSelection('none');
-  },
+  };
 
   render() {
     const decorationStats = this.props.result.decoration_stats;
@@ -181,7 +183,7 @@ const FieldAnalyzersSidebar = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default FieldAnalyzersSidebar;

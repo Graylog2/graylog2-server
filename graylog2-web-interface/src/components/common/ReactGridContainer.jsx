@@ -36,8 +36,8 @@ const BREAKPOINTS = {
  * or draggable. Use this for dashboards or pages where the user should
  * be able to decide how to arrange the content.
  */
-const ReactGridContainer = React.createClass({
-  propTypes: {
+class ReactGridContainer extends React.Component {
+  static propTypes = {
     /**
      * Object of positions in this format:
      * ```
@@ -103,31 +103,23 @@ const ReactGridContainer = React.createClass({
     columns: PropTypes.object,
     /** Specifies whether the grid should use CSS animations or not. */
     animate: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      locked: false,
-      isResizable: true,
-      rowHeight: ROW_HEIGHT,
-      columns: COLUMNS,
-      animate: true,
-    };
-  },
-
-  getInitialState() {
-    return {
-      layout: this.computeLayout(this.props.positions),
-    };
-  },
+  static defaultProps = {
+    locked: false,
+    isResizable: true,
+    rowHeight: ROW_HEIGHT,
+    columns: COLUMNS,
+    animate: true,
+  };
 
   componentWillReceiveProps(nextProps) {
     if (!lodash.isEqual(nextProps.positions, this.props.positions)) {
       this.setState({ layout: this.computeLayout(nextProps.positions) });
     }
-  },
+  }
 
-  computeLayout(positions) {
+  computeLayout = (positions) => {
     return Object.keys(positions).map((id) => {
       const { col, row, height, width } = positions[id];
       return {
@@ -138,9 +130,9 @@ const ReactGridContainer = React.createClass({
         w: width || 1,
       };
     });
-  },
+  };
 
-  _onLayoutChange(newLayout) {
+  _onLayoutChange = (newLayout) => {
     // `onLayoutChange` may be triggered when clicking somewhere in a widget, check before propagating the change.
     // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
     const filteredNewLayout = newLayout.map(item => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
@@ -160,7 +152,11 @@ const ReactGridContainer = React.createClass({
     });
 
     this.props.onPositionsChange(newPositions);
-  },
+  };
+
+  state = {
+    layout: this.computeLayout(this.props.positions),
+  };
 
   render() {
     const { children, locked, isResizable, rowHeight, columns, animate } = this.props;
@@ -185,7 +181,7 @@ const ReactGridContainer = React.createClass({
         {children}
       </WidthAdjustedReactGridLayout>
     );
-  },
-});
+  }
+}
 
 export default ReactGridContainer;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -20,21 +21,26 @@ function clusterOverviewFilter(state) {
   return state.clusterOverview ? state.clusterOverview[this.props.params.nodeId] : undefined;
 }
 
-const ShowNodePage = React.createClass({
+const ShowNodePage = createReactClass({
+  displayName: 'ShowNodePage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+
   mixins: [
     Reflux.connectFilter(NodesStore, 'node', nodeFilter),
     Reflux.connectFilter(ClusterOverviewStore, 'systemOverview', clusterOverviewFilter),
     Reflux.connect(InputTypesStore),
   ],
+
   getInitialState() {
     return {
       jvmInformation: undefined,
       plugins: undefined,
     };
   },
+
   componentWillMount() {
     Promise.all([
       ClusterOverviewStore.jvm(this.props.params.nodeId)
@@ -55,9 +61,11 @@ const ShowNodePage = React.createClass({
       }),
     ]).then(() => {}, errors => this.setState({ errors: errors }));
   },
+
   _isLoading() {
     return !(this.state.node && this.state.systemOverview);
   },
+
   render() {
     if (this.state.errors) {
       return <PageErrorOverview errors={[this.state.errors]} />;

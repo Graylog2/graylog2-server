@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, Spinner } from 'components/common';
@@ -15,7 +16,9 @@ function filterRules(state) {
   return state.rules ? state.rules.filter(r => r.id === this.props.params.ruleId)[0] : undefined;
 }
 
-const RuleDetailsPage = React.createClass({
+const RuleDetailsPage = createReactClass({
+  displayName: 'RuleDetailsPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

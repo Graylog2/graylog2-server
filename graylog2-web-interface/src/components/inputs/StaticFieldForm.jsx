@@ -6,19 +6,22 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 
-const StaticFieldForm = React.createClass({
-  propTypes: {
+class StaticFieldForm extends React.Component {
+  static propTypes = {
     input: PropTypes.object.isRequired,
-  },
-  open() {
+  };
+
+  open = () => {
     this.refs.modal.open();
-  },
-  _addStaticField() {
+  };
+
+  _addStaticField = () => {
     const fieldName = this.refs.fieldName.getValue();
     const fieldValue = this.refs.fieldValue.getValue();
 
     InputStaticFieldsStore.create(this.props.input, fieldName, fieldValue).then(() => this.refs.modal.close());
-  },
+  };
+
   render() {
     return (
       <BootstrapModalForm ref="modal" title="Add static field" submitButtonText="Add field"
@@ -31,7 +34,7 @@ const StaticFieldForm = React.createClass({
         <Input ref="fieldValue" type="text" id="field-value" label="Field value" required />
       </BootstrapModalForm>
     );
-  },
-});
+  }
+}
 
 export default StaticFieldForm;

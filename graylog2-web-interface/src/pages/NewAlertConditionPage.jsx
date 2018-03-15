@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
@@ -13,8 +14,10 @@ import DocsHelper from 'util/DocsHelper';
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const NewAlertConditionPage = React.createClass({
+const NewAlertConditionPage = createReactClass({
+  displayName: 'NewAlertConditionPage',
   mixins: [Reflux.connect(CurrentUserStore)],
+
   render() {
     return (
       <DocumentTitle title="New alert condition">

@@ -85,8 +85,8 @@ function collectTarget(connect, monitor) {
  * You most likely don't want to use this component directly, so please
  * check the `SortableList` documentation instead.
  */
-const SortableListItem = React.createClass({
-  propTypes: {
+class SortableListItem extends React.Component {
+  static propTypes = {
     connectDragSource: PropTypes.func.isRequired,
     connectDropTarget: PropTypes.func.isRequired,
     content: PropTypes.any.isRequired,
@@ -96,12 +96,11 @@ const SortableListItem = React.createClass({
     isOver: PropTypes.bool.isRequired,
     id: PropTypes.any.isRequired,
     moveItem: PropTypes.func.isRequired,
-  },
-  getDefaultProps() {
-    return {
-      disableDragging: false,
-    };
-  },
+  };
+
+  static defaultProps = {
+    disableDragging: false,
+  };
 
   render() {
     const { content, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
@@ -127,7 +126,7 @@ const SortableListItem = React.createClass({
     );
 
     return this.props.disableDragging ? component : connectDragSource(connectDropTarget(component));
-  },
-});
+  }
+}
 
 export default DropTarget(ItemTypes.ITEM, itemTarget, collectTarget)(DragSource(ItemTypes.ITEM, itemSource, collectSource)(SortableListItem));

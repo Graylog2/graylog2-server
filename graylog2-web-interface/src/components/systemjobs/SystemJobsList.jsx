@@ -4,17 +4,19 @@ import { Alert } from 'react-bootstrap';
 
 import { SystemJob } from 'components/systemjobs';
 
-const SystemJobsList = React.createClass({
-  propTypes: {
+class SystemJobsList extends React.Component {
+  static propTypes = {
     jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
-  },
-  _formatSystemJob(job) {
+  };
+
+  _formatSystemJob = (job) => {
     return (
       <div className="systemjob systemjob-progress systemjob-active" key={`job-${job.id}`}>
         <SystemJob job={job} />
       </div>
     );
-  },
+  };
+
   render() {
     const jobs = this.props.jobs.map(this._formatSystemJob);
     if (jobs.length === 0) {
@@ -30,7 +32,7 @@ const SystemJobsList = React.createClass({
         {jobs}
       </span>
     );
-  },
-});
+  }
+}
 
 export default SystemJobsList;

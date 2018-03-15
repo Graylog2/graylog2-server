@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
@@ -19,12 +20,16 @@ const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
-const DecoratorSidebar = React.createClass({
+const DecoratorSidebar = createReactClass({
+  displayName: 'DecoratorSidebar',
+
   propTypes: {
     stream: PropTypes.string,
     maximumHeight: PropTypes.number,
   },
+
   mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
   getInitialState() {
     return {
       maxDecoratorsHeight: 1000,
@@ -62,6 +67,7 @@ const DecoratorSidebar = React.createClass({
                                                    decorator={decorator}
                                                    typeDefinition={typeDefinition} /> });
   },
+
   _updateOrder(decorators) {
     decorators.forEach((item, idx) => {
       const decorator = this.state.decorators.find(i => i.id === item.id);
@@ -69,6 +75,7 @@ const DecoratorSidebar = React.createClass({
       DecoratorsActions.update(decorator.id, decorator);
     });
   },
+
   render() {
     if (!this.state.decorators) {
       return <Spinner />;

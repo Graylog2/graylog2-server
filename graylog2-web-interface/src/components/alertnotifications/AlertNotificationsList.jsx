@@ -4,38 +4,36 @@ import React from 'react';
 import { AlertNotification } from 'components/alertnotifications';
 import { EntityList, PaginatedList } from 'components/common';
 
-const AlertNotificationsList = React.createClass({
-  propTypes: {
+class AlertNotificationsList extends React.Component {
+  static propTypes = {
     alertNotifications: PropTypes.array.isRequired,
     streams: PropTypes.array.isRequired,
     onNotificationUpdate: PropTypes.func,
     onNotificationDelete: PropTypes.func,
-  },
+  };
 
-  getInitialState() {
-    return {
-      currentPage: 0,
-    };
-  },
+  state = {
+    currentPage: 0,
+  };
 
-  PAGE_SIZE: 10,
+  PAGE_SIZE = 10;
 
-  _onChangePaginatedList(currentPage) {
+  _onChangePaginatedList = (currentPage) => {
     this.setState({ currentPage: currentPage - 1 });
-  },
+  };
 
-  _paginatedNotifications() {
+  _paginatedNotifications = () => {
     return this.props.alertNotifications.slice(this.state.currentPage * this.PAGE_SIZE, (this.state.currentPage + 1) * this.PAGE_SIZE);
-  },
+  };
 
-  _formatNotification(notification) {
+  _formatNotification = (notification) => {
     const stream = this.props.streams.find(s => s.id === notification.stream_id);
     return (
       <AlertNotification key={notification.id} alertNotification={notification} stream={stream}
                          onNotificationUpdate={this.props.onNotificationUpdate}
                          onNotificationDelete={this.props.onNotificationDelete} />
     );
-  },
+  };
 
   render() {
     const notifications = this.props.alertNotifications;
@@ -48,7 +46,7 @@ const AlertNotificationsList = React.createClass({
                     items={this._paginatedNotifications().map(notification => this._formatNotification(notification))} />
       </PaginatedList>
     );
-  },
-});
+  }
+}
 
 export default AlertNotificationsList;

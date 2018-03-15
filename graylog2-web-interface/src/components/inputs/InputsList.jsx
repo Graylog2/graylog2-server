@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
@@ -18,23 +19,29 @@ import StoreProvider from 'injection/StoreProvider';
 const InputsStore = StoreProvider.getStore('Inputs');
 const SingleNodeStore = StoreProvider.getStore('SingleNode');
 
-const InputsList = React.createClass({
+const InputsList = createReactClass({
+  displayName: 'InputsList',
+
   propTypes: {
     permissions: PropTypes.array.isRequired,
     node: PropTypes.object,
   },
+
   mixins: [Reflux.connect(SingleNodeStore), Reflux.listenTo(InputsStore, '_splitInputs')],
+
   getInitialState() {
     return {
       globalInputs: undefined,
       localInputs: undefined,
     };
   },
+
   componentDidMount() {
     InputTypesActions.list();
     InputsActions.list();
     SingleNodeActions.get();
   },
+
   _splitInputs(state) {
     const inputs = state.inputs;
     const globalInputs = inputs
@@ -50,15 +57,19 @@ const InputsList = React.createClass({
 
     this.setState({ globalInputs: globalInputs, localInputs: localInputs });
   },
+
   _isLoading() {
     return !(this.state.localInputs && this.state.globalInputs && this.state.node);
   },
+
   _formatInput(input) {
     return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions} />;
   },
+
   _nodeAffix() {
     return (this.props.node ? ' on this node' : '');
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

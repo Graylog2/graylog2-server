@@ -11,8 +11,8 @@ import InputWrapper from './InputWrapper';
  * code is adapted to the new API.
  *
  */
-const Input = React.createClass({
-  propTypes: {
+class Input extends React.Component {
+  static propTypes = {
     id: PropTypes.string.isRequired,
     type: PropTypes.string,
     label: PropTypes.oneOfType([
@@ -39,28 +39,26 @@ const Input = React.createClass({
       PropTypes.array,
       PropTypes.element,
     ]),
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      type: undefined,
-      label: '',
-      labelClassName: undefined,
-      bsStyle: null,
-      value: undefined,
-      placeholder: '',
-      help: '',
-      wrapperClassName: undefined,
-      addonAfter: null,
-      children: null,
-    };
-  },
+  static defaultProps = {
+    type: undefined,
+    label: '',
+    labelClassName: undefined,
+    bsStyle: null,
+    value: undefined,
+    placeholder: '',
+    help: '',
+    wrapperClassName: undefined,
+    addonAfter: null,
+    children: null,
+  };
 
-  getInputDOMNode() {
+  getInputDOMNode = () => {
     return this.input;
-  },
+  };
 
-  getValue() {
+  getValue = () => {
     if (!this.props.type) {
       throw new Error('Cannot use getValue without specifying input type.');
     }
@@ -72,21 +70,30 @@ const Input = React.createClass({
       default:
         return this.getInputDOMNode().value;
     }
-  },
+  };
 
-  getChecked() {
+  getChecked = () => {
     return this.getInputDOMNode().checked;
-  },
+  };
 
-  _renderFormControl(componentClass, props, children) {
+  _renderFormControl = (componentClass, props, children) => {
     return (
       <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...props}>
         {children}
       </FormControl>
     );
-  },
+  };
 
-  _renderFormGroup(id, validationState, wrapperClassName, label, labelClassName, help, children, addon) {
+  _renderFormGroup = (
+    id,
+    validationState,
+    wrapperClassName,
+    label,
+    labelClassName,
+    help,
+    children,
+    addon,
+  ) => {
     let input;
     if (addon) {
       input = (
@@ -108,9 +115,9 @@ const Input = React.createClass({
         </InputWrapper>
       </FormGroup>
     );
-  },
+  };
 
-  _renderCheckboxGroup(id, validationState, wrapperClassName, label, help, props) {
+  _renderCheckboxGroup = (id, validationState, wrapperClassName, label, help, props) => {
     return (
       <FormGroup controlId={id} validationState={validationState}>
         <InputWrapper className={wrapperClassName}>
@@ -119,9 +126,9 @@ const Input = React.createClass({
         </InputWrapper>
       </FormGroup>
     );
-  },
+  };
 
-  _renderRadioGroup(id, validationState, wrapperClassName, label, help, props) {
+  _renderRadioGroup = (id, validationState, wrapperClassName, label, help, props) => {
     return (
       <FormGroup controlId={id} validationState={validationState}>
         <InputWrapper className={wrapperClassName}>
@@ -130,7 +137,7 @@ const Input = React.createClass({
         </InputWrapper>
       </FormGroup>
     );
-  },
+  };
 
   render() {
     const { id, type, bsStyle, wrapperClassName, label, labelClassName, help, children, addonAfter, ...controlProps } = this.props;
@@ -161,7 +168,7 @@ const Input = React.createClass({
     }
 
     return null;
-  },
-});
+  }
+}
 
 export default Input;

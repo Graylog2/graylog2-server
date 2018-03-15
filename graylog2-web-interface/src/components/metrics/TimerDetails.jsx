@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
-const TimerDetails = React.createClass({
-  propTypes: {
+class TimerDetails extends React.Component {
+  static propTypes = {
     metric: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     const timing = this.props.metric.metric.time;
     return (
@@ -32,7 +33,7 @@ const TimerDetails = React.createClass({
         <dd><span>{numeral(timing.max).format('0,0.[00]')}</span>&#956;s</dd>
       </dl>
     );
-  },
-});
+  }
+}
 
 export default TimerDetails;

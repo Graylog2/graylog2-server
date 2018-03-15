@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
@@ -14,7 +15,8 @@ const SessionActions = ActionsProvider.getActions('Session');
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
-const LoginPage = React.createClass({
+const LoginPage = createReactClass({
+  displayName: 'LoginPage',
   mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
 
   getInitialState() {
@@ -28,6 +30,7 @@ const LoginPage = React.createClass({
     authStyle.use();
     SessionActions.validate();
   },
+
   componentWillUnmount() {
     disconnectedStyle.unuse();
     authStyle.unuse();
@@ -57,6 +60,7 @@ const LoginPage = React.createClass({
       }
     });
   },
+
   formatLastError(error) {
     if (error) {
       return (
@@ -69,9 +73,11 @@ const LoginPage = React.createClass({
     }
     return null;
   },
+
   resetLastError() {
     this.setState({ lastError: undefined });
   },
+
   render() {
     if (this.state.validatingSession) {
       return (

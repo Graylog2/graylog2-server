@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
@@ -13,11 +14,15 @@ const MetricsStore = StoreProvider.getStore('Metrics');
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
-const JournalState = React.createClass({
+const JournalState = createReactClass({
+  displayName: 'JournalState',
+
   propTypes: {
     nodeId: PropTypes.string.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   componentWillMount() {
     this.metricNames = {
       append: 'org.graylog2.journal.append.1-sec-rate',
@@ -27,12 +32,15 @@ const JournalState = React.createClass({
     };
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
+
   componentWillUnmount() {
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
   },
+
   _isLoading() {
     return !this.state.metrics;
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner text="Loading journal metrics..." />;

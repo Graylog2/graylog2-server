@@ -15,28 +15,30 @@ import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
-const StreamRulesEditor = React.createClass({
-  propTypes() {
+class StreamRulesEditor extends React.Component {
+  static propTypes() {
     return {
       currentUser: PropTypes.object.isRequired,
       streamId: PropTypes.string.isRequired,
       messageId: PropTypes.string,
       index: PropTypes.string,
     };
-  },
-  getInitialState() {
-    return {};
-  },
+  }
+
+  state = {};
+
   componentDidMount() {
     this.loadData();
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
-  },
+  }
+
   componentWillUnmount() {
     StreamsStore.unregister(this.loadData);
     StreamRulesStore.unregister(this.loadData);
-  },
-  onMessageLoaded(message) {
+  }
+
+  onMessageLoaded = (message) => {
     this.setState({ message: message });
     if (message !== undefined) {
       StreamsStore.testMatch(this.props.streamId, { message: message.fields }, (resultData) => {
@@ -45,8 +47,9 @@ const StreamRulesEditor = React.createClass({
     } else {
       this.setState({ matchData: undefined });
     }
-  },
-  loadData() {
+  };
+
+  loadData = () => {
     StreamRulesStore.types().then((types) => {
       this.setState({ streamRuleTypes: types });
     });
@@ -58,18 +61,22 @@ const StreamRulesEditor = React.createClass({
     if (this.state.message) {
       this.onMessageLoaded(this.state.message);
     }
-  },
-  _onStreamRuleFormSubmit(streamRuleId, data) {
+  };
+
+  _onStreamRuleFormSubmit = (streamRuleId, data) => {
     StreamRulesStore.create(this.props.streamId, data, () => {});
-  },
-  _onAddStreamRule(event) {
+  };
+
+  _onAddStreamRule = (event) => {
     event.preventDefault();
     this.refs.newStreamRuleForm.open();
-  },
-  _getListClassName(matchData) {
+  };
+
+  _getListClassName = (matchData) => {
     return (matchData.matches ? 'success' : 'danger');
-  },
-  _explainMatchResult() {
+  };
+
+  _explainMatchResult = () => {
     if (this.state.matchData) {
       if (this.state.matchData.matches) {
         return (
@@ -83,7 +90,8 @@ const StreamRulesEditor = React.createClass({
           </span>);
     }
     return ('Please load a message to check if it would match against these rules and therefore be routed into this stream.');
-  },
+  };
+
   render() {
     const styles = (this.state.matchData ? this._getListClassName(this.state.matchData) : 'info');
     if (this.state.stream && this.state.streamRuleTypes) {
@@ -139,7 +147,7 @@ const StreamRulesEditor = React.createClass({
       );
     }
     return (<div className="row content"><div style={{ marginLeft: 10 }}><Spinner /></div></div>);
-  },
-});
+  }
+}
 
 export default StreamRulesEditor;

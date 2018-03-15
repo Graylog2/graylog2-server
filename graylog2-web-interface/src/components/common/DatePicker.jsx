@@ -10,8 +10,8 @@ import 'react-day-picker/lib/style.css';
  * Component that renders a given children and wraps a date picker around it. The date picker will show when
  * the children is clicked, and hidden when clicking somewhere else.
  */
-const DatePicker = React.createClass({
-  propTypes: {
+class DatePicker extends React.Component {
+  static propTypes = {
     /** Element id to use in the date picker Popover. */
     id: PropTypes.string.isRequired,
     /** Title to use in the date picker Popover.  */
@@ -25,7 +25,8 @@ const DatePicker = React.createClass({
     onChange: PropTypes.func.isRequired,
     /** Element that will trigger the date picker Popover. */
     children: PropTypes.node.isRequired,
-  },
+  };
+
   render() {
     let selectedDate;
     if (this.props.date) {
@@ -60,7 +61,7 @@ const DatePicker = React.createClass({
         {this.props.children}
       </OverlayTrigger>
     );
-  },
-});
+  }
+}
 
 export default DatePicker;

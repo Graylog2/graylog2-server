@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 
@@ -8,13 +9,16 @@ import { ConfigurationForm } from 'components/configurationforms';
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 
-const AlertConditionForm = React.createClass({
+const AlertConditionForm = createReactClass({
+  displayName: 'AlertConditionForm',
+
   propTypes: {
     alertCondition: PropTypes.object,
     onCancel: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
   },
+
   mixins: [Reflux.connect(AlertConditionsStore)],
 
   getDefaultProps() {
@@ -34,16 +38,20 @@ const AlertConditionForm = React.createClass({
       parameters: values.configuration,
     };
   },
+
   open() {
     this.refs.configurationForm.open();
   },
+
   _onCancel() {
     this.props.onCancel();
   },
+
   _onSubmit() {
     const request = this.getValue();
     this.props.onSubmit(request);
   },
+
   _formatTitle(alertCondition, name) {
     const action = alertCondition ? 'Update' : 'Create new';
     const conditionName = alertCondition ? <em>{alertCondition.title || 'Untitled'}</em> : name;

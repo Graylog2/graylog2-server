@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
@@ -10,17 +11,22 @@ const SystemStore = StoreProvider.getStore('System');
 
 import { Spinner, Timestamp } from 'components/common';
 
-const TimesList = React.createClass({
+const TimesList = createReactClass({
+  displayName: 'TimesList',
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
+
   getInitialState() {
     return { time: moment() };
   },
+
   componentDidMount() {
     this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
   },
+
   componentWillUnmount() {
     clearInterval(this.interval);
   },
+
   render() {
     if (!this.state.system) {
       return <Spinner />;

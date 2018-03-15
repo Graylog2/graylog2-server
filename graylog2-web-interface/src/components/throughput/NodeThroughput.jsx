@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
@@ -14,17 +15,22 @@ import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
 // TODO this is a copy of GlobalTroughput, it just renders differently and only targets a single node.
-const NodeThroughput = React.createClass({
+const NodeThroughput = createReactClass({
+  displayName: 'NodeThroughput',
+
   propTypes: {
     nodeId: PropTypes.string.isRequired,
     longFormat: PropTypes.bool,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   getDefaultProps() {
     return {
       longFormat: false,
     };
   },
+
   componentWillMount() {
     this.metricNames = {
       totalIn: 'org.graylog2.throughput.input.1-sec-rate',
@@ -33,12 +39,15 @@ const NodeThroughput = React.createClass({
 
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
+
   componentWillUnmount() {
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
   },
+
   _isLoading() {
     return !this.state.metrics;
   },
+
   _formatThroughput(metrics) {
     if (this.props.longFormat) {
       return (
@@ -54,6 +63,7 @@ const NodeThroughput = React.createClass({
         </span>
     );
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner text="Loading throughput..." />;

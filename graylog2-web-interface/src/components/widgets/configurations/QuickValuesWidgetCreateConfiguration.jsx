@@ -2,18 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
-const QuickValuesWidgetCreateConfiguration = React.createClass({
-  propTypes: {
+class QuickValuesWidgetCreateConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialConfiguration() {
+  getInitialConfiguration = () => {
     return {
       show_pie_chart: true,
       show_data_table: true,
     };
-  },
+  };
 
   render() {
     return (
@@ -37,7 +37,7 @@ const QuickValuesWidgetCreateConfiguration = React.createClass({
                help="Include a table with quantitative information." />
       </fieldset>
     );
-  },
-});
+  }
+}
 
 export default QuickValuesWidgetCreateConfiguration;

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import { Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
@@ -13,7 +14,9 @@ const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 import StringUtils from 'util/StringUtils';
 
-const LegacyFieldGraph = React.createClass({
+const LegacyFieldGraph = createReactClass({
+  displayName: 'LegacyFieldGraph',
+
   propTypes: {
     graphId: PropTypes.string.isRequired,
     from: PropTypes.any.isRequired,
@@ -25,10 +28,13 @@ const LegacyFieldGraph = React.createClass({
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
     onDelete: PropTypes.func.isRequired,
   },
+
   mixins: [PureRenderMixin],
+
   componentDidMount() {
     FieldGraphsStore.renderFieldGraph(this.props.graphOptions, this.fieldGraphContainer);
   },
+
   componentDidUpdate(prevProps) {
     if (this.props.from !== prevProps.from || this.props.to !== prevProps.to) {
       FieldGraphsStore.updateFieldGraphData(this.props.graphId, this.fieldGraphContainer);
@@ -37,7 +43,6 @@ const LegacyFieldGraph = React.createClass({
 
   STACKED_WIDGET_TYPE: 'STACKED_CHART',
   REGULAR_WIDGET_TYPE: 'FIELD_CHART',
-
   statisticalFunctions: ['mean', 'max', 'min', 'total', 'count', 'cardinality'],
   interpolations: ['linear', 'step-after', 'basis', 'bundle', 'cardinal', 'monotone'],
   resolutions: ['minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'],
@@ -49,19 +54,24 @@ const LegacyFieldGraph = React.createClass({
 
     return this.props.from;
   },
+
   _getGraphTitle() {
     return this.props.stacked ? 'Combined graph' : `${this.props.graphOptions.field} graph`;
   },
+
   _getWidgetType() {
     return this.props.stacked ? this.STACKED_WIDGET_TYPE : this.REGULAR_WIDGET_TYPE;
   },
+
   _getWidgetConfiguration() {
     return this.props.stacked ? FieldGraphsStore.getStackedGraphAsCreateWidgetRequestParams(this.props.graphId) :
       FieldGraphsStore.getFieldGraphAsCreateWidgetRequestParams(this.props.graphId);
   },
+
   _submenuItemClassName(configKey, value) {
     return this.props.graphOptions[configKey] === value ? 'selected' : '';
   },
+
   _getSubmenu(configKey, values) {
     const submenuItems = values.map((value) => {
       const readableName = (configKey === 'valuetype') ? GraphVisualization.getReadableFieldChartStatisticalFunction(value) : value;
@@ -76,7 +86,9 @@ const LegacyFieldGraph = React.createClass({
 
     return <ul className={`dropdown-menu ${configKey}-selector`}>{submenuItems}</ul>;
   },
+
   renderers: ['area', 'bar', 'line', 'scatterplot'],
+
   render() {
     const submenus = [
       <li key="renderer-submenu" className="dropdown-submenu left-submenu">

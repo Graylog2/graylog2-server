@@ -1,6 +1,7 @@
 /* eslint-disable react/no-find-dom-node */
 /* global window */
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
@@ -18,7 +19,8 @@ const ClusterTrafficStore = StoreProvider.getStore('ClusterTraffic');
 const ClusterTrafficActions = ActionsProvider.getActions('ClusterTraffic');
 const NodesStore = StoreProvider.getStore('Nodes');
 
-const GraylogClusterOverview = React.createClass({
+const GraylogClusterOverview = createReactClass({
+  displayName: 'GraylogClusterOverview',
   mixins: [Reflux.connect(NodesStore, 'nodes'), Reflux.connect(ClusterTrafficStore, 'traffic')],
 
   getInitialState() {

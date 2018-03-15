@@ -11,30 +11,28 @@ import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMai
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
 
-const IndexSetConfigurationForm = React.createClass({
-  propTypes: {
+class IndexSetConfigurationForm extends React.Component {
+  static propTypes = {
     indexSet: PropTypes.object.isRequired,
     rotationStrategies: PropTypes.array.isRequired,
     retentionStrategies: PropTypes.array.isRequired,
     create: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
     cancelLink: PropTypes.string.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      indexSet: this.props.indexSet,
-      validationErrors: {},
-    };
-  },
+  state = {
+    indexSet: this.props.indexSet,
+    validationErrors: {},
+  };
 
-  _updateConfig(fieldName, value) {
+  _updateConfig = (fieldName, value) => {
     const config = this.state.indexSet;
     config[fieldName] = value;
     this.setState({ indexSet: config });
-  },
+  };
 
-  _validateIndexPrefix(event) {
+  _validateIndexPrefix = (event) => {
     const value = event.target.value;
 
     if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
@@ -58,17 +56,17 @@ const IndexSetConfigurationForm = React.createClass({
     }
 
     this._onInputChange(event);
-  },
+  };
 
-  _onInputChange(event) {
+  _onInputChange = (event) => {
     this._updateConfig(event.target.name, event.target.value);
-  },
+  };
 
-  _onDisableOptimizationClick(event) {
+  _onDisableOptimizationClick = (event) => {
     this._updateConfig(event.target.name, event.target.checked);
-  },
+  };
 
-  _saveConfiguration(event) {
+  _saveConfiguration = (event) => {
     event.preventDefault();
 
     const invalidFields = Object.keys(this.state.validationErrors);
@@ -78,18 +76,19 @@ const IndexSetConfigurationForm = React.createClass({
     }
 
     this.props.onUpdate(this.state.indexSet);
-  },
+  };
 
-  _updateRotationConfigState(strategy, data) {
+  _updateRotationConfigState = (strategy, data) => {
     this._updateConfig('rotation_strategy_class', strategy);
     this._updateConfig('rotation_strategy', data);
-  },
+  };
 
-  _updateRetentionConfigState(strategy, data) {
+  _updateRetentionConfigState = (strategy, data) => {
     this._updateConfig('retention_strategy_class', strategy);
     this._updateConfig('retention_strategy', data);
-  },
-  _onFieldTypeRefreshIntervalChange(value, unit) {
+  };
+
+  _onFieldTypeRefreshIntervalChange = (value, unit) => {
     let interval;
     switch (unit) {
       case 'NANOSECONDS':
@@ -118,7 +117,8 @@ const IndexSetConfigurationForm = React.createClass({
     }
 
     this._updateConfig('field_type_refresh_interval', interval);
-  },
+  };
+
   render() {
     const indexSet = this.props.indexSet;
     const validationErrors = this.state.validationErrors;
@@ -278,7 +278,7 @@ const IndexSetConfigurationForm = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default IndexSetConfigurationForm;

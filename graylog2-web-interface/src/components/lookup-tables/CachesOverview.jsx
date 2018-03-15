@@ -14,28 +14,27 @@ import Styles from './Overview.css';
 
 const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
-const CachesOverview = React.createClass({
-
-  propTypes: {
+class CachesOverview extends React.Component {
+  static propTypes = {
     caches: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
-  },
+  };
 
-  _onPageChange(newPage, newPerPage) {
+  _onPageChange = (newPage, newPerPage) => {
     LookupTableCachesActions.searchPaginated(newPage, newPerPage, this.props.pagination.query);
-  },
+  };
 
-  _onSearch(query, resetLoadingStateCb) {
+  _onSearch = (query, resetLoadingStateCb) => {
     LookupTableCachesActions
       .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
       .then(resetLoadingStateCb);
-  },
+  };
 
-  _onReset() {
+  _onReset = () => {
     LookupTableCachesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
-  },
+  };
 
-  _helpPopover() {
+  _helpPopover = () => {
     return (
       <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
         <p><strong>Available search fields</strong></p>
@@ -78,7 +77,7 @@ const CachesOverview = React.createClass({
         </p>
       </Popover>
     );
-  },
+  };
 
   render() {
     if (!this.props.caches) {
@@ -124,7 +123,7 @@ const CachesOverview = React.createClass({
         </Col>
       </Row>
     </div>);
-  },
-});
+  }
+}
 
 export default CachesOverview;

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col, Panel, Table, Tabs, Tab } from 'react-bootstrap';
 
 import Reflux from 'reflux';
@@ -14,7 +15,9 @@ import DocsHelper from 'util/DocsHelper';
 
 import RuleHelperStyle from './RuleHelper.css';
 
-const RuleHelper = React.createClass({
+const RuleHelper = createReactClass({
+  displayName: 'RuleHelper',
+
   mixins: [
     Reflux.connect(RulesStore),
   ],

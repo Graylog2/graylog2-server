@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import {
   InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem
 } from 'react-bootstrap';
@@ -11,7 +12,9 @@ import { InputWrapper } from 'components/bootstrap';
  * and a select that let the user choose the unit used for the given time
  * value.
  */
-const TimeUnitInput = React.createClass({
+const TimeUnitInput = createReactClass({
+  displayName: 'TimeUnitInput',
+
   propTypes: {
     /**
      * Function that will be called when the input changes, that is,

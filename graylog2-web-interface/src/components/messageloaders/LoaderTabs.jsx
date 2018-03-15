@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Tab, Tabs, Col } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -16,7 +17,9 @@ import MessageLoader from 'components/extractors/MessageLoader';
 import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
 
-const LoaderTabs = React.createClass({
+const LoaderTabs = createReactClass({
+  displayName: 'LoaderTabs',
+
   propTypes: {
     tabs: PropTypes.oneOfType([
       PropTypes.oneOf(['recent', 'messageId', 'raw']),
@@ -45,6 +48,7 @@ const LoaderTabs = React.createClass({
       inputs: undefined,
     };
   },
+
   componentDidMount() {
     this.loadData();
     if (this.props.messageId && this.props.index) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -8,7 +9,8 @@ import PluginList from 'components/enterprise/PluginList';
 import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
 
-const EnterprisePage = React.createClass({
+const EnterprisePage = createReactClass({
+  displayName: 'EnterprisePage',
   mixins: [Reflux.connect(NodesStore)],
 
   _isLoading() {

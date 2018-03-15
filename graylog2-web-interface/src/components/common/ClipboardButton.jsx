@@ -7,8 +7,8 @@ import Clipboard from 'clipboard';
  * Component that renders a button to copy some text in the clipboard when pressed.
  * The text to be copied can be given in the `text` prop, or in an external element through a CSS selector in the `target` prop.
  */
-const ClipboardButton = React.createClass({
-  propTypes: {
+class ClipboardButton extends React.Component {
+  static propTypes = {
     /** Text or element used in the button. */
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
     /** Action to perform. */
@@ -31,30 +31,31 @@ const ClipboardButton = React.createClass({
     disabled: PropTypes.bool,
     /** Text to display when hovering over the button. */
     buttonTitle: PropTypes.string,
-  },
-  getDefaultProps() {
-    return {
-      action: 'copy',
-      disabled: false,
-      buttonTitle: undefined,
-    };
-  },
-  getInitialState() {
-    return {
-      tooltipMessage: '',
-    };
-  },
+  };
+
+  static defaultProps = {
+    action: 'copy',
+    disabled: false,
+    buttonTitle: undefined,
+  };
+
+  state = {
+    tooltipMessage: '',
+  };
+
   componentDidMount() {
     this.clipboard = new Clipboard('[data-clipboard-button]');
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
-  },
+  }
+
   componentWillUnmount() {
     if (this.clipboard) {
       this.clipboard.destroy();
     }
-  },
-  _onSuccess(event) {
+  }
+
+  _onSuccess = (event) => {
     this.setState({ tooltipMessage: 'Copied!' });
 
     if (this.props.onSuccess) {
@@ -62,12 +63,14 @@ const ClipboardButton = React.createClass({
     }
 
     event.clearSelection();
-  },
-  _onError(event) {
+  };
+
+  _onError = (event) => {
     const key = event.action === 'cut' ? 'K' : 'C';
     this.setState({ tooltipMessage: <span>Press Ctrl+{key}&thinsp;/&thinsp;&#8984;{key} to {event.action}</span> });
-  },
-  _getFilteredProps() {
+  };
+
+  _getFilteredProps = () => {
     const { className, style, bsStyle, bsSize, disabled, buttonTitle } = this.props;
     return {
       className: className,
@@ -77,7 +80,8 @@ const ClipboardButton = React.createClass({
       disabled: disabled,
       title: buttonTitle,
     };
-  },
+  };
+
   render() {
     const filteredProps = this._getFilteredProps();
     const tooltip = <Tooltip id={'copy-button-tooltip'}>{this.state.tooltipMessage}</Tooltip>;
@@ -95,7 +99,7 @@ const ClipboardButton = React.createClass({
         </Button>
       </OverlayTrigger>
     );
-  },
-});
+  }
+}
 
 export default ClipboardButton;

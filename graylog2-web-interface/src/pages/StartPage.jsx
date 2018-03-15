@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
@@ -14,28 +15,35 @@ const GettingStartedStore = StoreProvider.getStore('GettingStarted');
 import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
-const StartPage = React.createClass({
+const StartPage = createReactClass({
+  displayName: 'StartPage',
   mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+
   getInitialState() {
     return {
       gettingStarted: undefined,
     };
   },
+
   componentDidMount() {
     GettingStartedActions.getStatus();
     CurrentUserStore.reload();
   },
+
   componentDidUpdate() {
     if (!this._isLoading()) {
       this._redirectToStartpage();
     }
   },
+
   onGettingStartedUpdate(state) {
     this.setState({ gettingStarted: state.status });
   },
+
   _redirect(page) {
     history.push(page);
   },
+
   _redirectToStartpage() {
     // Show getting started page if user is an admin and getting started wasn't dismissed
     if (PermissionsMixin.isPermitted(this.state.currentUser.permissions, ['inputs:create'])) {
@@ -63,9 +71,11 @@ const StartPage = React.createClass({
       this._redirect(Routes.STREAMS);
     }
   },
+
   _isLoading() {
     return !this.state.currentUser || !this.state.gettingStarted;
   },
+
   render() {
     return <Spinner />;
   },

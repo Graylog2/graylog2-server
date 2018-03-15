@@ -9,30 +9,25 @@ import { DataAdapterForm } from 'components/lookup-tables';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import ObjectUtils from 'util/ObjectUtils';
 
-const DataAdapterCreate = React.createClass({
-
-  propTypes: {
+class DataAdapterCreate extends React.Component {
+  static propTypes = {
     saved: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      validate: null,
-      validationErrors: {},
-    };
-  },
+  static defaultProps = {
+    validate: null,
+    validationErrors: {},
+  };
 
-  getInitialState() {
-    return {
-      dataAdapter: undefined,
-      type: undefined,
-    };
-  },
+  state = {
+    dataAdapter: undefined,
+    type: undefined,
+  };
 
-  _onTypeSelect(adapterType) {
+  _onTypeSelect = (adapterType) => {
     this.setState({
       type: adapterType,
       dataAdapter: {
@@ -43,7 +38,7 @@ const DataAdapterCreate = React.createClass({
         config: ObjectUtils.clone(this.props.types[adapterType].default_config),
       },
     });
-  },
+  };
 
   render() {
     const adapterPlugins = {};
@@ -95,8 +90,8 @@ const DataAdapterCreate = React.createClass({
         </Row>
       )}
     </div>);
-  },
-});
+  }
+}
 
 
 export default DataAdapterCreate;

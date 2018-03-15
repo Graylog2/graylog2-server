@@ -14,8 +14,8 @@ const OPTIONS = [
   { value: 'NULL', label: 'null' },
 ];
 
-const JSONValueInput = React.createClass({
-  propTypes: {
+class JSONValueInput extends React.Component {
+  static propTypes = {
     update: PropTypes.func.isRequired,
     label: PropTypes.string,
     help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
@@ -42,49 +42,45 @@ const JSONValueInput = React.createClass({
     },
     labelClassName: PropTypes.string,
     wrapperClassName: PropTypes.string,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      value: '',
-      valueType: 'STRING',
-      allowedTypes: OPTIONS.map(option => option.value),
-      label: '',
-      help: '',
-      required: false,
-      validationState: null,
-      labelClassName: undefined,
-      wrapperClassName: undefined,
-    };
-  },
-
-  getInitialState() {
-    return this._computeInitialState(this.props);
-  },
+  static defaultProps = {
+    value: '',
+    valueType: 'STRING',
+    allowedTypes: OPTIONS.map(option => option.value),
+    label: '',
+    help: '',
+    required: false,
+    validationState: null,
+    labelClassName: undefined,
+    wrapperClassName: undefined,
+  };
 
   componentWillReceiveProps(nextProps) {
     this.setState(this._computeInitialState(nextProps));
-  },
+  }
 
-  _computeInitialState(props) {
+  _computeInitialState = (props) => {
     return {
       value: props.value,
       valueType: props.valueType,
     };
-  },
+  };
 
-  _propagateState() {
+  _propagateState = () => {
     this.props.update(this.state.value, this.state.valueType);
-  },
+  };
 
-  _onUpdate(e) {
+  _onUpdate = (e) => {
     const value = e.target.value;
     this.setState({ value: value }, this._propagateState);
-  },
+  };
 
-  _onValueTypeSelect(valueType) {
+  _onValueTypeSelect = (valueType) => {
     this.setState({ valueType: valueType }, this._propagateState);
-  },
+  };
+
+  state = this._computeInitialState(this.props);
 
   render() {
     const options = OPTIONS.filter(o => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => {
@@ -108,7 +104,7 @@ const JSONValueInput = React.createClass({
         </InputWrapper>
       </FormGroup>
     );
-  },
-});
+  }
+}
 
 export default JSONValueInput;

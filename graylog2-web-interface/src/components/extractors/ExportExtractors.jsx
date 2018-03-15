@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
@@ -13,17 +14,23 @@ const ExtractorsActions = ActionsProvider.getActions('Extractors');
 import StoreProvider from 'injection/StoreProvider';
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 
-const ExportExtractors = React.createClass({
+const ExportExtractors = createReactClass({
+  displayName: 'ExportExtractors',
+
   propTypes: {
     input: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(ExtractorsStore), Reflux.ListenerMethods],
+
   componentDidMount() {
     ExtractorsActions.list.triggerPromise(this.props.input.id);
   },
+
   _isLoading() {
     return !this.state.extractors;
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

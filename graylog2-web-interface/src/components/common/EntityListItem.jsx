@@ -6,8 +6,8 @@ import { Row, Col } from 'react-bootstrap';
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
  * This component is meant to use alongside `EntityList`. Look there for an example of how to use this component.
  */
-const EntityListItem = React.createClass({
-  propTypes: {
+class EntityListItem extends React.Component {
+  static propTypes = {
     /** Entity's title. */
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** Text to append to the title. Usually the type or a short description. */
@@ -23,12 +23,12 @@ const EntityListItem = React.createClass({
      * to show configuration options.
      */
     contentRow: PropTypes.node,
-  },
-  getDefaultProps() {
-    return {
-      createdFromContentPack: false,
-    };
-  },
+  };
+
+  static defaultProps = {
+    createdFromContentPack: false,
+  };
+
   render() {
     let titleSuffix;
     if (this.props.titleSuffix) {
@@ -69,7 +69,7 @@ const EntityListItem = React.createClass({
         </Row>
       </li>
     );
-  },
-});
+  }
+}
 
 export default EntityListItem;

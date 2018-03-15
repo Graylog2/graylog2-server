@@ -9,24 +9,26 @@ const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 import StoreProvider from 'injection/StoreProvider';
 const DeflectorStore = StoreProvider.getStore('Deflector'); // eslint-disable-line no-unused-vars
 
-const IndicesMaintenanceDropdown = React.createClass({
-  propTypes: {
+class IndicesMaintenanceDropdown extends React.Component {
+  static propTypes = {
     indexSetId: PropTypes.string.isRequired,
     indexSet: PropTypes.object,
-  },
+  };
 
-  _onRecalculateIndexRange() {
+  _onRecalculateIndexRange = () => {
     if (window.confirm('This will recalculate index ranges for this index set using a background system job. Do you want to proceed?')) {
       IndexRangesActions.recalculate(this.props.indexSetId);
     }
-  },
-  _onCycleDeflector() {
+  };
+
+  _onCycleDeflector = () => {
     if (window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')) {
       DeflectorActions.cycle(this.props.indexSetId).then(() => {
         DeflectorActions.list(this.props.indexSetId);
       });
     }
-  },
+  };
+
   render() {
     let cycleButton;
     if (this.props.indexSet && this.props.indexSet.writable) {
@@ -40,7 +42,7 @@ const IndicesMaintenanceDropdown = React.createClass({
         </DropdownButton>
       </ButtonGroup>
     );
-  },
-});
+  }
+}
 
 export default IndicesMaintenanceDropdown;

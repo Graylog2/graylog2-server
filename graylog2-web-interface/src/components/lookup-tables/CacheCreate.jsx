@@ -9,30 +9,25 @@ import { CacheForm } from 'components/lookup-tables';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import ObjectUtils from 'util/ObjectUtils';
 
-const CacheCreate = React.createClass({
-
-  propTypes: {
+class CacheCreate extends React.Component {
+  static propTypes = {
     saved: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      validate: null,
-      validationErrors: {},
-    };
-  },
+  static defaultProps = {
+    validate: null,
+    validationErrors: {},
+  };
 
-  getInitialState() {
-    return {
-      cache: undefined,
-      type: undefined,
-    };
-  },
+  state = {
+    cache: undefined,
+    type: undefined,
+  };
 
-  _onTypeSelect(cacheType) {
+  _onTypeSelect = (cacheType) => {
     this.setState({
       type: cacheType,
       cache: {
@@ -43,7 +38,7 @@ const CacheCreate = React.createClass({
         config: ObjectUtils.clone(this.props.types[cacheType].default_config),
       },
     });
-  },
+  };
 
   render() {
     const cachePlugins = {};
@@ -91,8 +86,8 @@ const CacheCreate = React.createClass({
         </Row>
       )}
     </div>);
-  },
-});
+  }
+}
 
 
 export default CacheCreate;

@@ -12,28 +12,28 @@ import FormsUtils from 'util/FormsUtils';
 
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
 
-const StreamRuleForm = React.createClass({
-  propTypes: {
+class StreamRuleForm extends React.Component {
+  static propTypes = {
     onSubmit: PropTypes.func.isRequired,
     streamRule: PropTypes.object,
     streamRuleTypes: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
-  },
-  getDefaultProps() {
-    return {
-      streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
-    };
-  },
-  getInitialState() {
-    return this.props.streamRule;
-  },
-  FIELD_PRESENCE_RULE_TYPE: 5,
-  ALWAYS_MATCH_RULE_TYPE: 7,
-  modal: undefined,
-  _resetValues() {
+  };
+
+  static defaultProps = {
+    streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
+  };
+
+  state = this.props.streamRule;
+  FIELD_PRESENCE_RULE_TYPE = 5;
+  ALWAYS_MATCH_RULE_TYPE = 7;
+  modal = undefined;
+
+  _resetValues = () => {
     this.setState(this.props.streamRule);
-  },
-  _onSubmit() {
+  };
+
+  _onSubmit = () => {
     if (this.state.type === this.ALWAYS_MATCH_RULE_TYPE) {
       this.state.field = '';
     }
@@ -42,25 +42,30 @@ const StreamRuleForm = React.createClass({
     }
     this.props.onSubmit(this.props.streamRule.id, this.state);
     this.modal.close();
-  },
-  _formatStreamRuleType(streamRuleType) {
+  };
+
+  _formatStreamRuleType = (streamRuleType) => {
     return (
       <option key={`streamRuleType${streamRuleType.id}`}
               value={streamRuleType.id}>{streamRuleType.short_desc}</option>
     );
-  },
-  open() {
+  };
+
+  open = () => {
     this._resetValues();
     this.modal.open();
-  },
-  close() {
+  };
+
+  close = () => {
     this.modal.close();
-  },
-  handleChange(event) {
+  };
+
+  handleChange = (event) => {
     const change = {};
     change[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState(change);
-  },
+  };
+
   render() {
     const { field, type, value, inverted, description } = this.state;
 
@@ -111,7 +116,7 @@ const StreamRuleForm = React.createClass({
         </div>
       </BootstrapModalForm>
     );
-  },
-});
+  }
+}
 
 export default StreamRuleForm;

@@ -8,14 +8,13 @@ import crossfilter from 'crossfilter';
 import numeral from 'numeral';
 import DateTime from 'logic/datetimes/DateTime';
 
-const TrafficGraph = React.createClass({
-
-  propTypes: {
+class TrafficGraph extends React.Component {
+  static propTypes = {
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
     traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
     width: PropTypes.number.isRequired,
-  },
+  };
 
   render() {
     if (!this.props.traffic) {
@@ -52,7 +51,7 @@ const TrafficGraph = React.createClass({
                               valueTitleRenderer={d => `${numeral(d.y).format('0.00b')}`}
                               computationTimeRange={{ from: this.props.from, to: this.props.to }} />
     );
-  },
-});
+  }
+}
 
 export default TrafficGraph;

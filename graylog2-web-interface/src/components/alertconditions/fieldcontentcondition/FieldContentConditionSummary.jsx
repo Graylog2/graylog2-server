@@ -5,13 +5,15 @@ import GracePeriodSummary from 'components/alertconditions/GracePeriodSummary';
 import BacklogSummary from 'components/alertconditions/BacklogSummary';
 import RepeatNotificationsSummary from 'components/alertconditions/RepeatNotificationsSummary';
 
-const FieldContentConditionSummary = React.createClass({
-  propTypes: {
+class FieldContentConditionSummary extends React.Component {
+  static propTypes = {
     alertCondition: PropTypes.object.isRequired,
-  },
-  _formatMatcher(field, value) {
+  };
+
+  _formatMatcher = (field, value) => {
     return <span>{`\<${field}: "${value}"\>`}</span>;
-  },
+  };
+
   render() {
     const alertCondition = this.props.alertCondition;
     const field = alertCondition.parameters.field;
@@ -28,7 +30,7 @@ const FieldContentConditionSummary = React.createClass({
         <RepeatNotificationsSummary alertCondition={alertCondition} />
       </span>
     );
-  },
-});
+  }
+}
 
 export default FieldContentConditionSummary;

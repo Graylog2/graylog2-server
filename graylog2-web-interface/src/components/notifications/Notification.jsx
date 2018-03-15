@@ -8,15 +8,17 @@ import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 import ActionsProvider from 'injection/ActionsProvider';
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
-const Notification = React.createClass({
-  propTypes: {
+class Notification extends React.Component {
+  static propTypes = {
     notification: PropTypes.object.isRequired,
-  },
-  _onClose() {
+  };
+
+  _onClose = () => {
     if (window.confirm('Really delete this notification?')) {
       NotificationsActions.delete(this.props.notification.type);
     }
-  },
+  };
+
   render() {
     const notification = this.props.notification;
     const notificationView = NotificationsFactory.getForNotification(notification);
@@ -37,7 +39,7 @@ const Notification = React.createClass({
         </div>
       </Alert>
     );
-  },
-});
+  }
+}
 
 export default Notification;

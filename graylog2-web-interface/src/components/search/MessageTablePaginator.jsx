@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import { Page } from 'components/common';
 
@@ -12,7 +13,9 @@ import $ from 'jquery';
 global.jQuery = $;
 require('bootstrap/js/affix');
 
-const MessageTablePaginator = React.createClass({
+const MessageTablePaginator = createReactClass({
+  displayName: 'MessageTablePaginator',
+
   propTypes: {
     resultCount: PropTypes.number.isRequired,
     currentPage: PropTypes.number.isRequired,
@@ -59,6 +62,7 @@ const MessageTablePaginator = React.createClass({
       });
     }
   },
+
   _setPaginationWidth() {
     if (this.props.position === 'bottom') {
       this.eventsThrottler.throttle(() => {
@@ -66,13 +70,16 @@ const MessageTablePaginator = React.createClass({
       });
     }
   },
+
   _numberOfPages() {
     return Math.ceil(this.props.resultCount / this.props.pageSize);
   },
+
   _minPage() {
     const currentTenMin = Math.floor(this.props.currentPage / 10) * 10;
     return Math.max(1, currentTenMin);
   },
+
   _maxPage() {
     if (this.props.currentPage > this._numberOfPages()) {
       return this.props.currentPage;
@@ -80,6 +87,7 @@ const MessageTablePaginator = React.createClass({
     const currentTenMax = Math.ceil((this.props.currentPage + 1) / 10) * 10;
     return Math.min(this._numberOfPages(), currentTenMax);
   },
+
   _onPageChanged(page) {
     let newPage;
 
@@ -93,6 +101,7 @@ const MessageTablePaginator = React.createClass({
 
     this.props.onPageChange(newPage);
   },
+
   render() {
     const pages = [];
 

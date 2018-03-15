@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -14,8 +15,10 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
-const CreateAlertConditionInput = React.createClass({
+const CreateAlertConditionInput = createReactClass({
+  displayName: 'CreateAlertConditionInput',
   mixins: [Reflux.connect(AlertConditionsStore)],
+
   getInitialState() {
     return {
       streams: undefined,
@@ -49,12 +52,15 @@ const CreateAlertConditionInput = React.createClass({
       history.push(Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
     });
   },
+
   _openForm() {
     this.refs.configurationForm.open();
   },
+
   _resetForm() {
     this.setState({ type: this.PLACEHOLDER });
   },
+
   _formatConditionForm(type) {
     return (
       <AlertConditionForm ref="configurationForm" onCancel={this._resetForm} onSubmit={this._onSubmit} type={type} />

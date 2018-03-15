@@ -4,23 +4,24 @@ import { Input } from 'components/bootstrap';
 import { KeyValueTable } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
-const HTTPJSONPathAdapterFieldSet = React.createClass({
-  propTypes: {
+class HTTPJSONPathAdapterFieldSet extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     // eslint-disable-next-line react/no-unused-prop-types
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
     validationState: PropTypes.func.isRequired,
     validationMessage: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {};
-  },
-  onHTTPHeaderUpdate(headers) {
+  };
+
+  state = {};
+
+  onHTTPHeaderUpdate = (headers) => {
     const config = ObjectUtils.clone(this.props.config);
     config.headers = headers;
     this.props.updateConfig(config);
-  },
+  };
+
   render() {
     const config = this.props.config;
 
@@ -77,7 +78,7 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
       </Input>
 
     </fieldset>);
-  },
-});
+  }
+}
 
 export default HTTPJSONPathAdapterFieldSet;

@@ -10,18 +10,18 @@ import {} from 'components/indices/retention'; // Load rotation plugin UI plugin
 
 const style = require('!style/useable!css!components/configurations/ConfigurationStyles.css');
 
-const IndicesConfiguration = React.createClass({
-  propTypes: {
+class IndicesConfiguration extends React.Component {
+  static propTypes = {
     indexSet: PropTypes.object.isRequired,
-  },
+  };
 
   componentDidMount() {
     style.use();
-  },
+  }
 
   componentWillUnmount() {
     style.unuse();
-  },
+  }
 
   render() {
     if (!this.props.indexSet.writable) {
@@ -56,7 +56,7 @@ const IndicesConfiguration = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default IndicesConfiguration;

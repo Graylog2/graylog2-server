@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -12,8 +13,10 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import UserList from 'components/users/UserList';
 
-const UsersPage = React.createClass({
+const UsersPage = createReactClass({
+  displayName: 'UsersPage',
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+
   render() {
     return (
       <DocumentTitle title="Users">

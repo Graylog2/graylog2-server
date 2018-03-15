@@ -1,12 +1,15 @@
 /* eslint-env browser */
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Map, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 
 import {} from 'leaflet/dist/leaflet.css';
 import style from './MapVisualization.css';
 
-const MapVisualization = React.createClass({
+const MapVisualization = createReactClass({
+  displayName: 'MapVisualization',
+
   propTypes: {
     id: PropTypes.string.isRequired,
     data: PropTypes.object,
@@ -18,6 +21,7 @@ const MapVisualization = React.createClass({
     onRenderComplete: PropTypes.func,
     locked: PropTypes.bool, // Disables zoom and dragging
   },
+
   getDefaultProps() {
     return {
       data: {},
@@ -79,9 +83,11 @@ const MapVisualization = React.createClass({
       </CircleMarker>
     );
   },
+
   _onZoomChange(event) {
     this.setState({ zoomLevel: event.target.getZoom() });
   },
+
   _getBucket(value, bucketCount, minValue, maxValue, increment) {
     // Calculate bucket size based on min/max value and the number of buckets.
     const bucketSize = (maxValue - minValue) / bucketCount;

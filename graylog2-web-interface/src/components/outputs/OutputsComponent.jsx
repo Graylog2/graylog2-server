@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -12,11 +13,14 @@ import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
 
-const OutputsComponent = React.createClass({
+const OutputsComponent = createReactClass({
+  displayName: 'OutputsComponent',
   mixins: [PermissionsMixin],
+
   componentDidMount() {
     this.loadData();
   },
+
   loadData() {
     const callback = (resp) => {
       this.setState({
@@ -36,13 +40,16 @@ const OutputsComponent = React.createClass({
       this.setState({ types: resp.types });
     });
   },
+
   getInitialState() {
     return {
     };
   },
+
   _handleUpdate() {
     this.loadData();
   },
+
   _handleCreateOutput(data) {
     OutputsStore.save(data, (result) => {
       this.setState({ typeName: 'placeholder' });
@@ -57,6 +64,7 @@ const OutputsComponent = React.createClass({
       return result;
     });
   },
+
   _fetchAssignableOutputs(outputs) {
     OutputsStore.load((resp) => {
       const streamOutputIds = outputs.map((output) => { return output.id; });
@@ -66,12 +74,14 @@ const OutputsComponent = React.createClass({
       this.setState({ assignableOutputs: assignableOutputs });
     });
   },
+
   _handleAssignOutput(outputId) {
     StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
       this._handleUpdate();
       return response;
     });
   },
+
   _removeOutputGlobally(outputId) {
     if (window.confirm('Do you really want to terminate this output?')) {
       OutputsStore.remove(outputId, (response) => {
@@ -81,6 +91,7 @@ const OutputsComponent = React.createClass({
       });
     }
   },
+
   _removeOutputFromStream(outputId, streamId) {
     if (window.confirm('Do you really want to remove this output from the stream?')) {
       StreamsStore.removeOutput(streamId, outputId, (response) => {
@@ -90,11 +101,13 @@ const OutputsComponent = React.createClass({
       });
     }
   },
+
   _handleOutputUpdate(output, deltas) {
     OutputsStore.update(output, deltas, () => {
       this._handleUpdate();
     });
   },
+
   render() {
     if (this.state.outputs && this.state.types && (!this.props.streamId || this.state.assignableOutputs)) {
       const permissions = this.props.permissions;

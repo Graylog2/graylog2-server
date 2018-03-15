@@ -2,20 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-const PipelineConnectionsList = React.createClass({
-  propTypes: {
+class PipelineConnectionsList extends React.Component {
+  static propTypes = {
     pipeline: PropTypes.object.isRequired,
     connections: PropTypes.array.isRequired,
     streams: PropTypes.array.isRequired,
     streamsFormatter: PropTypes.func.isRequired,
     noConnectionsMessage: PropTypes.any,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      noConnectionsMessage: 'Pipeline not connected to any streams',
-    };
-  },
+  static defaultProps = {
+    noConnectionsMessage: 'Pipeline not connected to any streams',
+  };
 
   render() {
     const streamsUsingPipeline = this.props.connections
@@ -29,7 +27,7 @@ const PipelineConnectionsList = React.createClass({
         {streamsUsingPipeline.length === 0 ? this.props.noConnectionsMessage : this.props.streamsFormatter(streamsUsingPipeline)}
       </span>
     );
-  },
-});
+  }
+}
 
 export default PipelineConnectionsList;

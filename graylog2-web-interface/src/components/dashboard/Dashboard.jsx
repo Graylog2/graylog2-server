@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { Link } from 'react-router';
@@ -16,20 +17,26 @@ const StartpageStore = StoreProvider.getStore('Startpage');
 
 import Routes from 'routing/Routes';
 
-const Dashboard = React.createClass({
+const Dashboard = createReactClass({
+  displayName: 'Dashboard',
+
   propTypes: {
     dashboard: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string),
   },
+
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
+
   _setStartpage() {
     StartpageStore.set(this.state.currentUser.username, 'dashboard', this.props.dashboard.id);
   },
+
   _onDashboardDelete() {
     if (window.confirm(`Do you really want to delete the dashboard ${this.props.dashboard.title}?`)) {
       DashboardsActions.delete(this.props.dashboard);
     }
   },
+
   _getDashboardActions() {
     let dashboardActions;
     const setAsStartpageMenuItem = (
@@ -61,6 +68,7 @@ const Dashboard = React.createClass({
 
     return dashboardActions;
   },
+
   render() {
     const createdFromContentPack = (this.props.dashboard.content_pack ?
       <i className="fa fa-cube" title="Created from content pack" /> : null);

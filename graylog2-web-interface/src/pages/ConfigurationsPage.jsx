@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -14,7 +15,8 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import {} from 'components/maps/configurations'
 
-const ConfigurationsPage = React.createClass({
+const ConfigurationsPage = createReactClass({
+  displayName: 'ConfigurationsPage',
   mixins: [Reflux.connect(ConfigurationsStore)],
 
   getInitialState() {

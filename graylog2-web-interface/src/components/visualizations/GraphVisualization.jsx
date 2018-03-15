@@ -65,8 +65,8 @@ const GraphFactory = {
   },
 };
 
-const GraphVisualization = React.createClass({
-  propTypes: {
+class GraphVisualization extends React.Component {
+  static propTypes = {
     id: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired,
     config: PropTypes.object.isRequired,
@@ -78,47 +78,47 @@ const GraphVisualization = React.createClass({
     width: PropTypes.number,
     interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
-  },
+  };
 
-  statics: {
-    getReadableFieldChartStatisticalFunction(statisticalFunction) {
-      switch (statisticalFunction) {
-        case 'count':
-          return 'total';
-        case 'total':
-          return 'sum';
-        default:
-          return statisticalFunction;
-      }
-    },
-  },
+  static getReadableFieldChartStatisticalFunction(statisticalFunction) {
+    switch (statisticalFunction) {
+      case 'count':
+        return 'total';
+      case 'total':
+        return 'sum';
+      default:
+        return statisticalFunction;
+    }
+  }
 
-  getDefaultProps() {
-    return {
-      interactive: true,
-      onRenderComplete: () => {},
-    };
-  },
+  static defaultProps = {
+    interactive: true,
+    onRenderComplete: () => {},
+  };
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
     this.triggerRender = true;
     this.graphData = crossfilter();
     this.dimension = this.graphData.dimension(d => d.x);
     this.group = this.dimension.group().reduceSum(d => d.y);
 
-    return {
+    this.state = {
       dataPoints: [],
     };
-  },
+  }
+
   componentDidMount() {
     this.disableTransitions = dc.disableTransitions;
     dc.disableTransitions = !this.props.interactive;
     this.renderGraph();
     this._updateData(this.props.data, this.props.config, this.props.computationTimeRange);
-  },
+  }
+
   componentDidUpdate() {
     this.drawData();
-  },
+  }
+
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
       return;
@@ -128,20 +128,21 @@ const GraphVisualization = React.createClass({
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
     this._updateData(nextProps.data, nextProps.config, nextProps.computationTimeRange);
-  },
+  }
 
   componentWillUnmount() {
     dc.disableTransitions = this.disableTransitions;
-  },
+  }
 
-  _updateData(data, config, computationTimeRange) {
+  _updateData = (data, config, computationTimeRange) => {
     const isSearchAll = (config.timerange.type === 'relative' && config.timerange.range === 0);
     const dataPoints = HistogramFormatter.format(data, computationTimeRange,
       config.interval, this.props.width, isSearchAll, config.valuetype);
 
     this.setState({ dataPoints: this._normalizeData(dataPoints) });
-  },
-  _normalizeData(data) {
+  };
+
+  _normalizeData = (data) => {
     if (data === null || data === undefined || !Array.isArray(data)) {
       return [];
     }
@@ -149,8 +150,9 @@ const GraphVisualization = React.createClass({
       dataPoint.y = NumberUtils.normalizeGraphNumber(dataPoint.y);
       return dataPoint;
     });
-  },
-  _formatTooltipTitle(d) {
+  };
+
+  _formatTooltipTitle = (d) => {
     const formattedKey = d.x === undefined ? d.x : new DateTime(d.x).toString(DateTime.Formats.COMPLETE);
 
     let formattedValue;
@@ -164,14 +166,16 @@ const GraphVisualization = React.createClass({
     const keyText = `<span class="date">${formattedKey}</span>`;
 
     return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
-  },
-  _resizeVisualization(width, height) {
+  };
+
+  _resizeVisualization = (width, height) => {
     this.graph
       .width(width)
       .height(height);
     this.triggerRender = true;
-  },
-  drawData() {
+  };
+
+  drawData = () => {
     this.graph.xUnits(() => Math.max(this.state.dataPoints.length - 1, 1));
     this.graphData.remove();
     this.graphData.add(this.state.dataPoints);
@@ -187,9 +191,10 @@ const GraphVisualization = React.createClass({
     if (this.props.config.threshold) {
       this.renderThreshold();
     }
-  },
+  };
+
   // Draws a horizontal threshold line in the graph
-  renderThreshold() {
+  renderThreshold = () => {
     const threshold = this.props.config.threshold;
     const thresholdColor = this.props.config.threshold_color || '#f00';
     const thresholdTooltip = this.props.config.threshold_tooltip || `threshold: ${threshold}`;
@@ -265,8 +270,9 @@ const GraphVisualization = React.createClass({
         .attr('fill', thresholdColor);
       dots.exit().remove();
     });
-  },
-  renderGraph() {
+  };
+
+  renderGraph = () => {
     const graphDomNode = this._graph;
     const interactive = this.props.interactive;
 
@@ -308,13 +314,14 @@ const GraphVisualization = React.createClass({
         return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format('.2s')(value);
       });
     this.graph.render();
-  },
+  };
+
   render() {
     return (
       <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
            className={`graph ${this.props.config.renderer}`} />
     );
-  },
-});
+  }
+}
 
 export default GraphVisualization;

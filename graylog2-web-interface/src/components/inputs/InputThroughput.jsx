@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
@@ -12,22 +13,29 @@ const MetricsActions = ActionsProvider.getActions('Metrics');
 import NumberUtils from 'util/NumberUtils';
 import { LinkToNode, Spinner } from 'components/common';
 
-const InputThroughput = React.createClass({
+const InputThroughput = createReactClass({
+  displayName: 'InputThroughput',
+
   propTypes: {
     input: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   getInitialState() {
     return {
       showDetails: false,
     };
   },
+
   componentWillMount() {
     this._metricNames().forEach(metricName => MetricsActions.addGlobal(metricName));
   },
+
   componentWillUnmount() {
     this._metricNames().forEach(metricName => MetricsActions.removeGlobal(metricName));
   },
+
   _metricNames() {
     return [
       this._prefix('incomingMessages'),
@@ -40,10 +48,12 @@ const InputThroughput = React.createClass({
       this._prefix('read_bytes_total'),
     ];
   },
+
   _prefix(metric) {
     const input = this.props.input;
     return `${input.type}.${input.id}.${metric}`;
   },
+
   _getValueFromMetric(metric) {
     if (metric === null || metric === undefined) {
       return undefined;
@@ -60,6 +70,7 @@ const InputThroughput = React.createClass({
         return undefined;
     }
   },
+
   _calculateMetrics(metrics) {
     const result = {};
     this._metricNames().forEach((metricName) => {
@@ -77,9 +88,11 @@ const InputThroughput = React.createClass({
 
     return result;
   },
+
   _formatCount(count) {
     return numeral(count).format('0,0');
   },
+
   _formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal) {
     const network = (
       <span className="input-io">
@@ -107,6 +120,7 @@ const InputThroughput = React.createClass({
 
     return network;
   },
+
   _formatConnections(openConnections, totalConnections) {
     return (
       <span>
@@ -116,6 +130,7 @@ const InputThroughput = React.createClass({
       </span>
     );
   },
+
   _formatAllNodeDetails(metrics) {
     return (
       <span>
@@ -124,6 +139,7 @@ const InputThroughput = React.createClass({
       </span>
     );
   },
+
   _formatNodeDetails(nodeId, metrics) {
     const openConnections = this._getValueFromMetric(metrics[this._prefix('open_connections')]);
     const totalConnections = this._getValueFromMetric(metrics[this._prefix('total_connections')]);
@@ -146,10 +162,12 @@ const InputThroughput = React.createClass({
       </span>
     );
   },
+
   _toggleShowDetails(evt) {
     evt.preventDefault();
     this.setState({ showDetails: !this.state.showDetails });
   },
+
   render() {
     if (!this.state.metrics) {
       return <Spinner />;

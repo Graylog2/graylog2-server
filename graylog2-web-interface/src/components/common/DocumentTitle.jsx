@@ -13,8 +13,8 @@ import React from 'react';
  * </DocumentTitle>
  * ```
  */
-const DocumentTitle = React.createClass({
-  propTypes: {
+class DocumentTitle extends React.Component {
+  static propTypes = {
     /** Title to prepend to the page `document.title`. */
     title: PropTypes.string.isRequired,
     /** Children to be rendered. */
@@ -22,20 +22,21 @@ const DocumentTitle = React.createClass({
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
-  },
+  };
 
   componentDidMount() {
     document.title = `${document.title} - ${this.props.title}`;
-  },
+  }
 
   componentWillUnmount() {
     document.title = this.defaultTitle;
-  },
+  }
 
-  defaultTitle: 'Graylog',
+  defaultTitle = 'Graylog';
+
   render() {
     return this.props.children;
-  },
-});
+  }
+}
 
 export default DocumentTitle;

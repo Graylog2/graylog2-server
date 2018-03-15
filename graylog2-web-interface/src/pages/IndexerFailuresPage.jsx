@@ -12,25 +12,28 @@ import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/co
 import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
 
-const IndexerFailuresPage = React.createClass({
-  getInitialState() {
-    return {};
-  },
+class IndexerFailuresPage extends React.Component {
+  state = {};
+
   componentDidMount() {
     IndexerFailuresStore.count(moment().subtract(10, 'years')).then((response) => {
       this.setState({ total: response.count });
     });
     this.loadData(1, this.defaultPageSize);
-  },
-  defaultPageSize: 50,
-  loadData(page, size) {
+  }
+
+  defaultPageSize = 50;
+
+  loadData = (page, size) => {
     IndexerFailuresStore.list(size, (page - 1) * size).then((response) => {
       this.setState({ failures: response.failures });
     });
-  },
-  _onChangePaginatedList(page, size) {
+  };
+
+  _onChangePaginatedList = (page, size) => {
     this.loadData(page, size);
-  },
+  };
+
   render() {
     if (this.state.total === undefined || !this.state.failures) {
       return <Spinner />;
@@ -60,7 +63,7 @@ const IndexerFailuresPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default IndexerFailuresPage;

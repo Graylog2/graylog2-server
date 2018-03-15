@@ -15,8 +15,8 @@ import graphHelper from 'legacy/graphHelper';
 
 import style from './StackedGraphVisualization.css';
 
-const StackedGraphVisualization = React.createClass({
-  propTypes: {
+class StackedGraphVisualization extends React.Component {
+  static propTypes = {
     id: PropTypes.string.isRequired,
     data: PropTypes.array.isRequired,
     height: PropTypes.number,
@@ -25,28 +25,29 @@ const StackedGraphVisualization = React.createClass({
     computationTimeRange: PropTypes.object,
     interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      interactive: true,
-      onRenderComplete: () => {},
-    };
-  },
+  static defaultProps = {
+    interactive: true,
+    onRenderComplete: () => {},
+  };
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
     this.series = Immutable.List();
     this.seriesNames = Immutable.Map();
     this.barWidthScale = d3.scale.linear().domain(d3.range(0, 10000)).range(d3.range(0.6, 0, -0.01));
     this.dataPoints = Immutable.Set();
 
-    return {};
-  },
+    this.state = {};
+  }
+
   componentDidMount() {
     this.renderGraph(this.props);
     this.dataPoints = this._formatData(this.props);
     this.drawData();
-  },
+  }
+
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
       return;
@@ -59,14 +60,16 @@ const StackedGraphVisualization = React.createClass({
       this.renderGraph(nextProps);
     }
     this.drawData();
-  },
-  _normalizeData(data) {
+  }
+
+  _normalizeData = (data) => {
     if (data === null || data === undefined || !Array.isArray(data)) {
       return [];
     }
     return data;
-  },
-  _formatData(props) {
+  };
+
+  _formatData = (props) => {
     const data = props.data;
     const normalizedData = this._normalizeData(data);
     const isSearchAll = (props.config.timerange.type === 'relative' && props.config.timerange.range === 0);
@@ -78,8 +81,9 @@ const StackedGraphVisualization = React.createClass({
     }, this);
 
     return this._mergeSeries(formattedSeries);
-  },
-  _mergeSeries(series) {
+  };
+
+  _mergeSeries = (series) => {
     let mergedSeries = Immutable.Map();
 
     series.forEach((aSeries, idx) => {
@@ -95,8 +99,9 @@ const StackedGraphVisualization = React.createClass({
     }, this);
 
     return mergedSeries.toOrderedSet().sortBy(dataPoint => dataPoint.get('timestamp'));
-  },
-  _getGraphType() {
+  };
+
+  _getGraphType = () => {
     let graphType;
 
     switch (this.props.config.renderer) {
@@ -114,8 +119,9 @@ const StackedGraphVisualization = React.createClass({
     }
 
     return graphType;
-  },
-  _applyGraphConfiguration(graphType) {
+  };
+
+  _applyGraphConfiguration = (graphType) => {
     /* eslint-disable no-case-declarations */
     switch (graphType) {
       case 'bar':
@@ -135,11 +141,13 @@ const StackedGraphVisualization = React.createClass({
         console.warn(`Invalid graph type ${graphType}`);
     }
     /* eslint-enable no-case-declarations */
-  },
-  _formatTooltipTitle(x) {
+  };
+
+  _formatTooltipTitle = (x) => {
     return new DateTime(x).toString(DateTime.Formats.COMPLETE);
-  },
-  _formatTooltipValue(value) {
+  };
+
+  _formatTooltipValue = (value) => {
     let formattedValue;
     try {
       formattedValue = numeral(value).format('0,0.[00]');
@@ -148,14 +156,16 @@ const StackedGraphVisualization = React.createClass({
     }
 
     return formattedValue;
-  },
-  _resizeVisualization(width, height) {
+  };
+
+  _resizeVisualization = (width, height) => {
     this.graph.resize({
       width: width,
       height: height,
     });
-  },
-  _updateSeriesNames(props) {
+  };
+
+  _updateSeriesNames = (props) => {
     let i = 0;
     let newSeriesNames = Immutable.Map();
     props.config.series.forEach((seriesConfig) => {
@@ -169,8 +179,9 @@ const StackedGraphVisualization = React.createClass({
       this.seriesNames = newSeriesNames;
       this.graph.data.names(this.seriesNames.toJS());
     }
-  },
-  drawData() {
+  };
+
+  drawData = () => {
     const graphType = this._getGraphType();
     this._applyGraphConfiguration(graphType);
 
@@ -190,8 +201,9 @@ const StackedGraphVisualization = React.createClass({
       },
       type: graphType,
     });
-  },
-  renderGraph(props) {
+  };
+
+  renderGraph = (props) => {
     const graphDomNode = this._graph;
     const colourPalette = D3Utils.glColourPalette();
 
@@ -274,14 +286,15 @@ const StackedGraphVisualization = React.createClass({
     }
 
     this.graph = c3.generate(config);
-  },
+  };
+
   render() {
     const classNames = this.props.config.doNotShowCircles ? 'donotshowcircles' : '';
     return (
       <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
            className={`graph ${this.props.config.renderer}${classNames}`} />
     );
-  },
-});
+  }
+}
 
 export default StackedGraphVisualization;

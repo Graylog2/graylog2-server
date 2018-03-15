@@ -3,26 +3,30 @@ import React from 'react';
 import { SplitButton, MenuItem } from 'react-bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 
-const MessageFieldSearchActions = React.createClass({
-  propTypes: {
+class MessageFieldSearchActions extends React.Component {
+  static propTypes = {
     fieldName: PropTypes.string.isRequired,
     message: PropTypes.object.isRequired,
     onLoadTerms: PropTypes.func.isRequired,
     onAddFieldToSearchBar: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(this.props.message.source_node_id,
-      this.props.message.source_input_id, this.props.fieldName, this.props.message.index, this.props.message.id);
+  };
 
-    return null;
-  },
-  _formatExtractorMenuItem(extractorType) {
+  constructor(props) {
+    super(props);
+    this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(props.message.source_node_id,
+      props.message.source_input_id, props.fieldName, props.message.index, props.message.id);
+
+    this.state = null;
+  }
+
+  _formatExtractorMenuItem = (extractorType) => {
     return (
       <MenuItem key={`menu-item-${extractorType}`} href={this.newExtractorRoutes[extractorType]}>
         {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
       </MenuItem>
     );
-  },
+  };
+
   render() {
     const messageField = this.props.message.fields[this.props.fieldName];
     let extractors;
@@ -50,7 +54,7 @@ const MessageFieldSearchActions = React.createClass({
         </SplitButton>
       </div>
     );
-  },
-});
+  }
+}
 
 export default MessageFieldSearchActions;

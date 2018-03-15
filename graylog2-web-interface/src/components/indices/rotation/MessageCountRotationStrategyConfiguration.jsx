@@ -2,20 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
-const MessageCountRotationStrategyConfiguration = React.createClass({
-  propTypes: {
+class MessageCountRotationStrategyConfiguration extends React.Component {
+  static propTypes = {
     config: PropTypes.object.isRequired,
     jsonSchema: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      max_docs_per_index: this.props.config.max_docs_per_index,
-    };
-  },
+  state = {
+    max_docs_per_index: this.props.config.max_docs_per_index,
+  };
 
-  _onInputUpdate(field) {
+  _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
       update[field] = e.target.value;
@@ -23,7 +21,7 @@ const MessageCountRotationStrategyConfiguration = React.createClass({
       this.setState(update);
       this.props.updateConfig(update);
     };
-  },
+  };
 
   render() {
     return (
@@ -40,7 +38,7 @@ const MessageCountRotationStrategyConfiguration = React.createClass({
         </fieldset>
       </div>
     );
-  },
-});
+  }
+}
 
 export default MessageCountRotationStrategyConfiguration;

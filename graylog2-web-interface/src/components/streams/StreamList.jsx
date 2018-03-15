@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Alert } from 'react-bootstrap';
 
 import Stream from './Stream';
 import PermissionsMixin from 'util/PermissionsMixin';
 
-const StreamList = React.createClass({
+const StreamList = createReactClass({
+  displayName: 'StreamList',
+
   propTypes: {
     streams: PropTypes.array.isRequired,
     streamRuleTypes: PropTypes.array.isRequired,
@@ -14,6 +17,7 @@ const StreamList = React.createClass({
     permissions: PropTypes.array.isRequired,
     onStreamSave: PropTypes.func.isRequired,
   },
+
   mixins: [PermissionsMixin],
 
   getInitialState() {

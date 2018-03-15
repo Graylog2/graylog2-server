@@ -2,21 +2,19 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-const WidgetVisualizationNotFound = React.createClass({
-  propTypes: {
+class WidgetVisualizationNotFound extends React.Component {
+  static propTypes = {
     widgetClassName: PropTypes.string.isRequired,
     onRenderComplete: PropTypes.func,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      onRenderComplete: () => {},
-    };
-  },
+  static defaultProps = {
+    onRenderComplete: () => {},
+  };
 
   componentDidMount() {
     this.props.onRenderComplete();
-  },
+  }
 
   render() {
     return (
@@ -25,7 +23,7 @@ const WidgetVisualizationNotFound = React.createClass({
         It looks like the plugin supplying this widget is not loaded.
       </Alert>
     );
-  },
-});
+  }
+}
 
 export default WidgetVisualizationNotFound;

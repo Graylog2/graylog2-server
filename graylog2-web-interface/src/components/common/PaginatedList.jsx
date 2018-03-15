@@ -9,8 +9,8 @@ import { Input } from 'components/bootstrap';
  * You still need to fetch or filter the data yourself to ensure that
  * the selected page is displayed on screen.
  */
-const PaginatedList = React.createClass({
-  propTypes: {
+class PaginatedList extends React.Component {
+  static propTypes = {
     /** React element containing items of the current selected page. */
     children: PropTypes.node.isRequired,
     /**
@@ -26,31 +26,34 @@ const PaginatedList = React.createClass({
     totalItems: PropTypes.number.isRequired,
     /** */
     showPageSizeSelect: PropTypes.bool,
-  },
-  getDefaultProps() {
+  };
+
+  static defaultProps = function() {
     const defaultPageSizes = [10, 50, 100];
     return {
       pageSizes: defaultPageSizes,
       pageSize: defaultPageSizes[0],
       showPageSizeSelect: true,
     };
-  },
-  getInitialState() {
-    return { currentPage: 1, pageSize: this.props.pageSize };
-  },
-  _onChangePageSize(event) {
+  }();
+
+  state = { currentPage: 1, pageSize: this.props.pageSize };
+
+  _onChangePageSize = (event) => {
     event.preventDefault();
     const pageSize = Number(event.target.value);
     this.setState({ pageSize: pageSize });
     this.props.onChange(this.state.currentPage, pageSize);
-  },
-  _onChangePage(eventKey, event) {
+  };
+
+  _onChangePage = (eventKey, event) => {
     event.preventDefault();
     const pageNo = Number(eventKey);
     this.setState({ currentPage: pageNo });
     this.props.onChange(pageNo, this.state.pageSize);
-  },
-  _pageSizeSelect() {
+  };
+
+  _pageSizeSelect = () => {
     if (!this.props.showPageSizeSelect) {
       return null;
     }
@@ -61,7 +64,8 @@ const PaginatedList = React.createClass({
         </Input>
       </div>
     );
-  },
+  };
+
   render() {
     const numberPages = Math.ceil(this.props.totalItems / this.state.pageSize);
     if (numberPages === 0) {
@@ -82,7 +86,7 @@ const PaginatedList = React.createClass({
         </div>
       </span>
     );
-  },
-});
+  }
+}
 
 export default PaginatedList;

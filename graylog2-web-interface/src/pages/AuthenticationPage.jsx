@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Row, Col } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
@@ -12,7 +13,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
 
-const AuthenticationPage = React.createClass({
+const AuthenticationPage = createReactClass({
+  displayName: 'AuthenticationPage',
 
   propTypes: {
     children: PropTypes.object,

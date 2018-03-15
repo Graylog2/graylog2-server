@@ -6,12 +6,13 @@ import { DecoratedMessageFieldMarker } from 'components/search';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
-const DecoratedSidebarMessageField = React.createClass({
-  propTypes: {
+class DecoratedSidebarMessageField extends React.Component {
+  static propTypes = {
     field: PropTypes.object,
     onToggled: PropTypes.func,
     selected: PropTypes.bool,
-  },
+  };
+
   render() {
     const label = (<span>
       {this.props.field.name}
@@ -30,7 +31,7 @@ const DecoratedSidebarMessageField = React.createClass({
         </div>
       </li>
     );
-  },
-});
+  }
+}
 
 export default DecoratedSidebarMessageField;

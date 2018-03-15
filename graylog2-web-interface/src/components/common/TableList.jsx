@@ -24,8 +24,8 @@ import style from './TableList.css';
  * customize how the list of components should look like, or how filtering works,
  * please use that component instead of this one.
  */
-const TableList = React.createClass({
-  propTypes: {
+class TableList extends React.Component {
+  static propTypes = {
     /** Specifies key to use as item ID. */
     idKey: PropTypes.string,
     /** Specifies a key to use as item title. */
@@ -65,25 +65,23 @@ const TableList = React.createClass({
      * The function will receive the whole item object as an argument.
      */
     itemActionsFactory: PropTypes.func,
-  },
-  getDefaultProps() {
-    return {
-      idKey: 'id',
-      titleKey: 'title',
-      descriptionKey: 'description',
-      enableFilter: true,
-      filterLabel: 'Filter',
-      enableBulkActions: true,
-      bulkActionsFactory: () => {},
-      itemActionsFactory: () => {},
-    };
-  },
-  getInitialState() {
-    return {
-      filteredItems: this.props.items,
-      selected: Immutable.Set(),
-    };
-  },
+  };
+
+  static defaultProps = {
+    idKey: 'id',
+    titleKey: 'title',
+    descriptionKey: 'description',
+    enableFilter: true,
+    filterLabel: 'Filter',
+    enableBulkActions: true,
+    bulkActionsFactory: () => {},
+    itemActionsFactory: () => {},
+  };
+
+  state = {
+    filteredItems: this.props.items,
+    selected: Immutable.Set(),
+  };
 
   componentDidUpdate(prevProps) {
     const { filteredItems, selected } = this.state;
@@ -97,36 +95,36 @@ const TableList = React.createClass({
         this._updateFilteredItems(this.props.items);
       }
     }
-  },
+  }
 
-  _recalculateSelection(selected, nextFilteredItems) {
+  _recalculateSelection = (selected, nextFilteredItems) => {
     const nextFilteredIds = Immutable.Set(nextFilteredItems.map(item => item[this.props.idKey]));
     return selected.intersect(nextFilteredIds);
-  },
+  };
 
-  _updateFilteredItems(nextFilteredItems) {
+  _updateFilteredItems = (nextFilteredItems) => {
     const filteredSelected = this._recalculateSelection(this.state.selected, nextFilteredItems);
     this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected });
-  },
+  };
 
-  _setSelectAllCheckboxState(selectAllInput, filteredItems, selected) {
+  _setSelectAllCheckboxState = (selectAllInput, filteredItems, selected) => {
     const selectAllCheckbox = selectAllInput ? selectAllInput.getInputDOMNode() : undefined;
     if (!selectAllCheckbox) {
       return;
     }
     // Set the select all checkbox as indeterminate if some but not items are selected.
     selectAllCheckbox.indeterminate = selected.count() > 0 && !this._isAllSelected(filteredItems, selected);
-  },
+  };
 
-  _filterItems(filteredItems) {
+  _filterItems = (filteredItems) => {
     this._updateFilteredItems(Immutable.List(filteredItems));
-  },
+  };
 
-  _isAllSelected(filteredItems, selected) {
+  _isAllSelected = (filteredItems, selected) => {
     return filteredItems.count() > 0 && filteredItems.count() === selected.count();
-  },
+  };
 
-  _headerItem() {
+  _headerItem = () => {
     if (!this.props.enableBulkActions) {
       return <ControlledTableList.Header />;
     }
@@ -151,12 +149,14 @@ const TableList = React.createClass({
                wrapperClassName="form-group-inline" />
       </ControlledTableList.Header>
     );
-  },
-  _toggleSelectAll(event) {
+  };
+
+  _toggleSelectAll = (event) => {
     const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map(item => item[this.props.idKey])) : Immutable.Set();
     this.setState({ selected: newSelected });
-  },
-  _formatItem(item) {
+  };
+
+  _formatItem = (item) => {
     let formattedItem;
 
     if (this.props.enableBulkActions) {
@@ -184,13 +184,15 @@ const TableList = React.createClass({
         </div>
       </ControlledTableList.Item>
     );
-  },
-  _onItemSelect(id) {
+  };
+
+  _onItemSelect = (id) => {
     return (event) => {
       const newSelected = event.target.checked ? this.state.selected.add(id) : this.state.selected.delete(id);
       this.setState({ selected: newSelected });
     };
-  },
+  };
+
   render() {
     let filter;
     if (this.props.enableFilter) {
@@ -233,7 +235,7 @@ const TableList = React.createClass({
         </ControlledTableList>
       </div>
     );
-  },
-});
+  }
+}
 
 export default TableList;

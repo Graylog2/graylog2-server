@@ -16,8 +16,8 @@ import DateTime from 'logic/datetimes/DateTime';
  * was used in the server.
  *
  */
-const Timestamp = React.createClass({
-  propTypes: {
+class Timestamp extends React.Component {
+  static propTypes = {
     /**
      * Date time to be displayed in the component. You can provide an ISO
      * 8601 string, a JS native `Date` object, or a moment `Date` object.
@@ -45,13 +45,13 @@ const Timestamp = React.createClass({
      * time zones supported by moment timezone.
      */
     tz: PropTypes.string,
-  },
-  getDefaultProps() {
-    return {
-      format: DateTime.Formats.TIMESTAMP,
-    };
-  },
-  _formatDateTime() {
+  };
+
+  static defaultProps = {
+    format: DateTime.Formats.TIMESTAMP,
+  };
+
+  _formatDateTime = () => {
     const dateTime = new DateTime(this.props.dateTime);
     if (this.props.relative) {
       return dateTime.toRelativeString();
@@ -66,14 +66,15 @@ const Timestamp = React.createClass({
         return dateTime.toTimeZone(this.props.tz).toString(this.props.format);
 
     }
-  },
+  };
+
   render() {
     return (
       <time key={`time-${this.props.dateTime}`} dateTime={this.props.dateTime} title={this.props.dateTime}>
         {this._formatDateTime()}
       </time>
     );
-  },
-});
+  }
+}
 
 export default Timestamp;

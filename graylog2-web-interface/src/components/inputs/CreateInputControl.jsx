@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Row, Col } from 'react-bootstrap';
 
@@ -13,14 +14,17 @@ const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import { InputForm } from 'components/inputs';
 
-const CreateInputControl = React.createClass({
+const CreateInputControl = createReactClass({
+  displayName: 'CreateInputControl',
   mixins: [Reflux.connect(InputTypesStore)],
+
   getInitialState() {
     return {
       selectedInput: undefined,
       selectedInputDefinition: undefined,
     };
   },
+
   _formatSelectOptions() {
     let options = [];
 
@@ -36,6 +40,7 @@ const CreateInputControl = React.createClass({
 
     return options;
   },
+
   _onInputSelect(selectedInput) {
     if (selectedInput === '') {
       this.setState(this.getInitialState());
@@ -44,15 +49,18 @@ const CreateInputControl = React.createClass({
     this.setState({ selectedInput: selectedInput });
     InputTypesActions.get.triggerPromise(selectedInput).then(inputDefinition => this.setState({ selectedInputDefinition: inputDefinition }));
   },
+
   _openModal(event) {
     event.preventDefault();
     this.refs.configurationForm.open();
   },
+
   _createInput(data) {
     InputsActions.create(data).then(() => {
       this.setState(this.getInitialState());
     });
   },
+
   render() {
     let inputModal;
     if (this.state.selectedInputDefinition) {

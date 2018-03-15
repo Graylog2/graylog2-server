@@ -15,8 +15,8 @@ import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
 import Routes from 'routing/Routes';
 
-const MessageDetail = React.createClass({
-  propTypes: {
+class MessageDetail extends React.Component {
+  static propTypes = {
     allStreams: PropTypes.object,
     allStreamsLoaded: PropTypes.bool,
     disableTestAgainstStream: PropTypes.bool,
@@ -32,15 +32,14 @@ const MessageDetail = React.createClass({
     customFieldActions: PropTypes.node,
     searchConfig: PropTypes.object,
     disableMessageActions: PropTypes.bool,
-  },
+  };
 
-  getInitialState() {
-    return {
-      allStreamsLoaded: false,
-      allStreams: Immutable.List(),
-      showOriginal: false,
-    };
-  },
+  state = {
+    allStreamsLoaded: false,
+    allStreams: Immutable.List(),
+    showOriginal: false,
+  };
+
   componentDidMount() {
     if (this.props.allStreams === undefined) {
       // our parent does not provide allStreams for the test against stream menu, we have to load it ourselves
@@ -52,16 +51,18 @@ const MessageDetail = React.createClass({
       const promise = StreamsStore.listStreams();
       promise.done(streams => this._onStreamsLoaded(streams));
     }
-  },
-  _onStreamsLoaded(streams) {
-    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
-  },
+  }
 
-  _inputName(inputId) {
+  _onStreamsLoaded = (streams) => {
+    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
+  };
+
+  _inputName = (inputId) => {
     const input = this.props.inputs.get(inputId);
     return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
-  },
-  _nodeName(nodeId) {
+  };
+
+  _nodeName = (nodeId) => {
     const node = this.props.nodes.get(nodeId);
     let nodeInformation;
 
@@ -79,16 +80,16 @@ const MessageDetail = React.createClass({
       nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
     }
     return nodeInformation;
-  },
+  };
 
-  _getAllStreams() {
+  _getAllStreams = () => {
     if (this.props.allStreams) {
       return this.props.allStreams;
     }
     return this.state.allStreams;
-  },
+  };
 
-  _getTestAgainstStreamButton() {
+  _getTestAgainstStreamButton = () => {
     if (this.props.disableTestAgainstStream) {
       return null;
     }
@@ -122,9 +123,9 @@ const MessageDetail = React.createClass({
         { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
       </DropdownButton>
     );
-  },
+  };
 
-  _formatMessageActions() {
+  _formatMessageActions = () => {
     if (this.props.disableMessageActions) {
       return <ButtonGroup className="pull-right" bsSize="small" />;
     }
@@ -156,11 +157,11 @@ const MessageDetail = React.createClass({
         {this._getTestAgainstStreamButton()}
       </ButtonGroup>
     );
-  },
+  };
 
-  _toggleShowOriginal() {
+  _toggleShowOriginal = () => {
     this.setState({ showOriginal: !this.state.showOriginal });
-  },
+  };
 
   render() {
     // Short circuit when all messages are being expanded at the same time
@@ -273,7 +274,7 @@ const MessageDetail = React.createClass({
         </Col>
       </Row>
     </div>);
-  },
-});
+  }
+}
 
 export default MessageDetail;

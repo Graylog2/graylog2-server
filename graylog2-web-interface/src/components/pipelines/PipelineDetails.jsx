@@ -7,13 +7,13 @@ import PipelineForm from './PipelineForm';
 
 import { MetricContainer, CounterRate } from 'components/metrics';
 
-const PipelineDetails = React.createClass({
-  propTypes: {
+class PipelineDetails extends React.Component {
+  static propTypes = {
     pipeline: PropTypes.object,
     create: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func,
-  },
+  };
 
   render() {
     if (this.props.create) {
@@ -50,7 +50,7 @@ const PipelineDetails = React.createClass({
         <hr />
       </div>
     );
-  },
-});
+  }
+}
 
 export default PipelineDetails;

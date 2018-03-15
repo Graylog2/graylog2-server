@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Accordion, Panel, Row, Col } from 'react-bootstrap';
 import $ from 'jquery';
@@ -15,7 +16,8 @@ import SourceType from './SourceType';
 import ConfigurationBundlePreview from './ConfigurationBundlePreview';
 import Spinner from 'components/common/Spinner';
 
-const ConfigurationBundles = React.createClass({
+const ConfigurationBundles = createReactClass({
+  displayName: 'ConfigurationBundles',
   mixins: [Reflux.connect(ConfigurationBundlesStore)],
 
   getInitialState() {
@@ -24,14 +26,17 @@ const ConfigurationBundles = React.createClass({
       sourceTypeDescription: '',
     };
   },
+
   componentDidMount() {
     ConfigurationBundlesActions.list();
   },
+
   _getCategoriesHtml() {
     const categories = $.map(this.state.configurationBundles, (bundles, category) => category);
     categories.sort();
     return categories.map((category, idx) => this._getSourceTypeHtml(category, idx), this);
   },
+
   _getSourceTypeHtml(category, idx) {
     const bundles = this._getSortedBundles(category);
     const bundlesJsx = bundles.map((bundle) => {
@@ -53,6 +58,7 @@ const ConfigurationBundles = React.createClass({
       </Panel>
     );
   },
+
   _getSortedBundles(category) {
     const bundles = this.state.configurationBundles[category];
     bundles.sort((bundle1, bundle2) => {
@@ -66,6 +72,7 @@ const ConfigurationBundles = React.createClass({
     });
     return bundles;
   },
+
   onSubmit(submitEvent) {
     submitEvent.preventDefault();
     if (!this.refs.uploadedFile.files || !this.refs.uploadedFile.files[0]) {
@@ -90,12 +97,15 @@ const ConfigurationBundles = React.createClass({
 
     reader.readAsText(this.refs.uploadedFile.files[0]);
   },
+
   handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
     this.setState({ sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription });
   },
+
   _resetSelection() {
     this.setState(this.getInitialState());
   },
+
   render() {
     return (
       <Row className="configuration-bundles">

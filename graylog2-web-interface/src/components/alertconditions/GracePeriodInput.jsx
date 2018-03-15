@@ -3,24 +3,26 @@ import React from 'react';
 
 import { Pluralize } from 'components/common';
 
-const GracePeriodInput = React.createClass({
-  propTypes: {
+class GracePeriodInput extends React.Component {
+  static propTypes = {
     parameters: PropTypes.object.isRequired,
-  },
-  getInitialState() {
-    return {
-      grace: this.props.parameters.grace,
-      backlog: this.props.parameters.backlog,
-    };
-  },
-  getValue() {
+  };
+
+  state = {
+    grace: this.props.parameters.grace,
+    backlog: this.props.parameters.backlog,
+  };
+
+  getValue = () => {
     return this.state;
-  },
-  _onChange(event) {
+  };
+
+  _onChange = (event) => {
     const state = {};
     state[event.target.name] = event.target.value;
     this.setState(state);
-  },
+  };
+
   render() {
     return (
       <span>
@@ -38,7 +40,7 @@ const GracePeriodInput = React.createClass({
         <Pluralize singular="message" plural="messages" value={this.state.backlog} /> of the stream evaluated for this alert condition.
       </span>
     );
-  },
-});
+  }
+}
 
 export default GracePeriodInput;

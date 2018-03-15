@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
 
@@ -12,22 +13,30 @@ const MetricsActions = ActionsProvider.getActions('Metrics');
 import StoreProvider from 'injection/StoreProvider';
 const MetricsStore = StoreProvider.getStore('Metrics');
 
-const NodeLoggers = React.createClass({
+const NodeLoggers = createReactClass({
+  displayName: 'NodeLoggers',
+
   propTypes: {
     nodeId: PropTypes.string.isRequired,
     subsystems: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   getInitialState() {
     return { showDetails: false };
   },
+
   componentDidMount() {
     MetricsActions.add(this.props.nodeId, this.metric_name);
   },
+
   componentWillUnmount() {
     MetricsActions.remove(this.props.nodeId, this.metric_name);
   },
+
   metric_name: 'org.apache.logging.log4j.core.Appender.all',
+
   _formatThroughput() {
     const { metrics } = this.state;
     const { nodeId } = this.props;

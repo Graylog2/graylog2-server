@@ -13,18 +13,18 @@ import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 import { SmallSupportLink, DocumentationLink } from 'components/support';
 
-const IndexerFailuresComponent = React.createClass({
-  getInitialState() {
-    return {};
-  },
+class IndexerFailuresComponent extends React.Component {
+  state = {};
+
   componentDidMount() {
     const since = moment().subtract(24, 'hours');
 
     IndexerFailuresStore.count(since).then((response) => {
       this.setState({ total: response.count });
     });
-  },
-  _formatFailuresSummary() {
+  }
+
+  _formatFailuresSummary = () => {
     return (
       <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
         <i className={`fa fa-${this._iconForFailureCount(this.state.total)}`} /> {this._formatTextForFailureCount(this.state.total)}
@@ -36,19 +36,22 @@ const IndexerFailuresComponent = React.createClass({
         </LinkContainer>
       </Alert>
     );
-  },
-  _formatTextForFailureCount(count) {
+  };
+
+  _formatTextForFailureCount = (count) => {
     if (count === 0) {
       return 'No failed indexing attempts in the last 24 hours.';
     }
     return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
-  },
-  _iconForFailureCount(count) {
+  };
+
+  _iconForFailureCount = (count) => {
     if (count === 0) {
       return 'check-circle';
     }
     return 'ambulance';
-  },
+  };
+
   render() {
     let content;
     if (this.state.total === undefined) {
@@ -71,7 +74,7 @@ const IndexerFailuresComponent = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default IndexerFailuresComponent;

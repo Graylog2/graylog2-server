@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-const CSVFileAdapterDocumentation = React.createClass({
+class CSVFileAdapterDocumentation extends React.Component {
   render() {
     const csvFile1 = `"ipaddr","hostname"
 "127.0.0.1","localhost"
@@ -55,7 +55,7 @@ const CSVFileAdapterDocumentation = React.createClass({
       <h5 style={{ marginBottom: 10 }}>CSV File</h5>
       <pre>{csvFile2}</pre>
     </div>);
-  },
-});
+  }
+}
 
 export default CSVFileAdapterDocumentation;

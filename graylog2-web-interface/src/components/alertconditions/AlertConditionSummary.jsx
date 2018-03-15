@@ -10,14 +10,14 @@ import { EntityListItem } from 'components/common';
 import { GenericAlertConditionSummary } from 'components/alertconditions';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-const AlertConditionSummary = React.createClass({
-  propTypes: {
+class AlertConditionSummary extends React.Component {
+  static propTypes = {
     alertCondition: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
     stream: PropTypes.object,
     actions: PropTypes.array.isRequired,
     linkToDetails: PropTypes.bool,
-  },
+  };
 
   render() {
     const stream = this.props.stream;
@@ -54,7 +54,7 @@ const AlertConditionSummary = React.createClass({
                       actions={this.props.actions}
                       contentRow={content} />
     );
-  },
-});
+  }
+}
 
 export default AlertConditionSummary;

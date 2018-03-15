@@ -5,22 +5,22 @@ import { Col, Panel, Row } from 'react-bootstrap';
 import { ContactUs, DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 
-const MalformedSearchQuery = React.createClass({
-  propTypes: {
+class MalformedSearchQuery extends React.Component {
+  static propTypes = {
     error: PropTypes.object.isRequired,
-  },
+  };
 
-  _isGenericError(error) {
+  _isGenericError = (error) => {
     return error.column === null || error.line === null;
-  },
+  };
 
-  _getFormattedErrorDetails(details) {
+  _getFormattedErrorDetails = (details) => {
     return details.map(function(detail) {
         return <li><code>{detail}</code></li>
     });
-  },
+  };
 
-  _getFormattedErrorDescription(error) {
+  _getFormattedErrorDescription = (error) => {
     return (
       <Panel bsStyle="danger">
         <dl style={{ marginBottom: 0 }}>
@@ -31,7 +31,7 @@ const MalformedSearchQuery = React.createClass({
         </dl>
       </Panel>
     );
-  },
+  };
 
   render() {
     const error = this.props.error.body;
@@ -81,7 +81,7 @@ const MalformedSearchQuery = React.createClass({
         <ContactUs />
       </div>
     );
-  },
-});
+  }
+}
 
 export default MalformedSearchQuery;

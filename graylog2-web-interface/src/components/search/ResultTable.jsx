@@ -12,8 +12,8 @@ const RefreshActions = ActionsProvider.getActions('Refresh');
 
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
-const ResultTable = React.createClass({
-  propTypes: {
+class ResultTable extends React.Component {
+  static propTypes = {
     disableSurroundingSearch: PropTypes.bool,
     highlight: PropTypes.bool.isRequired,
     inputs: PropTypes.object.isRequired,
@@ -28,21 +28,20 @@ const ResultTable = React.createClass({
     sortOrder: PropTypes.string.isRequired,
     streams: PropTypes.object.isRequired,
     searchConfig: PropTypes.object.isRequired,
-  },
-  getDefaultProps() {
-    return {
-      disableSurroundingSearch: false,
-      onPageChange: (page) => { SearchStore.page = page; },
-    };
-  },
-  getInitialState() {
-    return {
-      expandedMessages: Immutable.Set(),
-      allStreamsLoaded: false,
-      allStreams: Immutable.List(),
-      expandAllRenderAsync: false,
-    };
-  },
+  };
+
+  static defaultProps = {
+    disableSurroundingSearch: false,
+    onPageChange: (page) => { SearchStore.page = page; },
+  };
+
+  state = {
+    expandedMessages: Immutable.Set(),
+    allStreamsLoaded: false,
+    allStreams: Immutable.List(),
+    expandAllRenderAsync: false,
+  };
+
   componentDidMount() {
     // only load the streams per page
     if (this.state.allStreamsLoaded) {
@@ -50,20 +49,23 @@ const ResultTable = React.createClass({
     }
     const promise = StreamsStore.listStreams();
     promise.done(streams => this._onStreamsLoaded(streams));
-  },
+  }
+
   componentDidUpdate() {
     if (this.state.expandAllRenderAsync) {
       // This may take some time, so we ensure we display a loading indicator in the page
       // while all messages are being expanded
       setTimeout(() => this.setState({ expandAllRenderAsync: false }), this.EXPAND_ALL_RENDER_ASYNC_DELAY);
     }
-  },
-  EXPAND_ALL_RENDER_ASYNC_DELAY: 10,
-  _onStreamsLoaded(streams) {
-    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
-  },
+  }
 
-  _toggleMessageDetail(id) {
+  EXPAND_ALL_RENDER_ASYNC_DELAY = 10;
+
+  _onStreamsLoaded = (streams) => {
+    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
+  };
+
+  _toggleMessageDetail = (id) => {
     let newSet;
     if (this.state.expandedMessages.contains(id)) {
       newSet = this.state.expandedMessages.delete(id);
@@ -72,33 +74,38 @@ const ResultTable = React.createClass({
       RefreshActions.disable();
     }
     this.setState({ expandedMessages: newSet });
-  },
+  };
 
-  _fieldColumns() {
+  _fieldColumns = () => {
     return this.props.selectedFields.delete('message');
-  },
-  _columnStyle(fieldName) {
+  };
+
+  _columnStyle = (fieldName) => {
     if (fieldName.toLowerCase() === 'source' && this._fieldColumns().size > 1) {
       return { width: 180 };
     }
     return {};
-  },
-  expandAll() {
+  };
+
+  expandAll = () => {
     // If more than 30% of the messages are being expanded, show a loading indicator
     const expandedChangeRatio = (this.props.messages.length - this.state.expandedMessages.size) / 100;
     const renderLoadingIndicator = expandedChangeRatio > 0.3;
 
     const newSet = Immutable.Set(this.props.messages.map(message => `${message.index}-${message.id}`));
     this.setState({ expandedMessages: newSet, expandAllRenderAsync: renderLoadingIndicator });
-  },
-  collapseAll() {
+  };
+
+  collapseAll = () => {
     this.setState({ expandedMessages: Immutable.Set() });
-  },
-  _handleSort(e, field, order) {
+  };
+
+  _handleSort = (e, field, order) => {
     e.preventDefault();
     SearchStore.sort(field, order);
-  },
-  _sortIcons(fieldName) {
+  };
+
+  _sortIcons = (fieldName) => {
     let sortLinks = null;
     // the classes look funny, but using the default asc/desc icons looks odd.
     // .sort-order-item does the margins
@@ -133,7 +140,7 @@ const ResultTable = React.createClass({
       );
     }
     return <span>{sortLinks}</span>;
-  },
+  };
 
   render() {
     const selectedColumns = this._fieldColumns();
@@ -210,7 +217,7 @@ const ResultTable = React.createClass({
         </MessageTablePaginator>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ResultTable;

@@ -1,10 +1,11 @@
 
 import React from 'react';
 
-const TimeoutUnitSelect = React.createClass({
-  getValue() {
+class TimeoutUnitSelect extends React.Component {
+  getValue = () => {
     return this.refs.session_timeout_unit.value;
-  },
+  };
+
   render() {
     return (
       <select className="form-control" ref="session_timeout_unit" {...this.props}>
@@ -14,7 +15,7 @@ const TimeoutUnitSelect = React.createClass({
         <option value={24 * 60 * 60 * 1000}>Days</option>
       </select>
     );
-  },
-});
+  }
+}
 
 export default TimeoutUnitSelect;

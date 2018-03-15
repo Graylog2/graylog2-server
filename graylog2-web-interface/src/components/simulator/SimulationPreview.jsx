@@ -4,11 +4,11 @@ import { Alert } from 'react-bootstrap';
 
 import MessageShow from 'components/search/MessageShow';
 
-const SimulationPreview = React.createClass({
-  propTypes: {
+class SimulationPreview extends React.Component {
+  static propTypes = {
     simulationResults: PropTypes.object.isRequired,
     streams: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     const messages = this.props.simulationResults.messages;
@@ -38,7 +38,7 @@ const SimulationPreview = React.createClass({
     });
 
     return <div className="message-preview-wrapper">{formattedMessages}</div>;
-  },
-});
+  }
+}
 
 export default SimulationPreview;

@@ -4,8 +4,8 @@ import { Input } from 'components/bootstrap';
 
 import { Select } from 'components/common';
 
-const IndexMaintenanceStrategiesConfiguration = React.createClass({
-  propTypes: {
+class IndexMaintenanceStrategiesConfiguration extends React.Component {
+  static propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     selectPlaceholder: PropTypes.string.isRequired,
@@ -13,37 +13,35 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
     strategies: PropTypes.array.isRequired,
     activeConfig: PropTypes.object.isRequired,
     updateState: PropTypes.func.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      activeStrategy: this.props.activeConfig.strategy,
-      activeConfig: this.props.activeConfig.config,
-      newStrategy: this.props.activeConfig.strategy,
-      newConfig: this.props.activeConfig.config,
-    };
-  },
+  state = {
+    activeStrategy: this.props.activeConfig.strategy,
+    activeConfig: this.props.activeConfig.config,
+    newStrategy: this.props.activeConfig.strategy,
+    newConfig: this.props.activeConfig.config,
+  };
 
-  _getDefaultStrategyConfig(selectedStrategy) {
+  _getDefaultStrategyConfig = (selectedStrategy) => {
     const result = this.props.strategies.filter(strategy => strategy.type === selectedStrategy)[0];
     return result ? result.default_config : undefined;
-  },
+  };
 
-  _getStrategyJsonSchema(selectedStrategy) {
+  _getStrategyJsonSchema = (selectedStrategy) => {
     const result = this.props.strategies.filter(strategy => strategy.type === selectedStrategy)[0];
     return result ? result.json_schema : undefined;
-  },
+  };
 
-  _getStrategyConfig(selectedStrategy) {
+  _getStrategyConfig = (selectedStrategy) => {
     if (this.state.activeStrategy === selectedStrategy) {
       // If the newly selected strategy is the current active strategy, we use the active configuration.
       return this.state.activeConfig;
     }
       // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
     return this._getDefaultStrategyConfig(selectedStrategy);
-  },
+  };
 
-  _onSelect(newStrategy) {
+  _onSelect = (newStrategy) => {
     if (!newStrategy || newStrategy.length < 1) {
       this.setState({ newStrategy: undefined });
       return;
@@ -53,9 +51,9 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
 
     this.setState({ newStrategy: newStrategy, newConfig: newConfig });
     this.props.updateState(newStrategy, newConfig);
-  },
+  };
 
-  _addConfigType(strategy, data) {
+  _addConfigType = (strategy, data) => {
     // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
     const result = this.props.strategies.filter(s => s.type === strategy)[0];
     const copy = data;
@@ -65,22 +63,22 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
     }
 
     return copy;
-  },
+  };
 
-  _onConfigUpdate(newConfig) {
+  _onConfigUpdate = (newConfig) => {
     const config = this._addConfigType(this.state.newStrategy, newConfig);
 
     this.setState({ newConfig: config });
     this.props.updateState(this.state.newStrategy, config);
-  },
+  };
 
-  _availableSelectOptions() {
+  _availableSelectOptions = () => {
     return this.props.pluginExports.map((config) => {
       return { value: config.type, label: config.displayName };
     });
-  },
+  };
 
-  _getConfigurationComponent(selectedStrategy) {
+  _getConfigurationComponent = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
       return null;
     }
@@ -99,11 +97,11 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
     });
 
     return (<span key={strategy.type}>{element}</span>);
-  },
+  };
 
-  _activeSelection() {
+  _activeSelection = () => {
     return this.state.newStrategy;
-  },
+  };
 
   render() {
     return (
@@ -120,7 +118,7 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
         {this._getConfigurationComponent(this._activeSelection())}
       </span>
     );
-  },
-});
+  }
+}
 
 export default IndexMaintenanceStrategiesConfiguration;

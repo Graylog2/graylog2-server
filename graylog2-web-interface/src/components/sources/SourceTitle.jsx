@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const SourceTitle = React.createClass({
-  propTypes: {
+class SourceTitle extends React.Component {
+  static propTypes = {
     className: PropTypes.string,
     resetFilters: PropTypes.func.isRequired,
     resetFilterId: PropTypes.string,
@@ -11,7 +11,8 @@ const SourceTitle = React.createClass({
       PropTypes.element,
       PropTypes.string,
     ]).isRequired,
-  },
+  };
+
   render() {
     return (
       <h3 className="sources-title">
@@ -24,7 +25,7 @@ const SourceTitle = React.createClass({
         </span>
       </h3>
     );
-  },
-});
+  }
+}
 
 export default SourceTitle;

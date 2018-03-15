@@ -1,15 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { MetricsActions, MetricsStore } = CombinedProvider.get('Metrics');
 
-const MetricsMapper = React.createClass({
+const MetricsMapper = createReactClass({
+  displayName: 'MetricsMapper',
+
   propTypes: {
     map: PropTypes.object.isRequired,
     computeValue: PropTypes.func.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
 
   getDefaultProps() {

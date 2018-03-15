@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
 import { ProgressBar, Row, Col, Alert } from 'react-bootstrap';
@@ -21,10 +22,13 @@ import { Spinner, Timestamp } from 'components/common';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 
-const JournalDetails = React.createClass({
+const JournalDetails = createReactClass({
+  displayName: 'JournalDetails',
+
   propTypes: {
     nodeId: PropTypes.string.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
 
   getInitialState() {

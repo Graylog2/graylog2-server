@@ -4,7 +4,7 @@ import { Col, Row } from 'react-bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
-const ContactUs = React.createClass({
+class ContactUs extends React.Component {
   render() {
     return (
       <Row className="content">
@@ -34,7 +34,7 @@ const ContactUs = React.createClass({
         </Col>
       </Row>
     );
-  },
-});
+  }
+}
 
 export default ContactUs;

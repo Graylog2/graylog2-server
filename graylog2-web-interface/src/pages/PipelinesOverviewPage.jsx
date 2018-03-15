@@ -9,7 +9,7 @@ import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimeline
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
-const PipelinesOverviewPage = React.createClass({
+class PipelinesOverviewPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Pipelines">
@@ -46,7 +46,7 @@ const PipelinesOverviewPage = React.createClass({
         </div>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default PipelinesOverviewPage;

@@ -6,13 +6,13 @@ import { Button, ButtonGroup, ButtonToolbar, Tab, Tabs } from 'react-bootstrap';
 
 import { TableList } from 'components/common';
 
-const PermissionSelector = React.createClass({
-  propTypes: {
+class PermissionSelector extends React.Component {
+  static propTypes = {
     onChange: PropTypes.func,
     streams: PropTypes.object,
     dashboards: PropTypes.object,
     permissions: PropTypes.object,
-  },
+  };
 
   render() {
     const streamItemButtons = (stream) => {
@@ -99,48 +99,48 @@ const PermissionSelector = React.createClass({
         </Tabs>
       </div>
     );
-  },
+  }
 
   /*
    * onClick actions for single edits
    */
-  _toggleStreamReadPermissions(stream) {
+  _toggleStreamReadPermissions = (stream) => {
     this._toggleReadPermissions('streams', Immutable.Set.of(stream.id));
-  },
+  };
 
-  _toggleStreamEditPermissions(stream) {
+  _toggleStreamEditPermissions = (stream) => {
     this._toggleEditPermissions('streams', Immutable.Set.of(stream.id));
-  },
+  };
 
-  _toggleDashboardReadPermissions(dashboard) {
+  _toggleDashboardReadPermissions = (dashboard) => {
     this._toggleReadPermissions('dashboards', Immutable.Set.of(dashboard.id));
-  },
+  };
 
-  _toggleDashboardEditPermissions(dashboard) {
+  _toggleDashboardEditPermissions = (dashboard) => {
     this._toggleEditPermissions('dashboards', Immutable.Set.of(dashboard.id));
-  },
+  };
 
   /*
    * onClick actions for bulk edits
    */
 
-  _toggleAllStreamsRead(streamIds, clearPermissions) {
+  _toggleAllStreamsRead = (streamIds, clearPermissions) => {
     this._toggleReadPermissions('streams', streamIds, clearPermissions);
-  },
+  };
 
-  _toggleAllStreamsEdit(streamIds, clearPermissions) {
+  _toggleAllStreamsEdit = (streamIds, clearPermissions) => {
     this._toggleEditPermissions('streams', streamIds, clearPermissions);
-  },
+  };
 
-  _toggleAllDashboardsRead(dashboardIds, clearPermissions) {
+  _toggleAllDashboardsRead = (dashboardIds, clearPermissions) => {
     this._toggleReadPermissions('dashboards', dashboardIds, clearPermissions);
-  },
+  };
 
-  _toggleAllDashboardsEdit(dashboardIds, clearPermissions) {
+  _toggleAllDashboardsEdit = (dashboardIds, clearPermissions) => {
     this._toggleEditPermissions('dashboards', dashboardIds, clearPermissions);
-  },
+  };
 
-  _toggleReadPermissions(target, idList, clearPermissions = true) {
+  _toggleReadPermissions = (target, idList, clearPermissions = true) => {
     let added = Immutable.Set.of();
     let deleted = Immutable.Set.of();
 
@@ -155,8 +155,9 @@ const PermissionSelector = React.createClass({
       }
     }, this);
     this.props.onChange(added, deleted);
-  },
-  _toggleEditPermissions(target, idList, clearPermissions = true) {
+  };
+
+  _toggleEditPermissions = (target, idList, clearPermissions = true) => {
     let added = Immutable.Set.of();
     let deleted = Immutable.Set.of();
 
@@ -171,7 +172,7 @@ const PermissionSelector = React.createClass({
       }
     }, this);
     this.props.onChange(added, deleted);
-  },
-});
+  };
+}
 
 export default PermissionSelector;

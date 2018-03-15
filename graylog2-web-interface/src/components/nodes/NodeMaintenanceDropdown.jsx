@@ -8,10 +8,11 @@ import { ExternalLink, IfPermitted } from 'components/common';
 
 import Routes from 'routing/Routes';
 
-const NodeMaintenanceDropdown = React.createClass({
-  propTypes: {
+class NodeMaintenanceDropdown extends React.Component {
+  static propTypes = {
     node: PropTypes.object.isRequired,
-  },
+  };
+
   render() {
     const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname().toString();
     return (
@@ -39,7 +40,7 @@ const NodeMaintenanceDropdown = React.createClass({
         </DropdownButton>
       </ButtonGroup>
     );
-  },
-});
+  }
+}
 
 export default NodeMaintenanceDropdown;

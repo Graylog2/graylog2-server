@@ -10,17 +10,16 @@ const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
-const BulkLoadPatternModal = React.createClass({
-  propTypes: {
+class BulkLoadPatternModal extends React.Component {
+  static propTypes = {
     onSuccess: PropTypes.func.isRequired,
-  },
-  getInitialState() {
-    return {
-      replacePatterns: false,
-    };
-  },
+  };
 
-  _onSubmit(evt) {
+  state = {
+    replacePatterns: false,
+  };
+
+  _onSubmit = (evt) => {
     evt.preventDefault();
 
     const reader = new FileReader();
@@ -35,7 +34,8 @@ const BulkLoadPatternModal = React.createClass({
     };
 
     reader.readAsText(this.refs['pattern-file'].getInputDOMNode().files[0]);
-  },
+  };
+
   render() {
     return (
       <span>
@@ -61,7 +61,7 @@ const BulkLoadPatternModal = React.createClass({
         </BootstrapModalForm>
       </span>
     );
-  },
-});
+  }
+}
 
 export default BulkLoadPatternModal;

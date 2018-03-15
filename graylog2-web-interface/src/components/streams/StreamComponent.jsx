@@ -13,15 +13,14 @@ import Spinner from 'components/common/Spinner';
 
 import CreateStreamButton from './CreateStreamButton';
 
-const StreamComponent = React.createClass({
-  propTypes: {
+class StreamComponent extends React.Component {
+  static propTypes = {
     currentUser: PropTypes.object.isRequired,
     onStreamSave: PropTypes.func.isRequired,
     indexSets: PropTypes.array.isRequired,
-  },
-  getInitialState() {
-    return {};
-  },
+  };
+
+  state = {};
 
   componentDidMount() {
     this.loadData();
@@ -30,41 +29,41 @@ const StreamComponent = React.createClass({
     });
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
-  },
+  }
 
   componentDidUpdate() {
     if (this.state.filteredStreams === null) {
       this._filterStreams();
     }
-  },
+  }
 
   componentWillUnmount() {
     StreamsStore.unregister(this.loadData);
     StreamRulesStore.unregister(this.loadData);
-  },
+  }
 
-  loadData() {
+  loadData = () => {
     StreamsStore.load((streams) => {
       this.setState({
         streams: streams,
         filteredStreams: null,
       });
     });
-  },
+  };
 
-  _filterStreams() {
+  _filterStreams = () => {
     if (this.refs.streamFilter) {
       this.refs.streamFilter.filterData();
     }
-  },
+  };
 
-  _updateFilteredStreams(filteredStreams) {
+  _updateFilteredStreams = (filteredStreams) => {
     this.setState({ filteredStreams: filteredStreams });
-  },
+  };
 
-  _isLoading() {
+  _isLoading = () => {
     return !(this.state.streams && this.state.streamRuleTypes);
-  },
+  };
 
   render() {
     if (this._isLoading()) {
@@ -117,7 +116,7 @@ const StreamComponent = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default StreamComponent;

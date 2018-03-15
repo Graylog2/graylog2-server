@@ -3,22 +3,20 @@ import React from 'react';
 
 import { ChangedMessageField, MessageField } from 'components/search';
 
-const MessageFields = React.createClass({
-  propTypes: {
+class MessageFields extends React.Component {
+  static propTypes = {
     customFieldActions: PropTypes.node,
     disableFieldActions: PropTypes.bool,
     message: PropTypes.object.isRequired,
     renderForDisplay: PropTypes.func.isRequired,
     showDecoration: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      showDecoration: false,
-    };
-  },
+  static defaultProps = {
+    showDecoration: false,
+  };
 
-  _formatFields(fields, showDecoration) {
+  _formatFields = (fields, showDecoration) => {
     const decorationStats = this.props.message.decoration_stats;
 
     if (!showDecoration || !decorationStats) {
@@ -54,7 +52,8 @@ const MessageFields = React.createClass({
 
       return <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} disableFieldActions />;
     });
-  },
+  };
+
   render() {
     const formattedFields = this.props.message.formatted_fields;
     const fields = this._formatFields(formattedFields, this.props.showDecoration);
@@ -64,7 +63,7 @@ const MessageFields = React.createClass({
         {fields}
       </dl>
     );
-  },
-});
+  }
+}
 
 export default MessageFields;

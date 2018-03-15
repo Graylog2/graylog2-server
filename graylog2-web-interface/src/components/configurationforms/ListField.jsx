@@ -4,8 +4,8 @@ import React from 'react';
 import { MultiSelect } from 'components/common';
 import { FieldHelpers } from 'components/configurationforms';
 
-const ListField = React.createClass({
-  propTypes: {
+class ListField extends React.Component {
+  static propTypes = {
     autoFocus: PropTypes.bool.isRequired,
     field: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -14,36 +14,32 @@ const ListField = React.createClass({
     value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     addPlaceholder: PropTypes.bool,
     disabled: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      addPlaceholder: false,
-    };
-  },
+  static defaultProps = {
+    addPlaceholder: false,
+  };
 
-  getInitialState() {
-    return {
-      typeName: this.props.typeName,
-      field: this.props.field,
-      title: this.props.title,
-      value: this.props.value,
-    };
-  },
+  state = {
+    typeName: this.props.typeName,
+    field: this.props.field,
+    title: this.props.title,
+    value: this.props.value,
+  };
 
   componentWillReceiveProps(props) {
     this.setState(props);
-  },
+  }
 
-  _formatOption(key, value) {
+  _formatOption = (key, value) => {
     return { value: value, label: key };
-  },
+  };
 
-  _handleChange(nextValue) {
+  _handleChange = (nextValue) => {
     const values = (nextValue === '' ? [] : nextValue.split(','));
     this.props.onChange(this.state.title, values);
     this.setState({ value: values });
-  },
+  };
 
   render() {
     const field = this.state.field;
@@ -75,7 +71,7 @@ const ListField = React.createClass({
         <p className="help-block">{field.description}</p>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ListField;

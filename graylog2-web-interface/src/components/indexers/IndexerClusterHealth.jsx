@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
@@ -10,7 +11,8 @@ import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 
-const IndexerClusterHealth = React.createClass({
+const IndexerClusterHealth = createReactClass({
+  displayName: 'IndexerClusterHealth',
   mixins: [Reflux.connect(IndexerClusterStore)],
 
   componentDidMount() {

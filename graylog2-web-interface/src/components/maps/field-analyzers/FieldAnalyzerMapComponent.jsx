@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Spinner } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
@@ -11,7 +12,9 @@ import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import StoreProvider from 'injection/StoreProvider';
 const RefreshStore = StoreProvider.getStore('Refresh');
 
-const FieldAnalyzerMapComponent = React.createClass({
+const FieldAnalyzerMapComponent = createReactClass({
+  displayName: 'FieldAnalyzerMapComponent',
+
   propTypes: {
     from: PropTypes.any.isRequired,
     to: PropTypes.any.isRequired,
@@ -41,6 +44,7 @@ const FieldAnalyzerMapComponent = React.createClass({
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
   },
+
   componentWillReceiveProps(nextProps) {
     // Reload values when executed search changes
     if (this.props.query !== nextProps.query ||
@@ -58,11 +62,13 @@ const FieldAnalyzerMapComponent = React.createClass({
       this.timer = setInterval(() => this._loadData(this.props), refresh.interval);
     }
   },
+
   _stopTimer() {
     if (this.timer) {
       clearInterval(this.timer);
     }
   },
+
   DEFAULT_WIDTH: 800,
   WIDGET_TYPE: 'org.graylog.plugins.map.widget.strategy.MapWidgetStrategy',
   eventThrottler: new EventHandlersThrottler(),

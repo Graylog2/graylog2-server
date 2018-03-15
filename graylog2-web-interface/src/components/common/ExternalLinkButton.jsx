@@ -9,8 +9,8 @@ import { ExternalLink } from 'components/common';
  *
  * All props besides `iconClass` and `children` are passed down to the react-bootstrap `<Button />` component.
  */
-const ExternalLinkButton = React.createClass({
-  propTypes: {
+class ExternalLinkButton extends React.Component {
+  static propTypes = {
     /** Link to the external location. */
     href: PropTypes.string.isRequired,
     /** Text for the button. (should be one line) */
@@ -27,18 +27,16 @@ const ExternalLinkButton = React.createClass({
     className: PropTypes.string,
     /** Render a disabled button if this is <code>true</code>. */
     disabled: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      bsStyle: 'default',
-      bsSize: '',
-      target: '_blank',
-      iconClass: 'fa-external-link',
-      className: '',
-      disabled: false,
-    };
-  },
+  static defaultProps = {
+    bsStyle: 'default',
+    bsSize: '',
+    target: '_blank',
+    iconClass: 'fa-external-link',
+    className: '',
+    disabled: false,
+  };
 
   render() {
     const { iconClass, children, ...props } = this.props;
@@ -48,7 +46,7 @@ const ExternalLinkButton = React.createClass({
         <ExternalLink iconClass={iconClass}>{children}</ExternalLink>
       </Button>
     );
-  },
-});
+  }
+}
 
 export default ExternalLinkButton;

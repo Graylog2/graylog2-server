@@ -6,26 +6,29 @@ import { DocumentTitle, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
 
-const StreamSearchPage = React.createClass({
-  propTypes: {
+class StreamSearchPage extends React.Component {
+  static propTypes = {
     params: PropTypes.object.isRequired,
-  },
-  getInitialState() {
-    return {
-      stream: undefined,
-    };
-  },
+  };
+
+  state = {
+    stream: undefined,
+  };
+
   componentDidMount() {
     this._fetchStream(this.props.params.streamId);
-  },
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.params.streamId !== nextProps.params.streamId) {
       this._fetchStream(nextProps.params.streamId);
     }
-  },
-  _fetchStream(streamId) {
+  }
+
+  _fetchStream = (streamId) => {
     StreamsStore.get(streamId, stream => this.setState({ stream: stream }));
-  },
+  };
+
   render() {
     if (!this.state.stream) {
       return <Spinner />;
@@ -36,7 +39,7 @@ const StreamSearchPage = React.createClass({
         <SearchPage searchInStream={this.state.stream} {...this.props} />
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default StreamSearchPage;

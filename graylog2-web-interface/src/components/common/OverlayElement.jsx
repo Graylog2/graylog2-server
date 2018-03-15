@@ -8,8 +8,8 @@ import { OverlayTrigger } from 'react-bootstrap';
  *
  * See: https://github.com/react-bootstrap/react-bootstrap/issues/364
  */
-const OverlayElement = React.createClass({
-  propTypes: {
+class OverlayElement extends React.Component {
+  static propTypes = {
     /** Element that will be displayed in the overlay. */
     overlay: PropTypes.element,
     /** Placement for the overlay. */
@@ -26,7 +26,7 @@ const OverlayElement = React.createClass({
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
-  },
+  };
 
   render() {
     if (this.props.overlay && this.props.useOverlay) {
@@ -42,7 +42,7 @@ const OverlayElement = React.createClass({
     }
 
     return this.props.children;
-  },
-});
+  }
+}
 
 export default OverlayElement;

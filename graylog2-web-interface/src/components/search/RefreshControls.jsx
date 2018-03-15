@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import moment from 'moment';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -11,8 +12,10 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 import ActionsProvider from 'injection/ActionsProvider';
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
-const RefreshControls = React.createClass({
+const RefreshControls = createReactClass({
+  displayName: 'RefreshControls',
   mixins: [Reflux.connect(RefreshStore, 'refresh')],
+
   INTERVAL_OPTIONS: {
     '1 Second': 1,
     '2 Seconds': 2,
@@ -22,10 +25,12 @@ const RefreshControls = React.createClass({
     '1 Minute': 60,
     '5 Minutes': 300,
   },
+
   _changeInterval(interval) {
     RefreshActions.changeInterval(interval);
     RefreshActions.enable();
   },
+
   render() {
     const intervalOptions = Object.keys(this.INTERVAL_OPTIONS).map((key) => {
       const interval = this.INTERVAL_OPTIONS[key] * 1000;

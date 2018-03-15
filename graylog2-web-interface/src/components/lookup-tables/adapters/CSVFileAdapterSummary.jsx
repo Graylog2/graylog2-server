@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const CSVFileAdapterSummary = React.createClass({
-  propTypes: {
+class CSVFileAdapterSummary extends React.Component {
+  static propTypes = {
     dataAdapter: PropTypes.object.isRequired,
-  },
+  };
 
   render() {
     const config = this.props.dataAdapter.config;
@@ -24,8 +24,8 @@ const CSVFileAdapterSummary = React.createClass({
       <dt>Case-insensitive lookup</dt>
       <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
     </dl>);
-  },
-});
+  }
+}
 
 
 export default CSVFileAdapterSummary;

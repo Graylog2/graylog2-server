@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -13,7 +14,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
-const AlertConditionsComponent = React.createClass({
+const AlertConditionsComponent = createReactClass({
+  displayName: 'AlertConditionsComponent',
   mixins: [Reflux.connect(AlertConditionsStore)],
 
   getInitialState() {

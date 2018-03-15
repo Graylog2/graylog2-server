@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
 
@@ -11,12 +12,16 @@ import { LinkToNode, Spinner } from 'components/common';
 
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 
-const InputStateBadge = React.createClass({
+const InputStateBadge = createReactClass({
+  displayName: 'InputStateBadge',
+
   propTypes: {
     input: PropTypes.object.isRequired,
   },
+
   mixins: [Reflux.connect(InputStatesStore), Reflux.connect(NodesStore)],
   comparator: new InputStateComparator(),
+
   _labelClassForState(sortedStates) {
     const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => {
       return numberOfNodes + state.count;
@@ -38,15 +43,18 @@ const InputStateBadge = React.createClass({
         return 'warning';
     }
   },
+
   _textForState(sortedStates) {
     if (this.props.input.global) {
       return sortedStates.map(state => `${state.count} ${state.state}`).join(', ');
     }
     return sortedStates[0].state;
   },
+
   _isLoading() {
     return !(this.state.inputStates && this.state.nodes);
   },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;

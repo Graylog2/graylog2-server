@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
 import Reflux from 'reflux';
@@ -19,7 +20,9 @@ const { FieldQuickValuesStore, FieldQuickValuesActions } = CombinedProvider.get(
 const { RefreshStore } = CombinedProvider.get('Refresh');
 const { SystemStore } = CombinedProvider.get('System');
 
-const FieldQuickValues = React.createClass({
+const FieldQuickValues = createReactClass({
+  displayName: 'FieldQuickValues',
+
   propTypes: {
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
     query: PropTypes.string.isRequired,
@@ -29,6 +32,7 @@ const FieldQuickValues = React.createClass({
     forceFetch: PropTypes.bool,
     fields: PropTypes.arrayOf(PropTypes.object),
   },
+
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'), Reflux.connect(FieldQuickValuesStore)],
 
   DEFAULT_OPTIONS: {
@@ -60,6 +64,7 @@ const FieldQuickValues = React.createClass({
   componentDidMount() {
     this._loadQuickValuesData();
   },
+
   componentWillReceiveProps(nextProps) {
     // Reload values when executed search changes
     if (this.props.query !== nextProps.query ||
@@ -70,12 +75,14 @@ const FieldQuickValues = React.createClass({
       this._loadQuickValuesData();
     }
   },
+
   componentDidUpdate(oldProps, oldState) {
     if (this.state.field !== oldState.field) {
       const element = ReactDOM.findDOMNode(this);
       UIUtils.scrollToHint(element);
     }
   },
+
   componentWillUnmount() {
     this._stopTimer();
   },
@@ -89,11 +96,13 @@ const FieldQuickValues = React.createClass({
       this.timer = setInterval(this._loadQuickValuesData, refresh.interval);
     }
   },
+
   _stopTimer() {
     if (this.timer) {
       clearInterval(this.timer);
     }
   },
+
   addField(field) {
     this.setState({
       field: field,
@@ -102,6 +111,7 @@ const FieldQuickValues = React.createClass({
       options: this.DEFAULT_OPTIONS,
     }, () => this._loadQuickValuesData(false));
   },
+
   // Builds a field query object list: [{ field: "cluster_id", value: "a" }, { field: "source", value: "b" }, ...]
   _buildFieldQueryObjects() {
     // We build a list of field query objects from the terms and terms_mapping data.
@@ -162,6 +172,7 @@ const FieldQuickValues = React.createClass({
       return list;
     }, []);
   },
+
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
       this.setState({ loadingData: true });
@@ -176,6 +187,7 @@ const FieldQuickValues = React.createClass({
       }
     }
   },
+
   _resetStatus() {
     this.setState(this.getInitialState());
   },

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Input } from 'components/bootstrap';
 
@@ -8,19 +9,24 @@ const NodesStore = StoreProvider.getStore('Nodes');
 
 import { Spinner } from 'components/common';
 
-const NodeOrGlobalSelect = React.createClass({
+const NodeOrGlobalSelect = createReactClass({
+  displayName: 'NodeOrGlobalSelect',
+
   propTypes: {
     global: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     node: PropTypes.string,
   },
+
   mixins: [Reflux.connect(NodesStore)],
+
   getInitialState() {
     return {
       global: this.props.global !== undefined ? this.props.global : false,
       node: this.props.node,
     };
   },
+
   _onChangeGlobal(evt) {
     const global = evt.target.checked;
     this.setState({ global: global });
@@ -32,10 +38,12 @@ const NodeOrGlobalSelect = React.createClass({
     }
     this.props.onChange('global', global);
   },
+
   _onChangeNode(evt) {
     this.setState({ node: evt.target.value });
     this.props.onChange('node', evt.target.value);
   },
+
   render() {
     if (!this.state.nodes) {
       return <Spinner />;

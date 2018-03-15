@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 import { Button, ProgressBar } from 'react-bootstrap';
@@ -15,13 +16,17 @@ import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
 
-const BufferUsage = React.createClass({
+const BufferUsage = createReactClass({
+  displayName: 'BufferUsage',
+
   propTypes: {
     bufferType: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
     title: PropTypes.node.isRequired,
   },
+
   mixins: [Reflux.connect(MetricsStore)],
+
   componentWillMount() {
     const prefix = this._metricPrefix();
     const metricNames = [
@@ -30,12 +35,15 @@ const BufferUsage = React.createClass({
     ];
     metricNames.forEach(metricName => MetricsActions.add(this.props.nodeId, metricName));
   },
+
   _metricPrefix() {
     return `org.graylog2.buffers.${this.props.bufferType}`;
   },
+
   _metricFilter() {
     return `org\\.graylog2\\.buffers\\.${this.props.bufferType}\\.|${this.props.bufferType}buffer`;
   },
+
   render() {
     if (!this.state.metrics) {
       return <Spinner />;

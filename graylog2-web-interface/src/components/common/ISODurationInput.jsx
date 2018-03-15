@@ -6,8 +6,8 @@ import ISODurationUtils from 'util/ISODurationUtils';
 /**
  * Displays an `Input` component for ISO8601 durations.
  */
-const ISODurationInput = React.createClass({
-  propTypes: {
+class ISODurationInput extends React.Component {
+  static propTypes = {
     /** Input id */
     id: PropTypes.string.isRequired,
     /** Value to show in the Input. */
@@ -30,26 +30,22 @@ const ISODurationInput = React.createClass({
     autoFocus: PropTypes.bool,
     /** Specify that the Input is required to submit the form. */
     required: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      label: 'Duration',
-      help: 'as ISO8601 Duration',
-      validator: () => true,
-      errorText: 'invalid',
-      autoFocus: false,
-      required: false,
-    };
-  },
+  static defaultProps = {
+    label: 'Duration',
+    help: 'as ISO8601 Duration',
+    validator: () => true,
+    errorText: 'invalid',
+    autoFocus: false,
+    required: false,
+  };
 
-  getInitialState() {
-    return {
-      duration: this.props.duration,
-    };
-  },
+  state = {
+    duration: this.props.duration,
+  };
 
-  _onUpdate() {
+  _onUpdate = () => {
     let duration = this.refs.isoDuration.getValue().toUpperCase();
 
     if (!duration.startsWith('P')) {
@@ -62,7 +58,7 @@ const ISODurationInput = React.createClass({
       // Only propagate state if the config is valid.
       this.props.update(duration);
     }
-  },
+  };
 
   render() {
     return (
@@ -78,7 +74,7 @@ const ISODurationInput = React.createClass({
              autoFocus={this.props.autoFocus}
              required={this.props.required} />
     );
-  },
-});
+  }
+}
 
 export default ISODurationInput;

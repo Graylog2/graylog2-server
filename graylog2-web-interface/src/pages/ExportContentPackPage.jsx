@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 
@@ -23,11 +24,14 @@ const ConfigurationBundlesStore = StoreProvider.getStore('ConfigurationBundles')
 const InputsActions = ActionsProvider.getActions('Inputs');
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
-const ExportContentPackPage = React.createClass({
+const ExportContentPackPage = createReactClass({
+  displayName: 'ExportContentPackPage',
   mixins: [Reflux.connect(InputsStore), Reflux.connect(DashboardsStore)],
+
   getInitialState() {
     return {};
   },
+
   componentDidMount() {
     GrokPatternsStore.loadPatterns((grokPatterns) => {
       this.setState({ grok_patterns: grokPatterns });
@@ -52,6 +56,7 @@ const ExportContentPackPage = React.createClass({
       this.setState({ lookup_data_adapters: result.data_adapters });
     });
   },
+
   onSubmit(evt) {
     evt.preventDefault();
     const request = {
@@ -80,9 +85,11 @@ const ExportContentPackPage = React.createClass({
         FileSaver.save(response, 'content_pack.json', 'application/json', 'utf-8');
       });
   },
+
   isEmpty(obj) {
     return ((obj === undefined) || (typeof obj.count === 'function' ? obj.count() === 0 : obj.length === 0));
   },
+
   inputDetails(input) {
     let details = input.name;
     if (input.attributes.bind_address) {
@@ -94,6 +101,7 @@ const ExportContentPackPage = React.createClass({
 
     return details;
   },
+
   formatDashboard(dashboard) {
     return (
       <div className="checkbox" key={`dashboard_checkbox-${dashboard.id}`}>
@@ -101,6 +109,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatGrokPattern(grokPattern) {
     return (
       <div className="checkbox" key={`grok_pattern_checkbox-${grokPattern.id}`}>
@@ -109,6 +118,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatInput(input) {
     return (
       <div className="checkbox" key={`input_checkbox-${input.id}`}>
@@ -117,6 +127,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatOutput(output) {
     return (
       <div className="checkbox" key={`output_checkbox-${output.id}`}>
@@ -124,6 +135,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatStream(stream) {
     return (
       <div className="checkbox" key={`stream_checkbox-${stream.id}`}>
@@ -131,6 +143,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatLookupTable(lookupTable) {
     return (
       <div className="checkbox" key={`lookup_table_checkbox-${lookupTable.id}`}>
@@ -138,6 +151,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatLookupCache(lookupCache) {
     return (
       <div className="checkbox" key={`lookup_cache_checkbox-${lookupCache.id}`}>
@@ -145,6 +159,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   formatLookupDataAdapter(lookupDataAdapter) {
     return (
       <div className="checkbox" key={`lookup_data_adapter_checkbox-${lookupDataAdapter.id}`}>
@@ -152,6 +167,7 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+
   selectAll(group) {
     Object.keys(this.refs).forEach((key) => {
       if (key.indexOf(group) === 0) {
@@ -159,30 +175,39 @@ const ExportContentPackPage = React.createClass({
       }
     });
   },
+
   selectAllInputs() {
     this.selectAll('input');
   },
+
   selectAllGrokPatterns() {
     this.selectAll('grok_pattern');
   },
+
   selectAllOutputs() {
     this.selectAll('output');
   },
+
   selectAllStreams() {
     this.selectAll('stream');
   },
+
   selectAllDashboards() {
     this.selectAll('dashboard');
   },
+
   selectAllLookupTables() {
     this.selectAll('lookup_table');
   },
+
   selectAllLookupCaches() {
     this.selectAll('lookup_cache');
   },
+
   selectAllLookupDataAdapters() {
     this.selectAll('lookup_data_adapter');
   },
+
   render() {
     return (
       <DocumentTitle title="Create a content pack">

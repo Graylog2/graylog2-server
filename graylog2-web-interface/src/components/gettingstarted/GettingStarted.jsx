@@ -8,8 +8,8 @@ import { Spinner } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
-const GettingStarted = React.createClass({
-  propTypes() {
+class GettingStarted extends React.Component {
+  static propTypes() {
     return {
       clusterId: PropTypes.string.isRequired,
       masterOs: PropTypes.string.isRequired,
@@ -18,21 +18,22 @@ const GettingStarted = React.createClass({
       noDismissButton: PropTypes.bool,
       onDismiss: PropTypes.func,
     };
-  },
-  getInitialState() {
-    return {
-      guideLoaded: false,
-      guideUrl: '',
-      showStaticContent: false,
-      frameHeight: '500px',
-    };
-  },
+  }
+
+  state = {
+    guideLoaded: false,
+    guideUrl: '',
+    showStaticContent: false,
+    frameHeight: '500px',
+  };
+
   componentDidMount() {
     if (window.addEventListener) {
       window.addEventListener('message', this._onMessage);
     }
     this.timeoutId = window.setTimeout(this._displayFallbackContent, 3000);
-  },
+  }
+
   componentWillUnmount() {
     if (window.removeEventListener) {
       window.removeEventListener('message', this._onMessage);
@@ -41,10 +42,11 @@ const GettingStarted = React.createClass({
       window.clearTimeout(Number(this.timeoutId));
       this.timeoutId = null;
     }
-  },
+  }
 
-  timeoutId: null,
-  _onMessage(messageEvent) {
+  timeoutId = null;
+
+  _onMessage = (messageEvent) => {
     // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
     if (this.props.gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
       if (this.timeoutId !== null) {
@@ -57,17 +59,20 @@ const GettingStarted = React.createClass({
         minHeight: messageEvent.data.height === 0 ? this.state.minHeight : messageEvent.data.height,
       });
     }
-  },
-  _displayFallbackContent() {
+  };
+
+  _displayFallbackContent = () => {
     this.setState({ showStaticContent: true });
-  },
-  _dismissGuide() {
+  };
+
+  _dismissGuide = () => {
     GettingStartedActions.dismiss.triggerPromise().then(() => {
       if (this.props.onDismiss) {
         this.props.onDismiss();
       }
     });
-  },
+  };
+
   render() {
     let dismissButton = null;
     if (!this.props.noDismissButton) {
@@ -141,7 +146,7 @@ const GettingStarted = React.createClass({
         {gettingStartedContent}
       </div>
     );
-  },
-});
+  }
+}
 
 export default GettingStarted;
