@@ -25,7 +25,6 @@ export default class SearchRequest {
             type: query.get('rangeType'),
             range: query.getIn(['rangeParams', 'range']),
           },
-          // TODO the view state should reflect what search types we will be requesting for each query
           search_types: searchTypes.map((searchType) => {
             const searchTypeId = uuid();
             this.widgetMapping = this.widgetMapping.update(searchType.widgetId, new Immutable.Set(), widgetSearchTypes => widgetSearchTypes.add(searchTypeId));
@@ -41,7 +40,14 @@ export default class SearchRequest {
                   id: searchTypeId,
                   type: searchType.type,
                 });
-          }).toJS(),
+          })
+            .add({
+              id: uuid(),
+              type: 'messages',
+              limit: 150,
+              offset: 0,
+            })
+            .toJS(),
         };
       }).valueSeq().toJS(),
     };

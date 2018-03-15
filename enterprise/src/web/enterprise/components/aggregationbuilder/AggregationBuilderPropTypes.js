@@ -6,3 +6,10 @@ export const FieldList = PropTypes.arrayOf(
     value: PropTypes.string.isRequired,
   }),
 );
+
+export const AggregationType = PropTypes.shape({
+  rowPivots: PropTypes.arrayOf(PropTypes.string),
+  series: PropTypes.arrayOf(PropTypes.string),
+  sort: PropTypes.arrayOf(PropTypes.string),
+  visualization: PropTypes.string,
+});

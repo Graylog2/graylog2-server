@@ -10,6 +10,9 @@ import AggregationHandler from './logic/searchtypes/AggregationHandler';
 import AggregationTransformer from './logic/searchresulttransformers/AggregationTransformer';
 import AggregationBuilder from './components/aggregationbuilder/AggregationBuilder';
 import AggregationConfigGenerator from './logic/searchtypes/aggregation/AggregationConfigGenerator';
+import BarVisualization from './components/visualizations/bar/BarVisualization';
+import LineVisualization from './components/visualizations/line/LineVisualization';
+import PieVisualization from './components/visualizations/pie/PieVisualization';
 
 const extendedSearchPath = '/extendedsearch';
 
@@ -148,6 +151,28 @@ export default {
     {
       type: 'search',
       title: 'Search for values like this',
+    },
+  ],
+  visualizationTypes: [
+    {
+      type: 'bar',
+      displayName: 'Bar Chart',
+      component: BarVisualization,
+    },
+    {
+      type: 'line',
+      displayName: 'Line Chart',
+      component: LineVisualization,
+    },
+    {
+      type: 'pie',
+      displayName: 'Pie Chart',
+      component: PieVisualization,
+    },
+    {
+      type: 'table',
+      displayName: 'Data Table',
+      component: DataTable,
     },
   ],
 };

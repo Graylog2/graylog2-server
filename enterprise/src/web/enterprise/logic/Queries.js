@@ -7,7 +7,7 @@ import QueriesStore from 'enterprise/stores/QueriesStore';
 import WidgetActions from 'enterprise/actions/WidgetActions';
 // eslint-disable-next-line no-unused-vars
 import WidgetStore from 'enterprise/stores/WidgetStore';
-import { dataTable, messageList, resultHistogram } from 'enterprise/logic/Widget';
+import { resultHistogram } from 'enterprise/logic/Widget';
 
 export const _defaultQuery = (id) => {
   return {

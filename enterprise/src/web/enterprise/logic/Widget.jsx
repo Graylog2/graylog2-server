@@ -23,11 +23,19 @@ export const messageList = (id, timeRange, fields) => {
 export const resultHistogram = (id, timeRange = {}) => {
   return {
     id: id,
-    type: 'SEARCH_RESULT_CHART2',
+    type: 'AGGREGATION',
     title: 'Histogram',
     computationTimeRange: timeRange,
     config: {
-      timerange: timeRange,
+      rowPivots: [
+        'timestamp',
+      ],
+      series: [
+        'count()',
+      ],
+      columnPivots: [],
+      sort: [],
+      visualization: 'bar',
     },
   };
 };

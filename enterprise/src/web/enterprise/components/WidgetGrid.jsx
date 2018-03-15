@@ -8,7 +8,7 @@ import style from 'pages/ShowDashboardPage.css';
 import ViewWidget from 'enterprise/components/widgets/ViewWidget';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import CurrentWidgetsActions from '../actions/CurrentWidgetsActions';
-import CUrrentWidgetsStore from '../stores/CurrentWidgetsStore';
+import CurrentWidgetsStore from '../stores/CurrentWidgetsStore';
 
 export default class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {

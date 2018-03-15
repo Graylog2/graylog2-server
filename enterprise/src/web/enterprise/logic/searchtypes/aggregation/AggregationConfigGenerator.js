@@ -11,12 +11,29 @@ const _parseSeries = (s) => {
   return definition;
 };
 
-const _group = (fieldNames, series) => (fieldNames.length > 0 ? [{
-  type: 'values',
-  field: fieldNames.shift(),
-  metrics: series.filter(s => s !== 'count()').map(s => _parseSeries(s)),
-  groups: fieldNames.length > 0 ? _group(fieldNames, series) : [],
-}] : []);
+const _typeForField = (field) => {
+  switch (field) {
+    case 'timestamp':
+      return { type: 'time', interval: 'minute' };
+    default:
+      return { type: 'values' };
+  }
+};
+
+const _group = (fieldNames, series) => {
+  if (fieldNames.length > 0) {
+    const fieldName = fieldNames.shift();
+    return [
+      Object.assign({
+        field: fieldName,
+        metrics: series.map(s => _parseSeries(s)),
+        groups: fieldNames.length > 0 ? _group(fieldNames, series) : [],
+      },
+      _typeForField(fieldName)),
+    ];
+  }
+  return [];
+};
 
 export default ({ rowPivots, series }) => {
   const fieldNames = rowPivots.slice();

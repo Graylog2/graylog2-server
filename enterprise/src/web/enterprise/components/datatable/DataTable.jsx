@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import naturalSort from 'javascript-natural-sort';
 
 import expandRows from 'enterprise/logic/ExpandRows';
 import DataTableEntry from './DataTableEntry';
@@ -31,7 +30,7 @@ const DataTable = React.createClass({
     const { config, data } = this.props;
     const { rowPivots, series } = config;
     const rows = data[0] ? data[0].results : [];
-    const fields = new Immutable.OrderedSet(rowPivots).merge(series.filter(s => s !== 'count()')).merge(this._extractAllFieldnames(rows));
+    const fields = new Immutable.OrderedSet(rowPivots).merge(this._extractAllFieldnames(rows));
     const sortedRows = expandRows(rowPivots.slice(), series, rows);
     return (
       <div className="messages-container">

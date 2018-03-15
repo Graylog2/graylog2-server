@@ -17,9 +17,7 @@ const _formatBucket = (fieldNames, series, buckets) => {
   }
   const fieldName = fieldNames.shift();
   return buckets.map((bucket) => {
-    const result = {
-      count: bucket.count,
-    };
+    const result = {};
     series.forEach((seriesName, idx) => {
       const { type, field } = _parseSeries(seriesName);
       if (bucket.metrics[idx] && bucket.metrics[idx][type]) {
@@ -37,7 +35,7 @@ const _formatBucket = (fieldNames, series, buckets) => {
 export default (data, widget) => {
   const { rowPivots, series } = widget.config;
   if (data && data[0] && data[0].groups[0]) {
-    const buckets = _formatBucket(rowPivots.slice(), series.filter(s => s !== 'count()'), data[0].groups[0].buckets);
+    const buckets = _formatBucket(rowPivots.slice(), series, data[0].groups[0].buckets);
     return [{ results: buckets }];
   }
   return [];

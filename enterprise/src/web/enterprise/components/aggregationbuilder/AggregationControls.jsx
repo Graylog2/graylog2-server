@@ -33,30 +33,29 @@ export default class AggregationControls extends React.Component {
   constructor(props) {
     super(props);
 
-    this._onColumnPivotChange = this._onColumnPivotChange.bind(this);
-    this._onRowPivotChange = this._onRowPivotChange.bind(this);
-    this._onSeriesChange = this._onSeriesChange.bind(this);
-    this._onSortChange = this._onSortChange.bind(this);
-
     const { children, fields, onChange, ...rest } = props;
     this.state = rest;
   }
 
-  _onColumnPivotChange(columnPivots) {
+  _onColumnPivotChange = (columnPivots) => {
     this.setState(state => this._mutateStateAndPropagate(state, { columnPivots: columnPivots.split(',') }));
-  }
+  };
 
-  _onRowPivotChange(rowPivots) {
+  _onRowPivotChange = (rowPivots) => {
     this.setState(state => this._mutateStateAndPropagate(state, { rowPivots: rowPivots.split(',') }));
-  }
+  };
 
-  _onSeriesChange(series) {
+  _onSeriesChange = (series) => {
     this.setState(state => this._mutateStateAndPropagate(state, { series: series.split(',') }));
-  }
+  };
 
-  _onSortChange(sort) {
+  _onSortChange = (sort) => {
     this.setState(state => this._mutateStateAndPropagate(state, { sort: sort.split(',') }));
-  }
+  };
+
+  _onVisualizationChange = (visualization) => {
+    this.setState(state => this._mutateStateAndPropagate(state, { visualization: visualization }));
+  };
 
   _mutateStateAndPropagate(state, stateDelta) {
     const newState = Object.assign({}, state, stateDelta);
