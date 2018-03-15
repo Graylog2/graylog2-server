@@ -1,4 +1,4 @@
-import ExtendedSearchPage from 'enterprise/pages/ExtendedSearchPage';
+import ExtendedSearchPage from 'enterprise/ExtendedSearchPage';
 import { Histogram, MessageList, SearchSidebarWidget } from 'enterprise/components/widgets';
 import GroupByHandler from 'enterprise/logic/searchtypes/GroupByHandler';
 import { DateHistogramHandler, MessageListHandler } from 'enterprise/logic/searchtypes';
