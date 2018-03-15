@@ -2,12 +2,21 @@ import React from 'react';
 
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 
-describe('UserPreferencesButton', function () {
+const e = () => {
+  // eslint-disable-next-line global-require
+  const enzyme = require('enzyme');
+  // eslint-disable-next-line global-require
+  const Adapter = require('enzyme-adapter-react-15');
+  enzyme.configure({ adapter: new Adapter() });
+  return enzyme;
+};
+
+describe('UserPreferencesButton', () => {
   beforeEach(() => {
     jest.resetModules();
   });
 
-  it('should load user data when user clicks edit button', function () {
+  it('should load user data when user clicks edit button', () => {
     const PreferencesStore = StoreMock('get', 'listen', 'loadUserPreferences');
     const combinedProviderMock = new CombinedProviderMock({
       Preferences: { PreferencesStore },
@@ -15,9 +24,10 @@ describe('UserPreferencesButton', function () {
 
     jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
 
+    // eslint-disable-next-line global-require
     const UserPreferencesButton = require('components/users/UserPreferencesButton');
     const userName = 'Full';
-    const instance = require('enzyme').mount(<UserPreferencesButton userName={userName} />);
+    const instance = e().mount(<UserPreferencesButton userName={userName} />);
 
     expect(instance).toMatchSnapshot();
     expect(instance.find('button')).toBeDefined();
