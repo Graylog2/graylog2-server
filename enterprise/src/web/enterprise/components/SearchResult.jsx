@@ -1,9 +1,9 @@
 import React from 'react';
 
-const SearchResult = React.createClass({
+class SearchResult extends React.Component {
   render() {
     return <div>Search result</div>;
-  },
-});
+  }
+}
 
 export default SearchResult;

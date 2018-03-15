@@ -6,8 +6,8 @@ import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
 
-const MessageTableEntry = React.createClass({
-  propTypes: {
+class MessageTableEntry extends React.Component {
+  static propTypes = {
     allStreams: PropTypes.instanceOf(Immutable.List).isRequired,
     allStreamsLoaded: PropTypes.bool.isRequired,
     disableSurroundingSearch: PropTypes.bool,
@@ -28,17 +28,16 @@ const MessageTableEntry = React.createClass({
     showMessageRow: PropTypes.bool,
     streams: PropTypes.instanceOf(Immutable.Map).isRequired,
     toggleDetail: PropTypes.func.isRequired,
-  },
-  getDefaultProps() {
-    return {
-      disableSurroundingSearch: false,
-      highlight: false,
-      highlightMessage: undefined,
-      searchConfig: undefined,
-      selectedFields: Immutable.OrderedSet(),
-      showMessageRow: false,
-    };
-  },
+  };
+
+  static defaultProps = {
+    disableSurroundingSearch: false,
+    highlight: false,
+    highlightMessage: undefined,
+    searchConfig: undefined,
+    selectedFields: Immutable.OrderedSet(),
+    showMessageRow: false,
+  };
 
   shouldComponentUpdate(newProps) {
     if (this.props.highlight !== newProps.highlight) {
@@ -60,8 +59,9 @@ const MessageTableEntry = React.createClass({
       return true;
     }
     return false;
-  },
-  possiblyHighlight(fieldName, truncate) {
+  }
+
+  possiblyHighlight = (fieldName, truncate) => {
     const fullOrigValue = this.props.message.fields[fieldName];
     if (fullOrigValue === undefined) {
       return '';
@@ -98,10 +98,12 @@ const MessageTableEntry = React.createClass({
       return String(origValue);
     }
     return String(origValue);
-  },
-  _toggleDetail() {
+  };
+
+  _toggleDetail = () => {
     this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
-  },
+  };
+
   render() {
     const colSpanFixup = this.props.selectedFields.size + 1;
 
@@ -146,7 +148,7 @@ const MessageTableEntry = React.createClass({
         }
       </tbody>
     );
-  },
-});
+  }
+}
 
 export default MessageTableEntry;

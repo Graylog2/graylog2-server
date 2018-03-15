@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import Value from '../Value';
 
-const DataTableEntry = React.createClass({
-  propTypes: {
+class DataTableEntry extends React.Component {
+  static propTypes = {
     item: PropTypes.object.isRequired,
     fields: PropTypes.instanceOf(Immutable.OrderedSet).isRequired,
-  },
+  };
 
   render() {
     const classes = 'message-group';
@@ -23,7 +23,7 @@ const DataTableEntry = React.createClass({
         </tr>
       </tbody>
     );
-  },
-});
+  }
+}
 
 export default DataTableEntry;

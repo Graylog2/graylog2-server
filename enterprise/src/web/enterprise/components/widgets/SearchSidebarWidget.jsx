@@ -8,19 +8,17 @@ import SearchSidebar from 'enterprise/components/widgets/SearchSidebarWithoutBor
 const _fieldAnalyzers = filter => PluginStore.exports('fieldAnalyzers')
   .filter(analyzer => (filter !== undefined ? filter(analyzer) : true));
 
-export default React.createClass({
-  getInitialState() {
-    return {
-      showAllFields: false,
-    };
-  },
+export default class extends React.Component {
+  state = {
+    showAllFields: false,
+  };
 
-  _togglePageFields() {
+  _togglePageFields = () => {
     this.setState({ showAllFields: !this.state.showAllFields });
-  },
+  };
 
-  _toggleField(field) {
-  },
+  _toggleField = (field) => {
+  };
 
   render() {
     const data = Object.assign({}, this.props.data);
@@ -48,5 +46,5 @@ export default React.createClass({
       togglePageFields: this._togglePageFields,
     };
     return <SearchSidebar {...sidebarProps} />;
-  },
-});
+  }
+}

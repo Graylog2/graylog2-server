@@ -1,12 +1,15 @@
 /* eslint-disable react/no-find-dom-node,react/no-string-refs */
 /* global window */
 import React from 'react';
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import { AutoAffix } from 'react-overlays';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-const SideBar = React.createClass({
+const SideBar = createReactClass({
+  displayName: 'SideBar',
+
   getInitialState() {
     return {
       availableHeight: 1000,

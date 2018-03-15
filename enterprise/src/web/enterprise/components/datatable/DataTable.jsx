@@ -6,8 +6,8 @@ import expandRows from 'enterprise/logic/ExpandRows';
 import DataTableEntry from './DataTableEntry';
 import Field from '../Field';
 
-const DataTable = React.createClass({
-  propTypes: {
+class DataTable extends React.Component {
+  static propTypes = {
     config: PropTypes.shape({
       data: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.object),
@@ -17,15 +17,17 @@ const DataTable = React.createClass({
       ]),
       fields: PropTypes.arrayOf(PropTypes.string),
     }).isRequired,
-  },
-  _extractAllFieldnames(data) {
+  };
+
+  _extractAllFieldnames = (data) => {
     const fieldNames = new Set();
     data.forEach((item) => {
       Object.keys(item).forEach(fieldName => fieldNames.add(fieldName));
     });
 
     return new Immutable.OrderedSet(fieldNames).sort();
-  },
+  };
+
   render() {
     const { config, data } = this.props;
     const { rowPivots, series } = config;
@@ -50,7 +52,7 @@ const DataTable = React.createClass({
         </table>
       </div>
     );
-  },
-});
+  }
+}
 
 export default DataTable;

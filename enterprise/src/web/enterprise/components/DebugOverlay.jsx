@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Modal } from 'react-bootstrap';
 
@@ -8,7 +9,9 @@ import SearchStore from 'enterprise/stores/SearchStore';
 import WidgetStore from 'enterprise/stores/WidgetStore';
 import ViewsStore from 'enterprise/stores/ViewsStore';
 
-const DebugOverlay = React.createClass({
+const DebugOverlay = createReactClass({
+  displayName: 'DebugOverlay',
+
   mixins: [
     Reflux.connect(CurrentViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
@@ -16,12 +19,15 @@ const DebugOverlay = React.createClass({
     Reflux.connect(ViewsStore, 'views'),
     Reflux.connect(WidgetStore, 'widgets'),
   ],
+
   _onOpen() {
     this.setState({ open: true });
   },
+
   _onClose() {
     this.setState({ open: false });
   },
+
   render() {
     return (
       <span>

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
@@ -16,12 +17,15 @@ const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const { ConfigurationsStore } = CombinedProvider.get('Configurations');
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
-const MessageList = React.createClass({
+const MessageList = createReactClass({
+  displayName: 'MessageList',
+
   mixins: [
     Reflux.connect(ConfigurationsStore, 'configurations'),
     Reflux.connect(CurrentViewStore, 'currentViewStore'),
     Reflux.connect(QueriesStore, 'queries'),
   ],
+
   propTypes: {
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -31,6 +35,7 @@ const MessageList = React.createClass({
       pageSize: PropTypes.number,
     }).isRequired,
   },
+
   getInitialState() {
     return {
       currentPage: 1,
@@ -40,9 +45,11 @@ const MessageList = React.createClass({
       },
     };
   },
+
   componentDidMount() {
     return ConfigurationActions.listSearchesClusterConfig();
   },
+
   _columnStyle(fieldName) {
     const selectedFields = Immutable.OrderedSet(this.props.config.fields);
     if (fieldName.toLowerCase() === 'source' && this._fieldColumns(selectedFields).size > 1) {
@@ -50,9 +57,11 @@ const MessageList = React.createClass({
     }
     return {};
   },
+
   _fieldColumns(fields) {
     return fields.delete('message');
   },
+
   _toggleMessageDetail(id) {
     let newSet;
     if (this.state.expandedMessages.contains(id)) {

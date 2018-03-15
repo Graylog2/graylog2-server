@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -13,20 +14,25 @@ import QueryInput from 'enterprise/components/searchbar/QueryInput';
 import QueriesActions from 'enterprise/actions/QueriesActions';
 import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 
-const SearchBar = React.createClass({
+const SearchBar = createReactClass({
+  displayName: 'SearchBar',
+
   mixins: [
     Reflux.connect(CurrentViewStore, 'currentView'),
   ],
+
   getInitialState() {
     return {
       savedSearch: '',
       keywordPreview: Immutable.Map(),
     };
   },
+
   _performSearch(event) {
     event.preventDefault();
     this.props.onExecute();
   },
+
   _getSavedSearchesSelector() {
   },
 
