@@ -135,7 +135,7 @@
         <pkts.version>3.0.2</pkts.version>
         <protobuf.version>3.5.1</protobuf.version>
         <reflections.version>0.9.11</reflections.version>
-        <retrofit.version>2.3.0</retrofit.version>
+        <retrofit.version>2.4.0</retrofit.version>
         <scala.version>2.11.8</scala.version>
         <shiro.version>1.4.0</shiro.version>
         <sigar.version>1.6.4</sigar.version>
