@@ -87,7 +87,7 @@
         <amqp-client.version>5.1.2</amqp-client.version>
         <antlr.version>4.7.1</antlr.version>
         <apache-directory-version>1.0.0</apache-directory-version>
-        <auto-value.version>1.5.3</auto-value.version>
+        <auto-value.version>1.6.1</auto-value.version>
         <auto-value-javabean.version>1.0.0</auto-value-javabean.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <commons-codec.version>1.11</commons-codec.version>
