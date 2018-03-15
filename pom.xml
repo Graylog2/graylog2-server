@@ -109,7 +109,7 @@
         <jackson.version>2.8.11</jackson.version>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
-        <javapoet.version>1.7.0</javapoet.version>
+        <javapoet.version>1.11.1</javapoet.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <javax.inject.version>1</javax.inject.version>
