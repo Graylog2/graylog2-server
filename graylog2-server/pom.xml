@@ -868,6 +868,8 @@
                         <configuration>
                             <forkCount>1</forkCount>
                             <skip>${it.es.skip}</skip>
+                            <!-- prevent ForkedBooter from stealing window focus on Mac OS -->
+                            <argLine>-Djava.awt.headless=true</argLine>
                         </configuration>
                         <executions>
                             <execution>
