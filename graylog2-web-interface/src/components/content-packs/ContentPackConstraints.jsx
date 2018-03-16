@@ -33,7 +33,7 @@ class ContentPackConstraints extends React.Component {
         sortByKey="type"
         dataRowFormatter={ContentPackConstraints.rowFormatter}
         rows={this.props.constraints}
-        filterKeys={['name']}
+        filterKeys={[]}
       />);
   }
 }
