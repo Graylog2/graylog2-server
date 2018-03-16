@@ -4,42 +4,32 @@ import React from 'react';
 import { DataTable } from 'components/common';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
-class ContentPackVersions extends React.Component {
+class ContentPackInstallations extends React.Component {
   static propTypes = {
-    versions: PropTypes.arrayOf(PropTypes.string),
-    onChange: PropTypes.func,
+    installations: PropTypes.arrayOf(PropTypes.string),
   };
 
   static defaultProps = {
-    versions: [],
-    onChange: () => {},
+    installations: [],
   };
 
   constructor(props) {
     super(props);
-    this.state = { selectedVersion: this.props.versions[0] };
 
-    this.onChange = this.onChange.bind(this);
+    console.log(this.props);
     this.rowFormatter = this.rowFormatter.bind(this);
     this.headerFormater = this.headerFormater.bind(this);
-  }
-
-  onChange(event) {
-    this.setState({
-      selectedVersion: event.target.value,
-    });
-    this.props.onChange(event.target.value);
   }
 
   rowFormatter(item) {
     return (
       <tr key={item}>
         <td>
-          <input type="radio" value={item.version} onChange={this.onChange} checked={this.state.selectedVersion === item.version} />
+          {item.comment}
         </td>
         <td>{item.version}</td>
         <td className="text-right">
-          <Button bsStyle="info" bsSize="small">View</Button>
+          <Button bsStyle="info" bsSize="small">Install</Button>
           &nbsp;
           <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
             <MenuItem>Remove</MenuItem>
@@ -61,19 +51,18 @@ class ContentPackVersions extends React.Component {
   }
 
   render() {
-    const headers = ['Select', 'Revision', 'Action'];
-    const versions = this.props.versions.map((version) => { return { version: version }; });
+    const headers = ['Comment', 'Version', 'Action'];
     return (
       <DataTable
         id="content-packs-versions"
         headers={headers}
         headerCellFormatter={this.headerFormater}
-        sortByKey="version"
+        sortByKey="comment"
         dataRowFormatter={this.rowFormatter}
-        rows={versions}
+        rows={this.props.installations}
         filterKeys={[]}
       />);
   }
 }
 
-export default ContentPackVersions;
+export default ContentPackInstallations;
