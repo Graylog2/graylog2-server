@@ -72,6 +72,7 @@ export default class WidgetGrid extends React.Component {
           <div key={widgetId} className={style.widgetContainer}>
             <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange}>
               <VisComponent id={widgetId}
+                            title={widget.title}
                             config={config}
                             data={widgetData}
                             fields={this.props.fields}
@@ -96,6 +97,7 @@ export default class WidgetGrid extends React.Component {
       <ReactGridContainer locked={this.props.locked}
                           positions={positions}
                           animate={false}
+                          useDragHandle=".widget-drag-handle"
                           onPositionsChange={this.props.onPositionsChange}>
         {widgets}
       </ReactGridContainer>

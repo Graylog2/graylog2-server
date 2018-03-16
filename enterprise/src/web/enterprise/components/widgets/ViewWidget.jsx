@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 export default class extends React.Component {
   static propTypes = {
@@ -35,11 +34,13 @@ export default class extends React.Component {
   };
 
   render() {
-    const calculatedAt = moment().toISOString();
+    const { title } = this.props;
 
     return (
       <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'scroll' }} data-widget-id={this.props.widgetId}>
-        {this.props.children}
+        <div style={{ height: '95%', padding: '5px' }}>
+          {this.props.children}
+        </div>
       </div>
     );
   }

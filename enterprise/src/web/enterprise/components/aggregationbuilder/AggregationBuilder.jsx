@@ -6,18 +6,23 @@ import { AggregationType } from './AggregationBuilderPropTypes';
 import AggregationControls from './AggregationControls';
 import EditModeToggleButton from './EditModeToggleButton';
 import FullSizeContainer from './FullSizeContainer';
-import DataTable from '../datatable/DataTable';
+import WidgetHeader from '../widgets/WidgetHeader';
 
 const defaultVisualizationType = 'table';
 
 export default class AggregationBuilder extends React.Component {
   static defaultProps = {
     editing: false,
+    visualization: defaultVisualizationType,
   };
 
   static propTypes = {
+    config: AggregationType.isRequired,
+    data: PropTypes.array.isRequired,
     editing: PropTypes.bool,
     fields: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
   };
 
   static _visualizationForType(type) {
@@ -38,7 +43,7 @@ export default class AggregationBuilder extends React.Component {
   };
 
   render() {
-    const { config, data, fields, onChange } = this.props;
+    const { config, data, fields, onChange, title } = this.props;
     const VisComponent = AggregationBuilder._visualizationForType(config.visualization || defaultVisualizationType);
     const chartData = data && data[0] ? data : [{ results: [] }];
     const children = (
@@ -53,20 +58,11 @@ export default class AggregationBuilder extends React.Component {
     ) : children;
     return (
       <span>
-        <EditModeToggleButton value={this.state.editing} onToggle={this._toggleEditMode} />
+        <WidgetHeader title={title}>
+          <EditModeToggleButton value={this.state.editing} onToggle={this._toggleEditMode} />
+        </WidgetHeader>
         {content}
       </span>
     );
   }
 }
-
-AggregationBuilder.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  config: AggregationType,
-};
-
-AggregationBuilder.defaultProps = {
-  config: {
-    visualization: defaultVisualizationType,
-  },
-};

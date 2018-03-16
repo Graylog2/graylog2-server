@@ -1,0 +1,4 @@
+:local(.widgetDragHandle) {
+    cursor: move;
+    opacity: 0.3;
+}
