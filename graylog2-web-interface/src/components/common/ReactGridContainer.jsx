@@ -114,11 +114,11 @@ class ReactGridContainer extends React.Component {
     /** Specifies whether the grid should use CSS animations or not. */
     animate: PropTypes.bool,
     /**
-     * Specifieds whether (and which css class) a drag handle should be used.
+     * Specifies whether (and which css class) a drag handle should be used.
      *
-     * If this prop is not specified, the whole widget can be used for dragging when the grid is unlockd.
+     * If this prop is not specified, the whole widget can be used for dragging when the grid is unlocked.
      *
-     * If this prop is specified, the css class specified will define which item can be used for dragging if unlocked.
+     * If this prop is defined, the css class specified will define which item can be used for dragging if unlocked.
      *
      */
     useDragHandle: PropTypes.string,
