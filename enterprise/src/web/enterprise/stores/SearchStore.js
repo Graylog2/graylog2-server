@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import Bluebird from 'bluebird';
 
 import SearchJobActions from 'enterprise/actions/SearchJobActions';
 import SearchJobStore from 'enterprise/stores/SearchJobStore';
@@ -13,10 +13,11 @@ const displayError = (error) => {
   console.log(error);
 };
 
+Bluebird.config({ cancellation: true });
 
 export default Reflux.createStore({
   listenables: [SearchActions],
-  state: new Immutable.Map(),
+  executePromise: null,
 
   init() {
     this.listenTo(WidgetStore, this.onWidgetStoreUpdate, this.onWidgetStoreUpdate);
@@ -31,40 +32,33 @@ export default Reflux.createStore({
   },
 
   trackJobStatus(job, searchRequest, search) {
-    return new Promise((resolve, reject) => {
+    return new Bluebird((resolve) => {
       if (job && job.execution.done) {
-        resolve(new SearchResult(searchRequest, job));
-      } else {
-        if (this.trackTimeout) {
-          clearTimeout(this.trackTimeout);
-        }
-        this.trackTimeout = setTimeout(() => SearchJobActions.jobStatus(job.id)
-          .then(jobStatus => resolve(this.trackJobStatus(jobStatus, searchRequest, search)), error => reject(error)), 250);
+        return resolve(new SearchResult(searchRequest, job));
       }
+      return resolve(Bluebird.delay(250)
+        .then(() => SearchJobActions.jobStatus(job.id))
+        .then(jobStatus => this.trackJobStatus(jobStatus, searchRequest, search)));
     });
   },
 
   trackJob(search, searchRequest) {
-    return SearchJobActions.run(search.id).then((job) => {
-      return this.trackJobStatus(job, searchRequest, search);
-    });
+    return SearchJobActions.run(search.id).then(job => this.trackJobStatus(job, searchRequest, search));
   },
 
   execute() {
+    if (this.executePromise) {
+      this.executePromise.cancel();
+    }
     const searchRequest = new SearchRequest(this.queries, this.widgets);
-    const promise = SearchJobActions.create(searchRequest)
-      .then((search) => {
-        return this.trackJob(search, searchRequest);
-      }, displayError)
+    this.executePromise = SearchJobActions.create(searchRequest)
+      .then(({ request, search }) => this.trackJob(search, request), displayError)
       .then((result) => {
-        this.state = this.state.set('result', result);
-        this._trigger();
+        this.trigger({ result });
+        this.executePromise = undefined;
+        return result;
       }, displayError);
 
-    SearchActions.execute.promise(promise);
+    SearchActions.execute.promise(this.executePromise);
   },
-
-  _trigger() {
-    this.trigger(this.state);
-  }
 });

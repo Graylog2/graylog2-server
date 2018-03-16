@@ -31,7 +31,7 @@ export default Reflux.createStore({
       .then((search) => {
         this.state.searches[search.id] = search;
         this._trigger();
-        return search;
+        return { request: searchRequest, search: search };
       });
     SearchJobActions.create.promise(promise);
   },
