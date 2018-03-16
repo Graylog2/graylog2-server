@@ -30,6 +30,16 @@ const BREAKPOINTS = {
   xs: COLUMN_WIDTH * COLUMNS.xs,
 };
 
+const _gridClass = (locked, isResizable, useDragHandle) => {
+  if (locked || !isResizable) {
+    return 'locked';
+  }
+  if (useDragHandle) {
+    return '';
+  }
+  return 'unlocked';
+};
+
 /**
  * Component that renders a draggable and resizable grid. You can control
  * the grid elements' positioning, as well as if they should be resizable
@@ -103,6 +113,15 @@ class ReactGridContainer extends React.Component {
     columns: PropTypes.object,
     /** Specifies whether the grid should use CSS animations or not. */
     animate: PropTypes.bool,
+    /**
+     * Specifieds whether (and which css class) a drag handle should be used.
+     *
+     * If this prop is not specified, the whole widget can be used for dragging when the grid is unlockd.
+     *
+     * If this prop is specified, the css class specified will define which item can be used for dragging if unlocked.
+     *
+     */
+    useDragHandle: PropTypes.string,
   };
 
   static defaultProps = {
@@ -111,6 +130,7 @@ class ReactGridContainer extends React.Component {
     rowHeight: ROW_HEIGHT,
     columns: COLUMNS,
     animate: true,
+    useDragHandle: undefined,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -159,13 +179,13 @@ class ReactGridContainer extends React.Component {
   };
 
   render() {
-    const { children, locked, isResizable, rowHeight, columns, animate } = this.props;
+    const { children, locked, isResizable, rowHeight, columns, animate, useDragHandle } = this.props;
     const { layout } = this.state;
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${locked || !isResizable ? 'locked' : 'unlocked'}`}
+      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${_gridClass(locked, isResizable, useDragHandle)}`}
                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                     breakpoints={BREAKPOINTS}
                                     cols={columns}
@@ -177,7 +197,7 @@ class ReactGridContainer extends React.Component {
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
                                     useCSSTransforms={animate}
-                                    draggableHandle={locked ? '.no-handle' : ''}>
+                                    draggableHandle={locked ? '.no-handle' : useDragHandle}>
         {children}
       </WidthAdjustedReactGridLayout>
     );
