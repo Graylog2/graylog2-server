@@ -10,6 +10,8 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackStores from 'stores/content-packs/ContentPackStores';
+import ShowContentPackStyle from './ShowContentPackPage.css';
+import ContentPackInstallations from "../components/content-packs/ContentPackInstallations";
 
 class ContentPacksPage extends React.Component {
   static propTypes = {
@@ -32,7 +34,7 @@ class ContentPacksPage extends React.Component {
 
   _loadContentPack() {
     ContentPackStores.get(this.props.params.contentPackId).then((contentPack) => {
-      const versions = Object.keys(contentPack);
+      const versions = Object.keys(contentPack.versions);
       this.setState({ contentPack: contentPack, selectedVersion: versions[0] });
     });
   }
@@ -68,14 +70,24 @@ class ContentPacksPage extends React.Component {
           </PageHeader>
 
           <Row>
-            <Col md={6} className="content">
+            <Col md={4} className="content">
               <div id="content-pack-versions">
-                <h2>Versions</h2>
-                <ContentPackVersions versions={Object.keys(contentPack)} onChange={this._onVersionChanged} />
+                <Row className={ShowContentPackStyle.leftRow}>
+                  <Col>
+                    <h2>Versions</h2>
+                    <ContentPackVersions versions={Object.keys(contentPack.versions)} onChange={this._onVersionChanged} />
+                  </Col>
+                </Row>
+                <Row className={ShowContentPackStyle.leftRow}>
+                  <Col>
+                    <h2>Installations</h2>
+                    <ContentPackInstallations installations={contentPack.installations} />
+                  </Col>
+                </Row>
               </div>
             </Col>
-            <Col md={6} className="content">
-              <ContentPackDetails contentPack={contentPack[selectedVersion]} />
+            <Col md={8} className="content">
+              <ContentPackDetails contentPack={contentPack.versions[selectedVersion]} />
             </Col>
           </Row>
         </span>

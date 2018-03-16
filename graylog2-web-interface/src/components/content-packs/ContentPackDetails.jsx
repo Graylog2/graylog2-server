@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { markdown } from 'markdown';
+import { Col } from 'react-bootstrap';
 
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
