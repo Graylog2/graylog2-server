@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.database.MongoConnectionRule;
-import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.events.ClusterEventBus;
@@ -17,6 +16,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -94,7 +96,7 @@ public class ViewServiceTest {
     }
 
     @Test
-    public void searchPaginated() {
+    public void search() {
         final ImmutableMap<String, SearchQueryField> searchFieldMapping = ImmutableMap.<String, SearchQueryField>builder()
                 .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
                 .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -109,7 +111,8 @@ public class ViewServiceTest {
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
-        final PaginatedList<ViewDTO> result = dbService.searchPaginated(queryParser.parse("A B D"), "desc", "title", 1, 10);
+        final List<ViewDTO> result = dbService.search(queryParser.parse("A B D"), "desc", "title")
+                .collect(Collectors.toList());
 
         assertThat(result)
                 .hasSize(3)

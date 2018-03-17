@@ -39,6 +39,8 @@ import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
@@ -82,9 +84,19 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-            // TODO: Add permission checks - need to check every view for permissions
-            final PaginatedList<ViewDTO> result = dbService.searchPaginated(searchQuery, order, sort, page, perPage);
 
+            // We cannot paginate using database queries because we have to do permission checks.
+            // Since the permissions are only stored in roles or the user object, we have to do the filtering in
+            // memory after loading all views.
+            final AtomicInteger total = new AtomicInteger(0);
+            final List<ViewDTO> list = dbService.search(searchQuery, order, sort)
+                    .filter(view -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, view.id()))
+                    .peek(view -> total.incrementAndGet())
+                    .skip(perPage * Math.max(0, page - 1))
+                    .limit(perPage)
+                    .collect(Collectors.toList());
+
+            final PaginatedList<ViewDTO> result = new PaginatedList<>(list, total.get(), page, perPage);
             return PaginatedResponse.create("views", result, query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
