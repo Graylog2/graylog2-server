@@ -28,8 +28,12 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.zafarkhaja.semver.Version;
 import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
+import org.graylog2.jackson.VersionDeserializer;
+import org.graylog2.jackson.VersionSerializer;
 import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
@@ -56,11 +60,13 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                                 @JacksonSubTypes Set<NamedType> subtypes) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
+        final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
+                .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())
@@ -71,7 +77,10 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
                         .addSerializer(new RangeJsonSerializer())
                         .addSerializer(new SizeSerializer())
-                        .addSerializer(new ObjectIdSerializer()));
+                        .addSerializer(new ObjectIdSerializer())
+                        .addSerializer(new VersionSerializer())
+                        .addDeserializer(Version.class, new VersionDeserializer())
+                );
 
         if (subtypes != null) {
             objectMapper.registerSubtypes(subtypes.toArray(new NamedType[]{}));
