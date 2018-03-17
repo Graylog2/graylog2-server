@@ -18,8 +18,10 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -84,26 +86,23 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @PUT
     @Path("{id}")
-    @ApiOperation("Update existing view")
+    @ApiOperation("Update view")
     public ViewDTO update(@ApiParam @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid ViewDTO dto) {
+        loadView(id);
         return dbService.save(dto.toBuilder().id(id).build());
     }
 
-    @JsonAutoDetect
-    @SuppressWarnings("unused")
-    static class ViewResultPage {
-        @JsonProperty("query")
-        private final String query;
-        @JsonUnwrapped
-        private final PaginatedList.PaginationInfo pagination;
-        @JsonProperty("views")
-        private final List<ViewDTO> views;
+    @DELETE
+    @Path("{id}")
+    @ApiOperation("Delete view")
+    public ViewDTO delete(@ApiParam @PathParam("id") @NotEmpty String id) {
+        final ViewDTO dto = loadView(id);
+        dbService.delete(id);
+        return dto;
+    }
 
-        ViewResultPage(String query, PaginatedList.PaginationInfo pagination, List<ViewDTO> views) {
-            this.query = query;
-            this.pagination = pagination;
-            this.views = views;
-        }
+    private ViewDTO loadView(String id) {
+        return dbService.get(id).orElseThrow(() -> new NotFoundException("View " + id + " doesn't exist"));
     }
 }
