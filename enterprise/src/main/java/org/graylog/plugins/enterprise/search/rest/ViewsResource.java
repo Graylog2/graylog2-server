@@ -78,6 +78,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
+    @GET
+    @Path("{id}")
+    @ApiOperation("Get a single view")
+    public ViewDTO get(@ApiParam @PathParam("id") @NotEmpty String id) {
+        if ("default".equals(id)) {
+            return dbService.getDefault().orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
+        }
+        return loadView(id);
+    }
+
     @POST
     @ApiOperation("Create a new view")
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) {
@@ -91,6 +101,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                           @ApiParam @Valid ViewDTO dto) {
         loadView(id);
         return dbService.save(dto.toBuilder().id(id).build());
+    }
+
+    @PUT
+    @Path("{id}/default")
+    @ApiOperation("Configures the view as default view")
+    public void setDefault(@ApiParam @PathParam("id") @NotEmpty String id) {
+        dbService.saveDefault(loadView(id));
     }
 
     @DELETE

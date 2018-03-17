@@ -6,8 +6,12 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.database.MongoConnectionRule;
 import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,6 +20,8 @@ import org.junit.Test;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 public class ViewServiceTest {
     @ClassRule
@@ -24,11 +30,20 @@ public class ViewServiceTest {
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     private ViewService dbService;
+    private ClusterConfigServiceImpl clusterConfigService;
 
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        this.dbService = new ViewService(mongoRule.getMongoConnection(), objectMapperProvider);
+        this.clusterConfigService = new ClusterConfigServiceImpl(
+                objectMapperProvider,
+                mongoRule.getMongoConnection(),
+                mock(NodeId.class),
+                new ChainingClassLoader(getClass().getClassLoader()),
+                new ClusterEventBus()
+        );
+        this.dbService = new ViewService(mongoRule.getMongoConnection(), objectMapperProvider, clusterConfigService);
+
     }
 
     @After
@@ -100,5 +115,22 @@ public class ViewServiceTest {
                 .hasSize(3)
                 .extracting("title")
                 .containsExactly("View D", "View B", "View A");
+    }
+
+    @Test
+    public void saveAndGetDefault() {
+        dbService.save(ViewDTO.builder().title("View A").build());
+        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").build());
+
+        dbService.saveDefault(savedView2);
+
+        assertThat(dbService.getDefault())
+                .isPresent()
+                .get()
+                .extracting("id", "title")
+                .containsExactly(savedView2.id(), "View B");
+
+        assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").build()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
