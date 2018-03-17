@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ForwardingList;
+import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -81,6 +82,15 @@ public class PaginatedList<E> extends ForwardingList<E> {
         @JsonProperty("per_page")
         public int getPerPage() {
             return perPage;
+        }
+
+        public ImmutableMap<String, Object> asMap() {
+            return ImmutableMap.of(
+                    "total", globalTotal,
+                    "page", page,
+                    "per_page", perPage,
+                    "count", getCount()
+            );
         }
 
         @Override

@@ -1,13 +1,9 @@
 package org.graylog.plugins.enterprise.search.rest;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog.plugins.enterprise.search.views.ViewDTO;
@@ -31,7 +27,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 import static java.util.Locale.ENGLISH;
 
@@ -58,14 +53,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @GET
     @ApiOperation("Get a list of all views")
-    public ViewResultPage views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                @ApiParam(name = "sort",
-                                   value = "The field to sort the result on",
-                                   required = true,
-                                   allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sort,
-                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                @ApiParam(name = "query") @QueryParam("query") String query ) {
+    public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                            @ApiParam(name = "sort",
+                                                    value = "The field to sort the result on",
+                                                    required = true,
+                                                    allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sort,
+                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
+                                            @ApiParam(name = "query") @QueryParam("query") String query ) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sort.toLowerCase(ENGLISH))) {
             sort = ViewDTO.FIELD_TITLE;
@@ -73,10 +68,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
-
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(searchQuery, order, sort, page, perPage);
 
-            return new ViewResultPage(query, result.pagination(), StreamEx.of(result).toList());
+            return PaginatedResponse.create("views", result, query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
