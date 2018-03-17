@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -102,6 +104,45 @@ public abstract class PaginatedDbService<DTO> {
     }
 
     /**
+     * Returns a {@link PaginatedList<DTO>} for the given query, filter and pagination parameters.
+     * <p>
+     * Since the database cannot execute the filter function directly, this method streams over the result cursor
+     * and executes the filter function for each database object. This is more expensive than using
+     * {@link PaginatedDbService#findPaginatedWithQueryFilterAndSort(DBQuery.Query, Predicate, DBSort.SortBuilder, int, int) #findPaginatedWithQueryAndSort()}.
+     * <p>
+     * This method is only accessible by subclasses to avoid exposure of the {@link DBQuery} and {@link DBSort}
+     * interfaces to consumers.
+     *
+     * @param query the query to execute
+     * @param filter the filter to apply to each database entry
+     * @param sort the sort builder for the query
+     * @param page the page number that should be returned
+     * @param perPage the number of entries per page
+     * @return the paginated list
+     */
+    protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSort(DBQuery.Query query,
+                                                                     Predicate<DTO> filter,
+                                                                     DBSort.SortBuilder sort,
+                                                                     int page,
+                                                                     int perPage) {
+        final AtomicInteger total = new AtomicInteger(0);
+
+        // First created a filtered stream
+        final Stream<DTO> dtoStream = streamQueryWithSort(query, sort)
+                .peek(dto -> total.incrementAndGet())
+                .filter(filter);
+
+        // Then use that filtered stream and only collect the entries according to page and perPage
+        final List<DTO> list = Stream.of(dtoStream)
+                .flatMap(stream -> stream)
+                .skip(perPage * Math.max(0, page - 1))
+                .limit(perPage)
+                .collect(Collectors.toList());
+
+        return new PaginatedList<>(list, total.get(), page, perPage);
+    }
+
+    /**
      * Returns an unordered stream of all entries in the database.
      *
      * @return stream of all database entries
@@ -143,5 +184,22 @@ public abstract class PaginatedDbService<DTO> {
      */
     protected Stream<DTO> streamQueryWithSort(DBQuery.Query query, DBSort.SortBuilder sort) {
         return Streams.stream((Iterable<DTO>) db.find(query).sort(sort));
+    }
+
+    /**
+     * Returns a sort builder for the given order and field name.
+     *
+     * @param order the order. either "asc" or "desc"
+     * @param field the field to sort on
+     * @return the sort builder
+     */
+    protected DBSort.SortBuilder getSortBuilder(String order, String field) {
+        DBSort.SortBuilder sortBuilder;
+        if ("desc".equalsIgnoreCase(order)) {
+            sortBuilder = DBSort.desc(field);
+        } else {
+            sortBuilder = DBSort.asc(field);
+        }
+        return sortBuilder;
     }
 }
