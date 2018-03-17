@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog.plugins.enterprise.search.views.ViewDTO;
 import org.graylog.plugins.enterprise.search.views.ViewService;
@@ -70,6 +71,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
+            // TODO: Add permission checks - need to check every view for permissions
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(searchQuery, order, sort, page, perPage);
 
             return PaginatedResponse.create("views", result, query);
@@ -83,13 +85,18 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Get a single view")
     public ViewDTO get(@ApiParam @PathParam("id") @NotEmpty String id) {
         if ("default".equals(id)) {
-            return dbService.getDefault().orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
+            // If the user is not permitted to access the default view, return a 404
+            return dbService.getDefault()
+                    .filter(dto -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, dto.id()))
+                    .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
+        checkPermission(EnterpriseSearchRestPermissions.VIEW_READ, id);
         return loadView(id);
     }
 
     @POST
     @ApiOperation("Create a new view")
+    @RequiresPermissions(EnterpriseSearchRestPermissions.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) {
         return dbService.save(dto);
     }
@@ -99,6 +106,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Update view")
     public ViewDTO update(@ApiParam @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid ViewDTO dto) {
+        checkPermission(EnterpriseSearchRestPermissions.VIEW_EDIT, id);
         loadView(id);
         return dbService.save(dto.toBuilder().id(id).build());
     }
@@ -107,6 +115,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
     public void setDefault(@ApiParam @PathParam("id") @NotEmpty String id) {
+        checkPermission(EnterpriseSearchRestPermissions.VIEW_READ, id);
+        checkPermission(EnterpriseSearchRestPermissions.DEFAULT_VIEW_SET);
         dbService.saveDefault(loadView(id));
     }
 
@@ -114,6 +124,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("{id}")
     @ApiOperation("Delete view")
     public ViewDTO delete(@ApiParam @PathParam("id") @NotEmpty String id) {
+        checkPermission(EnterpriseSearchRestPermissions.VIEW_DELETE, id);
         final ViewDTO dto = loadView(id);
         dbService.delete(id);
         return dto;
