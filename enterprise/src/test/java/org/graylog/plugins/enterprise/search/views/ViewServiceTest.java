@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.database.MongoConnectionRule;
+import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.events.ClusterEventBus;
@@ -16,9 +17,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +94,7 @@ public class ViewServiceTest {
     }
 
     @Test
-    public void search() {
+    public void searchPaginated() {
         final ImmutableMap<String, SearchQueryField> searchFieldMapping = ImmutableMap.<String, SearchQueryField>builder()
                 .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
                 .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
@@ -111,13 +109,31 @@ public class ViewServiceTest {
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
-        final List<ViewDTO> result = dbService.search(queryParser.parse("A B D"), "desc", "title")
-                .collect(Collectors.toList());
+        final PaginatedList<ViewDTO> result1 = dbService.searchPaginated(
+                queryParser.parse("A B D"),
+                view -> true, "desc",
+                "title",
+                1,
+                5
+        );
 
-        assertThat(result)
+        assertThat(result1)
                 .hasSize(3)
                 .extracting("title")
                 .containsExactly("View D", "View B", "View A");
+
+        final PaginatedList<ViewDTO> result2 = dbService.searchPaginated(
+                queryParser.parse("A B D"),
+                view -> view.title().contains("B") || view.title().contains("D"), "desc",
+                "title",
+                1,
+                5
+        );
+
+        assertThat(result2)
+                .hasSize(2)
+                .extracting("title")
+                .containsExactly("View D", "View B");
     }
 
     @Test

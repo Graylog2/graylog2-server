@@ -1,15 +1,15 @@
 package org.graylog.plugins.enterprise.search.views;
 
 import org.graylog.plugins.enterprise.database.PaginatedDbService;
+import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -26,18 +26,12 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         this.clusterConfigService = clusterConfigService;
     }
 
-    private DBSort.SortBuilder getSortBuilder(String order, String sort) {
-        DBSort.SortBuilder sortBuilder;
-        if ("desc".equalsIgnoreCase(order)) {
-            sortBuilder = DBSort.desc(sort);
-        } else {
-            sortBuilder = DBSort.asc(sort);
-        }
-        return sortBuilder;
-    }
-
-    public Stream<ViewDTO> search(SearchQuery query, String order, String sort) {
-        return streamQueryWithSort(query.toDBQuery(), getSortBuilder(order, sort));
+    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
+                                                  Predicate<ViewDTO> filter, String order,
+                                                  String sortField,
+                                                  int page,
+                                                  int perPage) {
+        return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter, getSortBuilder(order, sortField), page, perPage);
     }
 
     public void saveDefault(ViewDTO dto) {

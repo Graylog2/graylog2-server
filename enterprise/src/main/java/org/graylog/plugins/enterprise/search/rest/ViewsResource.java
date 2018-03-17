@@ -39,8 +39,6 @@ import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
@@ -74,29 +72,23 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                                             @ApiParam(name = "sort",
                                                     value = "The field to sort the result on",
                                                     required = true,
-                                                    allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sort,
+                                                    allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
                                             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
                                             @ApiParam(name = "query") @QueryParam("query") String query ) {
 
-        if (!ViewDTO.SORT_FIELDS.contains(sort.toLowerCase(ENGLISH))) {
-            sort = ViewDTO.FIELD_TITLE;
+        if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
+            sortField = ViewDTO.FIELD_TITLE;
         }
 
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
+            final PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                    searchQuery,
+                    view -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, view.id()), order,
+                    sortField,
+                    page,
+                    perPage);
 
-            // We cannot paginate using database queries because we have to do permission checks.
-            // Since the permissions are only stored in roles or the user object, we have to do the filtering in
-            // memory after loading all views.
-            final AtomicInteger total = new AtomicInteger(0);
-            final List<ViewDTO> list = dbService.search(searchQuery, order, sort)
-                    .filter(view -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, view.id()))
-                    .peek(view -> total.incrementAndGet())
-                    .skip(perPage * Math.max(0, page - 1))
-                    .limit(perPage)
-                    .collect(Collectors.toList());
-
-            final PaginatedList<ViewDTO> result = new PaginatedList<>(list, total.get(), page, perPage);
             return PaginatedResponse.create("views", result, query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
