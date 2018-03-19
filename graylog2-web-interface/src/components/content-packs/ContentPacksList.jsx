@@ -48,7 +48,7 @@ class ContentPacksList extends React.Component {
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.title}</Link> <small>Version: {item.version}</small>
+              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.version}</small>
                 <ContentPackStatus states={item.states} />
               </h3>
             </Col>
@@ -120,9 +120,9 @@ class ContentPacksList extends React.Component {
               id="content-packs-filter"
               label="Filter"
               data={this.props.contentPacks}
-              displayKey="title"
+              displayKey="name"
               onDataFiltered={this._filterContentPacks}
-              searchInKeys={['title', 'summary']}
+              searchInKeys={['name', 'summary']}
               filterSuggestions={[]}
             />
           </Col>
