@@ -37,6 +37,7 @@ import org.mongojack.ObjectId;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -226,10 +227,12 @@ public class PaginatedDbServiceTest {
         dbService.save(newDto("hello3"));
         dbService.save(newDto("hello4"));
 
-        assertThat(dbService.streamAll().collect(Collectors.toList()))
-                .hasSize(4)
-                .extracting("title")
-                .containsExactly("hello1", "hello2", "hello3", "hello4");
+        try (final Stream<TestDTO> cursor = dbService.streamAll()) {
+            assertThat(cursor.collect(Collectors.toList()))
+                    .hasSize(4)
+                    .extracting("title")
+                    .containsExactly("hello1", "hello2", "hello3", "hello4");
+        }
     }
 
     @Test
@@ -240,13 +243,14 @@ public class PaginatedDbServiceTest {
         dbService.save(newDto("hello5"));
         dbService.save(newDto("hello5"));
 
-        final List<TestDTO> list = dbService.streamByIds(ImmutableSet.of(hello1.id, hello2.id, hello3.id))
-                .collect(Collectors.toList());
+        try (final Stream<TestDTO> cursor = dbService.streamByIds(ImmutableSet.of(hello1.id, hello2.id, hello3.id))) {
+            final List<TestDTO> list = cursor.collect(Collectors.toList());
 
-        assertThat(list)
-                .hasSize(3)
-                .extracting("title")
-                .containsExactly("hello1", "hello2", "hello3");
+            assertThat(list)
+                    .hasSize(3)
+                    .extracting("title")
+                    .containsExactly("hello1", "hello2", "hello3");
+        }
     }
 
     @Test
@@ -259,12 +263,14 @@ public class PaginatedDbServiceTest {
 
         final DBQuery.Query query = DBQuery.in("title", "hello1", "hello3", "hello4");
 
-        final List<TestDTO> list = dbService.streamQuery(query).collect(Collectors.toList());
+        try (final Stream<TestDTO> cursor = dbService.streamQuery(query)) {
+            final List<TestDTO> list = cursor.collect(Collectors.toList());
 
-        assertThat(list)
-                .hasSize(3)
-                .extracting("title")
-                .containsExactly("hello1", "hello3", "hello4");
+            assertThat(list)
+                    .hasSize(3)
+                    .extracting("title")
+                    .containsExactly("hello1", "hello3", "hello4");
+        }
     }
 
     @Test
@@ -278,12 +284,14 @@ public class PaginatedDbServiceTest {
         final DBQuery.Query query = DBQuery.in("title", "hello5", "hello3", "hello1");
         final DBSort.SortBuilder sort = DBSort.desc("title");
 
-        final List<TestDTO> list = dbService.streamQueryWithSort(query, sort).collect(Collectors.toList());
+        try (final Stream<TestDTO> cursor = dbService.streamQueryWithSort(query, sort)) {
+            final List<TestDTO> list = cursor.collect(Collectors.toList());
 
-        assertThat(list)
-                .hasSize(3)
-                .extracting("title")
-                .containsExactly("hello5", "hello3", "hello1");
+            assertThat(list)
+                    .hasSize(3)
+                    .extracting("title")
+                    .containsExactly("hello5", "hello3", "hello1");
+        }
     }
 
     @Test

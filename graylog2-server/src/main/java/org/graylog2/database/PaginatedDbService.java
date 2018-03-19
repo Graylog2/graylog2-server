@@ -106,12 +106,12 @@ public abstract class PaginatedDbService<DTO> {
      * @return the paginated list
      */
     protected PaginatedList<DTO> findPaginatedWithQueryAndSort(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
-        final DBCursor<DTO> cursor = db.find(query)
+        try (final DBCursor<DTO> cursor = db.find(query)
                 .sort(sort)
                 .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1));
-
-        return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+                .skip(perPage * Math.max(0, page - 1))) {
+            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+        }
     }
 
     private ImmutableList<DTO> asImmutableList(Iterator<? extends DTO> cursor) {
@@ -122,8 +122,10 @@ public abstract class PaginatedDbService<DTO> {
      * Returns a {@link PaginatedList<DTO>} for the given query, filter and pagination parameters.
      * <p>
      * Since the database cannot execute the filter function directly, this method streams over the result cursor
-     * and executes the filter function for each database object. This is more expensive than using
-     * {@link PaginatedDbService#findPaginatedWithQueryFilterAndSort(DBQuery.Query, Predicate, DBSort.SortBuilder, int, int) #findPaginatedWithQueryAndSort()}.
+     * and executes the filter function for each database object. <strong>This increases memory consumption and should only be
+     * used if necessary.</strong> Use the
+     * {@link PaginatedDbService#findPaginatedWithQueryFilterAndSort(DBQuery.Query, Predicate, DBSort.SortBuilder, int, int) #findPaginatedWithQueryAndSort()}
+     * method if possible.
      * <p>
      * This method is only accessible by subclasses to avoid exposure of the {@link DBQuery} and {@link DBSort}
      * interfaces to consumers.
@@ -142,23 +144,27 @@ public abstract class PaginatedDbService<DTO> {
                                                                      int perPage) {
         final AtomicInteger total = new AtomicInteger(0);
 
-        // First created a filtered stream
-        final Stream<DTO> dtoStream = streamQueryWithSort(query, sort)
-                .filter(filter)
-                .peek(dto -> total.incrementAndGet());
+        try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
+            // First created a filtered stream
+            final Stream<DTO> dtoStream = cursor
+                    .filter(filter)
+                    .peek(dto -> total.incrementAndGet());
 
-        // Then use that filtered stream and only collect the entries according to page and perPage
-        final List<DTO> list = Stream.of(dtoStream)
-                .flatMap(stream -> stream)
-                .skip(perPage * Math.max(0, page - 1))
-                .limit(perPage)
-                .collect(Collectors.toList());
+            // Then use that filtered stream and only collect the entries according to page and perPage
+            final List<DTO> list = Stream.of(dtoStream)
+                    .flatMap(stream -> stream)
+                    .skip(perPage * Math.max(0, page - 1))
+                    .limit(perPage)
+                    .collect(Collectors.toList());
 
-        return new PaginatedList<>(list, total.get(), page, perPage);
+            return new PaginatedList<>(list, total.get(), page, perPage);
+        }
     }
 
     /**
      * Returns an unordered stream of all entries in the database.
+     * <p>
+     * The returned stream needs to be closed to free the underlying database resources.
      *
      * @return stream of all database entries
      */
@@ -168,6 +174,8 @@ public abstract class PaginatedDbService<DTO> {
 
     /**
      * Returns an unordered stream of all entries in the database for the given IDs.
+     * <p>
+     * The returned stream needs to be closed to free the underlying database resources.
      *
      * @param idSet set of IDs to query
      * @return stream of database entries for the given IDs
@@ -182,23 +190,29 @@ public abstract class PaginatedDbService<DTO> {
 
     /**
      * Returns an unordered stream of database entries for the given {@link DBQuery.Query}.
+     * <p>
+     * The returned stream needs to be closed to free the underlying database resources.
      *
      * @param query the query to execute
      * @return stream of database entries that match the query
      */
     protected Stream<DTO> streamQuery(DBQuery.Query query) {
-        return Streams.stream((Iterable<DTO>) db.find(query));
+        final DBCursor<DTO> cursor = db.find(query);
+        return Streams.stream((Iterable<DTO>) cursor).onClose(cursor::close);
     }
 
     /**
      * Returns a stream of database entries for the given {@link DBQuery.Query} sorted by the give {@link DBSort.SortBuilder}.
+     * <p>
+     * The returned stream needs to be closed to free the underlying database resources.
      *
      * @param query the query to execute
      * @param sort the sort order for the query
      * @return stream of database entries that match the query
      */
     protected Stream<DTO> streamQueryWithSort(DBQuery.Query query, DBSort.SortBuilder sort) {
-        return Streams.stream((Iterable<DTO>) db.find(query).sort(sort));
+        final DBCursor<DTO> cursor = db.find(query).sort(sort);
+        return Streams.stream((Iterable<DTO>) cursor).onClose(cursor::close);
     }
 
     /**
