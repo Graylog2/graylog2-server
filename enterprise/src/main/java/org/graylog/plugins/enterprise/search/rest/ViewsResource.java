@@ -44,7 +44,6 @@ import java.util.Set;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
 
-// TODO permission system
 @Api(value = "Enterprise/Views", description = "Views management")
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
