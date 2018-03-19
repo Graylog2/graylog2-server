@@ -8,15 +8,20 @@ const Plot = createPlotlyComponent(Plotly);
 
 const GenericPlot = ({ chartData }) => (
   <Plot data={chartData}
-        style={{ position: 'absolute' }}
-        fit
+        useResizeHandler
         layout={{
+          autosize: true,
           margin: {
+            autoexpand: true,
             t: 10,
-            pad: 10,
+            l: 40,
+            r: 40,
+            b: 30,
+            pad: 0,
           },
         }}
-        config={{ displayModeBar: false }}/>
+        style={{ height: '100%', width: '100%' }}
+        config={{ displayModeBar: false }} />
 );
 
 GenericPlot.propTypes = {
