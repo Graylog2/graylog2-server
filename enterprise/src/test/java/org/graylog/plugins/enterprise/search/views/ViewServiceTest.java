@@ -2,6 +2,7 @@ package org.graylog.plugins.enterprise.search.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.database.MongoConnectionRule;
 import org.graylog.plugins.enterprise.database.PaginatedList;
@@ -63,9 +64,12 @@ public class ViewServiceTest {
                 .title("View 1")
                 .summary("This is a nice view")
                 .description("This contains lots of descriptions for the view.")
+                .searchId("abc123")
+                .properties(ImmutableSet.of("read-only"))
                 .build();
         final ViewDTO dto2 = ViewDTO.builder()
                 .title("View 2")
+                .searchId("abc123")
                 .build();
 
         final ViewDTO savedDto1 = dbService.save(dto1);
@@ -74,13 +78,13 @@ public class ViewServiceTest {
 
         assertThat(savedDto1)
                 .satisfies(this::hasValidId)
-                .extracting("title", "summary", "description")
-                .containsExactly("View 1", "This is a nice view", "This contains lots of descriptions for the view.");
+                .extracting("title", "summary", "description", "searchId", "properties")
+                .containsExactly("View 1", "This is a nice view", "This contains lots of descriptions for the view.", "abc123", ImmutableSet.of("read-only"));
 
         assertThat(savedDto2)
                 .satisfies(this::hasValidId)
-                .extracting("title", "summary", "description")
-                .containsExactly("View 2", "", "");
+                .extracting("title", "summary", "description", "searchId", "properties")
+                .containsExactly("View 2", "", "", "abc123", ImmutableSet.of());
 
         assertThat(dbService.get(savedDto1.id()))
                 .isPresent()
@@ -101,11 +105,11 @@ public class ViewServiceTest {
                 .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
                 .build();
 
-        dbService.save(ViewDTO.builder().title("View A").build());
-        dbService.save(ViewDTO.builder().title("View B").build());
-        dbService.save(ViewDTO.builder().title("View C").build());
-        dbService.save(ViewDTO.builder().title("View D").build());
-        dbService.save(ViewDTO.builder().title("View E").build());
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").build());
+        dbService.save(ViewDTO.builder().title("View B").searchId("abc123").build());
+        dbService.save(ViewDTO.builder().title("View C").searchId("abc123").build());
+        dbService.save(ViewDTO.builder().title("View D").searchId("abc123").build());
+        dbService.save(ViewDTO.builder().title("View E").searchId("abc123").build());
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
@@ -138,8 +142,8 @@ public class ViewServiceTest {
 
     @Test
     public void saveAndGetDefault() {
-        dbService.save(ViewDTO.builder().title("View A").build());
-        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").build());
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").build());
+        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").searchId("abc123").build());
 
         dbService.saveDefault(savedView2);
 
@@ -149,7 +153,7 @@ public class ViewServiceTest {
                 .extracting("id", "title")
                 .containsExactly(savedView2.id(), "View B");
 
-        assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").build()))
+        assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").searchId("abc123").build()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

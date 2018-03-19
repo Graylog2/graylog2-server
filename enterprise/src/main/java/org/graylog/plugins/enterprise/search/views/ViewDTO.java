@@ -13,6 +13,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
@@ -22,6 +23,8 @@ public abstract class ViewDTO {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_SUMMARY = "summary";
     public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_SEARCH_ID = "search_id";
+    public static final String FIELD_PROPERTIES = "properties";
     public static final String FIELD_CREATED_AT = "created_at";
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
@@ -43,6 +46,12 @@ public abstract class ViewDTO {
     // A longer description of the view, probably including markup text
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
+
+    @JsonProperty(FIELD_SEARCH_ID)
+    public abstract String searchId();
+
+    @JsonProperty(FIELD_PROPERTIES)
+    public abstract ImmutableSet<String> properties();
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
@@ -69,6 +78,17 @@ public abstract class ViewDTO {
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
+        @JsonProperty(FIELD_SEARCH_ID)
+        public abstract Builder searchId(String searchId);
+
+        abstract ImmutableSet.Builder<String> propertiesBuilder();
+
+        @JsonProperty(FIELD_PROPERTIES)
+        public Builder properties(Set<String> properties) {
+            propertiesBuilder().addAll(properties);
+            return this;
+        }
+
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
@@ -77,6 +97,7 @@ public abstract class ViewDTO {
             return new AutoValue_ViewDTO.Builder()
                     .summary("")
                     .description("")
+                    .properties(ImmutableSet.of())
                     .createdAt(DateTime.now(DateTimeZone.UTC));
         }
 
