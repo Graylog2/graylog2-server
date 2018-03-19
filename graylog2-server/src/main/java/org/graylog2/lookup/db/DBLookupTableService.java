@@ -17,27 +17,24 @@
 package org.graylog2.lookup.db;
 
 import com.google.common.collect.ImmutableList;
-
 import com.mongodb.BasicDBObject;
-
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.dto.LookupTableDto;
-import org.graylog2.rest.models.PaginatedList;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 public class DBLookupTableService {
 

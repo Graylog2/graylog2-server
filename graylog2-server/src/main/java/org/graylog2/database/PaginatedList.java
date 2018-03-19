@@ -14,19 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.ForwardingList;
+package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ForwardingList;
+import com.google.common.collect.ImmutableMap;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import javax.annotation.Nonnull;
 
 public class PaginatedList<E> extends ForwardingList<E> {
 
@@ -80,13 +79,8 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     @JsonAutoDetect
     public class PaginationInfo {
-        @JsonProperty("total")
         private final int globalTotal;
-
-        @JsonProperty("page")
         private final int page;
-
-        @JsonProperty("per_page")
         private final int perPage;
 
         public PaginationInfo(int globalTotal, int page, int perPage) {
@@ -100,10 +94,35 @@ public class PaginatedList<E> extends ForwardingList<E> {
             return delegate().size();
         }
 
+        @JsonProperty("total")
+        public int getGlobalTotal() {
+            return globalTotal;
+        }
+
+        @JsonProperty("page")
+        public int getPage() {
+            return page;
+        }
+
+        @JsonProperty("per_page")
+        public int getPerPage() {
+            return perPage;
+        }
+
+        public ImmutableMap<String, Object> asMap() {
+            return ImmutableMap.of(
+                    "total", globalTotal,
+                    "page", page,
+                    "per_page", perPage,
+                    "count", getCount()
+            );
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof PaginatedList.PaginationInfo)) return false;
+            @SuppressWarnings("unchecked")
             PaginationInfo that = (PaginationInfo) o;
             return globalTotal == that.globalTotal &&
                     page == that.page &&
