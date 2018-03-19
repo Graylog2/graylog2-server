@@ -3,7 +3,7 @@ package org.graylog.plugins.enterprise.search.rest;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
-import org.graylog.plugins.enterprise.database.PaginatedList;
+import org.graylog2.database.PaginatedList;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

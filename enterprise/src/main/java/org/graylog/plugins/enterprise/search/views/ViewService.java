@@ -1,9 +1,9 @@
 package org.graylog.plugins.enterprise.search.views;
 
-import org.graylog.plugins.enterprise.database.PaginatedDbService;
-import org.graylog.plugins.enterprise.database.PaginatedList;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.search.SearchQuery;
 
