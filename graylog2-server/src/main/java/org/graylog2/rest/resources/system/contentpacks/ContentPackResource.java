@@ -19,20 +19,30 @@ package org.graylog2.rest.resources.system.contentpacks;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bundles.ContentPackService;
 import org.graylog2.content_packs.ContentPack;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.Set;
 
 @RequiresAuthentication
@@ -56,10 +66,31 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
     public Set<ContentPack> listBundles() {
-        //TODO: [konrad] checkpermission!
-        LOG.info("List content packs");
+        checkPermission(RestPermissions.BUNDLE_READ);
         Set<ContentPack> contentPacks = contentPackService.loadAll();
 
         return contentPacks;
     }
+
+    @POST
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Upload a content pack")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Missing or invalid content pack"),
+            @ApiResponse(code = 500, message = "Error while saving content apck")
+    })
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_CREATE)
+    public Response createBundle(
+            @ApiParam(name = "Request body", value = "Content pack", required = true)
+            @NotNull @Valid
+            final ContentPack contentPack) {
+        checkPermission(RestPermissions.BUNDLE_CREATE);
+        final ContentPack pack = contentPackService.insert(contentPack);
+        final URI packUri = getUriBuilderToSelf().path(ContentPackResource.class)
+                .path("{contentPackId}")
+                .build(pack.getId());
+        return Response.created(packUri).build();
+    }
+
 }
