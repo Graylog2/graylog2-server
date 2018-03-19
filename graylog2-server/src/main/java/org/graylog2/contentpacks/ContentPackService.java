@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bundles;
+package org.graylog2.contentpacks;
 
 import com.google.common.collect.Iterators;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.content_packs.ContentPack;
+import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.database.MongoConnection;
 import org.mongojack.DBCursor;
 import org.mongojack.JacksonDBCollection;

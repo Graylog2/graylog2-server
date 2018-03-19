@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.contentpacks;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,8 +26,9 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.bundles.ContentPackService;
-import org.graylog2.content_packs.ContentPack;
+import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,7 @@ public class ContentPackResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
+    @JsonView(ContentPackView.HttpView.class)
     public Set<ContentPack> listBundles() {
         checkPermission(RestPermissions.BUNDLE_READ);
         Set<ContentPack> contentPacks = contentPackService.loadAll();
@@ -72,7 +75,7 @@ public class ContentPackResource extends RestResource {
         return contentPacks;
     }
 
-    @POST
+ /*   @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Upload a content pack")
@@ -91,6 +94,6 @@ public class ContentPackResource extends RestResource {
                 .path("{contentPackId}")
                 .build(pack.getId());
         return Response.created(packUri).build();
-    }
+    } */
 
 }
