@@ -121,7 +121,8 @@ public class PaginatedDbServiceTest {
     public void delete() {
         final TestDTO savedDto = dbService.save(newDto("hello"));
 
-        dbService.delete(savedDto.id);
+        assertThat(dbService.delete(savedDto.id)).isEqualTo(1);
+        assertThat(dbService.delete(savedDto.id)).isEqualTo(0);
 
         assertThat(dbService.get(savedDto.id)).isNotPresent();
     }

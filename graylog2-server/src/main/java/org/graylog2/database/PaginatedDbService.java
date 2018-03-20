@@ -88,9 +88,10 @@ public abstract class PaginatedDbService<DTO> {
      * Deletes the {@link DTO} for the given ID from the database.
      *
      * @param id ID of the {@link DTO} to delete
+     * @return the number of deleted documents
      */
-    public void delete(String id) {
-        db.removeById(new ObjectId(id));
+    public int delete(String id) {
+        return db.removeById(new ObjectId(id)).getN();
     }
 
     /**
