@@ -9,7 +9,7 @@ import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
-import ContentPackStores from 'stores/content-packs/ContentPackStores';
+import ContentPacksStores from 'stores/content-packs/ContentPacksStores';
 import ShowContentPackStyle from './ShowContentPackPage.css';
 import ContentPackInstallations from "../components/content-packs/ContentPackInstallations";
 
@@ -33,7 +33,7 @@ class ContentPacksPage extends React.Component {
   }
 
   _loadContentPack() {
-    ContentPackStores.get(this.props.params.contentPackId).then((contentPack) => {
+    ContentPacksStores.get(this.props.params.contentPackId).then((contentPack) => {
       const versions = Object.keys(contentPack.versions);
       this.setState({ contentPack: contentPack, selectedVersion: versions[0] });
     });

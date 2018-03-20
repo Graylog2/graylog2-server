@@ -1,4 +1,6 @@
 import React from 'react';
+import Reflux from 'reflux';
+import createReactClass from 'create-react-class';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -7,26 +9,17 @@ import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
-import ContentPackStores from 'stores/content-packs/ContentPackStores';
+import CombinedProvider from 'injection/CombinedProvider';
 
-class ContentPacksPage extends React.Component {
+const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      contentPacks: undefined,
-    };
-  }
+const ContentPacksPage = createReactClass({
+  displayName: 'ContentPacksPage',
+  mixins: [Reflux.connect(ContentPacksStore)],
 
   componentDidMount() {
-    this._loadContentPacks();
-  }
-
-  _loadContentPacks() {
-    ContentPackStores.list().then((contentPacks) => {
-      this.setState({ contentPacks: contentPacks });
-    });
-  }
+    ContentPacksActions.list();
+  },
 
   render() {
     if (!this.state.contentPacks) {
@@ -67,7 +60,7 @@ class ContentPacksPage extends React.Component {
         </span>
       </DocumentTitle>
     );
-  }
-}
+  },
+});
 
 export default ContentPacksPage;
