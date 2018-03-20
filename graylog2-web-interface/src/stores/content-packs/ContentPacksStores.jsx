@@ -4,10 +4,14 @@ import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import ActionsProvider from 'injection/ActionsProvider';
 
-const ContentPackStores = Reflux.createStore({
+const ContentPacksActions = ActionsProvider.getActions('ContentPacks');
+
+const ContentPacksStores = Reflux.createStore({
+  listenables: [ContentPacksActions],
+
   init() {
-
     this.contentPack = {
       versions: {
         '1.0': {
@@ -47,24 +51,22 @@ const ContentPackStores = Reflux.createStore({
   },
 
   list() {
-    const failCallback = (error) => {
-      UserNotification.error(`Fetching content_packs failed with status: ${error.message} \
-          Could not retrieve content packs.`);
-    };
+    const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.list().url);
+    const promise = fetch('GET', url)
+      .then((result) => {
+        this.trigger({ contentPacks: result });
 
-    const promise = new Promise((resolve) => {
-      const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.list().url);
-      return fetch('GET', url).then((response) => {
-        resolve(response);
-      }, failCallback);
-    });
-    return promise;
+        return result;
+      });
+
+    ContentPacksActions.list.promise(promise);
   },
 
   create(request) {
-    return fetch('POST', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.create().url), request);
-  },
+    const promise = fetch('POST', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.create().url), request);
 
+    ContentPacksActions.create.promise(promise);
+  },
 });
 
-export default ContentPackStores;
+export default ContentPacksStores;

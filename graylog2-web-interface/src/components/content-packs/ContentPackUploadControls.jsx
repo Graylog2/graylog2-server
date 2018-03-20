@@ -3,10 +3,11 @@ import React from 'react';
 import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { Button } from 'react-bootstrap';
-import ContentPackStores from 'stores/content-packs/ContentPackStores';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 
 class ContentPackUploadControls extends React.Component {
-
   constructor(props) {
     super(props);
     this._openModal = this._openModal.bind(this);
@@ -32,10 +33,11 @@ class ContentPackUploadControls extends React.Component {
 
     reader.onload = (evt) => {
       const request = evt.target.result;
-      ContentPackStores.create(request)
+      ContentPacksActions.create.triggerPromise(request)
         .then(
           () => {
             UserNotification.success('Content pack imported successfully', 'Success!');
+            ContentPacksActions.list();
           },
           () => {
             UserNotification.error('Error importing content pack, please ensure it is a valid JSON file. Check your ' +
