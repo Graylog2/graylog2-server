@@ -14,7 +14,7 @@ class CombinedProvider {
       Collectors: () => require('actions/sidecars/CollectorsActions'),
       Configuration: () => require('actions/configurations/ConfigurationActions'),
       ConfigurationBundles: () => require('actions/configuration-bundles/ConfigurationBundlesActions'),
-      ContentPacks: () => require('actions/content_packs/ContentPacksActions'),
+      ContentPacks: () => require('actions/content-packs/ContentPacksActions'),
       Dashboards: () => require('actions/dashboards/DashboardsActions'),
       Decorators: () => require('actions/decorators/DecoratorsActions'),
       Deflector: () => require('actions/indices/DeflectorActions'),
