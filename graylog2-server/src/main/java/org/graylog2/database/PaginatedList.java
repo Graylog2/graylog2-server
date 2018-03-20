@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.ForwardingList;
+package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.ForwardingList;
+import com.google.common.collect.ImmutableMap;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import javax.annotation.Nonnull;
 
 public class PaginatedList<E> extends ForwardingList<E> {
 
@@ -34,9 +34,9 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     private final PaginationInfo paginationInfo;
 
-    public PaginatedList(@Nonnull List<E> delegate, int globalTotal, int page, int perPage) {
+    public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage) {
         this.delegate = delegate;
-        this.paginationInfo = new PaginationInfo(globalTotal, page, perPage);
+        this.paginationInfo = PaginationInfo.create(total, delegate.size(), page, perPage);
     }
 
     @Override
@@ -79,49 +79,31 @@ public class PaginatedList<E> extends ForwardingList<E> {
     }
 
     @JsonAutoDetect
-    public class PaginationInfo {
+    @AutoValue
+    public static abstract class PaginationInfo {
         @JsonProperty("total")
-        private final int globalTotal;
-
-        @JsonProperty("page")
-        private final int page;
-
-        @JsonProperty("per_page")
-        private final int perPage;
-
-        public PaginationInfo(int globalTotal, int page, int perPage) {
-            this.globalTotal = globalTotal;
-            this.page = page;
-            this.perPage = perPage;
-        }
+        public abstract int total();
 
         @JsonProperty("count")
-        public int getCount() {
-            return delegate().size();
+        public abstract int count();
+
+        @JsonProperty("page")
+        public abstract int page();
+
+        @JsonProperty("per_page")
+        public abstract int perPage();
+
+        public static PaginationInfo create(int total, int count, int page, int perPage) {
+            return new AutoValue_PaginatedList_PaginationInfo(total, count, page, perPage);
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof PaginatedList.PaginationInfo)) return false;
-            PaginationInfo that = (PaginationInfo) o;
-            return globalTotal == that.globalTotal &&
-                    page == that.page &&
-                    perPage == that.perPage;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(globalTotal, page, perPage);
-        }
-
-        @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                    .add("globalTotal", globalTotal)
-                    .add("page", page)
-                    .add("perPage", perPage)
-                    .toString();
+        public ImmutableMap<String, Object> asMap() {
+            return ImmutableMap.of(
+                    "total", total(),
+                    "page", page(),
+                    "per_page", perPage(),
+                    "count", count()
+            );
         }
     }
 }
