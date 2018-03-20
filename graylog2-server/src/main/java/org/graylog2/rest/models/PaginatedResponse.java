@@ -17,7 +17,7 @@
 package org.graylog2.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.database.PaginatedList;
 
@@ -27,11 +27,18 @@ import java.util.Map;
 
 @JsonAutoDetect
 public class PaginatedResponse<T> {
-    @SuppressWarnings("unused")
-    @JsonUnwrapped
-    private final Map<String, Object> data;
+    private final String listKey;
+    private final PaginatedList<T> paginatedList;
+    private final String query;
 
     private PaginatedResponse(String listKey, PaginatedList<T> paginatedList, @Nullable String query) {
+        this.listKey = listKey;
+        this.paginatedList = paginatedList;
+        this.query = query;
+    }
+
+    @JsonValue
+    public Map<String, Object> jsonValue() {
         final ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
                 .putAll(paginatedList.pagination().asMap())
                 .put(listKey, new ArrayList<>(paginatedList));
@@ -40,7 +47,7 @@ public class PaginatedResponse<T> {
             builder.put("query", query);
         }
 
-        this.data = builder.build();
+        return builder.build();
     }
 
     public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList) {
