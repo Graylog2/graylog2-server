@@ -60,6 +60,11 @@ const ContentPackStores = Reflux.createStore({
     });
     return promise;
   },
+
+  create(request) {
+    return fetch('POST', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.create().url), request);
+  },
+
 });
 
 export default ContentPackStores;
