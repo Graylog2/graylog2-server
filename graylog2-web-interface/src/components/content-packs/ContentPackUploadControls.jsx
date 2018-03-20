@@ -39,9 +39,15 @@ class ContentPackUploadControls extends React.Component {
             UserNotification.success('Content pack imported successfully', 'Success!');
             ContentPacksActions.list();
           },
-          () => {
-            UserNotification.error('Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-              'Graylog logs for more information.', 'Could not import content pack');
+          (response) => {
+            const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
+              'Graylog logs for more information.';
+            const title = 'Could not import content pack';
+            let smallMessage = '';
+            if (response.additional && response.additional.body && response.additional.body.message) {
+              smallMessage = `<br /><small>${response.additional.body.message}</small>`;
+            }
+            UserNotification.error(message + smallMessage, title);
           });
     };
 
