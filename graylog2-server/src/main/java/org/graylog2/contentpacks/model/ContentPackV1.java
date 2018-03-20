@@ -25,6 +25,7 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.parameters.Parameter;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 
 @AutoValue
@@ -41,6 +42,7 @@ public abstract class ContentPackV1 implements ContentPack {
     static final String FIELD_ENTITIES = "entities";
     static final String FIELD_DB_ID = "_id";
 
+    @Nullable
     @JsonView(ContentPackView.DBView.class)
     @JsonProperty(FIELD_DB_ID)
     public abstract String _id();
@@ -86,40 +88,40 @@ public abstract class ContentPackV1 implements ContentPack {
     @AutoValue.Builder
     public abstract static class Builder implements ContentPack.ContentPackBuilder<Builder> {
 
-        @JsonView(ContentPackView.DBView.class)
         @JsonProperty(FIELD_DB_ID)
+        @JsonView(ContentPackView.DBView.class)
         public abstract Builder _id(String _id);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_NAME)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder name(String name);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_SUMMARY)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder summary(String summary);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_DESCRIPTION)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder description(String description);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_VENDOR)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder vendor(String vendor);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_URL)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder url(URI url);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_REQUIRES)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder requires(ImmutableSet<Constraint> requirements);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_PARAMETERS)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
-        @JsonView(ContentPackView.HttpView.class)
         @JsonProperty(FIELD_ENTITIES)
+        @JsonView(ContentPackView.HttpView.class)
         public abstract Builder entities(ImmutableSet<Entity> entities);
 
         abstract ContentPackV1 autoBuild();

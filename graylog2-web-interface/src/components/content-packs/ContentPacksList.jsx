@@ -42,14 +42,15 @@ class ContentPacksList extends React.Component {
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => {
-      const updateButton = item.states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
+      const states = item.states || [];
+      const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
       return (
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.version}</small>
-                <ContentPackStatus states={item.states} />
+              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.rev}</small>
+                <ContentPackStatus states={states} />
               </h3>
             </Col>
             <Col md={3} className="text-right">
