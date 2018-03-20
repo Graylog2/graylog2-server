@@ -26,6 +26,7 @@ const ApiRoutes = {
   },
   ContentPacksController: {
     list: () => { return { url: '/system/content_packs' }; },
+    create: () => { return { url: '/system/content_packs' }; },
   },
   BundlesApiController: {
     apply: (bundleId) => { return { url: `/system/bundles/${bundleId}/apply` }; },

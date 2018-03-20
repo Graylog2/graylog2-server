@@ -16,13 +16,19 @@
  */
 package org.graylog2.contentpacks;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Iterators;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.database.MongoConnection;
 import org.mongojack.DBCursor;
+import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
+import org.mongojack.WriteResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,6 +40,7 @@ public class ContentPackService {
     private static final String COLLECTION_NAME = "content_packs";
 
     private final JacksonDBCollection<ContentPack, ObjectId> dbCollection;
+    private static final Logger LOG = LoggerFactory.getLogger(ContentPackService.class);
 
     @Inject
     public ContentPackService(final MongoJackObjectMapperProvider mapperProvider,
@@ -53,5 +60,16 @@ public class ContentPackService {
         Iterators.addAll(contentPacks, ContentPacks);
 
         return contentPacks;
+    }
+
+    @JsonView(ContentPackView.DBView.class)
+    public ContentPack insert(final ContentPack pack) {
+        final DBQuery.Query query = DBQuery.is("id", pack.id()).is("revision", pack.revision());
+        if (dbCollection.findOne(query) != null) {
+            LOG.debug("Content pack already found id: {} revision: {}. Did not insert!", pack.id(), pack.revision());
+            return null;
+        }
+        final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.insert(pack);
+        return writeResult.getSavedObject();
     }
 }

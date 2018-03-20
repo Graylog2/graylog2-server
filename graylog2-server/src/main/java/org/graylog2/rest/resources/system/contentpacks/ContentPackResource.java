@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -75,7 +76,7 @@ public class ContentPackResource extends RestResource {
         return contentPacks;
     }
 
- /*   @POST
+    @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Upload a content pack")
@@ -84,16 +85,21 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while saving content apck")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_CREATE)
+    @JsonView(ContentPackView.HttpView.class)
     public Response createBundle(
             @ApiParam(name = "Request body", value = "Content pack", required = true)
             @NotNull @Valid
             final ContentPack contentPack) {
         checkPermission(RestPermissions.BUNDLE_CREATE);
         final ContentPack pack = contentPackService.insert(contentPack);
+        if (pack == null) {
+            //TODO: fix error handling!
+            throw new BadRequestException("Content pack with this version already found!");
+        }
         final URI packUri = getUriBuilderToSelf().path(ContentPackResource.class)
                 .path("{contentPackId}")
-                .build(pack.getId());
+                .build(pack.id());
         return Response.created(packUri).build();
-    } */
+    }
 
 }
