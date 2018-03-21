@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.contentpacks.model.ModelId;
@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -64,11 +63,11 @@ import java.util.stream.Collectors;
 public class ContentPackResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackResource.class);
 
-    private final ContentPackService contentPackService;
+    private final ContentPackPersistenceService contentPackPersistenceService;
 
     @Inject
-    public ContentPackResource(final ContentPackService contentPackService) {
-        this.contentPackService = contentPackService;
+    public ContentPackResource(final ContentPackPersistenceService contentPackPersistenceService) {
+        this.contentPackPersistenceService = contentPackPersistenceService;
     }
 
     @GET
@@ -80,7 +79,7 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public Set<ContentPack> listContentPacks() {
         checkPermission(RestPermissions.BUNDLE_READ);
-        Set<ContentPack> contentPacks = contentPackService.loadAll();
+        Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
 
         return contentPacks;
     }
@@ -96,7 +95,7 @@ public class ContentPackResource extends RestResource {
     public Set<ContentPack> listLatestContentPacks() {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackService.loadAllLatest();
+        return contentPackPersistenceService.loadAllLatest();
     }
 
     @GET
@@ -113,7 +112,7 @@ public class ContentPackResource extends RestResource {
                     String id) {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackService.findAllById(ModelId.of(id)).stream()
+        return contentPackPersistenceService.findAllById(ModelId.of(id)).stream()
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
     }
 
@@ -128,14 +127,14 @@ public class ContentPackResource extends RestResource {
     public ContentPack listContentPackRevisions(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId")
-            String id,
+                    String id,
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision")
-            int revision
+                    int revision
     ) {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackService.findByIdAndRevision(ModelId.of(id), revision)
+        return contentPackPersistenceService.findByIdAndRevision(ModelId.of(id), revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
     }
 
@@ -153,7 +152,7 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "Request body", value = "Content pack", required = true)
             @NotNull @Valid final ContentPack contentPack) {
         checkPermission(RestPermissions.BUNDLE_CREATE);
-        final ContentPack pack = contentPackService.insert(contentPack)
+        final ContentPack pack = contentPackPersistenceService.insert(contentPack)
                 .orElseThrow(() -> new BadRequestException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!"));
 
         final URI packUri = getUriBuilderToSelf().path(ContentPackResource.class)
@@ -175,10 +174,9 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
-            @PathParam("contentPackId")
-            final String contentPackId) {
+            @PathParam("contentPackId") final String contentPackId) {
         checkPermission(RestPermissions.BUNDLE_DELETE);
-        final int deleted = contentPackService.deleteById(ModelId.of(contentPackId));
+        final int deleted = contentPackPersistenceService.deleteById(ModelId.of(contentPackId));
 
         LOG.debug("Deleted {} content packs with id {}", deleted, contentPackId);
     }
@@ -196,13 +194,11 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
-            @PathParam("contentPackId")
-            final String contentPackId,
+            @PathParam("contentPackId") final String contentPackId,
             @ApiParam(name = "revision", value = "Content Pack revision", required = true)
-            @PathParam("revision")
-            final int revision) {
+            @PathParam("revision") final int revision) {
         checkPermission(RestPermissions.BUNDLE_DELETE);
-        contentPackService.deleteByIdAndRevision(ModelId.of(contentPackId), revision);
+        contentPackPersistenceService.deleteByIdAndRevision(ModelId.of(contentPackId), revision);
 
         LOG.debug("Deleted content packs with id {} and revision", contentPackId, revision);
     }

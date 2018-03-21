@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
-import org.apache.zookeeper.Op;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
@@ -43,20 +42,20 @@ import java.util.Optional;
 import java.util.Set;
 
 @Singleton
-public class ContentPackService {
+public class ContentPackPersistenceService {
     private static final String COLLECTION_NAME = "content_packs";
 
     private final JacksonDBCollection<ContentPack, ObjectId> dbCollection;
-    private static final Logger LOG = LoggerFactory.getLogger(ContentPackService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ContentPackPersistenceService.class);
 
     @Inject
-    public ContentPackService(final MongoJackObjectMapperProvider mapperProvider,
-                              final MongoConnection mongoConnection) {
+    public ContentPackPersistenceService(final MongoJackObjectMapperProvider mapperProvider,
+                                         final MongoConnection mongoConnection) {
         this(JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ContentPack.class, ObjectId.class, mapperProvider.get()));
     }
 
-    ContentPackService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection) {
+    ContentPackPersistenceService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection) {
         this.dbCollection = dbCollection;
 
         dbCollection.createIndex(new BasicDBObject(Identified.FIELD_META_ID, 1).append(Revisioned.FIELD_META_REVISION, 1), new BasicDBObject("unique", true));
