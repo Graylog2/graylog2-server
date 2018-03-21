@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,7 +57,7 @@ public class ContentPackTest {
                 .put("long", 1234L)
                 .put("string", "foobar");
         final ContentPack contentPack = ContentPackV1.builder()
-                .id(ModelId.of(UUID.fromString("a7917ee5-3e1a-4f89-951d-aeb604616998")))
+                .id(ModelId.of("a7917ee5-3e1a-4f89-951d-aeb604616998"))
                 .revision(1)
                 .name("Test")
                 .summary("Summary")
@@ -75,7 +74,7 @@ public class ContentPackTest {
                         LongParameter.builder().name("MY_LONG").title("My Long").description("Some description").defaultValue(Optional.of(42L)).build(),
                         StringParameter.builder().name("MY_STRING").title("My String").description("Some description").defaultValue(Optional.of("Default Value")).build()))
                 .entities(ImmutableSet.of(
-                        Entity.builder().id(ModelId.of(UUID.fromString("fafd32d1-7f71-41a8-89f5-53c9b307d4d5"))).type("input").version(ModelVersion.of("1")).data(entityData).build()))
+                        Entity.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type("input").version(ModelVersion.of("1")).data(entityData).build()))
                 .build();
 
 
@@ -115,7 +114,7 @@ public class ContentPackTest {
 
         assertThat(contentPack).isNotNull();
         assertThat(contentPack.version()).isEqualTo(ModelVersion.of("1"));
-        assertThat(contentPack.id()).isEqualTo(ModelId.of(UUID.fromString("dcd74ede-6832-4ef7-9f69-62f626b324fb")));
+        assertThat(contentPack.id()).isEqualTo(ModelId.of("dcd74ede-6832-4ef7-9f69-62f626b324fb"));
         assertThat(contentPack.revision()).isEqualTo(12);
         assertThat(contentPack.name()).isEqualTo("The content pack name");
         assertThat(contentPack.summary()).isEqualTo("Short summary of what this content pack contains");
@@ -140,7 +139,7 @@ public class ContentPackTest {
         assertThat(contentPack.entities()).contains(
                 Entity.builder()
                         .version(ModelVersion.of("1"))
-                        .id(ModelId.of(UUID.fromString("311d9e16-e4d9-485d-a916-337fb4ca0e8b")))
+                        .id(ModelId.of("311d9e16-e4d9-485d-a916-337fb4ca0e8b"))
                         .type("lookup_table")
                         .data(objectMapper.createObjectNode()
                                 .put("title", "OTX API - IP")
