@@ -1,4 +1,5 @@
 import ExtendedSearchPage from 'enterprise/ExtendedSearchPage';
+import ViewManagementPage from 'enterprise/ViewManagementPage';
 import { Histogram, MessageList, SearchSidebarWidget } from 'enterprise/components/widgets';
 import GroupByHandler from 'enterprise/logic/searchtypes/GroupByHandler';
 import { DateHistogramHandler, MessageListHandler } from 'enterprise/logic/searchtypes';
@@ -15,17 +16,21 @@ import LineVisualization from './components/visualizations/line/LineVisualizatio
 import PieVisualization from './components/visualizations/pie/PieVisualization';
 
 const extendedSearchPath = '/extendedsearch';
+const viewsPath = '/views';
 
 export default {
   pages: {
-    // search: { component: ExtendedSearchPage }
+    search: { component: ExtendedSearchPage },
+    views: { component: ViewManagementPage },
   },
   routes: [
     { path: extendedSearchPath, component: ExtendedSearchPage },
+    { path: viewsPath, component: ViewManagementPage },
   ],
   navigation: [
     // Disabling navigation for extended search for now to avoid confusing alpha testers.
     // { path: extendedSearchPath, description: 'Extended Search' },
+    // { path: viewsPath, description: 'Views' },
   ],
   enterpriseWidgets: [
     {
