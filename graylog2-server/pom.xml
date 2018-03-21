@@ -356,6 +356,10 @@
             <artifactId>assertj-joda-time</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.revinate</groupId>
+            <artifactId>assertj-json</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.lordofthejars</groupId>
             <artifactId>nosqlunit-mongodb</artifactId>
         </dependency>
