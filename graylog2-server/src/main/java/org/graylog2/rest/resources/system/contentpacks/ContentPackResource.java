@@ -108,11 +108,10 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public Map<Integer, ContentPack> listContentPackRevisions(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
-            @PathParam("contentPackId")
-                    String id) {
+            @PathParam("contentPackId") ModelId id) {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackPersistenceService.findAllById(ModelId.of(id)).stream()
+        return contentPackPersistenceService.findAllById(id).stream()
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
     }
 
@@ -126,15 +125,14 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public ContentPack listContentPackRevisions(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
-            @PathParam("contentPackId")
-                    String id,
+            @PathParam("contentPackId") ModelId id,
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision")
                     int revision
     ) {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackPersistenceService.findByIdAndRevision(ModelId.of(id), revision)
+        return contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
     }
 
@@ -174,9 +172,9 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
-            @PathParam("contentPackId") final String contentPackId) {
+            @PathParam("contentPackId") final ModelId contentPackId) {
         checkPermission(RestPermissions.BUNDLE_DELETE);
-        final int deleted = contentPackPersistenceService.deleteById(ModelId.of(contentPackId));
+        final int deleted = contentPackPersistenceService.deleteById(contentPackId);
 
         LOG.debug("Deleted {} content packs with id {}", deleted, contentPackId);
     }
@@ -194,11 +192,11 @@ public class ContentPackResource extends RestResource {
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
-            @PathParam("contentPackId") final String contentPackId,
+            @PathParam("contentPackId") final ModelId contentPackId,
             @ApiParam(name = "revision", value = "Content Pack revision", required = true)
             @PathParam("revision") final int revision) {
         checkPermission(RestPermissions.BUNDLE_DELETE);
-        contentPackPersistenceService.deleteByIdAndRevision(ModelId.of(contentPackId), revision);
+        contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
 
         LOG.debug("Deleted content packs with id {} and revision", contentPackId, revision);
     }
