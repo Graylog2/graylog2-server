@@ -3,6 +3,8 @@ import React from 'react';
 import { Pagination } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 
+const defaultPageSizes = [10, 50, 100];
+
 /**
  * Wrapper component around an element that renders pagination
  * controls and provides a callback when the page or page size change.
@@ -24,20 +26,21 @@ class PaginatedList extends React.Component {
     pageSizes: PropTypes.arrayOf(PropTypes.number),
     /** Total amount of items in all pages. */
     totalItems: PropTypes.number.isRequired,
-    /** */
+    /** Whether to show the page size selector or not. */
     showPageSizeSelect: PropTypes.bool,
   };
 
-  static defaultProps = function() {
-    const defaultPageSizes = [10, 50, 100];
-    return {
-      pageSizes: defaultPageSizes,
-      pageSize: defaultPageSizes[0],
-      showPageSizeSelect: true,
-    };
-  }();
 
-  state = { currentPage: 1, pageSize: this.props.pageSize };
+  static defaultProps = {
+    pageSizes: defaultPageSizes,
+    pageSize: defaultPageSizes[0],
+    showPageSizeSelect: true,
+  };
+
+  state = {
+    currentPage: 1,
+    pageSize: this.props.pageSize,
+  };
 
   _onChangePageSize = (event) => {
     event.preventDefault();
@@ -79,10 +82,15 @@ class PaginatedList extends React.Component {
         {this.props.children}
 
         <div className="text-center">
-          <Pagination bsSize="small" items={numberPages} maxButtons={10}
+          <Pagination bsSize="small"
+                      items={numberPages}
+                      maxButtons={10}
                       activePage={this.state.currentPage}
                       onSelect={this._onChangePage}
-                      prev next first last />
+                      prev
+                      next
+                      first
+                      last />
         </div>
       </span>
     );
