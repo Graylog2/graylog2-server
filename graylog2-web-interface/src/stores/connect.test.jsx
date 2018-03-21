@@ -48,6 +48,7 @@ describe('connect()', () => {
   });
 
   it('connects component to store without state', () => {
+    SimpleStore.reset();
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
     const wrapper = mount(<Component />);
     expect(wrapper).toHaveText('No value.');
@@ -63,6 +64,7 @@ describe('connect()', () => {
   it('reflects state changes in store', () => {
     const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
     const wrapper = mount(<Component />);
+    SimpleStore.reset();
     expect(wrapper).toHaveText('No value.');
     SimpleStore.setValue(42);
     expect(wrapper).toHaveText('Value is: 42');
