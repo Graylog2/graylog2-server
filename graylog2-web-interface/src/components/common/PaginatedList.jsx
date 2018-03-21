@@ -20,6 +20,8 @@ class PaginatedList extends React.Component {
      * It receives the current page and the page size as arguments.
      */
     onChange: PropTypes.func.isRequired,
+    /** The active page number. If not specified the active page number will be tracked internally. */
+    activePage: PropTypes.number,
     /** Number of items per page. */
     pageSize: PropTypes.number,
     /** Array of different items per page that are allowed. */
@@ -32,15 +34,22 @@ class PaginatedList extends React.Component {
 
 
   static defaultProps = {
+    activePage: 0,
     pageSizes: defaultPageSizes,
     pageSize: defaultPageSizes[0],
     showPageSizeSelect: true,
   };
 
   state = {
-    currentPage: 1,
+    currentPage: this.props.activePage > 0 ? this.props.activePage : 1,
     pageSize: this.props.pageSize,
   };
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.activePage !== nextProps.activePage) {
+      this.setState({ currentPage: nextProps.activePage });
+    }
+  }
 
   _onChangePageSize = (event) => {
     event.preventDefault();
