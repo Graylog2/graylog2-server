@@ -240,24 +240,23 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                UFW Grok Patterns
-              </a>
+              />
                
               <small>
                 Version: 
-                1.0
               </small>
-              <span
-                className="badge installed"
-              >
-                installed
-              </span>
-              <span
-                className="badge edited"
-              >
-                edited
-              </span>
+              <div>
+                <span
+                  className="badge installed"
+                >
+                  installed
+                </span>
+                <span
+                  className="badge edited"
+                >
+                  edited
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -386,14 +385,12 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                Rails Log Patterns
-              </a>
+              />
                
               <small>
                 Version: 
-                2.1
               </small>
+              <div />
             </h3>
           </div>
           <div
@@ -522,19 +519,18 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                Backup Content Pack
-              </a>
+              />
                
               <small>
                 Version: 
-                3.0
               </small>
-              <span
-                className="badge installed"
-              >
-                installed
-              </span>
+              <div>
+                <span
+                  className="badge installed"
+                >
+                  installed
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -663,19 +659,18 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                SSH Archive
-              </a>
+              />
                
               <small>
                 Version: 
-                3.4
               </small>
-              <span
-                className="badge error"
-              >
-                error
-              </span>
+              <div>
+                <span
+                  className="badge error"
+                >
+                  error
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -804,24 +799,23 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                FTP Backup
-              </a>
+              />
                
               <small>
                 Version: 
-                1.0
               </small>
-              <span
-                className="badge installed"
-              >
-                installed
-              </span>
-              <span
-                className="badge updatable"
-              >
-                updatable
-              </span>
+              <div>
+                <span
+                  className="badge installed"
+                >
+                  installed
+                </span>
+                <span
+                  className="badge updatable"
+                >
+                  updatable
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -956,24 +950,23 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                UFW Grok Patterns
-              </a>
+              />
                
               <small>
                 Version: 
-                1.0
               </small>
-              <span
-                className="badge installed"
-              >
-                installed
-              </span>
-              <span
-                className="badge edited"
-              >
-                edited
-              </span>
+              <div>
+                <span
+                  className="badge installed"
+                >
+                  installed
+                </span>
+                <span
+                  className="badge edited"
+                >
+                  edited
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -1102,14 +1095,12 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                Rails Log Patterns
-              </a>
+              />
                
               <small>
                 Version: 
-                2.1
               </small>
+              <div />
             </h3>
           </div>
           <div
@@ -1238,19 +1229,18 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                Backup Content Pack
-              </a>
+              />
                
               <small>
                 Version: 
-                3.0
               </small>
-              <span
-                className="badge installed"
-              >
-                installed
-              </span>
+              <div>
+                <span
+                  className="badge installed"
+                >
+                  installed
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -1379,19 +1369,18 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                SSH Archive
-              </a>
+              />
                
               <small>
                 Version: 
-                3.4
               </small>
-              <span
-                className="badge error"
-              >
-                error
-              </span>
+              <div>
+                <span
+                  className="badge error"
+                >
+                  error
+                </span>
+              </div>
             </h3>
           </div>
           <div
@@ -1520,24 +1509,23 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
               <a
                 onClick={[Function]}
                 style={Object {}}
-              >
-                FTP Backup
-              </a>
+              />
                
               <small>
                 Version: 
-                1.0
               </small>
-              <span
-                className="badge installed"
-              >
-                installed
-              </span>
-              <span
-                className="badge updatable"
-              >
-                updatable
-              </span>
+              <div>
+                <span
+                  className="badge installed"
+                >
+                  installed
+                </span>
+                <span
+                  className="badge updatable"
+                >
+                  updatable
+                </span>
+              </div>
             </h3>
           </div>
           <div
