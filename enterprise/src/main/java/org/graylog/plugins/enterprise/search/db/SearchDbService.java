@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.rest.models.PaginatedList;
+import org.graylog2.database.PaginatedList;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
