@@ -25,10 +25,10 @@ import java.util.UUID;
 @AutoValue
 public abstract class ModelId {
     @JsonValue
-    public abstract UUID id();
+    public abstract String id();
 
     @JsonCreator
-    public static ModelId of(UUID id) {
+    public static ModelId of(String id) {
         return new AutoValue_ModelId(id);
     }
 
