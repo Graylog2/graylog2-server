@@ -16,13 +16,20 @@
  */
 package org.graylog2.contentpacks;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.Iterators;
+import com.google.common.collect.ImmutableSet;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBObject;
+import org.apache.zookeeper.Op;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
-import org.graylog2.contentpacks.model.ContentPackView;
+import org.graylog2.contentpacks.model.Identified;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.database.MongoConnection;
+import org.mongojack.Aggregation;
+import org.mongojack.AggregationResult;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -32,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Singleton
@@ -49,27 +56,79 @@ public class ContentPackService {
                 ContentPack.class, ObjectId.class, mapperProvider.get()));
     }
 
-    public ContentPackService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection) {
+    ContentPackService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection) {
         this.dbCollection = dbCollection;
+
+        dbCollection.createIndex(new BasicDBObject(Identified.FIELD_META_ID, 1).append(Revisioned.FIELD_META_REVISION, 1), new BasicDBObject("unique", true));
     }
 
     public Set<ContentPack> loadAll() {
-        final DBCursor<ContentPack> ContentPacks = dbCollection.find();
-        final Set<ContentPack> contentPacks = new HashSet<>();
-
-        Iterators.addAll(contentPacks, ContentPacks);
-
-        return contentPacks;
+        final DBCursor<ContentPack> contentPacks = dbCollection.find();
+        return ImmutableSet.copyOf((Iterable<ContentPack>) contentPacks);
     }
 
-    @JsonView(ContentPackView.DBView.class)
-    public ContentPack insert(final ContentPack pack) {
-        final DBQuery.Query query = DBQuery.is("id", pack.id()).is("revision", pack.revision());
-        if (dbCollection.findOne(query) != null) {
-            LOG.debug("Content pack already found id: {} revision: {}. Did not insert!", pack.id(), pack.revision());
-            return null;
+    public Set<ContentPack> loadAllLatest() {
+        final DBObject groupStage = BasicDBObjectBuilder.start()
+                .push("$group")
+                .append("_id", "$id")
+                .push("max_rev")
+                .append("$max", "$rev")
+                .get();
+        final DBObject lookupStage = BasicDBObject.parse(
+                "{$lookup: " +
+                        "        {from: \"content_packs\",\n" +
+                        "         let: {id:\"$_id\", rev:\"$max_rev\"},\n" +
+                        "         pipeline: [\n" +
+                        "             {$match:\n" +
+                        "                 {$expr:\n" +
+                        "                     {$and: [\n" +
+                        "                         {$eq: [\"$id\",\"$$id\"]},\n" +
+                        "                         {$eq: [\"$rev\", \"$$rev\"]}\n" +
+                        "                     ]}\n" +
+                        "                 }\n" +
+                        "             }\n" +
+                        "         ],\n" +
+                        "         as: \"latest\"\n" +
+                        "        }\n" +
+                        "    }");
+        final DBObject unwindStage = new BasicDBObject("$unwind", "$latest");
+        final DBObject replaceRootStage = BasicDBObjectBuilder.start()
+                .push("$replaceRoot")
+                .append("newRoot", "$latest")
+                .get();
+
+        final AggregationResult<ContentPack> result = dbCollection.aggregate(new Aggregation<>(ContentPack.class,
+                groupStage, lookupStage, unwindStage, replaceRootStage));
+        return ImmutableSet.copyOf(result.results());
+    }
+
+    public Set<ContentPack> findAllById(ModelId id) {
+        final DBCursor<ContentPack> result = dbCollection.find(DBQuery.is(Identified.FIELD_META_ID, id));
+        return ImmutableSet.copyOf((Iterable<ContentPack>) result);
+    }
+
+    public Optional<ContentPack> findByIdAndRevision(ModelId id, int revision) {
+        final DBQuery.Query query = DBQuery.is(Identified.FIELD_META_ID, id).is(Revisioned.FIELD_META_REVISION, revision);
+        return Optional.ofNullable(dbCollection.findOne(query));
+    }
+
+    public Optional<ContentPack> insert(final ContentPack pack) {
+        if (findByIdAndRevision(pack.id(), pack.revision()).isPresent()) {
+            LOG.debug("Content pack already found: id: {} revision: {}. Did not insert!", pack.id(), pack.revision());
+            return Optional.empty();
         }
         final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.insert(pack);
-        return writeResult.getSavedObject();
+        return Optional.of(writeResult.getSavedObject());
+    }
+
+    public int deleteById(ModelId id) {
+        final DBQuery.Query query = DBQuery.is(Identified.FIELD_META_ID, id);
+        final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.remove(query);
+        return writeResult.getN();
+    }
+
+    public void deleteByIdAndRevision(ModelId id, int revision) {
+        final DBQuery.Query query = DBQuery.is(Identified.FIELD_META_ID, id).is(Revisioned.FIELD_META_REVISION, revision);
+        dbCollection.remove(query);
     }
 }

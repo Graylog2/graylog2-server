@@ -1,5 +1,3 @@
-package org.graylog2.contentpacks.model;
-
 /**
  * This file is part of Graylog.
  *
@@ -16,8 +14,9 @@ package org.graylog2.contentpacks.model;
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.graylog2.contentpacks.model;
 
-public class ContentPackView {
-    public static class HttpView {}
-    public static class DBView extends HttpView {}
+public interface ContentPackView {
+    interface HttpView {}
+    interface DBView extends HttpView {}
 }
