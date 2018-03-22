@@ -7,7 +7,11 @@ import ContentPackConstraintsStyle from './ContentPackConstraints.css';
 
 class ContentPackConstraints extends React.Component {
   static propTypes = {
-    constraints: PropTypes.object.isRequired,
+    constraints: PropTypes.array,
+  };
+
+  static defaultProps = {
+    constraints: [],
   };
 
   static rowFormatter(item) {

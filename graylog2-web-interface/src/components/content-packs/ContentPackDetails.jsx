@@ -20,6 +20,8 @@ class ContentPackDetails extends React.Component {
       <div id="content-pack-details">
         <h2>Details</h2><small>Version: {this.props.contentPack.version}</small>
         <dl className="deflist">
+          <dt>Name:</dt> <dd>{this.props.contentPack.name}</dd>
+          <dt>Summary:</dt> <dd>{this.props.contentPack.summary}</dd>
           <dt>Vendor:</dt> <dd>{this.props.contentPack.vendor}</dd>
           <dt>URL:</dt> <dd><a href={this.props.contentPack.url}>{this.props.contentPack.url}</a></dd>
           <dt>ID:</dt> <dd><code>{this.props.contentPack.id}</code></dd>

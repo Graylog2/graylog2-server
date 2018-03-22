@@ -1,4 +1,6 @@
 import React from 'react';
+import Reflux from 'reflux';
+import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -9,39 +11,36 @@ import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
-import ContentPacksStores from 'stores/content-packs/ContentPacksStores';
-import ShowContentPackStyle from './ShowContentPackPage.css';
 import ContentPackInstallations from "../components/content-packs/ContentPackInstallations";
+import ShowContentPackStyle from './ShowContentPackPage.css';
+import CombinedProvider from 'injection/CombinedProvider';
 
-class ContentPacksPage extends React.Component {
-  static propTypes = {
+const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
+
+const ShowContentPackPage = createReactClass({
+  displayName: 'ShowContentPackPage',
+
+  propTypes: {
     params: PropTypes.object.isRequired,
-  };
+  },
 
-  constructor(props) {
-    super(props);
-    this.state = {
+  mixins: [Reflux.connect(ContentPacksStore)],
+
+  getInitialState() {
+    return {
       contentPack: undefined,
       selectedVersion: undefined,
     };
+  },
 
-    this._onVersionChanged = this._onVersionChanged.bind(this);
-  }
 
   componentDidMount() {
-    this._loadContentPack();
-  }
-
-  _loadContentPack() {
-    ContentPacksStores.get(this.props.params.contentPackId).then((contentPack) => {
-      const versions = Object.keys(contentPack.versions);
-      this.setState({ contentPack: contentPack, selectedVersion: versions[0] });
-    });
-  }
+    ContentPacksActions.get(this.props.params.contentPackId);
+  },
 
   _onVersionChanged(newVersion) {
     this.setState({ selectedVersion: newVersion });
-  }
+  },
 
   render() {
     if (!this.state.contentPack) {
@@ -49,6 +48,7 @@ class ContentPacksPage extends React.Component {
     }
 
     const { contentPack, selectedVersion } = this.state;
+    const versions = Object.keys(contentPack);
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -75,7 +75,7 @@ class ContentPacksPage extends React.Component {
                 <Row className={ShowContentPackStyle.leftRow}>
                   <Col>
                     <h2>Versions</h2>
-                    <ContentPackVersions versions={Object.keys(contentPack.versions)} onChange={this._onVersionChanged} />
+                    <ContentPackVersions versions={versions} onChange={this._onVersionChanged} />
                   </Col>
                 </Row>
                 <Row className={ShowContentPackStyle.leftRow}>
@@ -87,13 +87,13 @@ class ContentPacksPage extends React.Component {
               </div>
             </Col>
             <Col md={8} className="content">
-              <ContentPackDetails contentPack={contentPack.versions[selectedVersion]} />
+              <ContentPackDetails contentPack={contentPack[selectedVersion]} />
             </Col>
           </Row>
         </span>
       </DocumentTitle>
     );
-  }
-}
+  },
+});
 
-export default ContentPacksPage;
+export default ShowContentPackPage;

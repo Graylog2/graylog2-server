@@ -25,7 +25,8 @@ const ApiRoutes = {
     list: () => { return { url: '/alerts/conditions' }; },
   },
   ContentPacksController: {
-    list: () => { return { url: '/system/content_packs' }; },
+    list: () => { return { url: '/system/content_packs/latest' }; },
+    get: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
     create: () => { return { url: '/system/content_packs' }; },
   },
   BundlesApiController: {
