@@ -1,40 +1,55 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Reflux from 'reflux';
+import createReactClass from 'create-react-class';
 
+import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
 import { Row, Col, Button, DropdownButton, MenuItem, Pagination } from 'react-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import ContentPacksListStyle from './ContentPacksList.css';
 
-class ContentPacksList extends React.Component {
-  static propTypes = {
+const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
+
+const ContentPacksList = createReactClass({
+  displayName: 'ContentPacksList',
+
+  propTypes: {
     contentPacks: PropTypes.arrayOf(PropTypes.object),
-  };
+  },
 
-  static defaultProps = {
+  mixins: [Reflux.connect(ContentPacksStore)],
+
+  defaultProps: {
     contentPacks: [],
-  };
+  },
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
+  getInitialState() {
+    return {
       filteredContentPacks: this.props.contentPacks,
       pageSize: 10,
       currentPage: 1,
     };
-    this._filterContentPacks = this._filterContentPacks.bind(this);
-    this._itemsShownChange = this._itemsShownChange.bind(this);
-    this._onChangePage = this._onChangePage.bind(this);
-  }
+  },
 
   componentWillReceiveProps(nextProps) {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
-  }
+  },
+
+  _deleteContentPack(contentPackId) {
+    if (window.confirm('You are about to delete this content pack, are you sure?')) {
+      ContentPacksActions.delete(contentPackId).then(() => {
+        UserNotification.success('Content Pack deleted successfully.', 'Success');
+        ContentPacksActions.list();
+      }, () => {
+        UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
+      });
+    }
+  },
 
   _formatItems(items) {
     const begin = (this.state.pageSize * (this.state.currentPage - 1));
@@ -59,9 +74,7 @@ class ContentPacksList extends React.Component {
               <Button bsStyle="info" bsSize="small">Install</Button>
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                <MenuItem>Remove</MenuItem>
-                <MenuItem>Uninstall</MenuItem>
-                <MenuItem>Create New Version</MenuItem>
+                <MenuItem onSelect={() => { this._deleteContentPack(item.id); }}>Remove all</MenuItem>
                 <MenuItem>Download</MenuItem>
               </DropdownButton>
             </Col>
@@ -74,23 +87,23 @@ class ContentPacksList extends React.Component {
         </ControlledTableList.Item>
       );
     });
-  }
+  },
 
   _filterContentPacks(filteredItems) {
     this.setState({ filteredContentPacks: filteredItems });
-  }
+  },
 
   _itemsShownChange(event) {
     this.setState({ pageSize: event.target.value });
-  }
+  },
 
   _onChangePage(eventKey, event) {
     event.preventDefault();
     const pageNo = Number(eventKey);
     this.setState({ currentPage: pageNo });
-  }
+  },
 
-  MAX_PAGE_BUTTONS=10;
+  MAX_PAGE_BUTTONS: 10,
 
   render() {
     const numberPages = Math.ceil(this.state.filteredContentPacks.length / this.state.pageSize);
@@ -149,7 +162,7 @@ class ContentPacksList extends React.Component {
         </Row>
       </div>
     );
-  }
-}
+  },
+});
 
 export default ContentPacksList;
