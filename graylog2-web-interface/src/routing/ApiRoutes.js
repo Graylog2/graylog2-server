@@ -27,7 +27,10 @@ const ApiRoutes = {
   ContentPacksController: {
     list: () => { return { url: '/system/content_packs/latest' }; },
     get: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
+    getRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
     create: () => { return { url: '/system/content_packs' }; },
+    delete: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
+    deleteRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
   },
   BundlesApiController: {
     apply: (bundleId) => { return { url: `/system/bundles/${bundleId}/apply` }; },

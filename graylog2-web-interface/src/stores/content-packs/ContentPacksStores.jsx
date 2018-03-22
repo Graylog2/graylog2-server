@@ -41,6 +41,11 @@ const ContentPacksStores = Reflux.createStore({
 
     ContentPacksActions.create.promise(promise);
   },
+
+  delete(contentPackId) {
+    const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.delete(contentPackId).url));
+    ContentPacksActions.delete.promise(promise);
+  },
 });
 
 export default ContentPacksStores;
