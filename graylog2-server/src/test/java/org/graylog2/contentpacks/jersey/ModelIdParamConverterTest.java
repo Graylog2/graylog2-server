@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.jersey;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Test;
@@ -69,6 +70,7 @@ public class ModelIdParamConverterTest extends JerseyTest {
 
     @Path("resource")
     public static class Resource {
+        @NoAuditEvent("Test")
         @POST
         @Path("{path}")
         public String modelId(@PathParam("path") ModelId path,
