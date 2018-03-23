@@ -11,6 +11,13 @@ import { Spinner } from 'components/common';
  */
 class SearchForm extends React.Component {
   static propTypes = {
+    /** The query string value. */
+    query: PropTypes.string,
+    /**
+     * Callback that gets called on every update of the query string.
+     * The first argument of the function is the query string.
+     */
+    onQueryChange: PropTypes.func,
     /**
      * Callback when a search was submitted. The function receives the query
      * and a callback to reset the loading state of the form as arguments.
@@ -55,6 +62,8 @@ class SearchForm extends React.Component {
   };
 
   static defaultProps = {
+    query: '',
+    onQueryChange: null,
     onReset: null,
     label: null,
     placeholder: 'Enter search query...',
@@ -71,10 +80,9 @@ class SearchForm extends React.Component {
   };
 
   state = {
+    query: this.props.query,
     isLoading: false,
   };
-
-  queryRef = null;
 
   _setLoadingState = () => {
     return new Promise((resolve) => {
@@ -96,14 +104,22 @@ class SearchForm extends React.Component {
     e.preventDefault();
 
     this._setLoadingState().then(() => {
-      this.props.onSearch(this.queryRef.value, this._resetLoadingState);
+      this.props.onSearch(this.state.query, this._resetLoadingState);
     });
   };
 
   _onReset = () => {
     this._resetLoadingState();
-    this.queryRef.value = '';
-    this.props.onReset();
+    this.setState({ query: '' }, this.props.onReset);
+  };
+
+  handleQueryChange = (e) => {
+    const query = e.target.value;
+    this.setState({ query: query }, () => {
+      if (this.props.onQueryChange) {
+        this.props.onQueryChange(query);
+      }
+    });
   };
 
   render() {
@@ -112,8 +128,9 @@ class SearchForm extends React.Component {
         <form className="form-inline" onSubmit={this._onSearch}>
           <div className="form-group" >
             {this.props.label && <label htmlFor="common-search-form-query-input" className="control-label">{this.props.label}</label>}
-            <input ref={(q) => { this.queryRef = q; }}
-                   id="common-search-form-query-input"
+            <input id="common-search-form-query-input"
+                   onChange={this.handleQueryChange}
+                   value={this.state.query}
                    placeholder={this.props.placeholder}
                    type="text"
                    style={{ width: this.props.queryWidth }}
