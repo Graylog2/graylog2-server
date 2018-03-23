@@ -18,15 +18,11 @@ const ViewManagementPage = createReactClass({
   },
 
   handleViewExecution(view) {
-    return () => {
-      console.log('EXECUTE VIEW', view);
-    };
+    return ViewActions.execute(view);
   },
 
   handleViewDelete(view) {
-    return () => {
-      console.log('DELETE VIEW', view);
-    };
+    return ViewActions.delete(view);
   },
 
   render() {

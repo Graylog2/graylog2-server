@@ -6,9 +6,12 @@ import URLUtils from 'util/URLUtils';
 
 const ViewActions = Reflux.createActions({
   search: { asyncResult: true },
+  execute: { asyncResult: true },
+  delete: { asyncResult: true },
 });
 
 const viewsUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/views');
+const viewsIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/views/${id}`);
 
 const ViewStore = Reflux.createStore({
   listenables: [ViewActions],
@@ -51,6 +54,20 @@ const ViewStore = Reflux.createStore({
       });
 
     ViewActions.search.promise(promise);
+  },
+
+  execute(view) {
+    // TODO: Implement view execution?
+    console.log('EXECUTE VIEW', view);
+  },
+
+  delete(view) {
+    const promise = fetch('DELETE', viewsIdUrl(view.id)).catch((error) => {
+      UserNotification.error(`Deleting view ${view.title} failed with status: ${error}`,
+        'Could not delete view');
+    });
+
+    ViewActions.delete.promise(promise);
   },
 });
 

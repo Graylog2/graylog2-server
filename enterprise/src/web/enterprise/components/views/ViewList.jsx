@@ -61,16 +61,30 @@ const ViewList = createReactClass({
     });
   },
 
+  handleViewExecution(view) {
+    return () => this.props.handleViewExecution(view);
+  },
+
+  handleViewDelete(view) {
+    return () => {
+      this.props.handleViewDelete(view).then(() => {
+        this.setState({ page: 1 }, () => {
+          this.execSearch();
+        });
+      });
+    };
+  },
+
   itemActionsFactory(view) {
     return (
       <ButtonToolbar>
-        <Button bsStyle="primary" bsSize="xsmall" onClick={this.props.handleViewExecution(view)}>
+        <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleViewExecution(view)}>
           Execute
         </Button>
         <DropdownButton title="More Actions" id={`view-actions-dropdown-${view.id}`} bsSize="xsmall">
           <MenuItem disabled>Edit</MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={this.props.handleViewDelete(view)}>Delete</MenuItem>
+          <MenuItem onSelect={this.handleViewDelete(view)}>Delete</MenuItem>
         </DropdownButton>
       </ButtonToolbar>
     );
