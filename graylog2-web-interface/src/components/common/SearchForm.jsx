@@ -73,10 +73,6 @@ class SearchForm extends React.Component {
     isLoading: false,
   };
 
-  componentWillReceiveProps() {
-    this._resetLoadingState();
-  }
-
   queryRef = null;
 
   _setLoadingState = () => {
