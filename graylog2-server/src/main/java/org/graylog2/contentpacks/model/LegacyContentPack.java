@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
-@JsonDeserialize(builder = AutoValue_LegacyContentPack.Builder.class)
+@JsonDeserialize(builder = LegacyContentPack.Builder.class)
 public abstract class LegacyContentPack implements ContentPack {
     private static final ModelVersion VERSION = ModelVersion.of("0");
     private static final String FIELD_NAME = "name";
@@ -115,8 +116,8 @@ public abstract class LegacyContentPack implements ContentPack {
                 .build();
     }
 
-    public static Builder builder() {
-        return new AutoValue_LegacyContentPack.Builder();
+    static Builder builder() {
+        return Builder.builder();
     }
 
     @AutoValue.Builder
@@ -130,77 +131,84 @@ public abstract class LegacyContentPack implements ContentPack {
         private Collection<Entity> lookupCaches = Collections.emptySet();
         private Collection<Entity> lookupDataAdapters = Collections.emptySet();
 
+        @JsonCreator
+        static Builder builder() {
+            return new AutoValue_LegacyContentPack.Builder()
+                    // Set default id which can be overwritten by Jackson via `Builder#id(ModelId)`
+                    .id(ModelId.of(UUID.randomUUID().toString()));
+        }
+
         @JsonProperty(FIELD_DB_ID)
-        public abstract Builder _id(ObjectId _id);
+        abstract Builder _id(ObjectId _id);
 
         @JsonProperty(FIELD_NAME)
-        public abstract Builder name(String name);
+        abstract Builder name(String name);
 
-        public abstract Builder summary(String summary);
+        abstract Builder summary(String summary);
 
         @JsonProperty(FIELD_DESCRIPTION)
-        public abstract Builder description(String description);
+        abstract Builder description(String description);
 
-        public abstract Builder vendor(String vendor);
+        abstract Builder vendor(String vendor);
 
-        public abstract Builder url(URI url);
+        abstract Builder url(URI url);
 
-        public abstract Builder requires(ImmutableSet<Constraint> requirements);
+        abstract Builder requires(ImmutableSet<Constraint> requirements);
 
-        public abstract Builder parameters(ImmutableSet<Parameter> parameters);
+        abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
-        public abstract Builder entities(ImmutableSet<Entity> entities);
+        abstract Builder entities(ImmutableSet<Entity> entities);
 
         @JsonProperty("category")
-        public Builder category(@SuppressWarnings("unused") String category) {
+        Builder category(@SuppressWarnings("unused") String category) {
             // Ignored
             return this;
         }
 
         @JsonProperty("inputs")
-        public Builder inputs(Collection<JsonNode> inputs) {
+        Builder inputs(Collection<JsonNode> inputs) {
             this.inputs = convertInputs(inputs);
             return this;
         }
 
         @JsonProperty("streams")
-        public Builder streams(Collection<JsonNode> streams) {
+        Builder streams(Collection<JsonNode> streams) {
             this.streams = convertStreams(streams);
             return this;
         }
 
         @JsonProperty("outputs")
-        public Builder outputs(Collection<JsonNode> outputs) {
+        Builder outputs(Collection<JsonNode> outputs) {
             this.outputs = convertOutputs(outputs);
             return this;
         }
 
         @JsonProperty("dashboards")
-        public Builder dashboards(Collection<JsonNode> dashboards) {
+        Builder dashboards(Collection<JsonNode> dashboards) {
             this.dashboards = convertDashboards(dashboards);
             return this;
         }
 
         @JsonProperty("grok_patterns")
-        public Builder grokPatterns(Collection<JsonNode> grokPatterns) {
+        Builder grokPatterns(Collection<JsonNode> grokPatterns) {
             this.grokPatterns = convertGrokPatterns(grokPatterns);
             return this;
         }
 
         @JsonProperty("lookup_tables")
-        public Builder lookupTables(Collection<JsonNode> lookupTables) {
+        Builder lookupTables(Collection<JsonNode> lookupTables) {
             this.lookupTables = convertLookupTables(lookupTables);
             return this;
         }
 
         @JsonProperty("lookup_caches")
-        public Builder lookupCaches(Collection<JsonNode> lookupCaches) {
+        Builder lookupCaches(Collection<JsonNode> lookupCaches) {
             this.lookupCaches = convertLookupCaches(lookupCaches);
             return this;
         }
 
         @JsonProperty("lookup_data_adapters")
-        public Builder lookupDataAdapters(Collection<JsonNode> lookupDataAdapters) {
+        Builder lookupDataAdapters(Collection<JsonNode> lookupDataAdapters) {
             this.lookupDataAdapters = convertLookupDataAdapters(lookupDataAdapters);
             return this;
         }
@@ -219,15 +227,6 @@ public abstract class LegacyContentPack implements ContentPack {
                     .addAll(lookupCaches)
                     .addAll(lookupDataAdapters)
                     .build();
-
-            // Don't overwrite "id" if it was already set. Unfortunately `id()` will throw an IllegalStateException
-            // if it wasn't set because "id" isn't nullable (on purpose).
-            // This is such a dirty hack. :-(
-            try {
-                id();
-            } catch (IllegalStateException e) {
-                id(ModelId.of(UUID.randomUUID().toString()));
-            }
 
             version(VERSION);
             revision(DEFAULT_REVISION);
