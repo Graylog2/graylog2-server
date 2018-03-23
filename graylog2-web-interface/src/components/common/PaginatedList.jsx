@@ -80,16 +80,15 @@ class PaginatedList extends React.Component {
 
   render() {
     const numberPages = Math.ceil(this.props.totalItems / this.state.pageSize);
-    if (numberPages === 0) {
-      return <span>{this.props.children}</span>;
-    }
+    const hasPages = numberPages > 0;
 
     return (
       <span>
-        {this._pageSizeSelect()}
+        {hasPages && this._pageSizeSelect()}
 
         {this.props.children}
 
+        {hasPages &&
         <div className="text-center">
           <Pagination bsSize="small"
                       items={numberPages}
@@ -101,6 +100,7 @@ class PaginatedList extends React.Component {
                       first
                       last />
         </div>
+        }
       </span>
     );
   }
