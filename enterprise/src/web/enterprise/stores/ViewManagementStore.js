@@ -16,7 +16,7 @@ const viewsIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enter
 const ViewStore = Reflux.createStore({
   listenables: [ViewActions],
 
-  views: [],
+  views: undefined,
   pagination: {
     total: 0,
     count: 0,

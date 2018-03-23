@@ -22,7 +22,7 @@ const ViewList = createReactClass({
 
   getDefaultProps() {
     return {
-      views: [],
+      views: undefined,
     };
   },
 
@@ -93,7 +93,7 @@ const ViewList = createReactClass({
   render() {
     const list = this.props.views;
 
-    if (list.length === 0) {
+    if (!list) {
       return <Spinner text="Loading views..." />;
     }
 
