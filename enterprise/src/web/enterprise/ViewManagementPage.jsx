@@ -13,8 +13,8 @@ import ViewList from 'enterprise/components/views/ViewList';
 const ViewManagementPage = createReactClass({
   mixins: [Reflux.connect(ViewStore, 'views')],
 
-  handleSearch(query, page, perPage, callback = () => {}) {
-    ViewActions.search(query, page, perPage).then(callback).catch(callback);
+  handleSearch(query, page, perPage) {
+    return ViewActions.search(query, page, perPage);
   },
 
   handleViewExecution(view) {

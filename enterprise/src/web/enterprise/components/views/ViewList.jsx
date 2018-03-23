@@ -40,7 +40,7 @@ const ViewList = createReactClass({
 
   execSearch(resetLoadingState = () => {}) {
     const { query, page, perPage } = this.state;
-    this.props.handleSearch(query, page, perPage, resetLoadingState);
+    this.props.handleSearch(query, page, perPage).then(resetLoadingState).catch(resetLoadingState);
   },
 
   handleSearch(query, resetLoadingState) {
