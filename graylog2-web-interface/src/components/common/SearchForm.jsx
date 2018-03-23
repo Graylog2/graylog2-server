@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Promise from 'bluebird';
 import { Button } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 
@@ -76,9 +77,13 @@ class SearchForm extends React.Component {
   queryRef = null;
 
   _setLoadingState = () => {
-    if (this.props.useLoadingState) {
-      this.setState({ isLoading: true });
-    }
+    return new Promise((resolve) => {
+      if (this.props.useLoadingState) {
+        this.setState({ isLoading: true }, resolve);
+      } else {
+        resolve();
+      }
+    });
   };
 
   _resetLoadingState = () => {
@@ -90,8 +95,9 @@ class SearchForm extends React.Component {
   _onSearch = (e) => {
     e.preventDefault();
 
-    this._setLoadingState();
-    this.props.onSearch(this.queryRef.value, this._resetLoadingState);
+    this._setLoadingState().then(() => {
+      this.props.onSearch(this.queryRef.value, this._resetLoadingState);
+    });
   };
 
   _onReset = () => {
