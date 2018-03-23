@@ -54,6 +54,8 @@ class SearchForm extends React.Component {
   };
 
   static defaultProps = {
+    onReset: null,
+    label: null,
     placeholder: 'Enter search query...',
     wrapperClass: 'search',
     queryWidth: 'auto',
@@ -62,7 +64,9 @@ class SearchForm extends React.Component {
     searchBsStyle: 'default',
     searchButtonLabel: 'Search',
     resetButtonLabel: 'Reset',
+    useLoadingState: false,
     loadingLabel: 'Loading...',
+    children: null,
   };
 
   state = {
@@ -72,6 +76,8 @@ class SearchForm extends React.Component {
   componentWillReceiveProps() {
     this._resetLoadingState();
   }
+
+  queryRef = null;
 
   _setLoadingState = () => {
     if (this.props.useLoadingState) {
@@ -89,12 +95,12 @@ class SearchForm extends React.Component {
     e.preventDefault();
 
     this._setLoadingState();
-    this.props.onSearch(this.refs.query.value, this._resetLoadingState);
+    this.props.onSearch(this.queryRef.value, this._resetLoadingState);
   };
 
   _onReset = () => {
     this._resetLoadingState();
-    this.refs.query.value = '';
+    this.queryRef.value = '';
     this.props.onReset();
   };
 
@@ -103,8 +109,9 @@ class SearchForm extends React.Component {
       <div className={this.props.wrapperClass} style={{ marginTop: this.props.topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <div className="form-group" >
-            {this.props.label && <label className="control-label">{this.props.label}</label>}
-            <input ref="query"
+            {this.props.label && <label htmlFor="common-search-form-query-input" className="control-label">{this.props.label}</label>}
+            <input ref={(q) => { this.queryRef = q; }}
+                   id="common-search-form-query-input"
                    placeholder={this.props.placeholder}
                    type="text"
                    style={{ width: this.props.queryWidth }}
