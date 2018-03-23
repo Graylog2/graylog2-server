@@ -20,8 +20,7 @@ const viewsPath = '/views';
 
 export default {
   pages: {
-    search: { component: ExtendedSearchPage },
-    views: { component: ViewManagementPage },
+    // search: { component: ExtendedSearchPage },
   },
   routes: [
     { path: extendedSearchPath, component: ExtendedSearchPage },
