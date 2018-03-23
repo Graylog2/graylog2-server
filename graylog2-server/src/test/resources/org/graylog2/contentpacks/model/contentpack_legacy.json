@@ -1,0 +1,201 @@
+{
+  "name": "Name",
+  "description": "Description\nNew Line\n*Markdown*\n`Foobar`",
+  "category": "Legacy Content Packs",
+  "inputs": [
+    {
+      "id": "53794eebe4b03cdadeadbeef",
+      "title": "Input Title",
+      "type": "org.graylog2.inputs.raw.tcp.RawTCPInput",
+      "global": true,
+      "configuration": {
+        "recv_buffer_size": 1048576,
+        "use_null_delimiter": false,
+        "tcp_keepalive": false,
+        "tls_client_auth_cert_file": "",
+        "bind_address": "127.0.0.1",
+        "tls_cert_file": "",
+        "port": 5555,
+        "tls_key_file": "",
+        "tls_enable": false,
+        "tls_key_password": "",
+        "max_message_size": 2097152,
+        "tls_client_auth": "disabled",
+        "override_source": null
+      },
+      "static_fields": {},
+      "extractors": [
+        {
+          "title": "Regex Extractor",
+          "type": "REGEX",
+          "cursor_strategy": "COPY",
+          "target_field": "level",
+          "source_field": "message",
+          "configuration": {
+            "regex_value": "\\d <(.+)>"
+          },
+          "converters": [
+            {
+              "type": "SYSLOG_PRI_LEVEL",
+              "configuration": {}
+            }
+          ],
+          "condition_type": "NONE",
+          "condition_value": "",
+          "order": 0
+        }
+      ]
+    }
+  ],
+  "streams": [
+    {
+      "id": "cafebabee4b0f504664790f8",
+      "title": "Stream Title",
+      "description": "Stream Description",
+      "disabled": false,
+      "matching_type": "AND",
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "source",
+          "value": "example.org",
+          "inverted": false,
+          "description": null
+        }
+      ],
+      "outputs": [],
+      "default_stream": false
+    }
+  ],
+  "outputs": [
+    {
+      "id": "56ba78eae4b0bcb6deadbeef",
+      "title": "Output Title",
+      "type": "org.graylog2.plugins.slack.output.SlackMessageOutput",
+      "configuration": {
+        "graylog2_url": "https://graylog.example.com/",
+        "user_name": "Username",
+        "add_attachment": false,
+        "color": "#FF0000",
+        "notify_channel": false,
+        "icon_url": "",
+        "webhook_url": "https://hooks.slack.com/services/HURR/DURR/Foobar",
+        "icon_emoji": "",
+        "channel": "#foobar",
+        "short_mode": true,
+        "link_names": true
+      }
+    }
+  ],
+  "dashboards": [
+    {
+      "title": "Dashboard Title",
+      "description": "Das Dashboard. Freude am Graphen",
+      "dashboard_widgets": [
+        {
+          "description": "Stats Count Widget",
+          "type": "stats_count",
+          "cache_time": 60,
+          "configuration": {
+            "field": "clusterid",
+            "trend": true,
+            "query": "*",
+            "timerange": {
+              "range": 86400,
+              "type": "relative"
+            },
+            "stream_id": "cafebabee4b0f504664790f8",
+            "lower_is_better": false,
+            "stats_function": "cardinality"
+          },
+          "col": 4,
+          "row": 1,
+          "height": 1,
+          "width": 1
+        },
+        {
+          "description": "Quickvalues Widget",
+          "type": "quickvalues",
+          "cache_time": 10,
+          "configuration": {
+            "field": "version",
+            "query": "*",
+            "show_data_table": true,
+            "timerange": {
+              "range": 86400,
+              "type": "relative"
+            },
+            "stream_id": "cafebabee4b0f504664790f8",
+            "show_pie_chart": true
+          },
+          "col": 3,
+          "row": 1,
+          "height": 3,
+          "width": 1
+        },
+        {
+          "description": "Map Widget",
+          "type": "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "cache_time": 30,
+          "configuration": {
+            "timerange": {
+              "type": "relative",
+              "range": 3600
+            },
+            "field": "ip_address_geolocation",
+            "stream_id": "cafebabee4b0f504664790f8",
+            "query": ""
+          },
+          "col": 1,
+          "row": 1,
+          "height": 3,
+          "width": 2
+        }
+      ]
+    }
+  ],
+  "grok_patterns": [
+    {
+      "name": "SOME_PATTERN",
+      "pattern": "([a-z]+)"
+    }
+  ],
+  "lookup_tables": [
+    {
+      "title": "Lookup Table Title",
+      "description": "Lookup Table Description",
+      "name": "generic-lookup-table",
+      "cache_name": "generic-lookup-cache",
+      "data_adapter_name": "generic-data-adapter",
+      "default_single_value": "foobar",
+      "default_single_value_type": "NULL",
+      "default_multi_value": "",
+      "default_multi_value_type": "NULL"
+    }
+  ],
+  "lookup_caches": [
+    {
+      "title": "Lookup Cache Title",
+      "description": "Lookup Cache Description",
+      "name": "generic-lookup-cache",
+      "config": {
+        "type": "guava_cache",
+        "max_size": 1000,
+        "expire_after_access": 0,
+        "expire_after_access_unit": "SECONDS",
+        "expire_after_write": 1,
+        "expire_after_write_unit": "DAYS"
+      }
+    }
+  ],
+  "lookup_data_adapters": [
+    {
+      "title": "Data Adapter Title",
+      "description": "Data Adapter Description",
+      "name": "generic-data-adapter",
+      "config": {
+        "type": "torexitnode"
+      }
+    }
+  ]
+}

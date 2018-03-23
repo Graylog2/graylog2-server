@@ -25,6 +25,8 @@ public interface Identified {
     ModelId id();
 
     interface IdBuilder<SELF> {
+        ModelId id();
+
         @JsonProperty(FIELD_META_ID)
         SELF id(ModelId id);
     }

@@ -16,11 +16,13 @@
  */
 package org.graylog2.contentpacks.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.parameters.Parameter;
@@ -29,6 +31,7 @@ import javax.annotation.Nullable;
 import java.net.URI;
 
 @AutoValue
+@JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_ContentPackV1.Builder.class)
 public abstract class ContentPackV1 implements ContentPack {
     static final String VERSION = "1";
@@ -45,7 +48,7 @@ public abstract class ContentPackV1 implements ContentPack {
     @Nullable
     @JsonView(ContentPackView.DBView.class)
     @JsonProperty(FIELD_DB_ID)
-    public abstract String _id();
+    public abstract ObjectId _id();
 
     @JsonView(ContentPackView.HttpView.class)
     @JsonProperty(FIELD_NAME)
@@ -90,7 +93,7 @@ public abstract class ContentPackV1 implements ContentPack {
 
         @JsonProperty(FIELD_DB_ID)
         @JsonView(ContentPackView.DBView.class)
-        public abstract Builder _id(String _id);
+        public abstract Builder _id(ObjectId _id);
 
         @JsonProperty(FIELD_NAME)
         @JsonView(ContentPackView.HttpView.class)
