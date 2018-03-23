@@ -309,37 +309,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -443,37 +413,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -583,37 +523,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -723,37 +633,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -874,37 +754,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -1019,37 +869,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -1153,37 +973,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -1293,37 +1083,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -1433,37 +1193,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
@@ -1584,37 +1314,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Uninstall
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                  style={undefined}
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
+                    Remove all
                   </a>
                 </li>
                 <li
