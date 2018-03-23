@@ -19,8 +19,9 @@ package org.graylog2.contentpacks.model;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = Versioned.FIELD_META_VERSION)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = Versioned.FIELD_META_VERSION, defaultImpl = LegacyContentPack.class)
 @JsonSubTypes({
+        @JsonSubTypes.Type(value = LegacyContentPack.class),
         @JsonSubTypes.Type(value = ContentPackV1.class, name = ContentPackV1.VERSION)
 })
 public interface ContentPack extends Identified, Revisioned, Versioned {
