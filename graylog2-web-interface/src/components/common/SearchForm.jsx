@@ -117,7 +117,6 @@ class SearchForm extends React.Component {
                    placeholder={this.props.placeholder}
                    type="text"
                    style={{ width: this.props.queryWidth }}
-                   label="Search"
                    className="query form-control"
                    autoComplete="off"
                    spellCheck="false" />
