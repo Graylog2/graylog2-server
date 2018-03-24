@@ -5,9 +5,13 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.enterprise.search.Query;
+import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
+import org.graylog.plugins.enterprise.search.SearchMetadata;
 import org.graylog.plugins.enterprise.search.db.SearchDbService;
 import org.graylog.plugins.enterprise.search.db.SearchJobService;
 import org.graylog.plugins.enterprise.search.engine.QueryEngine;
@@ -33,10 +37,12 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // TODO permission system
 @Api(value = "Enterprise/Search", description = "Searching")
@@ -73,28 +79,25 @@ public class SearchResource extends RestResource implements PluginRestResource {
             return Response.serverError().build();
         }
         LOG.info("Created new search object {}", saved.id());
-//        final Query annotated = saved.withInfo(queryEngine.parse(saved));
-        Search annotated = saved;
-        //noinspection ConstantConditions
-        return Response.created(URI.create(annotated.id())).entity(annotated).build();
+        return Response.created(URI.create(Objects.requireNonNull(saved.id()))).entity(saved).build();
     }
 
     @GET
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
-    public Search getSearch(@ApiParam(name = "id") @PathParam("id") String queryId) {
-        return searchDbService.get(queryId)
-//                .map(query -> query.withInfo(queryEngine.parse(query)))
-                .orElseThrow(() -> new NotFoundException("No such search query " + queryId));
+    public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
+        return searchDbService.get(searchId)
+                .orElseThrow(() -> new NotFoundException("No such search " + searchId));
     }
 
     @GET
     @ApiOperation(value = "Get all current search queries in the system")
     public List<Search> getAllSearches() {
         // TODO should be paginated and limited to own (or visible queries)
-        return searchDbService.streamAll()
-//                .map(query -> query.withInfo(queryEngine.parse(query)))
-                .collect(Collectors.toList());
+        // make sure we close the iterator properly
+        try (Stream<Search> searchStream = searchDbService.streamAll()) {
+            return searchStream.collect(Collectors.toList());
+        }
     }
 
     @POST
@@ -148,5 +151,21 @@ public class SearchResource extends RestResource implements PluginRestResource {
         }
 
         return searchJob;
+    }
+
+    @GET
+    @ApiOperation(value = "Metadata for the given Search object", notes = "Used for already persisted search objects")
+    @Path("metadata/{searchId}")
+    public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId) {
+        final Search search = getSearch(searchId);
+        return metadataForObject(search);
+    }
+
+    @POST
+    @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
+    @Path("metadata")
+    public SearchMetadata metadataForObject(@ApiParam Search search) {
+        final Map<String, QueryMetadata> map = StreamEx.of(search.queries()).toMap(Query::id, queryEngine::parse);
+        return SearchMetadata.create(map);
     }
 }

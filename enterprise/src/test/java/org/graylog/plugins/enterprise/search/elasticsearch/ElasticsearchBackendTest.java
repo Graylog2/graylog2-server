@@ -5,10 +5,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Query;
-import org.graylog.plugins.enterprise.search.QueryInfo;
-import org.graylog.plugins.enterprise.search.QueryParameter;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
+import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESMessageList;
@@ -47,16 +46,16 @@ public class ElasticsearchBackendTest {
 
     @Test
     public void parse() throws Exception {
-        final QueryInfo queryInfo = backend.parse(Query.builder()
+        final QueryMetadata queryMetadata = backend.parse(Query.builder()
                 .id("abc123")
                 .query(ElasticsearchQueryString.builder().queryString("user_name:$username$ http_method:$foo$").build())
                 .timerange(RelativeRange.create(600))
                 .build());
 
-        assertThat(queryInfo.parameters())
+        assertThat(queryMetadata.parameters())
                 .containsOnly(
-                        Maps.immutableEntry("username", QueryParameter.any("username")),
-                        Maps.immutableEntry("foo", QueryParameter.any("foo")));
+                        Maps.immutableEntry("username", Parameter.any("username")),
+                        Maps.immutableEntry("foo", Parameter.any("foo")));
     }
 
     @Test

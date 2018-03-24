@@ -61,10 +61,6 @@ public abstract class Query {
     @JsonProperty
     public abstract ImmutableSet<Parameter> parameters();
 
-    @Nullable
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public abstract QueryInfo info();
-
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -110,17 +106,12 @@ public abstract class Query {
         return this;
     }
 
-    public Query withInfo(QueryInfo queryInfo) {
-        return toBuilder().info(queryInfo).build();
-    }
-
     public static Query emptyRoot() {
         return Query.builder()
                 .id("")
                 .timerange(EmptyTimeRange.emptyTimeRange())
                 .query(new BackendQuery.Fallback())
                 .filter(null)
-                .info(null)
                 .build();
     }
 
@@ -144,9 +135,6 @@ public abstract class Query {
 
         @JsonProperty
         public abstract Builder parameters(ImmutableSet<Parameter> parameters);
-
-        @JsonIgnore
-        public abstract Builder info(@Nullable QueryInfo info);
 
         abstract Query autoBuild();
 

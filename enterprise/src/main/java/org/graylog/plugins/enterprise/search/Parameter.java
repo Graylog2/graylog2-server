@@ -43,6 +43,12 @@ public abstract class Parameter {
         return new AutoValue_Parameter.Builder().optional(false);
     }
 
+    public static Parameter any(String name) {
+        return builder().name(name).dataType("any").build();
+    }
+
+    public abstract Builder toBuilder();
+
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
             include = JsonTypeInfo.As.PROPERTY,

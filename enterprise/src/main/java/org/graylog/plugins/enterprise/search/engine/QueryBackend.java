@@ -1,7 +1,7 @@
 package org.graylog.plugins.enterprise.search.engine;
 
 import org.graylog.plugins.enterprise.search.Query;
-import org.graylog.plugins.enterprise.search.QueryInfo;
+import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.SearchJob;
 
@@ -51,5 +51,5 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * This method decomposes the backend-specific query and returns information about used parameters, optionally the
      * AST for syntax highlight and other information the UI can use to offer help.
      */
-    QueryInfo parse(Query query);
+    QueryMetadata parse(Query query);
 }

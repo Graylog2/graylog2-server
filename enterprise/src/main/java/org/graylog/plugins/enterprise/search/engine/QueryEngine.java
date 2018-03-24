@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import one.util.streamex.StreamEx;
 import org.graylog.plugins.enterprise.search.Query;
-import org.graylog.plugins.enterprise.search.QueryInfo;
+import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -44,7 +44,7 @@ public class QueryEngine {
                 );
     }
 
-    public QueryInfo parse(Query query) {
+    public QueryMetadata parse(Query query) {
         final BackendQuery backendQuery = query.query();
         final QueryBackend queryBackend = queryBackends.get(backendQuery.type());
         return queryBackend.parse(query);
