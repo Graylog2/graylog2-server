@@ -68,7 +68,7 @@ class QueryInput extends Component {
   }
 
   _onChange = (newValue) => {
-    this.setState({ value: newValue });
+    this.setState({ value: newValue }, () => this.props.onChange(this.state.value));
   };
 
   _onExecute = () => {
@@ -87,7 +87,7 @@ class QueryInput extends Component {
                    name="QueryEditor"
                    showGutter={false}
                    showPrintMargin={false}
-                   hightlightActiveLine={false}
+                   highlightActiveLine={false}
                    minLines={1}
                    maxLines={1}
                    enableBasicAutocompletion

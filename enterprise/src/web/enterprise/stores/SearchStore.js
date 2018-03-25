@@ -1,6 +1,8 @@
 import Reflux from 'reflux';
 import Bluebird from 'bluebird';
+import _ from 'lodash';
 
+import SearchMetadataActions from 'enterprise/actions/SearchMetadataActions';
 import SearchJobActions from 'enterprise/actions/SearchJobActions';
 import SearchJobStore from 'enterprise/stores/SearchJobStore';
 import SearchActions from 'enterprise/actions/SearchActions';
@@ -24,11 +26,26 @@ export default Reflux.createStore({
     this.listenTo(QueriesStore, this.onQueriesStoreUpdate, this.onQueriesStoreUpdate);
   },
 
+  _debouncedParse: _.debounce((queries, widgets) => {
+    const search = new SearchRequest(queries, widgets);
+    console.log('Parsing search', search);
+    SearchMetadataActions.parseSearch(search)
+      .then(metadata => console.log(metadata));
+  }, 500),
+
   onWidgetStoreUpdate(widgets) {
     this.widgets = widgets;
+    this.onUpdate();
   },
   onQueriesStoreUpdate(queries) {
     this.queries = queries;
+    this.onUpdate();
+  },
+
+  onUpdate() {
+    if (this.queries && this.queries.size > 0) {
+      this._debouncedParse(this.queries, this.widgets);
+    }
   },
 
   trackJobStatus(job, searchRequest, search) {
