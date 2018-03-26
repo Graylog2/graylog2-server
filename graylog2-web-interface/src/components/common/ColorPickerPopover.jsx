@@ -27,6 +27,13 @@ const ColorPickerPopover = createReactClass({
     triggerNode: PropTypes.node.isRequired,
     /** Event that will show/hide the popover. */
     triggerAction: PropTypes.oneOf(['click', 'hover', 'focus']),
+    /**
+     * Function that will be called when the selected color changes.
+     * The function receives the color in hexadecimal format as first argument,
+     * the event as the second argument, and a callback function to hide the
+     * overlay as third argument.
+     */
+    onChange: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -37,16 +44,24 @@ const ColorPickerPopover = createReactClass({
     };
   },
 
+  handleChange(color, event) {
+    this.props.onChange(color, event, () => this.overlay.hide());
+  },
+
   render() {
     const { id, placement, title, triggerNode, triggerAction, ...colorPickerProps } = this.props;
     const popover = (
       <Popover id={id} title={title} className={style.customPopover}>
-        <ColorPicker {...colorPickerProps} />
+        <ColorPicker {...colorPickerProps} onChange={this.handleChange} />
       </Popover>
     );
 
     return (
-      <OverlayTrigger trigger={triggerAction} placement={placement} overlay={popover} rootClose>
+      <OverlayTrigger ref={(c) => { this.overlay = c; }}
+                      trigger={triggerAction}
+                      placement={placement}
+                      overlay={popover}
+                      rootClose>
         {triggerNode}
       </OverlayTrigger>
     );
