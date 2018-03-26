@@ -46,6 +46,8 @@ const SelectPopover = createReactClass({
     displayDataFilter: PropTypes.bool,
     /** Placeholder to display in the filter text input. */
     filterPlaceholder: PropTypes.string,
+    /** Text to display in the entry to clear the current selection. */
+    clearSelectionText: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -58,6 +60,7 @@ const SelectPopover = createReactClass({
       onItemSelect: () => {},
       displayDataFilter: true,
       filterPlaceholder: 'Type to filter',
+      clearSelectionText: 'Clear selection',
     };
   },
 
@@ -112,7 +115,9 @@ const SelectPopover = createReactClass({
 
   renderClearSelectionItem() {
     return (
-      <ListGroupItem onClick={this.handleItemSelection()}><i className="fa fa-fw fa-times text-danger" /> Clear selection</ListGroupItem>
+      <ListGroupItem onClick={this.handleItemSelection()}>
+        <i className="fa fa-fw fa-times text-danger" /> {this.props.clearSelectionText}
+      </ListGroupItem>
     );
   },
 

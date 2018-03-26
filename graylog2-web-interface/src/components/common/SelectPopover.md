@@ -34,7 +34,8 @@ const SelectPopoverExample = createReactClass({
                          items={items}
                          selectedItem={selectedItem}
                          onItemSelect={this.handleItemSelect}
-                         displayDataFilter={false} />
+                         displayDataFilter={false}
+                         clearSelectionText="Clear color selection"/>
         </div>
         
         {selectedItem ? `You have selected ${selectedItem}` : 'Please select a color!'}
