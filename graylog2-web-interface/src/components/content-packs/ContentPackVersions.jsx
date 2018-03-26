@@ -4,6 +4,8 @@ import React from 'react';
 import { DataTable } from 'components/common';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import '!style!css!./ContentPackVersions.css';
+
 class ContentPackVersions extends React.Component {
   static propTypes = {
     versions: PropTypes.arrayOf(PropTypes.string),
