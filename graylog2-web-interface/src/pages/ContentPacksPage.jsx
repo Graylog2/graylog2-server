@@ -1,11 +1,12 @@
 import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
-import { Row, Col, Button } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import Spinner from 'components/common/Spinner';
 import Routes from 'routing/Routes';
 
+import Spinner from 'components/common/Spinner';
+import { Row, Col, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
@@ -19,6 +20,17 @@ const ContentPacksPage = createReactClass({
 
   componentDidMount() {
     ContentPacksActions.list();
+  },
+
+  _deleteContentPack(contentPackId) {
+    if (window.confirm('You are about to delete this content pack, are you sure?')) {
+      ContentPacksActions.delete(contentPackId).then(() => {
+        UserNotification.success('Content Pack deleted successfully.', 'Success');
+        ContentPacksActions.list();
+      }, () => {
+        UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
+      });
+    }
   },
 
   render() {
@@ -53,6 +65,7 @@ const ContentPacksPage = createReactClass({
               <div id="react-configuration-bundles">
                 <ContentPacksList
                   contentPacks={this.state.contentPacks}
+                  onDeletePack={this._deleteContentPack}
                 />
               </div>
             </Col>

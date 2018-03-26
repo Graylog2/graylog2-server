@@ -3,6 +3,7 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
+import { TypeAheadInput } from 'components/common';
 
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
@@ -27,13 +28,31 @@ describe('<ContentPacksList />', () => {
     { id: '15', title: 'FTP Backup', summary: 'Fast but insecure backup', version: '1.0', states: ['installed', 'updatable'] },
   ];
 
-  it('should render with empty content-packs', () => {
+  it('should render with empty content packs', () => {
     const wrapper = renderer.create(<ContentPacksList contentPacks={[]} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-  it('should render with content-packs', () => {
+  it('should render with content packs', () => {
     const wrapper = renderer.create(<ContentPacksList contentPacks={contentPacks} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('should do pagination', () => {
+    const wrapper = mount(<ContentPacksList contentPacks={contentPacks} />);
+    const beforeFilter = wrapper.find('div.content-packs-summary').length;
+    expect(beforeFilter).toBe(10);
+    wrapper.find('span[children="›"]').at(0).simulate('click');
+    const afterFilter = wrapper.find('div.content-packs-summary').length;
+    expect(afterFilter).toBe(5);
+  });
+
+  it('should delete a content pack', () => {
+    const deleteFn = jest.fn((token) => {
+      expect(token).toEqual('1');
+    });
+    const wrapper = mount(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
+    wrapper.find('a[children="Remove all"]').at(0).simulate('click');
+    expect(deleteFn.mock.calls.length).toBe(1);
   });
 });

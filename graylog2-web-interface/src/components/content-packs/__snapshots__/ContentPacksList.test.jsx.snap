@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ContentPacksList /> should render with content-packs 1`] = `
+exports[`<ContentPacksList /> should render with content packs 1`] = `
 <div>
   <div
     className="row-sm row"
@@ -332,7 +332,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -436,7 +436,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -546,7 +546,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -656,7 +656,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -777,7 +777,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -892,7 +892,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -996,7 +996,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -1106,7 +1106,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -1216,7 +1216,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -1337,7 +1337,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
           </div>
         </div>
         <div
-          className="row-sm row"
+          className="row-sm content-packs-summary row"
         >
           <div
             className="col-md-12"
@@ -1497,7 +1497,7 @@ exports[`<ContentPacksList /> should render with content-packs 1`] = `
 </div>
 `;
 
-exports[`<ContentPacksList /> should render with empty content-packs 1`] = `
+exports[`<ContentPacksList /> should render with empty content packs 1`] = `
 <div>
   <div
     className="row-sm row"
