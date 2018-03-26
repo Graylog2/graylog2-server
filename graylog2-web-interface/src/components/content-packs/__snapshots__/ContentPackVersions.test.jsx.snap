@@ -37,21 +37,11 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                   checked={true}
                   onChange={[Function]}
                   type="radio"
-                  value={
-                    Array [
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                    ]
-                  }
+                  value={1}
                 />
               </td>
               <td>
                 1
-                2
-                3
-                4
               </td>
               <td
                 className="text-right"
@@ -72,7 +62,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                     aria-haspopup={true}
                     className="dropdown-toggle btn btn-sm btn-default"
                     disabled={false}
-                    id="more-actions-undefined"
+                    id="more-actions-11"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="button"
@@ -85,7 +75,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                     />
                   </button>
                   <ul
-                    aria-labelledby="more-actions-undefined"
+                    aria-labelledby="more-actions-11"
                     className="dropdown-menu dropdown-menu-right"
                     role="menu"
                   >
@@ -116,7 +106,74 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         role="menuitem"
                         tabIndex="-1"
                       >
-                        Uninstall
+                        Download
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  checked={false}
+                  onChange={[Function]}
+                  type="radio"
+                  value={2}
+                />
+              </td>
+              <td>
+                2
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  type="button"
+                >
+                  View
+                </button>
+                 
+                <div
+                  className="dropdown btn-group btn-group-sm"
+                >
+                  <button
+                    aria-expanded={false}
+                    aria-haspopup={true}
+                    className="dropdown-toggle btn btn-sm btn-default"
+                    disabled={false}
+                    id="more-actions-12"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="button"
+                    type="button"
+                  >
+                    More Actions
+                     
+                    <span
+                      className="caret"
+                    />
+                  </button>
+                  <ul
+                    aria-labelledby="more-actions-12"
+                    className="dropdown-menu dropdown-menu-right"
+                    role="menu"
+                  >
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Remove
                       </a>
                     </li>
                     <li
@@ -131,7 +188,156 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         role="menuitem"
                         tabIndex="-1"
                       >
-                        Create New Version
+                        Download
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  checked={false}
+                  onChange={[Function]}
+                  type="radio"
+                  value={3}
+                />
+              </td>
+              <td>
+                3
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  type="button"
+                >
+                  View
+                </button>
+                 
+                <div
+                  className="dropdown btn-group btn-group-sm"
+                >
+                  <button
+                    aria-expanded={false}
+                    aria-haspopup={true}
+                    className="dropdown-toggle btn btn-sm btn-default"
+                    disabled={false}
+                    id="more-actions-13"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="button"
+                    type="button"
+                  >
+                    More Actions
+                     
+                    <span
+                      className="caret"
+                    />
+                  </button>
+                  <ul
+                    aria-labelledby="more-actions-13"
+                    className="dropdown-menu dropdown-menu-right"
+                    role="menu"
+                  >
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Remove
+                      </a>
+                    </li>
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Download
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  checked={false}
+                  onChange={[Function]}
+                  type="radio"
+                  value={4}
+                />
+              </td>
+              <td>
+                4
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  type="button"
+                >
+                  View
+                </button>
+                 
+                <div
+                  className="dropdown btn-group btn-group-sm"
+                >
+                  <button
+                    aria-expanded={false}
+                    aria-haspopup={true}
+                    className="dropdown-toggle btn btn-sm btn-default"
+                    disabled={false}
+                    id="more-actions-14"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="button"
+                    type="button"
+                  >
+                    More Actions
+                     
+                    <span
+                      className="caret"
+                    />
+                  </button>
+                  <ul
+                    aria-labelledby="more-actions-14"
+                    className="dropdown-menu dropdown-menu-right"
+                    role="menu"
+                  >
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Remove
                       </a>
                     </li>
                     <li
@@ -155,27 +361,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`<ContentPackVersions /> should render with no content pack versions 1`] = `
-<div>
-  <div
-    className="row "
-  >
-    <div
-      className="col-md-12"
-    >
-      <div
-        className="data-table table-responsive"
-        id="content-packs-versions"
-      >
-        <p>
-          No data available.
-        </p>
       </div>
     </div>
   </div>

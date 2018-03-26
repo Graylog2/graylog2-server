@@ -75,7 +75,7 @@ const ShowContentPackPage = createReactClass({
                 <Row className={ShowContentPackStyle.leftRow}>
                   <Col>
                     <h2>Versions</h2>
-                    <ContentPackVersions versions={versions} onChange={this._onVersionChanged} />
+                    <ContentPackVersions contentPack={contentPack} onChange={this._onVersionChanged} />
                   </Col>
                 </Row>
                 <Row className={ShowContentPackStyle.leftRow}>
