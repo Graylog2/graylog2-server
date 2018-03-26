@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackVersions /> should render with content pack versions 1`] = `
+<div>
+  <div
+    className="row "
+  >
+    <div
+      className="col-md-12"
+    >
+      <div
+        className="data-table table-responsive"
+        id="content-packs-versions"
+      >
+        <table
+          className="table undefined"
+        >
+          <thead>
+            <tr>
+              <th>
+                Select
+              </th>
+              <th>
+                Revision
+              </th>
+              <th
+                className="text-right"
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input
+                  checked={true}
+                  onChange={[Function]}
+                  type="radio"
+                  value={
+                    Array [
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                    ]
+                  }
+                />
+              </td>
+              <td>
+                1
+                2
+                3
+                4
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  type="button"
+                >
+                  View
+                </button>
+                 
+                <div
+                  className="dropdown btn-group btn-group-sm"
+                >
+                  <button
+                    aria-expanded={false}
+                    aria-haspopup={true}
+                    className="dropdown-toggle btn btn-sm btn-default"
+                    disabled={false}
+                    id="more-actions-undefined"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="button"
+                    type="button"
+                  >
+                    More Actions
+                     
+                    <span
+                      className="caret"
+                    />
+                  </button>
+                  <ul
+                    aria-labelledby="more-actions-undefined"
+                    className="dropdown-menu dropdown-menu-right"
+                    role="menu"
+                  >
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Remove
+                      </a>
+                    </li>
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Uninstall
+                      </a>
+                    </li>
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Create New Version
+                      </a>
+                    </li>
+                    <li
+                      className=""
+                      role="presentation"
+                      style={undefined}
+                    >
+                      <a
+                        href="#"
+                        onClick={[Function]}
+                        onKeyDown={[Function]}
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Download
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackVersions /> should render with no content pack versions 1`] = `
+<div>
+  <div
+    className="row "
+  >
+    <div
+      className="col-md-12"
+    >
+      <div
+        className="data-table table-responsive"
+        id="content-packs-versions"
+      >
+        <p>
+          No data available.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;

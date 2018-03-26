@@ -3,7 +3,6 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
-import { TypeAheadInput } from 'components/common';
 
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
