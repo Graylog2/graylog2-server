@@ -53,14 +53,14 @@ public abstract class LegacyContentPack implements ContentPack {
 
     // Supported legacy entity types
     // TODO: Use some sort of types registry?
-    private static final String TYPE_INPUT = "input";
-    private static final String TYPE_STREAM = "stream";
-    private static final String TYPE_OUTPUT = "output";
-    private static final String TYPE_DASHBOARD = "dashboard";
-    private static final String TYPE_GROK_PATTERN = "grok_pattern";
-    private static final String TYPE_LOOKUP_TABLE = "lookup_table";
-    private static final String TYPE_LOOKUP_CACHE = "lookup_cache";
-    private static final String TYPE_DATA_ADAPTER = "data_adapter";
+    private static final ModelType TYPE_INPUT = ModelType.of("input");
+    private static final ModelType TYPE_STREAM = ModelType.of("stream");
+    private static final ModelType TYPE_OUTPUT = ModelType.of("output");
+    private static final ModelType TYPE_DASHBOARD = ModelType.of("dashboard");
+    private static final ModelType TYPE_GROK_PATTERN = ModelType.of("grok_pattern");
+    private static final ModelType TYPE_LOOKUP_TABLE = ModelType.of("lookup_table");
+    private static final ModelType TYPE_LOOKUP_CACHE = ModelType.of("lookup_cache");
+    private static final ModelType TYPE_DATA_ADAPTER = ModelType.of("data_adapter");
 
     private static final int DEFAULT_REVISION = 0;
 

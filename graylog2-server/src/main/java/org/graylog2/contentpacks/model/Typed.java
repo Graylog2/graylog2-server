@@ -22,10 +22,10 @@ public interface Typed {
     String FIELD_META_TYPE = "type";
 
     @JsonProperty(FIELD_META_TYPE)
-    String type();
+    ModelType type();
 
     interface TypeBuilder<SELF> {
         @JsonProperty(FIELD_META_TYPE)
-        SELF type(String type);
+        SELF type(ModelType type);
     }
 }

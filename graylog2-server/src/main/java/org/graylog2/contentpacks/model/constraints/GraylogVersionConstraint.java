@@ -19,12 +19,13 @@ package org.graylog2.contentpacks.model.constraints;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.contentpacks.model.ModelType;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_GraylogVersionConstraint.Builder.class)
 public abstract class GraylogVersionConstraint implements Constraint {
     // TODO: Rename to graylog-version
-    static final String TYPE = "server-version";
+    static final String TYPE_NAME = "server-version";
     static final String FIELD_GRAYLOG_VERSION = "version";
 
     // TODO: Build class for version constraint or use com.github.zafarkhaja.semver.expr.Expression?
@@ -43,7 +44,7 @@ public abstract class GraylogVersionConstraint implements Constraint {
         abstract GraylogVersionConstraint autoBuild();
 
         public GraylogVersionConstraint build() {
-            type(TYPE);
+            type(ModelType.of(TYPE_NAME));
             return autoBuild();
         }
     }

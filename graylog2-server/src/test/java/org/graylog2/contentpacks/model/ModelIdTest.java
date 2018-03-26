@@ -23,6 +23,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ModelIdTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -40,5 +41,18 @@ public class ModelIdTest {
     public void serialize() throws IOException {
         final ModelId modelId = objectMapper.readValue("\"foobar\"", ModelId.class);
         assertThat(modelId).isEqualTo(ModelId.of("foobar"));
+    }
+
+    @Test
+    public void ensureIdIsNotBlank() {
+        assertThatThrownBy(() -> ModelId.of(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("ID must not be blank");
+        assertThatThrownBy(() -> ModelId.of(""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("ID must not be blank");
+        assertThatThrownBy(() -> ModelId.of("    \n\r\t"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("ID must not be blank");
     }
 }

@@ -19,11 +19,12 @@ package org.graylog2.contentpacks.model.constraints;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.contentpacks.model.ModelType;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_PluginVersionConstraint.Builder.class)
 public abstract class PluginVersionConstraint implements Constraint {
-    static final String TYPE = "plugin-version";
+    static final String TYPE_NAME = "plugin-version";
     static final String FIELD_PLUGIN_ID = "plugin";
     static final String FIELD_PLUGIN_VERSION = "version";
 
@@ -49,7 +50,7 @@ public abstract class PluginVersionConstraint implements Constraint {
         abstract PluginVersionConstraint autoBuild();
 
         public PluginVersionConstraint build() {
-            type(TYPE);
+            type(ModelType.of(TYPE_NAME));
             return autoBuild();
         }
     }
