@@ -38,8 +38,8 @@ const SelectPopover = createReactClass({
     selectedItem: PropTypes.string,
     /**
      * Function that will be called when the item selection changes.
-     * The function will receive the selected item as argument or `undefined` if the selection
-     * is cleared.
+     * The function will receive the selected item as first argument or `undefined` if the selection
+     * is cleared, and a callback function to hide the popover as a second argument.
      */
     onItemSelect: PropTypes.func.isRequired,
     /** Indicates whether the component should display a text filter or not. */
@@ -81,7 +81,7 @@ const SelectPopover = createReactClass({
   handleItemSelection(item) {
     return () => {
       this.setState({ selectedItem: item });
-      this.props.onItemSelect(item);
+      this.props.onItemSelect(item, () => this.overlay.hide());
     };
   },
 
@@ -142,7 +142,11 @@ const SelectPopover = createReactClass({
     );
 
     return (
-      <OverlayTrigger trigger={triggerAction} placement={placement} overlay={popover} rootClose>
+      <OverlayTrigger ref={(c) => { this.overlay = c; }}
+                      trigger={triggerAction}
+                      placement={placement}
+                      overlay={popover}
+                      rootClose>
         {triggerNode}
       </OverlayTrigger>
     );

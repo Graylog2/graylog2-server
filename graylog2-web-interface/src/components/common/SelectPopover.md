@@ -77,7 +77,8 @@ const SelectPopoverFormattedExample = createReactClass({
     };
   },
   
-  handleItemSelect(item) {
+  handleItemSelect(item, hidePopover) {
+    hidePopover();
     this.setState({ selectedItem: item });
   },
   
