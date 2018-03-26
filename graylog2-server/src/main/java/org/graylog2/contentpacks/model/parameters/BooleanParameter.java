@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.model.parameters;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.contentpacks.model.ModelType;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_BooleanParameter.Builder.class)
@@ -38,7 +39,7 @@ public abstract class BooleanParameter implements Parameter<Boolean> {
         abstract BooleanParameter autoBuild();
 
         public BooleanParameter build() {
-            type(TYPE_NAME);
+            type(ModelType.of(TYPE_NAME));
             return autoBuild();
         }
     }

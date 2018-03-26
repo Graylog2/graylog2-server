@@ -80,7 +80,7 @@ public class ContentPackTest {
                         LongParameter.builder().name("MY_LONG").title("My Long").description("Some description").defaultValue(Optional.of(42L)).build(),
                         StringParameter.builder().name("MY_STRING").title("My String").description("Some description").defaultValue(Optional.of("Default Value")).build()))
                 .entities(ImmutableSet.of(
-                        Entity.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type("input").version(ModelVersion.of("1")).data(entityData).build()))
+                        Entity.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelType.of("input")).version(ModelVersion.of("1")).data(entityData).build()))
                 .build();
 
 
@@ -148,7 +148,7 @@ public class ContentPackTest {
                 Entity.builder()
                         .version(ModelVersion.of("1"))
                         .id(ModelId.of("311d9e16-e4d9-485d-a916-337fb4ca0e8b"))
-                        .type("lookup_table")
+                        .type(ModelType.of("lookup_table"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "OTX API - IP")
                                 .put("name", "otx-api-ip")
@@ -224,7 +224,7 @@ public class ContentPackTest {
         assertThat(legacyContentPack.entities()).contains(
                 Entity.builder()
                         .id(ModelId.of("53794eebe4b03cdadeadbeef"))
-                        .type("input")
+                        .type(ModelType.of("input"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("id", "53794eebe4b03cdadeadbeef")
@@ -266,7 +266,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("cafebabee4b0f504664790f8"))
-                        .type("stream")
+                        .type(ModelType.of("stream"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("id", "cafebabee4b0f504664790f8")
@@ -286,7 +286,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("56ba78eae4b0bcb6deadbeef"))
-                        .type("output")
+                        .type(ModelType.of("output"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("id", "56ba78eae4b0bcb6deadbeef")
@@ -307,7 +307,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("SOME_PATTERN"))
-                        .type("grok_pattern")
+                        .type(ModelType.of("grok_pattern"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("name", "SOME_PATTERN")
@@ -315,7 +315,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("generic-lookup-table"))
-                        .type("lookup_table")
+                        .type(ModelType.of("lookup_table"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "Lookup Table Title")
@@ -330,7 +330,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("generic-lookup-cache"))
-                        .type("lookup_cache")
+                        .type(ModelType.of("lookup_cache"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "Lookup Cache Title")
@@ -346,7 +346,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("generic-data-adapter"))
-                        .type("data_adapter")
+                        .type(ModelType.of("data_adapter"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "Data Adapter Title")
@@ -377,7 +377,7 @@ public class ContentPackTest {
         assertThat(contentPack.entities()).contains(
                 Entity.builder()
                         .id(ModelId.of("53794eebe4b03cdadeadbeef"))
-                        .type("input")
+                        .type(ModelType.of("input"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("id", "53794eebe4b03cdadeadbeef")
@@ -419,7 +419,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("cafebabee4b0f504664790f8"))
-                        .type("stream")
+                        .type(ModelType.of("stream"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("id", "cafebabee4b0f504664790f8")
@@ -439,7 +439,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("56ba78eae4b0bcb6deadbeef"))
-                        .type("output")
+                        .type(ModelType.of("output"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("id", "56ba78eae4b0bcb6deadbeef")
@@ -460,7 +460,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("SOME_PATTERN"))
-                        .type("grok_pattern")
+                        .type(ModelType.of("grok_pattern"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("name", "SOME_PATTERN")
@@ -468,7 +468,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("generic-lookup-table"))
-                        .type("lookup_table")
+                        .type(ModelType.of("lookup_table"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "Lookup Table Title")
@@ -483,7 +483,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("generic-lookup-cache"))
-                        .type("lookup_cache")
+                        .type(ModelType.of("lookup_cache"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "Lookup Cache Title")
@@ -499,7 +499,7 @@ public class ContentPackTest {
                         .build(),
                 Entity.builder()
                         .id(ModelId.of("generic-data-adapter"))
-                        .type("data_adapter")
+                        .type(ModelType.of("data_adapter"))
                         .version(ModelVersion.of("1"))
                         .data(objectMapper.createObjectNode()
                                 .put("title", "Data Adapter Title")

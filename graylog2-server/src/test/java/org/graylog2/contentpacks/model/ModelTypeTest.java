@@ -25,13 +25,13 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ModelVersionTest {
+public class ModelTypeTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void deserialize() {
-        final ModelVersion modelVersion = ModelVersion.of("foobar");
-        final JsonNode jsonNode = objectMapper.convertValue(modelVersion, JsonNode.class);
+        final ModelType modelType = ModelType.of("foobar");
+        final JsonNode jsonNode = objectMapper.convertValue(modelType, JsonNode.class);
 
         assertThat(jsonNode.isTextual()).isTrue();
         assertThat(jsonNode.asText()).isEqualTo("foobar");
@@ -39,20 +39,20 @@ public class ModelVersionTest {
 
     @Test
     public void serialize() throws IOException {
-        final ModelVersion modelVersion = objectMapper.readValue("\"foobar\"", ModelVersion.class);
-        assertThat(modelVersion).isEqualTo(ModelVersion.of("foobar"));
+        final ModelType modelType = objectMapper.readValue("\"foobar\"", ModelType.class);
+        assertThat(modelType).isEqualTo(ModelType.of("foobar"));
     }
 
     @Test
-    public void ensureVersionIsNotBlank() {
-        assertThatThrownBy(() -> ModelVersion.of(null))
+    public void ensureTypeIsNotBlank() {
+        assertThatThrownBy(() -> ModelType.of(null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Version must not be blank");
-        assertThatThrownBy(() -> ModelVersion.of(""))
+                .hasMessage("Type must not be blank");
+        assertThatThrownBy(() -> ModelType.of(""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Version must not be blank");
-        assertThatThrownBy(() -> ModelVersion.of("    \n\r\t"))
+                .hasMessage("Type must not be blank");
+        assertThatThrownBy(() -> ModelType.of("    \n\r\t"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Version must not be blank");
+                .hasMessage("Type must not be blank");
     }
 }

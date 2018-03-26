@@ -22,21 +22,20 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.UUID;
-
 @AutoValue
-public abstract class ModelId {
+public abstract class ModelType {
     @JsonValue
-    public abstract String id();
+    public abstract String type();
 
     @Override
     public String toString() {
-        return id();
+        return type();
     }
 
     @JsonCreator
-    public static ModelId of(String id) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(id), "ID must not be blank");
-        return new AutoValue_ModelId(id);
+    public static ModelType of(String type) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(type), "Type must not be blank");
+        return new AutoValue_ModelType(type);
     }
+
 }
