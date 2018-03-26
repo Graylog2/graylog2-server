@@ -16,7 +16,6 @@ class ContentPackInstallations extends React.Component {
   constructor(props) {
     super(props);
 
-    console.log(this.props);
     this.rowFormatter = this.rowFormatter.bind(this);
     this.headerFormater = this.headerFormater.bind(this);
   }

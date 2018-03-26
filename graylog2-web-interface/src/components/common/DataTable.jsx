@@ -26,7 +26,7 @@ class DataTable extends React.Component {
     /** Label to use next to the suggestions for the data filter input. */
     filterBy: PropTypes.string,
     /** Label to use next to the data filter input. */
-    filterLabel: PropTypes.string.isRequired,
+    filterLabel: PropTypes.string,
     /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
     filterKeys: PropTypes.array.isRequired,
     /** Array to use as suggestions in the data filter input. */
@@ -39,7 +39,7 @@ class DataTable extends React.Component {
     /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
     headers: PropTypes.array.isRequired,
     /** Element id to use in the table container */
-    id: PropTypes.string,
+    id: PropTypes.string.isRequired,
     /** Text or element to show when there is no data. */
     noDataText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** Array of objects to be rendered in the table. The render of those values is controlled by `dataRowFormatter`. */
@@ -57,10 +57,12 @@ class DataTable extends React.Component {
 
   static defaultProps = {
     filterSuggestions: [],
+    filterLabel: 'Filter',
     displayKey: 'value',
     noDataText: 'No data available.',
     rowClassName: '',
     useResponsiveTable: true,
+    sortByKey: undefined,
   };
 
   state = {
