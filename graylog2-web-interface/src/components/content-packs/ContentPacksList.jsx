@@ -10,6 +10,7 @@ import { Row, Col, Button, DropdownButton, MenuItem, Pagination } from 'react-bo
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
+import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import CombinedProvider from 'injection/CombinedProvider';
 import ContentPacksListStyle from './ContentPacksList.css';
 
@@ -51,12 +52,19 @@ const ContentPacksList = createReactClass({
     }
   },
 
+
   _formatItems(items) {
     const begin = (this.state.pageSize * (this.state.currentPage - 1));
     const end = begin + this.state.pageSize;
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => {
+      let downloadRef;
+      const downloadModal = (<ContentPackDownloadControl
+        ref={(node) => { downloadRef = node; }}
+        contentPackId={item.id}
+        revision={item.rev}
+      />);
       const states = item.states || [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
@@ -75,8 +83,9 @@ const ContentPacksList = createReactClass({
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
                 <MenuItem onSelect={() => { this._deleteContentPack(item.id); }}>Remove all</MenuItem>
-                <MenuItem>Download</MenuItem>
+                <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
               </DropdownButton>
+              {downloadModal}
             </Col>
           </Row>
           <Row className="row-sm">
