@@ -3,23 +3,24 @@ import React from 'react';
 
 import { DataTable } from 'components/common';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
-import '!style!css!./ContentPackVersions.css';
+import './ContentPackVersions.css';
 
 class ContentPackVersions extends React.Component {
   static propTypes = {
-    versions: PropTypes.arrayOf(PropTypes.string),
+    contentPack: PropTypes.object.isRequired,
     onChange: PropTypes.func,
   };
 
   static defaultProps = {
-    versions: [],
     onChange: () => {},
   };
 
   constructor(props) {
     super(props);
-    this.state = { selectedVersion: this.props.versions[0] };
+    const versions = Object.keys(this.props.contentPack);
+    this.state = { selectedVersion: versions[0] };
 
     this.onChange = this.onChange.bind(this);
     this.rowFormatter = this.rowFormatter.bind(this);
@@ -33,23 +34,29 @@ class ContentPackVersions extends React.Component {
     this.props.onChange(event.target.value);
   }
 
-  rowFormatter(item) {
+  rowFormatter(rev) {
+    const pack = this.props.contentPack[parseInt(rev.version, 10)];
+    let downloadRef;
+    const downloadModal = (<ContentPackDownloadControl
+      ref={(node) => { downloadRef = node; }}
+      contentPackId={pack.id}
+      revision={pack.rev}
+    />);
     return (
-      <tr key={item}>
+      <tr key={pack.id + pack.rev}>
         <td>
-          <input type="radio" value={item.version} onChange={this.onChange} checked={this.state.selectedVersion === item.version} />
+          <input type="radio" value={pack.rev} onChange={this.onChange} checked={this.state.selectedVersion === pack.rev.toString()} />
         </td>
-        <td>{item.version}</td>
+        <td>{pack.rev}</td>
         <td className="text-right">
           <Button bsStyle="info" bsSize="small">View</Button>
           &nbsp;
-          <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
+          <DropdownButton id={`more-actions-${pack.id + pack.rev}`} title="More Actions" bsSize="small" pullRight>
             <MenuItem>Remove</MenuItem>
-            <MenuItem>Uninstall</MenuItem>
-            <MenuItem>Create New Version</MenuItem>
-            <MenuItem>Download</MenuItem>
+            <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
           </DropdownButton>
         </td>
+        {downloadModal}
       </tr>
     );
   }
@@ -63,8 +70,8 @@ class ContentPackVersions extends React.Component {
   }
 
   render() {
+    const versions = Object.keys(this.props.contentPack).map((rev) => { return { version: rev }; });
     const headers = ['Select', 'Revision', 'Action'];
-    const versions = this.props.versions.map((version) => { return { version: version }; });
     return (
       <DataTable
         id="content-packs-versions"
