@@ -32,6 +32,7 @@ import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackList;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackRevisions;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -108,13 +109,14 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
-    public Map<Integer, ContentPack> listContentPackRevisions(
+    public ContentPackRevisions listContentPackRevisions(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id) {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackPersistenceService.findAllById(id).stream()
+        Map<Integer, ContentPack> contentPackMap = contentPackPersistenceService.findAllById(id).stream()
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
+        return ContentPackRevisions.create(contentPackMap);
     }
 
     @GET
