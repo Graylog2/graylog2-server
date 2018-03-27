@@ -14,12 +14,11 @@ describe('<ContentPackVersions />', () => {
       rev: rev,
       title: 'UFW Grok Patterns',
       description: 'Grok Patterns to extract informations from UFW logfiles',
-      version: '1.0',
       states: ['installed', 'edited'],
       summary: 'This is a summary',
       vendor: 'graylog.com',
       url: 'www.graylog.com',
-    }
+    };
   };
   const contentPack = {
     1: buildPack(1),
@@ -40,5 +39,15 @@ describe('<ContentPackVersions />', () => {
     const wrapper = mount(<ContentPackVersions onChange={changeFn} contentPack={contentPack} />);
     wrapper.find('input[value=1]').simulate('change', { target: { checked: true, value: '1' } });
     expect(changeFn.mock.calls.length).toBe(1);
+  });
+
+  it('should fire on delete when clicked on delete a version', () => {
+    const deleteFn = jest.fn((version, revision) => {
+      expect(version).toEqual('1');
+      expect(revision).toEqual(1);
+    });
+    const wrapper = mount(<ContentPackVersions onDeletePack={deleteFn} contentPack={contentPack} />);
+    wrapper.find('a[children="Remove"]').at(0).simulate('click');
+    expect(deleteFn.mock.calls.length).toBe(1);
   });
 });

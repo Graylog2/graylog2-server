@@ -8,12 +8,13 @@ import Spinner from 'components/common/Spinner';
 
 import Routes from 'routing/Routes';
 
+import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
-import ContentPackInstallations from "../components/content-packs/ContentPackInstallations";
-import ShowContentPackStyle from './ShowContentPackPage.css';
+import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
 import CombinedProvider from 'injection/CombinedProvider';
+import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
 
@@ -28,7 +29,6 @@ const ShowContentPackPage = createReactClass({
 
   getInitialState() {
     return {
-      contentPack: undefined,
       selectedVersion: undefined,
     };
   },
@@ -42,13 +42,23 @@ const ShowContentPackPage = createReactClass({
     this.setState({ selectedVersion: newVersion });
   },
 
+  _deleteContentPackRev(contentPackId, revision) {
+    if (window.confirm('You are about to delete this content pack, are you sure?')) {
+      ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
+        UserNotification.success('Content Pack deleted successfully.', 'Success');
+        ContentPacksActions.get(contentPackId);
+      }, () => {
+        UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
+      });
+    }
+  },
+
   render() {
     if (!this.state.contentPack) {
       return (<Spinner />);
     }
 
     const { contentPack, selectedVersion } = this.state;
-    const versions = Object.keys(contentPack);
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -75,7 +85,9 @@ const ShowContentPackPage = createReactClass({
                 <Row className={ShowContentPackStyle.leftRow}>
                   <Col>
                     <h2>Versions</h2>
-                    <ContentPackVersions contentPack={contentPack} onChange={this._onVersionChanged} />
+                    <ContentPackVersions contentPack={contentPack}
+                                         onChange={this._onVersionChanged}
+                                         onDeletePack={this._deleteContentPackRev} />
                   </Col>
                 </Row>
                 <Row className={ShowContentPackStyle.leftRow}>
