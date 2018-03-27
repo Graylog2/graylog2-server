@@ -71,7 +71,7 @@ public class InMemoryGrokPatternServiceTest {
         GrokPattern pattern2 = service.save(GrokPattern.create("NAME2", ".*"));
         GrokPattern pattern3 = service.save(GrokPattern.create("NAME3", ".*"));
 
-        assertThat(service.bulkLoad(ImmutableSet.of("NAME1", "NAME3"))).containsExactlyInAnyOrder(pattern1, pattern3);
+        assertThat(service.bulkLoad(ImmutableSet.of(pattern1.id(), pattern3.id()))).containsExactlyInAnyOrder(pattern1, pattern3);
     }
 
     @Test
