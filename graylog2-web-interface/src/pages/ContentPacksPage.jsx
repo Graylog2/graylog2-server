@@ -53,7 +53,8 @@ const ContentPacksPage = createReactClass({
 
             <div>
               <ContentPackUploadControls />
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.EXPORT}>
+              &nbsp;
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
                 <Button bsStyle="success" bsSize="large">Create a content pack</Button>
               </LinkContainer>
             </div>
