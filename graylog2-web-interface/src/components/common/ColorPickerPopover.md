@@ -9,7 +9,8 @@ const ColorPickerOverlayExample = createReactClass({
     };
   },
 
-  handleColorChange(color) {
+  handleColorChange(color, _, hidePopover) {
+    hidePopover();
     this.setState({ color: color });
   },
 
