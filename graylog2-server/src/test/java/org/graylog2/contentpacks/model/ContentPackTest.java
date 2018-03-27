@@ -26,7 +26,7 @@ import com.google.common.io.Resources;
 import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
-import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.parameters.BooleanParameter;
 import org.graylog2.contentpacks.model.parameters.DoubleParameter;
 import org.graylog2.contentpacks.model.parameters.IntegerParameter;
@@ -80,7 +80,7 @@ public class ContentPackTest {
                         LongParameter.builder().name("MY_LONG").title("My Long").description("Some description").defaultValue(Optional.of(42L)).build(),
                         StringParameter.builder().name("MY_STRING").title("My String").description("Some description").defaultValue(Optional.of("Default Value")).build()))
                 .entities(ImmutableSet.of(
-                        Entity.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelType.of("input")).version(ModelVersion.of("1")).data(entityData).build()))
+                        EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelType.of("input")).version(ModelVersion.of("1")).data(entityData).build()))
                 .build();
 
 
@@ -145,7 +145,7 @@ public class ContentPackTest {
                         .description("Your personal OTX API key")
                         .build());
         assertThat(contentPackV1.entities()).contains(
-                Entity.builder()
+                EntityV1.builder()
                         .version(ModelVersion.of("1"))
                         .id(ModelId.of("311d9e16-e4d9-485d-a916-337fb4ca0e8b"))
                         .type(ModelType.of("lookup_table"))
@@ -222,7 +222,7 @@ public class ContentPackTest {
         assertThat(legacyContentPack.parameters()).isEmpty();
         assertThat(legacyContentPack.requires()).isEmpty();
         assertThat(legacyContentPack.entities()).contains(
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("53794eebe4b03cdadeadbeef"))
                         .type(ModelType.of("input"))
                         .version(ModelVersion.of("1"))
@@ -264,7 +264,7 @@ public class ContentPackTest {
                                                                         .put("type", "SYSLOG_PRI_LEVEL")
                                                                         .set("configuration", objectMapper.createObjectNode()))))))))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("cafebabee4b0f504664790f8"))
                         .type(ModelType.of("stream"))
                         .version(ModelVersion.of("1"))
@@ -284,7 +284,7 @@ public class ContentPackTest {
                                                 .set("description", NullNode.getInstance())),
                                         "outputs", objectMapper.createArrayNode())))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("56ba78eae4b0bcb6deadbeef"))
                         .type(ModelType.of("output"))
                         .version(ModelVersion.of("1"))
@@ -305,7 +305,7 @@ public class ContentPackTest {
                                         .put("short_mode", true)
                                         .put("link_names", true)))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("SOME_PATTERN"))
                         .type(ModelType.of("grok_pattern"))
                         .version(ModelVersion.of("1"))
@@ -313,7 +313,7 @@ public class ContentPackTest {
                                 .put("name", "SOME_PATTERN")
                                 .put("pattern", "([a-z]+)"))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("generic-lookup-table"))
                         .type(ModelType.of("lookup_table"))
                         .version(ModelVersion.of("1"))
@@ -328,7 +328,7 @@ public class ContentPackTest {
                                 .put("default_multi_value", "")
                                 .put("default_multi_value_type", "NULL"))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("generic-lookup-cache"))
                         .type(ModelType.of("lookup_cache"))
                         .version(ModelVersion.of("1"))
@@ -344,7 +344,7 @@ public class ContentPackTest {
                                         .put("expire_after_write", 1)
                                         .put("expire_after_write_unit", "DAYS")))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("generic-data-adapter"))
                         .type(ModelType.of("data_adapter"))
                         .version(ModelVersion.of("1"))
@@ -375,7 +375,7 @@ public class ContentPackTest {
         assertThat(contentPack.parameters()).isEmpty();
         assertThat(contentPack.requires()).isEmpty();
         assertThat(contentPack.entities()).contains(
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("53794eebe4b03cdadeadbeef"))
                         .type(ModelType.of("input"))
                         .version(ModelVersion.of("1"))
@@ -417,7 +417,7 @@ public class ContentPackTest {
                                                                         .put("type", "SYSLOG_PRI_LEVEL")
                                                                         .set("configuration", objectMapper.createObjectNode()))))))))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("cafebabee4b0f504664790f8"))
                         .type(ModelType.of("stream"))
                         .version(ModelVersion.of("1"))
@@ -437,7 +437,7 @@ public class ContentPackTest {
                                                 .set("description", NullNode.getInstance())),
                                         "outputs", objectMapper.createArrayNode())))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("56ba78eae4b0bcb6deadbeef"))
                         .type(ModelType.of("output"))
                         .version(ModelVersion.of("1"))
@@ -458,7 +458,7 @@ public class ContentPackTest {
                                         .put("short_mode", true)
                                         .put("link_names", true)))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("SOME_PATTERN"))
                         .type(ModelType.of("grok_pattern"))
                         .version(ModelVersion.of("1"))
@@ -466,7 +466,7 @@ public class ContentPackTest {
                                 .put("name", "SOME_PATTERN")
                                 .put("pattern", "([a-z]+)"))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("generic-lookup-table"))
                         .type(ModelType.of("lookup_table"))
                         .version(ModelVersion.of("1"))
@@ -481,7 +481,7 @@ public class ContentPackTest {
                                 .put("default_multi_value", "")
                                 .put("default_multi_value_type", "NULL"))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("generic-lookup-cache"))
                         .type(ModelType.of("lookup_cache"))
                         .version(ModelVersion.of("1"))
@@ -497,7 +497,7 @@ public class ContentPackTest {
                                         .put("expire_after_write", 1)
                                         .put("expire_after_write_unit", "DAYS")))
                         .build(),
-                Entity.builder()
+                EntityV1.builder()
                         .id(ModelId.of("generic-data-adapter"))
                         .type(ModelType.of("data_adapter"))
                         .version(ModelVersion.of("1"))

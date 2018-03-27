@@ -1,0 +1,15 @@
+{
+  "v": "1",
+  "type": "input",
+  "id": "78547c87-af21-4292-8e57-614da5baf6c3",
+  "data": {
+    "title": "GELF Input",
+    "type": "org.graylog2.inputs.gelf.udp.GELFUDPInput",
+    "configuration": {
+      "port": "$GELF_PORT$",
+      "bind_address": "0.0.0.0"
+    },
+    "extractors": [],
+    "static_fields": []
+  }
+}

@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.parameters.Parameter;
 
 import javax.annotation.Nullable;
@@ -251,7 +252,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertInput(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("id").asText(UUID.randomUUID().toString())))
                     .type(TYPE_INPUT)
                     .version(ModelVersion.of("1"))
@@ -270,7 +271,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertStream(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("id").asText(UUID.randomUUID().toString())))
                     .type(TYPE_STREAM)
                     .version(ModelVersion.of("1"))
@@ -289,7 +290,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertOutput(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("id").asText(UUID.randomUUID().toString())))
                     .type(TYPE_OUTPUT)
                     .version(ModelVersion.of("1"))
@@ -308,7 +309,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertDashboard(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(UUID.randomUUID().toString()))
                     .type(TYPE_DASHBOARD)
                     .version(ModelVersion.of("1"))
@@ -327,7 +328,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertGrokPattern(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
                     .type(TYPE_GROK_PATTERN)
                     .version(ModelVersion.of("1"))
@@ -346,7 +347,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertLookupTable(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
                     .type(TYPE_LOOKUP_TABLE)
                     .version(ModelVersion.of("1"))
@@ -365,7 +366,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertLookupCache(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
                     .type(TYPE_LOOKUP_CACHE)
                     .version(ModelVersion.of("1"))
@@ -384,7 +385,7 @@ public abstract class LegacyContentPack implements ContentPack {
         }
 
         private Entity convertLookupDataAdapter(JsonNode json) {
-            return Entity.builder()
+            return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
                     .type(TYPE_DATA_ADAPTER)
                     .version(ModelVersion.of("1"))
