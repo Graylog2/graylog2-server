@@ -31,6 +31,7 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackList;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -77,11 +78,11 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
-    public Set<ContentPack> listContentPacks() {
+    public ContentPackList listContentPacks() {
         checkPermission(RestPermissions.BUNDLE_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
 
-        return contentPacks;
+        return ContentPackList.create(contentPacks);
     }
 
     @GET
@@ -92,10 +93,11 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
-    public Set<ContentPack> listLatestContentPacks() {
+    public ContentPackList listLatestContentPacks() {
         checkPermission(RestPermissions.BUNDLE_READ);
 
-        return contentPackPersistenceService.loadAllLatest();
+        Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
+        return ContentPackList.create(contentPacks);
     }
 
     @GET
