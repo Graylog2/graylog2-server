@@ -5,6 +5,7 @@ const ContentPacksActions = Reflux.createActions({
   list: { asyncResult: true },
   get: { asyncResult: true },
   delete: { asyncResult: true },
+  deleteRev: { asyncResult: true },
 });
 
 export default ContentPacksActions;

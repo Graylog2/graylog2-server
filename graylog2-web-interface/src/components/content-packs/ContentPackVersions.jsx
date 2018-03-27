@@ -11,10 +11,12 @@ class ContentPackVersions extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    onDeletePack: PropTypes.func,
   };
 
   static defaultProps = {
     onChange: () => {},
+    onDeletePack: () => {},
   };
 
   constructor(props) {
@@ -52,7 +54,7 @@ class ContentPackVersions extends React.Component {
           <Button bsStyle="info" bsSize="small">View</Button>
           &nbsp;
           <DropdownButton id={`more-actions-${pack.id + pack.rev}`} title="More Actions" bsSize="small" pullRight>
-            <MenuItem>Remove</MenuItem>
+            <MenuItem onSelect={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Remove</MenuItem>
             <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
           </DropdownButton>
         </td>
