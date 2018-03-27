@@ -126,8 +126,9 @@ public class ContentPackPersistenceService {
         return writeResult.getN();
     }
 
-    public void deleteByIdAndRevision(ModelId id, int revision) {
+    public int deleteByIdAndRevision(ModelId id, int revision) {
         final DBQuery.Query query = DBQuery.is(Identified.FIELD_META_ID, id).is(Revisioned.FIELD_META_REVISION, revision);
-        dbCollection.remove(query);
+        final WriteResult<ContentPack, ObjectId> writeResult = dbCollection.remove(query);
+        return writeResult.getN();
     }
 }
