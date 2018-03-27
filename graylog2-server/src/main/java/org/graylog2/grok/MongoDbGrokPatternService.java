@@ -33,6 +33,8 @@ import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -47,6 +49,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MongoDbGrokPatternService implements GrokPatternService {
     public static final String COLLECTION_NAME = "grok_patterns";
     public static final String INDEX_NAME = "idx_name_asc_unique";
+
+    private static final Logger log = LoggerFactory.getLogger(MongoDbGrokPatternService.class);
 
     private final JacksonDBCollection<GrokPattern, ObjectId> dbCollection;
 
@@ -87,6 +91,12 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     public Optional<GrokPattern> loadByName(String name) {
         final GrokPattern pattern = dbCollection.findOne(DBQuery.is("name", name));
         return Optional.ofNullable(pattern);
+    }
+
+    @Override
+    public Set<GrokPattern> bulkLoad(Collection<String> patternIds) {
+        final DBCursor<GrokPattern> dbCursor = dbCollection.find(DBQuery.in("_id", patternIds));
+        return ImmutableSet.copyOf((Iterable<GrokPattern>) dbCursor);
     }
 
     @Override

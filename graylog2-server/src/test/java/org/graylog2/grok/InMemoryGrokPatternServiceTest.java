@@ -17,6 +17,7 @@
 package org.graylog2.grok;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.junit.Before;
@@ -62,6 +63,15 @@ public class InMemoryGrokPatternServiceTest {
         GrokPattern pattern3 = service.save(GrokPattern.create("NAME3", ".*"));
 
         assertThat(service.loadAll()).containsExactlyInAnyOrder(pattern1, pattern2, pattern3);
+    }
+
+    @Test
+    public void bulkLoad() throws Exception {
+        GrokPattern pattern1 = service.save(GrokPattern.create("NAME1", ".*"));
+        GrokPattern pattern2 = service.save(GrokPattern.create("NAME2", ".*"));
+        GrokPattern pattern3 = service.save(GrokPattern.create("NAME3", ".*"));
+
+        assertThat(service.bulkLoad(ImmutableSet.of("NAME1", "NAME3"))).containsExactlyInAnyOrder(pattern1, pattern3);
     }
 
     @Test

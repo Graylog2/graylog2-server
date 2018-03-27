@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,6 +52,14 @@ public class InMemoryGrokPatternService implements GrokPatternService {
             throw new NotFoundException("Couldn't find Grok pattern with ID " + patternId);
         }
         return pattern;
+    }
+
+    @Override
+    public Set<GrokPattern> bulkLoad(Collection<String> patternIds) {
+        return patternIds.stream()
+                .map(store::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     @Override
