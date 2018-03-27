@@ -28,6 +28,8 @@ import java.util.Set;
 public interface GrokPatternService {
     GrokPattern load(String patternId) throws NotFoundException;
 
+    Set<GrokPattern> bulkLoad(Collection<String> patternIds);
+
     Set<GrokPattern> loadAll();
 
     GrokPattern save(GrokPattern pattern) throws ValidationException;

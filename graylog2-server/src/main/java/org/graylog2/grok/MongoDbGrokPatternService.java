@@ -16,6 +16,7 @@
  */
 package org.graylog2.grok;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -44,8 +45,11 @@ import java.util.regex.PatternSyntaxException;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MongoDbGrokPatternService implements GrokPatternService {
-    public static final String GROK_PATTERNS = "grok_patterns";
     private static final Logger log = LoggerFactory.getLogger(MongoDbGrokPatternService.class);
+
+    @VisibleForTesting
+    static final String COLLECTION_NAME = "grok_patterns";
+
     private final JacksonDBCollection<GrokPattern, ObjectId> dbCollection;
 
     @Inject
@@ -53,7 +57,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
                                         MongoJackObjectMapperProvider mapper) {
 
         dbCollection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(GROK_PATTERNS),
+                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 GrokPattern.class,
                 ObjectId.class,
                 mapper.get());
@@ -66,6 +70,12 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             throw new NotFoundException("Couldn't find Grok pattern with ID " + patternId);
         }
         return pattern;
+    }
+
+    @Override
+    public Set<GrokPattern> bulkLoad(Collection<String> patternIds) {
+        final DBCursor<GrokPattern> dbCursor = dbCollection.find(DBQuery.in("_id", patternIds));
+        return ImmutableSet.copyOf((Iterable<GrokPattern>) dbCursor);
     }
 
     @Override
