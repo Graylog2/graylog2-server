@@ -34,8 +34,10 @@ const SelectPopover = createReactClass({
      * and must return a React node that will be displayed on screen.
      */
     itemFormatter: PropTypes.func,
-    /** Indicates which is the selected item. This should be the same string that appears in the `items` list. */
-    selectedItem: PropTypes.string,
+    /** Indicates whether the component will allow multiple selected items or not. */
+    multiple: PropTypes.bool,
+    /** Indicates which items are selected. This should be the same string that appears in the `items` list. */
+    selectedItems: PropTypes.arrayOf(PropTypes.string),
     /**
      * Function that will be called when the item selection changes.
      * The function will receive the selected item as first argument or `undefined` if the selection
@@ -56,7 +58,8 @@ const SelectPopover = createReactClass({
       triggerAction: 'click',
       items: [],
       itemFormatter: item => item,
-      selectedItem: undefined,
+      multiple: false,
+      selectedItems: [],
       onItemSelect: () => {},
       displayDataFilter: true,
       filterPlaceholder: 'Type to filter',
@@ -68,23 +71,38 @@ const SelectPopover = createReactClass({
     return {
       filterText: '',
       filteredItems: this.props.items,
-      selectedItem: this.props.selectedItem,
+      selectedItems: this.props.selectedItems,
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.selectedItem !== nextProps.selectedItem) {
-      this.setState({ selectedItem: nextProps.selectedItem });
+    if (lodash.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
+      this.setState({ selectedItems: nextProps.selectedItems });
     }
     if (this.props.items !== nextProps.items) {
       this.filterData(this.state.filterText, nextProps.items);
     }
   },
 
+  handleSelectionChange(nextSelection) {
+    this.setState({ selectedItems: nextSelection });
+    this.props.onItemSelect(nextSelection, () => this.overlay.hide());
+  },
+
+  clearItemSelection() {
+    this.handleSelectionChange([]);
+  },
+
   handleItemSelection(item) {
     return () => {
-      this.setState({ selectedItem: item });
-      this.props.onItemSelect(item, () => this.overlay.hide());
+      const selectedItems = this.state.selectedItems;
+      let nextSelectedItems;
+      if (selectedItems.includes(item)) {
+        nextSelectedItems = lodash.without(selectedItems, item);
+      } else {
+        nextSelectedItems = this.props.multiple ? lodash.concat(selectedItems, item) : [item];
+      }
+      this.handleSelectionChange(nextSelectedItems);
     };
   },
 
@@ -115,7 +133,7 @@ const SelectPopover = createReactClass({
 
   renderClearSelectionItem() {
     return (
-      <ListGroupItem onClick={this.handleItemSelection()}>
+      <ListGroupItem onClick={this.clearItemSelection}>
         <i className="fa fa-fw fa-times text-danger" /> {this.props.clearSelectionText}
       </ListGroupItem>
     );
@@ -124,19 +142,19 @@ const SelectPopover = createReactClass({
   render() {
     const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, ...otherProps } = this.props;
     const popoverProps = this.pickPopoverProps(otherProps);
-    const { filteredItems, selectedItem } = this.state;
+    const { filteredItems, selectedItems } = this.state;
 
     const popover = (
       <Popover {...popoverProps} className={style.customPopover}>
         {displayDataFilter && this.renderDataFilter(items)}
-        {selectedItem && this.renderClearSelectionItem()}
+        {selectedItems.length > 0 && this.renderClearSelectionItem()}
         <IsolatedScroll className={style.scrollableList}>
           <ListGroup>
             {filteredItems.map((item) => {
               return (
                 <ListGroupItem key={item}
                                onClick={this.handleItemSelection(item)}
-                               active={this.state.selectedItem === item}>
+                               active={this.state.selectedItems.includes(item)}>
                   {itemFormatter(item)}
                 </ListGroupItem>
               );

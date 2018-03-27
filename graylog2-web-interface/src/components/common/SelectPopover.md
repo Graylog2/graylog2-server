@@ -14,16 +14,16 @@ const items = [
 const SelectPopoverExample = createReactClass({
   getInitialState() {
     return {
-      selectedItem: undefined,
+      selectedColor: undefined,
     };
   },
   
   handleItemSelect(item) {
-    this.setState({ selectedItem: item });
+    this.setState({ selectedColor: item[0] });
   },
   
   render() {
-    const selectedItem = this.state.selectedItem;
+    const selectedColor = this.state.selectedColor;
 
     return (
       <div>
@@ -32,13 +32,13 @@ const SelectPopoverExample = createReactClass({
                          title="Filter by color"
                          triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
                          items={items}
-                         selectedItem={selectedItem}
+                         selectedItems={selectedColor ? [selectedColor] : []}
                          onItemSelect={this.handleItemSelect}
                          displayDataFilter={false}
                          clearSelectionText="Clear color selection"/>
         </div>
         
-        {selectedItem ? `You have selected ${selectedItem}` : 'Please select a color!'}
+        {selectedColor ? `You have selected ${selectedColor}` : 'Please select a color!'}
       </div>
     );
   }
@@ -74,13 +74,12 @@ const items = [
 const SelectPopoverFormattedExample = createReactClass({
   getInitialState() {
     return {
-      selectedItem: undefined,
+      selectedColors: [],
     };
   },
   
-  handleItemSelect(item, hidePopover) {
-    hidePopover();
-    this.setState({ selectedItem: item });
+  handleItemSelect(item) {
+    this.setState({ selectedColors: item });
   },
   
   formatItem(item) {
@@ -92,7 +91,7 @@ const SelectPopoverFormattedExample = createReactClass({
   },
   
   render() {
-    const selectedItem = this.state.selectedItem;
+    const selectedColors = this.state.selectedColors;
 
     return (
       <div>
@@ -102,12 +101,13 @@ const SelectPopoverFormattedExample = createReactClass({
                          triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
                          items={items}
                          itemFormatter={this.formatItem}
-                         selectedItem={selectedItem}
                          onItemSelect={this.handleItemSelect}
-                         filterPlaceholder="Filter by color" />
+                         filterPlaceholder="Filter by color"
+                         multiple={true}
+                         selectedItems={selectedColors} />
         </div>
         
-        {selectedItem ? `You have selected ${selectedItem}` : 'Please select another color!'}
+        {selectedColors.length > 0 ? `You have selected ${selectedColors.join(', ')}` : 'Please select some colors!'}
       </div>
     );
   }
