@@ -43,11 +43,11 @@ public abstract class EntityV1 implements Entity {
         @JsonProperty(FIELD_DATA)
         public abstract Builder data(JsonNode data);
 
-        public abstract EntityV1 autoBbuild();
+        abstract EntityV1 autoBuild();
 
         public EntityV1 build() {
             version(ModelVersion.of(VERSION));
-            return autoBbuild();
+            return autoBuild();
         }
     }
 }
