@@ -16,32 +16,17 @@
  */
 package org.graylog2.contentpacks.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.Typed;
 import org.graylog2.contentpacks.model.Versioned;
 
-@AutoValue
-@JsonDeserialize(builder = AutoValue_Entity.Builder.class)
-public abstract class Entity implements Identified, Typed, Versioned {
-    public static final String FIELD_DATA = "data";
-
-    // TODO: Use more type-safe way to represent entity configuration?
-    @JsonProperty(FIELD_DATA)
-    public abstract JsonNode data();
-
-    public static Builder builder() {
-        return new AutoValue_Entity.Builder();
-    }
-
-    @AutoValue.Builder
-    public interface Builder extends IdBuilder<Builder>, TypeBuilder<Builder>, VersionBuilder<Builder> {
-        @JsonProperty(FIELD_DATA)
-        Builder data(JsonNode data);
-
-        Entity build();
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = Versioned.FIELD_META_VERSION)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = EntityV1.class, name = EntityV1.VERSION)
+})
+public interface Entity extends Identified, Typed, Versioned {
+    interface EntityBuilder<SELF> extends IdBuilder<SELF>, TypeBuilder<SELF>, VersionBuilder<SELF> {
     }
 }
