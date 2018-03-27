@@ -200,8 +200,8 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "revision", value = "Content Pack revision", required = true)
             @PathParam("revision") final int revision) {
         checkPermission(RestPermissions.BUNDLE_DELETE);
-        contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
+        final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
 
-        LOG.debug("Deleted content packs with id {} and revision", contentPackId, revision);
+        LOG.debug("Deleted {} content packs with id {} and revision", deleted, contentPackId, revision);
     }
 }
