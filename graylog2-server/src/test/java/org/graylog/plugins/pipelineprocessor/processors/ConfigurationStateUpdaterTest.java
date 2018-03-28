@@ -32,17 +32,14 @@
   */
 package org.graylog.plugins.pipelineprocessor.processors;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
-
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
-
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
@@ -73,8 +70,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Ignore("code generation disabled")
@@ -129,7 +130,7 @@ public class ConfigurationStateUpdaterTest {
 
     private static class DummyStreamService implements StreamService {
 
-        private final Map<String, Stream> store = new MapMaker().makeMap();
+        private final Map<String, Stream> store = new HashMap<>();
 
         @Override
         public Stream create(Map<String, Object> fields) {
@@ -168,6 +169,14 @@ public class ConfigurationStateUpdaterTest {
         @Override
         public List<Stream> loadAll() {
             return ImmutableList.copyOf(store.values());
+        }
+
+        @Override
+        public Set<Stream> loadByIds(Collection<String> streamIds) {
+            return streamIds.stream()
+                    .map(store::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
         }
 
         @Override
