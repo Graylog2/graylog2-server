@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams;
 
+import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -99,5 +100,13 @@ public class StreamServiceImplTest {
         assertThat(alertableStreams)
             .isNotEmpty()
             .hasSize(2);
+    }
+
+    @Test
+    @UsingDataSet(locations = "someStreamsWithAlertConditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void loadByIds() {
+        assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2"))).hasSize(1);
+        assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a5deadbeef"))).isEmpty();
+        assertThat(this.streamService.loadByIds(ImmutableSet.of("565f02223b0c25a537197af2", "565f02223b0c25a5deadbeef"))).hasSize(1);
     }
 }

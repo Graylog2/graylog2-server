@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -205,6 +206,13 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }
 
         return streams.build();
+    }
+
+    @Override
+    public Set<Stream> loadByIds(Collection<String> streamIds) {
+        final DBObject query = QueryBuilder.start("_id").in(streamIds).get();
+
+        return ImmutableSet.copyOf(loadAll(query));
     }
 
     @Override

@@ -25,8 +25,10 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface StreamService extends PersistedService {
     Stream create(Map<String, Object> fields);
@@ -38,6 +40,8 @@ public interface StreamService extends PersistedService {
     void destroy(Stream stream) throws NotFoundException;
 
     List<Stream> loadAll();
+
+    Set<Stream> loadByIds(Collection<String> streamIds);
 
     List<Stream> loadAllEnabled();
 
