@@ -210,7 +210,10 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public Set<Stream> loadByIds(Collection<String> streamIds) {
-        final DBObject query = QueryBuilder.start("_id").in(streamIds).get();
+        final Set<ObjectId> objectIds = streamIds.stream()
+                .map(ObjectId::new)
+                .collect(Collectors.toSet());
+        final DBObject query = QueryBuilder.start("_id").in(objectIds).get();
 
         return ImmutableSet.copyOf(loadAll(query));
     }
