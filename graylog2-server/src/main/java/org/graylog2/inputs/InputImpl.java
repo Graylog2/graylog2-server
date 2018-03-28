@@ -44,6 +44,7 @@ import static com.google.common.base.Strings.emptyToNull;
 public class InputImpl extends PersistedImpl implements Input {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_STATIC_FIELD_KEY = "key";
     public static final String FIELD_STATIC_FIELD_VALUE = "value";
 
