@@ -25,6 +25,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -65,6 +66,7 @@ public class InputServiceImplTest {
     private InputServiceImpl inputService;
 
     @Before
+    @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
         inputService = new InputServiceImpl(
