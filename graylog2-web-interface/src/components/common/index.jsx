@@ -41,3 +41,4 @@ export { default as TypeAheadInput } from './TypeAheadInput';
 export { default as JSONValueInput } from './JSONValueInput';
 export { default as TimeUnitInput } from './TimeUnitInput';
 export { default as TimeUnit } from './TimeUnit';
+export { default as Wizard } from './Wizard';
