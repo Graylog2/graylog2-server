@@ -1,0 +1,91 @@
+{
+  "inputs": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "recv_buffer_size": 1048576,
+        "tcp_keepalive": false,
+        "use_null_delimiter": false,
+        "number_worker_threads": 4,
+        "tls_client_auth_cert_file": "",
+        "bind_address": "127.0.0.1",
+        "tls_cert_file": "",
+        "port": 5555,
+        "tls_key_file": "",
+        "tls_enable": false,
+        "tls_key_password": "",
+        "max_message_size": 2097152,
+        "tls_client_auth": "disabled",
+        "override_source": null
+      },
+      "name": "Raw/Plaintext TCP",
+      "created_at": {
+        "$date": "2018-03-26T11:01:00.000Z"
+      },
+      "global": false,
+      "type": "org.graylog2.inputs.raw.tcp.RawTCPInput",
+      "title": "Raw TCP",
+      "content_pack": null,
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "expand_structured_data": false,
+        "recv_buffer_size": 262144,
+        "port": 1514,
+        "number_worker_threads": 4,
+        "override_source": null,
+        "force_rdns": false,
+        "allow_override_date": true,
+        "bind_address": "127.0.0.1",
+        "store_full_message": false
+      },
+      "name": "Syslog UDP",
+      "created_at": {
+        "$date": "2018-03-27T12:02:00.000Z"
+      },
+      "global": false,
+      "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
+      "title": "Syslog UDP",
+      "content_pack": "54e3cafebabecafebabe0001",
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "recv_buffer_size": 1048576,
+        "tcp_keepalive": false,
+        "use_null_delimiter": true,
+        "number_worker_threads": 4,
+        "tls_client_auth_cert_file": "",
+        "bind_address": "127.0.0.1",
+        "tls_cert_file": "",
+        "decompress_size_limit": 8388608,
+        "port": 12201,
+        "tls_key_file": "",
+        "tls_enable": false,
+        "tls_key_password": "",
+        "max_message_size": 2097152,
+        "tls_client_auth": "disabled",
+        "override_source": null
+      },
+      "name": "GELF TCP",
+      "created_at": {
+        "$date": "2018-03-28T13:03:00.000Z"
+      },
+      "global": true,
+      "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput",
+      "title": "GELF TCP"
+    }
+  ]
+}
