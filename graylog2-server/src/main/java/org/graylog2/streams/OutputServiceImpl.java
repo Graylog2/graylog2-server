@@ -37,6 +37,7 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -73,6 +74,14 @@ public class OutputServiceImpl implements OutputService {
     public Set<Output> loadAll() {
         try (org.mongojack.DBCursor<OutputImpl> outputs = coll.find()) {
             return ImmutableSet.copyOf((Iterable<OutputImpl>) outputs);
+        }
+    }
+
+    @Override
+    public Set<Output> loadByIds(Collection<String> ids) {
+        final DBQuery.Query query = DBQuery.in(OutputImpl.FIELD_ID, ids);
+        try (org.mongojack.DBCursor<OutputImpl> dbCursor = coll.find(query)) {
+            return ImmutableSet.copyOf((Iterable<? extends Output>) dbCursor);
         }
     }
 
