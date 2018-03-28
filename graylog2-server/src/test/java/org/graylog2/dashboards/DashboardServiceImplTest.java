@@ -16,6 +16,7 @@
  */
 package org.graylog2.dashboards;
 
+import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -35,6 +36,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.List;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -53,13 +55,13 @@ public class DashboardServiceImplTest {
     private DashboardWidgetCreator dashboardWidgetCreator;
 
     @Before
-    public void setUpService() throws Exception {
+    public void setUpService() {
         this.dashboardService = new DashboardServiceImpl(mongoRule.getMongoConnection(), dashboardWidgetCreator);
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void testCreate() throws Exception {
+    public void testCreate() {
         final String title = "Dashboard Title";
         final String description = "This is the dashboard description";
         final String creatorUserId = "foobar";
@@ -76,13 +78,13 @@ public class DashboardServiceImplTest {
 
     @Test(expected = NotFoundException.class)
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void testLoadNonExistentDashboard() throws Exception {
+    public void testLoadNonExistentDashboard() throws NotFoundException {
         this.dashboardService.load("54e3deadbeefdeadbeefaffe");
     }
 
     @Test
     @UsingDataSet(locations = "singleDashboard.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testLoad() throws Exception {
+    public void testLoad() throws NotFoundException {
         final String exampleDashboardId = "54e3deadbeefdeadbeefaffe";
 
         final Dashboard dashboard = dashboardService.load(exampleDashboardId);
@@ -93,7 +95,7 @@ public class DashboardServiceImplTest {
 
     @Test
     @UsingDataSet(locations = "singleDashboard.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testAll() throws Exception {
+    public void testAll() {
         final List<Dashboard> dashboards = dashboardService.all();
         final Dashboard dashboard = dashboards.get(0);
 
@@ -102,28 +104,13 @@ public class DashboardServiceImplTest {
     }
 
     @Test
-    public void testUpdateWidgetPositions() throws Exception {
-
-    }
-
-    @Test
-    public void testAddWidget() throws Exception {
-
-    }
-
-    @Test
-    public void testRemoveWidget() throws Exception {
-
-    }
-
-    @Test
-    public void testUpdateWidgetDescription() throws Exception {
-
-    }
-
-    @Test
-    public void testUpdateWidgetCacheTime() throws Exception {
-
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testLoadByIds() {
+        assertThat(dashboardService.loadByIds(ImmutableSet.of())).isEmpty();
+        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
+        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001"))).hasSize(1);
+        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0001"))).hasSize(1);
+        assertThat(dashboardService.loadByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002", "54e300000000000000000000"))).hasSize(2);
     }
 
     @Test

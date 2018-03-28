@@ -18,6 +18,7 @@ package org.graylog2.dashboards;
 
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.widgets.DashboardWidget;
@@ -36,9 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,10 +59,10 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     @Override
     public Dashboard create(String title, String description, String creatorUserId, DateTime createdAt) {
         Map<String, Object> dashboardData = Maps.newHashMap();
-        dashboardData.put("title", title);
-        dashboardData.put("description", description);
-        dashboardData.put("creator_user_id", creatorUserId);
-        dashboardData.put("created_at", createdAt);
+        dashboardData.put(DashboardImpl.FIELD_TITLE, title);
+        dashboardData.put(DashboardImpl.FIELD_DESCRIPTION, description);
+        dashboardData.put(DashboardImpl.FIELD_CREATOR_USER_ID, creatorUserId);
+        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, createdAt);
 
         return new DashboardImpl(dashboardData);
     }
@@ -96,18 +98,33 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
             throw new NotFoundException("Couldn't find dashboard with ID " + id);
         }
 
-        final Dashboard dashboard = this.create((ObjectId) o.get("_id"), o.toMap());
-
-        return dashboard;
+        return this.create((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap());
     }
 
     @Override
     public List<Dashboard> all() {
         final List<DBObject> results = query(DashboardImpl.class, new BasicDBObject());
 
-        return (List<Dashboard>)results.stream()
-                .map(o -> (Dashboard)new DashboardImpl((ObjectId) o.get("_id"), o.toMap()))
+        return results.stream()
+                .map(o -> (Dashboard) new DashboardImpl((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Dashboard> loadByIds(Collection<String> ids) {
+        final Set<ObjectId> objectIds = ids.stream()
+                .map(ObjectId::new)
+                .collect(Collectors.toSet());
+
+        final DBObject query = BasicDBObjectBuilder.start()
+                .push(DashboardImpl.FIELD_ID)
+                .append("$in", objectIds)
+                .get();
+        final List<DBObject> results = query(DashboardImpl.class, query);
+
+        return results.stream()
+                .map(o -> (Dashboard) new DashboardImpl((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap()))
+                .collect(Collectors.toSet());
     }
 
     @Override
