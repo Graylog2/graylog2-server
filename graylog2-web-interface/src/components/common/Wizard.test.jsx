@@ -64,7 +64,7 @@ describe('<Wizard />', () => {
 
   it('should render step 2 when two times clicked on next and one time clicked on previous', () => {
     const changeFn = jest.fn(() => {});
-    const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn}/>);
+    const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
     wrapper.find('button[children="Next"]').simulate('click');
     wrapper.find('button[children="Next"]').simulate('click');
     wrapper.find('button[children="Previous"]').simulate('click');
@@ -81,7 +81,7 @@ describe('<Wizard />', () => {
       expect(step).toEqual('Key2');
     });
 
-    const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn}/>);
+    const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
     wrapper.find('button[children="Next"]').simulate('click');
     expect(changeFn.mock.calls.length).toBe(1);
   });
