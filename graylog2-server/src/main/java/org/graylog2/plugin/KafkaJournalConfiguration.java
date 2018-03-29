@@ -21,18 +21,20 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
+import org.graylog2.configuration.PathConfiguration;
 import org.joda.time.Duration;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Objects;
 
-public class KafkaJournalConfiguration {
+public class KafkaJournalConfiguration extends PathConfiguration {
 
     public KafkaJournalConfiguration() { }
 
     @JsonCreator
-    public KafkaJournalConfiguration(@NotNull @JsonProperty("directory") File messageJournalDir,
+    public KafkaJournalConfiguration(@NotNull @JsonProperty("directory") Path messageJournalDir,
                                      @JsonProperty("segment_size") long messageJournalSegmentSize,
                                      @JsonProperty("segment_age") Duration messageJournalSegmentAge,
                                      @JsonProperty("max_size") long messageJournalMaxSize,
@@ -50,7 +52,7 @@ public class KafkaJournalConfiguration {
 
     @Parameter(value = "message_journal_dir", required = true)
     @JsonProperty("directory")
-    private File messageJournalDir = new File("data/journal");
+    private Path messageJournalDir = getDataDir().resolve("journal");
 
     @Parameter("message_journal_segment_size")
     @JsonProperty("segment_size")
@@ -79,7 +81,7 @@ public class KafkaJournalConfiguration {
     @JsonProperty("flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
 
-    public File getMessageJournalDir() {
+    public Path getMessageJournalDir() {
         return messageJournalDir;
     }
 

@@ -140,3 +140,13 @@ The following HTTP API paths changed due to the plugin merge:
 +---------------------------------------------------------------------------------------------+-----------------------------------------------+
 | ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/simulate``                | ``/system/pipelines/simulate``                |
 +---------------------------------------------------------------------------------------------+-----------------------------------------------+
+
+New "bin_dir" and "data_dir" configuration parameters
+=====================================================
+
+We introduced two new configuration parameters related to file system paths.
+
+- ``bin_dir`` config option points to the directory that contains scripts like ``graylogctl``.
+- ``data_dir`` option configures the base directory for Graylog server state.
+
+Please check the updated default ``graylog.conf`` configuration file for required changes to your existing file.

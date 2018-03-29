@@ -26,13 +26,16 @@ import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
+import org.graylog2.configuration.PathConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SuppressWarnings("FieldMayBeFinal")
-public abstract class BaseConfiguration {
+public abstract class BaseConfiguration extends PathConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
@@ -52,9 +55,6 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
-
-    @Parameter(value = "plugin_dir")
-    private String pluginDir = "plugin";
 
     @Parameter(value = "async_eventbus_processors")
     private int asyncEventbusProcessors = 2;
@@ -127,10 +127,6 @@ public abstract class BaseConfiguration {
 
     public WaitStrategy getInputBufferWaitStrategy() {
         return getWaitStrategy(inputBufferWaitStrategy, "inputbuffer_wait_strategy");
-    }
-
-    public String getPluginDir() {
-        return pluginDir;
     }
 
     public int getAsyncEventbusProcessors() {

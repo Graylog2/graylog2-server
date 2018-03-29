@@ -21,7 +21,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -69,9 +68,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.SyncFailedException;
+import java.io.UncheckedIOException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -156,7 +157,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final int throttleThresholdPercentage;
 
     @Inject
-    public KafkaJournal(@Named("message_journal_dir") File journalDirectory,
+    public KafkaJournal(@Named("message_journal_dir") Path journalDirectory,
                         @Named("scheduler") ScheduledExecutorService scheduler,
                         @Named("message_journal_segment_size") Size segmentSize,
                         @Named("message_journal_segment_age") Duration segmentAge,
@@ -236,14 +237,17 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         false,
                         "MD5");
 
-        if (!journalDirectory.exists() && !journalDirectory.mkdirs()) {
-            LOG.error("Cannot create journal directory at {}, please check the permissions", journalDirectory.getAbsolutePath());
-            final AccessDeniedException accessDeniedException = new AccessDeniedException(journalDirectory.getAbsolutePath(), null, "Could not create journal directory.");
-            throw new RuntimeException(accessDeniedException);
+        if (!java.nio.file.Files.exists(journalDirectory)) {
+            try {
+                java.nio.file.Files.createDirectories(journalDirectory);
+            } catch (IOException e) {
+                LOG.error("Cannot create journal directory at {}, please check the permissions", journalDirectory.toAbsolutePath());
+                throw new UncheckedIOException(e);
+            }
         }
 
         // TODO add check for directory, etc
-        committedReadOffsetFile = new File(journalDirectory, "graylog2-committed-read-offset");
+        committedReadOffsetFile = new File(journalDirectory.toFile(), "graylog2-committed-read-offset");
         try {
             if (!committedReadOffsetFile.createNewFile()) {
                 final String line = Files.readFirstLine(committedReadOffsetFile, StandardCharsets.UTF_8);
@@ -265,7 +269,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             kafkaScheduler = new KafkaScheduler(2, "kafka-journal-scheduler-", false); // TODO make thread count configurable
             kafkaScheduler.startup();
             logManager = new LogManager(
-                    new File[]{journalDirectory},
+                    new File[]{journalDirectory.toFile()},
                     Map$.MODULE$.<String, LogConfig>empty(),
                     defaultConfig,
                     cleanerConfig,

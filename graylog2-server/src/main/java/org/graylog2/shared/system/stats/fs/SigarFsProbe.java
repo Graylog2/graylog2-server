@@ -17,6 +17,8 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.Configuration;
+import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.shared.system.stats.SigarService;
 import org.hyperic.sigar.FileSystem;
 import org.hyperic.sigar.FileSystemMap;
@@ -25,21 +27,25 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class SigarFsProbe implements FsProbe {
     private final SigarService sigarService;
-    private final Set<File> locations;
-    private final Map<File, FileSystem> sigarFileSystems = new HashMap<>();
+    private final Set<Path> locations;
+    private final Map<Path, FileSystem> sigarFileSystems = new HashMap<>();
 
     @Inject
-    public SigarFsProbe(SigarService sigarService, @Named("message_journal_dir") File journalDirectory) {
+    public SigarFsProbe(SigarService sigarService, Configuration configuration,
+                        KafkaJournalConfiguration kafkaJournalConfiguration) {
         this.sigarService = sigarService;
-        this.locations = ImmutableSet.of(journalDirectory);
+        this.locations = ImmutableSet.of(
+                configuration.getBinDir(),
+                configuration.getDataDir(),
+                kafkaJournalConfiguration.getMessageJournalDir()
+        );
     }
 
     @Override
@@ -47,8 +53,8 @@ public class SigarFsProbe implements FsProbe {
         final Sigar sigar = sigarService.sigar();
         final Map<String, FsStats.Filesystem> filesystems = new HashMap<>(locations.size());
 
-        for (File location : locations) {
-            final String path = location.getAbsolutePath();
+        for (Path location : locations) {
+            final String path = location.toAbsolutePath().toString();
 
             try {
                 FileSystem fileSystem = sigarFileSystems.get(location);
@@ -56,7 +62,7 @@ public class SigarFsProbe implements FsProbe {
                 if (fileSystem == null) {
                     FileSystemMap fileSystemMap = sigar.getFileSystemMap();
                     if (fileSystemMap != null) {
-                        fileSystem = fileSystemMap.getMountPoint(location.getPath());
+                        fileSystem = fileSystemMap.getMountPoint(path);
                         sigarFileSystems.put(location, fileSystem);
                     }
                 }
