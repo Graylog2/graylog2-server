@@ -17,10 +17,6 @@ const ViewManagementPage = createReactClass({
     return ViewActions.search(query, page, perPage);
   },
 
-  handleViewExecution(view) {
-    return ViewActions.execute(view);
-  },
-
   handleViewDelete(view) {
     return ViewActions.delete(view);
   },
@@ -48,7 +44,6 @@ const ViewManagementPage = createReactClass({
               <ViewList views={this.state.views.list}
                         pagination={this.state.views.pagination}
                         handleSearch={this.handleSearch}
-                        handleViewExecution={this.handleViewExecution}
                         handleViewDelete={this.handleViewDelete} />
             </Col>
           </Row>

@@ -6,7 +6,6 @@ import URLUtils from 'util/URLUtils';
 
 const ViewActions = Reflux.createActions({
   search: { asyncResult: true },
-  execute: { asyncResult: true },
   delete: { asyncResult: true },
 });
 
@@ -54,11 +53,6 @@ const ViewStore = Reflux.createStore({
       });
 
     ViewActions.search.promise(promise);
-  },
-
-  execute(view) {
-    // TODO: Implement view execution?
-    console.log('EXECUTE VIEW', view);
   },
 
   delete(view) {

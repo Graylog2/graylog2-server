@@ -4,7 +4,9 @@ import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
 import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
+import Routes from 'routing/Routes';
 import { PaginatedList, SearchForm, Spinner, TableList } from 'components/common';
 
 const ViewList = createReactClass({
@@ -16,7 +18,6 @@ const ViewList = createReactClass({
       perPage: PropTypes.number.isRequired,
     }).isRequired,
     handleSearch: PropTypes.func.isRequired,
-    handleViewExecution: PropTypes.func.isRequired,
     handleViewDelete: PropTypes.func.isRequired,
   },
 
@@ -61,10 +62,6 @@ const ViewList = createReactClass({
     });
   },
 
-  handleViewExecution(view) {
-    return () => this.props.handleViewExecution(view);
-  },
-
   handleViewDelete(view) {
     return () => {
       this.props.handleViewDelete(view).then(() => {
@@ -78,9 +75,10 @@ const ViewList = createReactClass({
   itemActionsFactory(view) {
     return (
       <ButtonToolbar>
-        <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleViewExecution(view)}>
-          Execute
-        </Button>
+        {/* TODO: This needs to point to the correct route */}
+        <LinkContainer to={Routes.pluginRoute('VIEWS_VIEWID')(view.id)}>
+          <Button bsStyle="info" bsSize="xsmall">Open</Button>
+        </LinkContainer>
         <DropdownButton title="More Actions" id={`view-actions-dropdown-${view.id}`} bsSize="xsmall">
           <MenuItem disabled>Edit</MenuItem>
           <MenuItem divider />

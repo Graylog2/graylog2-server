@@ -17,6 +17,7 @@ import PieVisualization from './components/visualizations/pie/PieVisualization';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
+const viewPath = '/views/:viewId';
 
 export default {
   pages: {
@@ -25,6 +26,8 @@ export default {
   routes: [
     { path: extendedSearchPath, component: ExtendedSearchPage },
     { path: viewsPath, component: ViewManagementPage },
+    // TODO: This needs to point to the correct component
+    { path: viewPath, component: ExtendedSearchPage },
   ],
   navigation: [
     // Disabling navigation for extended search for now to avoid confusing alpha testers.
