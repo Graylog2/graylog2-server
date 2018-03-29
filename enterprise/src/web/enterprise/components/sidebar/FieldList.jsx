@@ -2,13 +2,14 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
 
 import Field from 'enterprise/components/Field';
 import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 
 import QueriesActions from 'enterprise/actions/QueriesActions';
 import CurrentViewStore from '../../stores/CurrentViewStore';
+
+import styles from './FieldList.css'
 
 const FieldList = createReactClass({
   propTypes: {
@@ -26,7 +27,7 @@ const FieldList = createReactClass({
     const fieldList = fields.entrySeq ? fields.entrySeq()
       .sort()
       .map(([name]) => (
-        <li key={`field-${name}`} style={{ fontSize: '12px' }}>
+        <li key={`field-${name}`} className={styles.fieldListItem} >
           <FieldSelected name={name}
                          selected={selectedFields.contains(name)}
                          onToggleSelected={fieldName => QueriesActions.toggleField(
@@ -44,7 +45,7 @@ const FieldList = createReactClass({
         </li>
       )) : null;
     return (
-      <ul style={{ padding: 0 }}>
+      <ul className={styles.fieldList}>
         {fieldList}
       </ul>
     );
