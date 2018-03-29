@@ -63,7 +63,7 @@ export default class WidgetGrid extends React.Component {
       const dataKey = widget.data || widgetId;
       const widgetData = data[dataKey];
 
-      positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
+      returnedWidgets.positions[widgetId] = Object.assign({}, (positions[widgetId] || WidgetGrid._defaultDimensions(widget.type)));
 
       const { height, width } = (this.state && this.state.widgetDimensions[widgetId]) || {};
 
@@ -85,8 +85,6 @@ export default class WidgetGrid extends React.Component {
         );
       }
     });
-
-    returnedWidgets.positions = positions;
 
     return returnedWidgets;
   };
