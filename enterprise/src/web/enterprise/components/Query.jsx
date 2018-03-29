@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
 import moment from 'moment';
@@ -13,7 +12,7 @@ import ViewsActions from 'enterprise/actions/ViewsActions';
 
 import WidgetGrid from 'enterprise/components/WidgetGrid';
 import SideBar from 'enterprise/components/SideBar';
-import { FieldList } from 'enterprise/components/sidebar/index';
+import { AddWidgetButton, FieldList } from 'enterprise/components/sidebar/index';
 import MessageList from 'enterprise/components/widgets/MessageList';
 
 import style from 'pages/ShowDashboardPage.css';
@@ -59,6 +58,7 @@ const Query = ({ fields, onToggleMessages, showMessages, results, view, widgetMa
     return (
       <span>
         <Col md={2} style={{ paddingLeft: 0, paddingRight: 10 }}>
+          <AddWidgetButton viewId={view.get('id')} queryId={queryId} />
           <SideBar>
             <FieldList queryId={queryId}
                        selectedFields={selectedFields}

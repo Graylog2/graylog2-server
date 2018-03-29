@@ -1,6 +1,6 @@
 import ExtendedSearchPage from 'enterprise/ExtendedSearchPage';
 import ViewManagementPage from 'enterprise/ViewManagementPage';
-import { Histogram, MessageList, SearchSidebarWidget } from 'enterprise/components/widgets';
+import { AlertStatus, Histogram, MessageList, SearchSidebarWidget } from 'enterprise/components/widgets';
 import GroupByHandler from 'enterprise/logic/searchtypes/GroupByHandler';
 import { DateHistogramHandler, MessageListHandler } from 'enterprise/logic/searchtypes';
 import DataTable from 'enterprise/components/datatable/DataTable';
@@ -99,6 +99,15 @@ export default {
       visualizationComponent: AggregationBuilder,
       searchResultTransformer: AggregationTransformer,
       searchTypes: AggregationConfigGenerator,
+    },
+    {
+      type: 'ALERT_STATUS',
+      displayName: 'Alert Status',
+      defaultHeight: 2,
+      defaultWidth: 2,
+      visualizationComponent: AlertStatus,
+      searchResultTransformer: data => data,
+      searchTypes: () => [],
     },
   ],
   searchTypes: [
