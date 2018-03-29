@@ -17,9 +17,10 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.Configuration;
+import org.graylog2.plugin.KafkaJournalConfiguration;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +30,12 @@ public class JmxFsProbe implements FsProbe {
     private final Set<File> locations;
 
     @Inject
-    public JmxFsProbe(@Named("message_journal_dir") File journalDirectory) {
-        this.locations = ImmutableSet.of(journalDirectory);
+    public JmxFsProbe(Configuration configuration, KafkaJournalConfiguration kafkaJournalConfiguration) {
+        this.locations = ImmutableSet.of(
+                configuration.getBinDir().toFile(),
+                configuration.getDataDir().toFile(),
+                kafkaJournalConfiguration.getMessageJournalDir().toFile()
+        );
     }
 
     @Override

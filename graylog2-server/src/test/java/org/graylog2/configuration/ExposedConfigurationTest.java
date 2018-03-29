@@ -22,6 +22,9 @@ import org.graylog2.Configuration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
+import java.net.URI;
+import java.nio.file.Paths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExposedConfigurationTest {
@@ -39,6 +42,8 @@ public class ExposedConfigurationTest {
         assertThat(c.inputBufferWaitStrategy()).isEqualTo(configuration.getInputBufferWaitStrategy().getClass().getName());
         assertThat(c.inputBufferRingSize()).isEqualTo(configuration.getInputBufferRingSize());
         assertThat(c.ringSize()).isEqualTo(configuration.getRingSize());
+        assertThat(c.binDir()).isEqualTo(configuration.getBinDir());
+        assertThat(c.dataDir()).isEqualTo(configuration.getDataDir());
         assertThat(c.pluginDir()).isEqualTo(configuration.getPluginDir());
         assertThat(c.nodeIdFile()).isEqualTo(configuration.getNodeIdFile());
         assertThat(c.allowHighlighting()).isEqualTo(configuration.isAllowHighlighting());
@@ -63,7 +68,9 @@ public class ExposedConfigurationTest {
         assertThat((String) JsonPath.read(json, "$.inputbuffer_wait_strategy")).isEqualTo(c.inputBufferWaitStrategy());
         assertThat((int) JsonPath.read(json, "$.inputbuffer_ring_size")).isEqualTo(c.inputBufferRingSize());
         assertThat((int) JsonPath.read(json, "$.ring_size")).isEqualTo(c.ringSize());
-        assertThat((String) JsonPath.read(json, "$.plugin_dir")).isEqualTo(c.pluginDir());
+        assertThat(URI.create(JsonPath.read(json, "$.bin_dir"))).isEqualTo(c.binDir().toUri());
+        assertThat(URI.create(JsonPath.read(json, "$.data_dir"))).isEqualTo(c.dataDir().toUri());
+        assertThat(URI.create(JsonPath.read(json, "$.plugin_dir"))).isEqualTo(c.pluginDir().toUri());
         assertThat((String) JsonPath.read(json, "$.node_id_file")).isEqualTo(c.nodeIdFile());
         assertThat((boolean) JsonPath.read(json, "$.allow_highlighting")).isEqualTo(c.allowHighlighting());
         assertThat((boolean) JsonPath.read(json, "$.allow_leading_wildcard_searches")).isEqualTo(c.allowLeadingWildcardSearches());
@@ -84,6 +91,8 @@ public class ExposedConfigurationTest {
                 "  \"inputbuffer_wait_strategy\": \"com.lmax.disruptor.BlockingWaitStrategy\"," +
                 "  \"inputbuffer_ring_size\": 65536," +
                 "  \"ring_size\": 65536," +
+                "  \"bin_dir\": \"bin\"," +
+                "  \"data_dir\": \"data\"," +
                 "  \"plugin_dir\": \"plugin\"," +
                 "  \"node_id_file\": \"/etc/graylog/server/node-id\"," +
                 "  \"allow_highlighting\": false," +
@@ -104,7 +113,9 @@ public class ExposedConfigurationTest {
         assertThat(c.inputBufferWaitStrategy()).isEqualTo(JsonPath.read(json, "$.inputbuffer_wait_strategy"));
         assertThat(c.inputBufferRingSize()).isEqualTo(JsonPath.read(json, "$.inputbuffer_ring_size"));
         assertThat(c.ringSize()).isEqualTo(JsonPath.read(json, "$.ring_size"));
-        assertThat(c.pluginDir()).isEqualTo(JsonPath.read(json, "$.plugin_dir"));
+        assertThat(c.binDir()).isEqualTo(Paths.get((String) JsonPath.read(json, "$.bin_dir")));
+        assertThat(c.dataDir()).isEqualTo(Paths.get((String) JsonPath.read(json, "$.data_dir")));
+        assertThat(c.pluginDir()).isEqualTo(Paths.get((String) JsonPath.read(json, "$.plugin_dir")));
         assertThat(c.nodeIdFile()).isEqualTo(JsonPath.read(json, "$.node_id_file"));
         assertThat(c.allowHighlighting()).isEqualTo(JsonPath.read(json, "$.allow_highlighting"));
         assertThat(c.allowLeadingWildcardSearches()).isEqualTo(JsonPath.read(json, "$.allow_leading_wildcard_searches"));

@@ -14,9 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin;
+package org.graylog2.configuration;
 
-import org.graylog2.configuration.PathConfiguration;
+import com.github.joschi.jadconfig.Parameter;
 
-public class PluginLoaderConfig extends PathConfiguration {
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public abstract class PathConfiguration {
+    @Parameter(value = "bin_dir", required = true)
+    private Path binDir = Paths.get("bin");
+
+    @Parameter(value = "data_dir", required = true)
+    private Path dataDir = Paths.get("data");
+
+    @Parameter(value = "plugin_dir", required = true)
+    private Path pluginDir = Paths.get("plugin");
+
+    public Path getBinDir() {
+        return binDir;
+    }
+
+    public Path getDataDir() {
+        return dataDir;
+    }
+
+    public Path getPluginDir() {
+        return pluginDir;
+    }
+
 }

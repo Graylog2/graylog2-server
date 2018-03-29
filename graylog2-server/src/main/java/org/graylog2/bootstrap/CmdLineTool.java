@@ -69,6 +69,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -265,7 +266,7 @@ public abstract class CmdLineTool implements CliCommand {
         dumpCurrentConfigAndExit();
     }
 
-    private PluginBindings installPluginConfigAndBindings(String pluginPath, ChainingClassLoader classLoader) {
+    private PluginBindings installPluginConfigAndBindings(Path pluginPath, ChainingClassLoader classLoader) {
         final Set<Plugin> plugins = loadPlugins(pluginPath, classLoader);
         final PluginBindings pluginBindings = new PluginBindings(plugins);
         for (final Plugin plugin : plugins) {
@@ -279,18 +280,17 @@ public abstract class CmdLineTool implements CliCommand {
         return pluginBindings;
     }
 
-    private String getPluginPath(String configFile) {
+    private Path getPluginPath(String configFile) {
         final PluginLoaderConfig pluginLoaderConfig = new PluginLoaderConfig();
         processConfiguration(new JadConfig(getConfigRepositories(configFile), pluginLoaderConfig));
 
         return pluginLoaderConfig.getPluginDir();
     }
 
-    protected Set<Plugin> loadPlugins(String pluginPath, ChainingClassLoader chainingClassLoader) {
-        final File pluginDir = new File(pluginPath);
+    protected Set<Plugin> loadPlugins(Path pluginPath, ChainingClassLoader chainingClassLoader) {
         final Set<Plugin> plugins = new HashSet<>();
 
-        final PluginLoader pluginLoader = new PluginLoader(pluginDir, chainingClassLoader);
+        final PluginLoader pluginLoader = new PluginLoader(pluginPath.toFile(), chainingClassLoader);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
             final PluginMetaData metadata = plugin.metadata();
             if (capabilities().containsAll(metadata.getRequiredCapabilities())) {

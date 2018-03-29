@@ -23,6 +23,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.Configuration;
 
+import java.nio.file.Path;
+
 /**
  * List of configuration values that are safe to return, i.e. do not include any sensitive
  * information. Building a list manually because we need to guarantee never to return any
@@ -53,8 +55,14 @@ public abstract class ExposedConfiguration {
     @JsonProperty("ring_size")
     public abstract int ringSize();
 
+    @JsonProperty("bin_dir")
+    public abstract Path binDir();
+
+    @JsonProperty("data_dir")
+    public abstract Path dataDir();
+
     @JsonProperty("plugin_dir")
-    public abstract String pluginDir();
+    public abstract Path pluginDir();
 
     @JsonProperty("node_id_file")
     public abstract String nodeIdFile();
@@ -89,6 +97,8 @@ public abstract class ExposedConfiguration {
                 configuration.getInputBufferWaitStrategy().getClass().getName(),
                 configuration.getInputBufferRingSize(),
                 configuration.getRingSize(),
+                configuration.getBinDir(),
+                configuration.getDataDir(),
                 configuration.getPluginDir(),
                 configuration.getNodeIdFile(),
                 configuration.isAllowHighlighting(),
@@ -109,7 +119,9 @@ public abstract class ExposedConfiguration {
             @JsonProperty("inputbuffer_wait_strategy") String inputBufferWaitStrategy,
             @JsonProperty("inputbuffer_ring_size") int inputBufferRingSize,
             @JsonProperty("ring_size") int ringSize,
-            @JsonProperty("plugin_dir") String pluginDir,
+            @JsonProperty("bin_dir") Path binDir,
+            @JsonProperty("data_dir") Path dataDir,
+            @JsonProperty("plugin_dir") Path pluginDir,
             @JsonProperty("node_id_file") String nodeIdFile,
             @JsonProperty("allow_highlighting") boolean allowHighlighting,
             @JsonProperty("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches,
@@ -126,6 +138,8 @@ public abstract class ExposedConfiguration {
                 inputBufferWaitStrategy,
                 inputBufferRingSize,
                 ringSize,
+                binDir,
+                dataDir,
                 pluginDir,
                 nodeIdFile,
                 allowHighlighting,
