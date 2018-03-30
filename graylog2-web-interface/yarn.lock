@@ -3484,7 +3484,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "3.0.0-alpha.2-SNAPSHOT"
+  version "3.0.0-SNAPSHOT"
   dependencies:
     babel-eslint "^7.2.3"
     eslint "^4.3.0"
