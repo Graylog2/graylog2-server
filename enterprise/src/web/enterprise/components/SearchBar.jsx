@@ -58,14 +58,11 @@ const SearchBar = createReactClass({
     const { selectedView } = this.state.currentView;
 
     return (
-      <Row className="no-bm">
-        <Col md={12}
-             id="universalsearch-container"
-             style={{ paddingLeft: '15px', paddingRight: '15px', paddingBottom: '10px' }}>
-          <Row className="no-bm">
-            <Col md={12} id="universalsearch" style={{ marginTop: '0px', marginLeft: '15px', marginRight: '15px' }}>
-              <form className="universalsearch-form"
-                    method="GET"
+      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+        <Col md={12}>
+          <Row>
+            <Col md={12}>
+              <form method="GET"
                     onSubmit={this._performSearch}>
                 <Row>
                   <Col md={9}>
