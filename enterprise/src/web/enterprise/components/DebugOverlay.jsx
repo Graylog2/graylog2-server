@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Modal } from 'react-bootstrap';
@@ -12,6 +13,11 @@ import ViewsStore from 'enterprise/stores/ViewsStore';
 const DebugOverlay = createReactClass({
   displayName: 'DebugOverlay',
 
+  propTypes: {
+    show: PropTypes.bool.isRequired,
+    onClose: PropTypes.func,
+  },
+
   mixins: [
     Reflux.connect(CurrentViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
@@ -20,26 +26,21 @@ const DebugOverlay = createReactClass({
     Reflux.connect(WidgetStore, 'widgets'),
   ],
 
-  _onOpen() {
-    this.setState({ open: true });
-  },
-
-  _onClose() {
-    this.setState({ open: false });
+  getDefaultProps() {
+    return {
+      onClose: () => {},
+    };
   },
 
   render() {
     return (
-      <span>
-        <Button onClick={this._onOpen}>Debug</Button>
-        <Modal onHide={this._onClose} show={this.state.open}>
-          <Modal.Body>
-            <textarea disabled style={{ height: '600', width: '100%' }}>
-              {JSON.stringify(this.state, null, 2)}
-            </textarea>
-          </Modal.Body>
-        </Modal>
-      </span>
+      <Modal onHide={this.props.onClose} show={this.props.show}>
+        <Modal.Body>
+          <textarea disabled style={{ height: '600', width: '100%' }}>
+            {JSON.stringify(this.state, null, 2)}
+          </textarea>
+        </Modal.Body>
+      </Modal>
     );
   },
 });

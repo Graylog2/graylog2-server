@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Tab, Tabs } from 'react-bootstrap';
 import Immutable from 'immutable';
 
-import DebugOverlay from 'enterprise/components/DebugOverlay';
+import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
 
 const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles }) => {
@@ -24,7 +24,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 
   return (
     <span>
-      <span className="pull-right"><DebugOverlay /></span>
+      <span className="pull-right"><QueryTabActions /></span>
       <Tabs
         id="QueryTabs"
         activeKey={selectedQuery}
