@@ -50,6 +50,8 @@ const SelectPopover = createReactClass({
     filterPlaceholder: PropTypes.string,
     /** Text to display in the entry to clear the current selection. */
     clearSelectionText: PropTypes.string,
+    /** Indicates whether items will be clickable or not. */
+    disabled: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -64,6 +66,7 @@ const SelectPopover = createReactClass({
       displayDataFilter: true,
       filterPlaceholder: 'Type to filter',
       clearSelectionText: 'Clear selection',
+      disabled: false,
     };
   },
 
@@ -76,7 +79,7 @@ const SelectPopover = createReactClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (lodash.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
+    if (!lodash.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
       this.setState({ selectedItems: nextProps.selectedItems });
     }
     if (this.props.items !== nextProps.items) {
@@ -140,7 +143,7 @@ const SelectPopover = createReactClass({
   },
 
   render() {
-    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, ...otherProps } = this.props;
+    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, disabled, ...otherProps } = this.props;
     const popoverProps = this.pickPopoverProps(otherProps);
     const { filteredItems, selectedItems } = this.state;
 
@@ -153,8 +156,9 @@ const SelectPopover = createReactClass({
             {filteredItems.map((item) => {
               return (
                 <ListGroupItem key={item}
-                               onClick={this.handleItemSelection(item)}
-                               active={this.state.selectedItems.includes(item)}>
+                               onClick={disabled ? () => {} : this.handleItemSelection(item)}
+                               active={this.state.selectedItems.includes(item)}
+                               disabled={disabled}>
                   {itemFormatter(item)}
                 </ListGroupItem>
               );
