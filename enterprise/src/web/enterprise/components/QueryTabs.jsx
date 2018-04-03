@@ -6,7 +6,7 @@ import Immutable from 'immutable';
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
 
-const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles }) => {
+const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, toggleDashboard }) => {
   const queryTitles = titles || new Immutable.Map();
   const tabs = queries.toArray().map((query, index) => {
     const id = query.get('id');
@@ -24,7 +24,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 
   return (
     <span>
-      <span className="pull-right"><QueryTabActions /></span>
+      <span className="pull-right"><QueryTabActions toggleDashboard={toggleDashboard} /></span>
       <Tabs
         id="QueryTabs"
         activeKey={selectedQuery}
