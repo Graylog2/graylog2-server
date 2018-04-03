@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.filter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonTypeName(OrFilter.NAME)
-@JsonDeserialize(builder = AutoValue_OrFilter.Builder.class)
+@JsonDeserialize(builder = OrFilter.Builder.class)
 public abstract class OrFilter implements Filter {
     public static final String NAME = "or";
 
@@ -24,7 +25,7 @@ public abstract class OrFilter implements Filter {
     public abstract Set<Filter> filters();
 
     public static Builder builder() {
-        return new AutoValue_OrFilter.Builder().type(NAME);
+        return Builder.create();
     }
 
     public static OrFilter or(Filter... filters) {
@@ -43,5 +44,10 @@ public abstract class OrFilter implements Filter {
 
         @JsonProperty
         public abstract OrFilter build();
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_OrFilter.Builder().type(NAME);
+        }
     }
 }

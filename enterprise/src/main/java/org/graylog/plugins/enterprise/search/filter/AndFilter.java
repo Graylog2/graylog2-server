@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.filter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -24,7 +25,7 @@ public abstract class AndFilter implements Filter {
     public abstract Set<Filter> filters();
 
     public static Builder builder() {
-        return new AutoValue_AndFilter.Builder().type(NAME);
+        return Builder.create();
     }
 
     public static AndFilter and(Filter... filters) {
@@ -42,5 +43,10 @@ public abstract class AndFilter implements Filter {
         public abstract Builder filters(Set<Filter> filters);
 
         public abstract AndFilter build();
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_AndFilter.Builder().type(NAME);
+        }
     }
 }

@@ -13,19 +13,35 @@ import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeType
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
 import QueriesActions from 'enterprise/actions/QueriesActions';
 import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import StreamsFilter from './searchbar/StreamsFilter';
+import QueryFiltersActions from '../actions/QueryFiltersActions';
+import QueryFiltersStore from '../stores/QueryFiltersStore';
+
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 const SearchBar = createReactClass({
   displayName: 'SearchBar',
 
   mixins: [
     Reflux.connect(CurrentViewStore, 'currentView'),
+    Reflux.connect(QueryFiltersStore, 'queryFilters'),
   ],
 
   getInitialState() {
     return {
       savedSearch: '',
       keywordPreview: Immutable.Map(),
+      availableStreams: [],
     };
+  },
+
+  componentDidMount() {
+    StreamsStore.listStreams().then((streams) => {
+      const availableStreams = streams.map(stream => ({ key: stream.title, value: stream.id }));
+      this.setState({ availableStreams });
+    });
   },
 
   _performSearch(event) {
@@ -38,6 +54,7 @@ const SearchBar = createReactClass({
 
   render() {
     const { rangeParams, rangeType, query, id } = this.props.query.toObject();
+    const { streams } = this.state.queryFilters.get(id, new Immutable.Map()).toObject();
     const { selectedView } = this.state.currentView;
 
     return (
@@ -50,7 +67,7 @@ const SearchBar = createReactClass({
               <form className="universalsearch-form"
                     method="GET"
                     onSubmit={this._performSearch}>
-                <Row className="no-bm">
+                <Row>
                   <Col md={9}>
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
@@ -73,6 +90,10 @@ const SearchBar = createReactClass({
                                     config={this.props.config} />
                   </Col>
                 </Row>
+
+                <StreamsFilter value={streams}
+                               streams={this.state.availableStreams}
+                               onChange={value => QueryFiltersActions.streams(selectedView, id, value)} />
 
               </form>
             </Col>

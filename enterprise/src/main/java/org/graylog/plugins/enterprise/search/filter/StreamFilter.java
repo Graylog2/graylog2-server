@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.filter;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -33,7 +34,7 @@ public abstract class StreamFilter implements Filter {
     public abstract String streamTitle();
 
     public static Builder builder() {
-        return new AutoValue_StreamFilter.Builder().type(NAME);
+        return Builder.create();
     }
 
     public static StreamFilter ofId(String id) {
@@ -55,5 +56,10 @@ public abstract class StreamFilter implements Filter {
         public abstract Builder streamTitle(@Nullable String streamTitle);
 
         public abstract StreamFilter build();
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_StreamFilter.Builder().type(NAME);
+        }
     }
 }

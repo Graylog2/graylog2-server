@@ -4,8 +4,24 @@ import uuid from 'uuid/v4';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { searchTypeDefinition } from 'enterprise/logic/SearchType';
 
+const _streamFilters = (selectedStreams) => {
+  return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
+};
+
+const _filtersForQuery = (filters) => {
+  const streamFilters = _streamFilters(filters.get('streams', []));
+  if (streamFilters.length === 0) {
+    return {};
+  }
+
+  return {
+    type: 'or',
+    filters: streamFilters,
+  };
+};
+
 export default class SearchRequest {
-  constructor(queries, widgets) {
+  constructor(queries, widgets, filters) {
     this.id = uuid();
     this.widgetMapping = new Immutable.Map();
     this.searchRequest = {
@@ -13,6 +29,7 @@ export default class SearchRequest {
         const searchTypes = widgets.get(id, new Immutable.Map())
           .map(widget => widgetDefinition(widget.get('type')).searchTypes(widget.get('config')).map(searchType => Object.assign(searchType, { widgetId: widget.get('id') })))
           .reduce((acc, cur) => acc.merge(cur), Immutable.Set());
+        const filter = _filtersForQuery(filters.get(id, new Immutable.Map()));
         return {
           id: id,
           // TODO create conversion objects for query objects
@@ -20,6 +37,7 @@ export default class SearchRequest {
             type: 'elasticsearch',
             query_string: query.get('query'),
           },
+          filter,
           // TODO create conversion objects for timerange objects
           timerange: {
             type: query.get('rangeType'),

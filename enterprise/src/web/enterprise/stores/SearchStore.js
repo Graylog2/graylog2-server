@@ -10,6 +10,7 @@ import SearchRequest from 'enterprise/logic/SearchRequest';
 import SearchResult from 'enterprise/logic/SearchResult';
 import WidgetStore from './WidgetStore';
 import QueriesStore from './QueriesStore';
+import QueryFiltersStore from './QueryFiltersStore';
 
 const displayError = (error) => {
   console.log(error);
@@ -24,10 +25,11 @@ export default Reflux.createStore({
   init() {
     this.listenTo(WidgetStore, this.onWidgetStoreUpdate, this.onWidgetStoreUpdate);
     this.listenTo(QueriesStore, this.onQueriesStoreUpdate, this.onQueriesStoreUpdate);
+    this.listenTo(QueryFiltersStore, this.onQueryFiltersStoreUpdate, this.onQueryFiltersStoreUpdate);
   },
 
-  _debouncedParse: _.debounce((queries, widgets) => {
-    const search = new SearchRequest(queries, widgets);
+  _debouncedParse: _.debounce((queries, widgets, filters) => {
+    const search = new SearchRequest(queries, widgets, filters);
     console.log('Parsing search', search);
     SearchMetadataActions.parseSearch(search)
       .then(metadata => console.log(metadata));
@@ -41,10 +43,14 @@ export default Reflux.createStore({
     this.queries = queries;
     this.onUpdate();
   },
+  onQueryFiltersStoreUpdate(filters) {
+    this.filters = filters;
+    this.onUpdate();
+  },
 
   onUpdate() {
     if (this.queries && this.queries.size > 0) {
-      this._debouncedParse(this.queries, this.widgets);
+      this._debouncedParse(this.queries, this.widgets, this.filters);
     }
   },
 
@@ -67,7 +73,7 @@ export default Reflux.createStore({
     if (this.executePromise) {
       this.executePromise.cancel();
     }
-    const searchRequest = new SearchRequest(this.queries, this.widgets);
+    const searchRequest = new SearchRequest(this.queries, this.widgets, this.filters);
     this.executePromise = SearchJobActions.create(searchRequest)
       .then(({ request, search }) => this.trackJob(search, request), displayError)
       .then((result) => {
