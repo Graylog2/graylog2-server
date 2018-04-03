@@ -60,15 +60,54 @@ class QueryInput extends Component {
     _snippets.getCompletions = _completions(fields);
   }
 
+  _placeholderNode() {
+    const node = document.createElement('div');
+    node.textContent = 'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]';
+    node.className = 'ace_invisible ace_emptyMessage';
+    node.style.padding = '0 9px';
+    node.style.color = '#aaa';
+    return node;
+  }
+
+  _addPlaceholder = (editor) => {
+    const node = this._placeholderNode();
+    editor.renderer.emptyMessageNode = node;
+    editor.renderer.scroller.appendChild(node);
+  };
+
   editor = undefined;
+  addedPlaceholder = false;
+
   _bindEditor(editor) {
     if (editor) {
       this.editor = editor;
+      if (!this.addedPlaceholder) {
+        this._addPlaceholder(editor.editor);
+        this.addedPlaceholder = true;
+      }
     }
   }
 
   _onChange = (newValue) => {
     this.setState({ value: newValue }, () => this.props.onChange(this.state.value));
+  };
+
+  _onBlur = () => {
+    const editor = this.editor.editor;
+    const shouldShow = !editor.session.getValue().length;
+    const nodeExists = editor.renderer.emptyMessageNode;
+    if (shouldShow && !nodeExists) {
+      this._addPlaceholder(editor);
+    }
+  };
+
+  _onFocus = () => {
+    const editor = this.editor.editor;
+    const nodeExists = editor.renderer.emptyMessageNode;
+    if (nodeExists) {
+      editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
+      editor.renderer.emptyMessageNode = null;
+    }
   };
 
   _onExecute = () => {
@@ -78,11 +117,13 @@ class QueryInput extends Component {
 
   render() {
     return (
-      <div className="query">
+      <div className="query" style={{ display: 'flex' }}>
         <AceEditor mode="lucene"
                    ref={editor => this._bindEditor(editor)}
                    theme="ace-queryinput"
+                   onBlur={this._onBlur}
                    onChange={this._onChange}
+                   onFocus={this._onFocus}
                    value={this.state.value}
                    name="QueryEditor"
                    showGutter={false}
