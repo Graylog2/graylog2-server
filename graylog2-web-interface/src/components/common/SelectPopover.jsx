@@ -79,7 +79,7 @@ const SelectPopover = createReactClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (lodash.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
+    if (!lodash.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
       this.setState({ selectedItems: nextProps.selectedItems });
     }
     if (this.props.items !== nextProps.items) {
