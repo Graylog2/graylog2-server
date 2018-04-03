@@ -65,29 +65,33 @@ export default class AggregationControls extends React.Component {
 
   render() {
     const { children, fields } = this.props;
+    const { columnPivots, rowPivots, series, sort, visualization } = this.state;
     const formattedFields = fields.map((_, v) => ({ label: v, value: v }))
       .valueSeq()
       .toJS()
       .sort((v1, v2) => naturalSort(v1.label, v2.label));
+    const currentlyUsedFields = [].concat(rowPivots, columnPivots, series)
+      .sort(naturalSort)
+      .map(v => ({ label: v, value: v}));
     return (
       <span>
         <Row>
           <Col md={3} style={{ paddingRight: '2px' }}>
-            <VisualizationTypeSelect value={this.state.visualization} onChange={this._onVisualizationChange} />
+            <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <RowPivotSelect fields={formattedFields} rowPivots={this.state.rowPivots.join(',')} onChange={this._onRowPivotChange} />
+            <RowPivotSelect fields={formattedFields} rowPivots={rowPivots.join(',')} onChange={this._onRowPivotChange} />
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <ColumnPivotSelect fields={formattedFields} columnPivots={this.state.columnPivots.join(',')} onChange={this._onColumnPivotChange} />
+            <ColumnPivotSelect fields={formattedFields} columnPivots={columnPivots.join(',')} onChange={this._onColumnPivotChange} />
           </Col>
           <Col md={2} style={{ paddingLeft: '2px' }}>
-            <SortSelect fields={formattedFields} sort={this.state.sort.join(',')} onChange={this._onSortChange} />
+            <SortSelect fields={currentlyUsedFields} sort={sort.join(',')} onChange={this._onSortChange} />
           </Col>
         </Row>
         <Row style={{ height: '100%' }}>
           <Col md={3}>
-            <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={this.state.series.join(',')} />
+            <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series.join(',')} />
           </Col>
           <Col md={9} style={{ height: '100%' }}>
             {children}

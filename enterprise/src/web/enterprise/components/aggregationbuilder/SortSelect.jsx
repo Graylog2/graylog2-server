@@ -5,7 +5,11 @@ import Select from 'components/common/Select';
 import { FieldList } from './AggregationBuilderPropTypes';
 
 const SortSelect = ({ fields, onChange, sort }) => (
-  <Select placeholder="Sort" size="small" options={fields} multi value={sort} onChange={onChange} />
+  <Select placeholder="Sort"
+          options={fields}
+          multi
+          value={sort}
+          onChange={onChange} />
 );
 
 SortSelect.propTypes = {

@@ -11,7 +11,10 @@ const VisualizationTypeSelect = ({ onChange, value }) => {
     .sort((v1, v2) => naturalSort(v1.displayName, v2.displayName));
 
   return (
-    <Select placeholder="Visualization type" size="small" options={visualizationTypes} onChange={onChange} value={value} />
+    <Select placeholder="Visualization type"
+            options={visualizationTypes}
+            onChange={onChange}
+            value={value} />
   );
 };
 

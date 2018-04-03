@@ -5,7 +5,11 @@ import Select from 'components/common/Select';
 import { FieldList } from './AggregationBuilderPropTypes';
 
 const ColumnPivotSelect = ({ columnPivots, fields, onChange }) => (
-  <Select placeholder="Column pivot" size="small" options={fields} multi value={columnPivots} onChange={onChange} />
+  <Select placeholder="Column pivot"
+          options={fields}
+          multi
+          value={columnPivots}
+          onChange={onChange} />
 );
 
 ColumnPivotSelect.propTypes = {

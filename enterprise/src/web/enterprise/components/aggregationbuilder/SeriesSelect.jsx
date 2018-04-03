@@ -7,7 +7,6 @@ import { FieldList } from './AggregationBuilderPropTypes';
 const SeriesSelect = ({ fields, onChange, series }) => (
   <Select placeholder="Series"
           allowCreate
-          size="small"
           onChange={onChange}
           options={fields}
           value={series}
