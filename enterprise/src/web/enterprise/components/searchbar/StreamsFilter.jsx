@@ -10,7 +10,6 @@ const StreamsFilter = ({ value, streams, onChange }) => {
     <Row className="no-bm">
       <Col md={11} mdOffset={1}>
         <Select placeholder="Select streams to be searched in"
-                size="small"
                 displayKey="key"
                 onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
                 options={streams}
