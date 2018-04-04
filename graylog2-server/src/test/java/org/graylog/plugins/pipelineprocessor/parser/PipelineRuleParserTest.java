@@ -50,11 +50,9 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
-import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidOperation;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
-import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
@@ -66,7 +64,6 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -321,20 +318,6 @@ public class PipelineRuleParserTest extends BaseParserTest {
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(IncompatibleIndexType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
-        }
-    }
-
-    @Test
-    @Ignore("FIXME")
-    public void invalidArgumentValue() {
-        try {
-            parseRuleWithOptionalCodegen();
-            fail("Should have thrown parse exception");
-        } catch (ParseException e) {
-            assertEquals(1, e.getErrors().size());
-            final ParseError parseError = Iterables.getOnlyElement(e.getErrors());
-            assertEquals("Unable to pre-compute value for 1st argument timezone in call to function now_in_tz: The datetime zone id '123' is not recognised", parseError.toString());
-            assertEquals(InvalidFunctionArgument.class, parseError.getClass());
         }
     }
 
