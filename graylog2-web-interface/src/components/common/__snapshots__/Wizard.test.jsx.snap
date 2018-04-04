@@ -59,10 +59,10 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
       className="row"
     >
       <div
-        className="col-md-6"
+        className="col-md-6 col-sm-6 col-xs-6"
       >
         <button
-          className="btn btn-info"
+          className="btn btn-sm btn-info"
           disabled={true}
           onClick={[Function]}
           type="button"
@@ -71,10 +71,10 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
         </button>
       </div>
       <div
-        className="text-right col-md-6"
+        className="text-right col-md-6 col-sm-6 col-xs-6"
       >
         <button
-          className="btn btn-info"
+          className="btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
           type="button"
@@ -153,10 +153,10 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
       className="row"
     >
       <div
-        className="col-md-6"
+        className="col-md-6 col-sm-6 col-xs-6"
       >
         <button
-          className="btn btn-info"
+          className="btn btn-sm btn-info"
           disabled={true}
           onClick={[Function]}
           type="button"
@@ -165,10 +165,10 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
         </button>
       </div>
       <div
-        className="text-right col-md-6"
+        className="text-right col-md-6 col-sm-6 col-xs-6"
       >
         <button
-          className="btn btn-info"
+          className="btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
           type="button"

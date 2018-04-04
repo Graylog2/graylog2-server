@@ -46,34 +46,30 @@ class Wizard extends React.Component {
     this.state = {
       selectedStep: props.steps[0].key,
     };
-
-    this._wizardChanged = this._wizardChanged.bind(this);
-    this._onNext = this._onNext.bind(this);
-    this._onPrevious = this._onPrevious.bind(this);
   }
 
-  _wizardChanged(eventKey) {
+  _wizardChanged = (eventKey) => {
     this.props.onStepChange(eventKey);
     this.setState({ selectedStep: eventKey });
-  }
+  };
 
-  _disableButton(direction) {
+  _disableButton = (direction) => {
     const len = this.props.steps.length;
     const position = direction === 'next' ? (len - 1) : 0;
     return this.props.steps[position].key === this.state.selectedStep;
-  }
+  };
 
-  _onNext() {
+  _onNext = () => {
     this._wizardChanged(this.props.steps[this._getSelectedIndex() + 1].key);
-  }
+  };
 
-  _onPrevious() {
+  _onPrevious = () => {
     this._wizardChanged(this.props.steps[this._getSelectedIndex() - 1].key);
-  }
+  };
 
-  _getSelectedIndex() {
+  _getSelectedIndex = () => {
     return this.props.steps.map(step => step.key).indexOf(this.state.selectedStep);
-  }
+  };
 
   render() {
     return (
@@ -86,11 +82,11 @@ class Wizard extends React.Component {
           </Nav>
           <br />
           <Row>
-            <Col md={6}>
-              <Button onClick={this._onPrevious} bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
+            <Col md={6} sm={6} xs={6}>
+              <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
             </Col>
-            <Col className="text-right" md={6}>
-              <Button onClick={this._onNext} bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
+            <Col className="text-right" md={6} sm={6} xs={6}>
+              <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
             </Col>
           </Row>
         </Col>
