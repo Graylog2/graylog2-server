@@ -63,7 +63,7 @@ class SearchForm extends React.Component {
 
   static defaultProps = {
     query: '',
-    onQueryChange: null,
+    onQueryChange: () => {},
     onReset: null,
     label: null,
     placeholder: 'Enter search query...',
@@ -84,6 +84,20 @@ class SearchForm extends React.Component {
     isLoading: false,
   };
 
+  componentWillReceiveProps(nextProps) {
+    // The query might get reset outside of this component so we have to adjust the internal state
+    if (this.props.query !== nextProps.query) {
+      this.setState({ query: nextProps.query });
+    }
+  }
+
+  /**
+   * This sets the loading state and returns a promise which gets resolved once the loading state is set.
+   * Callers of this function should only continue once the promise got resolved to avoid race conditions
+   * with setting the loading state. Otherwise it can happen that the loading state gets set to "false"
+   * before setting it to "true" has happened and thus not resetting the state after a search request.
+   * @private
+   */
   _setLoadingState = () => {
     return new Promise((resolve) => {
       if (this.props.useLoadingState) {
@@ -110,16 +124,15 @@ class SearchForm extends React.Component {
 
   _onReset = () => {
     this._resetLoadingState();
-    this.setState({ query: '' }, this.props.onReset);
+    this.setState({ query: this.props.query });
+    this.props.onQueryChange(this.props.query);
+    this.props.onReset();
   };
 
   handleQueryChange = (e) => {
     const query = e.target.value;
-    this.setState({ query: query }, () => {
-      if (this.props.onQueryChange) {
-        this.props.onQueryChange(query);
-      }
-    });
+    this.setState({ query: query });
+    this.props.onQueryChange(query);
   };
 
   render() {
