@@ -24,6 +24,12 @@ export default Reflux.createStore({
     }
   },
 
+  duplicate(widgetId) {
+    const promise = WidgetActions.duplicate.triggerPromise(this.selectedView, this.selectedQuery, widgetId);
+    CurrentWidgetsActions.duplicate.promise(promise);
+    return promise;
+  },
+
   updateConfig(widgetId, newConfig) {
     const promise = WidgetActions.updateConfig.triggerPromise(this.selectedView, this.selectedQuery, widgetId, newConfig);
     CurrentWidgetsActions.updateConfig.promise(promise);

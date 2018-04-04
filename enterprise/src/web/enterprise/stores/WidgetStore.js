@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
+import uuid from 'uuid/v4';
 
 import WidgetActions from 'enterprise/actions/WidgetActions';
 import CurrentViewStore from './CurrentViewStore';
@@ -34,6 +35,16 @@ export default Reflux.createStore({
     }
     this.widgets = this.widgets.setIn([viewId, queryId, widget.id], new Immutable.Map(widget));
     this._trigger();
+  },
+  duplicate(viewId, queryId, widgetId) {
+    const widget = this.widgets.getIn([viewId, queryId, widgetId]);
+    if (!widget) {
+      throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
+    }
+    const duplicatedWidget = widget.set('id', uuid());
+    this.widgets = this.widgets.setIn([viewId, queryId, duplicatedWidget.get('id')], duplicatedWidget);
+    this._trigger();
+    return duplicatedWidget;
   },
   remove(viewId, queryId, widgetId) {
     this.widgets = this.widgets.removeIn([viewId, queryId, widgetId]);

@@ -38,6 +38,10 @@ export default class Widget extends React.Component {
     }
   };
 
+  _onDuplicate = (widgetId) => {
+    CurrentWidgetsActions.duplicate(widgetId);
+  };
+
   _onToggleEdit = () => {
     this.setState(state => ({ editing: !state.editing }));
   };
@@ -57,6 +61,7 @@ export default class Widget extends React.Component {
         <WidgetHeader title={widget.title}
                       onToggleEdit={this._onToggleEdit}
                       onDelete={() => this._onDelete(widget)}
+                      onDuplicate={() => this._onDuplicate(id)}
                       editing={editing} />
         <VisComponent id={id}
                       editing={editing}

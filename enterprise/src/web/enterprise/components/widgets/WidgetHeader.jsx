@@ -4,7 +4,7 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import styles from './WidgetHeader.css';
 
-const WidgetHeader = ({ children, editing, onDelete, onToggleEdit, title }) => (
+const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, title }) => (
   <div className={styles.widgetHeader}>
     <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}{title}
     {children}
@@ -17,7 +17,7 @@ const WidgetHeader = ({ children, editing, onDelete, onToggleEdit, title }) => (
           <MenuItem header>Actions</MenuItem>
           <MenuItem onSelect={onToggleEdit}>{editing ? 'Finish Editing' : 'Edit'}</MenuItem>
           <MenuItem>Rename</MenuItem>
-          <MenuItem>Duplicate</MenuItem>
+          <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>Delete</MenuItem>
         </Dropdown.Menu>
@@ -30,6 +30,7 @@ WidgetHeader.propTypes = {
   children: PropTypes.node,
   editing: PropTypes.bool,
   onDelete: PropTypes.func.isRequired,
+  onDuplicate: PropTypes.func.isRequired,
   onToggleEdit: PropTypes.func.isRequired,
   title: PropTypes.node.isRequired,
 };
