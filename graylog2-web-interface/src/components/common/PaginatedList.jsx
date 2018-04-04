@@ -87,7 +87,7 @@ class PaginatedList extends React.Component {
 
         {this.props.children}
 
-        {<div className="text-center">
+        <div className="text-center">
           <Pagination bsSize="small"
                       items={numberPages}
                       maxButtons={10}
@@ -97,7 +97,7 @@ class PaginatedList extends React.Component {
                       next
                       first
                       last />
-        </div>}
+        </div>
       </span>
     );
   }
