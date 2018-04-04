@@ -82,10 +82,10 @@ class Wizard extends React.Component {
           </Nav>
           <br />
           <Row>
-            <Col md={6} sm={6} xs={6}>
+            <Col xs={6}>
               <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
             </Col>
-            <Col className="text-right" md={6} sm={6} xs={6}>
+            <Col className="text-right" xs={6}>
               <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
             </Col>
           </Row>
