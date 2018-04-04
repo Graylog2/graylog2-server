@@ -20,7 +20,6 @@ import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.filters.ExtractorFilter;
-import org.graylog2.filters.RulesFilter;
 import org.graylog2.filters.StaticFieldFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -34,7 +33,6 @@ public class MessageFilterBindings extends AbstractModule {
         Multibinder<MessageFilter> messageFilters = Multibinder.newSetBinder(binder(), MessageFilter.class);
         messageFilters.addBinding().to(StaticFieldFilter.class);
         messageFilters.addBinding().to(ExtractorFilter.class);
-        messageFilters.addBinding().to(RulesFilter.class);
         messageFilters.addBinding().to(StreamMatcherFilter.class);
 
         // built it drools rules
