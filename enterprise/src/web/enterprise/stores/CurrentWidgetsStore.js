@@ -29,4 +29,10 @@ export default Reflux.createStore({
     CurrentWidgetsActions.updateConfig.promise(promise);
     return promise;
   },
+
+  remove(widgetId) {
+    const promise = WidgetActions.remove.triggerPromise(this.selectedView, this.selectedQuery, widgetId);
+    CurrentWidgetsActions.remove.promise(promise);
+    return promise;
+  }
 });

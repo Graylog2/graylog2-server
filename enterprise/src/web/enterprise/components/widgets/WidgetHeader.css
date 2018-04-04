@@ -1,3 +1,30 @@
+:local(.widgetHeader) {
+    font-size: 18px;
+    height: 25px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+:local(.widgetActionDropdown) {
+    position: relative;
+    z-index: 1;
+}
+
+:local(.widgetActionDropdownCaret) {
+    cursor: pointer;
+    opacity: 0.3;
+}
+
+:local(.widgetActionDropdownMenu) {
+    position: absolute;
+    left: -140px !important;
+    padding-left: 5px;
+    padding-right: 5px;
+    min-width: 160px !important;
+    color: #666666;
+}
+
 :local(.widgetDragHandle) {
     cursor: move;
     opacity: 0.3;

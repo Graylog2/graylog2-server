@@ -18,7 +18,15 @@ const AlertStatus = createReactClass({
       triggeredBgColor: PropTypes.string.isRequired,
       text: PropTypes.string.isRequired,
     }).isRequired,
+    editing: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
+    onFinishEditing: PropTypes.func.isRequired,
+  },
+
+  getDefaultProps() {
+    return {
+      editing: false,
+    };
   },
 
   getInitialState() {
@@ -33,13 +41,13 @@ const AlertStatus = createReactClass({
     this.setState({ updatedConfig }, callback);
   },
 
-  handleEdit(e) {
-    e.preventDefault();
-    this.modalRef.open();
-  },
-
   handleSave() {
     this.setState({ config: this.state.updatedConfig }, () => this.props.onChange(this.state.config));
+    this.props.onFinishEditing();
+  },
+
+  handleCancel() {
+    this.props.onFinishEditing();
   },
 
   handleColorPickerChange(name) {
@@ -64,20 +72,17 @@ const AlertStatus = createReactClass({
 
   modalRef: null,
 
-  renderHeaderActions() {
-    return (
-      <span>
-        <a key="save-link" href="" onClick={this.handleEdit}><small>edit</small></a>
-      </span>
-    );
-  },
-
-  renderConfigModal() {
+  renderConfigModal(editing) {
     const config = this.state.updatedConfig;
 
+    if (!editing) {
+      return null;
+    }
+
     return (
-      <WidgetConfigModal ref={(c) => { this.modalRef = c; }}
+      <WidgetConfigModal show
                          title={`Edit widget: ${this.state.config.title}`}
+                         onCancel={this.handleCancel}
                          onSave={this.handleSave}>
         <Panel header={`Preview: ${config.title}`}>
           {this.renderBody(config)}
@@ -140,13 +145,8 @@ const AlertStatus = createReactClass({
 
     return (
       <span>
-        <WidgetHeader title={config.title}>
-          <span className="pull-right" style={{ position: 'relative', zIndex: 1 }}>
-            {this.renderHeaderActions()}
-          </span>
-        </WidgetHeader>
         {this.renderBody(config)}
-        {this.renderConfigModal()}
+        {this.renderConfigModal(this.props.editing)}
       </span>
     );
   },

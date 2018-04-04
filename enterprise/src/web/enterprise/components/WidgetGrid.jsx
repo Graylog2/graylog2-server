@@ -3,21 +3,15 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import _ from 'lodash';
 
-import { ReactGridContainer } from 'components/common';
 import style from 'pages/ShowDashboardPage.css';
-import ViewWidget from 'enterprise/components/widgets/ViewWidget';
+import { ReactGridContainer } from 'components/common';
 import { widgetDefinition } from 'enterprise/logic/Widget';
-import CurrentWidgetsActions from '../actions/CurrentWidgetsActions';
-import CurrentWidgetsStore from '../stores/CurrentWidgetsStore';
+import Widget from './widgets/Widget';
 
 export default class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
     const widgetDef = widgetDefinition(type);
     return { col: 1, row: 1, height: widgetDef.defaultHeight, width: widgetDef.defaultWidth };
-  }
-
-  static _visualizationForType(type) {
-    return widgetDefinition(type).visualizationComponent;
   }
 
   static propTypes = {
@@ -29,16 +23,12 @@ export default class WidgetGrid extends React.Component {
   static defaultProps = {
     locked: true,
     positions: {},
-    onPositionsChange: () => {},
+    onPositionsChange: () => {
+    },
   };
 
   state = {
     widgetDimensions: {},
-  };
-
-  // TODO: Move to better place.
-  _onWidgetConfigChange = (widgetId, config) => {
-    CurrentWidgetsActions.updateConfig(widgetId, config);
   };
 
   _onWidgetSizeChange = (widgetId, dimensions) => {
@@ -58,8 +48,6 @@ export default class WidgetGrid extends React.Component {
 
     Object.keys(widgets).forEach((widgetId) => {
       const widget = widgets[widgetId];
-      const VisComponent = WidgetGrid._visualizationForType(widget.type);
-      const { config, computationTimeRange } = widget;
       const dataKey = widget.data || widgetId;
       const widgetData = data[dataKey];
 
@@ -69,18 +57,15 @@ export default class WidgetGrid extends React.Component {
 
       if (widgetData) {
         returnedWidgets.widgets.push(
-          <div key={widgetId} className={style.widgetContainer}>
-            <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange}>
-              <VisComponent id={widgetId}
-                            title={widget.title}
-                            config={config}
-                            data={widgetData}
-                            fields={this.props.fields}
-                            height={height}
-                            width={width}
-                            onChange={newWidgetConfig => this._onWidgetConfigChange(widgetId, newWidgetConfig)}
-                            computationTimeRange={computationTimeRange} />
-            </ViewWidget>
+          <div key={widget.id} className={style.widgetContainer}>
+            <Widget key={widgetId}
+                    id={widgetId}
+                    widget={widget}
+                    data={widgetData}
+                    height={height}
+                    width={width}
+                    fields={this.props.fields}
+                    onSizeChange={this._onWidgetSizeChange} />
           </div>,
         );
       }
@@ -107,5 +92,5 @@ export default class WidgetGrid extends React.Component {
         </div>
       </Row>
     );
-  }
+  };
 }

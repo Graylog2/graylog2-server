@@ -4,9 +4,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { AggregationType } from './AggregationBuilderPropTypes';
 import AggregationControls from './AggregationControls';
-import EditModeToggleButton from './EditModeToggleButton';
 import FullSizeContainer from './FullSizeContainer';
-import WidgetHeader from '../widgets/WidgetHeader';
 
 const defaultVisualizationType = 'table';
 
@@ -22,7 +20,6 @@ export default class AggregationBuilder extends React.Component {
     editing: PropTypes.bool,
     fields: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
   };
 
   static _visualizationForType(type) {
@@ -31,19 +28,8 @@ export default class AggregationBuilder extends React.Component {
     return visualization.component;
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      editing: props.editing,
-    };
-  }
-
-  _toggleEditMode = () => {
-    this.setState(state => ({ editing: !state.editing }));
-  };
-
   render() {
-    const { config, data, fields, onChange, title } = this.props;
+    const { config, data, fields, onChange } = this.props;
     const VisComponent = AggregationBuilder._visualizationForType(config.visualization || defaultVisualizationType);
     const chartData = data && data[0] ? data : [{ results: [] }];
     const children = (
@@ -51,16 +37,13 @@ export default class AggregationBuilder extends React.Component {
         <VisComponent {...this.props} data={chartData} />
       </FullSizeContainer>
     );
-    const content = this.state.editing ? (
+    const content = this.props.editing ? (
       <AggregationControls fields={fields} onChange={onChange} {...config}>
         {children}
       </AggregationControls>
     ) : children;
     return (
       <span>
-        <WidgetHeader title={title}>
-          <EditModeToggleButton value={this.state.editing} onToggle={this._toggleEditMode} />
-        </WidgetHeader>
         {content}
       </span>
     );
