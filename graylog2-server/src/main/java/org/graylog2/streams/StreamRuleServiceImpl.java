@@ -56,7 +56,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     }
 
     @Override
-    public List<StreamRule> loadForStream(Stream stream) throws NotFoundException {
+    public List<StreamRule> loadForStream(Stream stream) {
         return loadForStreamId(stream.getId());
     }
 
@@ -79,7 +79,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     }
 
     @Override
-    public List<StreamRule> loadForStreamId(String streamId) throws NotFoundException {
+    public List<StreamRule> loadForStreamId(String streamId) {
         ObjectId id = new ObjectId(streamId);
         final List<StreamRule> streamRules = new ArrayList<>();
         final List<DBObject> respStreamRules = query(StreamRuleImpl.class,

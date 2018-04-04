@@ -23,6 +23,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.contentpacks.catalogs.EntityCatalog;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -178,5 +179,9 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addMigration(Class<? extends Migration> migrationClass) {
         migrationsBinder().addBinding().to(migrationClass);
+    }
+
+    protected void addEntityCatalog(Class<? extends EntityCatalog> entityCatalogClass) {
+        entityCatalogBinder().addBinding().to(entityCatalogClass);
     }
 }

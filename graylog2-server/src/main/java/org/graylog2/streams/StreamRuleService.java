@@ -29,13 +29,13 @@ import java.util.Map;
 public interface StreamRuleService extends PersistedService {
     StreamRule load(String id) throws NotFoundException;
 
-    List<StreamRule> loadForStream(Stream stream) throws NotFoundException;
+    List<StreamRule> loadForStream(Stream stream);
 
     StreamRule create(Map<String, Object> data);
 
     StreamRule create(String streamId, CreateStreamRuleRequest request);
 
-    List<StreamRule> loadForStreamId(String streamId) throws NotFoundException;
+    List<StreamRule> loadForStreamId(String streamId);
 
     Map<String, List<StreamRule>> loadForStreamIds(Collection<String> streamIds);
 
