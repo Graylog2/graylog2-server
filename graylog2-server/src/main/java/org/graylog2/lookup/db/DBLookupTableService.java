@@ -71,6 +71,12 @@ public class DBLookupTableService {
         return asImmutableList(db.find());
     }
 
+    public Collection<LookupTableDto> findByNames(Collection<String> names) {
+        final DBQuery.Query query = DBQuery.in("name", names);
+        final DBCursor<LookupTableDto> dbCursor = db.find(query);
+        return asImmutableList(dbCursor);
+    }
+
     public PaginatedList<LookupTableDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
         try (DBCursor<LookupTableDto> cursor = db.find(query)
                 .sort(sort)

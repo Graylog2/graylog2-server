@@ -145,19 +145,25 @@ public abstract class LegacyContentPack implements ContentPack {
         @JsonProperty(FIELD_NAME)
         abstract Builder name(String name);
 
+        @JsonProperty(FIELD_SUMMARY)
         abstract Builder summary(String summary);
 
         @JsonProperty(FIELD_DESCRIPTION)
         abstract Builder description(String description);
 
+        @JsonProperty(FIELD_VENDOR)
         abstract Builder vendor(String vendor);
 
+        @JsonProperty(FIELD_URL)
         abstract Builder url(URI url);
 
+        @JsonProperty(FIELD_REQUIRES)
         abstract Builder requires(ImmutableSet<Constraint> requirements);
 
+        @JsonProperty(FIELD_PARAMETERS)
         abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
+        @JsonProperty(FIELD_ENTITIES)
         abstract Builder entities(ImmutableSet<Entity> entities);
 
         @JsonProperty("category")
