@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Promise from 'bluebird';
 import { Button } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 
@@ -10,6 +11,13 @@ import { Spinner } from 'components/common';
  */
 class SearchForm extends React.Component {
   static propTypes = {
+    /** The query string value. */
+    query: PropTypes.string,
+    /**
+     * Callback that gets called on every update of the query string.
+     * The first argument of the function is the query string.
+     */
+    onQueryChange: PropTypes.func,
     /**
      * Callback when a search was submitted. The function receives the query
      * and a callback to reset the loading state of the form as arguments.
@@ -54,6 +62,10 @@ class SearchForm extends React.Component {
   };
 
   static defaultProps = {
+    query: '',
+    onQueryChange: () => {},
+    onReset: null,
+    label: null,
     placeholder: 'Enter search query...',
     wrapperClass: 'search',
     queryWidth: 'auto',
@@ -62,21 +74,38 @@ class SearchForm extends React.Component {
     searchBsStyle: 'default',
     searchButtonLabel: 'Search',
     resetButtonLabel: 'Reset',
+    useLoadingState: false,
     loadingLabel: 'Loading...',
+    children: null,
   };
 
   state = {
+    query: this.props.query,
     isLoading: false,
   };
 
-  componentWillReceiveProps() {
-    this._resetLoadingState();
+  componentWillReceiveProps(nextProps) {
+    // The query might get reset outside of this component so we have to adjust the internal state
+    if (this.props.query !== nextProps.query) {
+      this.setState({ query: nextProps.query });
+    }
   }
 
+  /**
+   * This sets the loading state and returns a promise which gets resolved once the loading state is set.
+   * Callers of this function should only continue once the promise got resolved to avoid race conditions
+   * with setting the loading state. Otherwise it can happen that the loading state gets set to "false"
+   * before setting it to "true" has happened and thus not resetting the state after a search request.
+   * @private
+   */
   _setLoadingState = () => {
-    if (this.props.useLoadingState) {
-      this.setState({ isLoading: true });
-    }
+    return new Promise((resolve) => {
+      if (this.props.useLoadingState) {
+        this.setState({ isLoading: true }, resolve);
+      } else {
+        resolve();
+      }
+    });
   };
 
   _resetLoadingState = () => {
@@ -88,14 +117,22 @@ class SearchForm extends React.Component {
   _onSearch = (e) => {
     e.preventDefault();
 
-    this._setLoadingState();
-    this.props.onSearch(this.refs.query.value, this._resetLoadingState);
+    this._setLoadingState().then(() => {
+      this.props.onSearch(this.state.query, this._resetLoadingState);
+    });
   };
 
   _onReset = () => {
     this._resetLoadingState();
-    this.refs.query.value = '';
+    this.setState({ query: this.props.query });
+    this.props.onQueryChange(this.props.query);
     this.props.onReset();
+  };
+
+  handleQueryChange = (e) => {
+    const query = e.target.value;
+    this.setState({ query: query });
+    this.props.onQueryChange(query);
   };
 
   render() {
@@ -103,12 +140,13 @@ class SearchForm extends React.Component {
       <div className={this.props.wrapperClass} style={{ marginTop: this.props.topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>
           <div className="form-group" >
-            {this.props.label && <label className="control-label">{this.props.label}</label>}
-            <input ref="query"
+            {this.props.label && <label htmlFor="common-search-form-query-input" className="control-label">{this.props.label}</label>}
+            <input id="common-search-form-query-input"
+                   onChange={this.handleQueryChange}
+                   value={this.state.query}
                    placeholder={this.props.placeholder}
                    type="text"
                    style={{ width: this.props.queryWidth }}
-                   label="Search"
                    className="query form-control"
                    autoComplete="off"
                    spellCheck="false" />
