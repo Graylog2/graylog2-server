@@ -20,21 +20,19 @@ const RefreshActions = ActionsProvider.getActions('Refresh');
 const MessageList = createReactClass({
   displayName: 'MessageList',
 
-  mixins: [
-    Reflux.connect(ConfigurationsStore, 'configurations'),
-    Reflux.connect(CurrentViewStore, 'currentViewStore'),
-    Reflux.connect(QueriesStore, 'queries'),
-  ],
-
   propTypes: {
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
-    config: PropTypes.shape({
-      fields: PropTypes.arrayOf(PropTypes.string),
-      pageSize: PropTypes.number,
-    }).isRequired,
+    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    pageSize: PropTypes.number.isRequired,
   },
+
+  mixins: [
+    Reflux.connect(ConfigurationsStore, 'configurations'),
+    Reflux.connect(CurrentViewStore, 'currentView'),
+    Reflux.connect(QueriesStore, 'queries'),
+  ],
 
   getInitialState() {
     return {
@@ -51,7 +49,7 @@ const MessageList = createReactClass({
   },
 
   _columnStyle(fieldName) {
-    const selectedFields = Immutable.OrderedSet(this.props.config.fields);
+    const selectedFields = Immutable.OrderedSet(this.props.fields);
     if (fieldName.toLowerCase() === 'source' && this._fieldColumns(selectedFields).size > 1) {
       return { width: 180 };
     }
@@ -74,8 +72,7 @@ const MessageList = createReactClass({
   },
 
   render() {
-    const config = this.props.config || {};
-    const pageSize = config.pageSize || 7;
+    const pageSize = this.props.pageSize || 7;
     const messages = this.props.data.messages || [];
     const messageSlice = messages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
@@ -87,7 +84,7 @@ const MessageList = createReactClass({
           index: m.index,
         };
       });
-    const selectedFields = this.state.queries.getIn([this.state.currentViewStore.selectedQuery, 'fields']);
+    const selectedFields = this.props.fields;
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
     return (
       <span>
@@ -108,7 +105,10 @@ const MessageList = createReactClass({
                       return (
                         <th key={selectedFieldName}
                           style={this._columnStyle(selectedFieldName)}>
-                          <Field interactive name={selectedFieldName} queryId="FIXME" viewId="FIXME"/>
+                          <Field interactive
+                                 name={selectedFieldName}
+                                 queryId={this.state.currentView.selectedQuery}
+                                 viewId={this.state.currentView.selectedView} />
                         </th>
                       );
                     })}

@@ -8,6 +8,7 @@ import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 
 import QueriesActions from 'enterprise/actions/QueriesActions';
 import CurrentViewStore from '../../stores/CurrentViewStore';
+import SelectedFieldsActions from '../../actions/SelectedFieldsActions';
 
 import styles from './FieldList.css'
 
@@ -30,11 +31,7 @@ const FieldList = createReactClass({
         <li key={`field-${name}`} className={styles.fieldListItem} >
           <FieldSelected name={name}
                          selected={selectedFields.contains(name)}
-                         onToggleSelected={fieldName => QueriesActions.toggleField(
-                           this.state.currentView.selectedView,
-                           this.props.queryId,
-                           fieldName,
-                         )} />
+                         onToggleSelected={SelectedFieldsActions.toggle} />
           {' '}
           <Field queryId={selectedQuery}
                  viewId={selectedView}

@@ -13,6 +13,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.Map;
 import java.util.Set;
 
 @AutoValue
@@ -25,6 +26,7 @@ public abstract class ViewDTO {
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SEARCH_ID = "search_id";
     public static final String FIELD_PROPERTIES = "properties";
+    public static final String FIELD_STATE = "state";
     public static final String FIELD_CREATED_AT = "created_at";
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
@@ -52,6 +54,9 @@ public abstract class ViewDTO {
 
     @JsonProperty(FIELD_PROPERTIES)
     public abstract ImmutableSet<String> properties();
+
+    @JsonProperty(FIELD_STATE)
+    public abstract Map<String, ViewStateDTO> state();
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
@@ -91,6 +96,9 @@ public abstract class ViewDTO {
 
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
+
+        @JsonProperty(FIELD_STATE)
+        public abstract Builder state(Map<String, ViewStateDTO> state);
 
         @JsonCreator
         public static Builder create() {

@@ -7,6 +7,7 @@ import style from 'pages/ShowDashboardPage.css';
 import { ReactGridContainer } from 'components/common';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
+import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
 
 export default class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
@@ -17,7 +18,9 @@ export default class WidgetGrid extends React.Component {
   static propTypes = {
     locked: PropTypes.bool,
     onPositionsChange: PropTypes.func,
-    widgets: PropTypes.object.isRequired,
+    widgets: WidgetsMap.isRequired,
+    positions: PositionsMap.isRequired,
+    data: WidgetDataMap.isRequired,
   };
 
   static defaultProps = {
@@ -37,14 +40,12 @@ export default class WidgetGrid extends React.Component {
     this.setState({ widgetDimensions: widgetDimensions });
   };
 
-  _renderWidgets = (widgetConfig) => {
+  _renderWidgets = (widgets, positions, data) => {
     const returnedWidgets = { positions: {}, widgets: [] };
 
-    if (!widgetConfig || _.isEmpty(widgetConfig)) {
+    if (!widgets || _.isEmpty(widgets) || !data || _.isEmpty(data)) {
       return returnedWidgets;
     }
-
-    const { data, widgets, positions } = widgetConfig;
 
     Object.keys(widgets).forEach((widgetId) => {
       const widget = widgets[widgetId];
@@ -75,7 +76,7 @@ export default class WidgetGrid extends React.Component {
   };
 
   render = () => {
-    const { widgets, positions } = this._renderWidgets(this.props.widgets);
+    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data);
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer locked={this.props.locked}
                           positions={positions}

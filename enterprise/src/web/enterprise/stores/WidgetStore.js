@@ -46,6 +46,10 @@ export default Reflux.createStore({
     this._trigger();
     return duplicatedWidget;
   },
+  load(viewId, queryId, widgets) {
+    this.widgets = this.widgets.setIn([viewId, queryId], widgets);
+    this._trigger();
+  },
   remove(viewId, queryId, widgetId) {
     this.widgets = this.widgets.removeIn([viewId, queryId, widgetId]);
     this._trigger();

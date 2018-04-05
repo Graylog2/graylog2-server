@@ -17,16 +17,19 @@ import MessageList from 'enterprise/components/widgets/MessageList';
 
 import style from 'pages/ShowDashboardPage.css';
 
-const _onPositionsChange = (positions, view) => {
+const _onPositionsChange = (positions, view, queryId) => {
   const newPositions = {};
   positions.forEach(({ col, height, row, width, id }) => {
     newPositions[id] = { col, height, row, width };
   });
-  const updatedView = new Immutable.Map(view).set('positions', newPositions);
+  const updatedView = view.update('positions', (p) => {
+    p[queryId] = newPositions;
+    return p;
+  });
   ViewsActions.update(updatedView.get('id'), updatedView);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields, queryId) => {
   const widgets = {};
   const data = {};
 
@@ -40,19 +43,25 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields)
       data[widget.id] = dataTransformer(widgetData, widgetDef.toJS());
     }
   });
-  const config = { widgets, data, positions: view.get('positions') };
-  return <WidgetGrid fields={fields} locked={false} widgets={config} onPositionsChange={positions => _onPositionsChange(positions, view)} />;
+  const positions = view.get('positions')[queryId];
+  return (
+    <WidgetGrid fields={fields}
+                locked={false}
+                widgets={widgets}
+                positions={positions}
+                data={data}
+                onPositionsChange={positions => _onPositionsChange(positions, view, queryId)} />
+  );
 };
 
 const _extractMessages = (searchTypes) => {
   return new Immutable.Map(searchTypes).find(searchType => searchType.type.toLocaleUpperCase() === 'MESSAGES');
 };
 
-const Query = ({ fields, onToggleMessages, showMessages, results, view, widgetMapping, widgets, query }) => {
+const Query = ({ fields, onToggleMessages, results, selectedFields, showMessages, view, widgetMapping, widgets, query }) => {
   if (results) {
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields);
     const queryId = query.get('id');
-    const selectedFields = query.get('fields');
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields, queryId);
     const messages = _extractMessages(results.searchTypes);
     const calculatedAt = moment().toISOString();
     return (
@@ -72,7 +81,7 @@ const Query = ({ fields, onToggleMessages, showMessages, results, view, widgetMa
               <div className="widget">
                 <span style={{ fontSize: 10 }} onClick={onToggleMessages}><i className="fa fa-bars pull-right" /></span>
                 {showMessages ? <WidgetHeader title="Messages" calculatedAt={calculatedAt} /> : <span style={{ fontSize: 12 }}>Messages</span>}
-                {showMessages && <MessageList config={{ pageSize: 100 }} data={messages} /> }
+                {showMessages && <MessageList data={messages} fields={selectedFields} pageSize={100} /> }
               </div>
             </div>
           </div>
@@ -88,6 +97,7 @@ Query.propTypes = {
   fields: PropTypes.object.isRequired,
   onToggleMessages: PropTypes.func.isRequired,
   results: PropTypes.object.isRequired,
+  selectedFields: PropTypes.object.isRequired,
   showMessages: PropTypes.bool.isRequired,
   view: PropTypes.object.isRequired,
   widgetMapping: PropTypes.object.isRequired,

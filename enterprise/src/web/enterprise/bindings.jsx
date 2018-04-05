@@ -14,20 +14,21 @@ import AggregationConfigGenerator from './logic/searchtypes/aggregation/Aggregat
 import BarVisualization from './components/visualizations/bar/BarVisualization';
 import LineVisualization from './components/visualizations/line/LineVisualization';
 import PieVisualization from './components/visualizations/pie/PieVisualization';
+import ShowViewPage from './ShowViewPage';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
-const viewPath = '/views/:viewId';
+const showViewsPath = `${viewsPath}/:viewId`;
 
 export default {
   pages: {
-    // search: { component: ExtendedSearchPage },
+    //search: { component: ExtendedSearchPage },
+
   },
   routes: [
     { path: extendedSearchPath, component: ExtendedSearchPage },
     { path: viewsPath, component: ViewManagementPage },
-    // TODO: This needs to point to the correct component
-    { path: viewPath, component: ExtendedSearchPage },
+    { path: showViewsPath, component: ShowViewPage },
   ],
   navigation: [
     // Disabling navigation for extended search for now to avoid confusing alpha testers.

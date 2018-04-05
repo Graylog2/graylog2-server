@@ -5,16 +5,11 @@ import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar } from 'react-bootstrap';
 
 import DebugOverlay from 'enterprise/components/DebugOverlay';
+import SaveViewButton from './SaveViewButton';
 
 const QueryTabActions = createReactClass({
   propTypes: {
-    toggleDashboard: PropTypes.func,
-  },
-
-  getDefaultProps() {
-    return {
-      toggleDashboard: () => {},
-    };
+    onToggleDashboard: PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -24,7 +19,7 @@ const QueryTabActions = createReactClass({
   },
 
   handleDashboardClick() {
-    this.props.toggleDashboard();
+    this.props.onToggleDashboard();
   },
 
   handleDebugOpen() {
@@ -40,6 +35,7 @@ const QueryTabActions = createReactClass({
       <span>
         <ButtonToolbar>
           <Button onClick={this.handleDashboardClick}>Dashboard</Button>
+          <SaveViewButton />
           <Button onClick={this.handleDebugOpen}>Debug</Button>
         </ButtonToolbar>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />

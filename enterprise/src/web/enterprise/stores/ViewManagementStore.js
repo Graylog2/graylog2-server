@@ -5,9 +5,47 @@ import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 
 const ViewActions = Reflux.createActions({
+  get: { asyncResult: true },
+  save: { asyncResult: true },
   search: { asyncResult: true },
   delete: { asyncResult: true },
 });
+
+const mutateWidgets = (widgets) => {
+  return widgets.map((widget) => {
+    const newWidgetConfig = {};
+    const config = widget.get('config');
+    Object.keys(config).forEach((widgetConfigKey) => {
+      const newWidgetConfigKey = widgetConfigKey.replace(/([A-Z])/g, (_, wordStart) => `_${wordStart.toLowerCase()}`);
+      newWidgetConfig[newWidgetConfigKey] = config[widgetConfigKey];
+    });
+    const cleanedWidget = widget.delete('title')
+      .delete('computationTimeRange')
+      .update('type', type => type.toLowerCase());
+    return Object.assign({}, cleanedWidget.toJS(), { config: newWidgetConfig });
+  });
+};
+
+const _prepareViewRequest = (id, title, currentViewStore, view, widgets, fields, search) => {
+  const { positions } = view.toJS();
+  const { widgetMapping } = search.result.searchRequest;
+  const { search_id } = search.result.result;
+  const state = widgets.map((queryWidgets, queryId) => {
+    return {
+      widgets: mutateWidgets(queryWidgets.valueSeq()).toJS(),
+      positions: positions[queryId] || {},
+      widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
+      selected_fields: fields.get(queryId).toJS(),
+    };
+  }).toJS();
+
+  return {
+    id,
+    title,
+    state,
+    search_id,
+  };
+};
 
 const viewsUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/views');
 const viewsIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/views/${id}`);
@@ -28,6 +66,17 @@ const ViewStore = Reflux.createStore({
       pagination: this.pagination,
       list: this.views,
     };
+  },
+
+  get(viewId) {
+    const promise = fetch('GET', `${viewsUrl}/${viewId}`);
+    ViewActions.get.promise(promise);
+  },
+
+  save(id, title, currentViewStore, view, widgets, fields, search) {
+    const request = _prepareViewRequest(id, title, currentViewStore, view, widgets, fields, search);
+    const promise = fetch('POST', viewsUrl, request).then(response => console.log(response));
+    ViewActions.save.promise(promise);
   },
 
   search(query, page = 1, perPage = 10, sortBy = 'title', order = 'asc') {

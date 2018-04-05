@@ -39,6 +39,10 @@ export default Reflux.createStore({
     });
     this._trigger();
   },
+  load(viewId, queries) {
+    this.queries = this.queries.set(viewId, queries);
+    this._trigger();
+  },
   remove(viewId, queryId) {
     this.queries = this.queries.removeIn([viewId, queryId]);
     this._trigger();

@@ -8,6 +8,8 @@ import WidgetActions from 'enterprise/actions/WidgetActions';
 // eslint-disable-next-line no-unused-vars
 import WidgetStore from 'enterprise/stores/WidgetStore';
 import { resultHistogram } from 'enterprise/logic/Widget';
+import SelectedFieldsActions from '../actions/SelectedFieldsActions';
+import CurrentViewStore from '../stores/CurrentViewStore';
 
 export const _defaultQuery = (id) => {
   return {
@@ -15,7 +17,6 @@ export const _defaultQuery = (id) => {
     query: '',
     rangeType: 'relative',
     rangeParams: Immutable.Map({ range: '300' }),
-    fields: Immutable.Set.of('source', 'message'),
   };
 };
 
@@ -29,7 +30,8 @@ export const _defaultWidgets = () => {
 
 export const createEmptyQuery = (viewId) => {
   const defaultQuery = _defaultQuery(uuid());
-  QueriesActions.create(viewId, defaultQuery);
+  QueriesActions.create(viewId, defaultQuery)
+    .then(() => SelectedFieldsActions.set(defaultQuery.id, ['source', 'message']));
   _defaultWidgets().forEach(widget => WidgetActions.create(viewId, defaultQuery.id, widget));
   return defaultQuery;
 };

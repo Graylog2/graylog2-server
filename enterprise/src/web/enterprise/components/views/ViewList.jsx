@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
-import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Alert, Button, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
@@ -93,6 +93,9 @@ const ViewList = createReactClass({
 
     if (!list) {
       return <Spinner text="Loading views..." />;
+    }
+    if (list.length === 0) {
+      return <Alert bsStyle="warning"><i className="fa fa-info-circle" />&nbsp;No views defined.</Alert>;
     }
 
     const items = list.map((view) => {

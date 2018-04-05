@@ -1,9 +1,7 @@
 import Reflux from 'reflux';
 
 export default Reflux.createActions([
-  'create',
-  'load',
+  'add',
   'remove',
-  'title',
-  'update',
+  'toggle',
 ]);

@@ -35,6 +35,10 @@ export default Reflux.createStore({
     });
     this._trigger();
   },
+  load(viewId, view) {
+    this.views = this.views.set(viewId, view);
+    this._trigger();
+  },
   remove(viewId) {
     this.views = this.views.remove(viewId);
     this._trigger();

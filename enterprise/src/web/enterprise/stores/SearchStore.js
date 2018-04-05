@@ -3,6 +3,8 @@ import Bluebird from 'bluebird';
 import _ from 'lodash';
 
 import SearchMetadataActions from 'enterprise/actions/SearchMetadataActions';
+import URLUtils from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
 import SearchJobActions from 'enterprise/actions/SearchJobActions';
 import SearchJobStore from 'enterprise/stores/SearchJobStore';
 import SearchActions from 'enterprise/actions/SearchActions';
@@ -17,6 +19,8 @@ const displayError = (error) => {
 };
 
 Bluebird.config({ cancellation: true });
+
+const searchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 
 export default Reflux.createStore({
   listenables: [SearchActions],
@@ -52,6 +56,11 @@ export default Reflux.createStore({
     if (this.queries && this.queries.size > 0) {
       this._debouncedParse(this.queries, this.widgets, this.filters);
     }
+  },
+
+  get(searchId) {
+    const promise = fetch('GET', `${searchUrl}/${searchId}`);
+    SearchActions.get.promise(promise);
   },
 
   trackJobStatus(job, searchRequest, search) {

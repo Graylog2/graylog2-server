@@ -5,8 +5,9 @@ import Immutable from 'immutable';
 
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
+import SaveViewButton from './SaveViewButton';
 
-const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, toggleDashboard }) => {
+const QueryTabs = ({ children, onSaveView, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onToggleDashboard }) => {
   const queryTitles = titles || new Immutable.Map();
   const tabs = queries.toArray().map((query, index) => {
     const id = query.get('id');
@@ -24,7 +25,9 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 
   return (
     <span>
-      <span className="pull-right"><QueryTabActions toggleDashboard={toggleDashboard} /></span>
+      <span className="pull-right">
+        <QueryTabActions onToggleDashboard={onToggleDashboard} />
+      </span>
       <Tabs
         id="QueryTabs"
         activeKey={selectedQuery}
@@ -41,6 +44,7 @@ QueryTabs.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
+  onToggleDashboard: PropTypes.func.isRequired,
   queries: PropTypes.object.isRequired,
   selectedQuery: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
