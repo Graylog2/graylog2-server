@@ -32,6 +32,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.RestoreSystemProperties;
@@ -167,6 +168,7 @@ public class AbstractTcpTransportTest {
     }
 
     @Test
+    @Ignore("Disabled test due to being unreliable. For details see https://github.com/Graylog2/graylog2-server/issues/4702.")
     public void testTrafficCounter() throws Exception {
         final Configuration configuration = new Configuration(ImmutableMap.of(
                 "bind_address", "127.0.0.1",
