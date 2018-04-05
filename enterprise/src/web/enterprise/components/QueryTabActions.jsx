@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import DebugOverlay from 'enterprise/components/DebugOverlay';
-import SaveViewButton from './SaveViewButton';
+import SaveViewMenuItem from './SaveViewMenuItem';
 
 const QueryTabActions = createReactClass({
   propTypes: {
@@ -33,11 +33,12 @@ const QueryTabActions = createReactClass({
   render() {
     return (
       <span>
-        <ButtonToolbar>
-          <Button onClick={this.handleDashboardClick}>Dashboard</Button>
-          <SaveViewButton />
-          <Button onClick={this.handleDebugOpen}>Debug</Button>
-        </ButtonToolbar>
+        <DropdownButton title="View Actions">
+          <MenuItem onSelect={this.handleDashboardClick}>Dashboard</MenuItem>
+          <SaveViewMenuItem />
+          <MenuItem divider />
+          <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
+        </DropdownButton>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
       </span>
     );

@@ -5,9 +5,8 @@ import Immutable from 'immutable';
 
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
-import SaveViewButton from './SaveViewButton';
 
-const QueryTabs = ({ children, onSaveView, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onToggleDashboard }) => {
+const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onToggleDashboard }) => {
   const queryTitles = titles || new Immutable.Map();
   const tabs = queries.toArray().map((query, index) => {
     const id = query.get('id');

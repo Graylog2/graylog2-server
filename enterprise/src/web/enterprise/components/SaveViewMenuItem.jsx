@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { MenuItem } from 'react-bootstrap';
 
 import connect from 'stores/connect';
 import { ViewActions } from '../stores/ViewManagementStore';
@@ -9,7 +9,7 @@ import SearchStore from '../stores/SearchStore';
 import ViewsStore from '../stores/ViewsStore';
 import WidgetStore from '../stores/WidgetStore';
 
-class SaveViewButton extends React.Component {
+class SaveViewMenuItem extends React.Component {
   static propTypes = {};
 
   _onClick = () => {
@@ -19,11 +19,11 @@ class SaveViewButton extends React.Component {
   };
 
   render() {
-    return <Button onClick={this._onClick}>Save View</Button>;
+    return <MenuItem onSelect={this._onClick}>Save View</MenuItem>;
   }
 }
 
-export default connect(SaveViewButton, {
+export default connect(SaveViewMenuItem, {
   currentView: CurrentViewStore,
   search: SearchStore,
   selectedFields: SelectedFieldsStore,
