@@ -26,8 +26,8 @@ const mutateWidgets = (widgets) => {
   });
 };
 
-const _prepareViewRequest = (id, title, currentViewStore, view, widgets, fields, search) => {
-  const { positions } = view.toJS();
+const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search) => {
+  const { positions, title, summary, description } = view.toJS();
   const { widgetMapping } = search.result.searchRequest;
   const { search_id } = search.result.result;
   const state = widgets.map((queryWidgets, queryId) => {
@@ -42,6 +42,8 @@ const _prepareViewRequest = (id, title, currentViewStore, view, widgets, fields,
   return {
     id,
     title,
+    summary,
+    description,
     state,
     search_id,
   };
@@ -73,9 +75,9 @@ const ViewStore = Reflux.createStore({
     ViewActions.get.promise(promise);
   },
 
-  save(id, title, currentViewStore, view, widgets, fields, search) {
-    const request = _prepareViewRequest(id, title, currentViewStore, view, widgets, fields, search);
-    const promise = fetch('POST', viewsUrl, request).then(response => console.log(response));
+  save(id, currentViewStore, view, widgets, fields, search) {
+    const request = _prepareViewRequest(id, currentViewStore, view, widgets, fields, search);
+    const promise = fetch('POST', viewsUrl, request);
     ViewActions.save.promise(promise);
   },
 
