@@ -6,16 +6,16 @@ import PropTypes from 'prop-types';
 import Field from 'enterprise/components/Field';
 import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 
-import QueriesActions from 'enterprise/actions/QueriesActions';
-import CurrentViewStore from '../../stores/CurrentViewStore';
-import SelectedFieldsActions from '../../actions/SelectedFieldsActions';
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+import CurrentSelectedFieldsActions from 'enterprise/actions/CurrentSelectedFieldsActions';
+import CurrentSelectedFieldsStore from 'enterprise/stores/CurrentSelectedFieldsStore';
 
-import styles from './FieldList.css'
+import styles from './FieldList.css';
 
 const FieldList = createReactClass({
   propTypes: {
     fields: PropTypes.object.isRequired,
-    queryId: PropTypes.string.isRequired,
+    selectedFields: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(CurrentViewStore, 'currentView')],
 
@@ -31,7 +31,7 @@ const FieldList = createReactClass({
         <li key={`field-${name}`} className={styles.fieldListItem} >
           <FieldSelected name={name}
                          selected={selectedFields.contains(name)}
-                         onToggleSelected={SelectedFieldsActions.toggle} />
+                         onToggleSelected={CurrentSelectedFieldsActions.toggle} />
           {' '}
           <Field queryId={selectedQuery}
                  viewId={selectedView}
