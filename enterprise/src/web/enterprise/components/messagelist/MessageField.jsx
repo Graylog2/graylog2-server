@@ -1,54 +1,33 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import createReactClass from 'create-react-class';
+import connect from 'stores/connect';
+import Field from 'enterprise/components/Field';
+import Value from 'enterprise/components/Value';
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 
-import { MessageFieldDescription } from 'components/search';
-import Field from '../Field';
-import Value from '../Value';
+const SPECIAL_FIELDS = ['full_message', 'level'];
 
-const MessageField = createReactClass({
-  displayName: 'MessageField',
+const MessageField = ({ fieldName, message, value, currentView }) => {
+  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
+  const { selectedQuery } = currentView;
 
-  propTypes: {
-    customFieldActions: PropTypes.node,
-    disableFieldActions: PropTypes.bool,
-    fieldName: PropTypes.string.isRequired,
-    message: PropTypes.object.isRequired,
-    possiblyHighlight: PropTypes.func.isRequired,
-    value: PropTypes.any.isRequired,
-  },
+  return (
+    <span>
+      <dt>
+        <Field interactive queryId={selectedQuery} name={fieldName}>{fieldName}</Field>
+      </dt>
+      <dd>
+        <Value queryId={selectedQuery} field={fieldName} value={innerValue}>{innerValue}</Value>
+      </dd>
+    </span>
+  );
+};
 
-  SPECIAL_FIELDS: ['full_message', 'level'],
+MessageField.propTypes = {
+  fieldName: PropTypes.string.isRequired,
+  message: PropTypes.object.isRequired,
+  value: PropTypes.any.isRequired,
+};
 
-  _isAdded(key) {
-    const decorationStats = this.props.message.decoration_stats;
-    return decorationStats && decorationStats.added_fields && decorationStats.added_fields[key] !== undefined;
-  },
-
-  _isChanged(key) {
-    const decorationStats = this.props.message.decoration_stats;
-    return decorationStats && decorationStats.changed_fields && decorationStats.changed_fields[key] !== undefined;
-  },
-
-  _isDecorated(key) {
-    return this._isAdded(key) || this._isChanged(key);
-  },
-
-  render() {
-    const key = this.props.fieldName;
-    let innerValue = <Value queryId="FIXME" field={key} value={this.props.value}>{this.props.value}</Value>;
-    if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {
-      innerValue = <Value queryId="FIXME" field={key} value={this.props.message.fields[key]}>{this.props.message.fields[key]}</Value>;
-    }
-
-    return (
-      <span>
-        <dt key={`${key}Title`}><Field interactive queryId="FIXME" name={key}>{key}</Field></dt>
-        <dd>{innerValue}</dd>
-      </span>
-    );
-  },
-});
-
-export default MessageField;
+export default connect(MessageField, { currentView: CurrentViewStore });

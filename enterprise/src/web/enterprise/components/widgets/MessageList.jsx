@@ -88,6 +88,7 @@ const MessageList = createReactClass({
       });
     const { selectedFields } = this.state;
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
+    const { selectedQuery, selectedView } = this.state.currentView;
     return (
       <span>
         <MessageTablePaginator currentPage={Number(this.state.currentPage)}
@@ -102,15 +103,15 @@ const MessageList = createReactClass({
               <table className="table table-condensed messages">
                 <thead>
                   <tr>
-                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId="FIXME" /></th>
+                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={selectedQuery} /></th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
                           style={this._columnStyle(selectedFieldName)}>
                           <Field interactive
                                  name={selectedFieldName}
-                                 queryId={this.state.currentView.selectedQuery}
-                                 viewId={this.state.currentView.selectedView} />
+                                 queryId={selectedQuery}
+                                 viewId={selectedView} />
                         </th>
                       );
                     })}

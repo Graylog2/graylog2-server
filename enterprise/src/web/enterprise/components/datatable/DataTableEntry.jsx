@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import Value from '../Value';
+
+import connect from 'stores/connect';
+import Value from 'enterprise/components/Value';
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 
 class DataTableEntry extends React.Component {
   static propTypes = {
@@ -12,12 +15,13 @@ class DataTableEntry extends React.Component {
   render() {
     const classes = 'message-group';
     const item = this.props.item;
+    const { selectedQuery } = this.props.currentView;
     return (
       <tbody className={classes}>
         <tr className="fields-row">
           { this.props.fields.toSeq().map(fieldName => (
             <td key={fieldName}>
-              <Value field={fieldName} value={item[fieldName]} queryId="FIXME">{item[fieldName]}</Value>
+              <Value field={fieldName} value={item[fieldName]} queryId={selectedQuery}>{item[fieldName]}</Value>
             </td>
           )) }
         </tr>
@@ -26,4 +30,4 @@ class DataTableEntry extends React.Component {
   }
 }
 
-export default DataTableEntry;
+export default connect(DataTableEntry, { currentView: CurrentViewStore });

@@ -7,14 +7,15 @@ import DataTable from 'enterprise/components/datatable/DataTable';
 import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
 import FieldHistogramTransformer from 'enterprise/logic/searchresulttransformers/FieldHistogramTransformer';
-import AggregationHandler from './logic/searchtypes/AggregationHandler';
-import AggregationTransformer from './logic/searchresulttransformers/AggregationTransformer';
-import AggregationBuilder from './components/aggregationbuilder/AggregationBuilder';
-import AggregationConfigGenerator from './logic/searchtypes/aggregation/AggregationConfigGenerator';
-import BarVisualization from './components/visualizations/bar/BarVisualization';
-import LineVisualization from './components/visualizations/line/LineVisualization';
-import PieVisualization from './components/visualizations/pie/PieVisualization';
-import ShowViewPage from './ShowViewPage';
+import AggregationHandler from 'enterprise/logic/searchtypes/AggregationHandler';
+import AggregationTransformer from 'enterprise/logic/searchresulttransformers/AggregationTransformer';
+import AggregationBuilder from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+import AggregationConfigGenerator from 'enterprise/logic/searchtypes/aggregation/AggregationConfigGenerator';
+import BarVisualization from 'enterprise/components/visualizations/bar/BarVisualization';
+import LineVisualization from 'enterprise/components/visualizations/line/LineVisualization';
+import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
+import ShowViewPage from 'enterprise/ShowViewPage';
+import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -155,6 +156,11 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
+    },
+    {
+      type: 'add-to-table',
+      title: 'Add to table',
+      handler: AddToTableActionHandler,
     },
     {
       type: 'new-query',

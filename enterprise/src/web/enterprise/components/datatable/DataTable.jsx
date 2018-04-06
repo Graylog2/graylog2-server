@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 
 import expandRows from 'enterprise/logic/ExpandRows';
+import connect from 'stores/connect';
+import Field from 'enterprise/components/Field';
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 import DataTableEntry from './DataTableEntry';
-import Field from '../Field';
 
 class DataTable extends React.Component {
   static propTypes = {
@@ -34,6 +36,7 @@ class DataTable extends React.Component {
     const rows = data[0] ? data[0].results : [];
     const fields = new Immutable.OrderedSet(rowPivots).merge(this._extractAllFieldnames(rows));
     const sortedRows = expandRows(rowPivots.slice(), series, rows);
+    const { selectedQuery } = this.props.currentView;
     return (
       <div className="messages-container">
         <table className="table table-condensed messages">
@@ -42,7 +45,7 @@ class DataTable extends React.Component {
               {fields.toSeq().map((field) => {
                 return (
                   <th key={field} style={{ left: '0px' }}>
-                    <Field interactive name={field} queryId="FIXME" >{field}</Field>
+                    <Field interactive name={field} queryId={selectedQuery} >{field}</Field>
                   </th>
                 );
               })}
@@ -55,4 +58,4 @@ class DataTable extends React.Component {
   }
 }
 
-export default DataTable;
+export default connect(DataTable, { currentView: CurrentViewStore });
