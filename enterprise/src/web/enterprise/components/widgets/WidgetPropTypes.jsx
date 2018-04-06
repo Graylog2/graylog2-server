@@ -9,7 +9,9 @@ export const Position = PropTypes.shape({
 
 export const PositionsMap = PropTypes.objectOf(Position);
 
-export const Widget = PropTypes.object;
+export const Widget = PropTypes.shape({
+  config: PropTypes.object.isRequired,
+});
 
 export const WidgetsMap = PropTypes.objectOf(Widget);
 

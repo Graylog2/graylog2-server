@@ -5,7 +5,6 @@ import WidgetActions from 'enterprise/actions/WidgetActions';
 export default function (viewId, queryId, field) {
   const widget = {
     id: uuid(),
-    title: field,
     type: 'AGGREGATION',
     config: {
       rowPivots: ['timestamp'],

@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tab, Tabs } from 'react-bootstrap';
-import Immutable from 'immutable';
 
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
 
 const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveFinished, onToggleDashboard }) => {
-  const queryTitles = titles || new Immutable.Map();
+  const queryTitles = titles;
   const tabs = queries.toArray().map((query, index) => {
     const id = query.get('id');
-    const title = queryTitles.get(id, `Query#${index + 1}`);
+    const title = queryTitles.getIn([id, 'tab', 'title'], `Query#${index + 1}`);
     const tabTitle = <QueryTitle value={title} onChange={newTitle => onTitleChange(id, newTitle)} onClose={() => onRemove(id)} />;
     return (
       <Tab key={id}

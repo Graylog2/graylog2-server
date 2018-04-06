@@ -1,4 +1,5 @@
 import Reflux from 'reflux';
+import Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -26,7 +27,7 @@ const mutateWidgets = (widgets) => {
   });
 };
 
-const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search) => {
+const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search, titles) => {
   const { positions, title, summary, description } = view.toJS();
   const { widgetMapping } = search.result.searchRequest;
   const { search_id } = search.result.result;
@@ -36,6 +37,7 @@ const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search
       positions: positions[queryId] || {},
       widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
       selected_fields: fields.get(queryId).toJS(),
+      titles: titles.get(queryId, new Immutable.Map()),
     };
   }).toJS();
 
@@ -75,8 +77,8 @@ const ViewStore = Reflux.createStore({
     ViewActions.get.promise(promise);
   },
 
-  save(id, currentViewStore, view, widgets, fields, search) {
-    const request = _prepareViewRequest(id, currentViewStore, view, widgets, fields, search);
+  save(id, currentViewStore, view, widgets, fields, search, titles) {
+    const request = _prepareViewRequest(id, currentViewStore, view, widgets, fields, search, titles);
     const promise = fetch('POST', viewsUrl, request);
     ViewActions.save.promise(promise);
   },

@@ -3,16 +3,25 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import _ from 'lodash';
 
+import connect from 'stores/connect';
 import style from 'pages/ShowDashboardPage.css';
 import { ReactGridContainer } from 'components/common';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
+import CurrentTitlesStore from '../stores/CurrentTitlesStore';
 
-export default class WidgetGrid extends React.Component {
+const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
+
+class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
     const widgetDef = widgetDefinition(type);
     return { col: 1, row: 1, height: widgetDef.defaultHeight, width: widgetDef.defaultWidth };
+  }
+
+  static _defaultTitle(widget) {
+    const widgetDef = widgetDefinition(widget.type);
+    return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
   }
 
   static propTypes = {
@@ -56,6 +65,8 @@ export default class WidgetGrid extends React.Component {
 
       const { height, width } = (this.state && this.state.widgetDimensions[widgetId]) || {};
 
+      const widgetTitle = this.props.titles.getIn(['widget', widget.id], WidgetGrid._defaultTitle(widget));
+
       if (widgetData) {
         returnedWidgets.widgets.push(
           <div key={widget.id} className={style.widgetContainer}>
@@ -66,7 +77,8 @@ export default class WidgetGrid extends React.Component {
                     height={height}
                     width={width}
                     fields={this.props.fields}
-                    onSizeChange={this._onWidgetSizeChange} />
+                    onSizeChange={this._onWidgetSizeChange}
+                    title={widgetTitle} />
           </div>,
         );
       }
@@ -95,3 +107,5 @@ export default class WidgetGrid extends React.Component {
     );
   };
 }
+
+export default connect(WidgetGrid, { titles: CurrentTitlesStore });

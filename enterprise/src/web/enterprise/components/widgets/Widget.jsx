@@ -19,6 +19,7 @@ export default class Widget extends React.Component {
     width: PropTypes.number.isRequired,
     fields: PropTypes.any.isRequired,
     onSizeChange: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
   };
 
   static _visualizationForType(type) {
@@ -51,14 +52,13 @@ export default class Widget extends React.Component {
   };
 
   render() {
-    const { id, widget, data, height, width, fields } = this.props;
-    const { onSizeChange } = this.props;
+    const { id, widget, data, height, width, fields, onSizeChange, title } = this.props;
     const { config, computationTimeRange } = widget;
     const VisComponent = Widget._visualizationForType(widget.type);
     const { editing } = this.state;
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-        <WidgetHeader title={widget.title}
+        <WidgetHeader title={title}
                       onToggleEdit={this._onToggleEdit}
                       onDelete={() => this._onDelete(widget)}
                       onDuplicate={() => this._onDuplicate(id)}
