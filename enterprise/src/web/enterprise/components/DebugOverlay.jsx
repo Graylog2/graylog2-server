@@ -9,7 +9,8 @@ import QueriesStore from 'enterprise/stores/QueriesStore';
 import SearchStore from 'enterprise/stores/SearchStore';
 import WidgetStore from 'enterprise/stores/WidgetStore';
 import ViewsStore from 'enterprise/stores/ViewsStore';
-import SelectedFieldsStore from '../stores/SelectedFieldsStore';
+import SelectedFieldsStore from 'enterprise/stores/SelectedFieldsStore';
+import TitlesStore from 'enterprise/stores/TitlesStore';
 
 const DebugOverlay = createReactClass({
   displayName: 'DebugOverlay',
@@ -24,6 +25,7 @@ const DebugOverlay = createReactClass({
     Reflux.connect(QueriesStore, 'queries'),
     Reflux.connect(SearchStore, 'search'),
     Reflux.connect(SelectedFieldsStore, 'selectedFields'),
+    Reflux.connect(TitlesStore, 'titles'),
     Reflux.connect(ViewsStore, 'views'),
     Reflux.connect(WidgetStore, 'widgets'),
   ],

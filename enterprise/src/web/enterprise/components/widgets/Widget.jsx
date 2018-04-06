@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import CurrentWidgetsActions from 'enterprise/actions/CurrentWidgetsActions';
 import CurrentWidgetsStore from 'enterprise/stores/CurrentWidgetsStore';
+import CurrentTitlesActions from 'enterprise/actions/CurrentTitlesActions';
+
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 
@@ -62,6 +64,7 @@ export default class Widget extends React.Component {
                       onToggleEdit={this._onToggleEdit}
                       onDelete={() => this._onDelete(widget)}
                       onDuplicate={() => this._onDuplicate(id)}
+                      onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
                       editing={editing} />
         <VisComponent id={id}
                       editing={editing}

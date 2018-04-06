@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class QueryTitle extends React.Component {
+import styles from './EditableTitle.css';
+
+export default class EditableTitle extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -38,29 +40,16 @@ class QueryTitle extends React.Component {
   render() {
     const { onClose } = this.props;
     const { editing, value } = this.state;
-    const valueField = editing ? (
-      <form onSubmit={this._onSubmit}>
-        <input autoFocus
-               type="text"
-               value={value}
-               onBlur={this._toggleEditing}
-               onChange={this._onChange} />
-      </form>
-    ) : <span onDoubleClick={this._toggleEditing}>{value}</span>;
-    return (
+    return editing ? (
       <span>
-        {valueField}{' '}
-        {!editing && <i className="fa fa-times"
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onClose();
-                        }} />}
+        <form onSubmit={this._onSubmit} className={styles.inlineForm}>
+          <input autoFocus
+                 type="text"
+                 value={value}
+                 onBlur={this._toggleEditing}
+                 onChange={this._onChange} />
+        </form>
       </span>
-    );
+    ) : <span onDoubleClick={this._toggleEditing}>{value}</span>;
   }
 }
-
-export default QueryTitle;
-    

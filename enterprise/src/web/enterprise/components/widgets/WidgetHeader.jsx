@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
+import EditableTitle from 'enterprise/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
 
-const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, title }) => (
+const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, onRename, title }) => (
   <div className={styles.widgetHeader}>
-    <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}{title}
+    <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}
+    <EditableTitle value={title} onChange={onRename} />
     {children}
     <span className={`pull-right ${styles.widgetActionDropdown}`}>
       <Dropdown componentClass="span" id="widget-action-dropdown">
@@ -16,7 +18,6 @@ const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, 
         <Dropdown.Menu className={styles.widgetActionDropdownMenu}>
           <MenuItem header>Actions</MenuItem>
           <MenuItem onSelect={onToggleEdit}>{editing ? 'Finish Editing' : 'Edit'}</MenuItem>
-          <MenuItem>Rename</MenuItem>
           <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>Delete</MenuItem>
