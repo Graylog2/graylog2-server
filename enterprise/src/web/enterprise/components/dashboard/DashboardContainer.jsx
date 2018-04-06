@@ -46,6 +46,11 @@ const DashboardContainer = createReactClass({
 
     const viewDashboardWidgets = dashboardWidgets.get(view.get('id'));
 
+    if (!viewDashboardWidgets) {
+      // No dashboard widgets defined
+      return null;
+    }
+
     const widgetsWithResults = viewDashboardWidgets.map((value, widgetId) => {
       let m = new Immutable.Map();
       m = m.set('widget', widgetDefs.getIn([value.queryId, widgetId]));
