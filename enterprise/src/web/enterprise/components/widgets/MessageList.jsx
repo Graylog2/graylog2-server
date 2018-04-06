@@ -25,7 +25,7 @@ const MessageList = createReactClass({
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
-    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fields: PropTypes.instanceOf(Immutable.Map).isRequired,
     pageSize: PropTypes.number.isRequired,
   },
 
