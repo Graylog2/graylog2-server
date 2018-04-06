@@ -90,12 +90,14 @@ const DashboardContainer = createReactClass({
     const { widgets, dashboardWidgets, widgetMapping, results, view } = this.props;
     const widgetGrid = this.renderWidgetGrid(widgets, dashboardWidgets, widgetMapping, results.results, view);
 
+    const { title, summary } = view.toJS();
+
     return (
-      <DocumentTitle title="Dashboard Title">
+      <DocumentTitle title={`${title} - Dashboard`}>
         <span>
-          <PageHeader title="Dashboard Title">
+          <PageHeader title={`${title} - Dashboard`}>
             <span>
-               Dashboard description.
+              {summary}
             </span>
 
             {null}
