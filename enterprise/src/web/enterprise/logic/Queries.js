@@ -7,7 +7,7 @@ import QueriesStore from 'enterprise/stores/QueriesStore';
 import WidgetActions from 'enterprise/actions/WidgetActions';
 // eslint-disable-next-line no-unused-vars
 import WidgetStore from 'enterprise/stores/WidgetStore';
-import { resultHistogram } from 'enterprise/logic/Widget';
+import { messageList, resultHistogram } from 'enterprise/logic/Widget';
 import SelectedFieldsActions from '../actions/SelectedFieldsActions';
 import CurrentViewStore from '../stores/CurrentViewStore';
 
@@ -24,7 +24,7 @@ export const _defaultWidgets = () => {
   return [
     resultHistogram(uuid()),
     //dataTable(uuid()),
-    //messageList(uuid(), undefined, ['source', 'message'])
+    messageList(uuid(), undefined, ['source', 'message']),
   ];
 };
 

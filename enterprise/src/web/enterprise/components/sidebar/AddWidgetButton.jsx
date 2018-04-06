@@ -17,29 +17,39 @@ const AddWidgetButton = createReactClass({
     return {};
   },
 
-  handleWidget(type, title) {
-    return () => {
-      console.log('CREATE', type, title);
-      WidgetActions.create(this.props.viewId, this.props.queryId, {
-        id: uuid(),
-        title: title,
-        type: type,
-        config: {
-          title: title,
-          triggered: false,
-          bgColor: '#8bc34a',
-          triggeredBgColor: '#d32f2f',
-          text: 'OK',
-        },
-      });
-    };
+  onCreateAlertStatus() {
+    WidgetActions.create(this.props.viewId, this.props.queryId, {
+      id: uuid(),
+      title: 'Alert Status',
+      type: 'ALERT_STATUS',
+      config: {
+        title: 'Alert Status',
+        triggered: false,
+        bgColor: '#8bc34a',
+        triggeredBgColor: '#d32f2f',
+        text: 'OK',
+      },
+    });
+  },
+
+  onCreateMessageTable() {
+    WidgetActions.create(this.props.viewId, this.props.queryId, {
+      id: uuid(),
+      title: 'Messages',
+      type: 'MESSAGES',
+      config: {
+        fields: [],
+        showMessageRow: true,
+      },
+    });
   },
 
   render() {
     return (
       <div>
         <DropdownButton title="Add Widget">
-          <MenuItem onSelect={this.handleWidget('ALERT_STATUS', 'Alert Status')}>Alert Status</MenuItem>
+          <MenuItem onSelect={this.onCreateAlertStatus}>Alert Status</MenuItem>
+          <MenuItem onSelect={this.onCreateMessageTable}>Message Table</MenuItem>
         </DropdownButton>
       </div>
     );

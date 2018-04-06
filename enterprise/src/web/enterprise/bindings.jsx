@@ -39,8 +39,8 @@ export default {
     {
       type: 'MESSAGES',
       displayName: 'Message List',
-      defaultHeight: 4,
-      defaultWidth: 4,
+      defaultHeight: 5,
+      defaultWidth: 6,
       visualizationComponent: MessageList,
       searchResultTransformer: data => data[0],
       searchTypes: () => [{ type: 'messages' }],

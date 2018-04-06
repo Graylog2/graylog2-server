@@ -12,6 +12,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 import QueriesStore from 'enterprise/stores/QueriesStore';
+import CurrentSelectedFieldsStore from '../../stores/CurrentSelectedFieldsStore';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const { ConfigurationsStore } = CombinedProvider.get('Configurations');
@@ -30,6 +31,7 @@ const MessageList = createReactClass({
 
   mixins: [
     Reflux.connect(ConfigurationsStore, 'configurations'),
+    Reflux.connect(CurrentSelectedFieldsStore, 'selectedFields'),
     Reflux.connect(CurrentViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
   ],
@@ -84,7 +86,7 @@ const MessageList = createReactClass({
           index: m.index,
         };
       });
-    const selectedFields = this.props.fields;
+    const { selectedFields } = this.state;
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
     return (
       <span>

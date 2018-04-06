@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
-import moment from 'moment';
 
 import { Spinner } from 'components/common';
-import WidgetHeader from 'components/widgets/WidgetHeader';
 
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import ViewsActions from 'enterprise/actions/ViewsActions';
@@ -13,9 +10,6 @@ import ViewsActions from 'enterprise/actions/ViewsActions';
 import WidgetGrid from 'enterprise/components/WidgetGrid';
 import SideBar from 'enterprise/components/SideBar';
 import { AddWidgetButton, FieldList } from 'enterprise/components/sidebar/index';
-import MessageList from 'enterprise/components/widgets/MessageList';
-
-import style from 'pages/ShowDashboardPage.css';
 
 const _onPositionsChange = (positions, view, queryId) => {
   const newPositions = {};
@@ -50,41 +44,25 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields,
                 widgets={widgets}
                 positions={positions}
                 data={data}
-                onPositionsChange={positions => _onPositionsChange(positions, view, queryId)} />
+                onPositionsChange={p => _onPositionsChange(p, view, queryId)} />
   );
 };
 
-const _extractMessages = (searchTypes) => {
-  return new Immutable.Map(searchTypes).find(searchType => searchType.type.toLocaleUpperCase() === 'MESSAGES');
-};
-
-const Query = ({ fields, onToggleMessages, results, selectedFields, showMessages, view, widgetMapping, widgets, query }) => {
+const Query = ({ fields, results, selectedFields, view, widgetMapping, widgets, query }) => {
   if (results) {
     const queryId = query.get('id');
     const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields, queryId);
-    const messages = _extractMessages(results.searchTypes);
-    const calculatedAt = moment().toISOString();
     return (
       <span>
         <Col md={2} style={{ paddingLeft: 0, paddingRight: 10 }}>
           <AddWidgetButton viewId={view.get('id')} queryId={queryId} />
           <SideBar>
-            <FieldList queryId={queryId}
-                       selectedFields={selectedFields}
+            <FieldList selectedFields={selectedFields}
                        fields={fields} />
           </SideBar>
         </Col>
         <Col md={10}>
           {widgetGrid}
-          <div className="dashboard" style={{ marginLeft: -20 }}>
-            <div className={style.widgetContainer}>
-              <div className="widget">
-                <span style={{ fontSize: 10 }} onClick={onToggleMessages}><i className="fa fa-bars pull-right" /></span>
-                {showMessages ? <WidgetHeader title="Messages" calculatedAt={calculatedAt} /> : <span style={{ fontSize: 12 }}>Messages</span>}
-                {showMessages && <MessageList data={messages} fields={selectedFields} pageSize={100} /> }
-              </div>
-            </div>
-          </div>
         </Col>
       </span>
     );
