@@ -19,6 +19,7 @@ public abstract class ViewStateDTO {
     static final String FIELD_WIDGETS = "widgets";
     static final String FIELD_WIDGET_MAPPING = "widget_mapping";
     static final String FIELD_WIDGET_POSITIONS = "positions";
+    static final String FIELD_DASHBOARD_WIDGET_POSITIONS = "dashboard_positions";
 
     @JsonProperty(FIELD_SELECTED_FIELDS)
     public abstract Set<String> fields();
@@ -34,6 +35,9 @@ public abstract class ViewStateDTO {
 
     @JsonProperty(FIELD_WIDGET_POSITIONS)
     public abstract Map<String, WidgetPositionDTO> widgetPositions();
+
+    @JsonProperty(FIELD_DASHBOARD_WIDGET_POSITIONS)
+    public abstract Map<String, WidgetPositionDTO> dashboardWidgetPositions();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -52,11 +56,16 @@ public abstract class ViewStateDTO {
         @JsonProperty(FIELD_WIDGET_POSITIONS)
         public abstract Builder widgetPositions(Map<String, WidgetPositionDTO> widgetPositions);
 
+        @JsonProperty(FIELD_DASHBOARD_WIDGET_POSITIONS)
+        public abstract Builder dashboardWidgetPositions(Map<String, WidgetPositionDTO> dashboardWidgetPositions);
+
         public abstract ViewStateDTO build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_ViewStateDTO.Builder().titles(Collections.emptyMap());
+            return new AutoValue_ViewStateDTO.Builder()
+                    .dashboardWidgetPositions(Collections.emptyMap())
+                    .titles(Collections.emptyMap());
         }
     }
 }
