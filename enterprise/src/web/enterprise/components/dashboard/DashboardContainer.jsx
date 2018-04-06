@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
-import { Accordion, Button, Col, Panel, Row } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidgetGrid';
@@ -113,25 +113,6 @@ const DashboardContainer = createReactClass({
               <Button onClick={this.props.toggle} >Queries</Button>
             </span>
           </PageHeader>
-
-          <Row className="content">
-            <Col md={12}>
-              <Accordion>
-                <Panel header="Store content" eventKey="1">
-                  <pre>
-                    {JSON.stringify(this.props, null, 2)}
-                  </pre>
-                </Panel>
-              </Accordion>
-              <Accordion>
-                <Panel header="Results" eventKey="1">
-                  <pre>
-                    {JSON.stringify(this.props.results.results, null, 2)}
-                  </pre>
-                </Panel>
-              </Accordion>
-            </Col>
-          </Row>
 
           {widgetGrid}
         </span>
