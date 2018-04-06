@@ -26,4 +26,9 @@ export default Reflux.createStore({
     this.widgets = this.widgets.setIn([viewId, widgetId], { viewId: viewId, queryId: queryId, widgetId: widgetId });
     this._trigger();
   },
+
+  removeFromDashboard(viewId, widgetId) {
+    this.widgets = this.widgets.deleteIn([viewId, widgetId]);
+    this._trigger();
+  },
 });

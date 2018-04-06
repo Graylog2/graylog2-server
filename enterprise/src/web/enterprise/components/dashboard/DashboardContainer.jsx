@@ -6,9 +6,10 @@ import Immutable from 'immutable';
 import { Accordion, Button, Col, Panel, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import WidgetGrid from 'enterprise/components/WidgetGrid';
+import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidgetGrid';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import ViewsActions from 'enterprise/actions/ViewsActions';
+import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
 
 const DashboardContainer = createReactClass({
   propTypes: {
@@ -37,6 +38,10 @@ const DashboardContainer = createReactClass({
     });
     const updatedView = view.set('dashboardPositions', newPositions);
     ViewsActions.update(updatedView.get('id'), updatedView);
+  },
+
+  handleWidgetDelete(viewId, widgetId) {
+    DashboardWidgetsActions.removeFromDashboard(viewId, widgetId);
   },
 
   renderWidgetGrid(widgetDefs, dashboardWidgets, widgetMapping, queryResults, view) {
@@ -77,12 +82,14 @@ const DashboardContainer = createReactClass({
     });
     const positions = view.get('dashboardPositions');
     return (
-      <WidgetGrid fields={fields}
-                  locked={false}
-                  widgets={widgets}
-                  positions={positions}
-                  data={data}
-                  onPositionsChange={p => this.handlePositionsChange(p, view)} />
+      <DashboardWidgetGrid fields={fields}
+                           viewId={view.get('id')}
+                           locked={false}
+                           widgets={widgets}
+                           positions={positions}
+                           data={data}
+                           onWidgetDelete={widget => this.handleWidgetDelete(view.get('id'), widget)}
+                           onPositionsChange={p => this.handlePositionsChange(p, view)} />
     );
   },
 
