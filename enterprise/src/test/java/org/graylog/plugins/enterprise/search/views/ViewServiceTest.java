@@ -19,6 +19,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -66,10 +68,12 @@ public class ViewServiceTest {
                 .description("This contains lots of descriptions for the view.")
                 .searchId("abc123")
                 .properties(ImmutableSet.of("read-only"))
+                .state(Collections.emptyMap())
                 .build();
         final ViewDTO dto2 = ViewDTO.builder()
                 .title("View 2")
                 .searchId("abc123")
+                .state(Collections.emptyMap())
                 .build();
 
         final ViewDTO savedDto1 = dbService.save(dto1);
@@ -105,11 +109,11 @@ public class ViewServiceTest {
                 .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
                 .build();
 
-        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").build());
-        dbService.save(ViewDTO.builder().title("View B").searchId("abc123").build());
-        dbService.save(ViewDTO.builder().title("View C").searchId("abc123").build());
-        dbService.save(ViewDTO.builder().title("View D").searchId("abc123").build());
-        dbService.save(ViewDTO.builder().title("View E").searchId("abc123").build());
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).build());
+        dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).build());
+        dbService.save(ViewDTO.builder().title("View C").searchId("abc123").state(Collections.emptyMap()).build());
+        dbService.save(ViewDTO.builder().title("View D").searchId("abc123").state(Collections.emptyMap()).build());
+        dbService.save(ViewDTO.builder().title("View E").searchId("abc123").state(Collections.emptyMap()).build());
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
@@ -142,8 +146,8 @@ public class ViewServiceTest {
 
     @Test
     public void saveAndGetDefault() {
-        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").build());
-        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").searchId("abc123").build());
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).build());
 
         dbService.saveDefault(savedView2);
 
@@ -153,7 +157,7 @@ public class ViewServiceTest {
                 .extracting("id", "title")
                 .containsExactly(savedView2.id(), "View B");
 
-        assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").searchId("abc123").build()))
+        assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").searchId("abc123").state(Collections.emptyMap()).build()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
