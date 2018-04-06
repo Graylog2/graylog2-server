@@ -5,7 +5,7 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 import EditableTitle from 'enterprise/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
 
-const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, onRename, title }) => (
+const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, onRename, onAddToDashboard, title }) => (
   <div className={styles.widgetHeader}>
     <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}
     <EditableTitle value={title} onChange={onRename} />
@@ -20,6 +20,8 @@ const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, 
           <MenuItem onSelect={onToggleEdit}>{editing ? 'Finish Editing' : 'Edit'}</MenuItem>
           <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
           <MenuItem divider />
+          <MenuItem onSelect={onAddToDashboard}>Add to dashboard</MenuItem>
+          <MenuItem divider />
           <MenuItem onSelect={onDelete}>Delete</MenuItem>
         </Dropdown.Menu>
       </Dropdown>
@@ -33,6 +35,7 @@ WidgetHeader.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onDuplicate: PropTypes.func.isRequired,
   onToggleEdit: PropTypes.func.isRequired,
+  onAddToDashboard: PropTypes.func.isRequired,
   title: PropTypes.node.isRequired,
 };
 

@@ -28,13 +28,14 @@ const mutateWidgets = (widgets) => {
 };
 
 const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search, titles) => {
-  const { positions, title, summary, description } = view.toJS();
+  const { positions, dashboardPositions, title, summary, description } = view.toJS();
   const { widgetMapping } = search.result.searchRequest;
   const { search_id } = search.result.result;
   const state = widgets.map((queryWidgets, queryId) => {
     return {
       widgets: mutateWidgets(queryWidgets.valueSeq()).toJS(),
       positions: positions[queryId] || {},
+      dashboard_positions: dashboardPositions || {},
       widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
       selected_fields: fields.get(queryId).toJS(),
       titles: titles.get(queryId, new Immutable.Map()),

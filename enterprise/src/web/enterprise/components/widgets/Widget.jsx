@@ -49,6 +49,10 @@ export default class Widget extends React.Component {
     this.setState(state => ({ editing: !state.editing }));
   };
 
+  _onAddToDashboard = (widgetId) => {
+    CurrentWidgetsActions.addToDashboard(widgetId);
+  };
+
   _onWidgetConfigChange = (widgetId, config) => {
     CurrentWidgetsActions.updateConfig(widgetId, config);
   };
@@ -65,6 +69,7 @@ export default class Widget extends React.Component {
                       onDelete={() => this._onDelete(widget)}
                       onDuplicate={() => this._onDuplicate(id)}
                       onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
+                      onAddToDashboard={() => this._onAddToDashboard(id)}
                       editing={editing} />
         <VisComponent id={id}
                       editing={editing}

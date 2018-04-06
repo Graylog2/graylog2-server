@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 
 import CurrentWidgetsActions from 'enterprise/actions/CurrentWidgetsActions';
 import WidgetActions from '../actions/WidgetActions';
+import DashboardWidgetsActions from '../actions/DashboardWidgetsActions';
 import CurrentViewStore from './CurrentViewStore';
 
 export default Reflux.createStore({
@@ -40,5 +41,11 @@ export default Reflux.createStore({
     const promise = WidgetActions.remove.triggerPromise(this.selectedView, this.selectedQuery, widgetId);
     CurrentWidgetsActions.remove.promise(promise);
     return promise;
-  }
+  },
+
+  addToDashboard(widgetId) {
+    const promise = DashboardWidgetsActions.addToDashboard.triggerPromise(this.selectedView, this.selectedQuery, widgetId);
+    CurrentWidgetsActions.addToDashboard.promise(promise);
+    return promise;
+  },
 });
