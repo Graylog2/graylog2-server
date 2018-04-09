@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import uuid from 'uuid/v4';
+import ObjectID from 'bson-objectid';
 
 import ViewsActions from 'enterprise/actions/ViewsActions';
 import CurrentViewActions from 'enterprise/actions/CurrentViewActions';
@@ -12,7 +12,7 @@ export default Reflux.createStore({
   views: new Immutable.Map(),
 
   init() {
-    const id = uuid();
+    const id = ObjectID();
     this.views = this.views.set(id, new Immutable.Map({ id: id, positions: {} }));
     CurrentViewActions.selectView(id);
     const defaultQuery = createEmptyQuery(id);
