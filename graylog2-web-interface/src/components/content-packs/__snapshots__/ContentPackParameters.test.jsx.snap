@@ -1,0 +1,534 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackParameters /> should render a parameter 1`] = `
+<div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-lg-8"
+    >
+      <h2>
+        Create parameters
+      </h2>
+      <br />
+      <form
+        className="form-horizontal content-selection-form"
+        id="content-selection-form"
+        onSubmit={[Function]}
+      >
+        <fieldset>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="title"
+            >
+              Title
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="title"
+                label="Title"
+                maxLength={250}
+                name="title"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                Give a descriptive title for this content pack.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="name"
+            >
+              Name
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="name"
+                label="Name"
+                maxLength={250}
+                name="name"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                This is used as the parameter reference and must not contain a space.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="description"
+            >
+              Description
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="description"
+                label="Description"
+                maxLength={250}
+                name="description"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                Give a description explaining what will be done with this parameter.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="value_type"
+            >
+              Value Type
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <select
+                className="form-control"
+                id="value_type"
+                label="Value Type"
+                maxLength={250}
+                name="value_type"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="select"
+                value="string"
+              >
+                <option
+                  value="string"
+                >
+                  String
+                </option>
+                <option
+                  value="integer"
+                >
+                  Integer
+                </option>
+                <option
+                  value="ipv4Address"
+                >
+                  IPv4 Address
+                </option>
+                <option
+                  value="ipv6Address"
+                >
+                  IPv6 Address
+                </option>
+                <option
+                  value="port"
+                >
+                  port
+                </option>
+              </select>
+              <span
+                className="help-block"
+              >
+                Give the type of the parameter.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="default_value"
+            >
+              Default value
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="default_value"
+                label="Default value"
+                maxLength={250}
+                name="default_value"
+                onChange={[Function]}
+                placeholder=""
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                Give a default value if the parameter is not optional.
+              </span>
+            </div>
+          </div>
+          <button
+            className="btn btn-info"
+            disabled={false}
+            type="submit"
+          >
+            Add Parameter
+          </button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className=""
+    >
+      <h2>
+        Parameters list
+      </h2>
+      <br />
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="parameter-list"
+            >
+              <table
+                className="table undefined"
+              >
+                <thead>
+                  <tr>
+                    <th>
+                      Title
+                    </th>
+                    <th>
+                      Name
+                    </th>
+                    <th>
+                      Description
+                    </th>
+                    <th>
+                      Value Type
+                    </th>
+                    <th>
+                      Default Value
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      A parameter title
+                    </td>
+                    <td>
+                      A parameter name
+                    </td>
+                    <td>
+                      A parameter descriptions
+                    </td>
+                    <td>
+                      string
+                    </td>
+                    <td>
+                      test
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-primary"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
+<div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-lg-8"
+    >
+      <h2>
+        Create parameters
+      </h2>
+      <br />
+      <form
+        className="form-horizontal content-selection-form"
+        id="content-selection-form"
+        onSubmit={[Function]}
+      >
+        <fieldset>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="title"
+            >
+              Title
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="title"
+                label="Title"
+                maxLength={250}
+                name="title"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                Give a descriptive title for this content pack.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="name"
+            >
+              Name
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="name"
+                label="Name"
+                maxLength={250}
+                name="name"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                This is used as the parameter reference and must not contain a space.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="description"
+            >
+              Description
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="description"
+                label="Description"
+                maxLength={250}
+                name="description"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                Give a description explaining what will be done with this parameter.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="value_type"
+            >
+              Value Type
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <select
+                className="form-control"
+                id="value_type"
+                label="Value Type"
+                maxLength={250}
+                name="value_type"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="select"
+                value="string"
+              >
+                <option
+                  value="string"
+                >
+                  String
+                </option>
+                <option
+                  value="integer"
+                >
+                  Integer
+                </option>
+                <option
+                  value="ipv4Address"
+                >
+                  IPv4 Address
+                </option>
+                <option
+                  value="ipv6Address"
+                >
+                  IPv6 Address
+                </option>
+                <option
+                  value="port"
+                >
+                  port
+                </option>
+              </select>
+              <span
+                className="help-block"
+              >
+                Give the type of the parameter.
+              </span>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <label
+              className="col-sm-3 control-label"
+              htmlFor="default_value"
+            >
+              Default value
+            </label>
+            <div
+              className="col-sm-9"
+            >
+              <input
+                className="form-control"
+                id="default_value"
+                label="Default value"
+                maxLength={250}
+                name="default_value"
+                onChange={[Function]}
+                placeholder=""
+                type="text"
+                value=""
+              />
+              <span
+                className="help-block"
+              >
+                Give a default value if the parameter is not optional.
+              </span>
+            </div>
+          </div>
+          <button
+            className="btn btn-info"
+            disabled={false}
+            type="submit"
+          >
+            Add Parameter
+          </button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className=""
+    >
+      <h2>
+        Parameters list
+      </h2>
+      <br />
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="parameter-list"
+            >
+              <p>
+                No data available.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
