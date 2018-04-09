@@ -47,53 +47,6 @@ export default {
       searchTypes: () => [{ type: 'messages' }],
     },
     {
-      type: 'SEARCH_RESULT_CHART2',
-      displayName: 'Search result graph',
-      defaultHeight: 2,
-      defaultWidth: 4,
-      visualizationComponent: Histogram,
-      searchResultTransformer: data => data.find(d => d && d.type && d.type.toLocaleUpperCase() === 'DATE_HISTOGRAM'),
-      searchTypes: () => [{ type: 'messages' }, { type: 'date_histogram' }],
-    },
-    {
-      type: 'SEARCH_SIDEBAR',
-      displayName: 'Search result',
-      defaultHeight: 3,
-      defaultWidth: 1,
-      visualizationComponent: SearchSidebarWidget,
-    },
-    {
-      type: 'FIELD_HISTOGRAM',
-      displayName: 'Field Histogram',
-      defaultHeight: 1,
-      defaultWidth: 2,
-      visualizationComponent: Histogram,
-      searchResultTransformer: FieldHistogramTransformer,
-      searchTypes: config => [{
-        type: 'aggregation',
-        config: {
-          groups: [{
-            type: 'time',
-            field: 'timestamp',
-            interval: '1m',
-            metrics: [{
-              type: 'sum',
-              field: config.field,
-            }],
-          }],
-        },
-      }],
-    },
-    {
-      type: 'DATATABLE',
-      displayName: 'Results',
-      defaultHeight: 3,
-      defaultWidth: 2,
-      visualizationComponent: DataTable,
-      searchResultTransformer: data => data,
-      searchTypes: () => [],
-    },
-    {
       type: 'AGGREGATION',
       displayName: 'Results',
       defaultHeight: 4,
