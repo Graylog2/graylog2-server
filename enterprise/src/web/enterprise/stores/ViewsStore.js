@@ -12,7 +12,7 @@ export default Reflux.createStore({
   views: new Immutable.Map(),
 
   init() {
-    const id = ObjectID();
+    const id = ObjectID().toString();
     this.views = this.views.set(id, new Immutable.Map({ id: id, positions: {} }));
     CurrentViewActions.selectView(id);
     const defaultQuery = createEmptyQuery(id);
