@@ -1,0 +1,158 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ExpandableList /> should render with a Item 1`] = `
+<ul
+  className="list"
+>
+  <li
+    className="listItem"
+  >
+    <div
+      className="listItemContainer"
+    >
+      <label
+        className="checkbox-inline"
+        style={undefined}
+        title=""
+      >
+        <input
+          checked={false}
+          disabled={false}
+          type="checkbox"
+        />
+      </label>
+      <div
+        className="expandBoxContainer"
+      >
+        <div
+          className="fa-stack expandBox"
+          onClick={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <i
+            className="fa fa-circle-thin fa-stack-1x iconBackground"
+          />
+          <i
+            className="fa fa-stack-1x fa-angle-up"
+          />
+        </div>
+      </div>
+      <span
+        className="header"
+      >
+        Wheel of time
+      </span>
+    </div>
+    <div
+      className="expandableContent"
+    />
+  </li>
+</ul>
+`;
+
+exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
+<ul
+  className="list"
+>
+  <li
+    className="listItem"
+  >
+    <div
+      className="listItemContainer"
+    >
+      <label
+        className="checkbox-inline"
+        style={undefined}
+        title=""
+      >
+        <input
+          checked={false}
+          disabled={false}
+          type="checkbox"
+        />
+      </label>
+      <div
+        className="expandBoxContainer"
+      >
+        <div
+          className="fa-stack expandBox"
+          onClick={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <i
+            className="fa fa-circle-thin fa-stack-1x iconBackground"
+          />
+          <i
+            className="fa fa-stack-1x fa-angle-down"
+          />
+        </div>
+      </div>
+      <span
+        className="header"
+      >
+        Wheel of time
+      </span>
+    </div>
+    <div
+      className="expandableContent"
+    >
+      <ul
+        className="list"
+      >
+        <li
+          className="listItem"
+        >
+          <div
+            className="listItemContainer"
+          >
+            <label
+              className="checkbox-inline"
+              style={undefined}
+              title=""
+            >
+              <input
+                checked={false}
+                disabled={false}
+                type="checkbox"
+              />
+            </label>
+            <div
+              className="expandBoxContainer"
+            >
+              <div
+                className="fa-stack expandBox"
+                onClick={[Function]}
+                role="button"
+                tabIndex={0}
+              >
+                <i
+                  className="fa fa-circle-thin fa-stack-1x iconBackground"
+                />
+                <i
+                  className="fa fa-stack-1x fa-angle-up"
+                />
+              </div>
+            </div>
+            <span
+              className="header"
+            >
+              Edmonds Field
+            </span>
+          </div>
+          <div
+            className="expandableContent"
+          />
+        </li>
+      </ul>
+    </div>
+  </li>
+</ul>
+`;
+
+exports[`<ExpandableList /> should render with no children 1`] = `
+<ul
+  className="list"
+/>
+`;
