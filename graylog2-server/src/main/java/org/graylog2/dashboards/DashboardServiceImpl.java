@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -105,8 +106,9 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     public List<Dashboard> all() {
         final List<DBObject> results = query(DashboardImpl.class, new BasicDBObject());
 
-        return results.stream()
-                .map(o -> (Dashboard) new DashboardImpl((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap()))
+        final Stream<Dashboard> dashboardStream = results.stream()
+                .map(o -> (Dashboard) new DashboardImpl((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap()));
+        return dashboardStream
                 .collect(Collectors.toList());
     }
 
@@ -122,8 +124,9 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
                 .get();
         final List<DBObject> results = query(DashboardImpl.class, query);
 
-        return results.stream()
-                .map(o -> (Dashboard) new DashboardImpl((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap()))
+        final Stream<Dashboard> dashboardStream = results.stream()
+                .map(o -> (Dashboard) new DashboardImpl((ObjectId) o.get(DashboardImpl.FIELD_ID), o.toMap()));
+        return dashboardStream
                 .collect(Collectors.toSet());
     }
 

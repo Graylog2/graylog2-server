@@ -63,6 +63,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
@@ -124,8 +125,9 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                 .push(InputImpl.FIELD_ID)
                 .append("$in", objectIds)
                 .get();
-        return query(InputImpl.class, query).stream()
-                .map(o -> new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()))
+        final Stream<InputImpl> inputStream = query(InputImpl.class, query).stream()
+                .map(o -> new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+        return inputStream
                 .collect(Collectors.toSet());
     }
 
