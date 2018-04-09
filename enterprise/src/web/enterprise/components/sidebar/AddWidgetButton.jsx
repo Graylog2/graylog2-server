@@ -17,6 +17,19 @@ const AddWidgetButton = createReactClass({
     return {};
   },
 
+  onCreateAggregation() {
+    WidgetActions.create(this.props.viewId, this.props.queryId, {
+      id: uuid(),
+      type: 'AGGREGATION',
+      config: {
+        series: ['count()'],
+        rowPivots: ['timestamp'],
+        columnPivots: [],
+        sort: [],
+      },
+    });
+  },
+
   onCreateAlertStatus() {
     WidgetActions.create(this.props.viewId, this.props.queryId, {
       id: uuid(),
@@ -48,6 +61,7 @@ const AddWidgetButton = createReactClass({
     return (
       <div>
         <DropdownButton title="Add Widget">
+          <MenuItem onSelect={this.onCreateAggregation}>Aggregation</MenuItem>
           <MenuItem onSelect={this.onCreateAlertStatus}>Alert Status</MenuItem>
           <MenuItem onSelect={this.onCreateMessageTable}>Message Table</MenuItem>
         </DropdownButton>
