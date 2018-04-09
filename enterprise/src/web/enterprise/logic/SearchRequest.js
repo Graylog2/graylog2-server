@@ -11,7 +11,7 @@ const _streamFilters = (selectedStreams) => {
 const _filtersForQuery = (filters) => {
   const streamFilters = _streamFilters(filters.get('streams', []));
   if (streamFilters.length === 0) {
-    return {};
+    return null;
   }
 
   return {
