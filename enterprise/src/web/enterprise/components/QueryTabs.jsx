@@ -5,7 +5,7 @@ import { Tab, Tabs } from 'react-bootstrap';
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
 
-const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveFinished, onToggleDashboard }) => {
+const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView, onToggleDashboard }) => {
   const queryTitles = titles;
   const tabs = queries.toArray().map((query, index) => {
     const id = query.get('id');
@@ -24,7 +24,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
   return (
     <span>
       <span className="pull-right">
-        <QueryTabActions onToggleDashboard={onToggleDashboard} onSaveFinished={onSaveFinished}/>
+        <QueryTabActions onToggleDashboard={onToggleDashboard} onSaveView={onSaveView}/>
       </span>
       <Tabs
         id="QueryTabs"

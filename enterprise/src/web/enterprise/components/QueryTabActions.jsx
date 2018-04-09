@@ -1,17 +1,25 @@
 import React from 'react';
+import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+
 import DebugOverlay from 'enterprise/components/DebugOverlay';
-import SaveViewModal from './views/SaveViewModal';
+import ViewsStore from 'enterprise/stores/ViewsStore';
+import ViewPropertiesModal from './views/ViewPropertiesModal';
 
 const QueryTabActions = createReactClass({
   propTypes: {
-    onSaveFinished: PropTypes.func.isRequired,
+    onSaveView: PropTypes.func.isRequired,
     onToggleDashboard: PropTypes.func.isRequired,
   },
+  mixins: [
+    Reflux.connect(CurrentViewStore, 'currentView'),
+    Reflux.connect(ViewsStore, 'views'),
+  ],
 
   getInitialState() {
     return {
@@ -32,29 +40,37 @@ const QueryTabActions = createReactClass({
     this.setState({ debugOpen: false });
   },
 
-  handleSaveView() {
-    this.setState({ saveViewOpen: true });
+  handleSaveAs() {
+    this.setState({ saveAsViewOpen: true });
   },
 
-  handleSaveViewClose() {
-    this.setState({ saveViewOpen: false });
+  handleSaveAsViewClose() {
+    this.setState({ saveAsViewOpen: false });
   },
 
-  handleSaveFinished(view) {
-    this.props.onSaveFinished(view);
+  handleSaveView(view) {
+    this.props.onSaveView(view);
+  },
+
+  _isNewView(view) {
+    return !view.has('title');
   },
 
   render() {
+    const { views, currentView } = this.state;
+    const view = views.get(currentView.selectedView);
+    const onSave = () => this.handleSaveView(view);
     return (
       <span>
         <DropdownButton title="View Actions">
           <MenuItem onSelect={this.handleDashboardClick}>Dashboard</MenuItem>
-          <MenuItem onSelect={this.handleSaveView}>Save</MenuItem>
+          <MenuItem onSelect={onSave} disabled={this._isNewView(view)}>Save</MenuItem>
+          <MenuItem onSelect={this.handleSaveAs}>Save as</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
         </DropdownButton>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
-        <SaveViewModal show={this.state.saveViewOpen} onClose={this.handleSaveViewClose} onSaveFinished={this.handleSaveFinished}/>
+        <ViewPropertiesModal view={view} title="Save new view" onSave={this.handleSaveView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
       </span>
     );
   },
