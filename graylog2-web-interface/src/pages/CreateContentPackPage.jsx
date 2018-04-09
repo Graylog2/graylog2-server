@@ -2,14 +2,77 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import Routes from 'routing/Routes';
-import { Row, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
+import Wizard from 'components/common/Wizard';
+import ContentPackSelection from 'components/content-packs/ContentPackSelection';
+import ContentPackDependencyResolution from 'components/content-packs/ContentPackDependencyResolution';
+import ContentPackDetails from 'components/content-packs/ContentPackDetails';
+import CombinedProvider from 'injection/CombinedProvider';
+import ContentPackPreview from 'components/content-packs/ContentPackPreview';
+import ContentPackParameters from 'components/content-packs/ContentPackParameters';
+
+const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 
 const CreateContentPackPage = createReactClass({
   displayName: 'ShowContentPackPage',
 
+  getInitialState() {
+    return {
+      contentPack: {
+        v: 1,
+        id: this._getUUID(),
+        rev: 1,
+        requires: [],
+        parameters: [],
+        entities: [],
+      },
+      selectedStep: undefined,
+    };
+  },
+
+  _getUUID() {
+    const s4 = () => {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    };
+    return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
+  },
+
+  _onStateChanged(updatedPack) {
+    this.setState({ contentPack: updatedPack });
+  },
+
+  _onSave() {
+    ContentPacksActions.create.triggerPromise(this.state.contentPack)
+      .then(
+        () => {
+          UserNotification.success('Content pack imported successfully', 'Success!');
+        },
+        (response) => {
+          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
+            'Graylog logs for more information.';
+          const title = 'Could not import content pack';
+          let smallMessage = '';
+          if (response.additional && response.additional.body && response.additional.body.message) {
+            smallMessage = `<br /><small>${response.additional.body.message}</small>`;
+          }
+          UserNotification.error(message + smallMessage, title);
+        });
+  },
+
   render() {
+    const steps = [
+      { key: 'selection', title: 'Content Selection', component: (<ContentPackSelection contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />) },
+      { key: 'dependency', title: 'Dependency Resolution', component: (<ContentPackDependencyResolution contentPack={this.state.contentPack} />) },
+      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />) },
+      { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />) },
+    ];
+
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -29,12 +92,16 @@ const CreateContentPackPage = createReactClass({
               </LinkContainer>
             </div>
           </PageHeader>
-          <Row />
+          <Wizard steps={steps}>
+            <div>
+              <ContentPackDetails contentPack={this.state.contentPack} />
+            </div>
+          </Wizard>
+          <textarea value={JSON.stringify(this.state.contentPack)} />
         </span>
       </DocumentTitle>
     );
   },
-
 });
 
 export default CreateContentPackPage;
