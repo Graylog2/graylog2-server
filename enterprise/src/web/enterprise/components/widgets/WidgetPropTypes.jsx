@@ -15,7 +15,7 @@ export const Widget = PropTypes.shape({
 
 export const WidgetsMap = PropTypes.objectOf(Widget);
 
-export const WidgetData = PropTypes.oneOf([
+export const WidgetData = PropTypes.oneOfType([
   PropTypes.arrayOf(
     PropTypes.shape({
       results: PropTypes.array.isRequired,
