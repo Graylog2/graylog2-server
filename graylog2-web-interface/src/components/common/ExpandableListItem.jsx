@@ -42,6 +42,7 @@ class ExpandableListItem extends React.Component {
     expanded: false,
     selectable: true,
     children: [],
+    subheader: undefined,
   };
 
   state = {
