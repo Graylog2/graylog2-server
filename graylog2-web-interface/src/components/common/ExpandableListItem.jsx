@@ -11,8 +11,13 @@ class ExpandableListItem extends React.Component {
   static propTypes = {
     /** Is the Item checked */
     checked: PropTypes.bool,
-    /** TODO: i do not know what this means */
-    undetermined: PropTypes.bool,
+    /**
+     * Indicates whether the checkbox on this item should be in an indetermined state or not.
+     * This is mostly helpful to represent cases where the element is only partially checked,
+     * for instance when ExpandableListItem's child is an ExpandableList and some of its items
+     * are checked, but others are not.
+     */
+    indetermined: PropTypes.bool,
     /** Is the item selectable */
     selectable: PropTypes.bool,
     /** Is the Item expandable */
@@ -32,7 +37,7 @@ class ExpandableListItem extends React.Component {
 
   static defaultProps = {
     checked: false,
-    undetermined: false,
+    indetermined: false,
     expandable: true,
     expanded: false,
     selectable: true,
@@ -46,8 +51,8 @@ class ExpandableListItem extends React.Component {
   };
 
   componentDidMount() {
-    if (this.props.undetermined && this._checkbox) {
-      this._checkbox.indeterminate = this.props.undetermined;
+    if (this.props.indetermined && this._checkbox) {
+      this._checkbox.indeterminate = this.props.indetermined;
     }
   }
 
@@ -57,7 +62,7 @@ class ExpandableListItem extends React.Component {
     }
 
     if (this._checkbox) {
-      this._checkbox.indeterminate = this.props.undetermined;
+      this._checkbox.indeterminate = this.props.indetermined;
     }
   }
 
@@ -68,7 +73,7 @@ class ExpandableListItem extends React.Component {
   };
 
   _filterInputProps = (props) => {
-    const { expanded, undetermined, ...inputProps } = props;
+    const { expanded, indetermined, ...inputProps } = props;
     return inputProps;
   };
 
