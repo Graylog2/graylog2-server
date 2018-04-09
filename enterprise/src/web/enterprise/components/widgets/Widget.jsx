@@ -13,15 +13,20 @@ export default class Widget extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     widget: PropTypes.shape({
-      computationTimeRange: PropTypes.object.isRequired,
+      computationTimeRange: PropTypes.object,
       config: PropTypes.object.isRequired,
     }).isRequired,
     data: PropTypes.any.isRequired,
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
+    height: PropTypes.number,
+    width: PropTypes.number,
     fields: PropTypes.any.isRequired,
     onSizeChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
+  };
+
+  static defaultProps = {
+    height: 1,
+    width: 1,
   };
 
   static _visualizationForType(type) {

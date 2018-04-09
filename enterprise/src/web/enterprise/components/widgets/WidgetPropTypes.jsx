@@ -15,10 +15,13 @@ export const Widget = PropTypes.shape({
 
 export const WidgetsMap = PropTypes.objectOf(Widget);
 
-export const WidgetData = PropTypes.arrayOf(
-  PropTypes.shape({
-    results: PropTypes.array.isRequired,
-  }),
+export const WidgetData = PropTypes.oneOf(
+  PropTypes.arrayOf(
+    PropTypes.shape({
+      results: PropTypes.array.isRequired,
+    }),
+  ),
+  PropTypes.object,
 );
 
 export const WidgetDataMap = PropTypes.objectOf(WidgetData);

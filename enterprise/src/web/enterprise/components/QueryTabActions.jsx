@@ -71,7 +71,7 @@ const QueryTabActions = createReactClass({
     const onSave = () => this.handleSaveView(view);
     return (
       <span>
-        <DropdownButton title="View Actions">
+        <DropdownButton title="View Actions" id="query-tab-actions-dropdown">
           <MenuItem onSelect={this.handleDashboardClick}>Dashboard</MenuItem>
           <MenuItem onSelect={this.handleEdit} disabled={this._isNewView(view)}>Edit</MenuItem>
           <MenuItem onSelect={onSave} disabled={this._isNewView(view)}>Save</MenuItem>

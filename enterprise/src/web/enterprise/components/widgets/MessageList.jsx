@@ -8,6 +8,7 @@ import { MessageTableEntry } from 'enterprise/components/messagelist';
 import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
 
+import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
@@ -17,6 +18,8 @@ import CurrentSelectedFieldsStore from '../../stores/CurrentSelectedFieldsStore'
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const { ConfigurationsStore } = CombinedProvider.get('Configurations');
 const RefreshActions = ActionsProvider.getActions('Refresh');
+
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 const MessageList = createReactClass({
   displayName: 'MessageList',
@@ -35,6 +38,12 @@ const MessageList = createReactClass({
     Reflux.connect(CurrentViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
   ],
+
+  getDefaultProps() {
+    return {
+      pageSize: UniversalSearchStore.DEFAULT_LIMIT,
+    };
+  },
 
   getInitialState() {
     return {

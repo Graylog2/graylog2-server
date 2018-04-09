@@ -6,8 +6,12 @@ import styles from './EditableTitle.css';
 export default class EditableTitle extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
+    onClose: PropTypes.func,
     value: PropTypes.string.isRequired,
+  };
+
+  static defaultProps = {
+    onClose: () => {},
   };
 
   state = {

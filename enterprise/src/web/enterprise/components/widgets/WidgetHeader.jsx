@@ -5,6 +5,33 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 import EditableTitle from 'enterprise/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
 
+/**
+ * This implements a custom toggle for a dropdown menu.
+ * See: "Custom Dropdown Components" in react-bootstrap documentation.
+ */
+class WidgetActionToggle extends React.Component {
+  static propTypes = {
+    onClick: PropTypes.func,
+  };
+
+  static defaultProps = {
+    onClick: () => {},
+  };
+
+  handleClick = (e) => {
+    e.preventDefault();
+    this.props.onClick(e);
+  };
+
+  render() {
+    return (
+      <span onClick={this.handleClick} role="presentation">
+        <i className={`fa fa-caret-down ${styles.widgetActionDropdownCaret}`} />
+      </span>
+    );
+  }
+}
+
 const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, onRename, onAddToDashboard, title }) => (
   <div className={styles.widgetHeader}>
     <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}
@@ -12,9 +39,7 @@ const WidgetHeader = ({ children, editing, onDelete, onDuplicate, onToggleEdit, 
     {children}
     <span className={`pull-right ${styles.widgetActionDropdown}`}>
       <Dropdown componentClass="span" id="widget-action-dropdown">
-        <span bsRole="toggle">
-          <i className={`fa fa-caret-down ${styles.widgetActionDropdownCaret}`} />
-        </span>
+        <WidgetActionToggle bsRole="toggle" />
         <Dropdown.Menu className={styles.widgetActionDropdownMenu}>
           <MenuItem header>Actions</MenuItem>
           <MenuItem onSelect={onToggleEdit}>{editing ? 'Finish Editing' : 'Edit'}</MenuItem>

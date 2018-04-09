@@ -6,6 +6,32 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import styles from './Field.css';
 
+/**
+ * This implements a custom toggle for a dropdown menu.
+ * See: "Custom Dropdown Components" in react-bootstrap documentation.
+ */
+class FieldToggle extends React.Component {
+  static propTypes = {
+    onClick: PropTypes.func,
+    children: PropTypes.node.isRequired,
+  };
+
+  static defaultProps = {
+    onClick: () => {},
+  };
+
+  handleClick = (e) => {
+    e.preventDefault();
+    this.props.onClick(e);
+  };
+
+  render() {
+    return (
+      <span onClick={this.handleClick} role="presentation" className={styles.dropdowntoggle}>{this.props.children}<span className="caret" /></span>
+    );
+  }
+}
+
 const Field = ({ children, interactive, name, queryId, viewId }) => {
   const element = children || name;
   if (interactive) {
@@ -17,7 +43,9 @@ const Field = ({ children, interactive, name, queryId, viewId }) => {
 
     return (
       <Dropdown id={`field-${name}-action-dropdown`}>
-        <span className={styles.dropdowntoggle} bsRole="toggle">{element}<span className="caret" /></span>
+        <FieldToggle bsRole="toggle">
+          {element}
+        </FieldToggle>
         <Dropdown.Menu style={{ paddingLeft: '5px', paddingRight: '5px', minWidth: 'max-content', color: '#666666' }}>
           <div style={{ marginBottom: '10px' }}>
             <span style={{
@@ -50,12 +78,13 @@ Field.propTypes = {
   interactive: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
   queryId: PropTypes.string.isRequired,
-  viewId: PropTypes.string.isRequired,
+  viewId: PropTypes.string,
 };
 
 Field.defaultProps = {
   children: null,
   interactive: false,
+  viewId: null,
 };
 
 export default Field;

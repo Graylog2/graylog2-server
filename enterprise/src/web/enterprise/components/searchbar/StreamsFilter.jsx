@@ -5,7 +5,7 @@ import { Col, Row } from 'react-bootstrap';
 import Select from 'components/common/Select';
 
 const StreamsFilter = ({ value, streams, onChange }) => {
-  const selectedStreams = (value || []).join(',');
+  const selectedStreams = value.join(',');
   return (
     <Row className="no-bm">
       <Col md={11} mdOffset={1}>
@@ -22,7 +22,7 @@ const StreamsFilter = ({ value, streams, onChange }) => {
 };
 
 StreamsFilter.propTypes = {
-  value: PropTypes.arrayOf(PropTypes.string).isRequired,
+  value: PropTypes.arrayOf(PropTypes.string),
   streams: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -30,6 +30,10 @@ StreamsFilter.propTypes = {
     }),
   ).isRequired,
   onChange: PropTypes.func.isRequired,
+};
+
+StreamsFilter.defaultProps = {
+  value: [],
 };
 
 export default StreamsFilter;

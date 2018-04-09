@@ -25,7 +25,7 @@ const GenericPlot = ({ chartData }) => (
 );
 
 GenericPlot.propTypes = {
-  chartData: PropTypes.object.isRequired,
+  chartData: PropTypes.array.isRequired,
 };
 
 export default GenericPlot;
