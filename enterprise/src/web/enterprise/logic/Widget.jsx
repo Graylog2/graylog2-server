@@ -7,25 +7,21 @@ export function widgetDefinition(type) {
     .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase())
 }
 
-export const messageList = (id, timeRange, fields) => {
+export const messageList = (id, fields = []) => {
   return {
     id: id,
     type: 'messages',
-    title: 'Messages',
     config: {
       fields: fields,
       showMessageRow: true,
     },
-    computationTimeRange: timeRange,
   };
 };
 
-export const resultHistogram = (id, timeRange = {}) => {
+export const resultHistogram = (id) => {
   return {
     id: id,
     type: 'AGGREGATION',
-    title: 'Histogram',
-    computationTimeRange: timeRange,
     config: {
       rowPivots: [
         'timestamp',
@@ -36,33 +32,6 @@ export const resultHistogram = (id, timeRange = {}) => {
       columnPivots: [],
       sort: [],
       visualization: 'bar',
-    },
-  };
-};
-
-export const searchSideBar = () => {
-  return {
-    type: 'SEARCH_SIDEBAR',
-    title: 'Search Result',
-    config: {},
-    data: 'messages',
-  };
-};
-
-export const dataTable = (id) => {
-  return {
-    id,
-    type: 'DATATABLE',
-    title: 'Results',
-    config: {
-      fields: ['action', 'controller', 'count'],
-      data: [
-        { action: 'index', controller: 'PostsController', count: 19016 },
-        { controller: 'UsersController', count: 1376 },
-        { action: 'login', controller: 'LoginController', count: 5156 },
-        { action: 'show', controller: 'PostsController', count: 5903 },
-        { action: 'edit', controller: 'PostsController', count: 922 },
-      ],
     },
   };
 };
