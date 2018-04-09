@@ -15,29 +15,30 @@ class ContentPackDetails extends React.Component {
 
   render() {
     const markdownDescription = markdown.toHTML(this.props.contentPack.description || '');
+    const contentPack = this.props.contentPack;
 
     return (
       <div id="content-pack-details">
-        <h2>Details</h2><small>Version: {this.props.contentPack.rev}</small>
+        <h2>Details</h2><small>Version: {contentPack.rev}</small>
         <div>
           <dl className="deflist">
-            <dt>Name:</dt> <dd>{this.props.contentPack.name}&nbsp;</dd>
-            <dt>Summary:</dt> <dd>{this.props.contentPack.summary}&nbsp;</dd>
-            <dt>Vendor:</dt> <dd>{this.props.contentPack.vendor}&nbsp;</dd>
-            <dt>URL:</dt> <dd><a href={this.props.contentPack.url}>{this.props.contentPack.url}</a>&nbsp;</dd>
-            { this.props.contentPack.id && (<span><dt>ID:</dt> <dd><code>{this.props.contentPack.id}</code></dd></span>) }
-            <dt>Parameters:</dt><dd>{this.props.contentPack.parameters.length}</dd>
+            <dt>Name:</dt> <dd>{contentPack.name}&nbsp;</dd>
+            <dt>Summary:</dt> <dd>{contentPack.summary}&nbsp;</dd>
+            <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
+            <dt>URL:</dt> <dd><a href={contentPack.url}>{contentPack.url}</a>&nbsp;</dd>
+            { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
+            { contentPack.parameter && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
           </dl>
         </div>
         <br />
-        { this.props.contentPack.status && <ContentPackStatus states={this.props.contentPack.states} /> }
+        { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
         <br />
         <br />
-        { this.props.contentPack.constraints &&
+        { contentPack.constraints &&
         <div>
           <h3>Constrains</h3>
           <br />
-          <ContentPackConstraints constraints={this.props.contentPack.constraints} />
+          <ContentPackConstraints constraints={contentPack.constraints} />
           <br />
         </div>
         }
