@@ -9,91 +9,71 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
   </h2>
   <small>
     Version: 
-    1.0
   </small>
-  <dl
-    className="deflist"
-  >
-    <dt>
-      Name:
-    </dt>
-     
-    <dd />
-    <dt>
-      Summary:
-    </dt>
-     
-    <dd>
-      This is a summary
-    </dd>
-    <dt>
-      Vendor:
-    </dt>
-     
-    <dd>
-      graylog.com
-    </dd>
-    <dt>
-      URL:
-    </dt>
-     
-    <dd>
-      <a
-        href="www.graylog.com"
-      >
-        www.graylog.com
-      </a>
-    </dd>
-    <dt>
-      ID:
-    </dt>
-     
-    <dd>
-      <code>
-        1
-      </code>
-    </dd>
-  </dl>
   <div>
-    <span
-      className="badge installed"
+    <dl
+      className="deflist"
     >
-      installed
-    </span>
-    <span
-      className="badge edited"
-    >
-      edited
-    </span>
-  </div>
-  <br />
-  <br />
-  <h2>
-    Constrains
-  </h2>
-  <br />
-  <div>
-    <div
-      className="row "
-    >
-      <div
-        className="col-md-12"
-      >
-        <div
-          className="data-table table-responsive"
-          id="content-packs-constraints"
+      <dt>
+        Name:
+      </dt>
+       
+      <dd>
+         
+      </dd>
+      <dt>
+        Summary:
+      </dt>
+       
+      <dd>
+        This is a summary
+         
+      </dd>
+      <dt>
+        Vendor:
+      </dt>
+       
+      <dd>
+        graylog.com
+         
+      </dd>
+      <dt>
+        URL:
+      </dt>
+       
+      <dd>
+        <a
+          href="www.graylog.com"
         >
-          <p>
-            No data available.
-          </p>
-        </div>
-      </div>
-    </div>
+          www.graylog.com
+        </a>
+         
+      </dd>
+      <span>
+        <dt>
+          ID:
+        </dt>
+         
+        <dd>
+          <code>
+            1
+          </code>
+        </dd>
+      </span>
+      <dt>
+        Parameters:
+      </dt>
+      <dd>
+        0
+      </dd>
+    </dl>
   </div>
   <br />
-  <h2>
+  <br />
+  <br />
+  <h3>
     Description
-  </h2>
+  </h3>
   <br />
   <div
     dangerouslySetInnerHTML={
