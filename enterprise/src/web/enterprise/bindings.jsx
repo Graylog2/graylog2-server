@@ -33,8 +33,9 @@ export default {
   ],
   navigation: [
     // Disabling navigation for extended search for now to avoid confusing alpha testers.
-    // { path: extendedSearchPath, description: 'Extended Search' },
-    // { path: viewsPath, description: 'Views' },
+    // TODO: Disable Views and ExtendedSearch menu items again for the next alpha release!
+    { path: extendedSearchPath, description: 'Extended Search' },
+    { path: viewsPath, description: 'Views' },
   ],
   enterpriseWidgets: [
     {
