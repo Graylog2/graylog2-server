@@ -5,6 +5,32 @@ import { Dropdown, MenuItem, Well } from 'react-bootstrap';
 
 import styles from './Value.css';
 
+/**
+ * This implements a custom toggle for a dropdown menu.
+ * See: "Custom Dropdown Components" in react-bootstrap documentation.
+ */
+class ValueToggle extends React.Component {
+  static propTypes = {
+    onClick: PropTypes.func,
+    children: PropTypes.node.isRequired,
+  };
+
+  static defaultProps = {
+    onClick: () => {},
+  };
+
+  handleClick = (e) => {
+    e.preventDefault();
+    this.props.onClick(e);
+  };
+
+  render() {
+    return (
+      <span onClick={this.handleClick} role="presentation" className={styles.dropdowntoggle}>{this.props.children}</span>
+    );
+  }
+}
+
 const Value = ({ children, field, value, queryId }) => {
   const element = children || value;
   const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
@@ -15,7 +41,9 @@ const Value = ({ children, field, value, queryId }) => {
 
   return (
     <Dropdown componentClass="span" id={`value-${field}-${value}-action-dropdown`}>
-      <span className={styles.dropdowntoggle} bsRole="toggle">{element}</span>
+      <ValueToggle bsRole="toggle">
+        {element}
+      </ValueToggle>
       <Dropdown.Menu style={{ paddingLeft: '5px', paddingRight: '5px', minWidth: 'max-content', color: '#666666' }}>
         <div style={{ marginBottom: '10px' }}>
           <span style={{
