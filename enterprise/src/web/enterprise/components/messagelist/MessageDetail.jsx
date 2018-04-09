@@ -9,6 +9,7 @@ import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'enterprise/components/messagelist';
 import { Spinner, ClipboardButton, Timestamp } from 'components/common';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
+import Link from 'enterprise/components/Link';
 
 import Routes from 'routing/Routes';
 
@@ -224,7 +225,7 @@ class MessageDetail extends React.Component {
     if (this.props.message.index) {
       messageTitle = (
         <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-          <a href="#">{this.props.message.id}</a>
+          <Link href="#">{this.props.message.id}</Link>
         </LinkContainer>
       );
     } else {
