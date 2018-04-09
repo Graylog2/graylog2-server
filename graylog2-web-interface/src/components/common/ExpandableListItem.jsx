@@ -36,6 +36,7 @@ class ExpandableListItem extends React.Component {
     expandable: true,
     expanded: false,
     selectable: true,
+    children: [],
   };
 
   state = {
@@ -88,7 +89,7 @@ class ExpandableListItem extends React.Component {
             </div>
           </div>
           }
-          <span className={style.header}>{header} <span className={style.subheader}>{subheader}</span></span>
+          <span className={style.header}>{header}{subheader && <span className={style.subheader}>{subheader}</span>}</span>
         </div>
         <div className={style.expandableContent}>
           {expanded && children}
