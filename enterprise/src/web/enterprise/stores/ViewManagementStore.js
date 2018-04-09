@@ -27,7 +27,24 @@ const mutateWidgets = (widgets) => {
   });
 };
 
-const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search, titles) => {
+const prepareDashboardWidgets = (widgets, positions) => {
+  if (!widgets) {
+    return null;
+  }
+
+  const newWidgets = {};
+
+  widgets.valueSeq().forEach((widget) => {
+    newWidgets[widget.widgetId] = {
+      query_id: widget.queryId,
+      widget_id: widget.widgetId,
+    };
+  });
+
+  return { widgets: newWidgets, positions: positions };
+};
+
+const _prepareViewRequest = (id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles) => {
   const { positions, dashboardPositions, title, summary, description } = view.toJS();
   const { widgetMapping } = search.result.searchRequest;
   const { search_id } = search.result.result;
@@ -35,12 +52,12 @@ const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search
     return {
       widgets: mutateWidgets(queryWidgets.valueSeq()).toJS(),
       positions: positions[queryId] || {},
-      dashboard_positions: dashboardPositions || {},
       widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
       selected_fields: fields.get(queryId).toJS(),
       titles: titles.get(queryId, new Immutable.Map()),
     };
   }).toJS();
+  const dashboardState = prepareDashboardWidgets(dashboardWidgets.get(view.get('id')) || new Immutable.Map(), dashboardPositions || {});
 
   return {
     id,
@@ -48,6 +65,7 @@ const _prepareViewRequest = (id, currentViewStore, view, widgets, fields, search
     summary,
     description,
     state,
+    dashboard_state: dashboardState,
     search_id,
   };
 };
@@ -78,8 +96,8 @@ const ViewStore = Reflux.createStore({
     ViewActions.get.promise(promise);
   },
 
-  save(id, currentViewStore, view, widgets, fields, search, titles) {
-    const request = _prepareViewRequest(id, currentViewStore, view, widgets, fields, search, titles);
+  save(id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles) {
+    const request = _prepareViewRequest(id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles);
     const promise = fetch('POST', viewsUrl, request);
     ViewActions.save.promise(promise);
   },

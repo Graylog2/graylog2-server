@@ -27,6 +27,7 @@ public abstract class ViewDTO {
     public static final String FIELD_SEARCH_ID = "search_id";
     public static final String FIELD_PROPERTIES = "properties";
     public static final String FIELD_STATE = "state";
+    public static final String FIELD_DASHBOARD_STATE = "dashboard_state";
     public static final String FIELD_CREATED_AT = "created_at";
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
@@ -57,6 +58,9 @@ public abstract class ViewDTO {
 
     @JsonProperty(FIELD_STATE)
     public abstract Map<String, ViewStateDTO> state();
+
+    @JsonProperty(FIELD_DASHBOARD_STATE)
+    public abstract ViewDashboardStateDTO dashboardState();
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
@@ -100,12 +104,16 @@ public abstract class ViewDTO {
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
+        @JsonProperty(FIELD_DASHBOARD_STATE)
+        public abstract Builder dashboardState(ViewDashboardStateDTO dashboardState);
+
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
                     .summary("")
                     .description("")
                     .properties(ImmutableSet.of())
+                    .dashboardState(ViewDashboardStateDTO.empty())
                     .createdAt(DateTime.now(DateTimeZone.UTC));
         }
 

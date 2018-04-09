@@ -31,17 +31,25 @@ const DashboardContainer = createReactClass({
     return {};
   },
 
+  updatePositions(view, newPositions) {
+    const updatedView = view.set('dashboardPositions', newPositions);
+    ViewsActions.update(updatedView.get('id'), updatedView);
+  },
+
   handlePositionsChange(positions, view) {
     const newPositions = {};
     positions.forEach(({ col, height, row, width, id }) => {
       newPositions[id] = { col, height, row, width };
     });
-    const updatedView = view.set('dashboardPositions', newPositions);
-    ViewsActions.update(updatedView.get('id'), updatedView);
+    this.updatePositions(view, newPositions);
   },
 
-  handleWidgetDelete(viewId, widgetId) {
-    DashboardWidgetsActions.removeFromDashboard(viewId, widgetId);
+  handleWidgetDelete(view, widgetId) {
+    DashboardWidgetsActions.removeFromDashboard(view.get('id'), widgetId);
+
+    const positions = view.get('dashboardPositions', {});
+    delete positions[widgetId];
+    this.updatePositions(view, positions);
   },
 
   renderWidgetGrid(widgetDefs, dashboardWidgets, widgetMapping, queryResults, view) {
@@ -88,7 +96,7 @@ const DashboardContainer = createReactClass({
                            widgets={widgets}
                            positions={positions}
                            data={data}
-                           onWidgetDelete={widget => this.handleWidgetDelete(view.get('id'), widget)}
+                           onWidgetDelete={widget => this.handleWidgetDelete(view, widget)}
                            onPositionsChange={p => this.handlePositionsChange(p, view)} />
     );
   },

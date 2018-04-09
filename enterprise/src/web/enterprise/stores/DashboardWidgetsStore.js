@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 import Immutable from 'immutable';
 
 import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
-import CurrentViewStore from './CurrentViewStore';
 
 export default Reflux.createStore({
   listenables: [DashboardWidgetsActions],
@@ -22,8 +21,15 @@ export default Reflux.createStore({
     this.trigger(this.widgets);
   },
 
+  load(viewId, widgets) {
+    widgets.entrySeq().forEach(([widgetId, widget]) => {
+      this.widgets = this.widgets.setIn([viewId, widgetId], { widgetId: widgetId, queryId: widget.query_id });
+    });
+    this._trigger();
+  },
+
   addToDashboard(viewId, queryId, widgetId) {
-    this.widgets = this.widgets.setIn([viewId, widgetId], { viewId: viewId, queryId: queryId, widgetId: widgetId });
+    this.widgets = this.widgets.setIn([viewId, widgetId], { queryId: queryId, widgetId: widgetId });
     this._trigger();
   },
 
