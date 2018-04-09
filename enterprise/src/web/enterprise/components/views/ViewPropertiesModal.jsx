@@ -59,21 +59,21 @@ export default class ViewPropertiesModal extends React.Component {
                  label="Title"
                  help="The title of the view."
                  onChange={this._onChange}
-                 value={view.title} />
+                 value={view.get('title')} />
           <Input id="summary"
                  type="text"
                  name="summary"
                  label="Summary"
                  help="A helpful summary of the view."
                  onChange={this._onChange}
-                 value={view.summary} />
+                 value={view.get('summary')} />
           <Input id="description"
                  type="textarea"
                  name="description"
                  label="Description"
                  help="A longer, helpful description of the view and its functionality."
                  onChange={this._onChange}
-                 value={view.description} />
+                 value={view.get('description')} />
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this._onSave} bsStyle="success">Save</Button>

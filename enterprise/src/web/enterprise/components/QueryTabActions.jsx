@@ -24,6 +24,7 @@ const QueryTabActions = createReactClass({
   getInitialState() {
     return {
       debugOpen: false,
+      editViewOpen: false,
       saveViewOpen: false,
     };
   },
@@ -38,6 +39,14 @@ const QueryTabActions = createReactClass({
 
   handleDebugClose() {
     this.setState({ debugOpen: false });
+  },
+
+  handleEdit() {
+    this.setState({ editViewOpen: true });
+  },
+
+  handleEditClose() {
+    this.setState({ editViewOpen: false });
   },
 
   handleSaveAs() {
@@ -64,6 +73,7 @@ const QueryTabActions = createReactClass({
       <span>
         <DropdownButton title="View Actions">
           <MenuItem onSelect={this.handleDashboardClick}>Dashboard</MenuItem>
+          <MenuItem onSelect={this.handleEdit} disabled={this._isNewView(view)}>Edit</MenuItem>
           <MenuItem onSelect={onSave} disabled={this._isNewView(view)}>Save</MenuItem>
           <MenuItem onSelect={this.handleSaveAs}>Save as</MenuItem>
           <MenuItem divider />
@@ -71,6 +81,7 @@ const QueryTabActions = createReactClass({
         </DropdownButton>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
         <ViewPropertiesModal view={view} title="Save new view" onSave={this.handleSaveView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
+        <ViewPropertiesModal view={view} title="Editing view" onSave={this.handleSaveView} show={this.state.editViewOpen} onClose={this.handleEditClose} />
       </span>
     );
   },
