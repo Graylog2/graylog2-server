@@ -60,12 +60,6 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
           </code>
         </dd>
       </span>
-      <dt>
-        Parameters:
-      </dt>
-      <dd>
-        0
-      </dd>
     </dl>
   </div>
   <br />
