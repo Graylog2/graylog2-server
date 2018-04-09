@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
-import { Button } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { Spinner } from 'components/common';
 import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidgetGrid';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import ViewsActions from 'enterprise/actions/ViewsActions';
@@ -16,14 +16,14 @@ const DashboardContainer = createReactClass({
     view: PropTypes.instanceOf(Immutable.Map).isRequired,
     widgets: PropTypes.instanceOf(Immutable.Map).isRequired,
     dashboardWidgets: PropTypes.instanceOf(Immutable.Map).isRequired,
-    widgetMapping: PropTypes.object.isRequired,
-    results: PropTypes.object.isRequired,
-    toggle: PropTypes.func,
+    widgetMapping: PropTypes.object,
+    results: PropTypes.object,
   },
 
   getDefaultProps() {
     return {
-      toggle: () => {},
+      widgetMapping: {},
+      results: {},
     };
   },
 
@@ -103,28 +103,17 @@ const DashboardContainer = createReactClass({
 
   render() {
     const { widgets, dashboardWidgets, widgetMapping, results, view } = this.props;
+
+    if (!results.results) {
+      return <Col md={12}><Spinner /></Col>;
+    }
+
     const widgetGrid = this.renderWidgetGrid(widgets, dashboardWidgets, widgetMapping, results.results, view);
 
-    const { title, summary } = view.toJS();
-
     return (
-      <DocumentTitle title={`${title} - Dashboard`}>
-        <span>
-          <PageHeader title={`${title} - Dashboard`}>
-            <span>
-              {summary}
-            </span>
-
-            {null}
-
-            <span>
-              <Button onClick={this.props.toggle} >Queries</Button>
-            </span>
-          </PageHeader>
-
-          {widgetGrid}
-        </span>
-      </DocumentTitle>
+      <Col md={12}>
+        {widgetGrid}
+      </Col>
     );
   },
 });
