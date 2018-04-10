@@ -1,20 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import numeral from 'numeral';
 
-const SearchResultOverview = ({ job }) => {
-  if (!job) {
-    return <span>Not run yet placeholder</span>;
-  }
+const findMessages = (results) => {
+  return Object.keys(results.searchTypes)
+    .map(id => results.searchTypes[id])
+    .find(searchType => searchType.type.toLocaleLowerCase() === 'messages');
+};
+
+const SearchResultOverview = ({ results }) => {
+  const messages = findMessages(results);
   return (
-    <div>
-      <h3>Search</h3>
-      <span>Executed {Object.keys(job.results).length} searches</span>
-    </div>
+    <span>
+      Found <strong>{numeral(messages.total).format('0,0')} messages</strong> in 42ms.
+    </span>
   );
 };
 
 SearchResultOverview.propTypes = {
-  job: PropTypes.object,
+  results: PropTypes.object.isRequired,
 };
 
 export default SearchResultOverview;

@@ -8,8 +8,7 @@ import { widgetDefinition } from 'enterprise/logic/Widget';
 import ViewsActions from 'enterprise/actions/ViewsActions';
 
 import WidgetGrid from 'enterprise/components/WidgetGrid';
-import SideBar from 'enterprise/components/SideBar';
-import { AddWidgetButton, FieldList } from 'enterprise/components/sidebar/index';
+import { FieldList, SideBar } from 'enterprise/components/sidebar';
 
 const _onPositionsChange = (positions, view, queryId) => {
   const newPositions = {};
@@ -51,14 +50,17 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields,
 const Query = ({ fields, results, selectedFields, view, widgetMapping, widgets, query }) => {
   if (results) {
     const queryId = query.get('id');
+    const viewId = view.get('id');
     const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields, queryId);
     return (
       <span>
         <Col md={2} style={{ paddingLeft: 0, paddingRight: 10 }}>
-          <AddWidgetButton viewId={view.get('id')} queryId={queryId} />
-          <SideBar>
-            <FieldList selectedFields={selectedFields}
-                       fields={fields} />
+          <SideBar viewId={viewId} queryId={queryId} view={view} results={results}>
+            {({ maximumHeight }) => (
+              <FieldList selectedFields={selectedFields}
+                         maximumHeight={maximumHeight}
+                         fields={fields} />
+            )}
           </SideBar>
         </Col>
         <Col md={10}>

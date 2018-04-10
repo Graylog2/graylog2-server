@@ -1,0 +1,12 @@
+:local(.sidebarContainer) {
+    margin-top: -15px;
+}
+
+:local(.sidebarContent) {
+    overflow: hidden;
+    max-height: calc(100vh - 72px);
+}
+
+:local(.viewMetadata) {
+    margin-bottom: 8px;
+}

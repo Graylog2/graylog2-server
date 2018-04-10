@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import Field from 'enterprise/components/Field';
 import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 
@@ -18,6 +19,37 @@ const FieldList = createReactClass({
     selectedFields: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(CurrentViewStore, 'currentView')],
+
+  componentDidMount() {
+    this._updateHeight();
+    window.addEventListener('scroll', this._onScroll);
+  },
+
+  componentDidUpdate(prevProps) {
+    if (this.props.maximumHeight !== prevProps.maximumHeight) {
+      this._updateHeight();
+    }
+  },
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._onScroll);
+  },
+
+  eventsThrottler: new EventHandlersThrottler(),
+  MINIMUM_FIELDS_HEIGHT: 50,
+
+  _onScroll() {
+    this.eventsThrottler.throttle(this._updateHeight, 30);
+  },
+
+  _updateHeight() {
+    const fieldsContainer = this.fieldList;
+
+    const maxHeight = this.props.maximumHeight -
+      fieldsContainer.getBoundingClientRect().top;
+
+    this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
+  },
 
   _renderFieldList(fields, selectedFields) {
     if (!fields) {
@@ -42,7 +74,10 @@ const FieldList = createReactClass({
         </li>
       )) : null;
     return (
-      <ul className={styles.fieldList}>
+      <ul ref={(elem) => { this.fieldList = elem; }}
+          style={{ maxHeight: this.state.maxFieldsHeight }}
+          className={styles.fieldList}>
+        {fieldList}
         {fieldList}
       </ul>
     );
@@ -51,7 +86,6 @@ const FieldList = createReactClass({
     const { selectedFields } = this.props;
     return (
       <div>
-        <h3>Fields</h3>
         {this._renderFieldList(this.props.fields, selectedFields)}
       </div>
     );

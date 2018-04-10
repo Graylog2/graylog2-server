@@ -1,7 +1,6 @@
 :local(.fieldList) {
     padding: 0;
     overflow-y: scroll;
-    max-height: 100vh;
 }
 
 :local(.fieldListItem) {
