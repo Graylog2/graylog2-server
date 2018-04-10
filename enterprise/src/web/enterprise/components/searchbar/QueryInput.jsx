@@ -137,6 +137,7 @@ class QueryInput extends Component {
                      selectionStyle: 'line',
                    }}
                    style={{
+                     height: '16px',
                      width: '100%',
                      marginTop: '10px',
                    }} />
