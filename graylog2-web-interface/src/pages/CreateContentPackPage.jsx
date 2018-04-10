@@ -1,4 +1,5 @@
 import React from 'react';
+import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
 import Routes from 'routing/Routes';
@@ -16,9 +17,11 @@ import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
 
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
+const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 
 const CreateContentPackPage = createReactClass({
   displayName: 'ShowContentPackPage',
+  mixins: [Reflux.connect(CatalogStore)],
 
   getInitialState() {
     return {
@@ -32,6 +35,10 @@ const CreateContentPackPage = createReactClass({
       },
       selectedStep: undefined,
     };
+  },
+
+  componentDidMount() {
+    CatalogActions.showEntityIndex();
   },
 
   _getUUID() {
@@ -67,7 +74,7 @@ const CreateContentPackPage = createReactClass({
 
   render() {
     const steps = [
-      { key: 'selection', title: 'Content Selection', component: (<ContentPackSelection contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />) },
+      { key: 'selection', title: 'Content Selection', component: (<ContentPackSelection contentPack={this.state.contentPack} onStateChange={this._onStateChanged} entities={this.state.entityIndex} />) },
       { key: 'dependency', title: 'Dependency Resolution', component: (<ContentPackDependencyResolution contentPack={this.state.contentPack} />) },
       { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />) },
       { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />) },
