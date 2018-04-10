@@ -13,7 +13,7 @@ import java.util.Map;
  * Parameters describe variable inputs to queries.
  * <p>
  * They consist of a declaration and a binding. Parameters without a binding are called "free" or "unbound" parameters.
- * In order to execute a query all of its non-optional parameters must have a binding asscociated with them, i.e. be "bound".
+ * In order to execute a query all of its non-optional parameters must have a binding associated with them, i.e. be "bound".
  * <p>
  * The caller is expected to provide a {@link Parameter} object when binding previously declared parameters.
  * In that case the declaration elements do not need to be repeated, only its {@link Parameter#name() name} property.
@@ -24,6 +24,14 @@ public abstract class Parameter {
 
     @JsonProperty
     public abstract String name();
+
+    @Nullable
+    @JsonProperty
+    public abstract String title();
+
+    @Nullable
+    @JsonProperty
+    public abstract String description();
 
     @JsonProperty("data_type")
     public abstract String dataType();
@@ -66,6 +74,14 @@ public abstract class Parameter {
     public abstract static class Builder {
         @JsonProperty
         public abstract Builder name(String name);
+
+        @Nullable
+        @JsonProperty
+        public abstract Builder title(String title);
+
+        @Nullable
+        @JsonProperty
+        public abstract Builder description(String description);
 
         @JsonProperty
         public abstract Builder dataType(String dataType);

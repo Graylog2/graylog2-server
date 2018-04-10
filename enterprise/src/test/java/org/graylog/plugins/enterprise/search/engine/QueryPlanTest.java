@@ -16,10 +16,12 @@ import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryGenerator;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.enterprise.search.elasticsearch.QueryStringParser;
+import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.enterprise.search.params.QueryReferenceBinding;
 import org.graylog.plugins.enterprise.search.params.ValueBinding;
+import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -49,9 +51,20 @@ public class QueryPlanTest {
     private static final Logger LOG = LoggerFactory.getLogger(QueryPlanTest.class);
 
     private final RelativeRange timerange;
+    private final QueryEngine queryEngine;
 
     public QueryPlanTest() throws InvalidRangeParametersException {
         timerange = RelativeRange.create(60);
+        Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
+        handlers.put(MessageList.NAME, ESMessageList::new);
+        handlers.put(DateHistogram.NAME, ESDateHistogram::new);
+        Map<String, Provider<Parameter.BindingHandler>> bindingHandlers = Maps.newHashMap();
+        bindingHandlers.put(ValueBinding.NAME, ValueBinding.Handler::new);
+        bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
+
+        final QueryStringParser queryStringParser = new QueryStringParser();
+        ElasticsearchBackend backend = new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, null);
+        queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend));
     }
 
     private static String randomUUID() {
@@ -65,7 +78,7 @@ public class QueryPlanTest {
                         .build()))
                 .build();
         SearchJob job = new SearchJob(randomUUID(), search);
-        final QueryPlan queryPlan = new QueryPlan(job);
+        final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
 
         ImmutableList<Query> queries = queryPlan.queries();
         assertThat(queries).doesNotContain(Query.emptyRoot());
@@ -74,16 +87,15 @@ public class QueryPlanTest {
     @Test
     public void singleQueryValueParam() {
         Search search = Search.builder()
-                .queries(of(wildcardQueryBuilder()
-                        .parameters(of(Parameter.builder()
-                                .name("PARAM1")
-                                .dataType("string")
-                                .binding(bindToValue("hello parameter"))
-                                .build()))
+                .queries(of(wildcardQueryBuilder().build()))
+                .parameters(of(Parameter.builder()
+                        .name("PARAM1")
+                        .dataType("string")
+                        .binding(bindToValue("hello parameter"))
                         .build()))
                 .build();
         SearchJob job = new SearchJob(randomUUID(), search);
-        final QueryPlan queryPlan = new QueryPlan(job);
+        final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
 
         ImmutableList<Query> elements = queryPlan.queries();
         assertThat(elements).doesNotContain(Query.emptyRoot());
@@ -94,7 +106,9 @@ public class QueryPlanTest {
         final Query topLevelQuery = wildcardQueryBuilder()
                 .searchTypes(of(MessageList.builder().id("messages").limit(10).offset(0).build()))
                 .build();
-        final Query subQuery = stringQueryBuilder("user_id:$USER_ID$")
+        final Query subQuery = stringQueryBuilder("user_id:$USER_ID$").build();
+        Search search = Search.builder()
+                .queries(of(subQuery, topLevelQuery)) // reverse the actual order to make it non-obvious that subQuery depends on topLevelQuery
                 .parameters(of(Parameter.builder()
                         .name("USER_ID")
                         .dataType("string")
@@ -103,11 +117,8 @@ public class QueryPlanTest {
                                 "$.messages[0].message.user_id"))
                         .build()))
                 .build();
-        Search search = Search.builder()
-                .queries(of(subQuery, topLevelQuery)) // reverse the actual order to make it non-obvious that subQuery depends on topLevelQuery
-                .build();
         SearchJob job = new SearchJob(randomUUID(), search);
-        final QueryPlan queryPlan = new QueryPlan(job);
+        final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
 
         ImmutableList<Query> elements = queryPlan.queries();
         LOG.warn(queryPlan.toString());
@@ -122,6 +133,9 @@ public class QueryPlanTest {
                 .build();
         final Query subQuery = stringQueryBuilder("user_id:$USER_ID$", "sub")
                 .searchTypes(of(MessageList.builder().id("messages").limit(10).offset(0).build()))
+                .build();
+        Search search = Search.builder()
+                .queries(of(subQuery, topLevelQuery)) // reverse the actual order to make it non-obvious that subQuery depends on topLevelQuery
                 .parameters(of(Parameter.builder()
                         .name("USER_ID")
                         .dataType("string")
@@ -129,9 +143,6 @@ public class QueryPlanTest {
                                 // TODO this is ugly because it relies on `ResultMessage` objects :/
                                 "$.messages[0].message.user_id")) // selects the first message's user_id field
                         .build()))
-                .build();
-        Search search = Search.builder()
-                .queries(of(subQuery, topLevelQuery)) // reverse the actual order to make it non-obvious that subQuery depends on topLevelQuery
                 .build();
         SearchJob job = new SearchJob(randomUUID(), search);
 

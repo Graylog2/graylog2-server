@@ -165,7 +165,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @Path("metadata")
     public SearchMetadata metadataForObject(@ApiParam Search search) {
-        final Map<String, QueryMetadata> map = StreamEx.of(search.queries()).toMap(Query::id, queryEngine::parse);
-        return SearchMetadata.create(map);
+        final Map<String, QueryMetadata> map = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
+        return SearchMetadata.create(map, search.parameters());
     }
 }

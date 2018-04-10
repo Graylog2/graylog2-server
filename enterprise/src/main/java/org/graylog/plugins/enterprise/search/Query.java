@@ -57,16 +57,11 @@ public abstract class Query {
     @JsonProperty("search_types")
     public abstract ImmutableSet<SearchType> searchTypes();
 
-    @Nonnull
-    @JsonProperty
-    public abstract ImmutableSet<Parameter> parameters();
-
     public abstract Builder toBuilder();
 
     public static Builder builder() {
         return new AutoValue_Query.Builder()
-                .searchTypes(of())
-                .parameters(of());
+                .searchTypes(of());
     }
 
     public Query applyExecutionState(ObjectMapper objectMapper, Map<String, Object> state) {
@@ -133,14 +128,11 @@ public abstract class Query {
         @JsonProperty("search_types")
         public abstract Builder searchTypes(@Nullable Set<SearchType> searchTypes);
 
-        @JsonProperty
-        public abstract Builder parameters(ImmutableSet<Parameter> parameters);
-
         abstract Query autoBuild();
 
         @JsonCreator
         public static Builder createWithDefaults() {
-            return Query.builder().parameters(ImmutableSet.of());
+            return Query.builder();
         }
 
         public Query build() {

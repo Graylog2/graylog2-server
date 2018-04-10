@@ -6,6 +6,7 @@ import one.util.streamex.StreamEx;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.QueryResult;
+import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
@@ -44,14 +45,14 @@ public class QueryEngine {
                 );
     }
 
-    public QueryMetadata parse(Query query) {
+    public QueryMetadata parse(Search search, Query query) {
         final BackendQuery backendQuery = query.query();
         final QueryBackend queryBackend = queryBackends.get(backendQuery.type());
-        return queryBackend.parse(query);
+        return queryBackend.parse(search.parameters(), query);
     }
 
     public SearchJob execute(SearchJob searchJob) {
-        final QueryPlan plan = new QueryPlan(searchJob);
+        final QueryPlan plan = new QueryPlan(this, searchJob);
 
         final ImmutableList<Query> queries = plan.queries();
         queries.forEach(query -> {

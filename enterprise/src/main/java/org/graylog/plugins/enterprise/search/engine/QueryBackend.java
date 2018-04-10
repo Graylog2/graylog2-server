@@ -1,5 +1,7 @@
 package org.graylog.plugins.enterprise.search.engine;
 
+import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.QueryResult;
@@ -51,5 +53,5 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * This method decomposes the backend-specific query and returns information about used parameters, optionally the
      * AST for syntax highlight and other information the UI can use to offer help.
      */
-    QueryMetadata parse(Query query);
+    QueryMetadata parse(ImmutableSet<Parameter> parameters, Query query);
 }

@@ -1,10 +1,11 @@
 package org.graylog.plugins.enterprise.search.elasticsearch;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import org.graylog.plugins.enterprise.search.Parameter;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.graylog.plugins.enterprise.search.QueryMetadata;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,11 +17,11 @@ public class QueryStringParser {
             return QueryMetadata.empty();
         }
         final Matcher matcher = PLACEHOLDER_PATTERN.matcher(queryString);
-        ImmutableMap.Builder<String, Parameter> parameters = ImmutableMap.builder();
+        Set<String> paramNames = Sets.newHashSet();
         while (matcher.find()) {
             final String name = matcher.group(1);
-            parameters.put(name, Parameter.any(name));
+            paramNames.add(name);
         }
-        return QueryMetadata.builder().parameters(parameters.build()).build();
+        return QueryMetadata.builder().usedParameterNames(ImmutableSet.copyOf(paramNames)).build();
     }
 }

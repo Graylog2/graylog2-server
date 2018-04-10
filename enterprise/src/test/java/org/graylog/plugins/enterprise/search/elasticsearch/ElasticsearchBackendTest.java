@@ -46,16 +46,14 @@ public class ElasticsearchBackendTest {
 
     @Test
     public void parse() throws Exception {
-        final QueryMetadata queryMetadata = backend.parse(Query.builder()
+        final QueryMetadata queryMetadata = backend.parse(ImmutableSet.of(), Query.builder()
                 .id("abc123")
                 .query(ElasticsearchQueryString.builder().queryString("user_name:$username$ http_method:$foo$").build())
                 .timerange(RelativeRange.create(600))
                 .build());
 
-        assertThat(queryMetadata.parameters())
-                .containsOnly(
-                        Maps.immutableEntry("username", Parameter.any("username")),
-                        Maps.immutableEntry("foo", Parameter.any("foo")));
+        assertThat(queryMetadata.usedParameterNames())
+                .containsOnly("username", "foo");
     }
 
     @Test
