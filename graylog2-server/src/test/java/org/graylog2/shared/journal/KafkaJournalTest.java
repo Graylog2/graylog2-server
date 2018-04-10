@@ -238,7 +238,7 @@ public class KafkaJournalTest {
 
         final byte[] idBytes0 = randomAlphanumeric(6).getBytes(UTF_8);
         // Build a message that has exactly the max segment size
-        final String largeMessage2 = randomAlphanumeric(Ints.saturatedCast(segmentSize.toBytes() - MessageSet.LogOverhead() - Message.MessageOverhead() - idBytes0.length));
+        final String largeMessage2 = randomAlphanumeric(Ints.saturatedCast(segmentSize.toBytes() - MessageSet.LogOverhead() - Message.CrcLength() - idBytes0.length));
         list.add(journal.createEntry(idBytes0, largeMessage2.getBytes(UTF_8)));
 
         while (size <= maxSize) {
