@@ -1,12 +1,14 @@
 package org.graylog.plugins.enterprise.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.Search;
@@ -166,6 +168,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("metadata")
     public SearchMetadata metadataForObject(@ApiParam Search search) {
         final Map<String, QueryMetadata> map = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
-        return SearchMetadata.create(map, search.parameters());
+        return SearchMetadata.create(map, Maps.uniqueIndex(search.parameters(), Parameter::name));
     }
 }
