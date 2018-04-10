@@ -24,14 +24,6 @@ const ApiRoutes = {
     available: () => { return { url: '/alerts/conditions/types' }; },
     list: () => { return { url: '/alerts/conditions' }; },
   },
-  ContentPacksController: {
-    list: () => { return { url: '/system/content_packs/latest' }; },
-    get: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
-    getRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
-    create: () => { return { url: '/system/content_packs' }; },
-    delete: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
-    deleteRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
-  },
   BundlesApiController: {
     apply: (bundleId) => { return { url: `/system/bundles/${bundleId}/apply` }; },
     create: () => { return { url: '/system/bundles' }; },
@@ -39,8 +31,19 @@ const ApiRoutes = {
     export: () => { return { url: '/system/bundles/export' }; },
     list: () => { return { url: '/system/bundles' }; },
   },
+  CatalogsController: {
+    showEntityIndex: () => { return { url: '/system/catalog' }; },
+  },
   CodecTypesController: {
     list: () => { return { url: '/system/codecs/types/all' }; },
+  },
+  ContentPacksController: {
+    list: () => { return { url: '/system/content_packs/latest' }; },
+    get: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
+    getRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
+    create: () => { return { url: '/system/content_packs' }; },
+    delete: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
+    deleteRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
   },
   CountsApiController: {
     total: () => { return { url: '/count/total' }; },

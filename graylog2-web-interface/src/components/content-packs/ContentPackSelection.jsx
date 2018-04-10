@@ -5,22 +5,31 @@ import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
+import { ExpandableList, ExpandableListItem } from "components/common";
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
     onStateChange: PropTypes.func,
+    entities: PropTypes.object,
   };
 
   static defaultProps = {
     onStateChange: () => {},
+    entities: {},
   };
+
+  static _toDisplayTitle(title) {
+    const newTitle = title.split('_').join(' ');
+    return newTitle[0].toUpperCase() + newTitle.substr(1);
+  }
 
   constructor(props) {
     super(props);
     this._bindValue = this._bindValue.bind(this);
     this.state = {
       contentPack: ObjectUtils.clone(this.props.contentPack),
+      selectedEntities: {},
     };
   }
 
@@ -35,7 +44,77 @@ class ContentPackSelection extends React.Component {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
   }
 
+  _updateSelectionEntity = (entity) => {
+    const newSelection = ObjectUtils.clone(this.state.selectedEntities);
+    newSelection[entity.type] = (newSelection[entity.type] || []);
+    const index = newSelection[entity.type].findIndex((e) => { return e.id === entity.id; });
+    if (index < 0) {
+      newSelection[entity.type].push(entity);
+    } else {
+      newSelection[entity.type].splice(index, 1);
+    }
+    this.setState({ selectedEntities: newSelection });
+  };
+
+  _updateSelectionGroup = (type) => {
+    const newSelection = ObjectUtils.clone(this.state.selectedEntities);
+    if (this._isGroupSelected(type)) {
+      newSelection[type] = [];
+    } else {
+      newSelection[type] = this.props.entities[type];
+    }
+
+    this.setState({ selectedEntities: newSelection });
+  };
+
+  _isUndetermined(type) {
+    if (!this.state.selectedEntities[type]) {
+      return false;
+    }
+
+    return !(this.state.selectedEntities[type].length === this.props.entities[type].length ||
+       this.state.selectedEntities[type].length === 0);
+  }
+
+  _isSelected(entity) {
+    if (!this.state.selectedEntities[entity.type]) {
+      return false;
+    }
+
+    return this.state.selectedEntities[entity.type].findIndex((e) => { return e.id === entity.id; }) >= 0;
+  }
+
+  _isGroupSelected(type) {
+    if (!this.state.selectedEntities[type]) {
+      return false;
+    }
+    return this.state.selectedEntities[type].length === this.props.entities[type].length;
+  }
+
   render() {
+    const entitiesComponent = Object.keys(this.props.entities || {}).map((entityType) => {
+      const group = this.props.entities[entityType];
+      const entities = group.map((entity) => {
+        const checked = this._isSelected(entity);
+        return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
+                                    key={entity.id}
+                                    checked={checked}
+                                    expandable={false}
+                                    header={entity.title} />);
+      });
+      return (
+        <ExpandableListItem key={entityType}
+                            onChange={() => this._updateSelectionGroup(entityType)}
+                            indetermined={this._isUndetermined(entityType)}
+                            checked={this._isGroupSelected(entityType)}
+                            header={ContentPackSelection._toDisplayTitle(entityType)}>
+          <ExpandableList>
+            {entities}
+          </ExpandableList>
+        </ExpandableListItem>
+      );
+    });
+
     return (
       <div>
         <Row>
@@ -100,6 +179,15 @@ class ContentPackSelection extends React.Component {
                        required />
               </fieldset>
             </form>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <h2>Content Pack selection</h2>
+            <br />
+            <ExpandableList>
+              {entitiesComponent}
+            </ExpandableList>
           </Col>
         </Row>
       </div>
