@@ -8,6 +8,8 @@ export { default as DatePicker } from './DatePicker';
 export { default as DocumentTitle } from './DocumentTitle';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
+export { default as ExpandableList } from './ExpandableList';
+export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as ExternalLink } from './ExternalLink';
 export { default as ExternalLinkButton } from './ExternalLinkButton';
 export { default as IfPermitted } from './IfPermitted';
