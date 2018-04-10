@@ -176,6 +176,21 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
       </form>
     </div>
   </div>
+  <div
+    className="row"
+  >
+    <div
+      className=""
+    >
+      <h2>
+        Content Pack selection
+      </h2>
+      <br />
+      <ul
+        className="list"
+      />
+    </div>
+  </div>
 </div>
 `;
 
@@ -353,6 +368,21 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
           </div>
         </fieldset>
       </form>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className=""
+    >
+      <h2>
+        Content Pack selection
+      </h2>
+      <br />
+      <ul
+        className="list"
+      />
     </div>
   </div>
 </div>
