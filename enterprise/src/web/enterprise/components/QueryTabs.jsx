@@ -19,8 +19,15 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
       </Tab>
     );
   });
+  const dashboardTitle = (
+    <span>
+      <i className="fa fa-tachometer" />
+      {' '}
+      Dashboard
+    </span>
+  );
+  tabs.push(<Tab key="dashboard" eventKey="dashboard" title={dashboardTitle} mountOnEnter>{renderDashboardTab()}</Tab>);
   tabs.push(<Tab key="new" eventKey="new" title="+" />);
-  tabs.push(<Tab key="dashboard" eventKey="dashboard" title="Dashboard" mountOnEnter>{renderDashboardTab()}</Tab>);
 
   return (
     <span>
@@ -40,6 +47,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 
 QueryTabs.propTypes = {
   children: PropTypes.func.isRequired,
+  onSaveView: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,

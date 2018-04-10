@@ -46,7 +46,13 @@ class QueryTitle extends React.Component {
                onBlur={this._toggleEditing}
                onChange={this._onChange} />
       </form>
-    ) : <span onDoubleClick={this._toggleEditing}>{value}</span>;
+    ) : (
+      <span onDoubleClick={this._toggleEditing}>
+        <i className="fa fa-search" />
+        {' '}
+        {value}
+      </span>
+    );
     return (
       <span>
         {valueField}{' '}
