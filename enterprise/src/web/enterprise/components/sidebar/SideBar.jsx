@@ -11,6 +11,9 @@ import { AddWidgetButton, SearchResultOverview } from 'enterprise/components/sid
 
 import styles from './SideBar.css';
 
+const defaultNewViewTitle = 'New View';
+const defaultNewViewSummary = 'No summary.';
+
 const SideBar = createReactClass({
   displayName: 'SideBar',
 
@@ -64,8 +67,8 @@ const SideBar = createReactClass({
         <AutoAffix viewportOffsetTop={46}>
           <div className={`content-col ${styles.sidebarContent}`} ref="sidebar">
             <div className={styles.viewMetadata}>
-              <h3>{view.get('title', 'Unnamed view')}</h3>
-              <small>{view.get('summary', 'No summary.')}</small>
+              <h3>{view.get('title', defaultNewViewTitle)}</h3>
+              <small>{view.get('summary', defaultNewViewSummary)}</small>
             </div>
 
             <div className={styles.viewMetadata}>

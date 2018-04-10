@@ -4,6 +4,7 @@ import ObjectID from 'bson-objectid';
 
 import ViewsActions from 'enterprise/actions/ViewsActions';
 import CurrentViewActions from 'enterprise/actions/CurrentViewActions';
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 
 import { createEmptyQuery } from 'enterprise/logic/Queries';
 
@@ -11,36 +12,28 @@ export default Reflux.createStore({
   listenables: [ViewsActions],
   views: new Immutable.Map(),
 
-  init() {
-    const id = ObjectID().toString();
-    this.views = this.views.set(id, new Immutable.Map({ id: id, positions: {} }));
-    CurrentViewActions.selectView(id);
-    const defaultQuery = createEmptyQuery(id);
-    CurrentViewActions.selectQuery(defaultQuery.id);
-  },
-
   getInitialState() {
     return this.views;
   },
 
-  create(view) {
-    if (view.id === undefined) {
-      throw new Error('Unable to add view without id.');
-    }
-    this.views = this.views.updateIn([view.id], (value) => {
-      if (value) {
-        throw new Error(`Unable to add view with id <${view.id}>, it is already present.`);
-      }
-      return new Immutable.Map(view);
-    });
+  create() {
+    const id = ObjectID().toString();
+    this.views = this.views.set(id, new Immutable.Map({ id: id, positions: {} }));
+    const selectView = CurrentViewActions.selectView.triggerPromise(id);
+    const defaultQuery = createEmptyQuery(id);
+    const selectQuery = CurrentViewActions.selectQuery.triggerPromise(defaultQuery.id);
+
+    ViewsActions.create.promise(Promise.all([selectView, selectQuery]));
     this._trigger();
   },
   load(viewId, view) {
     this.views = this.views.set(viewId, view);
+    ViewsActions.load.promise(Promise.resolve(this.views));
     this._trigger();
   },
   remove(viewId) {
     this.views = this.views.remove(viewId);
+    ViewsActions.remove.promise(Promise.resolve(this.views));
     this._trigger();
   },
   title(viewId, queryId, title) {
@@ -48,10 +41,12 @@ export default Reflux.createStore({
       const titlesMap = titles || new Immutable.Map();
       return titlesMap.set(queryId, title);
     });
+    ViewsActions.title.promise(Promise.resolve(this.views));
     this._trigger();
   },
   update(viewId, view) {
     this.views = this.views.set(viewId, new Immutable.Map(view));
+    ViewsActions.update.promise(Promise.resolve(this.views));
     this._trigger();
   },
   _trigger() {

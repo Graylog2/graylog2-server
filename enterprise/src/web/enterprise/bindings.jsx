@@ -16,6 +16,7 @@ import LineVisualization from 'enterprise/components/visualizations/line/LineVis
 import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
 import ShowViewPage from 'enterprise/ShowViewPage';
 import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
+import NewSearchPage from 'enterprise/NewSearchPage';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -27,7 +28,7 @@ export default {
 
   },
   routes: [
-    { path: extendedSearchPath, component: ExtendedSearchPage },
+    { path: extendedSearchPath, component: NewSearchPage },
     { path: viewsPath, component: ViewManagementPage },
     { path: showViewsPath, component: ShowViewPage },
   ],
