@@ -25,16 +25,21 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
+import java.util.Collection;
+
 public class Join extends AbstractFunction<String> {
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     public static final String NAME = "join";
 
     private final ParameterDescriptor<String, String> delimiterParam;
-    private final ParameterDescriptor<String[], String[]> elementsParam;
+    private final ParameterDescriptor<Object, String[]> elementsParam;
     private final ParameterDescriptor<Long, Integer> startIndexParam;
     private final ParameterDescriptor<Long, Integer> endIndexParam;
 
     public Join() {
-        elementsParam = ParameterDescriptor.type("elements", String[].class, String[].class)
+        elementsParam = ParameterDescriptor.type("elements", Object.class, String[].class)
+                .transform(Join::elementsToStringArray)
                 .description("The list of strings to join together, may be null")
                 .build();
         delimiterParam = ParameterDescriptor.string("delimiter").optional()
@@ -48,6 +53,17 @@ public class Join extends AbstractFunction<String> {
                 .transform(Ints::saturatedCast)
                 .description("The index to stop joining from (exclusive). It is an error to pass in an index larger than the number of elements")
                 .build();
+    }
+
+    private static String[] elementsToStringArray(Object obj) {
+        if (obj instanceof String[]) {
+            return (String[]) obj;
+        } else if (obj instanceof Collection) {
+            @SuppressWarnings("unchecked") final Collection<Object> collection = (Collection) obj;
+            return collection.stream().map(Object::toString).toArray(String[]::new);
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for parameter 'elements': " + obj.getClass().getCanonicalName());
+        }
     }
 
     @Override
