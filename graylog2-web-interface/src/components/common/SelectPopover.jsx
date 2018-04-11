@@ -100,10 +100,11 @@ const SelectPopover = createReactClass({
     return () => {
       const selectedItems = this.state.selectedItems;
       let nextSelectedItems;
-      if (selectedItems.includes(item)) {
-        nextSelectedItems = lodash.without(selectedItems, item);
+      if (this.props.multiple) {
+        // Clicking on a selected value on a multiselect input will toggle the item's select status
+        nextSelectedItems = selectedItems.includes(item) ? lodash.without(selectedItems, item) : lodash.concat(selectedItems, item);
       } else {
-        nextSelectedItems = this.props.multiple ? lodash.concat(selectedItems, item) : [item];
+        nextSelectedItems = [item];
       }
       this.handleSelectionChange(nextSelectedItems);
     };
