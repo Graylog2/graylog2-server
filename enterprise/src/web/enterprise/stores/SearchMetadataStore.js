@@ -16,7 +16,7 @@ export default Reflux.createStore({
     parameters: {
       undeclared: Immutable.Set(),
       used: Immutable.Set(),
-    }
+    },
   }),
 
   getInitialState() {

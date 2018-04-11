@@ -10,7 +10,7 @@ export default Reflux.createStore({
   executionState: Immutable.Map(),
 
   init() {
-    this.listenTo(SearchParameterStore, this.handleSearchParameterChange, this.handleSearchParameterChange)
+    this.listenTo(SearchParameterStore, this.handleSearchParameterChange, this.handleSearchParameterChange);
   },
 
   getInitialState() {
