@@ -74,6 +74,7 @@ const SearchBar = createReactClass({
                     <SearchButton running={this.state.running} />
 
                     <QueryInput value={query}
+                                placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                 onChange={value => QueriesActions.query(selectedView, id, value)}
                                 onExecute={this.props.onExecute}
                                 result={this.props.results} />

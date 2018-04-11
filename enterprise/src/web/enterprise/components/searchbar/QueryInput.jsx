@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Immutable from 'immutable';
 import _ from 'lodash';
 
 import 'brace/mode/lucene';
@@ -29,13 +30,13 @@ const _snippets = {
 
 const _extractFields = (queryResult) => {
   if (!queryResult) {
-    return null;
+    return new Immutable.Map();
   }
   // TODO this requires that each query actually has a message list available.
   const searchTypes = queryResult.searchTypes;
   // TODO how do we deal with multiple lists? is that even useful?
   const messagesSearchType = _.find(searchTypes, t => t.type === 'messages');
-  return messagesSearchType !== undefined ? messagesSearchType.fields : [];
+  return messagesSearchType !== undefined ? messagesSearchType.fields : new Immutable.Map();
 };
 
 class QueryInput extends Component {
@@ -60,9 +61,9 @@ class QueryInput extends Component {
     _snippets.getCompletions = _completions(fields);
   }
 
-  _placeholderNode() {
+  _placeholderNode(placeholder) {
     const node = document.createElement('div');
-    node.textContent = 'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]';
+    node.textContent = placeholder;
     node.className = 'ace_invisible ace_emptyMessage';
     node.style.padding = '0 9px';
     node.style.color = '#aaa';
@@ -70,7 +71,7 @@ class QueryInput extends Component {
   }
 
   _addPlaceholder = (editor) => {
-    const node = this._placeholderNode();
+    const node = this._placeholderNode(this.props.placeholder);
     editor.renderer.emptyMessageNode = node;
     editor.renderer.scroller.appendChild(node);
   };
@@ -81,7 +82,7 @@ class QueryInput extends Component {
   _bindEditor(editor) {
     if (editor) {
       this.editor = editor;
-      if (!this.addedPlaceholder) {
+      if (!this.addedPlaceholder && !this.state.value) {
         this._addPlaceholder(editor.editor);
         this.addedPlaceholder = true;
       }
@@ -147,14 +148,15 @@ class QueryInput extends Component {
 }
 
 QueryInput.propTypes = {
-  result: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  result: PropTypes.object,
   value: PropTypes.string.isRequired,
 };
 
 QueryInput.defaultProps = {
-  result: {},
+  result: undefined,
 };
 
 export default QueryInput;

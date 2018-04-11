@@ -82,10 +82,27 @@ const MessageList = createReactClass({
     this.setState({ expandedMessages: newSet });
   },
 
+  _parseFilter(filter) {
+    const terms = filter.split(/\s+(?:AND|OR)\s+/i);
+    return terms.map((term) => {
+      const [key, value] = term.split(/\s*:\s*/);
+      return { key, value };
+    });
+  },
+
+  _filterMessages(filter, messages) {
+    const filters = this._parseFilter(filter);
+    return messages.filter(({ message }) => {
+      return filters.every(({ key, value }) => message[key] === value);
+    });
+  },
+
   render() {
     const pageSize = this.props.pageSize || 7;
     const messages = this.props.data.messages || [];
-    const messageSlice = messages
+    const { filter } = this.props;
+    const filteredMessages = filter && filter !== '' ? this._filterMessages(this.props.filter, messages) : messages;
+    const messageSlice = filteredMessages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
       .map((m) => {
         return {

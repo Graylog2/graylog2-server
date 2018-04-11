@@ -1,0 +1,8 @@
+:local(.widgetActionDropdownMenu) {
+    position: absolute;
+    left: -140px !important;
+    padding-left: 5px;
+    padding-right: 5px;
+    min-width: 160px !important;
+    color: #666666;
+}

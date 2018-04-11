@@ -1,15 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import connect from 'stores/connect';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import CurrentWidgetsActions from 'enterprise/actions/CurrentWidgetsActions';
 import CurrentWidgetsStore from 'enterprise/stores/CurrentWidgetsStore';
 import CurrentTitlesActions from 'enterprise/actions/CurrentTitlesActions';
+import CurrentTitlesStore from 'enterprise/stores/CurrentTitlesStore';
+import WidgetFilterActions from 'enterprise/actions/WidgetFilterActions';
+import WidgetFilterStore from 'enterprise/stores/WidgetFilterStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
+import WidgetFilterMenu from './WidgetFilterMenu';
+import WidgetActionDropdown from './WidgetActionDropdown';
 
-export default class Widget extends React.Component {
+import styles from './Widget.css';
+
+class Widget extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     widget: PropTypes.shape({
@@ -67,15 +75,25 @@ export default class Widget extends React.Component {
     const { config, computationTimeRange } = widget;
     const VisComponent = Widget._visualizationForType(widget.type);
     const { editing } = this.state;
+    const filter = this.props.widgetFilters.get(id);
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
         <WidgetHeader title={title}
-                      onToggleEdit={this._onToggleEdit}
-                      onDelete={() => this._onDelete(widget)}
-                      onDuplicate={() => this._onDuplicate(id)}
                       onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
-                      onAddToDashboard={() => this._onAddToDashboard(id)}
-                      editing={editing} />
+                      editing={editing}>
+          <WidgetFilterMenu onChange={filter => WidgetFilterActions.change(id, filter)}>
+            <i className={`fa fa-filter ${styles.widgetActionDropdownCaret}`} />
+          </WidgetFilterMenu>
+          {' '}
+          <WidgetActionDropdown editing={editing}
+                                onAddToDashboard={() => this._onAddToDashboard(id)}
+                                onDelete={() => this._onDelete(widget)}
+                                onDuplicate={() => this._onDuplicate(id)}
+                                onToggleEdit={this._onToggleEdit}>
+            <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret}`} />
+          </WidgetActionDropdown>
+        </WidgetHeader>
+
         <VisComponent id={id}
                       editing={editing}
                       title={widget.title}
@@ -84,6 +102,7 @@ export default class Widget extends React.Component {
                       fields={fields}
                       height={height}
                       width={width}
+                      filter={filter}
                       onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
                       onFinishEditing={this._onToggleEdit}
                       computationTimeRange={computationTimeRange} />
@@ -91,3 +110,5 @@ export default class Widget extends React.Component {
     );
   }
 };
+
+export default connect(Widget, { widgetFilters: WidgetFilterStore });
