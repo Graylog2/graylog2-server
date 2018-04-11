@@ -233,17 +233,18 @@ public class KafkaTransport extends ThrottleableTransport {
         try {
 
             adminClient.listTopics().names().get().stream()
-                    .forEach(a->{
-                        if(a.matches(configuration.getString(CK_TOPIC_FILTER))) {
-                            streams.add(builder.stream(configuration.getString(CK_TOPIC_FILTER)));
+                    .forEach(topicName->{
+                        if(topicName.matches(configuration.getString(CK_TOPIC_FILTER))) {
+                            streams.add(builder.stream(topicName));
                         }
-                        else
-                            LOG.info("NOT MATCHED "+a);
                     });
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
+        }
+        finally{
+            adminClient.close();
         }
 
         final ExecutorService executor = executorService(numThreads);
