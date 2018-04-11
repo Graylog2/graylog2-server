@@ -21,8 +21,8 @@ class Wizard extends React.Component {
      * e.g:
      * [\[<br />
      * &nbsp;&nbsp;{key: 'key1', title: 'General Information', component: (&lt;Acomponent1 /&gt;)},<br />
-     * &nbsp;&nbsp;{key: 'key2', title: 'Details', component: (&lt;Acomponent2 /&gt;)},<br />
-     * &nbsp;&nbsp;{key: 'key3', title: 'Preview', component: (&lt;Acomponent3 /&gt;)},<br />
+     * &nbsp;&nbsp;{key: 'key2', title: 'Details', component: (&lt;Acomponent2 /&gt;), disabled: true},<br />
+     * &nbsp;&nbsp;{key: 'key3', title: 'Preview', component: (&lt;Acomponent3 /&gt;), disabled: true},<br />
      * \]]
      */
     steps: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -62,7 +62,7 @@ class Wizard extends React.Component {
   _disableButton = (direction) => {
     const len = this.props.steps.length;
     const position = direction === 'next' ? (len - 1) : 0;
-    return this.props.steps[position].key === this.state.selectedStep;
+    return this.props.steps[position].key === this.state.selectedStep || this.props.steps[position].disabled;
   };
 
   _onNext = () => {
@@ -125,6 +125,22 @@ class Wizard extends React.Component {
     return (
       <Row className={this.props.containerClassName}>
         {this.props.horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}
+        <Col md={2} className={WizardStyle.subnavigation}>
+          <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
+            {this.props.steps.map((navItem) => {
+              return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
+            })}
+          </Nav>
+          <br />
+          <Row>
+            <Col xs={6}>
+              <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
+            </Col>
+            <Col className="text-right" xs={6}>
+              <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
+            </Col>
+          </Row>
+        </Col>
         <Col md={7}>
           {this.props.steps[this._getSelectedIndex()].component}
         </Col>

@@ -95,4 +95,19 @@ describe('<Wizard />', () => {
     wrapper.find('button[children="Next"]').simulate('click');
     expect(changeFn.mock.calls.length).toBe(1);
   });
+
+  it('should respect disabled flat for a step', () => {
+    steps[1].disabled = true;
+    steps[2].disabled = true;
+    const wrapper = mount(<Wizard steps={steps} />);
+    wrapper.find('button[children="Next"]').simulate('click');
+    expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
+    expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+
+    wrapper.find('a[children="Title2"]').simulate('click');
+    expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
+    expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+  });
 });
