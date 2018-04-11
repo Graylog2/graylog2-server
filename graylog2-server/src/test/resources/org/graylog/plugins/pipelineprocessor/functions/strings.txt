@@ -26,7 +26,16 @@ when
     ends_with("", "bar") == false &&
     ends_with("foobar", "abc") == false &&
     ends_with("foobar", "BAR") == false &&
-    ends_with("foobar", "BAR", true) == true
+    ends_with("foobar", "BAR", true) == true &&
+    replace("", "") == "" &&
+    replace("", "", "") == "" &&
+    replace("aabbcc", "a", "") == "bbcc" &&
+    replace("aabbcc", "", "zz") == "aabbcc" &&
+    replace("aaa", "a", "b", 1) == "baa" &&
+    replace("abba", "b", "k", 2) == "akka" &&
+    replace("abba", "ab", "ka") == "kaba" &&
+    // Example from https://github.com/Graylog2/graylog2-server/issues/4705
+    replace("#011#011#011RAISE 'my message'", "#011", "\t") == "\t\t\tRAISE 'my message'"
 then
     set_field("has_xyz", contains("abcdef", "xyz"));
     set_field("string_literal", "abcd\\.e\tfg\u03a9\363");
