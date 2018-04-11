@@ -48,8 +48,8 @@ describe('<ContentPackParameters />', () => {
   });
 
   it('should create a parameter', () => {
-    const changeFn = jest.fn((newContentPack) => {
-      expect(newContentPack.parameters).toEqual([{
+    const changeFn = jest.fn((newState) => {
+      expect(newState.contentPack.parameters).toEqual([{
         name: 'name',
         title: 'title',
         description: 'descr',
