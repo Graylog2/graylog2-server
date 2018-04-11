@@ -4,7 +4,11 @@ when
     is_url(1234) == false &&
     is_url(12.34) == false &&
     is_url(true) == false &&
-    is_url(to_url("http://example.org/")) == true
+    is_url(to_url("http://example.org/")) == true &&
+    urlencode("this is a test") == "this+is+a+test" &&
+    urldecode("this+is+a+test") == "this is a test" &&
+    urldecode("this%20is%20a%20test") == "this is a test" &&
+    urldecode(urlencode("this is a test")) == "this is a test"
 then
     let url = to_url("https://admin:s3cr31@some.host.with.lots.of.subdomains.com:9999/path1/path2/three?q1=something&with_spaces=hello%20graylog&equal=can=containanotherone#anchorstuff");
     set_fields({

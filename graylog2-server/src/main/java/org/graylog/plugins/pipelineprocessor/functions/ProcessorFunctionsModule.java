@@ -110,6 +110,8 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConv
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
 import org.graylog2.plugin.PluginModule;
 
 public class ProcessorFunctionsModule extends PluginModule {
@@ -227,6 +229,8 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // URL parsing
         addMessageProcessorFunction(UrlConversion.NAME, UrlConversion.class);
+        addMessageProcessorFunction(UrlDecode.NAME, UrlDecode.class);
+        addMessageProcessorFunction(UrlEncode.NAME, UrlEncode.class);
 
         // Syslog support
         addMessageProcessorFunction(SyslogFacilityConversion.NAME, SyslogFacilityConversion.class);

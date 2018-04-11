@@ -114,6 +114,8 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConv
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog2.database.NotFoundException;
@@ -277,6 +279,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SyslogLevelConversion.NAME, new SyslogLevelConversion());
 
         functions.put(UrlConversion.NAME, new UrlConversion());
+        functions.put(UrlDecode.NAME, new UrlDecode());
+        functions.put(UrlEncode.NAME, new UrlEncode());
 
         functions.put(IsBoolean.NAME, new IsBoolean());
         functions.put(IsNumber.NAME, new IsNumber());
