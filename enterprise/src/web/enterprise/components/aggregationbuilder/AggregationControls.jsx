@@ -89,7 +89,7 @@ export default class AggregationControls extends React.Component {
             <SortSelect fields={currentlyUsedFields} sort={sort.join(',')} onChange={this._onSortChange} />
           </Col>
         </Row>
-        <Row style={{ height: '100%' }}>
+        <Row style={{ height: 'calc(100% - 60px)' }}>
           <Col md={3}>
             <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series.join(',')} />
           </Col>
