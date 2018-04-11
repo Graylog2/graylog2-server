@@ -62,6 +62,8 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
+import scala.collection.Seq;
+import scala.collection.immutable.HashMap;
 import scala.collection.JavaConversions;
 
 import javax.inject.Inject;
@@ -85,6 +87,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -278,19 +281,19 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             kafkaScheduler.startup();
 
             File jFile = journalDirectory.toFile();
-            java.util.List<File> f1 = new java.util.ArrayList<File>();
+            List<File> f1 = new ArrayList<File>();
             f1.add(jFile);
 
-            scala.collection.Seq<File> logDirsSeq = JavaConversions.asScalaBuffer(f1).seq();
+            Seq<File> logDirsSeq = JavaConversions.asScalaBuffer(f1).seq();
 
-            java.util.List<File> initLogFileDir = new java.util.ArrayList<File>();
+            List<File> initLogFileDir = new ArrayList<File>();
             initLogFileDir.add(new File("/data/initialLogDir"));
 
-            scala.collection.Seq<File> initiallogDirsSeq = JavaConversions.asScalaBuffer(initLogFileDir).seq();
+            Seq<File> initiallogDirsSeq = JavaConversions.asScalaBuffer(initLogFileDir).seq();
 
             BrokerTopicStats brokerTopicStats = new BrokerTopicStats();
 
-            scala.collection.Map<String, LogConfig> logConfigMap = new scala.collection.immutable.HashMap<>();
+            scala.collection.Map<String, LogConfig> logConfigMap = new HashMap<>();
 
             LogDirFailureChannel logDirFailureChannel = new LogDirFailureChannel(1);
 
@@ -627,7 +630,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     protected void flushDirtyLogs() {
         LOG.debug("Checking for dirty logs to flush...");
 
-        final java.util.Set<Map.Entry<TopicPartition, Log>> entries = JavaConversions.mapAsJavaMap(logManager.logsByTopicPartition()).entrySet();
+        final Set<Map.Entry<TopicPartition, Log>> entries = JavaConversions.mapAsJavaMap(logManager.logsByTopicPartition()).entrySet();
         for (final Map.Entry<TopicPartition, Log> topicAndPartitionLogEntry : entries) {
             final TopicPartition topicAndPartition = topicAndPartitionLogEntry.getKey();
             final Log kafkaLog = topicAndPartitionLogEntry.getValue();
