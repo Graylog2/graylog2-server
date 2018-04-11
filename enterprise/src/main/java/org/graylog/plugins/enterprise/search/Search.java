@@ -48,6 +48,12 @@ public abstract class Search {
 
         final JsonNode state = objectMapper.convertValue(executionState, JsonNode.class);
 
+        if (state.hasNonNull("parameter_bindings")) {
+            final ImmutableSet<Parameter> parameters = parameters().stream()
+                    .map(param -> param.applyExecutionState(objectMapper, state.path("parameter_bindings")))
+                    .collect(ImmutableSet.toImmutableSet());
+            builder.parameters(parameters);
+        }
         if (state.hasNonNull("queries")) {
             final ImmutableSet<Query> queries = queries().stream()
                     .map(query -> query.applyExecutionState(objectMapper, state.path("queries").path(query.id())))
