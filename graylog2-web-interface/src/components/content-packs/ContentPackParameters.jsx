@@ -143,9 +143,8 @@ class ContentPackParameters extends React.Component {
                        required>
                   <option value="string">String</option>
                   <option value="integer">Integer</option>
-                  <option value="ipv4Address">IPv4 Address</option>
-                  <option value="ipv6Address">IPv6 Address</option>
-                  <option value="port">port</option>
+                  <option value="double">Double</option>
+                  <option value="boolean">Boolean</option>
                 </Input>
                 <Input name="default_value"
                        id="default_value"
