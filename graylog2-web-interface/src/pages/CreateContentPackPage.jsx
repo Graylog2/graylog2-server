@@ -88,12 +88,25 @@ const CreateContentPackPage = createReactClass({
     );
   },
 
+  _dependencyComponent() {
+    return (
+      <ContentPackDependencyResolution contentPack={this.state.contentPack} />
+    )
+  },
+
+  _disableDependencyRes() {
+    const content = this.state.contentPack;
+    const selection = Object.keys(this.state.selectedEntities).length !== 0;
+    return !(content.name && content.summary && content.description && content.vendor &&
+        selection);
+  },
+
   render() {
     const steps = [
       { key: 'selection', title: 'Content Selection', component: (this._selectionComponent()) },
-      { key: 'dependency', title: 'Dependency Resolution', component: (<ContentPackDependencyResolution contentPack={this.state.contentPack} />) },
-      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />) },
-      { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />) },
+      { key: 'dependency', title: 'Dependency Resolution', component: (this._dependencyComponent()), disabled: this._disableDependencyRes() },
+      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />), disabled: this._disableDependencyRes() },
+      { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />), disabled: this._disableDependencyRes() },
     ];
 
     return (
