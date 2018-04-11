@@ -146,19 +146,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   Integer
                 </option>
                 <option
-                  value="ipv4Address"
+                  value="double"
                 >
-                  IPv4 Address
+                  Double
                 </option>
                 <option
-                  value="ipv6Address"
+                  value="boolean"
                 >
-                  IPv6 Address
-                </option>
-                <option
-                  value="port"
-                >
-                  port
+                  Boolean
                 </option>
               </select>
               <span
@@ -437,19 +432,14 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   Integer
                 </option>
                 <option
-                  value="ipv4Address"
+                  value="double"
                 >
-                  IPv4 Address
+                  Double
                 </option>
                 <option
-                  value="ipv6Address"
+                  value="boolean"
                 >
-                  IPv6 Address
-                </option>
-                <option
-                  value="port"
-                >
-                  port
+                  Boolean
                 </option>
               </select>
               <span
