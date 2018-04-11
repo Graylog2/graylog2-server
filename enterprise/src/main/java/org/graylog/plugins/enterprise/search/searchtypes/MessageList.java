@@ -2,6 +2,7 @@ package org.graylog.plugins.enterprise.search.searchtypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -10,7 +11,6 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 
 @AutoValue
 @JsonTypeName(MessageList.NAME)
@@ -50,16 +50,16 @@ public abstract class MessageList implements SearchType {
     }
 
     @Override
-    public SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state) {
-        final boolean hasLimit = state.containsKey("limit");
-        final boolean hasOffset = state.containsKey("offset");
+    public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
+        final boolean hasLimit = state.hasNonNull("limit");
+        final boolean hasOffset = state.hasNonNull("offset");
         if (hasLimit || hasOffset) {
             final Builder builder = toBuilder();
             if (hasLimit) {
-                builder.limit((Integer) state.get("limit"));
+                builder.limit(state.path("limit").asInt());
             }
             if (hasOffset) {
-                builder.offset((Integer) state.get("offset"));
+                builder.offset(state.path("offset").asInt());
             }
             return builder.build();
         }

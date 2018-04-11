@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -64,20 +64,20 @@ public abstract class Query {
                 .searchTypes(of());
     }
 
-    public Query applyExecutionState(ObjectMapper objectMapper, Map<String, Object> state) {
-        if (state == null) {
+    public Query applyExecutionState(ObjectMapper objectMapper, JsonNode state) {
+        if (state.isMissingNode()) {
             return this;
         }
-        final boolean hasTimerange = state.containsKey("timerange");
-        final boolean hasSearchTypes = state.containsKey("search_types");
+        final boolean hasTimerange = state.hasNonNull("timerange");
+        final boolean hasSearchTypes = state.hasNonNull("search_types");
         if (hasTimerange || hasSearchTypes) {
             final Builder builder = toBuilder();
             if (hasTimerange) {
                 try {
-                    final Object rawTimerange = state.get("timerange");
-                    final TimeRange newTimeRange = objectMapper.treeToValue(objectMapper.valueToTree(rawTimerange), TimeRange.class);
+                    final Object rawTimerange = state.path("timerange");
+                    final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
                     builder.timerange(newTimeRange);
-                } catch (JsonProcessingException e) {
+                } catch (Exception e) {
                     LOG.error("Unable to deserialize execution state for time range", e);
                 }
             }
@@ -85,15 +85,12 @@ public abstract class Query {
                 // copy all existing search types, we'll update them by id if necessary below
                 Map<String, SearchType> updatedSearchTypes = Maps.newHashMap(searchTypesIndex);
 
-                @SuppressWarnings("unchecked")
-                Map<String, Object> searchTypeStates = (Map<String, Object>) state.get("search_types");
-                for (Map.Entry<String, Object> stateEntry : searchTypeStates.entrySet()) {
+                state.path("search_types").fields().forEachRemaining(stateEntry -> {
                     final String id = stateEntry.getKey();
                     final SearchType searchType = searchTypesIndex.get(id);
-                    @SuppressWarnings("unchecked")
-                    final SearchType updatedSearchType = searchType.applyExecutionContext(objectMapper, (Map<String, Object>) stateEntry.getValue());
+                    final SearchType updatedSearchType = searchType.applyExecutionContext(objectMapper, stateEntry.getValue());
                     updatedSearchTypes.put(id, updatedSearchType);
-                }
+                });
                 builder.searchTypes(ImmutableSet.copyOf(updatedSearchTypes.values()));
             }
             return builder.build();

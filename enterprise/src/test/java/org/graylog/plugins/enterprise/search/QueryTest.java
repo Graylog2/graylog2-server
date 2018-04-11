@@ -2,6 +2,7 @@ package org.graylog.plugins.enterprise.search;
 
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -88,7 +89,7 @@ public class QueryTest {
                 )
         );
 
-        final Query mergedQuery = query.applyExecutionState(objectMapper, executionState);
+        final Query mergedQuery = query.applyExecutionState(objectMapper, objectMapper.convertValue(executionState, JsonNode.class));
         assertThat(mergedQuery)
                 .isNotEqualTo(query)
                 .extracting(Query::timerange).extracting("range").containsExactly(60);

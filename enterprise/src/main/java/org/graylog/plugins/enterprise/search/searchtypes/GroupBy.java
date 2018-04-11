@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search.searchtypes;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -12,7 +13,6 @@ import org.graylog.plugins.enterprise.search.SearchType;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import java.util.List;
-import java.util.Map;
 
 @AutoValue
 @JsonTypeName(GroupBy.NAME)
@@ -65,7 +65,7 @@ public abstract class GroupBy implements SearchType {
     }
 
     @Override
-    public SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state) {
+    public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
         return this;
     }
 

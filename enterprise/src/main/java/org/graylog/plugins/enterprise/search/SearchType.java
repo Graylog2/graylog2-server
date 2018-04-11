@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,7 +32,7 @@ public interface SearchType {
 
     SearchType withId(String id);
 
-    SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state);
+    SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state);
 
     @JsonAutoDetect
     class Fallback implements SearchType {
@@ -60,7 +60,7 @@ public interface SearchType {
         }
 
         @Override
-        public SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state) {
+        public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
             return this;
         }
 

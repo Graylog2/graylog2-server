@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -43,11 +44,17 @@ public abstract class Search {
     public abstract ImmutableSet<Parameter> parameters();
 
     public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
-        //noinspection unchecked
-        final ImmutableSet<Query> queries = queries().stream()
-                .map(query -> query.applyExecutionState(objectMapper, (Map<String, Object>) executionState.get(query.id())))
-                .collect(ImmutableSet.toImmutableSet());
-        return toBuilder().queries(queries).build();
+        final Builder builder = toBuilder();
+
+        final JsonNode state = objectMapper.convertValue(executionState, JsonNode.class);
+
+        if (state.hasNonNull("queries")) {
+            final ImmutableSet<Query> queries = queries().stream()
+                    .map(query -> query.applyExecutionState(objectMapper, state.path("queries").path(query.id())))
+                    .collect(ImmutableSet.toImmutableSet());
+            builder.queries(queries);
+        }
+        return builder.build();
     }
 
     abstract Builder toBuilder();
