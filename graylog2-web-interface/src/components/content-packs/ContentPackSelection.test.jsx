@@ -21,13 +21,25 @@ describe('<ContentPackSelection />', () => {
       url: 'http://example.com',
     };
 
-    const wrapper = renderer.create(<ContentPackSelection contentPack={contentPack} />);
+    const entities = {
+      spaceship: [{
+        title: 'breq',
+        type: 'spaceship',
+        id: 'beef123',
+      }],
+    };
+
+    const wrapper = renderer.create(
+      <ContentPackSelection contentPack={contentPack}
+                            entities={entities}
+                            selectedEntities={{}}
+      />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should update the state when filling out the form', () => {
     let called = 0;
-    const changeFn = jest.fn((newContentPack) => {
+    const changeFn = jest.fn((state) => {
       const contentPack = {
         name: 'name',
         summary: 'summary',
@@ -37,7 +49,7 @@ describe('<ContentPackSelection />', () => {
       };
       called += 1;
       if (called === Object.keys(contentPack).length) {
-        expect(newContentPack).toEqual(contentPack);
+        expect(state.contentPack).toEqual(contentPack);
       }
     });
     const contentPack = {};
@@ -48,5 +60,29 @@ describe('<ContentPackSelection />', () => {
     wrapper.find('input#vendor').simulate('change', { target: { name: 'vendor', value: 'vendor' } });
     wrapper.find('input#url').simulate('change', { target: { name: 'url', value: 'url' } });
     expect(changeFn.mock.calls.length).toBe(5);
+  });
+
+  it('should update state if content selection changed', () => {
+    const contentPack = {};
+    const entities = {
+      spaceship: [{
+        title: 'breq',
+        type: 'spaceship',
+        id: 'beef123',
+      }],
+    };
+
+    const changeFn = jest.fn((newState) => {
+      expect(newState.selectedEntities).toEqual(entities);
+    });
+
+    const wrapper = mount(
+      <ContentPackSelection contentPack={contentPack}
+                            selectedEntities={{}}
+                            onStateChange={changeFn}
+                            entities={entities}
+      />);
+    wrapper.find('input[type="checkbox"]').at(0).simulate('change', { target: { checked: true } });
+    expect(changeFn.mock.calls.length).toBe(1);
   });
 });
