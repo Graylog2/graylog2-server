@@ -71,7 +71,7 @@ class ContentPackParameters extends React.Component {
       return;
     }
     newContentPack.parameters.splice(indexToDelete, 1);
-    this.props.onStateChange(newContentPack);
+    this.props.onStateChange({ contentPack: newContentPack });
   };
 
 

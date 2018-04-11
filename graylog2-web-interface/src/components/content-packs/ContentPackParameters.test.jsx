@@ -29,8 +29,8 @@ describe('<ContentPackParameters />', () => {
   });
 
   it('should delete a parameter', () => {
-    const changeFn = jest.fn((newContentPack) => {
-      expect(newContentPack.parameters).toEqual([]);
+    const changeFn = jest.fn((newState) => {
+      expect(newState.contentPack.parameters).toEqual([]);
     });
 
     const contentPack = {
