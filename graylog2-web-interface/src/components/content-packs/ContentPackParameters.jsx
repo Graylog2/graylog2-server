@@ -60,7 +60,7 @@ class ContentPackParameters extends React.Component {
     }
     const newContentPack = ObjectUtils.clone(this.props.contentPack);
     newContentPack.parameters.push(this.state.newParameter);
-    this.props.onStateChange(newContentPack);
+    this.props.onStateChange({ contentPack: newContentPack });
     this.setState({ newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter) });
   }
 

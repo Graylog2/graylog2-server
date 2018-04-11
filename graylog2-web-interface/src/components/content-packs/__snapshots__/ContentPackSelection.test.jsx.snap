@@ -382,7 +382,53 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
       <br />
       <ul
         className="list"
-      />
+      >
+        <li
+          className="listItem"
+        >
+          <div
+            className="listItemContainer"
+          >
+            <label
+              className="checkbox-inline"
+              style={undefined}
+              title=""
+            >
+              <input
+                checked={false}
+                disabled={false}
+                onChange={[Function]}
+                type="checkbox"
+              />
+            </label>
+            <div
+              className="expandBoxContainer"
+            >
+              <div
+                className="fa-stack expandBox"
+                onClick={[Function]}
+                role="button"
+                tabIndex={0}
+              >
+                <i
+                  className="fa fa-circle-thin fa-stack-1x iconBackground"
+                />
+                <i
+                  className="fa fa-stack-1x fa-angle-up"
+                />
+              </div>
+            </div>
+            <span
+              className="header"
+            >
+              Spaceship
+            </span>
+          </div>
+          <div
+            className="expandableContent"
+          />
+        </li>
+      </ul>
     </div>
   </div>
 </div>

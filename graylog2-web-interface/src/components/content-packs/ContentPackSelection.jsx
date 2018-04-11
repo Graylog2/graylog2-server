@@ -12,6 +12,7 @@ class ContentPackSelection extends React.Component {
     contentPack: PropTypes.object.isRequired,
     onStateChange: PropTypes.func,
     entities: PropTypes.object,
+    selectedEntities: PropTypes.object,
   };
 
   static defaultProps = {
@@ -29,14 +30,13 @@ class ContentPackSelection extends React.Component {
     this._bindValue = this._bindValue.bind(this);
     this.state = {
       contentPack: ObjectUtils.clone(this.props.contentPack),
-      selectedEntities: {},
     };
   }
 
   _updateField(name, value) {
     const updatedPack = ObjectUtils.clone(this.state.contentPack);
     updatedPack[name] = value;
-    this.props.onStateChange(updatedPack);
+    this.props.onStateChange({ contentPack: updatedPack });
     this.setState({ contentPack: updatedPack });
   }
 
@@ -45,7 +45,7 @@ class ContentPackSelection extends React.Component {
   }
 
   _updateSelectionEntity = (entity) => {
-    const newSelection = ObjectUtils.clone(this.state.selectedEntities);
+    const newSelection = ObjectUtils.clone(this.props.selectedEntities);
     newSelection[entity.type] = (newSelection[entity.type] || []);
     const index = newSelection[entity.type].findIndex((e) => { return e.id === entity.id; });
     if (index < 0) {
@@ -53,42 +53,42 @@ class ContentPackSelection extends React.Component {
     } else {
       newSelection[entity.type].splice(index, 1);
     }
-    this.setState({ selectedEntities: newSelection });
+    this.props.onStateChange({ selectedEntities: newSelection });
   };
 
   _updateSelectionGroup = (type) => {
-    const newSelection = ObjectUtils.clone(this.state.selectedEntities);
+    const newSelection = ObjectUtils.clone(this.props.selectedEntities);
     if (this._isGroupSelected(type)) {
       newSelection[type] = [];
     } else {
       newSelection[type] = this.props.entities[type];
     }
 
-    this.setState({ selectedEntities: newSelection });
+    this.props.onStateChange({ selectedEntities: newSelection });
   };
 
   _isUndetermined(type) {
-    if (!this.state.selectedEntities[type]) {
+    if (!this.props.selectedEntities[type]) {
       return false;
     }
 
-    return !(this.state.selectedEntities[type].length === this.props.entities[type].length ||
-       this.state.selectedEntities[type].length === 0);
+    return !(this.props.selectedEntities[type].length === this.props.entities[type].length ||
+       this.props.selectedEntities[type].length === 0);
   }
 
   _isSelected(entity) {
-    if (!this.state.selectedEntities[entity.type]) {
+    if (!this.props.selectedEntities[entity.type]) {
       return false;
     }
 
-    return this.state.selectedEntities[entity.type].findIndex((e) => { return e.id === entity.id; }) >= 0;
+    return this.props.selectedEntities[entity.type].findIndex((e) => { return e.id === entity.id; }) >= 0;
   }
 
   _isGroupSelected(type) {
-    if (!this.state.selectedEntities[type]) {
+    if (!this.props.selectedEntities[type]) {
       return false;
     }
-    return this.state.selectedEntities[type].length === this.props.entities[type].length;
+    return this.props.selectedEntities[type].length === this.props.entities[type].length;
   }
 
   render() {

@@ -33,6 +33,7 @@ const CreateContentPackPage = createReactClass({
         parameters: [],
         entities: [],
       },
+      selectedEntities: {},
       selectedStep: undefined,
     };
   },
@@ -50,8 +51,13 @@ const CreateContentPackPage = createReactClass({
     return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
   },
 
-  _onStateChanged(updatedPack) {
-    this.setState({ contentPack: updatedPack });
+  _onStateChanged(newState) {
+    const contentPack = newState.contentPack || this.state.contentPack;
+    const selectedEntities = newState.selectedEntities || this.state.selectedEntities;
+    this.setState({
+      contentPack: contentPack,
+      selectedEntities: selectedEntities,
+    });
   },
 
   _onSave() {
@@ -72,9 +78,19 @@ const CreateContentPackPage = createReactClass({
         });
   },
 
+  _selectionComponent() {
+    return (
+      <ContentPackSelection contentPack={this.state.contentPack}
+                            selectedEntities={this.state.selectedEntities}
+                            onStateChange={this._onStateChanged}
+                            entities={this.state.entityIndex}
+      />
+    );
+  },
+
   render() {
     const steps = [
-      { key: 'selection', title: 'Content Selection', component: (<ContentPackSelection contentPack={this.state.contentPack} onStateChange={this._onStateChanged} entities={this.state.entityIndex} />) },
+      { key: 'selection', title: 'Content Selection', component: (this._selectionComponent()) },
       { key: 'dependency', title: 'Dependency Resolution', component: (<ContentPackDependencyResolution contentPack={this.state.contentPack} />) },
       { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />) },
       { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />) },
@@ -105,6 +121,7 @@ const CreateContentPackPage = createReactClass({
             </div>
           </Wizard>
           <textarea value={JSON.stringify(this.state.contentPack)} />
+          <textarea value={JSON.stringify(this.state.selectedEntities)} />
         </span>
       </DocumentTitle>
     );
