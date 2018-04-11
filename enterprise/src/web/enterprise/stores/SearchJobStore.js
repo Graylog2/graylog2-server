@@ -41,7 +41,8 @@ export default Reflux.createStore({
     if (!query) {
       SearchJobActions.run.promise(Promise.reject());
     } else {
-      const promise = fetch('POST', executeQueryUrl(searchId), executionState || {})
+      const executionStateValue = executionState ? executionState.toJS() : {};
+      const promise = fetch('POST', executeQueryUrl(searchId), executionStateValue)
         .then((job) => {
           this.state.jobs[job.id] = job;
           this._trigger();

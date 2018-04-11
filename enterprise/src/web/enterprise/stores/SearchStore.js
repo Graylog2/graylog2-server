@@ -7,6 +7,7 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import SearchJobActions from 'enterprise/actions/SearchJobActions';
 import SearchJobStore from 'enterprise/stores/SearchJobStore';
+import SearchParameterStore from 'enterprise/stores/SearchParameterStore';
 import SearchActions from 'enterprise/actions/SearchActions';
 import SearchRequest from 'enterprise/logic/SearchRequest';
 import SearchResult from 'enterprise/logic/SearchResult';
@@ -30,13 +31,12 @@ export default Reflux.createStore({
     this.listenTo(WidgetStore, this.onWidgetStoreUpdate, this.onWidgetStoreUpdate);
     this.listenTo(QueriesStore, this.onQueriesStoreUpdate, this.onQueriesStoreUpdate);
     this.listenTo(QueryFiltersStore, this.onQueryFiltersStoreUpdate, this.onQueryFiltersStoreUpdate);
+    this.listenTo(SearchParameterStore, this.onSearchParameterUpdate, this.onSearchParameterUpdate);
   },
 
-  _debouncedParse: _.debounce((queries, widgets, filters) => {
-    const search = new SearchRequest(queries, widgets, filters);
-    console.log('Parsing search', search);
-    SearchMetadataActions.parseSearch(search)
-      .then(metadata => console.log(metadata));
+  _debouncedParse: _.debounce((queries, parameters, widgets, filters) => {
+    const search = new SearchRequest(queries, parameters, widgets, filters);
+    SearchMetadataActions.parseSearch(search);
   }, 500),
 
   onWidgetStoreUpdate(widgets) {
@@ -51,10 +51,14 @@ export default Reflux.createStore({
     this.filters = filters;
     this.onUpdate();
   },
+  onSearchParameterUpdate(parameters) {
+    this.parameters = parameters;
+    this.onUpdate();
+  },
 
   onUpdate() {
     if (this.queries && this.queries.size > 0) {
-      this._debouncedParse(this.queries, this.widgets, this.filters);
+      this._debouncedParse(this.queries, this.parameters, this.widgets, this.filters);
     }
   },
 
@@ -74,17 +78,17 @@ export default Reflux.createStore({
     });
   },
 
-  trackJob(search, searchRequest) {
-    return SearchJobActions.run(search.id).then(job => this.trackJobStatus(job, searchRequest, search));
+  trackJob(search, searchRequest, executionState) {
+    return SearchJobActions.run(search.id, executionState).then(job => this.trackJobStatus(job, searchRequest, search));
   },
 
-  execute() {
+  execute(executionState) {
     if (this.executePromise) {
       this.executePromise.cancel();
     }
-    const searchRequest = new SearchRequest(this.queries, this.widgets, this.filters);
+    const searchRequest = new SearchRequest(this.queries, this.parameters, this.widgets, this.filters);
     this.executePromise = SearchJobActions.create(searchRequest)
-      .then(({ request, search }) => this.trackJob(search, request), displayError)
+      .then(({ request, search }) => this.trackJob(search, request, executionState), displayError)
       .then((result) => {
         this.trigger({ result });
         this.executePromise = undefined;

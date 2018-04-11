@@ -12,14 +12,15 @@ const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins
 export default Reflux.createStore({
   listenables: [SearchMetadataActions],
 
-  state: {
-    parameters: {},
-  },
+  state: Immutable.fromJS({
+    parameters: {
+      undeclared: Immutable.Set(),
+      used: Immutable.Set(),
+    }
+  }),
 
   getInitialState() {
-    return {
-      state: this.state,
-    };
+    return this.state;
   },
 
   _postProcess(metadata) {
@@ -38,17 +39,16 @@ export default Reflux.createStore({
         }
       });
     });
-    return {
-      undeclared: undeclared.toJS(),
-      used: used.toJS(),
-      unused: [],
-    };
+    return Immutable.Map({
+      undeclared: undeclared,
+      used: used,
+    });
   },
 
   parseSearch(searchRequest) {
     const promise = fetch('POST', parseSearchUrl, searchRequest.toRequest())
       .then((metadata) => {
-        this.state.parameters = this._postProcess(metadata);
+        this.state = this.state.set('parameters', this._postProcess(metadata));
         this._trigger();
         return this.state;
       });
@@ -58,7 +58,7 @@ export default Reflux.createStore({
   parseSearchId(searchId) {
     const promise = fetch('GET', parseSearchIdUrl, searchId)
       .then((metadata) => {
-        this.state.parameters = this._postProcess(metadata);
+        this.state = this.state.set('parameters', this._postProcess(metadata));
         this._trigger();
         return this.state;
       });

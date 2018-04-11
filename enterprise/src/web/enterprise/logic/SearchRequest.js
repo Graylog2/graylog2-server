@@ -21,10 +21,11 @@ const _filtersForQuery = (filters) => {
 };
 
 export default class SearchRequest {
-  constructor(queries, widgets, filters) {
+  constructor(queries, parameters, widgets, filters) {
     this.id = uuid();
     this.widgetMapping = new Immutable.Map();
     this.searchRequest = {
+      parameters: new Immutable.Set(parameters.valueSeq()).toJS(),
       queries: queries.map((query, id) => {
         const searchTypes = widgets.get(id, new Immutable.Map())
           .map(widget => widgetDefinition(widget.get('type')).searchTypes(widget.get('config')).map(searchType => Object.assign(searchType, { widgetId: widget.get('id') })))
