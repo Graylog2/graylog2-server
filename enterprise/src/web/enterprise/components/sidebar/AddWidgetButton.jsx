@@ -6,6 +6,7 @@ import uuid from 'uuid/v4';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import WidgetActions from 'enterprise/actions/WidgetActions';
+import AggregateActionHandler from '../../logic/fieldactions/AggregateActionHandler';
 
 const AddWidgetButton = createReactClass({
   propTypes: {
@@ -18,16 +19,7 @@ const AddWidgetButton = createReactClass({
   },
 
   onCreateAggregation() {
-    WidgetActions.create(this.props.viewId, this.props.queryId, {
-      id: uuid(),
-      type: 'AGGREGATION',
-      config: {
-        series: ['count()'],
-        rowPivots: ['timestamp'],
-        columnPivots: [],
-        sort: [],
-      },
-    });
+    AggregateActionHandler(this.props.viewId, this.props.queryId, 'timestamp');
   },
 
   onCreateAlertStatus() {

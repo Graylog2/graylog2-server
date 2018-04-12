@@ -20,12 +20,11 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     static final String FIELD_SORT = "sort";
     static final String FIELD_VISUALIZATION = "visualization";
 
-
     @JsonProperty(FIELD_ROW_PIVOTS)
-    public abstract List<String> rowPivots();
+    public abstract List<PivotDTO> rowPivots();
 
     @JsonProperty(FIELD_COLUMN_PIVOTS)
-    public abstract List<String> columnPivots();
+    public abstract List<PivotDTO> columnPivots();
 
     @JsonProperty(FIELD_SERIES)
     public abstract List<String> series();
@@ -39,10 +38,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_ROW_PIVOTS)
-        public abstract Builder rowPivots(List<String> rowPivots);
+        public abstract Builder rowPivots(List<PivotDTO> rowPivots);
 
         @JsonProperty(FIELD_COLUMN_PIVOTS)
-        public abstract Builder columnPivots(List<String> columnPivots);
+        public abstract Builder columnPivots(List<PivotDTO> columnPivots);
 
         @JsonProperty(FIELD_SERIES)
         public abstract Builder series(List<String> series);

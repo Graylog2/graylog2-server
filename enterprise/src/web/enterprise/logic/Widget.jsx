@@ -1,4 +1,5 @@
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { pivotForField } from './searchtypes/aggregation/PivotGenerator';
 
 const widgetsKey = 'enterpriseWidgets';
 
@@ -24,7 +25,7 @@ export const resultHistogram = (id) => {
     type: 'AGGREGATION',
     config: {
       rowPivots: [
-        'timestamp',
+        pivotForField('timestamp'),
       ],
       series: [
         'count()',

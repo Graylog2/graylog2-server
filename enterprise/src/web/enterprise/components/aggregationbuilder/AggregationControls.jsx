@@ -38,11 +38,11 @@ export default class AggregationControls extends React.Component {
   }
 
   _onColumnPivotChange = (columnPivots) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { columnPivots: columnPivots.split(',') }));
+    this.setState(state => this._mutateStateAndPropagate(state, { columnPivots }));
   };
 
   _onRowPivotChange = (rowPivots) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { rowPivots: rowPivots.split(',') }));
+    this.setState(state => this._mutateStateAndPropagate(state, { rowPivots }));
   };
 
   _onSeriesChange = (series) => {
@@ -80,13 +80,13 @@ export default class AggregationControls extends React.Component {
             <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <RowPivotSelect fields={formattedFields} rowPivots={rowPivots.join(',')} onChange={this._onRowPivotChange} />
+            <RowPivotSelect fields={formattedFields} rowPivots={rowPivots} onChange={this._onRowPivotChange} />
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <ColumnPivotSelect fields={formattedFields} columnPivots={columnPivots.join(',')} onChange={this._onColumnPivotChange} />
+            <ColumnPivotSelect fields={formattedFields} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
           </Col>
           <Col md={2} style={{ paddingLeft: '2px' }}>
-            <SortSelect fields={currentlyUsedFields} sort={sort.join(',')} onChange={this._onSortChange} />
+            <SortSelect fields={currentlyUsedFields} sort={sort} onChange={this._onSortChange} />
           </Col>
         </Row>
         <Row style={{ height: 'calc(100% - 60px)' }}>

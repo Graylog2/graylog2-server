@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Select from 'components/common/Select';
 import { FieldList } from './AggregationBuilderPropTypes';
+import SortableSelect from './SortableSelect';
 
 const ColumnPivotSelect = ({ columnPivots, fields, onChange }) => (
-  <Select placeholder="Column pivot"
-          options={fields}
-          multi
-          value={columnPivots}
-          onChange={onChange} />
+  <SortableSelect
+    placeholder="Column pivot"
+    onChange={onChange}
+    options={fields}
+    value={columnPivots}
+  />
 );
 
 ColumnPivotSelect.propTypes = {

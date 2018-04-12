@@ -7,7 +7,8 @@ import GenericPlot from '../GenericPlot';
 import { generateSeries } from '../Series';
 
 const _generateSeries = (config, data) => {
-  const results = normalizeRows(config.rowPivots.slice(), config.series, data, true);
+  const fieldNames = config.rowPivots.map(({ field }) => field);
+  const results = normalizeRows(fieldNames, config.series, data, true);
   return generateSeries(config, results, 'scatter');
 };
 

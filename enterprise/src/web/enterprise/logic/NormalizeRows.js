@@ -1,6 +1,6 @@
 const _flatten = arrays => [].concat(...arrays);
 
-const normalizeRows = (fieldNames, series, rows, template = {}) => {
+const _normalizeRows = (fieldNames, series, rows, template = {}) => {
   if (fieldNames.length === 0) {
     return [];
   }
@@ -19,5 +19,7 @@ const normalizeRows = (fieldNames, series, rows, template = {}) => {
     return normalizeRows(fieldNames.slice(), series, newRows, newTemplate);
   }));
 };
+
+const normalizeRows = (fieldNames, series, rows, template = {}) => _normalizeRows(fieldNames.slice(), series, rows, template);
 
 export default normalizeRows;

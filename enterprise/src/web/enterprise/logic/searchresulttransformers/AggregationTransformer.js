@@ -34,8 +34,9 @@ const _formatBucket = (fieldNames, series, buckets) => {
 
 export default (data, widget) => {
   const { rowPivots, series } = widget.config;
+  const fieldNames = rowPivots.map(({ field }) => field);
   if (data && data[0] && data[0].groups[0]) {
-    const buckets = _formatBucket(rowPivots.slice(), series, data[0].groups[0].buckets);
+    const buckets = _formatBucket(fieldNames, series, data[0].groups[0].buckets);
     return [{ results: buckets }];
   }
   return [];

@@ -56,7 +56,7 @@ export default {
       visualizationComponent: AggregationBuilder,
       searchResultTransformer: AggregationTransformer,
       searchTypes: AggregationConfigGenerator,
-      titleGenerator: widget => `Aggregating ${widget.config.series} by ${widget.config.rowPivots}`,
+      titleGenerator: widget => `Aggregating ${widget.config.series} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`,
     },
     {
       type: 'ALERT_STATUS',

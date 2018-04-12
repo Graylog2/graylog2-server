@@ -13,8 +13,9 @@ const _dimensions = (idx, total) => {
 };
 const _generateSeries = (config, data) => {
   const { series } = config;
-  const results = normalizeRows(config.rowPivots.slice(), series, data, true);
-  const x = results.map(v => config.rowPivots.map(p => v[p]).join('-'));
+  const fieldNames = config.rowPivots.map(({ field }) => field);
+  const results = normalizeRows(fieldNames, series, data, true);
+  const x = results.map(v => fieldNames.map(p => v[p]).join('-'));
   return series.map((s, idx) => {
     const y = results.map(v => v[s]);
     return {

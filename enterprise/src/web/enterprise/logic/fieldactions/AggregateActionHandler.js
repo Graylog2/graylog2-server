@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4';
 
 import WidgetActions from 'enterprise/actions/WidgetActions';
+import { pivotForField } from '../searchtypes/aggregation/PivotGenerator';
 
 export default function (viewId, queryId, field) {
   const newWidget = {
@@ -8,7 +9,7 @@ export default function (viewId, queryId, field) {
     title: `Values of field ${field}`,
     type: 'AGGREGATION',
     config: {
-      rowPivots: [field],
+      rowPivots: [pivotForField(field)],
       series: ['count()'],
     },
   };

@@ -1,3 +1,5 @@
+import { pivotForField } from './PivotGenerator';
+
 const seriesRegex = /^(\w+)\((\w*)\)$/;
 
 const _parseSeries = (s) => {
@@ -11,10 +13,12 @@ const _parseSeries = (s) => {
   return definition;
 };
 
-const _typeForField = (field) => {
+const formatInterval = ({ value, unit }) => `${value}${unit[0]}`;
+
+const _typeForField = (field, { interval }) => {
   switch (field) {
     case 'timestamp':
-      return { type: 'time', interval: 'minute' };
+      return { type: 'time', interval: formatInterval(interval) };
     default:
       return { type: 'values' };
   }
@@ -22,14 +26,14 @@ const _typeForField = (field) => {
 
 const _group = (fieldNames, series) => {
   if (fieldNames.length > 0) {
-    const fieldName = fieldNames.shift();
+    const { field, config } = fieldNames.shift();
     return [
       Object.assign({
-        field: fieldName,
+        field,
         metrics: series.map(s => _parseSeries(s)),
         groups: fieldNames.length > 0 ? _group(fieldNames, series) : [],
       },
-      _typeForField(fieldName)),
+      _typeForField(field, config)),
     ];
   }
   return [];

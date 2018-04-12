@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Select from 'components/common/Select';
 import { FieldList } from './AggregationBuilderPropTypes';
+import SortableSelect from './SortableSelect';
 
 const SortSelect = ({ fields, onChange, sort }) => (
-  <Select placeholder="Sort"
-          options={fields}
-          multi
-          value={sort}
-          onChange={onChange} />
+  <SortableSelect
+    placeholder="Sort"
+    onChange={onChange}
+    options={fields}
+    value={sort}
+  />
 );
 
 SortSelect.propTypes = {
