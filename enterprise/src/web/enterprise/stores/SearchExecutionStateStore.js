@@ -50,7 +50,17 @@ export default Reflux.createStore({
     this.trigger(this.executionState);
   },
 
-  setParameterBinding(parameterName, value) {
+  setParameterValues(parameterMap) {
+    parameterMap.forEach((value, parameterName) => {
+      this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], Immutable.fromJS({
+        type: 'value',
+        value: value,
+      }));
+    });
+    this.trigger(this.executionState);
+  },
+
+  bindParameterValue(parameterName, value) {
     this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], Immutable.fromJS({
       type: 'value',
       value: value,
