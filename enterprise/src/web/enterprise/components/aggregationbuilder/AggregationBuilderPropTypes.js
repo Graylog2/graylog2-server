@@ -8,7 +8,7 @@ export const FieldList = PropTypes.arrayOf(
 );
 
 export const AggregationType = PropTypes.shape({
-  rowPivots: PropTypes.arrayOf(PropTypes.string),
+  rowPivots: PropTypes.arrayOf(PropTypes.object),
   series: PropTypes.arrayOf(PropTypes.string),
   sort: PropTypes.arrayOf(PropTypes.string),
   visualization: PropTypes.string,
