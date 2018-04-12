@@ -31,12 +31,13 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     // TODO we can probably push job, query and predecessorResults into the GeneratedQueryContext to simplify the signature
     default QueryResult run(SearchJob job, Query query, GeneratedQueryContext generatedQueryContext, Set<QueryResult> predecessorResults) {
         final Stopwatch stopwatch = Stopwatch.createStarted();
+        final QueryExecutionStats.Builder statsBuilder = QueryExecutionStats.builderWithCurrentTime();
         // https://www.ibm.com/developerworks/java/library/j-jtp04298/index.html#3.0
         //noinspection unchecked
         final QueryResult result = doRun(job, query, (T) generatedQueryContext, predecessorResults);
         stopwatch.stop();
         return result.toBuilder()
-                .executionStats(QueryExecutionStats.create(stopwatch.elapsed(TimeUnit.MILLISECONDS)))
+                .executionStats(statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS)).build())
                 .build();
     }
 
