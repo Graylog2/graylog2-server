@@ -39,7 +39,7 @@ public abstract class Parameter {
     public abstract String dataType();
 
     @Nullable
-    @JsonProperty("default")
+    @JsonProperty("default_value")
     public abstract Object defaultValue();
 
     @JsonProperty
@@ -98,7 +98,7 @@ public abstract class Parameter {
         @JsonProperty
         public abstract Builder dataType(String dataType);
 
-        @JsonProperty("default")
+        @JsonProperty("default_value")
         public abstract Builder defaultValue(Object defaultValue);
 
         @JsonProperty
@@ -120,10 +120,10 @@ public abstract class Parameter {
         // this method only exists because the compiler cannot treat `Binding` and `B extends Binding` as the same types
         // see SearchTypeHandler
         @SuppressWarnings("unchecked")
-        default Object resolve(Binding binding, Map<String, QueryResult> results) {
-            return doResolve((B) binding, results);
+        default Object resolve(Binding binding, Object defaultValue, Map<String, QueryResult> results) {
+            return doResolve((B) binding, defaultValue, results);
         }
 
-        Object doResolve(B binding, Map<String, QueryResult> results);
+        Object doResolve(B binding, Object defaultValue, Map<String, QueryResult> results);
     }
 }
