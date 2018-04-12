@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -67,7 +68,8 @@ public class GrokExtractorTest {
 
 
     @Test
-    public void postfix() {
+    public void issue_3949() {
+        // Also see: https://github.com/Graylog2/graylog2-server/issues/3949
         patternSet.add(GrokPattern.create("POSTFIX_QMGR_REMOVED", "%{POSTFIX_QUEUEID:postfix_queueid}: removed"));
         patternSet.add(GrokPattern.create("POSTFIX_CLEANUP_MILTER", "%{POSTFIX_QUEUEID:postfix_queueid}: milter-%{POSTFIX_ACTION:postfix_milter_result}: %{GREEDYDATA:postfix_milter_message}; %{GREEDYDATA_NO_COLON:postfix_keyvalue_data}(: %{GREEDYDATA:postfix_milter_data})?"));
         patternSet.add(GrokPattern.create("POSTFIX_QMGR_ACTIVE", "%{POSTFIX_QUEUEID:postfix_queueid}: %{POSTFIX_KEYVALUE_DATA:postfix_keyvalue_data} \\(queue active\\)"));
@@ -158,10 +160,9 @@ public class GrokExtractorTest {
 
         final Map<String, Object> config = new HashMap<>();
         config.put("named_captures_only", true);
-        final GrokExtractor extractor = makeExtractor("%{POSTFIX_SMTPD}", config);
-
-        final Extractor.Result[] results = extractor.run("Test 12345 Foobar");
-        assertEquals(0, results.length);
+        assertThatThrownBy(() ->  makeExtractor("%{POSTFIX_SMTPD}", config))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("No definition for key 'HOSTNAME' found, aborting");
     }
 
     @Test
