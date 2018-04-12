@@ -19,8 +19,8 @@ package org.graylog2.grok;
 import com.google.common.base.Strings;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.exception.GrokException;
+import io.thekraken.grok.api.GrokCompiler;
+import io.thekraken.grok.api.exception.GrokException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
@@ -106,8 +106,8 @@ public class InMemoryGrokPatternService implements GrokPatternService {
     public boolean validate(GrokPattern pattern) {
         final boolean fieldsMissing = !(Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern()));
         try {
-            final Grok grok = new Grok();
-            grok.addPattern(pattern.name(), pattern.pattern());
+            final GrokCompiler grok = GrokCompiler.newInstance();
+            grok.register(pattern.name(), pattern.pattern());
             grok.compile("%{" + pattern.name() + "}");
         } catch (GrokException ignored) {
             // this only checks for null or empty again.

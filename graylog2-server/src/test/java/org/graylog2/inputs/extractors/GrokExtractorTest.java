@@ -28,7 +28,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -170,8 +170,8 @@ public class GrokExtractorTest {
         final Extractor.Result[] results = extractor.run("2015-07-31T10:05:36.773Z");
         assertEquals("ISO date is parsed", 1, results.length);
         Object value = results[0].getValue();
-        assertTrue(value instanceof Date);
-        DateTime date = new DateTime(value, DateTimeZone.UTC);
+        assertTrue(value instanceof Instant);
+        DateTime date = new DateTime(((Instant) value).toEpochMilli(), DateTimeZone.UTC);
 
         assertEquals(2015, date.getYear());
         assertEquals(7, date.getMonthOfYear());

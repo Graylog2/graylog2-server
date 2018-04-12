@@ -18,8 +18,8 @@ package org.graylog2.grok;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.exception.GrokException;
+import io.thekraken.grok.api.Grok;
+import io.thekraken.grok.api.exception.GrokException;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,20 +49,19 @@ public class GrokPatternRegistryTest {
 
     private GrokPatternRegistry grokPatternRegistry;
     private EventBus eventBus;
-    private ScheduledExecutorService executor;
     @Mock
     private GrokPatternService grokPatternService;
 
     @Before
     public void setUp() {
         eventBus = new EventBus("Test");
-        executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("updater-%d").build());
+        final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("updater-%d").build());
         when(grokPatternService.loadAll()).thenReturn(GROK_PATTERNS);
         grokPatternRegistry = new GrokPatternRegistry(eventBus, grokPatternService, executor);
     }
 
     @Test
-    public void grokPatternsChanged() throws Exception {
+    public void grokPatternsChanged() {
         final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("NEW_PATTERN", "\\w+"));
         when(grokPatternService.loadAll()).thenReturn(newPatterns);
         eventBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), Collections.singleton("NEW_PATTERN")));
@@ -71,16 +70,16 @@ public class GrokPatternRegistryTest {
     }
 
     @Test
-    public void cachedGrokForPattern() throws Exception {
+    public void cachedGrokForPattern() {
         final Grok grok = grokPatternRegistry.cachedGrokForPattern("%{TESTNUM}");
         assertThat(grok.getPatterns()).containsEntry(GROK_PATTERN.name(), GROK_PATTERN.pattern());
     }
 
     @Test
-    public void cachedGrokForPatternThrowsRuntimeException() throws Exception {
-        expectedException.expectMessage("Invalid Pattern");
+    public void cachedGrokForPatternThrowsRuntimeException() {
+        expectedException.expectMessage("No definition for key 'EMPTY' found, aborting");
         expectedException.expect(RuntimeException.class);
-        expectedException.expectCause(Matchers.any(GrokException.class));
+        expectedException.expectCause(Matchers.any(IllegalArgumentException.class));
 
         final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
         when(grokPatternService.loadAll()).thenReturn(newPatterns);
@@ -90,16 +89,16 @@ public class GrokPatternRegistryTest {
     }
 
     @Test
-    public void cachedGrokForPatternWithNamedCaptureOnly() throws Exception {
+    public void cachedGrokForPatternWithNamedCaptureOnly() {
         final Grok grok = grokPatternRegistry.cachedGrokForPattern("%{TESTNUM}", true);
         assertThat(grok.getPatterns()).containsEntry(GROK_PATTERN.name(), GROK_PATTERN.pattern());
     }
 
     @Test
-    public void cachedGrokForPatternWithNamedCaptureOnlyThrowsRuntimeException() throws Exception {
-        expectedException.expectMessage("Invalid Pattern");
+    public void cachedGrokForPatternWithNamedCaptureOnlyThrowsRuntimeException() {
+        expectedException.expectMessage("No definition for key 'EMPTY' found, aborting");
         expectedException.expect(RuntimeException.class);
-        expectedException.expectCause(Matchers.any(GrokException.class));
+        expectedException.expectCause(Matchers.any(IllegalArgumentException.class));
 
         final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
         when(grokPatternService.loadAll()).thenReturn(newPatterns);
@@ -109,7 +108,7 @@ public class GrokPatternRegistryTest {
     }
 
     @Test
-    public void patterns() throws Exception {
+    public void patterns() {
         assertThat(grokPatternRegistry.patterns()).isEqualTo(GROK_PATTERNS);
     }
 }

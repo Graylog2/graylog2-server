@@ -18,9 +18,10 @@ package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.Match;
-import oi.thekraken.grok.api.exception.GrokException;
+import io.thekraken.grok.api.Grok;
+import io.thekraken.grok.api.GrokCompiler;
+import io.thekraken.grok.api.Match;
+import io.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.grok.GrokPattern;
@@ -78,15 +79,14 @@ public class GrokTesterResource extends RestResource {
     private GrokTesterResponse doTestGrok(String string, String pattern, boolean namedCapturesOnly) throws GrokException {
         final Set<GrokPattern> grokPatterns = grokPatternService.loadAll();
 
-        final Grok grok = new Grok();
+        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
         for (GrokPattern grokPattern : grokPatterns) {
-            grok.addPattern(grokPattern.name(), grokPattern.pattern());
+            grokCompiler.register(grokPattern.name(), grokPattern.pattern());
         }
 
-        grok.compile(pattern, namedCapturesOnly);
+        final Grok grok = grokCompiler.compile(pattern, namedCapturesOnly);
         final Match match = grok.match(string);
-        match.captures();
-        final Map<String, Object> matches = match.toMap();
+        final Map<String, Object> matches = match.capture();
 
         final GrokTesterResponse response;
         if (matches.isEmpty()) {

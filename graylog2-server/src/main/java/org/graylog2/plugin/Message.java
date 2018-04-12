@@ -37,7 +37,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -364,8 +370,28 @@ public class Message implements Messages {
             return;
         }
 
-        if (FIELD_TIMESTAMP.equals(trimmedKey) && value != null && value instanceof Date) {
+        final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
+        if (isTimestamp && value instanceof Date) {
             final DateTime timestamp = new DateTime(value);
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
+            updateSize(trimmedKey, timestamp, previousValue);
+        } else if (isTimestamp && value instanceof Temporal) {
+            final Date date;
+            if (value instanceof ZonedDateTime) {
+                date = Date.from(((ZonedDateTime) value).toInstant());
+            } else if (value instanceof OffsetDateTime) {
+                date = Date.from(((OffsetDateTime) value).toInstant());
+            } else if (value instanceof LocalDateTime) {
+                date = Date.from(((LocalDateTime) value).toInstant(ZoneOffset.UTC));
+            } else if (value instanceof LocalDate) {
+                date = Date.from(((LocalDate) value).atStartOfDay(ZoneOffset.UTC).toInstant());
+            } else if (value instanceof Instant) {
+                date = Date.from((Instant) value);
+            } else {
+                date = new Date();
+            }
+
+            final DateTime timestamp = new DateTime(date);
             final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
             updateSize(trimmedKey, timestamp, previousValue);
         } else if (value instanceof String) {
