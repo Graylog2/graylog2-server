@@ -504,16 +504,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();
-        assertThat(message.getField("limit_0")).isInstanceOf(String[].class);
-        assertThat((String[]) message.getField("limit_0"))
+        assertThat(message.getField("limit_0"))
+                .asList()
                 .isNotEmpty()
                 .containsExactly("foo", "bar", "baz");
-        assertThat(message.getField("limit_1")).isInstanceOf(String[].class);
-        assertThat((String[]) message.getField("limit_1"))
+        assertThat(message.getField("limit_1"))
+                .asList()
                 .isNotEmpty()
                 .containsExactly("foo:bar:baz");
-        assertThat(message.getField("limit_2")).isInstanceOf(String[].class);
-        assertThat((String[]) message.getField("limit_2"))
+        assertThat(message.getField("limit_2"))
+                .asList()
                 .isNotEmpty()
                 .containsExactly("foo", "bar|baz");
     }

@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
+import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -26,20 +27,20 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class Join extends AbstractFunction<String> {
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
     public static final String NAME = "join";
 
     private final ParameterDescriptor<String, String> delimiterParam;
-    private final ParameterDescriptor<Object, String[]> elementsParam;
+    private final ParameterDescriptor<Object, List> elementsParam;
     private final ParameterDescriptor<Long, Integer> startIndexParam;
     private final ParameterDescriptor<Long, Integer> endIndexParam;
 
     public Join() {
-        elementsParam = ParameterDescriptor.type("elements", Object.class, String[].class)
-                .transform(Join::elementsToStringArray)
+        elementsParam = ParameterDescriptor.type("elements", Object.class, List.class)
+                .transform(Join::toList)
                 .description("The list of strings to join together, may be null")
                 .build();
         delimiterParam = ParameterDescriptor.string("delimiter").optional()
@@ -55,12 +56,9 @@ public class Join extends AbstractFunction<String> {
                 .build();
     }
 
-    private static String[] elementsToStringArray(Object obj) {
-        if (obj instanceof String[]) {
-            return (String[]) obj;
-        } else if (obj instanceof Collection) {
-            @SuppressWarnings("unchecked") final Collection<Object> collection = (Collection) obj;
-            return collection.stream().map(Object::toString).toArray(String[]::new);
+    private static List toList(Object obj) {
+        if (obj instanceof Collection) {
+            return ImmutableList.copyOf((Collection) obj);
         } else {
             throw new IllegalArgumentException("Unsupported data type for parameter 'elements': " + obj.getClass().getCanonicalName());
         }
@@ -68,14 +66,14 @@ public class Join extends AbstractFunction<String> {
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String[] elements = elementsParam.required(args, context);
-        final int length = elements == null ? 0 : elements.length;
+        final List elements = elementsParam.optional(args, context).orElse(Collections.emptyList());
+        final int length = elements.size();
 
-        final String delimiter = delimiterParam.optional(args, context).orElse("");
+        final String delimiter = delimiterParam.required(args, context);
         final int startIndex = startIndexParam.optional(args, context).filter(idx -> idx >= 0).orElse(0);
         final int endIndex = endIndexParam.optional(args, context).filter(idx -> idx >= 0).orElse(length);
 
-        return StringUtils.join(elements, delimiter, startIndex, endIndex);
+        return StringUtils.join(elements.subList(startIndex, endIndex), delimiter);
     }
 
     @Override
