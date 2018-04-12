@@ -4,10 +4,14 @@ import Immutable from 'immutable';
 import SearchExecutionStateActions from 'enterprise/actions/SearchExecutionStateActions';
 import SearchParameterStore from './SearchParameterStore';
 
+const defaultExecutionState = Immutable.fromJS({
+  parameter_bindings: {},
+});
+
 export default Reflux.createStore({
   listenables: [SearchExecutionStateActions],
 
-  executionState: Immutable.Map(),
+  executionState: defaultExecutionState,
 
   init() {
     this.listenTo(SearchParameterStore, this.handleSearchParameterChange, this.handleSearchParameterChange);
@@ -29,8 +33,7 @@ export default Reflux.createStore({
   },
 
   clear() {
-    this.executionState = Immutable.Map();
-    this.trigger(this.executionState);
+    this.trigger(defaultExecutionState);
   },
 
   replace(bindings) {

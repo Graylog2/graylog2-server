@@ -56,6 +56,20 @@ export default class ViewDeserializer {
         QueriesActions.load(view.id, new Immutable.Map(queries));
         return state;
       })
+      .then((state) => { // restore search parameters
+        let parameters = Immutable.Map();
+        state.search.parameters.forEach((parameter) => {
+          parameters = parameters.set(parameter.name, Immutable.fromJS(parameter));
+        });
+        if (parameters.size > 0) {
+          SearchParameterActions.declare(view.id, parameters);
+        }
+        return state;
+      })
+      .then((state) => { // clear execution state
+        SearchExecutionStateActions.clear();
+        return state;
+      })
       .then((state) => { // restore each widget in view
         const viewState = viewResponse.state;
         Object.keys(viewState).forEach((queryId) => {
