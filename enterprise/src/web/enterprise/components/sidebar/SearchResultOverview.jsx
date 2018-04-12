@@ -10,9 +10,10 @@ const findMessages = (results) => {
 
 const SearchResultOverview = ({ results }) => {
   const messages = findMessages(results);
+  const duration = numeral(results.duration).format('0,0');
   return (
     <span>
-      Found <strong>{numeral(messages.total).format('0,0')} messages</strong> in 42ms.
+      Found <strong>{numeral(messages.total).format('0,0')} messages</strong> in {duration}ms.
     </span>
   );
 };

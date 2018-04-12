@@ -21,6 +21,7 @@ class SearchResult {
     this.results = _.mapValues(result.results, (queryResult) => {
       return {
         query: queryResult.query,
+        duration: queryResult.execution_stats.duration,
         searchTypes: _.mapValues(queryResult.search_types, (searchType) => {
           // each search type has a custom data structure attached to it, let the plugin convert the value
           return _searchTypePlugin(searchType.type).convert(searchType);

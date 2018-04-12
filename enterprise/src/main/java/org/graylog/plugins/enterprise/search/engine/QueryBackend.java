@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.engine;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Query;
@@ -8,6 +9,7 @@ import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.SearchJob;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A search backend that is capable of generating and executing search jobs
@@ -28,9 +30,14 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
 
     // TODO we can probably push job, query and predecessorResults into the GeneratedQueryContext to simplify the signature
     default QueryResult run(SearchJob job, Query query, GeneratedQueryContext generatedQueryContext, Set<QueryResult> predecessorResults) {
+        final Stopwatch stopwatch = Stopwatch.createStarted();
         // https://www.ibm.com/developerworks/java/library/j-jtp04298/index.html#3.0
         //noinspection unchecked
-        return doRun(job, query, (T) generatedQueryContext, predecessorResults);
+        final QueryResult result = doRun(job, query, (T) generatedQueryContext, predecessorResults);
+        stopwatch.stop();
+        return result.toBuilder()
+                .executionStats(QueryExecutionStats.create(stopwatch.elapsed(TimeUnit.MILLISECONDS)))
+                .build();
     }
 
     /**
