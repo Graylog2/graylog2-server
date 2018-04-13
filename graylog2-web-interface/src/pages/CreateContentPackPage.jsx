@@ -6,6 +6,7 @@ import Routes from 'routing/Routes';
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { AutoAffix } from 'react-overlays';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Wizard from 'components/common/Wizard';
@@ -129,9 +130,11 @@ const CreateContentPackPage = createReactClass({
             </div>
           </PageHeader>
           <Wizard steps={steps}>
-            <div>
-              <ContentPackDetails contentPack={this.state.contentPack} />
-            </div>
+            <AutoAffix viewportOffsetTop={65}>
+              <div>
+                <ContentPackDetails contentPack={this.state.contentPack} />
+              </div>
+            </AutoAffix>
           </Wizard>
           <textarea value={JSON.stringify(this.state.contentPack)} />
           <textarea value={JSON.stringify(this.state.selectedEntities)} />
