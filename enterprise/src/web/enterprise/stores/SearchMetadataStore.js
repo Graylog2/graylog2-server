@@ -9,6 +9,11 @@ import SearchMetadataActions from '../actions/SearchMetadataActions';
 const parseSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search/metadata');
 const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/metadata/${id}`);
 
+const getUndeclaredParameters = metadata => metadata.getIn(['parameters', 'undeclared'], Immutable.Set());
+const getUsedParameters = metadata => metadata.getIn(['parameters', 'used'], Immutable.Set());
+
+export { getUndeclaredParameters, getUsedParameters };
+
 export default Reflux.createStore({
   listenables: [SearchMetadataActions],
 
