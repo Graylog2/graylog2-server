@@ -1,58 +1,57 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { Dropdown, MenuItem, Well } from 'react-bootstrap';
+import { MenuItem, Well } from 'react-bootstrap';
 
-import styles from './Value.css';
+import OverlayDropdown from './OverlayDropdown';
 
-/**
- * This implements a custom toggle for a dropdown menu.
- * See: "Custom Dropdown Components" in react-bootstrap documentation.
- */
-class ValueToggle extends React.Component {
+import style from './Value.css';
+
+export default class Value extends React.Component {
   static propTypes = {
-    onClick: PropTypes.func,
-    children: PropTypes.node.isRequired,
+    children: PropTypes.node,
+    field: PropTypes.string.isRequired,
+    menuContainer: PropTypes.object,
+    queryId: PropTypes.string.isRequired,
+    value: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
-    onClick: () => {},
+    children: null,
+    interactive: false,
+    viewId: null,
+    menuContainer: document.body,
   };
 
-  handleClick = (e) => {
-    e.preventDefault();
-    this.props.onClick(e);
-  };
+  constructor(props, context) {
+    super(props, context);
+    this.state = {
+      open: false,
+    };
+  }
+
+  _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
   render() {
+    const { children, field, menuContainer, value, queryId } = this.props;
+    const element = children || value;
+    const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
+      const onSelect = (event) => {
+        this._onMenuToggle();
+        valueAction.handler(queryId, event.field);
+      };
+      return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
+                        eventKey={{ action: valueAction.type, field }}
+                        onSelect={onSelect}>{valueAction.title}</MenuItem>);
+    });
+
     return (
-      <span onClick={this.handleClick} role="presentation" className={styles.dropdowntoggle}>{this.props.children}</span>
-    );
-  }
-}
-
-const Value = ({ children, field, value, queryId }) => {
-  const element = children || value;
-  const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
-    return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
-                      eventKey={{ action: valueAction.type, field }}
-                      onSelect={event => valueAction.handler(queryId, event.field)}>{valueAction.title}</MenuItem>);
-  });
-
-  return (
-    <Dropdown componentClass="span" id={`value-${field}-${value}-action-dropdown`}>
-      <ValueToggle bsRole="toggle">
-        {element}
-      </ValueToggle>
-      <Dropdown.Menu style={{ paddingLeft: '5px', paddingRight: '5px', minWidth: 'max-content', color: '#666666' }}>
-        <div style={{ marginBottom: '10px' }}>
-          <span style={{
-            paddingLeft: '10px',
-            paddingRight: '10px',
-            paddingBottom: '5px',
-            marginBottom: '5px',
-            fontWeight: 600,
-          }}>
+      <OverlayDropdown show={this.state.open}
+                       toggle={element}
+                       onToggle={this._onMenuToggle}
+                       menuContainer={menuContainer}>
+        <div className={style.bottomSpacer}>
+          <span className={style.dropdownheader}>
             {field} = {value}
           </span>
         </div>
@@ -61,18 +60,8 @@ const Value = ({ children, field, value, queryId }) => {
         <MenuItem header>Actions</MenuItem>
         {valueActions}
 
-        <Well style={{ marginTop: '10px' }}>Found 3827 times in this result set.</Well>
-      </Dropdown.Menu>
-    </Dropdown>
-  );
+        <Well className={style.topSpacer}>Found 3827 times in this result set.</Well>
+      </OverlayDropdown>
+    );
+  }
 };
-
-Value.propTypes = {
-  children: PropTypes.node.isRequired,
-  field: PropTypes.string.isRequired,
-  value: PropTypes.node.isRequired,
-  queryId: PropTypes.string.isRequired,
-};
-
-export default Value;
-    

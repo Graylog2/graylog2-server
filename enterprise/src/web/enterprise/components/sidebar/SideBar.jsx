@@ -65,27 +65,29 @@ const SideBar = createReactClass({
     return (
       <div className={styles.sidebarContainer}>
         <AutoAffix viewportOffsetTop={46}>
-          <div className={`content-col ${styles.sidebarContent}`} ref="sidebar">
-            <div className={styles.viewMetadata}>
-              <h3>{view.get('title', defaultNewViewTitle)}</h3>
-              <small>{view.get('summary', defaultNewViewSummary)}</small>
-            </div>
+          <div id="sidebar">
+            <div className={`content-col ${styles.sidebarContent}`} ref="sidebar">
+              <div className={styles.viewMetadata}>
+                <h3>{view.get('title', defaultNewViewTitle)}</h3>
+                <small>{view.get('summary', defaultNewViewSummary)}</small>
+              </div>
 
-            <div className={styles.viewMetadata}>
-              <SearchResultOverview results={results} />
-            </div>
+              <div className={styles.viewMetadata}>
+                <SearchResultOverview results={results} />
+              </div>
 
-            <PanelGroup accordion activeKey={this.state.activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
-              <Panel eventKey="metadata" header="View Description">
-                {viewDescription}
-              </Panel>
-              <Panel eventKey="actions" header="Actions">
-                <AddWidgetButton viewId={viewId} queryId={queryId} />
-              </Panel>
-              <Panel eventKey="fields" header="Fields">
-                {this.props.children({ maximumHeight: this.state.availableHeight })}
-              </Panel>
-            </PanelGroup>
+              <PanelGroup accordion activeKey={this.state.activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
+                <Panel eventKey="metadata" header="View Description">
+                  {viewDescription}
+                </Panel>
+                <Panel eventKey="actions" header="Actions">
+                  <AddWidgetButton viewId={viewId} queryId={queryId} />
+                </Panel>
+                <Panel eventKey="fields" header="Fields">
+                  {this.props.children({ maximumHeight: this.state.availableHeight })}
+                </Panel>
+              </PanelGroup>
+            </div>
           </div>
         </AutoAffix>
       </div>

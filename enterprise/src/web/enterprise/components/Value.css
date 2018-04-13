@@ -1,8 +1,15 @@
-:local(.dropdowntoggle) {
-    cursor: pointer;
+:local(.dropdownheader) {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    font-weight: 600;
 }
 
-:local(.dropdowntoggle):hover {
-    color: #3967ff;
-    text-decoration: underline;
+:local(.bottomSpacer) {
+    margin-bottom: 10px;
+}
+
+:local(.topSpacer) {
+    margin-top: 10px;
 }
