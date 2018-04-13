@@ -78,7 +78,6 @@ const FieldList = createReactClass({
           style={{ maxHeight: this.state.maxFieldsHeight }}
           className={styles.fieldList}>
         {fieldList}
-        {fieldList}
       </ul>
     );
   },
