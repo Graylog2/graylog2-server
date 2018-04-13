@@ -61,9 +61,7 @@ export default class ViewDeserializer {
         state.search.parameters.forEach((parameter) => {
           parameters = parameters.set(parameter.name, Immutable.fromJS(parameter));
         });
-        if (parameters.size > 0) {
-          SearchParameterActions.declare(view.id, parameters);
-        }
+        SearchParameterActions.declare(view.id, parameters); // Even declare empty state to trigger parameters
         return state;
       })
       .then((state) => { // clear execution state
