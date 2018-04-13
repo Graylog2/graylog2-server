@@ -1,5 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -24,10 +25,20 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 const SearchBar = createReactClass({
   displayName: 'SearchBar',
 
+  propTypes: {
+    disableSearch: PropTypes.bool,
+  },
+
   mixins: [
     Reflux.connect(CurrentViewStore, 'currentView'),
     Reflux.connect(QueryFiltersStore, 'queryFilters'),
   ],
+
+  getDefaultProps() {
+    return {
+      disableSearch: false,
+    };
+  },
 
   getInitialState() {
     return {
@@ -71,7 +82,7 @@ const SearchBar = createReactClass({
                                          title="Search query syntax documentation"
                                          text={<i className="fa fa-lightbulb-o" />} />
                     </div>
-                    <SearchButton running={this.state.running} />
+                    <SearchButton running={this.state.running} disabled={this.props.disableSearch} />
 
                     <QueryInput value={query}
                                 placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
