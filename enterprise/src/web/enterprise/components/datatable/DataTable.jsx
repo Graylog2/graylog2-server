@@ -34,8 +34,9 @@ class DataTable extends React.Component {
     const { config, data } = this.props;
     const { rowPivots, series } = config;
     const rows = data[0] ? data[0].results : [];
-    const fields = new Immutable.OrderedSet(rowPivots).merge(this._extractAllFieldnames(rows));
-    const sortedRows = expandRows(rowPivots.slice(), series, rows);
+    const fieldNames = rowPivots.map(pivot => pivot.field);
+    const fields = new Immutable.OrderedSet(fieldNames).merge(this._extractAllFieldnames(rows));
+    const sortedRows = expandRows(fieldNames.slice(), series, rows);
     const { selectedQuery } = this.props.currentView;
     return (
       <div className="messages-container">
