@@ -8,7 +8,9 @@ export default function (viewId, queryId, field) {
     type: 'AGGREGATION',
     config: {
       rowPivots: ['timestamp'],
+      columnPivots: [],
       series: [`sum(${field})`],
+      sort: [],
       visualization: 'line',
     },
   };

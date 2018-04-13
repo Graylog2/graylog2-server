@@ -10,7 +10,10 @@ export default function (viewId, queryId, field) {
     type: 'AGGREGATION',
     config: {
       rowPivots: [pivotForField(field)],
+      columnPivots: [],
       series: ['count()'],
+      sort: [],
+      visualization: 'table',
     },
   };
   WidgetActions.create(viewId, queryId, newWidget);
