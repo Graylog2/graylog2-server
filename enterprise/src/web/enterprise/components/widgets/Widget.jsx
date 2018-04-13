@@ -49,7 +49,7 @@ class Widget extends React.Component {
   }
 
   _onDelete = (widget) => {
-    if (window.confirm(`Are you sure you want to remove the widget "${widget.title}"?`)) {
+    if (window.confirm(`Are you sure you want to remove the widget "${this.props.title}"?`)) {
       CurrentWidgetsActions.remove(widget.id);
     }
   };
