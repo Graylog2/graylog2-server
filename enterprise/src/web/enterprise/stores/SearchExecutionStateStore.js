@@ -18,10 +18,11 @@ const setParameterBindings = (executionState, bindings) => {
 };
 
 const getParameterBindings = executionState => executionState.get('parameter_bindings');
+const getParameterBindingValue = (executionState, parameterName) => executionState.getIn(['parameter_bindings', parameterName, 'value']);
 
 const getParameterBindingsAsMap = bindings => bindings.flatMap((value, name) => ({ [name]: value.get('value') }));
 
-export { newParameterBindingValue, setParameterBindings, getParameterBindings, getParameterBindingsAsMap };
+export { newParameterBindingValue, setParameterBindings, getParameterBindings, getParameterBindingsAsMap, getParameterBindingValue };
 
 export default Reflux.createStore({
   listenables: [SearchExecutionStateActions],
