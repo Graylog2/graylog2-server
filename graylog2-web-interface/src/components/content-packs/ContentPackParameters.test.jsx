@@ -20,7 +20,7 @@ describe('<ContentPackParameters />', () => {
         name: 'A parameter name',
         title: 'A parameter title',
         description: 'A parameter descriptions',
-        value_type: 'string',
+        type: 'string',
         default_value: 'test',
       }],
     };
@@ -38,7 +38,7 @@ describe('<ContentPackParameters />', () => {
         name: 'A parameter name',
         title: 'A parameter title',
         description: 'A parameter descriptions',
-        value_type: 'string',
+        type: 'string',
         default_value: 'test',
       }],
     };
@@ -53,7 +53,7 @@ describe('<ContentPackParameters />', () => {
         name: 'name',
         title: 'title',
         description: 'descr',
-        value_type: 'string',
+        type: 'string',
         default_value: 'test',
       }]);
     });

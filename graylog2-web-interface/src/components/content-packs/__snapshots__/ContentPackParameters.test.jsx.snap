@@ -116,7 +116,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
           >
             <label
               className="col-sm-3 control-label"
-              htmlFor="value_type"
+              htmlFor="type"
             >
               Value Type
             </label>
@@ -125,10 +125,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
             >
               <select
                 className="form-control"
-                id="value_type"
+                id="type"
                 label="Value Type"
                 maxLength={250}
-                name="value_type"
+                name="type"
                 onChange={[Function]}
                 placeholder=""
                 required={true}
@@ -402,7 +402,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
           >
             <label
               className="col-sm-3 control-label"
-              htmlFor="value_type"
+              htmlFor="type"
             >
               Value Type
             </label>
@@ -411,10 +411,10 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
             >
               <select
                 className="form-control"
-                id="value_type"
+                id="type"
                 label="Value Type"
                 maxLength={250}
-                name="value_type"
+                name="type"
                 onChange={[Function]}
                 placeholder=""
                 required={true}

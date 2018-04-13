@@ -21,7 +21,7 @@ class ContentPackParameters extends React.Component {
     name: '',
     title: '',
     description: '',
-    value_type: 'string',
+    type: 'string',
     default_value: '',
   };
 
@@ -81,7 +81,7 @@ class ContentPackParameters extends React.Component {
         <td>{parameter.title}</td>
         <td>{parameter.name}</td>
         <td>{parameter.description}</td>
-        <td>{parameter.value_type}</td>
+        <td>{parameter.type}</td>
         <td>{parameter.default_value}</td>
         <td><Button bsStyle="primary" onClick={() => { this._deleteParameter(parameter); }}>Delete</Button></td>
       </tr>
@@ -130,11 +130,11 @@ class ContentPackParameters extends React.Component {
                        label="Description"
                        help="Give a description explaining what will be done with this parameter."
                        required />
-                <Input name="value_type"
-                       id="value_type"
+                <Input name="type"
+                       id="type"
                        type="select"
                        maxLength={250}
-                       value={this.state.newParameter.value_type}
+                       value={this.state.newParameter.type}
                        onChange={this._bindValue}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
