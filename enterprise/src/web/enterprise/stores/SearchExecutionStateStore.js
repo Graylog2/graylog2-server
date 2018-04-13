@@ -8,6 +8,21 @@ const defaultExecutionState = Immutable.fromJS({
   parameter_bindings: {},
 });
 
+const newParameterBindingValue = (value) => Immutable.fromJS({
+  type: 'value',
+  value: value,
+});
+
+const setParameterBindings = (executionState, bindings) => {
+  return executionState.set('parameter_bindings', bindings);
+};
+
+const getParameterBindings = executionState => executionState.get('parameter_bindings');
+
+const getParameterBindingsAsMap = bindings => bindings.flatMap((value, name) => ({ [name]: value.get('value') }));
+
+export { newParameterBindingValue, setParameterBindings, getParameterBindings, getParameterBindingsAsMap };
+
 export default Reflux.createStore({
   listenables: [SearchExecutionStateActions],
 
@@ -36,35 +51,23 @@ export default Reflux.createStore({
     this.trigger(defaultExecutionState);
   },
 
-  replace(bindings) {
-    let parameterBindings = Immutable.Map();
-
-    bindings.forEach((value, parameterName) => {
-      parameterBindings = parameterBindings.set(parameterName, Immutable.fromJS({
-        type: 'value',
-        value: value,
-      }));
-    });
-
-    this.executionState = this.executionState.set('parameter_bindings', parameterBindings);
-    this.trigger(this.executionState);
+  replace(executionState, trigger = true) {
+    this.executionState = executionState;
+    if (trigger) {
+      this.trigger(this.executionState);
+    }
   },
 
   setParameterValues(parameterMap) {
     parameterMap.forEach((value, parameterName) => {
-      this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], Immutable.fromJS({
-        type: 'value',
-        value: value,
-      }));
+      this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], newParameterBindingValue(value));
     });
     this.trigger(this.executionState);
+    return this.executionState;
   },
 
   bindParameterValue(parameterName, value) {
-    this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], Immutable.fromJS({
-      type: 'value',
-      value: value,
-    }));
+    this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], newParameterBindingValue(value));
     this.trigger(this.executionState);
   },
 });
