@@ -62,7 +62,7 @@ describe('<ContentPackSelection />', () => {
     expect(changeFn.mock.calls.length).toBe(5);
   });
 
-  it('should update state if content selection changed', () => {
+  it('should add a entity if content selection was checked', () => {
     const contentPack = {};
     const entities = {
       spaceship: [{
@@ -83,6 +83,36 @@ describe('<ContentPackSelection />', () => {
                             entities={entities}
       />);
     wrapper.find('input[type="checkbox"]').at(0).simulate('change', { target: { checked: true } });
+    expect(changeFn.mock.calls.length).toBe(1);
+  });
+
+  it('should remove a entity if content selection was unchecked', () => {
+    const contentPack = {};
+    const breq = {
+      title: 'breq',
+      type: 'spaceship',
+      id: 'beef123',
+    };
+    const falcon = {
+      title: 'falcon',
+      type: 'spaceship',
+      id: 'beef124',
+    };
+    const entities = { spaceship: [breq, falcon] };
+    const selectedEntities = { spaceship: [breq, falcon] };
+
+    const changeFn = jest.fn((newState) => {
+      expect(newState.selectedEntities).toEqual({ spaceship: [falcon] });
+    });
+
+    const wrapper = mount(
+      <ContentPackSelection contentPack={contentPack}
+                            selectedEntities={selectedEntities}
+                            onStateChange={changeFn}
+                            entities={entities}
+      />);
+    wrapper.find('div.fa-stack').simulate('click');
+    wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
     expect(changeFn.mock.calls.length).toBe(1);
   });
 });
