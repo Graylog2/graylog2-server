@@ -49,6 +49,11 @@ export default Reflux.createStore({
     ViewsActions.update.promise(Promise.resolve(this.views));
     this._trigger();
   },
+  positions(viewId, positions) {
+    this.views = this.views.setIn([viewId, 'positions'], Object.assign({}, positions));
+    ViewsActions.positions.promise(Promise.resolve(this.views));
+    this._trigger();
+  },
   _trigger() {
     this.trigger(this.views);
   },

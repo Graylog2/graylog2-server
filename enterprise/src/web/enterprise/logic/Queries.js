@@ -21,6 +21,8 @@ import TitlesStore from '../stores/TitlesStore';
 import WidgetActions from 'enterprise/actions/WidgetActions';
 // eslint-disable-next-line no-unused-vars
 import WidgetStore from 'enterprise/stores/WidgetStore';
+import ViewsActions from '../actions/ViewsActions';
+import ViewsStore from '../stores/ViewsStore';
 
 export const _defaultQuery = (id) => {
   return {
@@ -46,15 +48,31 @@ export const _defaultWidgets = () => {
     },
   };
 
-  return { titles, widgets };
+  const positions = {
+    [histogram.id]: {
+      col: 0,
+      row: 0,
+      height: 2,
+      width: 4,
+    },
+    [messages.id]: {
+      col: 0,
+      row: 2,
+      height: 6,
+      width: 6,
+    },
+  };
+
+  return { titles, widgets, positions };
 };
 
 export const createEmptyQuery = (viewId) => {
   const defaultQuery = _defaultQuery(uuid());
   QueriesActions.create(viewId, defaultQuery)
     .then(() => SelectedFieldsActions.set(defaultQuery.id, ['source', 'message']));
-  const { titles, widgets } = _defaultWidgets();
+  const { titles, widgets, positions } = _defaultWidgets();
   widgets.forEach(widget => WidgetActions.create(viewId, defaultQuery.id, widget));
+  ViewsActions.positions(viewId, positions);
   TitlesActions.load(defaultQuery.id, titles);
   return defaultQuery;
 };

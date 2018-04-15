@@ -6,4 +6,5 @@ export default Reflux.createActions({
   remove: { asyncResult: true },
   title: { asyncResult: true },
   update: { asyncResult: true },
+  positions: { asyncResult: true },
 });
