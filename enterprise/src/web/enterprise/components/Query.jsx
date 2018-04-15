@@ -54,7 +54,7 @@ const Query = ({ fields, results, selectedFields, view, widgetMapping, widgets, 
     const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields, queryId);
     return (
       <span>
-        <Col md={2} style={{ paddingLeft: 0, paddingRight: 10 }}>
+        <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
           <SideBar viewId={viewId} queryId={queryId} view={view} results={results}>
             {({ maximumHeight }) => (
               <FieldList selectedFields={selectedFields}
@@ -63,7 +63,7 @@ const Query = ({ fields, results, selectedFields, view, widgetMapping, widgets, 
             )}
           </SideBar>
         </Col>
-        <Col md={10}>
+        <Col md={9}>
           {widgetGrid}
         </Col>
       </span>
