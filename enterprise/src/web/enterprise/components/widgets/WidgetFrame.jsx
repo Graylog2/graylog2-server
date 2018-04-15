@@ -34,7 +34,7 @@ export default class extends React.Component {
 
   render() {
     return (
-      <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'scroll' }} data-widget-id={this.props.widgetId}>
+      <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'hidden' }} data-widget-id={this.props.widgetId}>
         <div style={{ height: '95%', padding: '5px' }}>
           {this.props.children}
         </div>

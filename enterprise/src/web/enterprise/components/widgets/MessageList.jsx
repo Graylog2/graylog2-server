@@ -123,7 +123,7 @@ const MessageList = createReactClass({
           position="top"
           resultCount={messages.length} />
 
-        <div className="search-results-table">
+        <div className="search-results-table" style={{ overflow: 'scroll', height: '100%' }}>
           <div className="table-responsive">
             <div className="messages-container">
               <table className="table table-condensed messages">
