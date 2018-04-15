@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import connect from 'stores/connect';
 import style from 'pages/ShowDashboardPage.css';
-import { ReactGridContainer } from 'components/common';
+import ReactGridContainer from './ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
