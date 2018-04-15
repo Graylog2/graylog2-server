@@ -17,7 +17,7 @@ const SearchResultOverview = ({ results }) => {
   const timestamp = results.timestamp;
   return (
     <span>
-      Found <strong>{numeral(messages.total).format('0,0')} messages</strong> in {duration}ms.
+      Found <strong>{numeral(messages.total).format('0,0')} messages</strong> in {numeral(duration).format('0,0')}ms.
       <br />
       Query executed at <Timestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} />.
     </span>
