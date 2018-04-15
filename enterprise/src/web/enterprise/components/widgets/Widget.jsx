@@ -80,13 +80,13 @@ class Widget extends React.Component {
     const { config, computationTimeRange } = widget;
     const VisComponent = Widget._visualizationForType(widget.type);
     const { editing } = this.state;
-    const filter = this.props.widgetFilters.get(id);
+    const filter = this.props.widgetFilters.get(id, '');
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
         <WidgetHeader title={title}
                       onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
                       editing={editing}>
-          <WidgetFilterMenu onChange={newFilter => WidgetFilterActions.change(id, newFilter)}>
+          <WidgetFilterMenu onChange={newFilter => WidgetFilterActions.change(id, newFilter)} value={filter}>
             <i className={`fa fa-filter ${styles.widgetActionDropdownCaret}`} />
           </WidgetFilterMenu>
           {' '}

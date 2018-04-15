@@ -17,7 +17,7 @@ class WidgetFilterMenu extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      filter: '',
+      filter: props.value,
     };
   }
   _onUpdate = () => {

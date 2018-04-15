@@ -8,6 +8,7 @@ import ViewsActions from 'enterprise/actions/ViewsActions';
 import SelectedFieldsActions from 'enterprise/actions/SelectedFieldsActions';
 import TitlesActions from 'enterprise/actions/TitlesActions';
 import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
+import WidgetFilterActions from '../../actions/WidgetFilterActions';
 
 const mutateWidgetKeys = (widget) => {
   const newWidget = Object.assign({}, widget, { config: {} });
@@ -72,7 +73,12 @@ export default class ViewDeserializer {
         const viewState = viewResponse.state;
         Object.keys(viewState).forEach((queryId) => {
           const widgets = {};
-          viewState[queryId].widgets.forEach((widget) => { widgets[widget.id] = new Immutable.Map(mutateWidgetKeys(widget)); });
+          viewState[queryId].widgets.forEach((widget) => {
+            widgets[widget.id] = new Immutable.Map(mutateWidgetKeys(widget));
+            if (widget.filter) {
+              WidgetFilterActions.change(widget.id, widget.filter);
+            }
+          });
           WidgetActions.load(view.id, queryId, new Immutable.Map(widgets));
           TitlesActions.load(queryId, viewState[queryId].titles || {});
         });

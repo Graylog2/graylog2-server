@@ -12,7 +12,7 @@ const ViewActions = Reflux.createActions({
   delete: { asyncResult: true },
 });
 
-const mutateWidgets = (widgets) => {
+const mutateWidgets = (widgets, widgetFilters) => {
   return widgets.map((widget) => {
     const newWidgetConfig = {};
     const config = widget.get('config');
@@ -23,7 +23,9 @@ const mutateWidgets = (widgets) => {
     const cleanedWidget = widget.delete('title')
       .delete('computationTimeRange')
       .update('type', type => type.toLowerCase());
-    return Object.assign({}, cleanedWidget.toJS(), { config: newWidgetConfig });
+    const filter = widgetFilters.get(widget.get('id'));
+    const finalWidget = filter ? cleanedWidget.set('filter', filter) : cleanedWidget;
+    return Object.assign({}, finalWidget.toJS(), { config: newWidgetConfig });
   });
 };
 
@@ -44,13 +46,13 @@ const prepareDashboardWidgets = (widgets, positions) => {
   return { widgets: newWidgets, positions: positions };
 };
 
-const _prepareViewRequest = (id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles) => {
+const _prepareViewRequest = (id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles, widgetFilters) => {
   const { positions, dashboardPositions, title, summary, description } = view.toJS();
   const { widgetMapping } = search.result.searchRequest;
   const { search_id } = search.result.result;
   const state = widgets.map((queryWidgets, queryId) => {
     return {
-      widgets: mutateWidgets(queryWidgets.valueSeq()).toJS(),
+      widgets: mutateWidgets(queryWidgets.valueSeq(), widgetFilters).toJS(),
       positions: positions[queryId] || {},
       widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
       selected_fields: fields.get(queryId).toJS(),
@@ -96,8 +98,8 @@ const ViewStore = Reflux.createStore({
     ViewActions.get.promise(promise);
   },
 
-  save(id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles) {
-    const request = _prepareViewRequest(id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles);
+  save(id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles, widgetFilters) {
+    const request = _prepareViewRequest(id, currentViewStore, view, widgets, dashboardWidgets, fields, search, titles, widgetFilters);
     const promise = fetch('POST', viewsUrl, request);
     ViewActions.save.promise(promise);
   },
