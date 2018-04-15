@@ -39,7 +39,7 @@ class WidgetFilterMenu extends React.Component {
       </Popover>
     );
     return (
-      <OverlayTrigger ref={(elem) => { this.overlayTrigger = elem; }} trigger="click" placement="bottom" overlay={popoverBottom}>
+      <OverlayTrigger ref={(elem) => { this.overlayTrigger = elem; }} trigger="click" placement="bottom" overlay={popoverBottom} rootClose>
         {this.props.children}
       </OverlayTrigger>
     );
