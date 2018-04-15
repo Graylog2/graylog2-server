@@ -9,6 +9,7 @@ import SelectedFieldsActions from 'enterprise/actions/SelectedFieldsActions';
 import TitlesActions from 'enterprise/actions/TitlesActions';
 import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
 import WidgetFilterActions from '../../actions/WidgetFilterActions';
+import QueryFiltersActions from '../../actions/QueryFiltersActions';
 
 const mutateWidgetKeys = (widget) => {
   const newWidget = Object.assign({}, widget, { config: {} });
@@ -52,6 +53,10 @@ export default class ViewDeserializer {
             rangeType: query.timerange.type,
             rangeParams: new Immutable.Map(rangeParams),
           });
+          if (query.filter) {
+            const selectedStreams = query.filter.filters.filter(f => f.type === 'stream').map(f => f.id);
+            QueryFiltersActions.streams(view.id, query.id, selectedStreams);
+          }
           SelectedFieldsActions.set(query.id, viewResponse.state[query.id].selected_fields);
         });
         QueriesActions.load(view.id, new Immutable.Map(queries));
