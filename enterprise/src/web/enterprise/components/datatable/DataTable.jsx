@@ -39,7 +39,7 @@ class DataTable extends React.Component {
     const sortedRows = expandRows(fieldNames.slice(), series, rows);
     const { selectedQuery } = this.props.currentView;
     return (
-      <div className="messages-container" style={{ overflow: 'scroll', height: '100%' }}>
+      <div className="messages-container" style={{ overflow: 'auto', height: '100%' }}>
         <table className="table table-condensed messages">
           <thead>
             <tr>
