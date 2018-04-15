@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
+import UserNotification from 'util/UserNotification';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import CurrentWidgetsActions from 'enterprise/actions/CurrentWidgetsActions';
 import CurrentWidgetsStore from 'enterprise/stores/CurrentWidgetsStore';
@@ -63,7 +64,11 @@ class Widget extends React.Component {
   };
 
   _onAddToDashboard = (widgetId) => {
-    CurrentWidgetsActions.addToDashboard(widgetId);
+    CurrentWidgetsActions.addToDashboard(widgetId)
+      .then(
+        () => UserNotification.success('Added widget to dashboard.', 'Success!'),
+        e => UserNotification.error(`Failed adding widget to dashboard: ${e}`, 'Error!'),
+      );
   };
 
   _onWidgetConfigChange = (widgetId, config) => {
