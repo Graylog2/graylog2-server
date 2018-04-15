@@ -43,6 +43,7 @@ class QueryTitle extends React.Component {
         <input autoFocus
                type="text"
                value={value}
+               onFocus={e => e.target.select()}
                onBlur={this._toggleEditing}
                onChange={this._onChange} />
       </form>
