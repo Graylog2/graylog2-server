@@ -10,6 +10,7 @@ const UserNotification = {
       hideDuration: 1000,
       timeOut: 10000,
       extendedTimeOut: 1000,
+      escapeHtml: true,
     });
   },
   warning(message, title) {
@@ -21,6 +22,7 @@ const UserNotification = {
       hideDuration: 1000,
       timeOut: 7000,
       extendedTimeOut: 1000,
+      escapeHtml: true,
     });
   },
   success(message, title) {
@@ -32,6 +34,7 @@ const UserNotification = {
       hideDuration: 1000,
       timeOut: 7000,
       extendedTimeOut: 1000,
+      escapeHtml: true,
     });
   },
 };
