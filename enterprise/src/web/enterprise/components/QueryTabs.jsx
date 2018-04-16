@@ -26,7 +26,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
       Dashboard
     </span>
   );
-  const dashboardTab = <Tab key="dashboard" eventKey="dashboard" title={dashboardTitle} mountOnEnter>{renderDashboardTab()}</Tab>;
+  const dashboardTab = <Tab key="dashboard" eventKey="dashboard" title={dashboardTitle} mountOnEnter unmountOnExit>{renderDashboardTab()}</Tab>;
   const newTab = <Tab key="new" eventKey="new" title="+" />;
 
   const tabs = [dashboardTab, queryTabs, newTab];
