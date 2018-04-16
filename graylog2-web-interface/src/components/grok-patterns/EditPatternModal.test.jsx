@@ -12,7 +12,7 @@ describe('<EditPatternModal />', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-    it('should render a modal button with as create', () => {
+  it('should render a modal button with as create', () => {
     const wrapper = renderer.create(<EditPatternModal create />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });

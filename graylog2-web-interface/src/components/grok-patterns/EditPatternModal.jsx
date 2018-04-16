@@ -54,7 +54,7 @@ class EditPatternModal extends React.Component {
   };
 
   _onSampleDataChange = (event) => {
-    this.setState({sample_data: event.target.value});
+    this.setState({ sample_data: event.target.value });
   };
 
   _getId = (prefixIdName) => {

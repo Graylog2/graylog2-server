@@ -2,15 +2,14 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Row, Col, Button } from 'react-bootstrap';
 
-import StoreProvider from 'injection/StoreProvider';
-
-const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
-
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import DataTable from 'components/common/DataTable';
 import IfPermitted from 'components/common/IfPermitted';
+import StoreProvider from 'injection/StoreProvider';
+
+const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 const GrokPatterns = createReactClass({
   displayName: 'GrokPatterns',
