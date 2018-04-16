@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 
 import Select from 'react-select';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
+
+import { pivotForField } from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
 import ConfigurablePivot from './ConfigurablePivot';
 
-import { pivotForField } from '../../logic/searchtypes/aggregation/PivotGenerator';
+import styles from './SortableSelect.css';
 
 const _onChange = (fields, newValue, onChange) => {
   const newFields = newValue.map(v => v.value);
@@ -48,9 +50,10 @@ const SortableSelect = ({ onChange, value, sortableValueList, ...remainingProps 
   // eslint-disable-next-line react/prop-types
   const valueList = ({ children, ...rest }) => (
     <ValueListComponent {...rest}
-                       onSortEnd={v => _onSortEnd(v, onChange, value)}
-                       axis="x"
-                       pressDelay={200}>
+                        onSortEnd={v => _onSortEnd(v, onChange, value)}
+                        axis="x"
+                        helperClass={`Select--multi has-value is-clearable is-searchable ${styles.draggedElement}`}
+                        pressDelay={200}>
       {children}
     </ValueListComponent>
   );
