@@ -122,6 +122,14 @@ class ReactGridContainer extends React.Component {
      *
      */
     useDragHandle: PropTypes.string,
+    /**
+     * Specifies whether the grid is measured before mounting the grid component. Otherwise the grid is initialized with
+     * a width of 1280 before it is being resized.
+     *
+     * See: https://github.com/STRML/react-grid-layout/blob/0.14.3/lib/components/WidthProvider.jsx#L20-L21
+     *
+     */
+    measureBeforeMount: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -131,6 +139,7 @@ class ReactGridContainer extends React.Component {
     columns: COLUMNS,
     animate: true,
     useDragHandle: undefined,
+    measureBeforeMount: false,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -179,7 +188,7 @@ class ReactGridContainer extends React.Component {
   };
 
   render() {
-    const { children, locked, isResizable, rowHeight, columns, animate, useDragHandle } = this.props;
+    const { children, locked, isResizable, rowHeight, columns, animate, useDragHandle, measureBeforeMount } = this.props;
     const { layout } = this.state;
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
@@ -191,6 +200,7 @@ class ReactGridContainer extends React.Component {
                                     cols={columns}
                                     rowHeight={rowHeight}
                                     margin={[10, 10]}
+                                    measureBeforeMount={measureBeforeMount}
                                     // Do not allow dragging from elements inside a `.actions` css class. This is
                                     // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
                                     draggableCancel=".actions"
