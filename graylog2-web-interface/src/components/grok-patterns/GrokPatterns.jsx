@@ -91,6 +91,7 @@ const GrokPatterns = createReactClass({
             <EditPatternModal id={pattern.id}
                               name={pattern.name}
                               pattern={pattern.pattern}
+                              testPattern={this.testPattern}
                               create={false}
                               reload={this.loadData}
                               savePattern={this.savePattern}
