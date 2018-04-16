@@ -11,14 +11,17 @@ import style from './Field.css';
 export default class Field extends React.Component {
   static propTypes = {
     children: PropTypes.node,
+    disabled: PropTypes.bool,
     name: PropTypes.string.isRequired,
     menuContainer: PropTypes.object,
     queryId: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     viewId: PropTypes.string,
   };
 
   static defaultProps = {
     children: null,
+    disabled: false,
     interactive: false,
     viewId: null,
     menuContainer: document.body,
@@ -34,26 +37,30 @@ export default class Field extends React.Component {
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
   render() {
-    const { children, menuContainer, name, queryId, viewId } = this.props;
+    const { children, disabled, menuContainer, name, queryId, type, viewId } = this.props;
     const element = children || name;
+    const wrappedElement = disabled ? <span className={style.disabled}>{element}</span> : element;
     const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
       const onSelect = ({ field }) => {
         this._onMenuToggle();
         fieldAction.handler(viewId, queryId, field);
       };
+      const condition = fieldAction.condition || (() => true);
+      const actionDisabled = !condition({ name, type });
       return (<MenuItem key={`${name}-action-${fieldAction.type}`}
+                        disabled={actionDisabled}
                         eventKey={{ action: fieldAction.type, field: name }}
                         onSelect={onSelect}>{fieldAction.title}</MenuItem>);
     });
 
     return (
       <OverlayDropdown show={this.state.open}
-                       toggle={element}
+                       toggle={wrappedElement}
                        onToggle={this._onMenuToggle}
                        menuContainer={menuContainer} >
         <div style={{ marginBottom: '10px' }}>
           <span className={style.dropdownheader}>
-            {name}
+            {name} = {type}
           </span>
         </div>
 

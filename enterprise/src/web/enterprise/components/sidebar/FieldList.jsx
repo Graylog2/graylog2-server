@@ -12,9 +12,11 @@ import CurrentSelectedFieldsActions from 'enterprise/actions/CurrentSelectedFiel
 import CurrentSelectedFieldsStore from 'enterprise/stores/CurrentSelectedFieldsStore';
 
 import styles from './FieldList.css';
+import FieldTypeIcon from './FieldTypeIcon';
 
 const FieldList = createReactClass({
   propTypes: {
+    allFields: PropTypes.object.isRequired,
     fields: PropTypes.object.isRequired,
     selectedFields: PropTypes.object.isRequired,
   },
@@ -51,29 +53,40 @@ const FieldList = createReactClass({
     this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   },
 
-  _renderFieldList(fields, selectedFields) {
+  _renderField({ fields, fieldType, selectedQuery, selectedView, selectedFields }) {
+    const name = fieldType.get('field_name');
+    const type = fieldType.get('physical_type');
+    const disabled = !fields.find(f => f.get('field_name') === name);
+
+    return (
+      <li key={`field-${name}`} className={styles.fieldListItem} >
+        <FieldSelected name={name}
+                       selected={selectedFields.contains(name)}
+                       onToggleSelected={CurrentSelectedFieldsActions.toggle} />
+        {' '}
+        <FieldTypeIcon type={type} />
+        {' '}
+        <Field queryId={selectedQuery}
+               viewId={selectedView}
+               disabled={disabled}
+               menuContainer={document && document.getElementById('sidebar')}
+               name={name}
+               type={type}
+               interactive>
+          {name}
+        </Field>
+      </li>
+    );
+  },
+  _renderFieldList({ fields, selectedFields, allFields }) {
     if (!fields) {
       return <span>No field information available.</span>;
     }
     const selectedQuery = this.state.currentView.selectedQuery;
     const selectedView = this.state.currentView.selectedView;
-    const fieldList = fields.entrySeq ? fields.entrySeq()
+    const fieldList = allFields
       .sort()
-      .map(([name]) => (
-        <li key={`field-${name}`} className={styles.fieldListItem} >
-          <FieldSelected name={name}
-                         selected={selectedFields.contains(name)}
-                         onToggleSelected={CurrentSelectedFieldsActions.toggle} />
-          {' '}
-          <Field queryId={selectedQuery}
-                 viewId={selectedView}
-                 menuContainer={document && document.getElementById('sidebar')}
-                 name={name}
-                 interactive>
-            {name}
-          </Field>
-        </li>
-      )) : null;
+      .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, selectedFields, fields }));
     return (
       <ul ref={(elem) => { this.fieldList = elem; }}
           style={{ maxHeight: this.state.maxFieldsHeight }}
@@ -83,10 +96,10 @@ const FieldList = createReactClass({
     );
   },
   render() {
-    const { selectedFields } = this.props;
+    const { allFields, fields, selectedFields } = this.props;
     return (
       <div>
-        {this._renderFieldList(this.props.fields, selectedFields)}
+        {this._renderFieldList({ fields, selectedFields, allFields })}
       </div>
     );
   },

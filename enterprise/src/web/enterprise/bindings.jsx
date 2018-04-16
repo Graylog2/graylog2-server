@@ -106,6 +106,7 @@ export default {
       type: 'chart',
       title: 'Chart',
       handler: ChartActionHandler,
+      condition: ({ type }) => type === 'long',
     },
     {
       type: 'aggregate',

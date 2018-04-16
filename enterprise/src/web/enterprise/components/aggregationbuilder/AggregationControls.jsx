@@ -66,13 +66,15 @@ export default class AggregationControls extends React.Component {
   render() {
     const { children, fields } = this.props;
     const { columnPivots, rowPivots, series, sort, visualization } = this.state;
-    const formattedFields = fields.map((_, v) => ({ label: v, value: v }))
+    const formattedFields = fields
+      .map(fieldType => fieldType.get('field_name'))
+      .map(v => ({ label: v, value: v }))
       .valueSeq()
       .toJS()
       .sort((v1, v2) => naturalSort(v1.label, v2.label));
     const currentlyUsedFields = [].concat(rowPivots, columnPivots, series)
       .sort(naturalSort)
-      .map(v => ({ label: v, value: v}));
+      .map(v => ({ label: v, value: v }));
     return (
       <span>
         <Row>

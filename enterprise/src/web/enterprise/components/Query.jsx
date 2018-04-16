@@ -8,7 +8,6 @@ import { widgetDefinition } from 'enterprise/logic/Widget';
 import ViewsActions from 'enterprise/actions/ViewsActions';
 
 import WidgetGrid from 'enterprise/components/WidgetGrid';
-import { FieldList, SideBar } from 'enterprise/components/sidebar';
 
 const _onPositionsChange = (positions, view, queryId) => {
   const newPositions = {};
@@ -22,7 +21,7 @@ const _onPositionsChange = (positions, view, queryId) => {
   ViewsActions.update(updatedView.get('id'), updatedView);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields, queryId) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, queryId, fields, allFields) => {
   const widgets = {};
   const data = {};
 
@@ -39,6 +38,7 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields,
   const positions = view.get('positions')[queryId];
   return (
     <WidgetGrid fields={fields}
+                allFields={allFields}
                 locked={false}
                 widgets={widgets}
                 positions={positions}
@@ -47,21 +47,14 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, fields,
   );
 };
 
-const Query = ({ fields, results, selectedFields, view, widgetMapping, widgets, query }) => {
+const Query = ({ children, allFields, fields, results, view, widgetMapping, widgets, query }) => {
   if (results) {
     const queryId = query.get('id');
-    const viewId = view.get('id');
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, fields, queryId);
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, queryId, fields, allFields, );
     return (
       <span>
         <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
-          <SideBar viewId={viewId} queryId={queryId} view={view} results={results}>
-            {({ maximumHeight }) => (
-              <FieldList selectedFields={selectedFields}
-                         maximumHeight={maximumHeight}
-                         fields={fields} />
-            )}
-          </SideBar>
+          {children}
         </Col>
         <Col md={9}>
           {widgetGrid}
@@ -74,11 +67,10 @@ const Query = ({ fields, results, selectedFields, view, widgetMapping, widgets, 
 };
 
 Query.propTypes = {
+  allFields: PropTypes.object.isRequired,
+  children: PropTypes.node.isRequired,
   fields: PropTypes.object.isRequired,
-  onToggleMessages: PropTypes.func.isRequired,
   results: PropTypes.object.isRequired,
-  selectedFields: PropTypes.object.isRequired,
-  showMessages: PropTypes.bool.isRequired,
   view: PropTypes.object.isRequired,
   widgetMapping: PropTypes.object.isRequired,
   widgets: PropTypes.object.isRequired,

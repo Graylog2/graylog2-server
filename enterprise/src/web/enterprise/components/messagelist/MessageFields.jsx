@@ -25,8 +25,9 @@ class MessageFields extends React.Component {
       return Object.keys(fields)
         .sort()
         .map((key) => {
+          const fieldType = this.props.fields.find(type => type.get('field_name') === key);
           return (
-            <MessageField key={key} {...this.props} fieldName={key} value={fields[key]}
+            <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} fieldType={fieldType ? fieldType.get('physical_type') : 'unknown'}
                                disableFieldActions={this.props.disableFieldActions || decoratedFields.indexOf(key) !== -1} />
           );
         });
@@ -35,6 +36,7 @@ class MessageFields extends React.Component {
     const allKeys = Object.keys(decorationStats.removed_fields).concat(Object.keys(fields)).sort();
 
     return allKeys.map((key) => {
+      const fieldType = this.props.fields.find(f => f.get('field_name') === key);
       if (decorationStats.added_fields[key]) {
         return <ChangedMessageField key={key} fieldName={key} newValue={fields[key]} />;
       }
@@ -51,7 +53,7 @@ class MessageFields extends React.Component {
                                      originalValue={decorationStats.removed_fields[key]} />);
       }
 
-      return <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} disableFieldActions />;
+      return <MessageField key={key} {...this.props} fieldName={key} fieldType={fieldType.get('physical_type')} value={fields[key]} disableFieldActions />;
     });
   };
 

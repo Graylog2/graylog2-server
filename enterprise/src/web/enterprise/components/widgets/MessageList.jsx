@@ -28,7 +28,7 @@ const MessageList = createReactClass({
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
-    fields: PropTypes.instanceOf(Immutable.Map).isRequired,
+    filter: PropTypes.string,
     pageSize: PropTypes.number.isRequired,
   },
 
@@ -41,6 +41,7 @@ const MessageList = createReactClass({
 
   getDefaultProps() {
     return {
+      filter: '',
       pageSize: UniversalSearchStore.DEFAULT_LIMIT,
     };
   },
@@ -100,7 +101,7 @@ const MessageList = createReactClass({
   render() {
     const pageSize = this.props.pageSize || 7;
     const messages = this.props.data.messages || [];
-    const { filter } = this.props;
+    const { fields, filter } = this.props;
     const filteredMessages = filter && filter !== '' ? this._filterMessages(this.props.filter, messages) : messages;
     const messageSlice = filteredMessages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
@@ -135,6 +136,7 @@ const MessageList = createReactClass({
                         <th key={selectedFieldName}
                           style={this._columnStyle(selectedFieldName)}>
                           <Field interactive
+                                 type={fields.find(f => f.get('field_name') === selectedFieldName).get('physical_type', 'unknown')}
                                  name={selectedFieldName}
                                  queryId={selectedQuery}
                                  viewId={selectedView} />
@@ -146,20 +148,21 @@ const MessageList = createReactClass({
                 {messageSlice.map((message) => {
                   return (
                     <MessageTableEntry key={`${message.index}-${message.id}`}
-                      disableSurroundingSearch
-                      message={message}
-                      showMessageRow={selectedFields.contains('message')}
-                      selectedFields={selectedColumns}
-                      expanded={this.state.expandedMessages.contains(`${message.index}-${message.id}`)}
-                      toggleDetail={this._toggleMessageDetail}
-                      inputs={new Immutable.Map()}
-                      streams={new Immutable.Map()}
-                      allStreams={new Immutable.List()}
-                      allStreamsLoaded
-                      nodes={new Immutable.Map()}
-                      highlight={false}
-                      expandAllRenderAsync={false}
-                      searchConfig={this.state.configurations.searchesClusterConfig} />
+                                       fields={fields}
+                                       disableSurroundingSearch
+                                       message={message}
+                                       showMessageRow={selectedFields.contains('message')}
+                                       selectedFields={selectedColumns}
+                                       expanded={this.state.expandedMessages.contains(`${message.index}-${message.id}`)}
+                                       toggleDetail={this._toggleMessageDetail}
+                                       inputs={new Immutable.Map()}
+                                       streams={new Immutable.Map()}
+                                       allStreams={new Immutable.List()}
+                                       allStreamsLoaded
+                                       nodes={new Immutable.Map()}
+                                       highlight={false}
+                                       expandAllRenderAsync={false}
+                                       searchConfig={this.state.configurations.searchesClusterConfig} />
                   );
                 })}
               </table>

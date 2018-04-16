@@ -8,17 +8,17 @@ import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
-const MessageField = ({ fieldName, message, value, currentView }) => {
+const MessageField = ({ fieldName, fieldType, message, value, currentView }) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
   const { selectedQuery } = currentView;
 
   return (
     <span>
       <dt>
-        <Field interactive queryId={selectedQuery} name={fieldName}>{fieldName}</Field>
+        <Field interactive queryId={selectedQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
       </dt>
       <dd>
-        <Value queryId={selectedQuery} field={fieldName} value={innerValue}>{innerValue}</Value>
+        <Value queryId={selectedQuery} field={fieldName} value={innerValue} type={fieldType}>{innerValue}</Value>
       </dd>
     </span>
   );

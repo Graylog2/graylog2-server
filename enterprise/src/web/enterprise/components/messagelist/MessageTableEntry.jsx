@@ -13,6 +13,7 @@ class MessageTableEntry extends React.Component {
     disableSurroundingSearch: PropTypes.bool,
     expandAllRenderAsync: PropTypes.bool.isRequired,
     expanded: PropTypes.bool.isRequired,
+    fields: PropTypes.object.isRequired,
     highlight: PropTypes.bool,
     highlightMessage: PropTypes.string,
     inputs: PropTypes.instanceOf(Immutable.Map).isRequired,
@@ -134,6 +135,7 @@ class MessageTableEntry extends React.Component {
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
             <MessageDetail message={this.props.message}
+                           fields={this.props.fields}
                            inputs={this.props.inputs}
                            streams={this.props.streams}
                            allStreams={this.props.allStreams}

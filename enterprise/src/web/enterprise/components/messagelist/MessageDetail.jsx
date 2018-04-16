@@ -19,6 +19,7 @@ class MessageDetail extends React.Component {
   static propTypes = {
     allStreams: PropTypes.object,
     allStreamsLoaded: PropTypes.bool,
+    fields: PropTypes.object.isRequired,
     disableTestAgainstStream: PropTypes.bool,
     disableSurroundingSearch: PropTypes.bool,
     expandAllRenderAsync: PropTypes.bool,
@@ -265,6 +266,7 @@ class MessageDetail extends React.Component {
         <Col md={9}>
           <div ref="messageList">
             <MessageFields message={this.props.message}
+                           fields={this.props.fields}
                            possiblyHighlight={this.props.possiblyHighlight}
                            disableFieldActions={this.props.disableFieldActions}
                            customFieldActions={this.props.customFieldActions}

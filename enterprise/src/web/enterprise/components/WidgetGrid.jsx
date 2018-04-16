@@ -76,6 +76,7 @@ class WidgetGrid extends React.Component {
                     data={widgetData}
                     height={height}
                     width={width}
+                    allFields={this.props.allFields}
                     fields={this.props.fields}
                     onSizeChange={this._onWidgetSizeChange}
                     title={widgetTitle} />
