@@ -47,6 +47,12 @@ const GrokPatterns = createReactClass({
     });
   },
 
+  testPattern(pattern, callback) {
+    GrokPatternsStore.testPattern(pattern, (response) => {
+      callback(response);
+    });
+  },
+
   confirmedRemove(pattern) {
     if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
       GrokPatternsStore.deletePattern(pattern, this.loadData);
@@ -115,6 +121,7 @@ const GrokPatterns = createReactClass({
                                 name={''}
                                 pattern={''}
                                 create
+                                testPattern={this.testPattern}
                                 reload={this.loadData}
                                 savePattern={this.savePattern}
                                 validPatternName={this.validPatternName} />

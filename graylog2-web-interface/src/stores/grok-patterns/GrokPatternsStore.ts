@@ -1,5 +1,6 @@
 const UserNotification = require("util/UserNotification");
 const URLUtils = require('util/URLUtils');
+const ApiRoutes = require('routing/ApiRoutes');
 
 const fetchDefault = require('logic/rest/FetchProvider').default;
 const fetchPlainText = require('logic/rest/FetchProvider').fetchPlainText;
@@ -8,6 +9,12 @@ interface GrokPattern {
   id: string;
   name: string;
   pattern: string;
+}
+
+interface GrokPatternTest {
+  name: string,
+  pattern: string,
+  sample_data: string,
 }
 
 const GrokPatternsStore = {
@@ -31,9 +38,38 @@ const GrokPatternsStore = {
       failCallback);
   },
 
+  testPattern(pattern: GrokPatternTest, callback: (response) => void) {
+    const failCallback = (error) => {
+      let err_message = error.message;
+      if (error.additional.body && error.additional.body.message) {
+        err_message = error.additional.body.message.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
+        err_message = `<br/><code>${err_message}</code>`;
+      }
+      UserNotification.error("Testing Grok pattern \"" + pattern.name + "\" failed with status: " + err_message,
+        "Could not test Grok pattern");
+    };
+
+    const requestPatternTest = {
+      grok_pattern: {
+        name: pattern.name,
+        pattern: pattern.pattern
+      },
+      sample_data: pattern.sample_data
+    };
+
+    fetchDefault('POST', URLUtils.qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
+      .then(
+        response => {
+          callback(response);
+          return response;
+        },
+        failCallback
+      );
+
+  },
+
   savePattern(pattern: GrokPattern, callback: () => void) {
     var failCallback = (error) => {
-      console.log(error.additional.body.message);
       let err_message = error.message;
       if (error.additional.body && error.additional.body.message) {
         err_message = error.additional.body.message.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
