@@ -11,7 +11,6 @@ import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Wizard from 'components/common/Wizard';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
-import ContentPackDependencyResolution from 'components/content-packs/ContentPackDependencyResolution';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
@@ -89,13 +88,7 @@ const CreateContentPackPage = createReactClass({
     );
   },
 
-  _dependencyComponent() {
-    return (
-      <ContentPackDependencyResolution contentPack={this.state.contentPack} />
-    )
-  },
-
-  _disableDependencyRes() {
+  _disableNextStep() {
     const content = this.state.contentPack;
     const selection = Object.keys(this.state.selectedEntities).length !== 0;
     return !(content.name && content.summary && content.description && content.vendor &&
@@ -105,9 +98,8 @@ const CreateContentPackPage = createReactClass({
   render() {
     const steps = [
       { key: 'selection', title: 'Content Selection', component: (this._selectionComponent()) },
-      { key: 'dependency', title: 'Dependency Resolution', component: (this._dependencyComponent()), disabled: this._disableDependencyRes() },
-      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />), disabled: this._disableDependencyRes() },
-      { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />), disabled: this._disableDependencyRes() },
+      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />), disabled: this._disableNextStep() },
+      { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />), disabled: this._disableNextStep() },
     ];
 
     return (
