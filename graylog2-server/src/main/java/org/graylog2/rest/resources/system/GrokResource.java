@@ -27,6 +27,7 @@ import io.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
@@ -114,6 +115,7 @@ public class GrokResource extends RestResource {
     @POST
     @Timed
     @Path("/test")
+    @NoAuditEvent("Only used to test pattern.")
     @ApiOperation(value = "Test pattern with sample data")
     public Response testPattern(@ApiParam(name = "pattern", required = true) GrokPatternTestRequest request) {
         Map<String, Object> result;
