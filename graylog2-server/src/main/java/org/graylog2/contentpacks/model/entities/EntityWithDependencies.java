@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks.catalogs;
+package org.graylog2.contentpacks.model.entities;
 
-import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.entities.Entity;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.Optional;
-import java.util.Set;
+@AutoValue
+public abstract class EntityWithDependencies {
+    public abstract Entity entity();
 
-public interface EntityCatalog {
-    boolean supports(ModelType modelType);
+    public abstract ImmutableSet<EntityDescriptor> dependencies();
 
-    Set<EntityExcerpt> listEntityExcerpts();
+    public static EntityWithDependencies create(Entity entity) {
+        return new AutoValue_EntityWithDependencies(entity, ImmutableSet.of());
+    }
 
-    Optional<Entity> collectEntity(EntityDescriptor entityDescriptor);
-
-    Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor);
+    public static EntityWithDependencies create(Entity entity, Iterable<EntityDescriptor> dependencies) {
+        return new AutoValue_EntityWithDependencies(entity, ImmutableSet.copyOf(dependencies));
+    }
 }

@@ -37,13 +37,13 @@ public class ContentPacksModule extends PluginModule {
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ModelIdParamConverter.Provider.class);
 
-        addEntityCatalog(DashboardCatalog.class);
-        addEntityCatalog(GrokPatternCatalog.class);
-        addEntityCatalog(InputCatalog.class);
-        addEntityCatalog(LookupCacheCatalog.class);
-        addEntityCatalog(LookupDataAdapterCatalog.class);
-        addEntityCatalog(LookupTableCatalog.class);
-        addEntityCatalog(OutputCatalog.class);
-        addEntityCatalog(StreamCatalog.class);
+        addEntityCatalog(DashboardCatalog.TYPE, DashboardCatalog.class);
+        addEntityCatalog(GrokPatternCatalog.TYPE, GrokPatternCatalog.class);
+        addEntityCatalog(InputCatalog.TYPE, InputCatalog.class);
+        addEntityCatalog(LookupCacheCatalog.TYPE, LookupCacheCatalog.class);
+        addEntityCatalog(LookupDataAdapterCatalog.TYPE, LookupDataAdapterCatalog.class);
+        addEntityCatalog(LookupTableCatalog.TYPE, LookupTableCatalog.class);
+        addEntityCatalog(OutputCatalog.TYPE, OutputCatalog.class);
+        addEntityCatalog(StreamCatalog.TYPE, StreamCatalog.class);
     }
 }

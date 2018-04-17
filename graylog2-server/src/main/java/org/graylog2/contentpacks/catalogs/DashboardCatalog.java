@@ -22,15 +22,21 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.database.NotFoundException;
 
 import javax.inject.Inject;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DashboardCatalog implements EntityCatalog {
+    public static final ModelType TYPE = ModelTypes.DASHBOARD;
+
     private final DashboardService dashboardService;
     private final DashboardExcerptConverter excerptConverter;
     private final DashboardConverter converter;
@@ -46,7 +52,7 @@ public class DashboardCatalog implements EntityCatalog {
 
     @Override
     public boolean supports(ModelType modelType) {
-        return ModelTypes.DASHBOARD.equals(modelType);
+        return TYPE.equals(modelType);
     }
 
     @Override
@@ -57,12 +63,18 @@ public class DashboardCatalog implements EntityCatalog {
     }
 
     @Override
-    public Set<Entity> collectEntities(Collection<ModelId> modelIds) {
-        final Set<String> idStrings = modelIds.stream()
-                .map(ModelId::id)
-                .collect(Collectors.toSet());
-        return dashboardService.loadByIds(idStrings).stream()
-                .map(converter::convert)
-                .collect(Collectors.toSet());
+    public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
+        final ModelId modelId = entityDescriptor.id();
+        try {
+            final Dashboard dashboard = dashboardService.load(modelId.id());
+            return Optional.of(converter.convert(dashboard));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        return Collections.emptySet();
     }
 }
