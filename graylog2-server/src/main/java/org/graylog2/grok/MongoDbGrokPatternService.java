@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -80,7 +81,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             if (!validate(pattern)) {
                 throw new ValidationException("Invalid pattern " + pattern);
             }
-        } catch (GrokException e) {
+        } catch (GrokException | PatternSyntaxException e) {
             throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
         }
         final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);

@@ -69,7 +69,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_UPDATE = PREFIX + "extractor:update";
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = PREFIX + "getting_started_guide_opt_out:create";
     public static final String GROK_PATTERN_CREATE = PREFIX + "grok_pattern:create";
-    public static final String GROK_PATTERN_TEST = PREFIX + "grok_pattern:test";
     public static final String GROK_PATTERN_DELETE = PREFIX + "grok_pattern:delete";
     public static final String GROK_PATTERN_IMPORT_CREATE = PREFIX + "grok_pattern_import:create";
     public static final String GROK_PATTERN_UPDATE = PREFIX + "grok_pattern:update";
@@ -195,7 +194,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GROK_PATTERN_CREATE)
             .add(GROK_PATTERN_DELETE)
-            .add(GROK_PATTERN_TEST)
             .add(GROK_PATTERN_IMPORT_CREATE)
             .add(GROK_PATTERN_UPDATE)
             .add(INDEX_SET_CREATE)

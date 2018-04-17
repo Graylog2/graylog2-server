@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -68,6 +69,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 
@@ -113,14 +115,13 @@ public class GrokResource extends RestResource {
     @Timed
     @Path("/test")
     @ApiOperation(value = "Test pattern with sample data")
-    @AuditEvent(type = AuditEventTypes.GROK_PATTERN_TEST)
     public Response testPattern(@ApiParam(name = "pattern", required = true) GrokPatternTestRequest request) {
         Map<String, Object> result;
         try {
             result = grokPatternService.match(request.grokPattern(), request.sampleData());
-        } catch(GrokException e) {
-            Map<String, String> error = new HashMap(1);
-            error.put("message", e.getMessage());
+        } catch (GrokException | PatternSyntaxException e) {
+            Map<String, String> error = ImmutableMap.of("message", e.getMessage());
+
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(new JSONObject(error)).build());
         }
         return Response.ok(result).build();
@@ -160,7 +161,7 @@ public class GrokResource extends RestResource {
                 if (!grokPatternService.validate(pattern)) {
                     throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
                 }
-            } catch (GrokException e) {
+            } catch (GrokException | PatternSyntaxException e) {
                 throw new ValidationException("Invalid pattern " + pattern + "Did not save any patterns\n" + e.getMessage());
             }
         }
@@ -189,7 +190,7 @@ public class GrokResource extends RestResource {
                     if (!grokPatternService.validate(pattern)) {
                         throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
                     }
-                } catch (GrokException e) {
+                } catch (GrokException | PatternSyntaxException e) {
                     throw new ValidationException("Invalid pattern " + pattern + "Did not save any patterns\n" + e.getMessage());
                 }
             }
