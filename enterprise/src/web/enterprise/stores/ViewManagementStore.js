@@ -55,7 +55,7 @@ const _prepareViewRequest = (id, currentViewStore, view, widgets, dashboardWidge
       widgets: mutateWidgets(queryWidgets.valueSeq(), widgetFilters).toJS(),
       positions: positions[queryId] || {},
       widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
-      selected_fields: fields.get(queryId).toJS(),
+      selected_fields: fields.get(queryId, Immutable.List()).toJS(),
       titles: titles.get(queryId, new Immutable.Map()),
     };
   }).toJS();
