@@ -22,15 +22,19 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.lookup.db.DBDataAdapterService;
 
 import javax.inject.Inject;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LookupDataAdapterCatalog implements EntityCatalog {
+    public static final ModelType TYPE = ModelTypes.LOOKUP_ADAPTER;
+
     private final DBDataAdapterService dataAdapterService;
     private final LookupDataAdapterExcerptConverter excerptConverter;
     private final LookupDataAdapterConverter converter;
@@ -46,7 +50,7 @@ public class LookupDataAdapterCatalog implements EntityCatalog {
 
     @Override
     public boolean supports(ModelType modelType) {
-        return ModelTypes.LOOKUP_ADAPTER.equals(modelType);
+        return TYPE.equals(modelType);
     }
 
     @Override
@@ -57,12 +61,13 @@ public class LookupDataAdapterCatalog implements EntityCatalog {
     }
 
     @Override
-    public Set<Entity> collectEntities(Collection<ModelId> modelIds) {
-        final Set<String> idStrings = modelIds.stream()
-                .map(ModelId::id)
-                .collect(Collectors.toSet());
-        return dataAdapterService.findByIds(idStrings).stream()
-                .map(converter::convert)
-                .collect(Collectors.toSet());
+    public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
+        final ModelId modelId = entityDescriptor.id();
+        return dataAdapterService.get(modelId.id()).map(converter::convert);
+    }
+
+    @Override
+    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        return Collections.emptySet();
     }
 }

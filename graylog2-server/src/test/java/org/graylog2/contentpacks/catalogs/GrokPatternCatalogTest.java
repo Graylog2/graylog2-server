@@ -18,13 +18,13 @@ package org.graylog2.contentpacks.catalogs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.converters.GrokPatternConverter;
 import org.graylog2.contentpacks.converters.GrokPatternExcerptConverter;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.grok.GrokPattern;
@@ -34,6 +34,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +81,7 @@ public class GrokPatternCatalogTest {
     }
 
     @Test
-    public void collectEntities() throws ValidationException {
+    public void collectEntity() throws ValidationException {
         grokPatternService.save(GrokPattern.create("Test1", "[a-z]+"));
         grokPatternService.save(GrokPattern.create("Test2", "[a-z]+"));
 
@@ -93,9 +94,9 @@ public class GrokPatternCatalogTest {
                 .data(entityData)
                 .build();
 
-        final Set<Entity> entityAbstracts = catalog.collectEntities(ImmutableSet.of(ModelId.of("1")));
+        final Optional<Entity> entityAbstracts = catalog.collectEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
         assertThat(entityAbstracts)
-                .hasSize(1)
+                .isPresent()
                 .contains(expectedEntity);
     }
 }

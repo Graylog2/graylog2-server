@@ -16,13 +16,20 @@
  */
 package org.graylog2.rest.resources.system.contentpacks;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.catalogs.CatalogIndex;
 import org.graylog2.contentpacks.catalogs.EntityCatalog;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.rest.models.system.contenpacks.responses.CatalogIndexResponse;
+import org.graylog2.rest.models.system.contenpacks.responses.CatalogResolveRequest;
+import org.graylog2.rest.models.system.contenpacks.responses.CatalogResolveResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,6 +39,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -52,7 +60,7 @@ public class CatalogResourceTest {
 
     @Before
     public void setUp() {
-        final ImmutableSet<EntityCatalog> entityCatalogs = ImmutableSet.of(mockEntityCatalog);
+        final ImmutableMap<ModelType, EntityCatalog> entityCatalogs = ImmutableMap.of(ModelType.of("test"), mockEntityCatalog);
         catalogIndex = new CatalogIndex(entityCatalogs);
         catalogResource = new CatalogResource(catalogIndex);
     }
@@ -72,5 +80,27 @@ public class CatalogResourceTest {
         assertThat(catalogIndexResponse.entities())
                 .hasSize(1)
                 .containsAll(entityExcerpts);
+    }
+
+    @Test
+    public void resolveEntities() {
+        final EntityDescriptor entityDescriptor = EntityDescriptor.builder()
+                .id(ModelId.of("1234567890"))
+                .type(ModelType.of("test"))
+                .build();
+        final ImmutableSet<EntityDescriptor> entityDescriptors = ImmutableSet.of(entityDescriptor);
+        final EntityV1 entity = EntityV1.builder()
+                .id(ModelId.of("1234567890"))
+                .type(ModelType.of("test"))
+                .data(new ObjectNode(JsonNodeFactory.instance).put("test", "1234"))
+                .build();
+        when(mockEntityCatalog.resolve(entityDescriptor)).thenReturn(entityDescriptors);
+        when(mockEntityCatalog.collectEntity(entityDescriptor)).thenReturn(Optional.of(entity));
+
+        final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors);
+
+        final CatalogResolveResponse catalogResolveResponse = catalogResource.resolveEntities(request);
+
+        assertThat(catalogResolveResponse.entities()).containsOnly(entity);
     }
 }

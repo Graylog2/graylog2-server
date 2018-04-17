@@ -23,15 +23,21 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 
 import javax.inject.Inject;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InputCatalog implements EntityCatalog {
+    public static final ModelType TYPE = ModelTypes.INPUT;
+
     private final InputService inputService;
     private final InputExcerptConverter excerptConverter;
     private final InputConverter converter;
@@ -47,7 +53,7 @@ public class InputCatalog implements EntityCatalog {
 
     @Override
     public boolean supports(ModelType modelType) {
-        return ModelTypes.INPUT.equals(modelType);
+        return TYPE.equals(modelType);
     }
 
     @Override
@@ -58,13 +64,20 @@ public class InputCatalog implements EntityCatalog {
     }
 
     @Override
-    public Set<Entity> collectEntities(Collection<ModelId> modelIds) {
-        final Set<String> idStrings = modelIds.stream()
-                .map(ModelId::id)
-                .collect(Collectors.toSet());
-        return inputService.findByIds(idStrings).stream()
-                .map(input -> InputWithExtractors.create(input, inputService.getExtractors(input)))
-                .map(converter::convert)
-                .collect(Collectors.toSet());
+    public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
+        final ModelId modelId = entityDescriptor.id();
+
+        try {
+            final Input input = inputService.find(modelId.id());
+            final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+            return Optional.of(converter.convert(inputWithExtractors));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        return Collections.emptySet();
     }
 }
