@@ -13,7 +13,6 @@ const DashboardList = createReactClass({
 
   propTypes: {
     dashboards: ImmutablePropTypes.list,
-    onDashboardAdd: PropTypes.func,
     permissions: PropTypes.arrayOf(PropTypes.string),
   },
 
@@ -32,8 +31,7 @@ const DashboardList = createReactClass({
       if (this.isPermitted(this.props.permissions, ['dashboards:create'])) {
         createDashboardButton = (
           <span>
-            <EditDashboardModalTrigger action="create" buttonClass="btn-link btn-text"
-                                       onSaved={this.props.onDashboardAdd}>
+            <EditDashboardModalTrigger action="create" buttonClass="btn-link btn-text">
               Create one now
             </EditDashboardModalTrigger>
             .
