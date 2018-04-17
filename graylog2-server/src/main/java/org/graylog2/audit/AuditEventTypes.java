@@ -195,6 +195,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GROK_PATTERN_CREATE)
             .add(GROK_PATTERN_DELETE)
+            .add(GROK_PATTERN_TEST)
             .add(GROK_PATTERN_IMPORT_CREATE)
             .add(GROK_PATTERN_UPDATE)
             .add(INDEX_SET_CREATE)
