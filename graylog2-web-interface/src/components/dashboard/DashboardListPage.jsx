@@ -70,7 +70,6 @@ const DashboardListPage = createReactClass({
       } else {
         dashboardList = (
           <DashboardList dashboards={filteredDashboards}
-                         onDashboardAdd={this._onDashboardAdd}
                          permissions={this.props.permissions}/>
         );
       }
