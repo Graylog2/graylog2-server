@@ -112,7 +112,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
         Grok grok = grokCompiler.compile("%{" + pattern.name() + "}");
-        return grok.match(sampleData).capture();
+        return grok.capture(sampleData);
     }
 
     @Override
