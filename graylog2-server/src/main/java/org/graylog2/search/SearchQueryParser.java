@@ -238,6 +238,8 @@ public class SearchQueryParser {
                 return new FieldValue(parseDate(pair.getLeft()), pair.getRight(), negate);
             case STRING:
                 return new FieldValue(pair.getLeft(), pair.getRight(), negate);
+            case INT:
+                return new FieldValue(Integer.parseInt(pair.getLeft()), pair.getRight(), negate);
             default:
                 throw new IllegalArgumentException("Unhandled field type: " + field.getFieldType().toString());
         }
