@@ -388,7 +388,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             public Date getValue() {
                 long oldestSegment = Long.MAX_VALUE;
                 for (final LogSegment segment : KafkaJournal.this.getSegments()) {
-                    oldestSegment = Math.min(oldestSegment, segment.size());
+                    oldestSegment = Math.min(oldestSegment, segment.time().milliseconds());
                 }
 
                 return new Date(oldestSegment);
