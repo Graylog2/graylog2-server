@@ -84,13 +84,19 @@ public class GrokTesterResource extends RestResource {
             grokCompiler.register(grokPattern.name(), grokPattern.pattern());
         }
 
-        final Grok grok = grokCompiler.compile(pattern, namedCapturesOnly);
+        final Grok grok;
+        try {
+            grok = grokCompiler.compile(pattern, namedCapturesOnly);
+        } catch (Exception e) {
+            return GrokTesterResponse.createError(pattern, string, e.getMessage());
+        }
+
         final Match match = grok.match(string);
         final Map<String, Object> matches = match.capture();
 
         final GrokTesterResponse response;
         if (matches.isEmpty()) {
-            response = GrokTesterResponse.create(false, Collections.<GrokTesterResponse.Match>emptyList(), pattern, string);
+            response = GrokTesterResponse.createSuccess(false, Collections.<GrokTesterResponse.Match>emptyList(), pattern, string);
         } else {
             final List<GrokTesterResponse.Match> responseMatches = Lists.newArrayList();
             for (final Map.Entry<String, Object> entry : matches.entrySet()) {
@@ -100,7 +106,7 @@ public class GrokTesterResource extends RestResource {
                 }
             }
 
-            response = GrokTesterResponse.create(true, responseMatches, pattern, string);
+            response = GrokTesterResponse.createSuccess(true, responseMatches, pattern, string);
         }
         return response;
     }
