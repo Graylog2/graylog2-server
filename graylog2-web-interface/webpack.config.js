@@ -121,19 +121,12 @@ if (TARGET === 'build') {
   process.env.NODE_ENV = 'production';
   module.exports = merge(webpackConfig, {
     mode: 'production',
+    optimization: {
+      minimize: true,
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-      new webpack.optimize.UglifyJsPlugin({
-        minimize: true,
-        sourceMap: true,
-        compress: {
-          warnings: false,
-        },
-        mangle: {
-          except: ['$super', '$', 'exports', 'require'],
-        },
       }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
