@@ -1,0 +1,9 @@
+rule "regexMatch"
+when
+    regex_replace("b+", "aabbcc", "zz") == "aazzcc" &&
+    regex_replace("b", "aabbcc", "zz") == "aazzzzcc" &&
+    regex_replace("b", "aabbcc", "zz", false) == "aazzbcc" &&
+    regex_replace("(a+)(b+)(c+)", "aabbcc", "$3$2$1") == "ccbbaa"
+then
+    trigger_test();
+end

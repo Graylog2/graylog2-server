@@ -102,6 +102,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
@@ -208,6 +209,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         // generic functions
         functions.put(RegexMatch.NAME, new RegexMatch());
+        functions.put(RegexReplace.NAME, new RegexReplace());
 
         // string functions
         functions.put(Abbreviate.NAME, new Abbreviate());
@@ -480,6 +482,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         } catch (ParseException e) {
             Assert.fail("Should parse");
         }
+    }
+
+    @Test
+    public void regexReplace() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
     }
 
     @Test
