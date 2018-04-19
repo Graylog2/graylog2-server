@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-public class LinkFieldConverter implements SearchResponseDecorator {
+public class LinkFieldDecorator implements SearchResponseDecorator {
 
     private static final String CK_LINK_FIELD = "link_field";
 
@@ -78,7 +78,7 @@ public class LinkFieldConverter implements SearchResponseDecorator {
     }
 
     @Inject
-    public LinkFieldConverter(@Assisted Decorator decorator, Engine templateEngine) {
+    public LinkFieldConverter(@Assisted Decorator decorator) {
         this.linkField = (String) requireNonNull(decorator.config().get(CK_LINK_FIELD),
                                                    CK_LINK_FIELD + " cannot be null");
     }
@@ -87,14 +87,15 @@ public class LinkFieldConverter implements SearchResponseDecorator {
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
-                    final Message message = new Message(ImmutableMap.copyOf(summary.message()));
-                    if (summary.message().containsKey(linkField)) {
-                        final String href = (String) summary.message().get(linkField);
-                        final LinkedHashMap object = new LinkedHashMap<String, String>();
-                        object.put("type", "a");
-                        object.put("href", href);
-                        message.addField(linkField, object);
+                    if (!summary.message().containsKey(linkField)) {
+                      return summary;
                     }
+                    final Message message = new Message(ImmutableMap.copyOf(summary.message()));
+                    final String href = (String) summary.message().get(linkField);
+                    final Map<String, String> decoratedField = new HashMap<>();
+                    decoratedField.put("type", "a");
+                    decoratedField.put("href", href);
+                    message.addField(linkField, decoratedField);
                     return summary.toBuilder().message(message.getFields()).build();
                 })
                 .collect(Collectors.toList());

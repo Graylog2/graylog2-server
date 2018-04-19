@@ -50,13 +50,12 @@ class MessageFieldDescription extends React.Component {
     SearchStore.addSearchTerm(this.props.fieldName, this.props.fieldValue);
   };
 
-  _getFieldValue() {
+  _getFieldValue = () => {
     if (this.props.isDecorated && ('type' in this.props.fieldValue) && (this.props.fieldValue.type === 'a')) {
       const link = this.props.fieldValue.href;
-      return React.createElement('a', {href: link}, link);
-    } else {
-      return this.props.renderForDisplay(this.props.fieldName)
+      return React.createElement('a', { href: link }, link);
     }
+    return this.props.renderForDisplay(this.props.fieldName);
   };
 
   _getFormattedTerms = () => {
