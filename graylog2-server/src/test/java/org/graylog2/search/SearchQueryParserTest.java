@@ -158,6 +158,13 @@ public class SearchQueryParserTest {
         checkQuery(parser, "<1", SearchQueryField.Type.INT, "1", SearchQueryOperators.LESS);
         checkQuery(parser, "=1", SearchQueryField.Type.INT, "1", SearchQueryOperators.EQUALS);
         checkQuery(parser, "1", SearchQueryField.Type.INT, "1", SearchQueryOperators.EQUALS);
+
+        checkQuery(parser, ">=1", SearchQueryField.Type.LONG, "1", SearchQueryOperators.GREATER_EQUALS);
+        checkQuery(parser, "<=1", SearchQueryField.Type.LONG, "1", SearchQueryOperators.LESS_EQUALS);
+        checkQuery(parser, ">1", SearchQueryField.Type.LONG, "1", SearchQueryOperators.GREATER);
+        checkQuery(parser, "<1", SearchQueryField.Type.LONG, "1", SearchQueryOperators.LESS);
+        checkQuery(parser, "=1", SearchQueryField.Type.LONG, "1", SearchQueryOperators.EQUALS);
+        checkQuery(parser, "1", SearchQueryField.Type.LONG, "1", SearchQueryOperators.EQUALS);
     }
 
     private void checkQuery(SearchQueryParser parser, String query, SearchQueryField.Type type, String expectedQuery, SearchQueryOperator expectedOp) {
