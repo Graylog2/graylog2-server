@@ -69,7 +69,7 @@ class StreamRulesEditor extends React.Component {
 
   _onAddStreamRule = (event) => {
     event.preventDefault();
-    this.refs.newStreamRuleForm.open();
+    this.newStreamRuleForm.open();
   };
 
   _getListClassName = (matchData) => {
@@ -121,7 +121,7 @@ class StreamRulesEditor extends React.Component {
               <button className="btn btn-success show-stream-rule" onClick={this._onAddStreamRule}>
                 Add stream rule
               </button>
-              <StreamRuleForm ref="newStreamRuleForm" title="New Stream Rule"
+              <StreamRuleForm ref={(newStreamRuleForm) => { this.newStreamRuleForm = newStreamRuleForm; }} title="New Stream Rule"
                               streamRuleTypes={this.state.streamRuleTypes} onSubmit={this._onStreamRuleFormSubmit} />
             </div>
 
@@ -132,7 +132,7 @@ class StreamRulesEditor extends React.Component {
             {this._explainMatchResult()}
 
             <MatchingTypeSwitcher stream={this.state.stream} onChange={this.loadData} />
-            <Alert ref="well" bsStyle={styles}>
+            <Alert bsStyle={styles}>
               <StreamRuleList stream={this.state.stream} streamRuleTypes={this.state.streamRuleTypes}
                               permissions={this.props.currentUser.permissions} matchData={this.state.matchData} />
             </Alert>

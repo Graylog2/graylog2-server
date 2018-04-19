@@ -34,7 +34,7 @@ const NoSearchResults = createReactClass({
 
   _showQueryModal(event) {
     event.preventDefault();
-    this.refs.showQueryModal.open();
+    this.showQueryModal.open();
   },
 
   render() {
@@ -52,7 +52,7 @@ const NoSearchResults = createReactClass({
             <p className="description">
               Your search returned no results, try changing the used time range or the search query.{' '}
               Do you want more details? <a href="#" onClick={this._showQueryModal}>Show the Elasticsearch query</a>.
-              <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery} />
+              <ShowQueryModal key="debugQuery" ref={(showQueryModal) => { this.showQueryModal = showQueryModal; }} builtQuery={this.props.builtQuery} />
               <br />
               <strong>
                 Take a look at the{' '}

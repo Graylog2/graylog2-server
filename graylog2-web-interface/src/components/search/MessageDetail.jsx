@@ -115,7 +115,7 @@ class MessageDetail extends React.Component {
     });
 
     return (
-      <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream"
+      <DropdownButton pullRight bsSize="small" title="Test against stream"
                       id="select-stream-dropdown">
         { streamList }
         { (!streamList && !this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner" />
@@ -263,7 +263,7 @@ class MessageDetail extends React.Component {
           </dl>
         </Col>
         <Col md={9}>
-          <div ref="messageList">
+          <div>
             <MessageFields message={this.props.message}
                            renderForDisplay={this.props.renderForDisplay}
                            disableFieldActions={this.props.disableFieldActions}

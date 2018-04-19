@@ -77,7 +77,7 @@ class LookupTableConverterConfiguration extends React.Component {
     return (
       <div className="xtrc-converter">
         <Input type="checkbox"
-               ref="converterEnabled"
+               ref={(converterEnabled) => { this.converterEnabled = converterEnabled; }}
                id={`enable-${this.props.type}-converter`}
                label="Convert value by using lookup table"
                wrapperClassName="col-md-offset-2 col-md-10"
@@ -91,7 +91,7 @@ class LookupTableConverterConfiguration extends React.Component {
                      label="Lookup Table"
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()}
+                     required={this.converterEnabled && this.converterEnabled.getChecked()}
                      help={helpMessage}>
                 <Select placeholder="Select a lookup table"
                         clearable={false}

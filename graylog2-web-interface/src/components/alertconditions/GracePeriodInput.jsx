@@ -27,14 +27,14 @@ class GracePeriodInput extends React.Component {
     return (
       <span>
         and <br /> then wait at least{' '}
-        <input ref="grace" name="grace" type="number" min="0" className="form-control"
+        <input name="grace" type="number" min="0" className="form-control"
                value={this.state.grace} onChange={this._onChange} required />
         {' '}
         <Pluralize singular="minute" plural="minutes" value={this.state.grace} /> until triggering a new alert. (grace period)
         <br />
 
         When sending an alert, include the last{' '}
-        <input ref="backlog" name="backlog" type="number" min="0" className="form-control"
+        <input name="backlog" type="number" min="0" className="form-control"
                value={this.state.backlog} onChange={this._onChange} required />
         {' '}
         <Pluralize singular="message" plural="messages" value={this.state.backlog} /> of the stream evaluated for this alert condition.

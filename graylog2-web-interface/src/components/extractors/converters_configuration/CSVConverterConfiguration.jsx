@@ -47,7 +47,7 @@ class CSVConverterConfiguration extends React.Component {
     return (
       <div className="xtrc-converter">
         <Input type="checkbox"
-               ref="converterEnabled"
+               ref={(converterEnabled) => { this.converterEnabled = converterEnabled; }}
                id={`enable-${this.props.type}-converter`}
                label="Add CSV columns as fields"
                wrapperClassName="col-md-offset-2 col-md-10"
@@ -65,7 +65,7 @@ class CSVConverterConfiguration extends React.Component {
                      wrapperClassName="col-md-9"
                      placeholder="field1,field2,field3"
                      onChange={this._onChange('column_header')}
-                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()} />
+                     required={this.converterEnabled && this.converterEnabled.getChecked()} />
 
               <Input type="text"
                      id={`${this.props.type}_converter_separator`}

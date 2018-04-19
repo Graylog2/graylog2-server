@@ -66,8 +66,7 @@ class FlexdateConverterConfiguration extends React.Component {
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9"
                      help={timezoneHelpMessage}>
-                <TimezoneSelect ref="timezone"
-                                id={`${this.props.type}_converter_timezone`}
+                <TimezoneSelect id={`${this.props.type}_converter_timezone`}
                                 className="timezone-select"
                                 value={this.props.configuration.time_zone}
                                 onChange={this._onChange('time_zone')} />

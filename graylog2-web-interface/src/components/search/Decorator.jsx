@@ -40,7 +40,7 @@ const Decorator = createReactClass({
   },
 
   _handleEditClick() {
-    this.refs.editForm.open();
+    this.editForm.open();
   },
 
   _handleSubmit(data) {
@@ -110,7 +110,7 @@ const Decorator = createReactClass({
                            id={decorator.id}
                            configuration={config}
                            typeDefinition={this.props.typeDefinition} />
-        <ConfigurationForm ref="editForm"
+        <ConfigurationForm ref={(editForm) => { this.editForm = editForm; }}
                            key="configuration-form-decorator"
                            configFields={this.props.typeDefinition.requested_configuration}
                            title={`Edit ${this.props.typeDefinition.name}`}

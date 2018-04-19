@@ -52,8 +52,8 @@ const SubstringExtractorConfiguration = createReactClass({
   },
 
   _verifySubstringInputs() {
-    const beginIndex = this.refs.beginIndex.getInputDOMNode();
-    const endIndex = this.refs.endIndex.getInputDOMNode();
+    const beginIndex = this.beginIndex.getInputDOMNode();
+    const endIndex = this.endIndex.getInputDOMNode();
 
     if (this.state.configuration.begin_index === undefined || this.state.configuration.begin_index < 0) {
       beginIndex.value = 0;
@@ -110,7 +110,7 @@ const SubstringExtractorConfiguration = createReactClass({
     return (
       <div>
         <Input type="number"
-               ref="beginIndex"
+               ref={(beginIndex) => { this.beginIndex = beginIndex; }}
                id="begin_index"
                label="Begin index"
                labelClassName="col-md-2"
@@ -122,7 +122,7 @@ const SubstringExtractorConfiguration = createReactClass({
                help="Character position from where to start extracting. (Inclusive)" />
 
         <Input type="number"
-               ref="endIndex"
+               ref={(endIndex) => { this.endIndex = endIndex; }}
                id="end_index"
                label="End index"
                labelClassName="col-md-2"

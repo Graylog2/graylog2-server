@@ -67,7 +67,7 @@ class DateConverterConfiguration extends React.Component {
     return (
       <div className="xtrc-converter">
         <Input type="checkbox"
-               ref="converterEnabled"
+               ref={(converterEnabled) => { this.converterEnabled = converterEnabled; }}
                id={`enable-${this.props.type}-converter`}
                label="Convert to date type"
                wrapperClassName="col-md-offset-2 col-md-10"
@@ -84,7 +84,7 @@ class DateConverterConfiguration extends React.Component {
                      wrapperClassName="col-md-9"
                      placeholder="yyyy-MM-dd HH:mm:ss.SSS"
                      onChange={this._onChange('date_format')}
-                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()}
+                     required={this.converterEnabled && this.converterEnabled.getChecked()}
                      help={dateFormatHelpMessage} />
 
               <Input label="Time Zone"
@@ -92,8 +92,7 @@ class DateConverterConfiguration extends React.Component {
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9"
                      help={timezoneHelpMessage}>
-                <TimezoneSelect ref="timezone"
-                                id={`${this.props.type}_converter_timezone`}
+                <TimezoneSelect id={`${this.props.type}_converter_timezone`}
                                 className="timezone-select"
                                 value={this.props.configuration.time_zone}
                                 onChange={this._onChange('time_zone')} />
@@ -103,8 +102,7 @@ class DateConverterConfiguration extends React.Component {
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9"
                      help={localeHelpMessage}>
-                <LocaleSelect ref="locale"
-                              id={`${this.props.type}_converter_locale`}
+                <LocaleSelect id={`${this.props.type}_converter_locale`}
                               className="locale-select"
                               value={this.props.configuration.locale}
                               onChange={this._onChange('locale')} />

@@ -40,7 +40,7 @@ class AssignOutputDropdown extends React.Component {
             {outputList}
           </select>
           &nbsp;
-          <Button ref="submitButton" id="add-existing-output" bsStyle="success" type="button"
+          <Button id="add-existing-output" bsStyle="success" type="button"
                   disabled={this.state.selectedOutput === this.PLACEHOLDER} onClick={this._handleClick}>
             Assign existing Output
           </Button>

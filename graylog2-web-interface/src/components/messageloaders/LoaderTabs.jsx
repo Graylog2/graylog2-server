@@ -52,7 +52,7 @@ const LoaderTabs = createReactClass({
   componentDidMount() {
     this.loadData();
     if (this.props.messageId && this.props.index) {
-      this.refs.messageLoader.submit(this.props.messageId, this.props.index);
+      this.messageLoader.submit(this.props.messageId, this.props.index);
     }
   },
 
@@ -133,7 +133,7 @@ const LoaderTabs = createReactClass({
             Please provide the id and index of the message that you want to load in this form:
           </div>
 
-          <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText />
+          <MessageLoader ref={(messageLoader) => { this.messageLoader = messageLoader; }} onMessageLoaded={this.onMessageLoaded} hidden={false} hideText />
         </Tab>,
       );
     }

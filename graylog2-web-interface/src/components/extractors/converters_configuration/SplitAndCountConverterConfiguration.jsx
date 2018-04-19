@@ -49,7 +49,7 @@ class SplitAndCountConverterConfiguration extends React.Component {
     return (
       <div className="xtrc-converter">
         <Input type="checkbox"
-               ref="converterEnabled"
+               ref={(converterEnabled) => { this.converterEnabled = converterEnabled; }}
                id={`enable-${this.props.type}-converter`}
                label="Split & Count"
                wrapperClassName="col-md-offset-2 col-md-10"
@@ -65,7 +65,7 @@ class SplitAndCountConverterConfiguration extends React.Component {
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
                      onChange={this._onChange('split_by')}
-                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()}
+                     required={this.converterEnabled && this.converterEnabled.getChecked()}
                      help={splitByHelpMessage} />
             </div>
           </Col>

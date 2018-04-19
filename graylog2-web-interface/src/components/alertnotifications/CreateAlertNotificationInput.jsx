@@ -54,12 +54,12 @@ const CreateAlertNotificationInput = createReactClass({
       () => {
         history.push(Routes.ALERTS.NOTIFICATIONS);
       },
-      () => this.refs.configurationForm.open(),
+      () => this.configurationForm.open(),
     );
   },
 
   _openForm() {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _resetForm() {
@@ -69,7 +69,7 @@ const CreateAlertNotificationInput = createReactClass({
   _formatNotificationForm(type) {
     const typeDefinition = this.state.availableNotifications[type];
     return (
-      <ConfigurationForm ref="configurationForm"
+      <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                          key="configuration-form-output"
                          configFields={typeDefinition.requested_configuration}
                          title={`Create new ${typeDefinition.name}`}

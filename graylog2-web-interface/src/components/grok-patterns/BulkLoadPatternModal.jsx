@@ -33,7 +33,7 @@ class BulkLoadPatternModal extends React.Component {
       });
     };
 
-    reader.readAsText(this.refs['pattern-file'].getInputDOMNode().files[0]);
+    reader.readAsText(this.patternFile.getInputDOMNode().files[0]);
   };
 
   render() {
@@ -47,7 +47,7 @@ class BulkLoadPatternModal extends React.Component {
                               formProps={{ onSubmit: this._onSubmit }}>
           <Input id="pattern-file"
                  type="file"
-                 ref="pattern-file"
+                 ref={(patternFile) => { this.patternFile = patternFile; }}
                  name="patterns"
                  label="Pattern file"
                  help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."

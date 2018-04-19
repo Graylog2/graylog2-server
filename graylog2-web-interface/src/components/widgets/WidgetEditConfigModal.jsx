@@ -41,11 +41,11 @@ const WidgetEditConfigModal = createReactClass({
   },
 
   open() {
-    this.refs.editModal.open();
+    this.editModal.open();
   },
 
   hide() {
-    this.refs.editModal.close();
+    this.editModal.close();
   },
 
   _getWidgetData() {
@@ -228,7 +228,7 @@ const WidgetEditConfigModal = createReactClass({
 
   render() {
     return (
-      <BootstrapModalForm ref="editModal"
+      <BootstrapModalForm ref={(editModal) => { this.editModal = editModal; }}
                           title={`Edit widget "${this.state.description}"`}
                           onSubmitForm={this.save}
                           onModalClose={this.props.onModalHidden}

@@ -86,7 +86,7 @@ const FieldAnalyzerMapComponent = createReactClass({
   },
 
   _updateMapWidth() {
-    this.setState({width: (this.refs.mapContainer ? this.refs.mapContainer.clientWidth : this.DEFAULT_WIDTH)});
+    this.setState({width: (this.mapContainer ? this.mapContainer.clientWidth : this.DEFAULT_WIDTH)});
   },
 
   _getStreamId() {
@@ -137,7 +137,7 @@ const FieldAnalyzerMapComponent = createReactClass({
           </div>
           <h1>Map for field: {this.state.field}</h1>
 
-          <div ref="mapContainer" style={{maxHeight: 400, overflow: 'auto', marginTop: 10}}>{inner}</div>
+          <div ref={(mapContainer) => { this.mapContainer = mapContainer; }} style={{maxHeight: 400, overflow: 'auto', marginTop: 10}}>{inner}</div>
         </div>
       );
     }

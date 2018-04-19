@@ -46,7 +46,7 @@ class ISODurationInput extends React.Component {
   };
 
   _onUpdate = () => {
-    let duration = this.refs.isoDuration.getValue().toUpperCase();
+    let duration = this.isoDuration.getValue().toUpperCase();
 
     if (!duration.startsWith('P')) {
       duration = `P${duration}`;
@@ -64,7 +64,7 @@ class ISODurationInput extends React.Component {
     return (
       <Input id={this.props.id}
              type="text"
-             ref="isoDuration"
+             ref={(isoDuration) => { this.isoDuration = isoDuration; }}
              label={this.props.label}
              onChange={this._onUpdate}
              value={this.state.duration}

@@ -116,9 +116,9 @@ const OutputsComponent = createReactClass({
         (<CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput}
                               getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId} />) : null);
       const assignOutputDropdown = (streamId ?
-        (<AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId}
-                              outputs={this.state.assignableOutputs}
-                              onSubmit={this._handleAssignOutput} />) : null);
+        (<AssignOutputDropdown streamId={streamId}
+                               outputs={this.state.assignableOutputs}
+                               onSubmit={this._handleAssignOutput} />) : null);
       return (
         <div className="outputs">
           <Row className="content">
