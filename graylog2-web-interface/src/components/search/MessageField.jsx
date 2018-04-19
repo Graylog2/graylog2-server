@@ -4,6 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import { MessageFieldDescription } from 'components/search';
+import DecorationStats from 'logic/message/DecorationStats';
 
 const MessageField = createReactClass({
   displayName: 'MessageField',
@@ -18,20 +19,6 @@ const MessageField = createReactClass({
   },
 
   SPECIAL_FIELDS: ['full_message', 'level'],
-
-  _isAdded(key) {
-    const decorationStats = this.props.message.decoration_stats;
-    return decorationStats && decorationStats.added_fields && decorationStats.added_fields[key] !== undefined;
-  },
-
-  _isChanged(key) {
-    const decorationStats = this.props.message.decoration_stats;
-    return decorationStats && decorationStats.changed_fields && decorationStats.changed_fields[key] !== undefined;
-  },
-
-  _isDecorated(key) {
-    return this._isAdded(key) || this._isChanged(key);
-  },
 
   render() {
     const message = this.props.message;
@@ -49,9 +36,8 @@ const MessageField = createReactClass({
                                  fieldName={key}
                                  fieldValue={innerValue}
                                  renderForDisplay={this.props.renderForDisplay}
-                                 disableFieldActions={this._isAdded(key) || this.props.disableFieldActions}
-                                 customFieldActions={this.props.customFieldActions}
-                                 isDecorated={this._isDecorated(key)} />
+                                 disableFieldActions={DecorationStats.isFieldAddedByDecorator(message, key) || this.props.disableFieldActions}
+                                 customFieldActions={this.props.customFieldActions} />
       </span>
     );
   },
