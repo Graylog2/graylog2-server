@@ -25,14 +25,24 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.chrono.ThaiBuddhistDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -65,10 +75,18 @@ public class MessageTest {
 
     @Before
     public void setUp() {
+        DateTimeUtils.setCurrentMillisFixed(1524139200000L);
+
         metricRegistry = new MetricRegistry();
         originalTimestamp = Tools.nowUTC();
         message = new Message("foo", "bar", originalTimestamp);
         invalidTimestampMeter = metricRegistry.meter("test");
+
+    }
+
+    @After
+    public void tearDown() {
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -559,5 +577,51 @@ public class MessageTest {
         assertThat(Message.sizeForField("", 1L)).isEqualTo(8);
         assertThat(Message.sizeForField("", 1.0f)).isEqualTo(4);
         assertThat(Message.sizeForField("", 1.0d)).isEqualTo(8);
+    }
+
+    @Test
+    public void assignZonedDateTimeAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, ZonedDateTime.of(2018, 4, 19, 12, 0, 0, 0, ZoneOffset.UTC));
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    public void assignOffsetDateTimeAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, OffsetDateTime.of(2018, 4, 19, 12, 0, 0, 0, ZoneOffset.UTC));
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @SuppressForbidden("Intentionally using system default time zone")
+    public void assignLocalDateTimeAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, LocalDateTime.of(2018, 4, 19, 12, 0, 0, 0));
+        final DateTimeZone defaultTimeZone = DateTimeZone.getDefault();
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, defaultTimeZone).withZone(DateTimeZone.UTC));
+    }
+
+    @Test
+    @SuppressForbidden("Intentionally using system default time zone")
+    public void assignLocalDateAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, LocalDate.of(2018, 4, 19));
+        final DateTimeZone defaultTimeZone = DateTimeZone.getDefault();
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 0, 0, 0, 0, defaultTimeZone).withZone(DateTimeZone.UTC));
+    }
+
+    @Test
+    public void assignInstantAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, Instant.ofEpochMilli(1524139200000L));
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    public void assignUnsupportedTemporalTypeAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, ThaiBuddhistDate.of(0, 4, 19));
+        assertThat(message.getTimestamp()).isGreaterThan(new DateTime(2018, 4, 19, 0, 0, 0, 0, DateTimeZone.UTC));
     }
 }

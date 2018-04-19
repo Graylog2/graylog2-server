@@ -41,6 +41,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
@@ -382,12 +383,22 @@ public class Message implements Messages {
             } else if (value instanceof OffsetDateTime) {
                 date = Date.from(((OffsetDateTime) value).toInstant());
             } else if (value instanceof LocalDateTime) {
-                date = Date.from(((LocalDateTime) value).toInstant(ZoneOffset.UTC));
+                final LocalDateTime localDateTime = (LocalDateTime) value;
+                final ZoneId defaultZoneId = ZoneId.systemDefault();
+                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
+                date = Date.from(localDateTime.toInstant(offset));
             } else if (value instanceof LocalDate) {
-                date = Date.from(((LocalDate) value).atStartOfDay(ZoneOffset.UTC).toInstant());
+                final LocalDate localDate = (LocalDate) value;
+                final LocalDateTime localDateTime = localDate.atStartOfDay();
+                final ZoneId defaultZoneId = ZoneId.systemDefault();
+                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
+                date = Date.from(localDateTime.toInstant(offset));
             } else if (value instanceof Instant) {
                 date = Date.from((Instant) value);
             } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unsupported temporal type {}. Using current date and time in message {}.", value.getClass(), getId());
+                }
                 date = new Date();
             }
 
