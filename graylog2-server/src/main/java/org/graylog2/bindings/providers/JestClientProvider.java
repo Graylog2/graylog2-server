@@ -29,6 +29,8 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.graylog2.indexer.cluster.jest.GraylogJestRetryHandler;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -61,7 +63,13 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
                               ObjectMapper objectMapper) {
-        this.factory = new JestClientFactory();
+        this.factory = new JestClientFactory() {
+            @Override
+            protected HttpClientBuilder configureHttpClient(HttpClientBuilder builder) {
+                return super.configureHttpClient(builder)
+                    .disableAutomaticRetries();
+            }
+        };
         this.credentialsProvider = new BasicCredentialsProvider();
         final Set<HttpHost> preemptiveAuthHosts = new HashSet<>();
         final List<String> hosts = elasticsearchHosts.stream()
@@ -101,7 +109,7 @@ public class JestClientProvider implements Provider<JestClient> {
                 .discoveryFrequency(discoveryFrequency.toSeconds(), TimeUnit.SECONDS)
                 .preemptiveAuthTargetHosts(preemptiveAuthHosts)
                 .requestCompressionEnabled(compressionEnabled)
-                .retryHandler(new HttpRetryHandler(elasticsearchMaxRetries))
+                .retryHandler(new GraylogJestRetryHandler(elasticsearchMaxRetries))
                 .objectMapper(objectMapper);
 
         factory.setHttpClientConfig(httpClientConfigBuilder.build());
