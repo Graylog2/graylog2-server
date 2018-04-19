@@ -17,8 +17,7 @@
 package org.graylog2.contentpacks.catalogs;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.contentpacks.converters.LookupTableConverter;
-import org.graylog2.contentpacks.converters.LookupTableExcerptConverter;
+import org.graylog2.contentpacks.codecs.LookupTableCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -37,16 +36,13 @@ public class LookupTableCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.LOOKUP_TABLE;
 
     private final DBLookupTableService lookupTableService;
-    private final LookupTableExcerptConverter excerptConverter;
-    private final LookupTableConverter converter;
+    private final LookupTableCodec codec;
 
     @Inject
     public LookupTableCatalog(DBLookupTableService lookupTableService,
-                              LookupTableExcerptConverter excerptConverter,
-                              LookupTableConverter converter) {
+                              LookupTableCodec codec) {
         this.lookupTableService = lookupTableService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -57,14 +53,14 @@ public class LookupTableCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return lookupTableService.findAll().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return lookupTableService.get(modelId.id()).map(converter::convert);
+        return lookupTableService.get(modelId.id()).map(codec::encode);
     }
 
     @Override

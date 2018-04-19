@@ -19,21 +19,21 @@ package org.graylog2.contentpacks.catalogs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.contentpacks.converters.OutputConverter;
-import org.graylog2.contentpacks.converters.OutputExcerptConverter;
-import org.graylog2.contentpacks.converters.StreamConverter;
-import org.graylog2.contentpacks.converters.StreamExcerptConverter;
+import org.graylog2.contentpacks.codecs.OutputCodec;
+import org.graylog2.contentpacks.codecs.StreamCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
+import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -59,6 +59,10 @@ public class CatalogIndexTest {
     @Mock
     private StreamService streamService;
     @Mock
+    private StreamRuleService streamRuleService;
+    @Mock
+    private IndexSetService indexSetService;
+    @Mock
     private OutputService outputService;
 
     private CatalogIndex catalogIndex;
@@ -66,8 +70,8 @@ public class CatalogIndexTest {
     @Before
     public void setUp() throws Exception {
         final Map<ModelType, EntityCatalog> catalogs = ImmutableMap.of(
-                ModelTypes.STREAM, new StreamCatalog(streamService, new StreamExcerptConverter(), new StreamConverter(objectMapper)),
-                ModelTypes.OUTPUT, new OutputCatalog(outputService, new OutputExcerptConverter(), new OutputConverter(objectMapper))
+                ModelTypes.STREAM, new StreamCatalog(streamService, new StreamCodec(objectMapper, streamService, streamRuleService, indexSetService)),
+                ModelTypes.OUTPUT, new OutputCatalog(outputService, new OutputCodec(objectMapper, outputService))
         );
 
         catalogIndex = new CatalogIndex(catalogs);

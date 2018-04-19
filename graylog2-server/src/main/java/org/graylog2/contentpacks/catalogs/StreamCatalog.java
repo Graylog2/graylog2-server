@@ -16,8 +16,7 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.StreamConverter;
-import org.graylog2.contentpacks.converters.StreamExcerptConverter;
+import org.graylog2.contentpacks.codecs.StreamCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -39,16 +38,13 @@ public class StreamCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.STREAM;
 
     private final StreamService streamService;
-    private final StreamExcerptConverter excerptConverter;
-    private final StreamConverter converter;
+    private final StreamCodec codec;
 
     @Inject
     public StreamCatalog(StreamService streamService,
-                         StreamExcerptConverter excerptConverter,
-                         StreamConverter converter) {
+                         StreamCodec codec) {
         this.streamService = streamService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -59,7 +55,7 @@ public class StreamCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return streamService.loadAll().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
@@ -68,7 +64,7 @@ public class StreamCatalog implements EntityCatalog {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            return Optional.of(converter.convert(stream));
+            return Optional.of(codec.encode(stream));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

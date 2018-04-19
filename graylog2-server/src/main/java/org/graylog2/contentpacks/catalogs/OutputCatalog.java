@@ -16,8 +16,7 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.OutputConverter;
-import org.graylog2.contentpacks.converters.OutputExcerptConverter;
+import org.graylog2.contentpacks.codecs.OutputCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -38,16 +37,13 @@ public class OutputCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.OUTPUT;
 
     private final OutputService outputService;
-    private final OutputExcerptConverter excerptConverter;
-    private final OutputConverter converter;
+    private final OutputCodec codec;
 
     @Inject
     public OutputCatalog(OutputService outputService,
-                         OutputExcerptConverter excerptConverter,
-                         OutputConverter converter) {
+                         OutputCodec codec) {
         this.outputService = outputService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -58,7 +54,7 @@ public class OutputCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return outputService.loadAll().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
@@ -67,7 +63,7 @@ public class OutputCatalog implements EntityCatalog {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Output output = outputService.load(modelId.id());
-            return Optional.of(converter.convert(output));
+            return Optional.of(codec.encode(output));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

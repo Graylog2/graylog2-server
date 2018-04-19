@@ -1,0 +1,13 @@
+{
+  "pipeline_processor_pipelines_streams": [
+    {
+      "_id": {
+        "$oid": "5adf28464b900a0fdb4e56f2"
+      },
+      "stream_id": "5adf23894b900a0fdb4e517d",
+      "pipeline_ids": [
+        "5a85c4854b900afd5d662be3"
+      ]
+    }
+  ]
+}

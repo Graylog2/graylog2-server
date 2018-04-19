@@ -16,8 +16,7 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.DashboardConverter;
-import org.graylog2.contentpacks.converters.DashboardExcerptConverter;
+import org.graylog2.contentpacks.codecs.DashboardCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -38,16 +37,13 @@ public class DashboardCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.DASHBOARD;
 
     private final DashboardService dashboardService;
-    private final DashboardExcerptConverter excerptConverter;
-    private final DashboardConverter converter;
+    private final DashboardCodec codec;
 
     @Inject
     public DashboardCatalog(DashboardService dashboardService,
-                            DashboardExcerptConverter excerptConverter,
-                            DashboardConverter converter) {
+                            DashboardCodec codec) {
         this.dashboardService = dashboardService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -58,7 +54,7 @@ public class DashboardCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return dashboardService.all().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
@@ -67,7 +63,7 @@ public class DashboardCatalog implements EntityCatalog {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Dashboard dashboard = dashboardService.load(modelId.id());
-            return Optional.of(converter.convert(dashboard));
+            return Optional.of(codec.encode(dashboard));
         } catch (NotFoundException e) {
             return Optional.empty();
         }
