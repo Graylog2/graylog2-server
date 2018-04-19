@@ -37,7 +37,7 @@ public class DecoratorBindings extends Graylog2Module {
                                        LookupTableDecorator.Factory.class);
 
         installSearchResponseDecorator(searchResponseDecoratorBinder,
-                                       LinkFieldConverter.class,
-                                       LinkFieldConverter.Factory.class);
+                                       LinkFieldDecorator.class,
+                                       LinkFieldDecorator.Factory.class);
     }
 }

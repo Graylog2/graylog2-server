@@ -30,9 +30,8 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import javax.inject.Inject;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -45,13 +44,13 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
 
     public interface Factory extends SearchResponseDecorator.Factory {
         @Override
-        LinkFieldConverter create(Decorator decorator);
+        LinkFieldDecorator create(Decorator decorator);
 
         @Override
-        LinkFieldConverter.Config getConfig();
+        LinkFieldDecorator.Config getConfig();
 
         @Override
-        LinkFieldConverter.Descriptor getDescriptor();
+        LinkFieldDecorator.Descriptor getDescriptor();
     }
 
     public static class Config implements SearchResponseDecorator.Config {
@@ -78,7 +77,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     }
 
     @Inject
-    public LinkFieldConverter(@Assisted Decorator decorator) {
+    public LinkFieldDecorator(@Assisted Decorator decorator) {
         this.linkField = (String) requireNonNull(decorator.config().get(CK_LINK_FIELD),
                                                    CK_LINK_FIELD + " cannot be null");
     }
