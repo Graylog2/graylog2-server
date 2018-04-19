@@ -1,16 +1,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Modal } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+
+import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 
 class ContentPackParameters extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
     onStateChange: PropTypes.func,
+    appliedParameter: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -64,6 +68,21 @@ class ContentPackParameters extends React.Component {
     this.setState({ newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter) });
   }
 
+  _onParameterApply = (id, configKey, paramName) => {
+    const paramMap = { configKey: configKey, paramName: paramName };
+    const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
+    newAppliedParameter[id] = newAppliedParameter[id] || [];
+    newAppliedParameter[id].push(paramMap);
+    this.props.onStateChange({ appliedParameter: newAppliedParameter });
+  };
+
+  _onParameterClear = (id, configKey) => {
+    const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
+    const indexToRemove = newAppliedParameter[id].findIndex((paramMap) => { return paramMap.configKey === configKey; });
+    newAppliedParameter[id].splice(indexToRemove, 1);
+    this.props.onStateChange({ appliedParameter: newAppliedParameter });
+  };
+
   _deleteParameter = (parameter) => {
     const newContentPack = ObjectUtils.clone(this.props.contentPack);
     const indexToDelete = newContentPack.parameters.map(p => p.name).indexOf(parameter.name);
@@ -74,16 +93,66 @@ class ContentPackParameters extends React.Component {
     this.props.onStateChange({ contentPack: newContentPack });
   };
 
-
   _parameterRowFormater = (parameter) => {
     return (
-      <tr key={parameter.name}>
+      <tr key={parameter.title}>
         <td>{parameter.title}</td>
         <td>{parameter.name}</td>
         <td>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{parameter.default_value}</td>
-        <td><Button bsStyle="primary" onClick={() => { this._deleteParameter(parameter); }}>Delete</Button></td>
+        <td><Button bsStyle="primary" bsSize="small" onClick={() => { this._deleteParameter(parameter); }}>Delete</Button></td>
+      </tr>
+    );
+  };
+
+  _entityRowFormatter = (entity) => {
+    let modalRef;
+    const applyParamComponent = (<ContentPackApplyParameter
+      parameters={this.props.contentPack.parameters}
+      entity={entity}
+      appliedParameter={this.props.appliedParameter[entity.id]}
+      onParameterApply={(key, value) => { this._onParameterApply(entity.id, key, value); }}
+      onParameterClear={(key) => { this._onParameterClear(entity.id, key); }}
+    />);
+
+    const closeModal = () => {
+      modalRef.close();
+    };
+
+    const open = () => {
+      modalRef.open();
+    };
+
+    const modal = (
+      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+        <Modal.Header closeButton>
+          <Modal.Title>Apply Parameter</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {applyParamComponent}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeModal}>Close</Button>
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
+
+    const disableBtn = this.props.contentPack.parameters.length <= 0;
+    return (
+      <tr key={entity.data.title}>
+        <td>{entity.data.title}</td>
+        <td>{entity.type}</td>
+        <td>{entity.data.description || entity.data.name}</td>
+        <td>
+          <Button bsStyle="primary"
+                  bsSize="small"
+                  disabled={disableBtn}
+                  onClick={() => { open(); }}>
+            Apply Parameter
+          </Button>
+        </td>
+        {modal}
       </tr>
     );
   };
@@ -95,7 +164,7 @@ class ContentPackParameters extends React.Component {
           <Col lg={8}>
             <h2>Create parameters</h2>
             <br />
-            <form className="form-horizontal content-selection-form" id="content-selection-form" onSubmit={this._addNewParameter}>
+            <form className="form-horizontal parameter-form" id="parameter-form" onSubmit={this._addNewParameter}>
               <fieldset>
                 <Input name="title"
                        id="title"
@@ -133,7 +202,6 @@ class ContentPackParameters extends React.Component {
                 <Input name="type"
                        id="type"
                        type="select"
-                       maxLength={250}
                        value={this.state.newParameter.type}
                        onChange={this._bindValue}
                        labelClassName="col-sm-3"
@@ -156,23 +224,40 @@ class ContentPackParameters extends React.Component {
                        wrapperClassName="col-sm-9"
                        label="Default value"
                        help="Give a default value if the parameter is not optional." />
-                <Button bsStyle="info" type="submit">Add Parameter</Button>
+                <Row>
+                  <Col smOffset={10}>
+                    <Button bsStyle="info" type="submit">Add Parameter</Button>
+                  </Col>
+                </Row>
               </fieldset>
             </form>
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col smOffset={1} sm={7}>
             <h2>Parameters list</h2>
             <br />
             <DataTable
               id="parameter-list"
-              headers={['Title', 'Name', 'Description', 'Value Type', 'Default Value']}
-              headerCellFormatter={header => <th>{header}</th>}
+              headers={['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Action']}
               sortByKey="title"
               filterKeys={[]}
               rows={this.props.contentPack.parameters}
               dataRowFormatter={this._parameterRowFormater}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col smOffset={1} sm={7}>
+            <h2>Entity list</h2>
+            <br />
+            <DataTable
+              id="entity-list"
+              headers={['Title', 'Type', 'Description', 'Action']}
+              sortByKey="type"
+              filterKeys={[]}
+              rows={this.props.contentPack.entities}
+              dataRowFormatter={this._entityRowFormatter}
             />
           </Col>
         </Row>

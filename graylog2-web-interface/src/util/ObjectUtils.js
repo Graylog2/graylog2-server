@@ -7,6 +7,22 @@ const ObjectUtils = {
     const keys = Object.keys(object);
     return keys && keys.length === 0;
   },
+
+  getValue(object, path) {
+    let realPath = [];
+    if (typeof path === 'string') {
+      realPath = path.split('.');
+    }
+    if (Array.isArray(path)) {
+      realPath = path;
+    }
+    return realPath.reduce((obj, key) => {
+      if (!obj) {
+        return undefined;
+      }
+      return obj[key];
+    }, object);
+  },
 };
 
 export default ObjectUtils;

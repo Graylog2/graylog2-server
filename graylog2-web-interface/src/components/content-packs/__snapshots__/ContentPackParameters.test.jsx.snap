@@ -13,8 +13,8 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
       </h2>
       <br />
       <form
-        className="form-horizontal content-selection-form"
-        id="content-selection-form"
+        className="form-horizontal parameter-form"
+        id="parameter-form"
         onSubmit={[Function]}
       >
         <fieldset>
@@ -127,7 +127,6 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                 className="form-control"
                 id="type"
                 label="Value Type"
-                maxLength={250}
                 name="type"
                 onChange={[Function]}
                 placeholder=""
@@ -193,13 +192,21 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               </span>
             </div>
           </div>
-          <button
-            className="btn btn-info"
-            disabled={false}
-            type="submit"
+          <div
+            className="row"
           >
-            Add Parameter
-          </button>
+            <div
+              className="col-sm-offset-10"
+            >
+              <button
+                className="btn btn-info"
+                disabled={false}
+                type="submit"
+              >
+                Add Parameter
+              </button>
+            </div>
+          </div>
         </fieldset>
       </form>
     </div>
@@ -208,7 +215,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     className="row"
   >
     <div
-      className=""
+      className="col-sm-7 col-sm-offset-1"
     >
       <h2>
         Parameters list
@@ -245,6 +252,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     <th>
                       Default Value
                     </th>
+                    <th>
+                      Action
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -266,12 +276,80 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     </td>
                     <td>
                       <button
-                        className="btn btn-primary"
+                        className="btn btn-sm btn-primary"
                         disabled={false}
                         onClick={[Function]}
                         type="button"
                       >
                         Delete
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-7 col-sm-offset-1"
+    >
+      <h2>
+        Entity list
+      </h2>
+      <br />
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="entity-list"
+            >
+              <table
+                className="table undefined"
+              >
+                <thead>
+                  <tr>
+                    <th>
+                      Title
+                    </th>
+                    <th>
+                      Type
+                    </th>
+                    <th>
+                      Description
+                    </th>
+                    <th>
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      A good input
+                    </td>
+                    <td />
+                    <td>
+                      Input
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Apply Parameter
                       </button>
                     </td>
                   </tr>
@@ -299,8 +377,8 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
       </h2>
       <br />
       <form
-        className="form-horizontal content-selection-form"
-        id="content-selection-form"
+        className="form-horizontal parameter-form"
+        id="parameter-form"
         onSubmit={[Function]}
       >
         <fieldset>
@@ -413,7 +491,6 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                 className="form-control"
                 id="type"
                 label="Value Type"
-                maxLength={250}
                 name="type"
                 onChange={[Function]}
                 placeholder=""
@@ -479,13 +556,21 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               </span>
             </div>
           </div>
-          <button
-            className="btn btn-info"
-            disabled={false}
-            type="submit"
+          <div
+            className="row"
           >
-            Add Parameter
-          </button>
+            <div
+              className="col-sm-offset-10"
+            >
+              <button
+                className="btn btn-info"
+                disabled={false}
+                type="submit"
+              >
+                Add Parameter
+              </button>
+            </div>
+          </div>
         </fieldset>
       </form>
     </div>
@@ -494,7 +579,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     className="row"
   >
     <div
-      className=""
+      className="col-sm-7 col-sm-offset-1"
     >
       <h2>
         Parameters list
@@ -510,6 +595,36 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
             <div
               className="data-table table-responsive"
               id="parameter-list"
+            >
+              <p>
+                No data available.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-7 col-sm-offset-1"
+    >
+      <h2>
+        Entity list
+      </h2>
+      <br />
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="entity-list"
             >
               <p>
                 No data available.

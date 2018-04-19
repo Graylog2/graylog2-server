@@ -1,0 +1,334 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
+<div>
+  <form
+    className="apply-parameter-form"
+    id="apply-parameter-form"
+    onSubmit={[Function]}
+  >
+    <div
+      className="applyParameter row"
+    >
+      <div
+        className="col-sm-5 col-sm-offset-1"
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className="control-label"
+            htmlFor="config_key"
+          >
+            Config Key
+          </label>
+          <span>
+            <select
+              className="form-control"
+              id="config_key"
+              label="Config Key"
+              name="config_key"
+              onChange={[Function]}
+              placeholder=""
+              required={true}
+              type="select"
+              value=""
+            >
+              <option
+                value=""
+              >
+                Choose..
+              </option>
+              <option
+                value="name"
+              >
+                name
+              </option>
+              <option
+                value="title"
+              >
+                title
+              </option>
+              <option
+                value="configuration.listen_address"
+              >
+                configuration.listen_address
+              </option>
+              <option
+                value="configuration.port"
+              >
+                configuration.port
+              </option>
+            </select>
+            
+          </span>
+        </div>
+      </div>
+      <div
+        className="col-sm-5"
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className="control-label"
+            htmlFor="parameter"
+          >
+            Parameter
+          </label>
+          <span>
+            <select
+              className="form-control"
+              id="parameter"
+              label="Parameter"
+              name="parameter"
+              onChange={[Function]}
+              placeholder=""
+              required={true}
+              type="select"
+              value=""
+            >
+              <option
+                value=""
+              >
+                Choose..
+              </option>
+              <option
+                value="PORT"
+              >
+                PORT
+              </option>
+            </select>
+            
+          </span>
+        </div>
+      </div>
+      <div
+        className="col-sm-1"
+      />
+    </div>
+    <div
+      className="row"
+    >
+      <div
+        className="col-sm-3 col-sm-offset-1"
+      >
+        <button
+          className="btn btn-default"
+          disabled={true}
+          type="submit"
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+  </form>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-10 col-sm-offset-1"
+    >
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="config-key-list"
+            >
+              <table
+                className="table undefined"
+              >
+                <thead>
+                  <tr>
+                    <th>
+                      Config Key
+                    </th>
+                    <th>
+                      Parameter
+                    </th>
+                    <th>
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      configuration.port
+                    </td>
+                    <td>
+                      PORT
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Clear
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
+<div>
+  <form
+    className="apply-parameter-form"
+    id="apply-parameter-form"
+    onSubmit={[Function]}
+  >
+    <div
+      className="applyParameter row"
+    >
+      <div
+        className="col-sm-5 col-sm-offset-1"
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className="control-label"
+            htmlFor="config_key"
+          >
+            Config Key
+          </label>
+          <span>
+            <select
+              className="form-control"
+              id="config_key"
+              label="Config Key"
+              name="config_key"
+              onChange={[Function]}
+              placeholder=""
+              required={true}
+              type="select"
+              value=""
+            >
+              <option
+                value=""
+              >
+                Choose..
+              </option>
+              <option
+                value="name"
+              >
+                name
+              </option>
+              <option
+                value="title"
+              >
+                title
+              </option>
+              <option
+                value="configuration.listen_address"
+              >
+                configuration.listen_address
+              </option>
+              <option
+                value="configuration.port"
+              >
+                configuration.port
+              </option>
+            </select>
+            
+          </span>
+        </div>
+      </div>
+      <div
+        className="col-sm-5"
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className="control-label"
+            htmlFor="parameter"
+          >
+            Parameter
+          </label>
+          <span>
+            <select
+              className="form-control"
+              id="parameter"
+              label="Parameter"
+              name="parameter"
+              onChange={[Function]}
+              placeholder=""
+              required={true}
+              type="select"
+              value=""
+            >
+              <option
+                value=""
+              >
+                Choose..
+              </option>
+            </select>
+            
+          </span>
+        </div>
+      </div>
+      <div
+        className="col-sm-1"
+      />
+    </div>
+    <div
+      className="row"
+    >
+      <div
+        className="col-sm-3 col-sm-offset-1"
+      >
+        <button
+          className="btn btn-default"
+          disabled={true}
+          type="submit"
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+  </form>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-10 col-sm-offset-1"
+    >
+      <div>
+        <div
+          className="row "
+        >
+          <div
+            className="col-md-12"
+          >
+            <div
+              className="data-table table-responsive"
+              id="config-key-list"
+            >
+              <p>
+                No data available.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

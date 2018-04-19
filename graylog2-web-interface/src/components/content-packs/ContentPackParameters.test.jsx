@@ -9,12 +9,18 @@ describe('<ContentPackParameters />', () => {
   it('should render with empty parameters', () => {
     const contentPack = {
       parameters: [],
+      entities: [],
     };
     const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render a parameter', () => {
+    const entity = {
+      id: '111-beef',
+      v: '1.0',
+      data: { name: 'Input', title: 'A good input', configuration: { listen_address: '1.2.3.4', port: '23'} },
+    };
     const contentPack = {
       parameters: [{
         name: 'A parameter name',
@@ -23,8 +29,9 @@ describe('<ContentPackParameters />', () => {
         type: 'string',
         default_value: 'test',
       }],
+      entities: [entity],
     };
-    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} />);
+    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -41,6 +48,7 @@ describe('<ContentPackParameters />', () => {
         type: 'string',
         default_value: 'test',
       }],
+      entities: [],
     };
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} />);
     wrapper.find('button[children="Delete"]').simulate('click');
@@ -60,6 +68,7 @@ describe('<ContentPackParameters />', () => {
 
     const contentPack = {
       parameters: [],
+      entities: [],
     };
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} />);
     wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
@@ -75,6 +84,7 @@ describe('<ContentPackParameters />', () => {
 
     const contentPack = {
       parameters: [],
+      entities: [],
     };
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} />);
     wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
