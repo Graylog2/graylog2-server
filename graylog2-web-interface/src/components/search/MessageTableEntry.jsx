@@ -4,10 +4,11 @@ import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 
-import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import DateTime from 'logic/datetimes/DateTime';
+import DecorationStats from 'logic/message/DecorationStats';
+import MessageDetail from './MessageDetail';
 import style from './MessageTableEntry.css';
 
 class MessageTableEntry extends React.Component {
@@ -123,6 +124,12 @@ class MessageTableEntry extends React.Component {
 
   renderForDisplay = (fieldName, truncate) => {
     const fullOrigValue = this.props.message.fields[fieldName];
+    const isDecorated = DecorationStats.isFieldDecorated(this.props.message, fieldName);
+
+    if (isDecorated && (typeof fullOrigValue === 'object') && (fullOrigValue.type === 'a')) {
+      const link = fullOrigValue.href;
+      return React.createElement('a', { href: link }, link);
+    }
 
     if (fullOrigValue === undefined) {
       return '';
