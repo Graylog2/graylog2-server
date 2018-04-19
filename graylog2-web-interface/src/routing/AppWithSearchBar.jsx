@@ -73,8 +73,8 @@ const AppWithSearchBar = createReactClass({
   _updateSearchParams() {
     SearchStore.searchInStream = this.state.stream;
     SearchStore.load();
-    if (this.refs.searchBar) {
-      this.refs.searchBar.reload();
+    if (this.searchBar) {
+      this.searchBar.reload();
     }
   },
 
@@ -108,7 +108,8 @@ const AppWithSearchBar = createReactClass({
 
     return (
       <div className="container-fluid">
-        <SearchBar ref="searchBar" userPreferences={this.state.currentUser.preferences}
+        <SearchBar ref={(searchBar) => { this.searchBar = searchBar; }}
+                   userPreferences={this.state.currentUser.preferences}
                    savedSearches={this.state.savedSearches}
                    config={this.state.searchesClusterConfig}
                    displayRefreshControls={this._searchBarShouldDisplayRefreshControls()}
