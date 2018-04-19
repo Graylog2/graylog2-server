@@ -16,9 +16,8 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.InputConverter;
-import org.graylog2.contentpacks.converters.InputExcerptConverter;
-import org.graylog2.contentpacks.converters.InputWithExtractors;
+import org.graylog2.contentpacks.codecs.InputCodec;
+import org.graylog2.contentpacks.codecs.InputWithExtractors;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -39,16 +38,13 @@ public class InputCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.INPUT;
 
     private final InputService inputService;
-    private final InputExcerptConverter excerptConverter;
-    private final InputConverter converter;
+    private final InputCodec codec;
 
     @Inject
     public InputCatalog(InputService inputService,
-                        InputExcerptConverter excerptConverter,
-                        InputConverter converter) {
+                        InputCodec codec) {
         this.inputService = inputService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -59,7 +55,8 @@ public class InputCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return inputService.all().stream()
-                .map(excerptConverter::convert)
+                .map(InputWithExtractors::create)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
@@ -70,7 +67,7 @@ public class InputCatalog implements EntityCatalog {
         try {
             final Input input = inputService.find(modelId.id());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            return Optional.of(converter.convert(inputWithExtractors));
+            return Optional.of(codec.encode(inputWithExtractors));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

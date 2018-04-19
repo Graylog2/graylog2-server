@@ -1,0 +1,15 @@
+{
+  "lut_caches": [
+    {
+      "_id": {
+        "$oid": "5adf24b24b900a0fdb4e52dd"
+      },
+      "title": "No-op cache",
+      "description": "No-op cache",
+      "name": "no-op-cache",
+      "config": {
+        "type": "none"
+      }
+    }
+  ]
+}

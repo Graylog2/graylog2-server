@@ -1,0 +1,18 @@
+{
+  "pipeline_processor_pipelines": [
+    {
+      "_id": {
+        "$oid": "5a85c4854b900afd5d662be3"
+      },
+      "title": "Test",
+      "description": "test",
+      "source": "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nend",
+      "created_at": {
+        "$date": "2018-02-15T17:33:57.125Z"
+      },
+      "modified_at": {
+        "$date": "2018-04-24T12:37:31.592Z"
+      }
+    }
+  ]
+}

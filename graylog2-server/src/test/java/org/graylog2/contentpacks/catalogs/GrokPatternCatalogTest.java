@@ -18,8 +18,7 @@ package org.graylog2.contentpacks.catalogs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.graylog2.contentpacks.converters.GrokPatternConverter;
-import org.graylog2.contentpacks.converters.GrokPatternExcerptConverter;
+import org.graylog2.contentpacks.codecs.GrokPatternCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -41,15 +40,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GrokPatternCatalogTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
     private InMemoryGrokPatternService grokPatternService;
     private GrokPatternCatalog catalog;
 
     @Before
     public void setUp() throws Exception {
         grokPatternService = new InMemoryGrokPatternService();
-        final GrokPatternExcerptConverter excerptConverter = new GrokPatternExcerptConverter();
-        final GrokPatternConverter converter = new GrokPatternConverter(objectMapper);
-        catalog = new GrokPatternCatalog(grokPatternService, excerptConverter, converter);
+        final GrokPatternCodec codec = new GrokPatternCodec(objectMapper, grokPatternService);
+        catalog = new GrokPatternCatalog(grokPatternService, codec);
     }
 
     @Test
@@ -94,8 +93,8 @@ public class GrokPatternCatalogTest {
                 .data(entityData)
                 .build();
 
-        final Optional<Entity> entityAbstracts = catalog.collectEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
-        assertThat(entityAbstracts)
+        final Optional<Entity> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
+        assertThat(collectedEntity)
                 .isPresent()
                 .contains(expectedEntity);
     }

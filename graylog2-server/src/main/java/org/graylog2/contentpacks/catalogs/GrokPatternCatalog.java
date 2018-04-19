@@ -16,8 +16,7 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.GrokPatternConverter;
-import org.graylog2.contentpacks.converters.GrokPatternExcerptConverter;
+import org.graylog2.contentpacks.codecs.GrokPatternCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -38,16 +37,13 @@ public class GrokPatternCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.GROK_PATTERN;
 
     private final GrokPatternService grokPatternService;
-    private final GrokPatternExcerptConverter excerptConverter;
-    private final GrokPatternConverter converter;
+    private final GrokPatternCodec codec;
 
     @Inject
     public GrokPatternCatalog(GrokPatternService grokPatternService,
-                              GrokPatternExcerptConverter excerptConverter,
-                              GrokPatternConverter converter) {
+                              GrokPatternCodec codec) {
         this.grokPatternService = grokPatternService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -58,7 +54,7 @@ public class GrokPatternCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return grokPatternService.loadAll().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
@@ -67,7 +63,7 @@ public class GrokPatternCatalog implements EntityCatalog {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
-            return Optional.of(converter.convert(grokPattern));
+            return Optional.of(codec.encode(grokPattern));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

@@ -1,0 +1,18 @@
+{
+  "pipeline_processor_rules": [
+    {
+      "_id": {
+        "$oid": "5adf25034b900a0fdb4e5338"
+      },
+      "title": "debug",
+      "description": "Debug",
+      "source": "rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend",
+      "created_at": {
+        "$date": "2018-04-24T12:37:23.033Z"
+      },
+      "modified_at": {
+        "$date": "2018-04-24T12:37:23.033Z"
+      }
+    }
+  ]
+}

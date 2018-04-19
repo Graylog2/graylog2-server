@@ -16,8 +16,7 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.LookupDataAdapterConverter;
-import org.graylog2.contentpacks.converters.LookupDataAdapterExcerptConverter;
+import org.graylog2.contentpacks.codecs.LookupDataAdapterCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -36,16 +35,13 @@ public class LookupDataAdapterCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.LOOKUP_ADAPTER;
 
     private final DBDataAdapterService dataAdapterService;
-    private final LookupDataAdapterExcerptConverter excerptConverter;
-    private final LookupDataAdapterConverter converter;
+    private final LookupDataAdapterCodec codec;
 
     @Inject
     public LookupDataAdapterCatalog(DBDataAdapterService dataAdapterService,
-                                    LookupDataAdapterExcerptConverter excerptConverter,
-                                    LookupDataAdapterConverter converter) {
+                                    LookupDataAdapterCodec codec) {
         this.dataAdapterService = dataAdapterService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -56,14 +52,14 @@ public class LookupDataAdapterCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return dataAdapterService.findAll().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return dataAdapterService.get(modelId.id()).map(converter::convert);
+        return dataAdapterService.get(modelId.id()).map(codec::encode);
     }
 
     @Override

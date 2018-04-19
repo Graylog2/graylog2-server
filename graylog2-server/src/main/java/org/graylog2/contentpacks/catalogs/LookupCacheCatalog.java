@@ -16,8 +16,7 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.converters.LookupCacheConverter;
-import org.graylog2.contentpacks.converters.LookupCacheExcerptConverter;
+import org.graylog2.contentpacks.codecs.LookupCacheCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -36,16 +35,13 @@ public class LookupCacheCatalog implements EntityCatalog {
     public static final ModelType TYPE = ModelTypes.LOOKUP_CACHE;
 
     private final DBCacheService cacheService;
-    private final LookupCacheExcerptConverter excerptConverter;
-    private final LookupCacheConverter converter;
+    private final LookupCacheCodec codec;
 
     @Inject
     public LookupCacheCatalog(DBCacheService cacheService,
-                              LookupCacheExcerptConverter excerptConverter,
-                              LookupCacheConverter converter) {
+                              LookupCacheCodec codec) {
         this.cacheService = cacheService;
-        this.excerptConverter = excerptConverter;
-        this.converter = converter;
+        this.codec = codec;
     }
 
     @Override
@@ -56,14 +52,14 @@ public class LookupCacheCatalog implements EntityCatalog {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return cacheService.findAll().stream()
-                .map(excerptConverter::convert)
+                .map(codec::createExcerpt)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return cacheService.get(modelId.id()).map(converter::convert);
+        return cacheService.get(modelId.id()).map(codec::encode);
     }
 
     @Override
