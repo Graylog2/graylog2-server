@@ -34,8 +34,9 @@ class DataTable extends React.Component {
     /**
      * Function that renders a single header cell in the table. It receives two arguments: the header, and its index.
      * It usually returns a `<th>` element with the header.
+     * Default will wrap the headers in a <th> tag.
      */
-    headerCellFormatter: PropTypes.func.isRequired,
+    headerCellFormatter: PropTypes.func,
     /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
     headers: PropTypes.array.isRequired,
     /** Element id to use in the table container */
@@ -62,6 +63,7 @@ class DataTable extends React.Component {
     noDataText: 'No data available.',
     rowClassName: '',
     useResponsiveTable: true,
+    headerCellFormatter: (header) => { return (<th>{header}</th>); },
     sortByKey: undefined,
   };
 
