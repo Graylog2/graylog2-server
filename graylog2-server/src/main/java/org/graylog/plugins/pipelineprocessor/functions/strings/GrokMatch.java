@@ -17,8 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import com.google.common.collect.ForwardingMap;
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.Match;
+import io.thekraken.grok.api.Grok;
+import io.thekraken.grok.api.Match;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -62,9 +62,8 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
 
         final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern, onlyNamedCaptures);
 
-        final Match match = grok.match(value);
-        match.captures();
-        return new GrokResult(match.toMap());
+        final Match match = grok.match(value);;
+        return new GrokResult(match.capture());
     }
 
     @Override

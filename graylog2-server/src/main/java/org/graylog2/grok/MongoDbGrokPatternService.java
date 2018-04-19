@@ -20,8 +20,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.exception.GrokException;
+import io.thekraken.grok.api.GrokCompiler;
+import io.thekraken.grok.api.exception.GrokException;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -101,8 +101,8 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     public boolean validate(GrokPattern pattern) {
         final boolean fieldsMissing = !(Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern()));
         try {
-            final Grok grok = new Grok();
-            grok.addPattern(pattern.name(), pattern.pattern());
+            final GrokCompiler grok = GrokCompiler.newInstance();
+            grok.register(pattern.name(), pattern.pattern());
             grok.compile("%{" + pattern.name() + "}");
         } catch (GrokException ignored) {
             // this only checks for null or empty again.

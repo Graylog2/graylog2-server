@@ -22,7 +22,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import oi.thekraken.grok.api.Grok;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+import io.thekraken.grok.api.Grok;
+import io.thekraken.grok.api.GrokCompiler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +88,7 @@ public class GrokPatternRegistry {
             } else {
                 return grokCache.get(pattern);
             }
-        } catch (ExecutionException e) {
+        } catch (UncheckedExecutionException | ExecutionException e) {
             final Throwable rootCause = Throwables.getRootCause(e);
             log.error("Unable to load grok pattern {} into cache", pattern, rootCause);
             throw new RuntimeException(rootCause);
@@ -113,12 +115,11 @@ public class GrokPatternRegistry {
 
         @Override
         public Grok load(@Nonnull String pattern) throws Exception {
-            final Grok grok = new Grok();
+            final GrokCompiler grokCompiler = GrokCompiler.newInstance();
             for (GrokPattern grokPattern : patterns()) {
-                grok.addPattern(grokPattern.name(), grokPattern.pattern());
+                grokCompiler.register(grokPattern.name(), grokPattern.pattern());
             }
-            grok.compile(pattern, namedCapturesOnly);
-            return grok;
+            return grokCompiler.compile(pattern, namedCapturesOnly);
         }
     }
 }

@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 @JsonAutoDetect
@@ -31,25 +32,43 @@ import java.util.List;
 @WithBeanGetter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class GrokTesterResponse {
-    @JsonProperty
+    @JsonProperty("matched")
     public abstract boolean matched();
 
-    @JsonProperty
+    @JsonProperty("matches")
     @Nullable
     public abstract List<Match> matches();
 
-    @JsonProperty
+    @JsonProperty("pattern")
     public abstract String pattern();
 
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
+
+    @JsonProperty("error_message")
+    @Nullable
+    public abstract String errorMessage();
 
     @JsonCreator
     public static GrokTesterResponse create(@JsonProperty("matched") boolean matched,
                                             @JsonProperty("matches") @Nullable List<Match> matches,
                                             @JsonProperty("pattern") String pattern,
-                                            @JsonProperty("string") String string) {
-        return new AutoValue_GrokTesterResponse(matched, matches, pattern, string);
+                                            @JsonProperty("string") String string,
+                                            @JsonProperty("error_message") @Nullable String errorMessage) {
+        return new AutoValue_GrokTesterResponse(matched, matches, pattern, string, errorMessage);
+    }
+
+    public static GrokTesterResponse createError(String pattern,
+                                                 String string,
+                                                 @Nullable String errorMessage) {
+        return create(false, Collections.emptyList(), pattern, string, errorMessage);
+    }
+
+    public static GrokTesterResponse createSuccess(boolean matched,
+                                                   @Nullable List<Match> matches,
+                                                   String pattern,
+                                                   String string) {
+        return create(matched, matches, pattern, string, null);
     }
 
     @JsonAutoDetect

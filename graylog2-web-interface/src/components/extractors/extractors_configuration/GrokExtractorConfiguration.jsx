@@ -37,6 +37,11 @@ class GrokExtractorConfiguration extends React.Component {
 
     const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.configuration.named_captures_only, this.props.exampleMessage);
     promise.then((result) => {
+      if (result.error_message != null) {
+        UserNotification.error('We were not able to run the grok extraction because of the following error: ' + result.error_message);
+        return;
+      }
+
       if (!result.matched) {
         UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
         return;
