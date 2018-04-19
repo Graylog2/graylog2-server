@@ -184,6 +184,24 @@ public class GrokExtractorTest {
     }
 
     @Test
+    public void testDateWithComma() {
+        final GrokExtractor extractor = makeExtractor("%{GREEDY:timestamp;date;yyyy-MM-dd'T'HH:mm:ss,SSSX}");
+        final Extractor.Result[] results = extractor.run("2015-07-31T10:05:36,773Z");
+        assertEquals("ISO date is parsed", 1, results.length);
+        Object value = results[0].getValue();
+        assertTrue(value instanceof Instant);
+        DateTime date = new DateTime(((Instant) value).toEpochMilli(), DateTimeZone.UTC);
+
+        assertEquals(2015, date.getYear());
+        assertEquals(7, date.getMonthOfYear());
+        assertEquals(31, date.getDayOfMonth());
+        assertEquals(10, date.getHourOfDay());
+        assertEquals(5, date.getMinuteOfHour());
+        assertEquals(36, date.getSecondOfMinute());
+        assertEquals(773, date.getMillisOfSecond());
+    }
+
+    @Test
     public void testNamedCapturesOnly() throws Exception {
         final Map<String, Object> config = new HashMap<>();
 
