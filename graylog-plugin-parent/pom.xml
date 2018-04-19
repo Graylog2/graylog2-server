@@ -102,6 +102,7 @@
                             <directory>${basedir}</directory>
                             <includes>
                                 <include>build/**/*</include>
+                                <include>node_modules/**/*</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
