@@ -65,22 +65,6 @@ class MessageTableEntry extends React.Component {
     return false;
   }
 
-  renderForDisplay = (fieldName, truncate) => {
-    const fullOrigValue = this.props.message.fields[fieldName];
-
-    if (fullOrigValue === undefined) {
-      return '';
-    }
-
-    /* Timestamp can not be highlighted by elastic search. So we can safely
-     * skip them from highlighting. */
-    if (fieldName === 'timestamp') {
-      return this._toTimestamp(fullOrigValue);
-    } else {
-      return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
-    }
-  };
-
   possiblyHighlight = (fieldName, fullOrigValue, truncate) => {
     // Ensure the field is a string for later processing
     const fullStringOrigValue = StringUtils.stringify(fullOrigValue);
@@ -135,6 +119,22 @@ class MessageTableEntry extends React.Component {
         </OverlayTrigger>
       </span>
     );
+  };
+
+  renderForDisplay = (fieldName, truncate) => {
+    const fullOrigValue = this.props.message.fields[fieldName];
+
+    if (fullOrigValue === undefined) {
+      return '';
+    }
+
+    /* Timestamp can not be highlighted by elastic search. So we can safely
+     * skip them from highlighting. */
+    if (fieldName === 'timestamp') {
+      return this._toTimestamp(fullOrigValue);
+    } else {
+      return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
+    }
   };
 
   render() {
