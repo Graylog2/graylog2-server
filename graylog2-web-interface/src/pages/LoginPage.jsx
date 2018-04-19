@@ -43,8 +43,8 @@ const LoginPage = createReactClass({
     event.preventDefault();
     this.resetLastError();
     this.setState({ loading: true });
-    const username = this.refs.username.getValue();
-    const password = this.refs.password.getValue();
+    const username = this.username.getValue();
+    const password = this.password.getValue();
     const location = document.location.host;
     this.promise = SessionActions.login.triggerPromise(username, password, location);
     this.promise.catch((error) => {
@@ -96,9 +96,9 @@ const LoginPage = createReactClass({
 
                 {alert}
 
-                <Input ref="username" id="username" type="text" placeholder="Username" autoFocus />
+                <Input ref={(username) => { this.username = username; }} id="username" type="text" placeholder="Username" autoFocus />
 
-                <Input ref="password" id="password" type="password" placeholder="Password" />
+                <Input ref={(password) => { this.password = password; }} id="password" type="password" placeholder="Password" />
 
                 <FormGroup>
                   <Button type="submit" bsStyle="info" disabled={this.state.loading}>
