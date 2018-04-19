@@ -51,7 +51,7 @@ class MessageFieldDescription extends React.Component {
   };
 
   _getFieldValue = () => {
-    if (this.props.isDecorated && ('type' in this.props.fieldValue) && (this.props.fieldValue.type === 'a')) {
+    if (this.props.isDecorated && (typeof this.props.fieldValue === 'object') && (this.props.fieldValue.type === 'a')) {
       const link = this.props.fieldValue.href;
       return React.createElement('a', { href: link }, link);
     }
