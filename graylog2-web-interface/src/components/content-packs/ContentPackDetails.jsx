@@ -27,7 +27,8 @@ class ContentPackDetails extends React.Component {
             <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
             <dt>URL:</dt> <dd><a href={contentPack.url}>{contentPack.url}</a>&nbsp;</dd>
             { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
-            { contentPack.parameter && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
+            { contentPack.parameters && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
+            { contentPack.entities && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
           </dl>
         </div>
         <br />

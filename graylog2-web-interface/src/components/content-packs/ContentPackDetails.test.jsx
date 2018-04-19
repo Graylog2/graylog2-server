@@ -17,6 +17,7 @@ describe('<ContentPackDetails />', () => {
       vendor: 'graylog.com',
       url: 'www.graylog.com',
       parameters: [],
+      entities: [],
     };
     const wrapper = renderer.create(<ContentPackDetails contentPack={contentPack}/>);
     expect(wrapper.toJSON()).toMatchSnapshot();
