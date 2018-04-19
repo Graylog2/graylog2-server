@@ -67,9 +67,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorKeepAliveTime = 5000;
 
-    @Parameter("rules_file")
-    private String droolsRulesFile;
-
     @Parameter(value = "node_id_file", validator = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
 
@@ -185,10 +182,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getOutputBufferProcessorKeepAliveTime() {
         return outputBufferProcessorKeepAliveTime;
-    }
-
-    public String getDroolsRulesFile() {
-        return droolsRulesFile;
     }
 
     @Override

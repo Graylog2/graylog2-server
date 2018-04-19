@@ -649,6 +649,7 @@ public class Message implements Messages {
     }
 
     // drools seems to need the "get" prefix
+    @Deprecated
     public boolean getIsSourceInetAddress() {
         return fields.containsKey("gl2_remote_ip");
     }

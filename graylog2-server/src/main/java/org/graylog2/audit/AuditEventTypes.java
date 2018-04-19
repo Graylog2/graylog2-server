@@ -34,9 +34,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ALERT_RECEIVER_DELETE = PREFIX + "alert_receiver:delete";
     public static final String ALERT_RECEIVER_UPDATE = PREFIX + "alert_receiver:update";
     public static final String AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE = PREFIX + "authentication_provider_configuration:update";
-    public static final String BLACKLIST_FILTER_CREATE = PREFIX + "blacklist_filter:create";
-    public static final String BLACKLIST_FILTER_DELETE = PREFIX + "blacklist_filter:delete";
-    public static final String BLACKLIST_FILTER_UPDATE = PREFIX + "blacklist_filter:update";
     public static final String CLUSTER_CONFIGURATION_CREATE = PREFIX + "cluster_configuration:create";
     public static final String CLUSTER_CONFIGURATION_DELETE = PREFIX + "cluster_configuration:delete";
     public static final String CLUSTER_CONFIGURATION_UPDATE = PREFIX + "cluster_configuration:update";
@@ -161,9 +158,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ALERT_RECEIVER_DELETE)
             .add(ALERT_RECEIVER_UPDATE)
             .add(AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE)
-            .add(BLACKLIST_FILTER_CREATE)
-            .add(BLACKLIST_FILTER_DELETE)
-            .add(BLACKLIST_FILTER_UPDATE)
             .add(CLUSTER_CONFIGURATION_CREATE)
             .add(CLUSTER_CONFIGURATION_DELETE)
             .add(CLUSTER_CONFIGURATION_UPDATE)
