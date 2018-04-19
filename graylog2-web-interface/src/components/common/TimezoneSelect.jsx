@@ -26,7 +26,7 @@ class TimezoneSelect extends React.Component {
   };
 
   getValue = () => {
-    return this.refs.timezone.getValue();
+    return this.timezone.getValue();
   };
 
   // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
@@ -80,7 +80,7 @@ class TimezoneSelect extends React.Component {
     const { onChange, ...otherProps } = this.props;
 
     return (
-      <Select ref="timezone" {...otherProps}
+      <Select ref={(timezone) => { this.timezone = timezone; }} {...otherProps}
               onChange={onChange}
               placeholder="Pick a time zone"
               options={timezones}

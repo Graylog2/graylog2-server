@@ -36,12 +36,14 @@ const AuthProvidersConfig = createReactClass({
     };
   },
 
+  inputs: {},
+
   _openModal() {
-    this.refs.configModal.open();
+    this.configModal.open();
   },
 
   _closeModal() {
-    this.refs.configModal.close();
+    this.configModal.close();
   },
 
   _saveConfig() {
@@ -73,7 +75,7 @@ const AuthProvidersConfig = createReactClass({
     return () => {
       const disabledProcessors = this.state.config.disabled_realms;
       const update = ObjectUtils.clone(this.state.config);
-      const checked = this.refs[realmName].checked;
+      const checked = this.inputs[realmName].checked;
 
       if (checked) {
         update.disabled_realms = disabledProcessors.filter(p => p !== realmName);
@@ -131,7 +133,7 @@ const AuthProvidersConfig = createReactClass({
         <tr key={idx}>
           <td>{realm.displayName}</td>
           <td>
-            <input ref={realm.name}
+            <input ref={(elem) => { this.inputs[realm.name] = elem; }}
                    type="checkbox"
                    checked={enabled}
                    disabled={!realm.canBeDisabled}
@@ -174,7 +176,7 @@ const AuthProvidersConfig = createReactClass({
                   <Button onClick={this._onCancel}>Cancel</Button>
                 </IfPermitted>
 
-                <BootstrapModalForm ref="configModal"
+                <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
                                     title="Update Authentication Provider Configuration"
                                     onSubmitForm={this._saveConfig}
                                     onModalClose={this._resetConfig}

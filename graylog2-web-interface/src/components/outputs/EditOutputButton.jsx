@@ -20,7 +20,7 @@ class EditOutputButton extends React.Component {
   handleClick = () => {
     this.props.getTypeDefinition(this.props.output.type, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
-      this.refs.configurationForm.open();
+      this.configurationForm.open();
     });
   };
 
@@ -35,7 +35,7 @@ class EditOutputButton extends React.Component {
 
     if (typeDefinition) {
       configurationForm = (
-        <ConfigurationForm ref="configurationForm" key={`configuration-form-output-${output.id}`}
+        <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} key={`configuration-form-output-${output.id}`}
                            configFields={this.state.typeDefinition}
                            title={`Editing Output ${output.title}`}
                            typeName={output.type}

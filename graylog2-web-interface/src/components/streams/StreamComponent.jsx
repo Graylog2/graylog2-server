@@ -52,8 +52,8 @@ class StreamComponent extends React.Component {
   };
 
   _filterStreams = () => {
-    if (this.refs.streamFilter) {
-      this.refs.streamFilter.filterData();
+    if (this.streamFilter) {
+      this.streamFilter.filterData();
     }
   };
 
@@ -78,7 +78,7 @@ class StreamComponent extends React.Component {
       const createStreamButton = (
         <IfPermitted permissions="streams:create">
           <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
-                              buttonText="Create one now" ref="createStreamButton"
+                              buttonText="Create one now"
                               indexSets={this.props.indexSets}
                               onSave={this.props.onStreamSave} />
         </IfPermitted>
@@ -100,7 +100,7 @@ class StreamComponent extends React.Component {
         <Row className="row-sm">
           <Col md={8}>
             <TypeAheadDataFilter id="stream-data-filter"
-                                 ref="streamFilter"
+                                 ref={(streamFilter) => { this.streamFilter = streamFilter; }}
                                  label="Filter streams"
                                  data={this.state.streams}
                                  displayKey={'title'}

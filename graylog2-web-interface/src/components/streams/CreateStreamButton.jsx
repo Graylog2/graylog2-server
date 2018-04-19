@@ -18,7 +18,7 @@ class CreateStreamButton extends React.Component {
   };
 
   onClick = () => {
-    this.refs.streamForm.open();
+    this.streamForm.open();
   };
 
   render() {
@@ -28,7 +28,7 @@ class CreateStreamButton extends React.Component {
                 onClick={this.onClick}>
           {this.props.buttonText}
         </Button>
-        <StreamForm ref="streamForm" title="Creating Stream" indexSets={this.props.indexSets}
+        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }} title="Creating Stream" indexSets={this.props.indexSets}
                     onSubmit={this.props.onSave} />
       </span>
     );

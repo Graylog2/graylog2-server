@@ -24,6 +24,8 @@ const IndexSetsComponent = createReactClass({
     this.loadData(1, this.PAGE_SIZE);
   },
 
+  forms: {},
+
   loadData(pageNo, limit) {
     this.currentPageNo = pageNo;
     this.currentPageSize = limit;
@@ -49,7 +51,7 @@ const IndexSetsComponent = createReactClass({
 
   _onDelete(indexSet) {
     return () => {
-      this.refs[`index-set-deletion-form-${indexSet.id}`].open();
+      this.forms[`index-set-deletion-form-${indexSet.id}`].open();
     };
   },
 
@@ -80,7 +82,7 @@ const IndexSetsComponent = createReactClass({
       <Col md={12}>
         <IndexSetDetails indexSet={indexSet} />
 
-        <IndexSetDeletionForm ref={`index-set-deletion-form-${indexSet.id}`} indexSet={indexSet} onDelete={this._deleteIndexSet} />
+        <IndexSetDeletionForm ref={(elem) => { this.forms[`index-set-deletion-form-${indexSet.id}`] = elem; }} indexSet={indexSet} onDelete={this._deleteIndexSet} />
       </Col>
     );
 

@@ -38,8 +38,8 @@ class TypeAheadFieldInput extends React.Component {
   };
 
   componentDidMount() {
-    if (this.refs.fieldInput) {
-      const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
+    if (this.fieldInput) {
+      const fieldInput = $(this.fieldInput.getInputDOMNode());
       fetch('GET', URLUtils.qualifyUrl(ApiRoutes.SystemApiController.fields().url))
         .then(
           (data) => {
@@ -61,7 +61,7 @@ class TypeAheadFieldInput extends React.Component {
             }
           });
 
-      const fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
+      const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
         if (this.props.onChange) {
           this.props.onChange(event);
@@ -74,10 +74,10 @@ class TypeAheadFieldInput extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.refs.fieldInput) {
-      const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
+    if (this.fieldInput) {
+      const fieldInput = $(this.fieldInput.getInputDOMNode());
       fieldInput.typeahead('destroy');
-      const fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
+      const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
       $(fieldFormGroup).off('typeahead:change typeahead:selected');
     }
   }
@@ -97,7 +97,7 @@ class TypeAheadFieldInput extends React.Component {
   render() {
     return (
       <Input id={this.props.id}
-             ref="fieldInput"
+             ref={(fieldInput) => { this.fieldInput = fieldInput; }}
              label={this.props.label}
              wrapperClassName="typeahead-wrapper"
              defaultValue={this.props.valueLink ? this.props.valueLink.value : null}

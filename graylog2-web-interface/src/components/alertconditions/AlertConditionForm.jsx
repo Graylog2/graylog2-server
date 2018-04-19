@@ -31,7 +31,7 @@ const AlertConditionForm = createReactClass({
   },
 
   getValue() {
-    const values = this.refs.configurationForm.getValue();
+    const values = this.configurationForm.getValue();
     return {
       title: values.title,
       type: this.props.type,
@@ -40,7 +40,7 @@ const AlertConditionForm = createReactClass({
   },
 
   open() {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _onCancel() {
@@ -64,7 +64,7 @@ const AlertConditionForm = createReactClass({
     const typeDefinition = this.state.types[type];
 
     return (
-      <ConfigurationForm ref="configurationForm"
+      <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                          key="configuration-form-alert-condition"
                          configFields={typeDefinition.requested_configuration}
                          title={this._formatTitle(alertCondition, typeDefinition.name)}

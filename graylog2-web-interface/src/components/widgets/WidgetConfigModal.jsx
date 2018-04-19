@@ -17,11 +17,11 @@ class WidgetConfigModal extends React.Component {
   };
 
   open = () => {
-    this.refs.configModal.open();
+    this.configModal.open();
   };
 
   hide = () => {
-    this.refs.configModal.close();
+    this.configModal.close();
   };
 
   _getBasicConfiguration = () => {
@@ -88,7 +88,7 @@ class WidgetConfigModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper ref="configModal">
+      <BootstrapModalWrapper ref={(configModal) => { this.configModal = configModal; }}>
         <Modal.Header closeButton>
           <Modal.Title><span>Widget <em>{this.props.widget.description}</em> configuration</span></Modal.Title>
         </Modal.Header>

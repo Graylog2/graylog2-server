@@ -17,17 +17,17 @@ const ShowQueryModal = createReactClass({
   mixins: [PureRenderMixin],
 
   open() {
-    this.refs.modal.open();
+    this.modal.open();
   },
 
   close() {
-    this.refs.modal.close();
+    this.modal.close();
   },
 
   render() {
     const queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
     return (
-      <BootstrapModalWrapper ref="modal">
+      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }}>
         <Modal.Header closeButton>
           <Modal.Title>Elasticsearch Query</Modal.Title>
         </Modal.Header>

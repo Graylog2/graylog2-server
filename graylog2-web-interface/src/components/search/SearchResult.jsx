@@ -44,6 +44,8 @@ class SearchResult extends React.Component {
     this._resetSelectedFields();
   }
 
+  fieldAnalyzers = {};
+
   onFieldToggled = (fieldName) => {
     const currentFields = this.state.selectedFields;
     let newFieldSet;
@@ -102,7 +104,7 @@ class SearchResult extends React.Component {
   };
 
   addFieldAnalyzer = (ref, field) => {
-    this.refs[ref].addField(field);
+    this.fieldAnalyzers[ref].addField(field);
   };
 
   _fieldAnalyzers = (filter) => {
@@ -120,11 +122,13 @@ class SearchResult extends React.Component {
       }
     });
 
+    const fieldAnalyzers = this.fieldAnalyzers;
+
     return this._fieldAnalyzers(filter)
       .map((analyzer, idx) => {
         return React.createElement(analyzer.component, {
           key: idx,
-          ref: analyzer.refId,
+          ref: (elem) => { fieldAnalyzers[analyzer.refId] = elem; },
           permissions: this.props.permissions,
           query: searchParams.q,
           page: searchParams.page,
@@ -180,7 +184,7 @@ class SearchResult extends React.Component {
 
     return (
       <Row id="main-content-search">
-        <Col ref="opa" md={3} sm={12} id="sidebar">
+        <Col md={3} sm={12} id="sidebar">
           <SearchSidebar result={this.props.result}
                          builtQuery={this.props.builtQuery}
                          selectedFields={this.state.selectedFields}

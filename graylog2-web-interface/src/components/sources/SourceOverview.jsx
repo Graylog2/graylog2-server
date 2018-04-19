@@ -60,7 +60,7 @@ const SourceOverview = createReactClass({
 
   componentDidMount() {
     const onDataTableFiltered = (sourceName) => {
-      this.refs.sourcePieChart.setFilter(sourceName);
+      this.sourcePieChart.setFilter(sourceName);
       this._toggleResetButtons();
       dc.redrawAll();
       this.loadHistogramData();
@@ -82,9 +82,9 @@ const SourceOverview = createReactClass({
       }
     };
 
-    this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, this.nameMessageGroup, onDataTableFiltered);
-    this.refs.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, onPieChartFiltered);
-    this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, onLineChartFiltered);
+    this.sourceDataTable.renderDataTable(this.messageCountDimension, this.nameMessageGroup, onDataTableFiltered);
+    this.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, onPieChartFiltered);
+    this.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, onLineChartFiltered);
     this.applyRangeParameter();
     dc.renderAll();
     window.addEventListener('resize', this._resizeCallback);
@@ -105,8 +105,8 @@ const SourceOverview = createReactClass({
   setSearchFilter(filter) {
     this.setState({ filter: filter }, () => {
       this._filterSources();
-      this.refs.sourceDataTable.redraw();
-      this.refs.sourcePieChart.redraw();
+      this.sourceDataTable.redraw();
+      this.sourcePieChart.redraw();
     });
   },
 
@@ -136,17 +136,17 @@ const SourceOverview = createReactClass({
      * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
      * graphs, dc will propagate that to the crossfilter dimension.
      */
-    const pieChartFilters = this.refs.sourcePieChart.getFilters();
-    const dataTableFilters = this.refs.sourceDataTable.getFilters();
+    const pieChartFilters = this.sourcePieChart.getFilters();
+    const dataTableFilters = this.sourceDataTable.getFilters();
     this.nameDimension.filterAll();
     this.filterDimension.filterAll();
-    this.refs.sourcePieChart.clearFilters();
-    this.refs.sourceDataTable.clearFilters();
+    this.sourcePieChart.clearFilters();
+    this.sourceDataTable.clearFilters();
     this.sourcesData.remove();
     this.sourcesData.add(sources);
 
-    pieChartFilters.forEach(filter => this.refs.sourcePieChart.setFilter(filter));
-    dataTableFilters.forEach(filter => this.refs.sourceDataTable.setFilter(filter));
+    pieChartFilters.forEach(filter => this.sourcePieChart.setFilter(filter));
+    dataTableFilters.forEach(filter => this.sourceDataTable.setFilter(filter));
     this._filterSources();
 
     dc.redrawAll();
@@ -155,7 +155,7 @@ const SourceOverview = createReactClass({
   loadHistogramData() {
     let filters;
 
-    if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
+    if (this.sourcePieChart.getFilters().length !== 0 || this.sourceDataTable.getFilters().length !== 0) {
       filters = this.nameDimension.top(Infinity).map(source => UniversalSearch.escape(source.name));
     }
 
@@ -173,13 +173,13 @@ const SourceOverview = createReactClass({
   },
 
   _resetHistogram(histogram) {
-    const lineChartFilters = this.refs.sourceLineChart.getFilters();
+    const lineChartFilters = this.sourceLineChart.getFilters();
     this.valueDimension.filterAll();
-    this.refs.sourceLineChart.clearFilters();
+    this.sourceLineChart.clearFilters();
     this.histogramData.remove();
     this.histogramData.add(histogram);
 
-    lineChartFilters.forEach(filter => this.refs.sourceLineChart.setFilter(filter));
+    lineChartFilters.forEach(filter => this.sourceLineChart.setFilter(filter));
 
     dc.redrawAll();
   },
@@ -238,7 +238,7 @@ const SourceOverview = createReactClass({
   },
 
   resetSourcesFilters() {
-    this.refs.sourcePieChart.clearFilters();
+    this.sourcePieChart.clearFilters();
     this.nameDimension.filterAll();
     this.loadHistogramData();
     this._toggleResetButtons();
@@ -247,19 +247,19 @@ const SourceOverview = createReactClass({
 
   resetHistogramFilters() {
     this.valueDimension.filterAll();
-    this.refs.sourceLineChart.clearFilters();
+    this.sourceLineChart.clearFilters();
     dc.redrawAll();
   },
 
   _updateWidth() {
     SCREEN_RESOLUTION = $(window).width();
-    this.refs.sourcePieChart.updateWidth();
-    this.refs.sourceLineChart.updateWidth();
+    this.sourcePieChart.updateWidth();
+    this.sourceLineChart.updateWidth();
     dc.renderAll();
   },
 
   syncRangeWithQuery() {
-    const rangeSelectBox = this.refs.rangeSelector;
+    const rangeSelectBox = this.rangeSelector;
     if (Number(rangeSelectBox.value) === 0) {
       SearchStore.changeTimeRange('relative', { relative: 0 });
     } else {
@@ -271,7 +271,7 @@ const SourceOverview = createReactClass({
 
   _toggleResetButtons() {
     // We only need to toggle the datatable reset button, dc will take care of the other reset buttons
-    if (this.refs.sourcePieChart.getFilters().length !== 0) {
+    if (this.sourcePieChart.getFilters().length !== 0) {
       $('#dc-sources-result-reset').show();
     } else {
       $('#dc-sources-result-reset').hide();
@@ -295,7 +295,7 @@ const SourceOverview = createReactClass({
 
     // when range is changed the filter in line chart (corresponding to the brush) does not make any sense any more
     this.valueDimension.filterAll();
-    this.refs.sourceLineChart.clearFilters();
+    this.sourceLineChart.clearFilters();
     this.syncRangeWithQuery();
     if (keepChangeInHistory) {
       window.location.hash = `#${effectiveRange}`;
@@ -331,7 +331,7 @@ const SourceOverview = createReactClass({
     const results = (
       <div style={resultsStyle}>
         <div className="row content">
-          <SourceLineChart ref="sourceLineChart"
+          <SourceLineChart ref={(sourceLineChart) => { this.sourceLineChart = sourceLineChart; }}
                            reloadingHistogram={this.state.reloadingHistogram}
                            histogramDataAvailable={this.state.histogramDataAvailable}
                            resolution={this.state.resolution}
@@ -342,11 +342,11 @@ const SourceOverview = createReactClass({
           null}
         <div className="row content" style={{ display: this.state.loading ? 'none' : 'block' }}>
           <div className="col-md-7">
-            <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters}
+            <SourceDataTable ref={(sourceDataTable) => { this.sourceDataTable = sourceDataTable; }} resetFilters={this.resetSourcesFilters}
                              setSearchFilter={this.setSearchFilter} numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
           </div>
           <div className="col-md-3 col-md-offset-1">
-            <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}
+            <SourcePieChart ref={(sourcePieChart) => { this.sourcePieChart = sourcePieChart; }} resetFilters={this.resetSourcesFilters}
                             numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
           </div>
         </div>
@@ -359,7 +359,7 @@ const SourceOverview = createReactClass({
           <div className="col-md-12">
             <div>
               <div className="pull-right">
-                <select ref="rangeSelector" className="sources-range form-control input-sm" value={this.state.range}
+                <select ref={(rangeSelector) => { this.rangeSelector = rangeSelector; }} className="sources-range form-control input-sm" value={this.state.range}
                         onChange={this._onRangeChanged}>
                   <option value={hoursToSeconds(1)}>Last Hour</option>
                   <option value={daysToSeconds(1)}>Last Day</option>

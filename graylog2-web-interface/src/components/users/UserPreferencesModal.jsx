@@ -25,13 +25,13 @@ class UserPreferencesModal extends React.Component {
   };
 
   _save = () => {
-    PreferencesStore.saveUserPreferences(this.state.preferences, this.refs.modal.close);
+    PreferencesStore.saveUserPreferences(this.state.preferences, this.modal.close);
   };
 
   openModal = () => {
     PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
       this.setState({ preferences: preferences });
-      this.refs.modal.open();
+      this.modal.open();
     });
   };
 
@@ -59,7 +59,7 @@ class UserPreferencesModal extends React.Component {
       return formattedPreference;
     });
     return (
-      <BootstrapModalForm ref="modal"
+      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title={`Preferences for user ${this.props.userName}`}
                           onSubmitForm={this._save}
                           submitButtonText="Save">

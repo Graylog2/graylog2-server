@@ -84,8 +84,8 @@ class TypeAheadInput extends React.Component {
   };
 
   _updateTypeahead = (props) => {
-    this.fieldInput = this.refs.fieldInput.getInputDOMNode();
-    this.fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
+    this.fieldInput = this.fieldInputElem.getInputDOMNode();
+    this.fieldFormGroup = ReactDOM.findDOMNode(this.fieldInputElem);
 
     const $fieldInput = $(this.fieldInput);
 
@@ -123,7 +123,7 @@ class TypeAheadInput extends React.Component {
   render() {
     return (<Input id={this.props.id}
                    type="text"
-                   ref="fieldInput"
+                   ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
                    wrapperClassName="typeahead-wrapper"
                    label={this.props.label}
                    onKeyPress={this.props.onKeyPress} />);

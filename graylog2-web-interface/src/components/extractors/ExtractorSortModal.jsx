@@ -15,11 +15,11 @@ class ExtractorSortModal extends React.Component {
   };
 
   open = () => {
-    this.refs.modal.open();
+    this.modal.open();
   };
 
   close = () => {
-    this.refs.modal.close();
+    this.modal.close();
   };
 
   _updateSorting = (newSorting) => {
@@ -36,7 +36,7 @@ class ExtractorSortModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper ref="modal">
+      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }}>
         <Modal.Header closeButton>
           <Modal.Title>
             <span>Sort extractors for <em>{this.props.input.title}</em></span>

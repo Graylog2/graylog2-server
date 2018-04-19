@@ -83,7 +83,7 @@ const SearchSidebar = createReactClass({
   _updateHeight() {
     const viewPortHeight = window.innerHeight;
 
-    const sidebar = ReactDOM.findDOMNode(this.refs.sidebar);
+    const sidebar = ReactDOM.findDOMNode(this.sidebar);
     const sidebarCss = window.getComputedStyle(ReactDOM.findDOMNode(sidebar));
     const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 
@@ -216,7 +216,7 @@ const SearchSidebar = createReactClass({
 
     return (
       <AutoAffix affixClassName="affix">
-        <div className="content-col" ref="sidebar" style={{ top: undefined, position: undefined }}>
+        <div className="content-col" ref={(sidebar) => { this.sidebar = sidebar; }} style={{ top: undefined, position: undefined }}>
           <div>
             <h2>
               {searchTitle}

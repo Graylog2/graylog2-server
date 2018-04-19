@@ -60,7 +60,7 @@ const AddToDashboardMenu = createReactClass({
 
   _selectDashboard(dashboardId) {
     this.setState({ selectedDashboard: dashboardId });
-    this.refs.widgetModal.open();
+    this.widgetModal.open();
   },
 
   _saveWidget(title, configuration) {
@@ -119,12 +119,12 @@ const AddToDashboardMenu = createReactClass({
     this.setState({ loading: true });
     const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
     promise
-      .then(() => this.refs.widgetModal.saved())
+      .then(() => this.widgetModal.saved())
       .finally(() => this.setState({ loading: false }));
   },
 
   _createNewDashboard() {
-    this.refs.createDashboardModal.open();
+    this.createDashboardModal.open();
   },
 
   _renderLoadingDashboardsMenu() {
@@ -183,7 +183,7 @@ const AddToDashboardMenu = createReactClass({
                         id="no-dashboards-available-dropdown">
           {option}
         </DropdownButton>
-        <EditDashboardModal ref="createDashboardModal" onSaved={this._selectDashboard} />
+        <EditDashboardModal ref={(createDashboardModal) => { this.createDashboardModal = createDashboardModal; }} onSaved={this._selectDashboard} />
       </div>
     );
   },
@@ -209,7 +209,7 @@ const AddToDashboardMenu = createReactClass({
 
           {children}
         </ButtonToolbar>
-        <WidgetCreationModal ref="widgetModal"
+        <WidgetCreationModal ref={(widgetModal) => { this.widgetModal = widgetModal; }}
                              widgetType={this.props.widgetType}
                              onConfigurationSaved={this._saveWidget}
                              fields={this.props.fields}

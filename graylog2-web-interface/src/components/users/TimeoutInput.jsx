@@ -37,7 +37,7 @@ const TimeoutInput = createReactClass({
     if (this.state.sessionTimeoutNever) {
       return -1;
     }
-    return (this.refs.timeout.value * this.refs.session_timeout_unit.getValue());
+    return (this.timeout.value * this.session_timeout_unit.getValue());
   },
 
   MS_DAY: 24 * 60 * 60 * 1000,
@@ -86,7 +86,7 @@ const TimeoutInput = createReactClass({
   render() {
     return (
       <span>
-        <Input ref="session_timeout_never" type="checkbox" id="session-timeout-never" name="session_timeout_never"
+        <Input type="checkbox" id="session-timeout-never" name="session_timeout_never"
                labelClassName={`col-sm-${this.props.controlSize}`} wrapperClassName={`col-sm-offset-${this.props.labelSize} col-sm-${this.props.controlSize}`}
                label="Sessions do not time out" help="When checked sessions never time out due to inactivity."
                onChange={this._onClick} checked={this.state.sessionTimeoutNever} />
@@ -98,13 +98,13 @@ const TimeoutInput = createReactClass({
                wrapperClassName={`col-sm-${this.props.controlSize}`}>
           <Row>
             <Col sm={2}>
-              <input ref="timeout" type="number" id="timeout"
+              <input ref={(timeout) => { this.timeout = timeout; }} type="number" id="timeout"
                      className="session-timeout-fields validatable form-control"
                      name="timeout" min={1} data-validate="positive_number" disabled={this.state.sessionTimeoutNever}
                      value={this.state.value} onChange={this._onChangeValue} />
             </Col>
             <Col sm={3}>
-              <TimeoutUnitSelect ref="session_timeout_unit" className="form-control session-timeout-fields"
+              <TimeoutUnitSelect ref={(session_timeout_unit) => { this.session_timeout_unit = session_timeout_unit; }} className="form-control session-timeout-fields"
                                  disabled={this.state.sessionTimeoutNever}
                                  value={this.state.unit} onChange={this._onChangeUnit} />
             </Col>

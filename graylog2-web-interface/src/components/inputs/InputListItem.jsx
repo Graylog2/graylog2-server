@@ -37,11 +37,11 @@ const InputListItem = createReactClass({
   },
 
   _openStaticFieldForm() {
-    this.refs.staticFieldForm.open();
+    this.staticFieldForm.open();
   },
 
   _editInput() {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _updateInput(data) {
@@ -141,7 +141,7 @@ const InputListItem = createReactClass({
     }
 
     const inputForm = definition ?
-      (<InputForm ref="configurationForm" key={`edit-form-input-${input.id}`}
+      (<InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} key={`edit-form-input-${input.id}`}
                    globalValue={input.global} nodeValue={input.node}
                    configFields={definition.requested_configuration}
                    title={`Editing Input ${input.title}`}
@@ -156,7 +156,7 @@ const InputListItem = createReactClass({
                              id={input.id}
                              configuration={input.attributes}
                              typeDefinition={definition || {}} />
-          <StaticFieldForm ref="staticFieldForm" input={this.props.input} />
+          <StaticFieldForm ref={(staticFieldForm) => { this.staticFieldForm = staticFieldForm; }} input={this.props.input} />
           <InputStaticFields input={this.props.input} />
         </Col>
         <Col md={4}>

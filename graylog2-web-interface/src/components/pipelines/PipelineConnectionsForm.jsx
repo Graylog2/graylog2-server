@@ -27,7 +27,7 @@ const PipelineConnectionsForm = createReactClass({
   },
 
   openModal() {
-    this.refs.modal.open();
+    this.modal.open();
   },
 
   _onStreamsChange(newStreams) {
@@ -35,7 +35,7 @@ const PipelineConnectionsForm = createReactClass({
   },
 
   _closeModal() {
-    this.refs.modal.close();
+    this.modal.close();
   },
 
   _resetForm() {
@@ -88,7 +88,7 @@ const PipelineConnectionsForm = createReactClass({
         <Button onClick={this.openModal} bsStyle="info">
           <span>Edit connections</span>
         </Button>
-        <BootstrapModalForm ref="modal" title={<span>Edit connections for <em>{this.props.pipeline.title}</em></span>}
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }} title={<span>Edit connections for <em>{this.props.pipeline.title}</em></span>}
                             onSubmitForm={this._save} onCancel={this._resetForm} submitButtonText="Save">
           <fieldset>
             <FormGroup id="streamsConnections">

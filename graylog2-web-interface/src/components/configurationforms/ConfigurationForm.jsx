@@ -90,11 +90,11 @@ const ConfigurationForm = createReactClass({
     const data = this.getValue();
 
     this.props.submitAction(data);
-    this.refs.modal.close();
+    this.modal.close();
   },
 
   open() {
-    this.refs.modal.open();
+    this.modal.open();
   },
 
   _closeModal() {
@@ -163,7 +163,7 @@ const ConfigurationForm = createReactClass({
     });
 
     return (
-      <BootstrapModalForm ref="modal"
+      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title={title}
                           onCancel={this._closeModal}
                           onSubmitForm={this._save}

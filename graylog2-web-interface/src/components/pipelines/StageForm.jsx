@@ -49,7 +49,7 @@ const StageForm = createReactClass({
   },
 
   openModal() {
-    this.refs.modal.open();
+    this.modal.open();
   },
 
   _onChange(event) {
@@ -65,7 +65,7 @@ const StageForm = createReactClass({
   },
 
   _closeModal() {
-    this.refs.modal.close();
+    this.modal.close();
   },
 
   _saved() {
@@ -106,7 +106,7 @@ const StageForm = createReactClass({
                 bsStyle={this.props.create ? 'success' : 'info'}>
           {triggerButtonContent}
         </Button>
-        <BootstrapModalForm ref="modal"
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title={`${this.props.create ? 'Add new' : 'Edit'} stage ${this.state.stage.stage}`}
                             onSubmitForm={this._save}
                             submitButtonText="Save">

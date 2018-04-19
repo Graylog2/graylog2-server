@@ -45,7 +45,7 @@ const AddDecoratorButton = createReactClass({
   },
 
   _handleCancel() {
-    this.refs.select.clearValue();
+    this.select.clearValue();
     this.setState(this.getInitialState());
   },
 
@@ -61,7 +61,7 @@ const AddDecoratorButton = createReactClass({
   },
 
   _openModal() {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _onTypeChange(decoratorType) {
@@ -79,7 +79,7 @@ const AddDecoratorButton = createReactClass({
     }
     const decoratorTypes = jQuery.map(this.state.types, this._formatDecoratorType);
     const configurationForm = (this.state.typeName !== this.PLACEHOLDER ?
-      (<ConfigurationForm ref="configurationForm"
+      (<ConfigurationForm ref={(elem) => { this.configurationForm = elem; }}
                          key="configuration-form-output" configFields={this.state.typeDefinition.requested_configuration}
                          title={`Create new ${this.state.typeDefinition.name}`}
                          typeName={this.state.typeName} includeTitleField={false}
@@ -87,7 +87,7 @@ const AddDecoratorButton = createReactClass({
     return (
       <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
         <div className={DecoratorStyles.addDecoratorSelect}>
-          <Select ref="select"
+          <Select ref={(select) => { this.select = select; }}
                   placeholder="Select decorator"
                   onChange={this._onTypeChange}
                   options={decoratorTypes}

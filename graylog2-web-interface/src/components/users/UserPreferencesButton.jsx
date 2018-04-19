@@ -10,14 +10,14 @@ class UserPreferencesButton extends React.Component {
   };
 
   onClick = () => {
-    this.refs.userPreferencesModal.openModal();
+    this.userPreferencesModal.openModal();
   };
 
   render() {
     return (
       <span>
         <Button onClick={this.onClick} bsStyle="success">User preferences</Button>
-        <UserPreferencesModal ref="userPreferencesModal" userName={this.props.userName} />
+        <UserPreferencesModal ref={(userPreferencesModal) => { this.userPreferencesModal = userPreferencesModal; }} userName={this.props.userName} />
       </span>
     );
   }

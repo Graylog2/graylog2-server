@@ -58,11 +58,11 @@ const SavedSearchControls = createReactClass({
   },
 
   _openModal() {
-    this.refs.saveSearchModal.open();
+    this.saveSearchModal.open();
   },
 
   _hide() {
-    this.refs.saveSearchModal.close();
+    this.saveSearchModal.close();
   },
 
   _save() {
@@ -72,9 +72,9 @@ const SavedSearchControls = createReactClass({
 
     let promise;
     if (this._isSearchSaved()) {
-      promise = SavedSearchesActions.update.triggerPromise(this.props.currentSavedSearch, this.refs.title.getValue());
+      promise = SavedSearchesActions.update.triggerPromise(this.props.currentSavedSearch, this.title.getValue());
     } else {
-      promise = SavedSearchesActions.create.triggerPromise(this.refs.title.getValue());
+      promise = SavedSearchesActions.create.triggerPromise(this.title.getValue());
     }
     promise.then(() => this._hide());
   },
@@ -87,7 +87,7 @@ const SavedSearchControls = createReactClass({
   },
 
   _titleChanged() {
-    this.setState({ error: !SavedSearchesStore.isValidTitle(this.props.currentSavedSearch, this.refs.title.getValue()) });
+    this.setState({ error: !SavedSearchesStore.isValidTitle(this.props.currentSavedSearch, this.title.getValue()) });
   },
 
   _getNewSavedSearchButtons() {
@@ -108,14 +108,14 @@ const SavedSearchControls = createReactClass({
     return (
       <div style={{ display: 'inline-block' }}>
         {this._isSearchSaved() ? this._getEditSavedSearchControls() : this._getNewSavedSearchButtons()}
-        <BootstrapModalForm ref="saveSearchModal"
+        <BootstrapModalForm ref={(saveSearchModal) => { this.saveSearchModal = saveSearchModal; }}
                             title={this._isSearchSaved() ? 'Update saved search' : 'Save search criteria'}
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <Input type="text"
                  id="saved-search-title"
                  label="Title"
-                 ref="title"
+                 ref={(title) => { this.title = title; }}
                  required
                  defaultValue={this.state.title}
                  onChange={this._titleChanged}

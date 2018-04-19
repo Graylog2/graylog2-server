@@ -144,11 +144,11 @@ const SearchesConfig = createReactClass({
   },
 
   _openModal() {
-    this.refs.searchesConfigModal.open();
+    this.searchesConfigModal.open();
   },
 
   _closeModal() {
-    this.refs.searchesConfigModal.close();
+    this.searchesConfigModal.close();
   },
 
   queryTimeRangeLimitValidator(milliseconds) {
@@ -217,7 +217,7 @@ const SearchesConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref="searchesConfigModal"
+        <BootstrapModalForm ref={(searchesConfigModal) => { this.searchesConfigModal = searchesConfigModal; }}
                             title="Update Search Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}

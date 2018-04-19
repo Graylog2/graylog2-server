@@ -15,7 +15,7 @@ class RolesSelect extends React.Component {
   };
 
   getValue = () => {
-    return this.refs.select.getValue().split(',');
+    return this.select.getValue().split(',');
   };
 
   render() {
@@ -25,7 +25,7 @@ class RolesSelect extends React.Component {
     });
     return (
       <MultiSelect
-        ref="select"
+        ref={(select) => { this.select = select; }}
         options={rolesOptions}
         value={rolesValue}
         onChange={this.props.onValueChange}

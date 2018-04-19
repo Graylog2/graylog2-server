@@ -28,7 +28,7 @@ class BulkLoadPatternModal extends React.Component {
       const request = loaded.target.result;
       GrokPatternsStore.bulkImport(request, this.state.replacePatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
-        this.refs.modal.close();
+        this.modal.close();
         this.props.onSuccess();
       });
     };
@@ -39,9 +39,9 @@ class BulkLoadPatternModal extends React.Component {
   render() {
     return (
       <span>
-        <Button bsStyle="info" style={{ marginRight: 5 }} onClick={() => this.refs.modal.open()}>Import pattern file</Button>
+        <Button bsStyle="info" style={{ marginRight: 5 }} onClick={() => this.modal.open()}>Import pattern file</Button>
 
-        <BootstrapModalForm ref="modal"
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                               title="Import Grok patterns from file"
                               submitButtonText="Upload"
                               formProps={{ onSubmit: this._onSubmit }}>

@@ -38,7 +38,7 @@ const EditDashboardModal = createReactClass({
 
   render() {
     return (
-      <BootstrapModalForm ref="modal"
+      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title={this._isCreateModal() ? 'New Dashboard' : `Edit Dashboard ${this.props.title}`}
                           onSubmitForm={this._save}
                           submitButtonText="Save">
@@ -51,11 +51,11 @@ const EditDashboardModal = createReactClass({
   },
 
   close() {
-    this.refs.modal.close();
+    this.modal.close();
   },
 
   open() {
-    this.refs.modal.open();
+    this.modal.open();
   },
 
   _save() {
