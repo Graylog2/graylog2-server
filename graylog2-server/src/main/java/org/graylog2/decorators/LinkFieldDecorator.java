@@ -31,6 +31,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
