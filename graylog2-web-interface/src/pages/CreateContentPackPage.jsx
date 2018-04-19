@@ -93,7 +93,7 @@ const CreateContentPackPage = createReactClass({
     );
   },
 
-  _stepChanged() {
+  _stepChanged(selectedStep) {
     if (Object.keys(this.state.selectedEntities).length > 0) {
       CatalogActions.getSelectedEntities(this.state.selectedEntities).then((fetchedEntities) => {
         const newContentPack = ObjectUtils.clone(this.state.contentPack);
@@ -101,6 +101,7 @@ const CreateContentPackPage = createReactClass({
         this.setState({ contentPack: newContentPack });
       });
     }
+    this.setState({ selectedStep: selectedStep });
   },
 
   _disableNextStep() {
@@ -139,12 +140,10 @@ const CreateContentPackPage = createReactClass({
           <Wizard steps={steps} onStepChange={this._stepChanged}>
             <AutoAffix viewportOffsetTop={65}>
               <div>
-                <ContentPackDetails contentPack={this.state.contentPack} />
+                {this.state.selectedStep !== 'preview' && <ContentPackDetails contentPack={this.state.contentPack} />}
               </div>
             </AutoAffix>
           </Wizard>
-          <textarea rows={30} value={JSON.stringify(this.state.contentPack, null, 2)} />
-          <textarea rows={30} value={JSON.stringify(this.state.selectedEntities, null, 2)} />
         </span>
       </DocumentTitle>
     );
