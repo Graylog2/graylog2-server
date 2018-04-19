@@ -3,9 +3,9 @@
 }
 
 :local(.dropdowntoggle) .caret {
-    display: none;
+    visibility: hidden;
 }
 
 :local(.dropdowntoggle):hover .caret {
-    display: inline-block;
+    visibility: visible;
 }
