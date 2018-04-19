@@ -11,6 +11,7 @@ class BootstrapModalWrapper extends React.Component {
     onOpen: () => {},
     onClose: () => {},
     onHide: () => {},
+    bsSize: "small",
   }
 
   static propTypes = {
@@ -22,6 +23,7 @@ class BootstrapModalWrapper extends React.Component {
     onOpen: PropTypes.func,
     onClose: PropTypes.func,
     onHide: PropTypes.func,
+    bsSize: PropTypes.string,
   }
 
   state = {
@@ -42,7 +44,7 @@ class BootstrapModalWrapper extends React.Component {
 
   render() {
     return (
-      <Modal show={this.state.showModal} onHide={this.hide}>
+      <Modal bsSize={this.props.bsSize} show={this.state.showModal} onHide={this.hide}>
         {this.props.children}
       </Modal>
     );
