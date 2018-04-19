@@ -198,6 +198,11 @@ const ShowDashboardPage = React.createClass({
     this.setState({ forceUpdateInBackground: forceUpdate });
     UserNotification.success(`Graphs will be updated ${forceUpdate ? 'even' : 'only'} when the browser is in the ${forceUpdate ? 'background' : 'foreground'}`, '');
   },
+
+  _handleDashboardUpdate() {
+    this.loadData();
+  },
+
   render() {
     if (!this.state.dashboard) {
       return <Spinner />;
@@ -235,13 +240,17 @@ const ShowDashboardPage = React.createClass({
     }
 
     const editDashboardTrigger = !this.state.locked && !this._dashboardIsEmpty(dashboard) ?
-      (<EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
-                                 description={dashboard.description} buttonClass="btn-info btn-xs">
+      (<EditDashboardModalTrigger id={dashboard.id}
+                                  action="edit"
+                                  title={dashboard.title}
+                                  description={dashboard.description}
+                                  onSaved={this._handleDashboardUpdate}
+                                  buttonClass="btn-info btn-xs">
         <i className="fa fa-pencil" />
       </EditDashboardModalTrigger>) : null;
     const dashboardTitle = (
       <span>
-        <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
+        {dashboard.title}
         &nbsp;
         {editDashboardTrigger}
       </span>
@@ -250,7 +259,7 @@ const ShowDashboardPage = React.createClass({
       <DocumentTitle title={`Dashboard ${dashboard.title}`}>
         <span>
           <PageHeader title={dashboardTitle}>
-            <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
+            {dashboard.description}
             {supportText}
             {actions}
           </PageHeader>
