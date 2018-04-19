@@ -182,7 +182,7 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col smOffset={1}>
             <h2>Content Pack selection</h2>
             <br />
             <ExpandableList>
