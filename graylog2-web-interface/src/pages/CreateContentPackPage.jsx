@@ -15,6 +15,7 @@ import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
+import ObjectUtils from 'util/ObjectUtils';
 
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
@@ -35,6 +36,7 @@ const CreateContentPackPage = createReactClass({
       },
       selectedEntities: {},
       selectedStep: undefined,
+      appliedParameter: {},
     };
   },
 
@@ -54,9 +56,12 @@ const CreateContentPackPage = createReactClass({
   _onStateChanged(newState) {
     const contentPack = newState.contentPack || this.state.contentPack;
     const selectedEntities = newState.selectedEntities || this.state.selectedEntities;
+    const appliedParameter = newState.appliedParameter || this.state.appliedParameter;
+
     this.setState({
       contentPack: contentPack,
       selectedEntities: selectedEntities,
+      appliedParameter: appliedParameter,
     });
   },
 
@@ -88,6 +93,16 @@ const CreateContentPackPage = createReactClass({
     );
   },
 
+  _stepChanged() {
+    if (Object.keys(this.state.selectedEntities).length > 0) {
+      CatalogActions.getSelectedEntities(this.state.selectedEntities).then((fetchedEntities) => {
+        const newContentPack = ObjectUtils.clone(this.state.contentPack);
+        newContentPack.entities = fetchedEntities;
+        this.setState({ contentPack: newContentPack });
+      });
+    }
+  },
+
   _disableNextStep() {
     const content = this.state.contentPack;
     const selection = Object.keys(this.state.selectedEntities).length !== 0;
@@ -98,7 +113,7 @@ const CreateContentPackPage = createReactClass({
   render() {
     const steps = [
       { key: 'selection', title: 'Content Selection', component: (this._selectionComponent()) },
-      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} />), disabled: this._disableNextStep() },
+      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} appliedParameter={this.state.appliedParameter} />), disabled: this._disableNextStep() },
       { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />), disabled: this._disableNextStep() },
     ];
 
@@ -121,15 +136,15 @@ const CreateContentPackPage = createReactClass({
               </LinkContainer>
             </div>
           </PageHeader>
-          <Wizard steps={steps}>
+          <Wizard steps={steps} onStepChange={this._stepChanged}>
             <AutoAffix viewportOffsetTop={65}>
               <div>
                 <ContentPackDetails contentPack={this.state.contentPack} />
               </div>
             </AutoAffix>
           </Wizard>
-          <textarea value={JSON.stringify(this.state.contentPack)} />
-          <textarea value={JSON.stringify(this.state.selectedEntities)} />
+          <textarea rows={30} value={JSON.stringify(this.state.contentPack, null, 2)} />
+          <textarea rows={30} value={JSON.stringify(this.state.selectedEntities, null, 2)} />
         </span>
       </DocumentTitle>
     );
