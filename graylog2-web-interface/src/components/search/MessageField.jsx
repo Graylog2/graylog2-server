@@ -34,17 +34,18 @@ const MessageField = createReactClass({
   },
 
   render() {
+    const message = this.props.message;
     let innerValue = this.props.value;
     const key = this.props.fieldName;
     if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {
-      innerValue = this.props.message.fields[key];
+      innerValue = message.fields[key];
     }
 
     return (
       <span>
         <dt key={`${key}Title`}>{key}</dt>
         <MessageFieldDescription key={`${key}Description`}
-                                 message={this.props.message}
+                                 message={message}
                                  fieldName={key}
                                  fieldValue={innerValue}
                                  renderForDisplay={this.props.renderForDisplay}
