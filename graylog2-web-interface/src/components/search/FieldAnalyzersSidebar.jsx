@@ -46,16 +46,16 @@ class FieldAnalyzersSidebar extends React.Component {
   MINIMUM_FIELDS_HEIGHT = 50;
 
   _updateHeight = () => {
-    const fieldsContainer = ReactDOM.findDOMNode(this.refs.fields);
+    const fieldsContainer = ReactDOM.findDOMNode(this.fields);
 
-    const footer = ReactDOM.findDOMNode(this.refs.footer);
+    const footer = ReactDOM.findDOMNode(this.footer);
     const footerCss = window.getComputedStyle(footer);
     const footerMargin = parseFloat(footerCss.getPropertyValue('margin-top'));
 
     // Need to calculate this additionally, because margins are not included in the parent's height #computers
     let highlightToggleMargins = 0;
-    if (this.refs.highlightToggle) {
-      const toggle = ReactDOM.findDOMNode(this.refs.highlightToggle);
+    if (this.highlightToggle) {
+      const toggle = ReactDOM.findDOMNode(this.highlightToggle);
       const toggleCss = window.getComputedStyle(toggle);
       highlightToggleMargins = parseFloat(toggleCss.getPropertyValue('margin-top')) +
         parseFloat(toggleCss.getPropertyValue('margin-bottom'));
@@ -136,7 +136,7 @@ class FieldAnalyzersSidebar extends React.Component {
     let shouldHighlightToggle;
     if (this.props.showHighlightToggle) {
       shouldHighlightToggle = (
-        <Input ref="highlightToggle"
+        <Input ref={(highlightToggle) => { this.highlightToggle = highlightToggle; }}
                id="highligh-results-checkbox"
                type="checkbox"
                bsSize="small"
@@ -149,7 +149,7 @@ class FieldAnalyzersSidebar extends React.Component {
 
     return (
       <div>
-        <div ref="fieldsFilter" className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
+        <div className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
           <span className="input-group-btn">
             <button type="button" className="btn btn-default"
                     onClick={this._updateFieldSelectionToDefault}>Default
@@ -165,12 +165,12 @@ class FieldAnalyzersSidebar extends React.Component {
                  onChange={this._filterFields}
                  value={this.state.fieldFilter} />
         </div>
-        <div ref="fields" style={{ maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll' }}>
+        <div ref={(fields) => { this.fields = fields; }} style={{ maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll' }}>
           <ul className="search-result-fields">
             {messageFields}
           </ul>
         </div>
-        <div ref="footer" style={{ marginTop: 13, marginBottom: 0 }}>
+        <div ref={(footer) => { this.footer = footer; }} style={{ marginTop: 13, marginBottom: 0 }}>
           List{' '}
           <span className="message-result-fields-range"> fields of&nbsp;
             <a href="#" style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}

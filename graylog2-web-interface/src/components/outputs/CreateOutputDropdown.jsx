@@ -26,17 +26,20 @@ class CreateOutputDropdown extends React.Component {
           <button className="btn btn-success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</button>
         </div>
 
-        <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
-                                   helpBlock={'Select a name of your new output that describes it.'}
-                                   typeName={this.state.typeName}
-                                   submitAction={this.props.onSubmit} />
+        <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                           key="configuration-form-output"
+                           configFields={this.state.typeDefinition}
+                           title="Create new Output"
+                           helpBlock={'Select a name of your new output that describes it.'}
+                           typeName={this.state.typeName}
+                           submitAction={this.props.onSubmit} />
       </div>
     );
   }
 
   _openModal = (evt) => {
     if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '') {
-      this.refs.configurationForm.open();
+      this.configurationForm.open();
     }
   };
 

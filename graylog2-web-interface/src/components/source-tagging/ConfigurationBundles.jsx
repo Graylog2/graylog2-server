@@ -75,7 +75,7 @@ const ConfigurationBundles = createReactClass({
 
   onSubmit(submitEvent) {
     submitEvent.preventDefault();
-    if (!this.refs.uploadedFile.files || !this.refs.uploadedFile.files[0]) {
+    if (!this.uploadedFile.files || !this.uploadedFile.files[0]) {
       return;
     }
 
@@ -95,7 +95,7 @@ const ConfigurationBundles = createReactClass({
           });
     };
 
-    reader.readAsText(this.refs.uploadedFile.files[0]);
+    reader.readAsText(this.uploadedFile.files[0]);
   },
 
   handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
@@ -117,7 +117,7 @@ const ConfigurationBundles = createReactClass({
                 <form onSubmit={this.onSubmit} className="upload" encType="multipart/form-data">
                   <span className="help-block">Remember to apply the content pack after uploading it, to make the changes effective.</span>
                   <div className="form-group">
-                    <input ref="uploadedFile" type="file" name="bundle" />
+                    <input ref={(uploadedFile) => { this.uploadedFile = uploadedFile; }} type="file" name="bundle" />
                   </div>
                   <button type="submit" className="btn btn-success">Upload</button>
                 </form>

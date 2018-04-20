@@ -46,22 +46,22 @@ const WidgetCreationModal = createReactClass({
   },
 
   _getInitialConfiguration() {
-    if (!this.refs.pluginConfiguration) {
+    if (!this.pluginConfiguration) {
       return;
     }
 
     const configKeys = Object.keys(this.state.config);
     if (configKeys.length === 0) {
-      this.setState({ config: this.refs.pluginConfiguration.getInitialConfiguration() });
+      this.setState({ config: this.pluginConfiguration.getInitialConfiguration() });
     }
   },
 
   open() {
-    this.refs.createModal.open();
+    this.createModal.open();
   },
 
   hide() {
-    this.refs.createModal.close();
+    this.createModal.close();
   },
 
   save() {
@@ -115,7 +115,7 @@ const WidgetCreationModal = createReactClass({
   _getSpecificWidgetInputs() {
     if (this.widgetPlugin.configurationCreateComponent) {
       return React.createElement(this.widgetPlugin.configurationCreateComponent, {
-        ref: 'pluginConfiguration',
+        ref: (elem) => { this.pluginConfiguration = elem; },
         config: this.state.config,
         fields: this.props.fields,
         onChange: this._onConfigurationValueChange,
@@ -126,7 +126,7 @@ const WidgetCreationModal = createReactClass({
   render() {
     const loading = this.props.loading;
     return (
-      <BootstrapModalForm ref="createModal"
+      <BootstrapModalForm ref={(createModal) => { this.createModal = createModal; }}
                           title="Create Dashboard Widget"
                           onModalOpen={this._getInitialConfiguration}
                           onModalClose={this.props.onModalHidden}

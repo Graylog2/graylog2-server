@@ -51,7 +51,7 @@ class SelectableList extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.selectedOptions !== nextProps.selectedOptions) {
-      this.refs.select.clearValue();
+      this.select.clearValue();
     }
   }
 
@@ -102,7 +102,7 @@ class SelectableList extends React.Component {
     });
     return (
       <div>
-        <Select ref="select" autoFocus={this.props.autoFocus} options={this.props.options} onChange={this._onAddOption} clearable={false} />
+        <Select ref={(select) => { this.select = select; }} autoFocus={this.props.autoFocus} options={this.props.options} onChange={this._onAddOption} clearable={false} />
         {formattedOptions.length > 0 &&
         <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>
         }

@@ -65,7 +65,7 @@ class SourcePieChart extends React.Component {
 
   render() {
     return (
-      <div id="dc-sources-pie-chart" ref="sourcePieChart">
+      <div id="dc-sources-pie-chart">
         <SourceTitle className="reset" resetFilters={this.props.resetFilters}>Messages per source</SourceTitle>
       </div>
     );

@@ -28,26 +28,26 @@ class BulkLoadPatternModal extends React.Component {
       const request = loaded.target.result;
       GrokPatternsStore.bulkImport(request, this.state.replacePatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
-        this.refs.modal.close();
+        this.modal.close();
         this.props.onSuccess();
       });
     };
 
-    reader.readAsText(this.refs['pattern-file'].getInputDOMNode().files[0]);
+    reader.readAsText(this.patternFile.getInputDOMNode().files[0]);
   };
 
   render() {
     return (
       <span>
-        <Button bsStyle="info" style={{ marginRight: 5 }} onClick={() => this.refs.modal.open()}>Import pattern file</Button>
+        <Button bsStyle="info" style={{ marginRight: 5 }} onClick={() => this.modal.open()}>Import pattern file</Button>
 
-        <BootstrapModalForm ref="modal"
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                               title="Import Grok patterns from file"
                               submitButtonText="Upload"
                               formProps={{ onSubmit: this._onSubmit }}>
           <Input id="pattern-file"
                  type="file"
-                 ref="pattern-file"
+                 ref={(patternFile) => { this.patternFile = patternFile; }}
                  name="patterns"
                  label="Pattern file"
                  help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."

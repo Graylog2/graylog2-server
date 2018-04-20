@@ -30,7 +30,7 @@ class StatisticalCountWidgetCreateConfiguration extends React.Component {
   };
 
   getInitialConfiguration = () => {
-    const countConfiguration = this.refs.countConfiguration.getInitialConfiguration();
+    const countConfiguration = this.countConfiguration.getInitialConfiguration();
     const initialConfiguration = {};
 
     Object.keys(countConfiguration).forEach(key => initialConfiguration[key] = countConfiguration[key]);
@@ -79,7 +79,7 @@ class StatisticalCountWidgetCreateConfiguration extends React.Component {
           })}
         </Input>
 
-        <CountWidgetCreateConfiguration ref="countConfiguration" {...this.props} />
+        <CountWidgetCreateConfiguration ref={(countConfiguration) => { this.countConfiguration = countConfiguration; }} {...this.props} />
       </fieldset>
     );
   }

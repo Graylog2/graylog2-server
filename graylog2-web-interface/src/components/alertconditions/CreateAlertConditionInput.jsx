@@ -54,7 +54,7 @@ const CreateAlertConditionInput = createReactClass({
   },
 
   _openForm() {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _resetForm() {
@@ -63,7 +63,7 @@ const CreateAlertConditionInput = createReactClass({
 
   _formatConditionForm(type) {
     return (
-      <AlertConditionForm ref="configurationForm" onCancel={this._resetForm} onSubmit={this._onSubmit} type={type} />
+      <AlertConditionForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} onCancel={this._resetForm} onSubmit={this._onSubmit} type={type} />
     );
   },
 

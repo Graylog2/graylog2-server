@@ -143,7 +143,7 @@ class RuleForm extends React.Component {
     });
 
     return (
-      <form ref="form" onSubmit={this._submit}>
+      <form onSubmit={this._submit}>
         <fieldset>
           <FormGroup id="ruleTitleInformation">
             <ControlLabel>Title</ControlLabel>

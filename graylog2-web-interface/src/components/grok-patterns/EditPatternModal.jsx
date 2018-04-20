@@ -21,7 +21,7 @@ class EditPatternModal extends React.Component {
   };
 
   openModal = () => {
-    this.refs.modal.open();
+    this.modal.open();
   };
 
   _onPatternChange = (event) => {
@@ -43,7 +43,7 @@ class EditPatternModal extends React.Component {
   };
 
   _closeModal = () => {
-    this.refs.modal.close();
+    this.modal.close();
   };
 
   _saved = () => {
@@ -73,7 +73,7 @@ class EditPatternModal extends React.Component {
         <button onClick={this.openModal} className={this.props.create ? 'btn btn-success' : 'btn btn-info btn-xs'}>
           {triggerButtonContent}
         </button>
-        <BootstrapModalForm ref="modal"
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                                     title={`${this.props.create ? 'Create' : 'Edit'} Grok Pattern ${this.state.name}`}
                                     onSubmitForm={this._save}
                                     submitButtonText="Save">

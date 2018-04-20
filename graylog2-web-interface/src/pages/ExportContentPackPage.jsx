@@ -57,6 +57,8 @@ const ExportContentPackPage = createReactClass({
     });
   },
 
+  inputs: {},
+
   onSubmit(evt) {
     evt.preventDefault();
     const request = {
@@ -69,10 +71,10 @@ const ExportContentPackPage = createReactClass({
       lookup_data_adapters: [],
       grok_patterns: [],
     };
-    Object.keys(this.refs).forEach((key) => {
+    Object.keys(this.inputs).forEach((key) => {
       if (key.indexOf('.') === -1) {
-        request[key] = this.refs[key].value;
-      } else if (this.refs[key].checked) {
+        request[key] = this.inputs[key].value;
+      } else if (this.inputs[key].checked) {
         const group = key.split('.')[0];
         const id = key.split('.')[1];
 
@@ -105,7 +107,7 @@ const ExportContentPackPage = createReactClass({
   formatDashboard(dashboard) {
     return (
       <div className="checkbox" key={`dashboard_checkbox-${dashboard.id}`}>
-        <label className="checkbox"><input ref={`dashboards.${dashboard.id}`} type="checkbox" name="dashboards" id={`dashboard_${dashboard.id}`} value={dashboard.id} />{dashboard.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`dashboards.${dashboard.id}`] = elem; }} type="checkbox" name="dashboards" id={`dashboard_${dashboard.id}`} value={dashboard.id} />{dashboard.title}</label>
       </div>
     );
   },
@@ -113,7 +115,7 @@ const ExportContentPackPage = createReactClass({
   formatGrokPattern(grokPattern) {
     return (
       <div className="checkbox" key={`grok_pattern_checkbox-${grokPattern.id}`}>
-        <label className="checkbox"><input ref={`grok_patterns.${grokPattern.id}`} type="checkbox" name="grokPatterns" id={`grokPattern_${grokPattern.id}`} value={grokPattern.id} />{grokPattern.name}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`grok_patterns.${grokPattern.id}`] = elem; }} type="checkbox" name="grokPatterns" id={`grokPattern_${grokPattern.id}`} value={grokPattern.id} />{grokPattern.name}</label>
         <span className="help-inline">Pattern: <tt>{grokPattern.pattern}</tt></span>
       </div>
     );
@@ -122,7 +124,7 @@ const ExportContentPackPage = createReactClass({
   formatInput(input) {
     return (
       <div className="checkbox" key={`input_checkbox-${input.id}`}>
-        <label className="checkbox"><input ref={`inputs.${input.id}`} type="checkbox" name="inputs" id={`input_${input.id}`} value={input.id} />{input.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`inputs.${input.id}`] = elem; }} type="checkbox" name="inputs" id={`input_${input.id}`} value={input.id} />{input.title}</label>
         <span className="help-inline">({this.inputDetails(input)})</span>
       </div>
     );
@@ -131,7 +133,7 @@ const ExportContentPackPage = createReactClass({
   formatOutput(output) {
     return (
       <div className="checkbox" key={`output_checkbox-${output.id}`}>
-        <label className="checkbox"><input ref={`outputs.${output.id}`} type="checkbox" name="outputs" id={`output_${output.id}`} value={output.id} />{output.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`outputs.${output.id}`] = elem; }} type="checkbox" name="outputs" id={`output_${output.id}`} value={output.id} />{output.title}</label>
       </div>
     );
   },
@@ -139,7 +141,7 @@ const ExportContentPackPage = createReactClass({
   formatStream(stream) {
     return (
       <div className="checkbox" key={`stream_checkbox-${stream.id}`}>
-        <label className="checkbox"><input ref={`streams.${stream.id}`} type="checkbox" name="streams" id={`stream_${stream.id}`} value={stream.id} />{stream.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`streams.${stream.id}`] = elem; }} type="checkbox" name="streams" id={`stream_${stream.id}`} value={stream.id} />{stream.title}</label>
       </div>
     );
   },
@@ -147,7 +149,7 @@ const ExportContentPackPage = createReactClass({
   formatLookupTable(lookupTable) {
     return (
       <div className="checkbox" key={`lookup_table_checkbox-${lookupTable.id}`}>
-        <label className="checkbox"><input ref={`lookup_tables.${lookupTable.id}`} type="checkbox" name="lookup_tables" id={`lookup_table_${lookupTable.id}`} value={lookupTable.id} />{lookupTable.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`lookup_tables.${lookupTable.id}`] = elem; }} type="checkbox" name="lookup_tables" id={`lookup_table_${lookupTable.id}`} value={lookupTable.id} />{lookupTable.title}</label>
       </div>
     );
   },
@@ -155,7 +157,7 @@ const ExportContentPackPage = createReactClass({
   formatLookupCache(lookupCache) {
     return (
       <div className="checkbox" key={`lookup_cache_checkbox-${lookupCache.id}`}>
-        <label className="checkbox"><input ref={`lookup_caches.${lookupCache.id}`} type="checkbox" name="lookup_caches" id={`lookup_cache_${lookupCache.id}`} value={lookupCache.id} />{lookupCache.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`lookup_caches.${lookupCache.id}`] = elem; }} type="checkbox" name="lookup_caches" id={`lookup_cache_${lookupCache.id}`} value={lookupCache.id} />{lookupCache.title}</label>
       </div>
     );
   },
@@ -163,15 +165,15 @@ const ExportContentPackPage = createReactClass({
   formatLookupDataAdapter(lookupDataAdapter) {
     return (
       <div className="checkbox" key={`lookup_data_adapter_checkbox-${lookupDataAdapter.id}`}>
-        <label className="checkbox"><input ref={`lookup_data_adapters.${lookupDataAdapter.id}`} type="checkbox" name="lookup_data_adapters" id={`lookup_data_adapter_${lookupDataAdapter.id}`} value={lookupDataAdapter.id} />{lookupDataAdapter.title}</label>
+        <label className="checkbox"><input ref={(elem) => { this.inputs[`lookup_data_adapters.${lookupDataAdapter.id}`] = elem; }} type="checkbox" name="lookup_data_adapters" id={`lookup_data_adapter_${lookupDataAdapter.id}`} value={lookupDataAdapter.id} />{lookupDataAdapter.title}</label>
       </div>
     );
   },
 
   selectAll(group) {
-    Object.keys(this.refs).forEach((key) => {
+    Object.keys(this.inputs).forEach((key) => {
       if (key.indexOf(group) === 0) {
-        this.refs[key].checked = true;
+        this.inputs[key].checked = true;
       }
     });
   },
@@ -224,7 +226,7 @@ const ExportContentPackPage = createReactClass({
                     <label className="control-label" htmlFor="name">Name</label>
                   </Col>
                   <Col sm={10}>
-                    <input ref="name" type="text" id="name" className="input-xlarge form-control" name="name" required />
+                    <input ref={(name) => { this.name = name; }} type="text" id="name" className="input-xlarge form-control" name="name" required />
                     <span className="help-block">The name of your configuration bundle.</span>
                   </Col>
                 </div>
@@ -234,7 +236,7 @@ const ExportContentPackPage = createReactClass({
                     <label className="control-label" htmlFor="description">Description</label>
                   </Col>
                   <Col sm={10}>
-                    <textarea ref="description" rows="6" id="description" name="description" className="input-xlarge form-control" required />
+                    <textarea ref={(description) => { this.description = description; }} rows="6" id="description" name="description" className="input-xlarge form-control" required />
                     <span className="help-block">
                       A description of what your bundle does and possible special instructions for the user.
                       You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
@@ -247,7 +249,7 @@ const ExportContentPackPage = createReactClass({
                     <label className="control-label" htmlFor="category">Category</label>
                   </Col>
                   <Col sm={10}>
-                    <input ref="category" type="text" id="category" name="category" className="input-xlarge form-control" required />
+                    <input ref={(category) => { this.category = category; }} type="text" id="category" name="category" className="input-xlarge form-control" required />
                     <span className="help-block">A category for your bundle, e.g. Operating Systems, Firewalls or Switches.</span>
                   </Col>
                 </div>

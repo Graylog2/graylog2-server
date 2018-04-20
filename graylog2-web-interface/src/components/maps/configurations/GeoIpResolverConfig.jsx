@@ -44,7 +44,7 @@ const GeoIpResolverConfig = createReactClass({
 
   _onCheckboxClick(field, ref) {
     return () => {
-      this._updateConfigField(field, this.refs[ref].getChecked());
+      this._updateConfigField(field, this.inputs[ref].getChecked());
     };
   },
 
@@ -61,11 +61,11 @@ const GeoIpResolverConfig = createReactClass({
   },
 
   _openModal() {
-    this.refs.geoIpConfigModal.open();
+    this.geoIpConfigModal.open();
   },
 
   _closeModal() {
-    this.refs.geoIpConfigModal.close();
+    this.geoIpConfigModal.close();
   },
 
   _resetConfig() {
@@ -114,7 +114,7 @@ const GeoIpResolverConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref="geoIpConfigModal"
+        <BootstrapModalForm ref={(geoIpConfigModal) => { this.geoIpConfigModal = geoIpConfigModal; }}
                             title="Update Geo-Location Processor Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
@@ -122,11 +122,11 @@ const GeoIpResolverConfig = createReactClass({
           <fieldset>
             <Input id="geolocation-enable-checkbox"
                    type="checkbox"
-                   ref="configEnabled"
+                   ref={(elem) => { this.inputs.configEnabled = elem; }}
                    label="Enable Geo-Location processor"
                    name="enabled"
                    checked={this.state.config.enabled}
-                   onChange={this._onCheckboxClick('enabled', 'configEnabled')}/>
+                   onChange={this._onCheckboxClick('enabled', 'configEnabled')} />
             <Input id="maxmind-db-select"
                    label="Select the MaxMind database type"
                    help="Select the MaxMind database type you want to use to extract geo-location information.">

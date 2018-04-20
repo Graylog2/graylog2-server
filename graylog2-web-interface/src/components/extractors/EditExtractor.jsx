@@ -47,7 +47,7 @@ class EditExtractor extends React.Component {
     const newValue = value.replace(/[^\w\d_]/g, '');
 
     if (value !== newValue) {
-      this.refs.targetField.getInputDOMNode().value = newValue;
+      this.targetField.getInputDOMNode().value = newValue;
     }
 
     this._onFieldChange('target_field')(event);
@@ -194,7 +194,7 @@ class EditExtractor extends React.Component {
     // Grok and JSON extractors create their required fields, so no need to add an input for them
     if (this.state.updatedExtractor.type !== ExtractorUtils.ExtractorTypes.GROK && this.state.updatedExtractor.type !== ExtractorUtils.ExtractorTypes.JSON) {
       storeAsFieldInput = (
-        <Input type="text" ref="targetField" id="target_field" label="Store as field"
+        <Input type="text" ref={(targetField) => { this.targetField = targetField; }} id="target_field" label="Store as field"
                defaultValue={this.state.updatedExtractor.target_field}
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
@@ -223,8 +223,7 @@ class EditExtractor extends React.Component {
                   {this._staticField('Extractor type', ExtractorUtils.getReadableExtractorTypeName(this.state.updatedExtractor.type))}
                   {this._staticField('Source field', this.state.updatedExtractor.source_field)}
 
-                  <EditExtractorConfiguration ref="extractorConfiguration"
-                                              extractorType={this.state.updatedExtractor.type}
+                  <EditExtractorConfiguration extractorType={this.state.updatedExtractor.type}
                                               configuration={this.state.updatedExtractor.extractor_config}
                                               onChange={this._onConfigurationChange}
                                               exampleMessage={this.state.exampleMessage} />

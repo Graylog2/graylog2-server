@@ -212,8 +212,7 @@ class EditExtractorConverters extends React.Component {
                help="Add converters to transform the extracted value.">
           <Row className="row-sm">
             <Col md={11}>
-              <Select ref="addConverter"
-                      id="add-converter"
+              <Select id="add-converter"
                       placeholder="Select a converter"
                       options={this._getConverterOptions()}
                       value={this.state.selectedConverter}

@@ -29,7 +29,7 @@ const StreamRule = createReactClass({
 
   _onEdit(event) {
     event.preventDefault();
-    this.refs.streamRuleForm.open();
+    this.streamRuleForm.open();
   },
 
   _onDelete(event) {
@@ -80,8 +80,11 @@ const StreamRule = createReactClass({
       <li className={className}>
         {actionItems}
         <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
-        <StreamRuleForm ref="streamRuleForm" streamRule={streamRule} streamRuleTypes={streamRuleTypes}
-                        title="Edit Stream Rule" onSubmit={this._onSubmit} />
+        <StreamRuleForm ref={(streamRuleForm) => { this.streamRuleForm = streamRuleForm; }}
+                        streamRule={streamRule}
+                        streamRuleTypes={streamRuleTypes}
+                        title="Edit Stream Rule"
+                        onSubmit={this._onSubmit} />
         {description}
       </li>
     );

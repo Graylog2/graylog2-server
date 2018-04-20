@@ -23,7 +23,7 @@ const EditAlertConditionForm = createReactClass({
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   _onEdit() {
-    this.refs.updateForm.open();
+    this.updateForm.open();
   },
 
   _onUpdate(request) {
@@ -68,7 +68,7 @@ const EditAlertConditionForm = createReactClass({
       <div>
         <h2>Condition details</h2>
         <p>Define the condition to evaluate when triggering a new alert.</p>
-        <AlertConditionForm ref="updateForm"
+        <AlertConditionForm ref={(updateForm) => { this.updateForm = updateForm; }}
                             type={condition.type}
                             alertCondition={condition}
                             onSubmit={this._onUpdate} />

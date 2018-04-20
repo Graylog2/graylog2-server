@@ -22,7 +22,7 @@ const LocaleSelect = createReactClass({
   },
 
   getValue() {
-    return this.refs.locale.getValue();
+    return this.locale.getValue();
   },
 
   _formatLocales(locales) {
@@ -58,7 +58,7 @@ const LocaleSelect = createReactClass({
 
     const locales = this._formatLocales(this.state.locales);
     return (
-      <Select ref="locale" {...this.props}
+      <Select ref={(locale) => { this.locale = locale; }} {...this.props}
               placeholder="Pick a locale"
               options={locales}
               optionRenderer={this._renderOption} />

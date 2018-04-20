@@ -40,7 +40,7 @@ const AlertNotification = createReactClass({
   },
 
   _onEdit() {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _onSubmit(data) {
@@ -95,7 +95,7 @@ const AlertNotification = createReactClass({
     const content = (
       <Col md={12}>
         <div className="alert-callback alarm-callbacks">
-          <ConfigurationForm ref="configurationForm"
+          <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                              key={`configuration-form-notification-${notification.id}`}
                              configFields={typeDefinition.requested_configuration}
                              title={'Editing alert configuration '}

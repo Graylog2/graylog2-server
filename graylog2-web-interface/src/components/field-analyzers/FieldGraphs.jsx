@@ -42,7 +42,7 @@ const FieldGraphs = createReactClass({
     FieldGraphsStore.onFieldGraphsMerged = newStackedGraphs => this.setState({ stackedGraphs: Immutable.fromJS(newStackedGraphs.toJS()) });
     FieldGraphsStore.onFieldGraphCreated = (graphId) => {
       if (this.notifyOnNewGraphs && !this.initialFieldGraphs.has(graphId)) {
-        const element = ReactDOM.findDOMNode(this.refs[graphId]);
+        const element = ReactDOM.findDOMNode(this.graphs[graphId]);
         UIUtils.scrollToHint(element);
       }
     };
@@ -51,6 +51,8 @@ const FieldGraphs = createReactClass({
   componentWillUnmount() {
     FieldGraphsStore.resetStore();
   },
+
+  graphs: {},
 
   addField(field) {
     const streamId = this.props.stream ? this.props.stream.id : undefined;
@@ -66,7 +68,7 @@ const FieldGraphs = createReactClass({
       .sortBy(graph => graph.createdAt)
       .map((graphOptions, graphId) =>
         <LegacyFieldGraph key={graphId}
-                            ref={graphId}
+                            ref={(elem) => { this.graphs[graphId] = elem; }}
                             graphId={graphId}
                             graphOptions={graphOptions.toJS()}
                             onDelete={() => this.deleteFieldGraph(graphId)}

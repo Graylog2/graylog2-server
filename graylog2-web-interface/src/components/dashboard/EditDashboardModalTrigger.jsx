@@ -17,7 +17,7 @@ class EditDashboardModalTrigger extends React.Component {
   };
 
   openModal = () => {
-    this.refs.modal.open();
+    this.modal.open();
   };
 
   render() {
@@ -35,7 +35,7 @@ class EditDashboardModalTrigger extends React.Component {
                 className={`btn ${this.props.buttonClass}`}>
           {triggerButtonContent}
         </button>
-        <EditDashboardModal ref="modal" {...this.props} />
+        <EditDashboardModal ref={(modal) => { this.modal = modal; }} {...this.props} />
       </span>
     );
   }

@@ -444,7 +444,6 @@ const LdapComponent = createReactClass({
                      wrapperClassName="col-sm-9" label="Additional Default Roles"
                      help={help.ADDITIONAL_GROUPS}>
                 <MultiSelect
-                  ref="select"
                   options={rolesOptions}
                   disabled={disabled}
                   value={this.state.ldapSettings.additional_default_groups}

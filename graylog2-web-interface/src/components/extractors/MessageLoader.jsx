@@ -30,13 +30,13 @@ class MessageLoader extends React.Component {
 
   _focusMessageLoaderForm = () => {
     if (!this.state.hidden) {
-      this.refs.messageId.focus();
+      this.messageId.focus();
     }
   };
 
   loadMessage = (event) => {
-    const messageId = this.refs.messageId.value;
-    const index = this.refs.index.value;
+    const messageId = this.messageId.value;
+    const index = this.index.value;
     if (messageId === '' || index === '') {
       return;
     }
@@ -49,9 +49,9 @@ class MessageLoader extends React.Component {
   };
 
   submit = (messageId, index) => {
-    this.refs.messageId.value = messageId;
-    this.refs.index.value = index;
-    this.refs.submitButton.click();
+    this.messageId.value = messageId;
+    this.index.value = index;
+    this.submitButton.click();
   };
 
   render() {
@@ -67,9 +67,9 @@ class MessageLoader extends React.Component {
     const loadMessageForm = (
       <div>
         <form className="form-inline message-loader-form" onSubmit={this.loadMessage}>
-          <input type="text" ref="messageId" className="form-control message-id-input" placeholder="Message ID" required />
-          <input type="text" ref="index" className="form-control" placeholder="Index" required />
-          <button ref="submitButton" type="submit" className="btn btn-info" disabled={this.state.loading}>
+          <input type="text" ref={(messageId) => { this.messageId = messageId; }} className="form-control message-id-input" placeholder="Message ID" required />
+          <input type="text" ref={(index) => { this.index = index; }} className="form-control" placeholder="Index" required />
+          <button ref={(submitButton) => { this.submitButton = submitButton; }} type="submit" className="btn btn-info" disabled={this.state.loading}>
             {this.state.loading ? 'Loading message...' : 'Load message'}
           </button>
         </form>

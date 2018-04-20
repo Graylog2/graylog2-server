@@ -43,7 +43,7 @@ const ExtractorsList = createReactClass({
   },
 
   _openSortModal() {
-    this.refs.sortModal.open();
+    this.sortModal.open();
   },
 
   render() {
@@ -81,7 +81,7 @@ const ExtractorsList = createReactClass({
                         items={formattedExtractors} />
           </Col>
         </Row>
-        <ExtractorsSortModal ref="sortModal" input={this.props.input} extractors={this.state.extractors} />
+        <ExtractorsSortModal ref={(sortModal) => { this.sortModal = sortModal; }} input={this.props.input} extractors={this.state.extractors} />
       </div>
     );
   },

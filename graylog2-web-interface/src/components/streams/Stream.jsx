@@ -103,7 +103,7 @@ const Stream = createReactClass({
   },
 
   _onQuickAdd() {
-    this.refs.quickAddStreamRuleForm.open();
+    this.quickAddStreamRuleForm.open();
   },
 
   _onSaveStreamRule(streamRuleId, streamRule) {
@@ -213,7 +213,7 @@ const Stream = createReactClass({
             {streamRuleList}
           </div>
         </div>
-        <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule"
+        <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }} title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
                         streamRuleTypes={this.props.streamRuleTypes} />
       </li>

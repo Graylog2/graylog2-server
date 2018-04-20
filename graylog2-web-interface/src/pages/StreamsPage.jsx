@@ -63,7 +63,7 @@ const StreamsPage = createReactClass({
             </span>
 
             <IfPermitted permissions="streams:create">
-              <CreateStreamButton ref="createStreamButton" bsSize="large" bsStyle="success" onSave={this._onSave}
+              <CreateStreamButton bsSize="large" bsStyle="success" onSave={this._onSave}
                                   indexSets={this.state.indexSets} />
             </IfPermitted>
           </PageHeader>

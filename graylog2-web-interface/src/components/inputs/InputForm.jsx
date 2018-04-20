@@ -31,16 +31,16 @@ class InputForm extends React.Component {
   };
 
   open = () => {
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   };
 
   render() {
     const values = this.props.values ? this.props.values :
-      (this.refs.configurationForm ? this.refs.configurationForm.getValue().configuration : {});
+      (this.configurationForm ? this.configurationForm.getValue().configuration : {});
     const titleValue = this.props.titleValue ? this.props.titleValue :
-      (this.refs.configurationForm ? this.refs.configurationForm.getValue().titleValue : '');
+      (this.configurationForm ? this.configurationForm.getValue().titleValue : '');
     return (
-      <ConfigurationForm {...this.props} ref="configurationForm" values={values} titleValue={titleValue}
+      <ConfigurationForm {...this.props} ref={(configurationForm) => { this.configurationForm = configurationForm; }} values={values} titleValue={titleValue}
                          submitAction={this._onSubmit}>
         <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
       </ConfigurationForm>

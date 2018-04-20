@@ -37,12 +37,12 @@ const StreamControls = createReactClass({
 
   _onEdit(_, event) {
     event.preventDefault();
-    this.refs.streamForm.open();
+    this.streamForm.open();
   },
 
   _onClone(_, event) {
     event.preventDefault();
-    this.refs.cloneForm.open();
+    this.cloneForm.open();
   },
 
   _onCloneSubmit(_, stream) {
@@ -64,7 +64,7 @@ const StreamControls = createReactClass({
 
     return (
       <span>
-        <DropdownButton title="More Actions" ref="dropdownButton" pullRight
+        <DropdownButton title="More Actions" pullRight
                         id={`more-actions-dropdown-${stream.id}`} disabled={this.props.isDefaultStream}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit}>Edit stream</MenuItem>
@@ -87,8 +87,8 @@ const StreamControls = createReactClass({
             </MenuItem>
           </IfPermitted>
         </DropdownButton>
-        <StreamForm ref="streamForm" title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets} />
-        <StreamForm ref="cloneForm" title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets} />
+        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }} title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets} />
+        <StreamForm ref={(cloneForm) => { this.cloneForm = cloneForm; }} title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets} />
       </span>
     );
   },

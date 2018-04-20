@@ -73,7 +73,7 @@ class TypeAheadDataFilter extends React.Component {
 
   _onSearchTextChanged = (event) => {
     event.preventDefault();
-    this.setState({ filterText: this.refs.typeAheadInput.getValue() }, this.filterData);
+    this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
   };
 
   _onFilterAdded = (event, suggestion) => {
@@ -81,7 +81,7 @@ class TypeAheadDataFilter extends React.Component {
       filters: this.state.filters.add(suggestion[this.props.displayKey]),
       filterText: '',
     }, this.filterData);
-    this.refs.typeAheadInput.clear();
+    this.typeAheadInput.clear();
   };
 
   _onFilterRemoved = (event) => {
@@ -126,7 +126,7 @@ class TypeAheadDataFilter extends React.Component {
   };
 
   _resetFilters = () => {
-    this.refs.typeAheadInput.clear();
+    this.typeAheadInput.clear();
     this.setState({ filterText: '', filters: Immutable.OrderedSet() }, this.filterData);
   };
 
@@ -168,7 +168,7 @@ class TypeAheadDataFilter extends React.Component {
       <div className="filter">
         <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline' }}>
           <TypeAheadInput id={this.props.id}
-                          ref="typeAheadInput"
+                          ref={(typeAheadInput) => { this.typeAheadInput = typeAheadInput; }}
                           onSuggestionSelected={this._onFilterAdded}
                           suggestionText={`Filter by ${this.props.filterBy}: `}
                           suggestions={suggestions}

@@ -52,7 +52,7 @@ const CreateInputControl = createReactClass({
 
   _openModal(event) {
     event.preventDefault();
-    this.refs.configurationForm.open();
+    this.configurationForm.open();
   },
 
   _createInput(data) {
@@ -66,7 +66,7 @@ const CreateInputControl = createReactClass({
     if (this.state.selectedInputDefinition) {
       const inputTypeName = this.state.inputTypes[this.state.selectedInput];
       inputModal = (
-        <InputForm ref="configurationForm"
+        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                    key="configuration-form-input"
                    configFields={this.state.selectedInputDefinition.requested_configuration}
                    title={<span>Launch new <em>{inputTypeName}</em> input</span>}

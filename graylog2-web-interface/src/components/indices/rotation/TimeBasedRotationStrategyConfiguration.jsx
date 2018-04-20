@@ -14,10 +14,12 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     rotation_period: this.props.config.rotation_period,
   };
 
+  inputs = {};
+
   _onPeriodUpdate = (field) => {
     return () => {
       const update = {};
-      let period = this.refs[field].getValue().toUpperCase();
+      let period = this.inputs[field].getValue().toUpperCase();
 
       if (!period.startsWith('P')) {
         period = `P${period}`;
@@ -55,7 +57,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
       <div>
         <Input id="rotation-period"
                type="text"
-               ref="rotation_period"
+               ref={(rotationPeriod) => { this.inputs['rotation_period'] = rotationPeriod; }}
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
                value={this.state.rotation_period}

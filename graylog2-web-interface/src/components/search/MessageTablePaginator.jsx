@@ -54,7 +54,7 @@ const MessageTablePaginator = createReactClass({
 
   _initializeAffix() {
     if (this.props.position === 'bottom') {
-      $(ReactDOM.findDOMNode(this.refs.paginatorAffix)).affix({
+      $(ReactDOM.findDOMNode(this.paginatorAffix)).affix({
         offset: {
           top: 500,
           bottom: 10,
@@ -66,7 +66,7 @@ const MessageTablePaginator = createReactClass({
   _setPaginationWidth() {
     if (this.props.position === 'bottom') {
       this.eventsThrottler.throttle(() => {
-        this.setState({ paginationWidth: ReactDOM.findDOMNode(this.refs.paginatorContainer).clientWidth });
+        this.setState({ paginationWidth: ReactDOM.findDOMNode(this.paginatorContainer).clientWidth });
       });
     }
   },
@@ -123,7 +123,7 @@ const MessageTablePaginator = createReactClass({
     let nav;
     if (this.props.position === 'bottom') {
       nav = (
-        <div ref="paginatorAffix">
+        <div ref={(paginatorAffix) => { this.paginatorAffix = paginatorAffix; }}>
           {this.props.children}
           <nav className="text-center"
                style={{ width: this.state.paginationWidth + 20 }}>
@@ -136,7 +136,7 @@ const MessageTablePaginator = createReactClass({
     }
 
     return (
-      <div ref="paginatorContainer" id={`message-table-paginator-${this.props.position}`}>
+      <div ref={(paginatorContainer) => { this.paginatorContainer = paginatorContainer; }} id={`message-table-paginator-${this.props.position}`}>
         {nav}
       </div>
     );

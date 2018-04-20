@@ -16,7 +16,7 @@ class ImportExtractors extends React.Component {
   _onSubmit = (event) => {
     event.preventDefault();
     try {
-      const parsedExtractors = JSON.parse(this.refs.extractorsInput.getValue());
+      const parsedExtractors = JSON.parse(this.extractorsInput.getValue());
       const extractors = parsedExtractors.extractors;
       ExtractorsActions.import(this.props.input.id, extractors);
     } catch (error) {
@@ -37,7 +37,7 @@ class ImportExtractors extends React.Component {
           <Row>
             <Col md={12}>
               <form onSubmit={this._onSubmit}>
-                <Input type="textarea" ref="extractorsInput" id="extractor-export-textarea" rows={30} />
+                <Input type="textarea" ref={(extractorsInput) => { this.extractorsInput = extractorsInput; }} id="extractor-export-textarea" rows={30} />
                 <Button type="submit" bsStyle="success">Add extractors to input</Button>
               </form>
             </Col>

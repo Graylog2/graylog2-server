@@ -45,7 +45,7 @@ const PipelineForm = createReactClass({
   },
 
   openModal() {
-    this.refs.modal.open();
+    this.modal.open();
   },
 
   _onChange(event) {
@@ -55,7 +55,7 @@ const PipelineForm = createReactClass({
   },
 
   _closeModal() {
-    this.refs.modal.close();
+    this.modal.close();
   },
 
   _saved() {
@@ -113,7 +113,7 @@ const PipelineForm = createReactClass({
                   bsStyle="success">
             {triggerButtonContent}
           </Button>
-          <BootstrapModalForm ref="modal"
+          <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                               title={`${this.props.create ? 'Add new' : 'Edit'} pipeline ${this.state.pipeline.title}`}
                               onSubmitForm={this._save}
                               submitButtonText="Save">
