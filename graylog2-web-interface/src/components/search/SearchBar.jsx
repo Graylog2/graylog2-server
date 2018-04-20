@@ -388,6 +388,7 @@ const SearchBar = React.createClass({
                     action={SearchStore.searchBaseLocation('index')}
                     method="GET"
                     onSubmit={this._performSearch}>
+                {this.state.savedSearch && <input type="hidden" name="saved" value={this.state.savedSearch} />}
                 <input type="hidden" name="rangetype" value={this.state.rangeType} />
                 <input type="hidden" ref={(ref) => { this.fields = ref; }} name="fields" value="" />
                 <input type="hidden" ref={(ref) => { this.width = ref; }} name="width" value="" />
