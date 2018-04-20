@@ -40,8 +40,6 @@ import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.filters.FilterService;
-import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
@@ -180,7 +178,6 @@ public class ServerBindings extends Graylog2Module {
         bind(StreamRouter.class);
         install(new FactoryModuleBuilder().implement(StreamRouterEngine.class, StreamRouterEngine.class).build(
                 StreamRouterEngine.Factory.class));
-        bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
         bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
 

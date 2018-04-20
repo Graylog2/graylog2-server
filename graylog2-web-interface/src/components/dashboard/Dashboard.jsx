@@ -76,14 +76,14 @@ const Dashboard = createReactClass({
     return (
       <li className="stream">
         <h2>
-          <Link to={Routes.dashboard_show(this.props.dashboard.id)}><span>{this.props.dashboard.title}</span></Link>
+          <Link to={Routes.dashboard_show(this.props.dashboard.id)}>{this.props.dashboard.title}</Link>
         </h2>
 
         <div className="stream-data">
           {this._getDashboardActions()}
           <div className="stream-description">
             {createdFromContentPack}
-            <span>{this.props.dashboard.description}</span>
+            {this.props.dashboard.description}
           </div>
         </div>
       </li>

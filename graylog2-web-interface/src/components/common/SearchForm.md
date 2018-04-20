@@ -40,7 +40,7 @@ const SearchFormExample = createReactClass({
 <SearchFormExample />
 ```
 
-Search form with controlled query string:
+Search form with controlled query string and help:
 
 ```js
 const createReactClass = require('create-react-class');
@@ -79,6 +79,8 @@ const SearchFormExample = createReactClass({
                     query={this.state.queryTemplate}
                     searchBsStyle="info"
                     label="Search"
+                    queryWidth={300}
+                    queryHelpComponent={<Button onClick={() => alert('help!')} bsStyle="link"><i className="fa fa-question-circle" /></Button>}
                     useLoadingState />
       </div>
     );

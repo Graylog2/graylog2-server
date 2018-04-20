@@ -4,6 +4,8 @@ import Promise from 'bluebird';
 import { Button } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 
+import style from './SearchForm.css';
+
 /**
  * Component that renders a customizable search form. The component
  * supports a loading state, adding children next to the form, and
@@ -54,6 +56,18 @@ class SearchForm extends React.Component {
      * the callback function in the `onSearch` method is called.
      */
     useLoadingState: PropTypes.bool,
+    /**
+     * Specifies a component that should be render inside the search input
+     * field, and is meant to act as a trigger to display help about the query.
+     * You may want to enlarge `queryWidth` to give the user more room to write the
+     * query if you use this prop.
+     *
+     * **Note:** Due to size constraints rendering this component inside the input,
+     * this component should contain very little text and should be very light. For
+     * instance, a `Button` component with `bsStyle="link"` and a font-awesome icon
+     * inside would work just fine.
+     */
+    queryHelpComponent: PropTypes.element,
     /** Elements to display on the right of the search form. */
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
@@ -76,6 +90,7 @@ class SearchForm extends React.Component {
     resetButtonLabel: 'Reset',
     useLoadingState: false,
     loadingLabel: 'Loading...',
+    queryHelpComponent: null,
     children: null,
   };
 
@@ -139,7 +154,7 @@ class SearchForm extends React.Component {
     return (
       <div className={this.props.wrapperClass} style={{ marginTop: this.props.topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>
-          <div className="form-group" >
+          <div className="form-group has-feedback">
             {this.props.label && <label htmlFor="common-search-form-query-input" className="control-label">{this.props.label}</label>}
             <input id="common-search-form-query-input"
                    onChange={this.handleQueryChange}
@@ -150,7 +165,10 @@ class SearchForm extends React.Component {
                    className="query form-control"
                    autoComplete="off"
                    spellCheck="false" />
+            {this.props.queryHelpComponent &&
+              <span className={`form-control-feedback ${style.helpFeedback}`}>{this.props.queryHelpComponent}</span>}
           </div>
+
           <div className="form-group" style={{ marginLeft: this.props.buttonLeftMargin }}>
             <Button bsStyle={this.props.searchBsStyle}
                     type="submit"

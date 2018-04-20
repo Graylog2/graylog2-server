@@ -150,3 +150,125 @@ We introduced two new configuration parameters related to file system paths.
 - ``data_dir`` option configures the base directory for Graylog server state.
 
 Please check the updated default ``graylog.conf`` configuration file for required changes to your existing file.
+
+
+Removed support for Drools-based filters
+========================================
+
+For a long time, Graylog allowed to use `Drools <https://www.drools.org/>`_ to filter messages. Unfortunately, using Drools to perform complex filter logic came with a performance penalty and wasn't as flexible as we would have liked it to be.
+
+Starting with Graylog 3.0.0, the support for Drools-based message filters has been removed from Graylog. The ``rules_file`` configuration setting has been removed accordingly.
+
+If you still want to be able to use Drools for filtering messages in your Graylog cluster, you can install the [Drools plugin](https://github.com/fbalicchia/graylog-plugin-drools) and keep using your ``rules.drl`` file.
+
+We recommend migrating the Drools-based logic to `Processing Pipelines <http://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
+
+
+Drools-based blacklist
+----------------------
+
+Graylog provided undocumented blacklist-functionality based on Drools. This blacklist could only be modified via the Graylog REST API on the ``/filters/blacklist`` resource.
+
+If you've been using this functionality, you'll have to migrate these blacklist rules to the `Processing Pipelines <http://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
+
+To check if you're using the Drools-based blacklist in Graylog prior to version 3.0.0, you can run the following command::
+
+    # curl -u admin:password -H 'Accept: application/json' 'http://graylog.example.com/api/filters/blacklist?pretty=true'
+
+
+String-based blacklist rule
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Old blacklist rule::
+
+    {
+       "id" : "54e300001234123412340001",
+       "type" : "string",
+       "name" : "String Blacklist",
+       "description" : "Drop messages based on case-insensitive string comparison",
+       "fieldName" : "custom_field",
+       "pattern" : "EXAMPLE pattern",
+       "creator_user_id" : "admin",
+       "created_at" : "2018-04-04T12:00:00.000Z"
+    }
+
+New pipeline rule::
+
+    rule "string-blacklist"
+    when
+      has_field("custom_field") &&
+      lowercase(to_string($message.custom_field)) == "example pattern"
+    then
+      drop_message();
+    end
+
+See also:
+
+* `has_field() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
+* `lowercase() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#lowercase>`_
+* `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
+
+Regex-based blacklist rule
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Old blacklist rule::
+
+    {
+       "id" : "54e300001234123412340002",
+       "type" : "regex",
+       "name" : "Regex Blacklist",
+       "description" : "Drop messages based on regular expression",
+       "fieldName" : "custom_field",
+       "pattern" : "^EXAMPLE.*",
+       "creator_user_id" : "admin",
+       "created_at" : "2018-04-04T12:00:00.000Z"
+    }
+
+New pipeline rule::
+
+    rule "regex-blacklist"
+    when
+      has_field("custom_field") &&
+      regex("^EXAMPLE.*", to_string($message.custom_field)).matches == true
+    then
+      drop_message();
+    end
+
+See also:
+
+* `has_field() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
+* `regex() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#regex>`_
+* `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
+
+IP Range-based blacklist rule
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Old blacklist rule::
+
+    {
+       "id" : "54e300001234123412340003",
+       "type" : "iprange",
+       "name" : "IP Blacklist",
+       "description" : "Drop messages based on IP address",
+       "fieldName" : "custom_field",
+       "pattern" : "192.168.0.0/16",
+       "creator_user_id" : "admin",
+       "created_at" : "2018-04-04T12:00:00.000Z"
+    }
+
+New pipeline rule::
+
+    rule "ip-blacklist"
+    when
+      has_field("custom_field") &&
+      cidr_match("192.168.0.0/16", to_ip($message.custom_field))
+    then
+      drop_message();
+    end
+
+See also:
+
+* `has_field() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
+* `to_ip() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#to-ip>`_
+* `cidr_match() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#cidr-match>`_
+* `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_

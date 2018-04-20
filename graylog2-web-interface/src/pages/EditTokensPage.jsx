@@ -16,7 +16,7 @@ const EditTokensPage = createReactClass({
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   propTypes: {
-    params: PropTypes.object.isRequiered,
+    params: PropTypes.object.isRequired,
   },
 
   getInitialState() {

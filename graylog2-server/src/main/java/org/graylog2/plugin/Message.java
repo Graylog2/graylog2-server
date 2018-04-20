@@ -37,7 +37,14 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -364,8 +371,38 @@ public class Message implements Messages {
             return;
         }
 
-        if (FIELD_TIMESTAMP.equals(trimmedKey) && value != null && value instanceof Date) {
+        final boolean isTimestamp = FIELD_TIMESTAMP.equals(trimmedKey);
+        if (isTimestamp && value instanceof Date) {
             final DateTime timestamp = new DateTime(value);
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
+            updateSize(trimmedKey, timestamp, previousValue);
+        } else if (isTimestamp && value instanceof Temporal) {
+            final Date date;
+            if (value instanceof ZonedDateTime) {
+                date = Date.from(((ZonedDateTime) value).toInstant());
+            } else if (value instanceof OffsetDateTime) {
+                date = Date.from(((OffsetDateTime) value).toInstant());
+            } else if (value instanceof LocalDateTime) {
+                final LocalDateTime localDateTime = (LocalDateTime) value;
+                final ZoneId defaultZoneId = ZoneId.systemDefault();
+                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
+                date = Date.from(localDateTime.toInstant(offset));
+            } else if (value instanceof LocalDate) {
+                final LocalDate localDate = (LocalDate) value;
+                final LocalDateTime localDateTime = localDate.atStartOfDay();
+                final ZoneId defaultZoneId = ZoneId.systemDefault();
+                final ZoneOffset offset = defaultZoneId.getRules().getOffset(localDateTime);
+                date = Date.from(localDateTime.toInstant(offset));
+            } else if (value instanceof Instant) {
+                date = Date.from((Instant) value);
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unsupported temporal type {}. Using current date and time in message {}.", value.getClass(), getId());
+                }
+                date = new Date();
+            }
+
+            final DateTime timestamp = new DateTime(date);
             final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
             updateSize(trimmedKey, timestamp, previousValue);
         } else if (value instanceof String) {
@@ -612,6 +649,7 @@ public class Message implements Messages {
     }
 
     // drools seems to need the "get" prefix
+    @Deprecated
     public boolean getIsSourceInetAddress() {
         return fields.containsKey("gl2_remote_ip");
     }
