@@ -68,17 +68,6 @@ const EditDashboardModal = React.createClass({
       promise.then(() => {
         this.close();
 
-        const idSelector = `[data-dashboard-id="${this.state.id}"]`;
-        const $title = $(`${idSelector}.dashboard-title`);
-        if ($title.length > 0) {
-          $title.html(this.state.title);
-        }
-
-        const $description = $(`${idSelector}.dashboard-description`);
-        if ($description.length > 0) {
-          $description.html(this.state.description);
-        }
-
         if (typeof this.props.onSaved === 'function') {
           this.props.onSaved(this.state.id);
         }
