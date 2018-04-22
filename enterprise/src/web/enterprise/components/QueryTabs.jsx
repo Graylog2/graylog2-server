@@ -21,8 +21,6 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
   });
   const dashboardTitle = (
     <span>
-      <i className="fa fa-tachometer" />
-      {' '}
       Dashboard
     </span>
   );

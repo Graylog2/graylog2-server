@@ -23,3 +23,23 @@
 .search-button-execute {
     margin-right: 7px;
 }
+
+#QueryTabs .nav-tabs li a {
+    background-color: #eee;
+    color: #147faa;
+}
+
+#QueryTabs .nav-tabs li.active a {
+    background-color: #fff;
+    color: #333;
+}
+
+#QueryTabs .nav-tabs li a:hover {
+    background-color: #ededed;
+    border: 1px solid transparent;
+    color: #000;
+}
+
+.nav-tabs {
+    border-bottom: 0 !important;
+}

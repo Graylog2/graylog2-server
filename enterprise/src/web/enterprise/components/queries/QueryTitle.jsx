@@ -49,8 +49,6 @@ class QueryTitle extends React.Component {
       </form>
     ) : (
       <span onDoubleClick={this._toggleEditing}>
-        <i className="fa fa-search" />
-        {' '}
         {value}
       </span>
     );
