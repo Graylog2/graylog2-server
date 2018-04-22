@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 
 const SearchButton = ({ running, disabled }) => (
-  <Button type="submit" bsStyle={running ? 'warning' : 'success'} disabled={disabled} className="pull-left">
+  <Button type="submit" bsStyle={running ? 'warning' : 'success'} disabled={disabled} className="pull-left search-button-execute">
     <i className={running ? 'fa fa-spinner fa-pulse fa-fw' : 'fa fa-search'} />
   </Button>
 );

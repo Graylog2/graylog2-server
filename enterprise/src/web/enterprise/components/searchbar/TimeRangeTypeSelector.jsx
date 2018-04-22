@@ -5,7 +5,7 @@ import PropTypes from 'enterprise/components/CustomPropTypes';
 
 export default function TimeRangeTypeSelector({ onSelect, value }) {
   return (
-    <ButtonToolbar className="timerange-chooser pull-left">
+    <ButtonToolbar className="extended-search-timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
                       title={<i className="fa fa-clock-o" />}
                       onSelect={onSelect}

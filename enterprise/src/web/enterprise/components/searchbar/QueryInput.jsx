@@ -54,6 +54,8 @@ class QueryInput extends Component {
       exec: this._onExecute,
     });
 
+    this.editor.editor.setFontSize(16);
+
     this.editor.editor.completers.push(_snippets);
   }
   componentWillReceiveProps(nextProps) {
@@ -137,10 +139,11 @@ class QueryInput extends Component {
                    editorProps={{
                      selectionStyle: 'line',
                    }}
+                   fontSize={13}
                    style={{
-                     height: '16px',
-                     width: '100%',
-                     marginTop: '10px',
+                     marginTop: '9px',
+                     height: '34px',
+                     width: '100%'
                    }} />
       </div>
     );

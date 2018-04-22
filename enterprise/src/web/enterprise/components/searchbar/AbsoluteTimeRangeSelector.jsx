@@ -73,8 +73,8 @@ const _onDateSelected = (date, key, onChange) => {
 
 export default function AbsoluteTimeRangeSelector({ value, onChange }) {
   return (
-    <div className="timerange-selector absolute" style={{ width: 600 }}>
-      <Row className="no-bm" style={{ marginLeft: 50 }}>
+    <div className="timerange-selector absolute">
+      <Row className="no-bm">
         <Col md={5} style={{ padding: 0 }}>
           <input type="hidden" name="from" />
           <DatePicker id="searchFromDatePicker"
@@ -82,19 +82,23 @@ export default function AbsoluteTimeRangeSelector({ value, onChange }) {
                       date={value.get('from')}
                       onChange={date => _onDateSelected(date, 'from', onChange)}>
             <Input type="text"
+                   className={"absolute"}
                    value={_formattedDateStringInUserTZ('from', value)}
                    onChange={newValue => onChange('from', newValue)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={<Button bsSize="small" onClick={() => _setDateTimeToNow('from', onChange)}><i className="fa fa-magic" /></Button>}
                    bsStyle={_isValidDateField('from', value) ? null : 'error'}
-                   bsSize="small"
                    required />
           </DatePicker>
 
         </Col>
+
         <Col md={1}>
-          <p className="text-center" style={{ margin: 0, lineHeight: '30px' }}>to</p>
+          <p className="text-center" style={{ margin: 0, lineHeight: '34px', fontSize: '18px' }}>
+            <i className="fa fa-long-arrow-right" />
+          </p>
         </Col>
+
         <Col md={5} style={{ padding: 0 }}>
           <input type="hidden" name="to" />
           <DatePicker id="searchToDatePicker"
@@ -102,12 +106,12 @@ export default function AbsoluteTimeRangeSelector({ value, onChange }) {
                       date={value.get('to')}
                       onChange={date => _onDateSelected(date, 'to', onChange)}>
             <Input type="text"
+                   className={"absolute"}
                    value={_formattedDateStringInUserTZ('to', value)}
                    onChange={newValue => onChange('to', newValue)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={<Button bsSize="small" onClick={() => _setDateTimeToNow('to', onChange)}><i className="fa fa-magic" /></Button>}
                    bsStyle={_isValidDateField('to', value) ? null : 'error'}
-                   bsSize="small"
                    required />
           </DatePicker>
         </Col>

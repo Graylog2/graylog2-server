@@ -20,6 +20,8 @@ import StreamsFilter from './searchbar/StreamsFilter';
 import QueryFiltersActions from '../actions/QueryFiltersActions';
 import QueryFiltersStore from '../stores/QueryFiltersStore';
 
+import style from './Searchbar.css';
+
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const SearchBar = createReactClass({
@@ -71,12 +73,29 @@ const SearchBar = createReactClass({
     return (
       <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
         <Col md={12}>
-          <Row>
+          <Row className={"no-bm"}>
             <Col md={12}>
-              <form method="GET"
-                    onSubmit={this._performSearch}>
-                <Row>
-                  <Col md={9}>
+              <form method="GET" onSubmit={this._performSearch}>
+
+                <Row className={"no-bm extended-search-query-metadata"}>
+                  <Col md={4}>
+                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(selectedView, id, newRangeType)}
+                                           value={rangeType} />
+                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(selectedView, id, key, value)}
+                                    rangeType={rangeType}
+                                    rangeParams={rangeParams}
+                                    config={this.props.config} />
+                  </Col>
+
+                  <Col md={8}>
+                    <StreamsFilter value={streams}
+                               streams={this.state.availableStreams}
+                               onChange={value => QueryFiltersActions.streams(selectedView, id, value)} />
+                  </Col>
+                </Row>
+
+                <Row className={"no-bm"}>
+                  <Col md={12}>
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                          title="Search query syntax documentation"
@@ -90,20 +109,7 @@ const SearchBar = createReactClass({
                                 onExecute={this.props.onExecute}
                                 result={this.props.results} />
                   </Col>
-                  <Col md={3}>
-                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(selectedView, id, newRangeType)}
-                                           value={rangeType} />
-                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(selectedView, id, key, value)}
-                                    rangeType={rangeType}
-                                    rangeParams={rangeParams}
-                                    config={this.props.config} />
-                  </Col>
                 </Row>
-
-                <StreamsFilter value={streams}
-                               streams={this.state.availableStreams}
-                               onChange={value => QueryFiltersActions.streams(selectedView, id, value)} />
-
               </form>
             </Col>
           </Row>

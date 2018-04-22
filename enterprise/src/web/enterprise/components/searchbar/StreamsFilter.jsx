@@ -7,17 +7,13 @@ import Select from 'components/common/Select';
 const StreamsFilter = ({ value, streams, onChange }) => {
   const selectedStreams = value.join(',');
   return (
-    <Row className="no-bm">
-      <Col md={11} mdOffset={1}>
-        <Select placeholder="Select streams to be searched in"
-                displayKey="key"
-                onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
-                options={streams}
-                multi
-                style={{ width: '90%' }}
-                value={selectedStreams} />
-      </Col>
-    </Row>
+      <Select placeholder="Select streams to be searched in"
+              displayKey="key"
+              onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
+              options={streams}
+              multi
+              style={{ width: '100%' }}
+              value={selectedStreams} />
   );
 };
 

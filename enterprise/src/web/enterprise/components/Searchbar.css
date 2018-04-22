@@ -1,0 +1,25 @@
+.extended-search-timerange-chooser .btn {
+    padding: 6px 7px;
+    margin-right: 5px;
+}
+
+.timerange-selector .form-group {
+    margin-bottom: 0px;
+}
+
+.timerange-selector .relative {
+    font-size: 12px;
+    color: #666;
+}
+
+.timerange-selector .absolute {
+    font-size: 12px;
+}
+
+.extended-search-query-metadata {
+    margin-bottom: 7px !important;
+}
+
+.search-button-execute {
+    margin-right: 7px;
+}

@@ -37,13 +37,13 @@ export default function RelativeTimeRangeSelector({ config, value, onChange }) {
 
   return (
     <div className="timerange-selector relative"
-         style={{ width: 270, marginLeft: 50 }}>
+         style={{ marginLeft: 50 }}>
       <Input id="relative-timerange-selector"
              type="select"
              value={value.get('range')}
+             className={"relative"}
              name="relative"
-             onChange={event => onChange('range', event.target.value)}
-             className="input-sm">
+             onChange={event => onChange('range', event.target.value)}>
         {options}
       </Input>
     </div>
