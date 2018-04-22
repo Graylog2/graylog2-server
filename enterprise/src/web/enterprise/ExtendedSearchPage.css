@@ -43,3 +43,7 @@
 .nav-tabs {
     border-bottom: 0 !important;
 }
+
+.xtick text, .ytick text {
+    fill: #757575 !important;
+}

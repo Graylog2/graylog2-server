@@ -20,8 +20,6 @@ import StreamsFilter from './searchbar/StreamsFilter';
 import QueryFiltersActions from '../actions/QueryFiltersActions';
 import QueryFiltersStore from '../stores/QueryFiltersStore';
 
-import style from './Searchbar.css';
-
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const SearchBar = createReactClass({

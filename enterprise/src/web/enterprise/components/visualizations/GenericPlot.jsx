@@ -15,8 +15,8 @@ const GenericPlot = ({ chartData }) => (
             autoexpand: true,
             t: 10,
             l: 40,
-            r: 40,
-            b: 30,
+            r: 10,
+            b: 40,
             pad: 0,
           },
         }}
