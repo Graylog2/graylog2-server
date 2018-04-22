@@ -10,3 +10,15 @@
 :local(.viewMetadata) {
     margin-bottom: 8px;
 }
+
+.panel-group {
+    margin-top: 15px;
+}
+
+.panel h4 {
+    font-size: 14px;
+}
+
+.panel h4 a:hover {
+    cursor: pointer;
+}

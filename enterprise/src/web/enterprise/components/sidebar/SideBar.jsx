@@ -67,6 +67,10 @@ const SideBar = createReactClass({
         <AutoAffix viewportOffsetTop={46}>
           <div id="sidebar">
             <div className={`content-col ${styles.sidebarContent}`} ref="sidebar">
+              <span className={"pull-right"}>
+                <AddWidgetButton viewId={viewId} queryId={queryId} />
+              </span>
+
               <div className={styles.viewMetadata}>
                 <h3>{view.get('title', defaultNewViewTitle)}</h3>
                 <small>{view.get('summary', defaultNewViewSummary)}</small>
@@ -79,9 +83,6 @@ const SideBar = createReactClass({
               <PanelGroup accordion activeKey={this.state.activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
                 <Panel eventKey="metadata" header="View Description">
                   {viewDescription}
-                </Panel>
-                <Panel eventKey="actions" header="Actions">
-                  <AddWidgetButton viewId={viewId} queryId={queryId} />
                 </Panel>
                 <Panel eventKey="fields" header="Fields">
                   {this.props.children({ maximumHeight: this.state.availableHeight })}
