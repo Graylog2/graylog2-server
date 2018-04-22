@@ -47,3 +47,12 @@
 .xtick text, .ytick text {
     fill: #757575 !important;
 }
+
+
+dl.message-details-fields {
+    color: #666;
+}
+
+dl.message-details-fields dd {
+    font-family: monospace;
+}
