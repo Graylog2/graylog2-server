@@ -62,9 +62,12 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
+import scala.Predef;
+import scala.collection.JavaConverters;
 import scala.collection.Seq;
 import scala.collection.immutable.HashMap;
 import scala.collection.JavaConversions;
+import scala.math.Ordering;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -231,7 +234,20 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 // minInSyncReplicas If number of insync replicas drops below this number, we stop accepting writes with -1 (or all) required acks
                 .put(LogConfig.MinInSyncReplicasProp(), 1)
                 .build();
-        final LogConfig defaultConfig = new LogConfig(config);
+        // nothing to override
+
+        java.util.Set<String> hs = new java.util.HashSet<>();
+
+        List<String> testHs = new ArrayList<String>();
+        //JavaConversions.asScalaBuffer(testHs).thisCollection().
+
+        //JavaConversions.asScalaBuffer(testHs);
+
+        //scala.Predef.Set[scala.Predef.String]
+        scala.collection.immutable.Set<String> overridenConfig = null;//JavaConversions.asScalaBuffer(testHs);
+
+
+        final LogConfig defaultConfig = new LogConfig(config,overridenConfig);
 
         // these are the default values as per kafka 0.8.1.1, except we don't turn on the cleaner
         // Cleaner really is log compaction with respect to "deletes" in the log.
@@ -316,9 +332,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
             final TopicPartition topicPartition = new TopicPartition("messagejournal", 0);
 
-            final Option<Log> messageLog = logManager.getLog(topicPartition);
+            final Option<Log> messageLog = logManager.getLog(topicPartition,false);
             if (messageLog.isEmpty()) {
-                kafkaLog = logManager.getOrCreateLog(topicPartition, logManager.defaultConfig(), true);
+                kafkaLog = logManager.getOrCreateLog(topicPartition, logManager.currentDefaultConfig(), true, false);
             } else {
                 kafkaLog = messageLog.get();
             }
@@ -629,11 +645,12 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
      */
     protected void flushDirtyLogs() {
         LOG.debug("Checking for dirty logs to flush...");
+        Iterator<Log> logs = (JavaConversions.asJavaIterable(logManager.allLogs())).iterator();
 
-        final Set<Map.Entry<TopicPartition, Log>> entries = JavaConversions.mapAsJavaMap(logManager.logsByTopicPartition()).entrySet();
-        for (final Map.Entry<TopicPartition, Log> topicAndPartitionLogEntry : entries) {
-            final TopicPartition topicAndPartition = topicAndPartitionLogEntry.getKey();
-            final Log kafkaLog = topicAndPartitionLogEntry.getValue();
+        while(logs.hasNext())
+        {
+            final Log kafkaLog = logs.next();
+            final TopicPartition topicAndPartition = kafkaLog.topicPartition();
             final long timeSinceLastFlush = JODA_TIME.milliseconds() - kafkaLog.lastFlushTime();
             try {
                 LOG.debug(
