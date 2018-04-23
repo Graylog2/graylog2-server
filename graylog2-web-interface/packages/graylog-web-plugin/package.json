@@ -35,6 +35,7 @@
   ],
   "dependencies": {
     "babel-eslint": "^7.2.3",
+    "babel-preset-env": "^1.6.1",
     "eslint": "^4.3.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "html-webpack-plugin": "^2.22.0",
@@ -58,7 +59,6 @@
   "devDependencies": {
     "babel-cli": "^6.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-es2015": "^6.0.0",
     "babel-preset-stage-0": "^6.0.0"
   }
 }
