@@ -80,6 +80,14 @@ public class InMemoryGrokPatternServiceTest {
 
         assertThat(loaded).isEqualTo(updated);
 
+        //check that using stored patterns works
+        final GrokPattern newPattern = service.save(GrokPattern.create("NEWONE", "%{OTHERNAME}"));
+
+        final GrokPattern newLoaded = service.load(newPattern.id());
+
+        assertThat(newLoaded).isEqualTo(newPattern);
+
+
         // save should validate
         try {
             service.save(GrokPattern.create("INVALID", "*"));

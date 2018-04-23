@@ -130,11 +130,14 @@ public class InMemoryGrokPatternService implements GrokPatternService {
 
     @Override
     public boolean validate(GrokPattern pattern) throws GrokException {
-        requireNonNull(pattern, "A pattern must be given");
+        final Set<GrokPattern> patterns = loadAll();
         final boolean fieldsMissing = Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern());
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-         grokCompiler.register(pattern.name(), pattern.pattern());
-         grokCompiler.compile("%{" + pattern.name() + "}");
+        grokCompiler.register(pattern.name(), pattern.pattern());
+        for(GrokPattern storedPattern : patterns) {
+            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
+        }
+        grokCompiler.compile("%{" + pattern.name() + "}");
         return !fieldsMissing;
     }
 
