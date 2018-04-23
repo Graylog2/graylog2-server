@@ -38,14 +38,14 @@ const GrokPatternsStore = {
       failCallback);
   },
 
-  testPattern(pattern: GrokPatternTest, callback: (response) => void) {
+  testPattern(pattern: GrokPatternTest, callback: (response) => void, errCallback: (response) => void) {
     const failCallback = (error) => {
       let err_message = error.message;
-      if (error.additional.body && error.additional.body.message) {
-        err_message = error.additional.body.message.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
-        err_message = `<br/><code>${err_message}</code>`;
+      let err_body = error.additional.body;
+      if (err_body && err_body.message) {
+          err_message = error.additional.body.message;
       }
-      UserNotification.error("Testing Grok pattern \"" + pattern.name + "\" failed with status: " + err_message,
+      UserNotification.error(`Testing Grok pattern "${pattern.name}" failed with status: ${err_message}`,
         "Could not test Grok pattern");
     };
 
@@ -69,14 +69,14 @@ const GrokPatternsStore = {
   },
 
   savePattern(pattern: GrokPattern, callback: () => void) {
-    var failCallback = (error) => {
+    const failCallback = (error) => {
       let err_message = error.message;
-      if (error.additional.body && error.additional.body.message) {
-        err_message = error.additional.body.message.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
-        err_message = `<br/><code>${err_message}</code>`;
+      let err_body = error.additional.body;
+      if (err_body && err_body.message) {
+        err_message = error.additional.body.message;
       }
-      UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + err_message,
-        "Could not save Grok pattern");
+      UserNotification.error(`Testing Grok pattern "${pattern.name}" failed with status: ${err_message}`,
+        "Could not test Grok pattern");
     };
 
     const requestPattern = {
