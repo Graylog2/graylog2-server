@@ -81,6 +81,7 @@ import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.security.RestrictToMasterFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.streams.DefaultStreamChangeHandler;
 import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
@@ -146,6 +147,7 @@ public class ServerBindings extends Graylog2Module {
 
         install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
         bind(Stream.class).annotatedWith(DefaultStream.class).toProvider(DefaultStreamProvider.class);
+        bind(DefaultStreamChangeHandler.class).asEagerSingleton();
     }
 
     private void bindSingletons() {

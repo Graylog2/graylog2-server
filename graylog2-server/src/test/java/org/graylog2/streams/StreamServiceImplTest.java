@@ -22,6 +22,7 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.notifications.NotificationService;
@@ -68,7 +69,7 @@ public class StreamServiceImplTest {
     @Before
     public void setUp() throws Exception {
         this.streamService = new StreamServiceImpl(mongoRule.getMongoConnection(), streamRuleService, alertService,
-            outputService, indexSetService, factory, notificationService, alarmCallbackConfigurationService);
+            outputService, indexSetService, factory, notificationService, new ClusterEventBus(), alarmCallbackConfigurationService);
     }
 
     @Test
