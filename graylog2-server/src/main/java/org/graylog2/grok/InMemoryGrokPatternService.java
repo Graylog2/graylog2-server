@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 public class InMemoryGrokPatternService implements GrokPatternService {
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryGrokPatternService.class);
@@ -130,7 +130,7 @@ public class InMemoryGrokPatternService implements GrokPatternService {
 
     @Override
     public boolean validate(GrokPattern pattern) throws GrokException {
-        checkNotNull(pattern, "A pattern must be given");
+        requireNonNull(pattern, "A pattern must be given");
         final boolean fieldsMissing = Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern());
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
          grokCompiler.register(pattern.name(), pattern.pattern());

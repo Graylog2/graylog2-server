@@ -22,7 +22,6 @@ import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import net.minidev.json.JSONObject;
 import io.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
@@ -123,7 +122,7 @@ public class GrokResource extends RestResource {
         } catch (GrokException | PatternSyntaxException e) {
             Map<String, String> error = ImmutableMap.of("message", e.getMessage());
 
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(new JSONObject(error)).build());
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
         }
         return Response.ok(result).build();
     }
