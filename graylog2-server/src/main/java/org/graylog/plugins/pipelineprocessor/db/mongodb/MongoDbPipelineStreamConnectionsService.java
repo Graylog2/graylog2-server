@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -78,9 +78,8 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
 
     @Override
     public Set<PipelineConnections> loadAll() {
-        try {
-            final DBCursor<PipelineConnections> connections = dbCollection.find();
-            return Sets.newHashSet(connections.iterator());
+        try (DBCursor<PipelineConnections> connections = dbCollection.find()) {
+            return ImmutableSet.copyOf((Iterable<PipelineConnections>) connections);
         } catch (MongoException e) {
             log.error("Unable to load pipeline connections", e);
             return Collections.emptySet();

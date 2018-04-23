@@ -98,23 +98,24 @@ public class TrafficCounterService {
                 DBQuery.greaterThan(BUCKET, from)
         );
 
-        final DBCursor<TrafficDto> cursor = db.find(query);
-        cursor.forEach(trafficDto -> {
-            inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
-            outputBuilder.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
-            decodedBuilder.put(trafficDto.bucket(), trafficDto.decoded().values().stream().mapToLong(Long::valueOf).sum());
-        });
-        Map<DateTime, Long> inputHistogram = inputBuilder.build();
-        Map<DateTime, Long> outputHistogram = outputBuilder.build();
-        Map<DateTime, Long> decodedHistogram = decodedBuilder.build();
+        try (DBCursor<TrafficDto> cursor = db.find(query)) {
+            cursor.forEach(trafficDto -> {
+                inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
+                outputBuilder.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
+                decodedBuilder.put(trafficDto.bucket(), trafficDto.decoded().values().stream().mapToLong(Long::valueOf).sum());
+            });
+            Map<DateTime, Long> inputHistogram = inputBuilder.build();
+            Map<DateTime, Long> outputHistogram = outputBuilder.build();
+            Map<DateTime, Long> decodedHistogram = decodedBuilder.build();
 
-        // we might need to aggregate the hourly database values to their UTC daily buckets
-        if (interval == Interval.DAILY) {
-            inputHistogram = aggregateToDaily(inputHistogram);
-            outputHistogram = aggregateToDaily(outputHistogram);
-            decodedHistogram = aggregateToDaily(decodedHistogram);
+            // we might need to aggregate the hourly database values to their UTC daily buckets
+            if (interval == Interval.DAILY) {
+                inputHistogram = aggregateToDaily(inputHistogram);
+                outputHistogram = aggregateToDaily(outputHistogram);
+                decodedHistogram = aggregateToDaily(decodedHistogram);
+            }
+            return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
         }
-        return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
     }
 
     private TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {

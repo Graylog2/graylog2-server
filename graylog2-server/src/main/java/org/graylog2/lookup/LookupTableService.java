@@ -268,7 +268,7 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private CountDownLatch createAndStartAdapters() {
-        final Set<LookupDataAdapter> adapters = dbAdapters.streamAll()
+        final Set<LookupDataAdapter> adapters = dbAdapters.findAll().stream()
                 .map(dto -> createAdapter(dto, null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
@@ -320,7 +320,7 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private CountDownLatch createAndStartCaches() {
-        final Set<LookupCache> caches = dbCaches.streamAll()
+        final Set<LookupCache> caches = dbCaches.findAll().stream()
                 .map(dto -> createCache(dto, null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());

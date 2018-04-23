@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -30,10 +30,9 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
- * Manages the "index_field_Types" MongoDB collection.
+ * Manages the "index_field_types" MongoDB collection.
  */
 public class IndexFieldTypesService {
     private static final String FIELDS_FIELD_NAMES = String.format(Locale.US, "%s.%s", IndexFieldTypesDTO.FIELD_FIELDS, FieldTypeDTO.FIELD_NAME);
@@ -99,28 +98,28 @@ public class IndexFieldTypesService {
         }
     }
 
-    public Stream<IndexFieldTypesDTO> streamForIndexSet(String indexSetId) {
-        return streamQuery(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId));
+    public Collection<IndexFieldTypesDTO> findForIndexSet(String indexSetId) {
+        return findByQuery(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId));
     }
 
-    public Stream<IndexFieldTypesDTO> streamForFieldNames(Collection<String> fieldNames) {
-        return streamQuery(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames));
+    public Collection<IndexFieldTypesDTO> findForFieldNames(Collection<String> fieldNames) {
+        return findByQuery(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames));
     }
 
-    public Stream<IndexFieldTypesDTO> streamForFieldNamesAndIndices(Collection<String> fieldNames, Collection<String> indexNames) {
+    public Collection<IndexFieldTypesDTO> findForFieldNamesAndIndices(Collection<String> fieldNames, Collection<String> indexNames) {
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.in(IndexFieldTypesDTO.FIELD_INDEX_NAME, indexNames),
                 DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)
         );
 
-        return streamQuery(query);
+        return findByQuery(query);
     }
 
-    public Stream<IndexFieldTypesDTO> streamAll() {
-        return streamQuery(DBQuery.empty());
+    public Collection<IndexFieldTypesDTO> findAll() {
+        return findByQuery(DBQuery.empty());
     }
 
-    private Stream<IndexFieldTypesDTO> streamQuery(DBQuery.Query query) {
-        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(query));
+    private Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
+        return ImmutableList.copyOf((Iterable<IndexFieldTypesDTO>) db.find(query));
     }
 }

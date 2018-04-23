@@ -168,11 +168,11 @@ public class MongoFieldTypeLookup implements FieldTypeLookup {
         return result.build();
     }
 
-    private Stream<IndexFieldTypesDTO> getTypesStream(Collection<String> fieldNames, Collection<String> indexNames) {
+    private Collection<IndexFieldTypesDTO> getTypesStream(Collection<String> fieldNames, Collection<String> indexNames) {
         if (indexNames.isEmpty()) {
-            return dbService.streamForFieldNames(fieldNames);
+            return dbService.findForFieldNames(fieldNames);
         }
 
-        return dbService.streamForFieldNamesAndIndices(fieldNames, indexNames);
+        return dbService.findForFieldNamesAndIndices(fieldNames, indexNames);
     }
 }

@@ -17,7 +17,6 @@
 package org.graylog2.lookup.db;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -36,7 +35,6 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DBCacheService {
 
@@ -69,13 +67,13 @@ public class DBCacheService {
     }
 
     public PaginatedList<CacheDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
-
-        final DBCursor<CacheDto> cursor = db.find(query)
+        try (DBCursor<CacheDto> cursor = db.find(query)
                 .sort(sort)
                 .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1));
+                .skip(perPage * Math.max(0, page - 1))) {
 
-        return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+        }
     }
 
     private ImmutableList<CacheDto> asImmutableList(Iterator<? extends CacheDto> cursor) {
@@ -92,10 +90,15 @@ public class DBCacheService {
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {
-        return asImmutableList(db.find(DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()))));
+        final DBQuery.Query query = DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()));
+        try (DBCursor<CacheDto> cursor = db.find(query)) {
+            return asImmutableList(cursor);
+        }
     }
 
-    public Stream<CacheDto> streamAll() {
-        return Streams.stream((Iterable<CacheDto>) db.find());
+    public Collection<CacheDto> findAll() {
+        try (DBCursor<CacheDto> cursor = db.find()) {
+            return asImmutableList(cursor);
+        }
     }
 }
