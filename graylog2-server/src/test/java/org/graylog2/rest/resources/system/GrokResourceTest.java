@@ -31,7 +31,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import scala.collection.parallel.ParIterableLike;
 
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;

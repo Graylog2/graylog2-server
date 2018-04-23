@@ -21,9 +21,7 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import io.thekraken.grok.api.Grok;
 import io.thekraken.grok.api.GrokCompiler;
-import io.thekraken.grok.api.Match;
 import io.thekraken.grok.api.exception.GrokException;
-import org.apache.logging.log4j.core.util.Patterns;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
@@ -37,8 +35,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
-
-import static java.util.Objects.requireNonNull;
 
 public class InMemoryGrokPatternService implements GrokPatternService {
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryGrokPatternService.class);
