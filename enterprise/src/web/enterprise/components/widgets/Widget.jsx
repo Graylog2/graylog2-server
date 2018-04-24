@@ -87,7 +87,7 @@ class Widget extends React.Component {
                       onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
                       editing={editing}>
           <WidgetFilterMenu onChange={newFilter => WidgetFilterActions.change(id, newFilter)} value={filter}>
-            <i className={`fa fa-filter ${styles.widgetActionDropdownCaret}`} />
+            <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
           </WidgetFilterMenu>
           {' '}
           <WidgetActionDropdown editing={editing}

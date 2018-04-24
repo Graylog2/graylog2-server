@@ -1,5 +1,12 @@
 :local(.widgetActionDropdownCaret) {
     cursor: pointer;
-    opacity: 0.3;
     font-size: 14px !important;
+}
+
+:local(.filterNotSet) {
+    opacity: 0.3;
+}
+
+:local(.filterSet) {
+    opacity: 1.0;
 }
