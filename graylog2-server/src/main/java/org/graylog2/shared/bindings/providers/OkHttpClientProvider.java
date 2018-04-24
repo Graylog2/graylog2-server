@@ -131,7 +131,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         private final String credentials;
 
         ProxyAuthenticator(String user, String password) {
-            this.credentials = Credentials.basic(requireNonNull(user), requireNonNull(password));
+            this.credentials = Credentials.basic(requireNonNull(user, "user"), requireNonNull(password, "password"));
         }
 
         @Nullable
