@@ -125,7 +125,7 @@ if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
-      minimizer: [ new UglifyJsPlugin({
+      minimizer: [new UglifyJsPlugin({
         uglifyOptions: {
           minimize: true,
           sourceMap: true,
@@ -136,7 +136,7 @@ if (TARGET === 'build') {
             reserved: ['$super', '$', 'exports', 'require'],
           },
         },
-      }) ],
+      })],
     },
     plugins: [
       new webpack.DefinePlugin({
