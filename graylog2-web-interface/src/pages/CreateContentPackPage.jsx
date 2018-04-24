@@ -93,13 +93,52 @@ const CreateContentPackPage = createReactClass({
     );
   },
 
-  _stepChanged(selectedStep) {
-    if (Object.keys(this.state.selectedEntities).length > 0) {
-      CatalogActions.getSelectedEntities(this.state.selectedEntities).then((fetchedEntities) => {
-        const newContentPack = ObjectUtils.clone(this.state.contentPack);
-        newContentPack.entities = fetchedEntities;
-        this.setState({ contentPack: newContentPack });
+  _prepareForPreview() {
+    const newContentPack = ObjectUtils.clone(this.state.contentPack);
+    const entities = ObjectUtils.clone(this.state.fetchedEntities);
+    const preparedEntities = entities.map((entity) => {
+      const parameters = this.state.appliedParameter[entity.id] || [];
+      const entityData = ObjectUtils.clone(entity.data);
+      const configKeys = ObjectUtils.getPaths(entityData);
+      configKeys.forEach((path) => {
+        const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path });
+        let newValue;
+        if (index >= 0) {
+          newValue = { type: 'parameter', value: parameters[index].paramName };
+        } else {
+          const currentValue = ObjectUtils.getValue(entityData, path);
+          newValue = { type: 'value', value: currentValue };
+        }
+        ObjectUtils.setValue(entityData, path, newValue);
       });
+      return entityData;
+    });
+    newContentPack.entities = preparedEntities;
+    this.setState({ contentPack: newContentPack });
+  },
+
+  _stepChanged(selectedStep) {
+    switch (selectedStep) {
+      case 'parameters': {
+        const newContentPack = ObjectUtils.clone(this.state.contentPack);
+        newContentPack.entities = this.state.fetchedEntities || [];
+        this.setState({contentPack: newContentPack});
+        if (Object.keys(this.state.selectedEntities).length > 0) {
+          CatalogActions.getSelectedEntities(this.state.selectedEntities).then((fetchedEntities) => {
+            const contentPack = ObjectUtils.clone(this.state.contentPack);
+            contentPack.entities = fetchedEntities;
+            this.setState({contentPack: contentPack});
+          });
+        }
+        break;
+      }
+      case 'preview': {
+        this._prepareForPreview();
+        break;
+      }
+      default: {
+        break;
+      }
     }
     this.setState({ selectedStep: selectedStep });
   },
