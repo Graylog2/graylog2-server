@@ -113,7 +113,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
             if (!isNullOrEmpty(httpProxyUri.getUserInfo())) {
                 final List<String> list = Splitter.on(":")
                         .limit(2)
-                        .omitEmptyStrings()
                         .splitToList(httpProxyUri.getUserInfo());
                 if (list.size() == 2) {
                     clientBuilder.proxyAuthenticator(new ProxyAuthenticator(list.get(0), list.get(1)));

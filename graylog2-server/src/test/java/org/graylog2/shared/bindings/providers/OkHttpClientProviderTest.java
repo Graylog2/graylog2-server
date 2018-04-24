@@ -168,12 +168,87 @@ public class OkHttpClientProviderTest {
     public void testFailingProxyConnectionWithAuthenticationAndUnsupportedScheme() throws IOException, InterruptedException {
         server.enqueue(proxyAuthenticateMockResponse("Bearer"));
 
-        final URI proxyURI = server.url("/").newBuilder().username("user").password("password").build().uri();
+        final URI proxyURI = URI.create("http://user:password@" + server.getHostName() + ":" + server.getPort());
         final Response response = client(proxyURI).newCall(request()).execute();
         assertThat(response.isSuccessful()).isFalse();
         assertThat(response.code()).isEqualTo(407);
 
         assertThat(server.getRequestCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void testFailingProxyConnectionWithAuthenticationAndEmptyUsername() throws IOException, InterruptedException {
+        server.enqueue(proxyAuthenticateMockResponse());
+        server.enqueue(failedAuthMockResponse());
+
+        final URI proxyURI = URI.create("http://:password@" + server.getHostName() + ":" + server.getPort());
+        final Response response = client(proxyURI).newCall(request()).execute();
+
+        assertThat(server.getRequestCount()).isEqualTo(2);
+
+        final RecordedRequest unauthenticatedRequest = server.takeRequest();
+        assertThat(unauthenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(unauthenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isNull();
+
+        final RecordedRequest authenticatedRequest = server.takeRequest();
+        assertThat(authenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(authenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isEqualTo(Credentials.basic("", "password"));
+
+        assertThat(response.code()).isEqualTo(401);
+    }
+
+    @Test
+    public void testFailingProxyConnectionWithAuthenticationAndEmptyPassword() throws IOException, InterruptedException {
+        server.enqueue(proxyAuthenticateMockResponse());
+        server.enqueue(failedAuthMockResponse());
+
+        final URI proxyURI = URI.create("http://user:@" + server.getHostName() + ":" + server.getPort());
+        final Response response = client(proxyURI).newCall(request()).execute();
+
+        assertThat(server.getRequestCount()).isEqualTo(2);
+
+        final RecordedRequest unauthenticatedRequest = server.takeRequest();
+        assertThat(unauthenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(unauthenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isNull();
+
+        final RecordedRequest authenticatedRequest = server.takeRequest();
+        assertThat(authenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(authenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isEqualTo(Credentials.basic("user", ""));
+
+        assertThat(response.code()).isEqualTo(401);
+    }
+
+    @Test
+    public void testFailingProxyConnectionWithAuthenticationAndEmptyUsernamePassword() throws IOException, InterruptedException {
+        server.enqueue(proxyAuthenticateMockResponse());
+        server.enqueue(failedAuthMockResponse());
+
+        final URI proxyURI = URI.create("http://:@" + server.getHostName() + ":" + server.getPort());
+        final Response response = client(proxyURI).newCall(request()).execute();
+
+        assertThat(server.getRequestCount()).isEqualTo(2);
+
+        final RecordedRequest unauthenticatedRequest = server.takeRequest();
+        assertThat(unauthenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(unauthenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isNull();
+
+        final RecordedRequest authenticatedRequest = server.takeRequest();
+        assertThat(authenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(authenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isEqualTo(Credentials.basic("", ""));
+
+        assertThat(response.code()).isEqualTo(401);
     }
 
     private MockResponse successfulMockResponse() {
@@ -182,6 +257,10 @@ public class OkHttpClientProviderTest {
 
     private MockResponse failedMockResponse() {
         return new MockResponse().setResponseCode(400).setBody("Failed");
+    }
+
+    private MockResponse failedAuthMockResponse() {
+        return new MockResponse().setResponseCode(401).setBody("Unauthenticated");
     }
 
     private MockResponse proxyAuthenticateMockResponse() {
