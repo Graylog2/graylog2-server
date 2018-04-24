@@ -53,8 +53,9 @@ const SideBar = createReactClass({
   },
 
   formatViewDescription(view) {
-    if (view.has('description')) {
-      return <span>{view.get('description')}</span>;
+    const { description } = view.toObject();
+    if (description) {
+      return <span>{description}</span>;
     }
     return <i>No view description.</i>;
   },
@@ -72,8 +73,8 @@ const SideBar = createReactClass({
               </span>
 
               <div className={styles.viewMetadata}>
-                <h3>{view.get('title', defaultNewViewTitle)}</h3>
-                <small>{view.get('summary', defaultNewViewSummary)}</small>
+                <h3>{view.get('title') || defaultNewViewTitle}</h3>
+                <small>{view.get('summary') || defaultNewViewSummary}</small>
               </div>
 
               <div className={styles.viewMetadata}>
