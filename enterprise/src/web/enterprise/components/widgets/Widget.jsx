@@ -95,7 +95,7 @@ class Widget extends React.Component {
                                 onDelete={() => this._onDelete(widget)}
                                 onDuplicate={() => this._onDuplicate(id)}
                                 onToggleEdit={this._onToggleEdit}>
-            <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret}`} />
+            <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />
           </WidgetActionDropdown>
         </WidgetHeader>
 

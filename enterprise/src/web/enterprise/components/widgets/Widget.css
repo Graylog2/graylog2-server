@@ -3,6 +3,10 @@
     font-size: 14px !important;
 }
 
+:local(.tonedDown) {
+    opacity: 0.3;
+}
+
 :local(.filterNotSet) {
     opacity: 0.3;
 }
