@@ -16,7 +16,7 @@
  */
 package org.graylog2.bundles;
 
-import com.google.common.collect.Iterators;
+import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
@@ -31,7 +31,6 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashSet;
 import java.util.Set;
 
 @Singleton
@@ -77,14 +76,9 @@ public class BundleService {
     }
 
     public Set<ConfigurationBundle> loadAll() {
-        final DBCursor<ConfigurationBundle> ConfigurationBundles = dbCollection.find();
-        final Set<ConfigurationBundle> bundles = new HashSet<>();
-
-        if (ConfigurationBundles.hasNext()) {
-            Iterators.addAll(bundles, ConfigurationBundles);
+        try (DBCursor<ConfigurationBundle> configurationBundles = dbCollection.find()) {
+            return ImmutableSet.copyOf((Iterable<ConfigurationBundle>) configurationBundles);
         }
-
-        return bundles;
     }
 
     public boolean update(final String bundleId, final ConfigurationBundle bundle) {

@@ -141,10 +141,8 @@ public class ClusterEventPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        try {
-            LOG.debug("Opening MongoDB cursor on \"{}\"", COLLECTION_NAME);
-
-            final DBCursor<ClusterEvent> cursor = eventCursor(nodeId);
+        LOG.debug("Opening MongoDB cursor on \"{}\"", COLLECTION_NAME);
+        try (DBCursor<ClusterEvent> cursor = eventCursor(nodeId)) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("MongoDB query plan: {}", cursor.explain());
             }

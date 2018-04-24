@@ -16,10 +16,6 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -111,27 +107,29 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
-        final DBCursor<MongoIndexRange> indexRanges = collection.find(
-            DBQuery.or(
+        final DBQuery.Query query = DBQuery.or(
                 DBQuery.and(
-                    DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
-                    DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
-                    DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
+                        DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
+                        DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
+                        DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
                 ),
                 DBQuery.and(
-                    DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
-                    DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, 0L),
-                    DBQuery.greaterThanEquals(IndexRange.FIELD_END, 0L)
+                        DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
+                        DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, 0L),
+                        DBQuery.greaterThanEquals(IndexRange.FIELD_END, 0L)
                 )
-            )
         );
 
-        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) indexRanges);
+        try (DBCursor<MongoIndexRange> indexRanges = collection.find(query)) {
+            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) indexRanges);
+        }
     }
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) collection.find(DBQuery.notExists("start")));
+        try (DBCursor<MongoIndexRange> cursor = collection.find(DBQuery.notExists("start"))) {
+            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
+        }
     }
 
     @Override

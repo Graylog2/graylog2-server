@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -69,9 +69,8 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public Collection<PipelineDao> loadAll() {
-        try {
-            final DBCursor<PipelineDao> daos = dbCollection.find();
-            return Sets.newHashSet(daos.iterator());
+        try (DBCursor<PipelineDao> daos = dbCollection.find()) {
+            return ImmutableSet.copyOf((Iterable<PipelineDao>) daos);
         } catch (MongoException e) {
             log.error("Unable to load pipelines", e);
             return Collections.emptySet();

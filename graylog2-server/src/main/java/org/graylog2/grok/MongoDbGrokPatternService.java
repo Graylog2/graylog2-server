@@ -18,8 +18,7 @@ package org.graylog2.grok;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import io.thekraken.grok.api.GrokCompiler;
 import io.thekraken.grok.api.exception.GrokException;
 import org.bson.types.ObjectId;
@@ -67,10 +66,9 @@ public class MongoDbGrokPatternService implements GrokPatternService {
 
     @Override
     public Set<GrokPattern> loadAll() {
-        final DBCursor<GrokPattern> grokPatterns = dbCollection.find();
-        final Set<GrokPattern> patterns = Sets.newHashSet();
-        Iterables.addAll(patterns, grokPatterns);
-        return patterns;
+        try (DBCursor<GrokPattern> grokPatterns = dbCollection.find()) {
+            return ImmutableSet.copyOf((Iterable<GrokPattern>) grokPatterns);
+        }
     }
 
     @Override

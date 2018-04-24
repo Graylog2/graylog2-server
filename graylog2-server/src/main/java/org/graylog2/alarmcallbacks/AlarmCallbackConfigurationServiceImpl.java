@@ -16,7 +16,7 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.mongodb.DBCollection;
 import org.bson.types.ObjectId;
@@ -50,7 +50,9 @@ public class AlarmCallbackConfigurationServiceImpl implements AlarmCallbackConfi
 
     @Override
     public List<AlarmCallbackConfiguration> getForStreamId(String streamId) {
-        return this.toAbstractListType(coll.find(DBQuery.is("stream_id", streamId)).toArray());
+        try (DBCursor<AlarmCallbackConfigurationImpl> dbCursor = coll.find(DBQuery.is("stream_id", streamId))) {
+            return ImmutableList.copyOf((Iterable<AlarmCallbackConfigurationImpl>) dbCursor);
+        }
     }
 
     @Override
@@ -77,13 +79,14 @@ public class AlarmCallbackConfigurationServiceImpl implements AlarmCallbackConfi
     public Map<String, Long> countPerType() {
         final HashMap<String, Long> result = Maps.newHashMap();
 
-        final DBCursor<AlarmCallbackConfigurationImpl> avs = coll.find();
-        for (AlarmCallbackConfigurationImpl av : avs) {
-            Long count = result.get(av.getType());
-            if (count == null) {
-                count = 0L;
+        try(DBCursor<AlarmCallbackConfigurationImpl> avs = coll.find()) {
+            for (AlarmCallbackConfigurationImpl av : avs) {
+                Long count = result.get(av.getType());
+                if (count == null) {
+                    count = 0L;
+                }
+                result.put(av.getType(), count + 1);
             }
-            result.put(av.getType(), count + 1);
         }
 
         return result;
@@ -97,13 +100,6 @@ public class AlarmCallbackConfigurationServiceImpl implements AlarmCallbackConfi
     @Override
     public int destroy(AlarmCallbackConfiguration model) {
         return coll.removeById(model.getId()).getN();
-    }
-
-    private List<AlarmCallbackConfiguration> toAbstractListType(List<AlarmCallbackConfigurationImpl> callbacks) {
-        final List<AlarmCallbackConfiguration> result = Lists.newArrayList();
-        result.addAll(callbacks);
-
-        return result;
     }
 
     private AlarmCallbackConfigurationImpl implOrFail(AlarmCallbackConfiguration callback) {

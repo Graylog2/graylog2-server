@@ -16,8 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
@@ -74,9 +73,8 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public Collection<RuleDao> loadAll() {
-        try {
-            final DBCursor<RuleDao> ruleDaos = dbCollection.find().sort(DBSort.asc("title"));
-            return ruleDaos.toArray();
+        try(DBCursor<RuleDao> ruleDaos = dbCollection.find().sort(DBSort.asc("title"))) {
+            return ImmutableSet.copyOf((Iterable<RuleDao>) ruleDaos);
         } catch (MongoException e) {
             log.error("Unable to load processing rules", e);
             return Collections.emptySet();
@@ -93,9 +91,8 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public Collection<RuleDao> loadNamed(Collection<String> ruleNames) {
-        try {
-            final DBCursor<RuleDao> ruleDaos = dbCollection.find(DBQuery.in("title", ruleNames));
-            return Sets.newHashSet(ruleDaos.iterator());
+        try (DBCursor<RuleDao> ruleDaos = dbCollection.find(DBQuery.in("title", ruleNames))) {
+            return ImmutableSet.copyOf((Iterable<RuleDao>) ruleDaos);
         } catch (MongoException e) {
             log.error("Unable to bulk load rules", e);
             return Collections.emptySet();

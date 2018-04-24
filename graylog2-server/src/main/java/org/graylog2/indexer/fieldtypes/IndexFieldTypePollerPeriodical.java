@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
@@ -111,8 +112,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         indexSetService.findAll().forEach(indexSetConfig -> {
             final String indexSetId = indexSetConfig.id();
             final String indexSetTitle = indexSetConfig.title();
-            final Set<IndexFieldTypesDTO> existingIndexTypes = dbService.streamForIndexSet(indexSetId)
-                    .collect(Collectors.toSet());
+            final Set<IndexFieldTypesDTO> existingIndexTypes = ImmutableSet.copyOf(dbService.findForIndexSet(indexSetId));
 
             final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
 
@@ -126,7 +126,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             }
 
             // Cleanup orphaned field type entries that haven't been removed by the event handler
-            dbService.streamForIndexSet(indexSetId)
+            dbService.findForIndexSet(indexSetId).stream()
                     .filter(types -> !indices.exists(types.indexName()))
                     .forEach(types -> dbService.delete(types.id()));
         });

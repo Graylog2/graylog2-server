@@ -72,21 +72,27 @@ public class DBLookupTableService {
     }
 
     public PaginatedList<LookupTableDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
-
-        final DBCursor<LookupTableDto> cursor = db.find(query)
+        try (DBCursor<LookupTableDto> cursor = db.find(query)
                 .sort(sort)
                 .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1));
+                .skip(perPage * Math.max(0, page - 1))) {
 
-        return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+        }
     }
 
     public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
-        return asImmutableList(db.find(DBQuery.in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
+        final DBQuery.Query query = DBQuery.in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+        try (DBCursor<LookupTableDto> cursor = db.find(query)) {
+            return asImmutableList(cursor);
+        }
     }
 
     public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
-        return asImmutableList(db.find(DBQuery.in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
+        final DBQuery.Query query = DBQuery.in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+        try (DBCursor<LookupTableDto> cursor = db.find(query)) {
+            return asImmutableList(cursor);
+        }
     }
 
     private ImmutableList<LookupTableDto> asImmutableList(Iterator<? extends LookupTableDto> cursor) {
@@ -103,6 +109,8 @@ public class DBLookupTableService {
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {
-        db.find().forEachRemaining(action);
+        try (DBCursor<LookupTableDto> dbCursor = db.find()) {
+            dbCursor.forEachRemaining(action);
+        }
     }
 }
