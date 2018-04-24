@@ -42,6 +42,11 @@ public class DefaultStreamProvider implements Provider<Stream> {
         this.service = service;
     }
 
+    public void setDefaultStream(Stream defaultStream) {
+        LOG.debug("Setting new default stream: {}", defaultStream);
+        this.sharedInstance.set(defaultStream);
+    }
+
     @Override
     public Stream get() {
         Stream defaultStream = sharedInstance.get();
