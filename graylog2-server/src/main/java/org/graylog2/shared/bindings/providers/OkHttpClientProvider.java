@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import okhttp3.Authenticator;
+import okhttp3.Challenge;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,6 +44,8 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.net.HttpHeaders.PROXY_AUTHORIZATION;
@@ -122,6 +125,9 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     }
 
     public static class ProxyAuthenticator implements Authenticator {
+        private static final Logger LOG = LoggerFactory.getLogger(ProxyAuthenticator.class);
+        private static final String AUTH_BASIC = "Basic";
+
         private final String credentials;
 
         ProxyAuthenticator(String user, String password) {
@@ -131,6 +137,16 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         @Nullable
         @Override
         public Request authenticate(@Nonnull Route route, @Nonnull Response response) throws IOException {
+            final Set<String> authenticationMethods = response.challenges().stream()
+                    .map(Challenge::scheme)
+                    .collect(Collectors.toSet());
+
+            if (!authenticationMethods.contains(AUTH_BASIC)) {
+                LOG.warn("Graylog only supports the \"{}\" authentication scheme but the proxy server asks for one of the following: {}",
+                        AUTH_BASIC, authenticationMethods);
+                return null;
+            }
+
             if (response.request().header(PROXY_AUTHORIZATION) != null) {
                 return null; // Give up, we've already failed to authenticate.
             }

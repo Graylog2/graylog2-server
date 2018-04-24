@@ -164,6 +164,18 @@ public class OkHttpClientProviderTest {
         assertThat(authenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isEqualTo(Credentials.basic("user", "password"));
     }
 
+    @Test
+    public void testFailingProxyConnectionWithAuthenticationAndUnsupportedScheme() throws IOException, InterruptedException {
+        server.enqueue(proxyAuthenticateMockResponse("Bearer"));
+
+        final URI proxyURI = server.url("/").newBuilder().username("user").password("password").build().uri();
+        final Response response = client(proxyURI).newCall(request()).execute();
+        assertThat(response.isSuccessful()).isFalse();
+        assertThat(response.code()).isEqualTo(407);
+
+        assertThat(server.getRequestCount()).isEqualTo(1);
+    }
+
     private MockResponse successfulMockResponse() {
         return new MockResponse().setResponseCode(200).setBody("Test");
     }
@@ -173,7 +185,11 @@ public class OkHttpClientProviderTest {
     }
 
     private MockResponse proxyAuthenticateMockResponse() {
-        return new MockResponse().setResponseCode(407).addHeader(HttpHeaders.PROXY_AUTHENTICATE, "Basic");
+        return proxyAuthenticateMockResponse("Basic");
+    }
+
+    private MockResponse proxyAuthenticateMockResponse(String scheme) {
+        return new MockResponse().setResponseCode(407).addHeader(HttpHeaders.PROXY_AUTHENTICATE, scheme + " realm=\"test\"");
     }
 
     private OkHttpClient client(URI proxyURI) {
