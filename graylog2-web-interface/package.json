@@ -87,6 +87,7 @@
     "toastr": "^2.1.2",
     "typeahead.js": "^0.11.1",
     "ua-parser-js": "^0.7.12",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "urijs": "^1.17.0"
   },
   "devDependencies": {

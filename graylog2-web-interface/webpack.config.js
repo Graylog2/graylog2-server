@@ -4,6 +4,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -124,7 +125,18 @@ if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
-      minimize: true,
+      minimizer: [ new UglifyJsPlugin({
+        uglifyOptions: {
+          minimize: true,
+          sourceMap: true,
+          compress: {
+            warnings: false,
+          },
+          mangle: {
+            reserved: ['$super', '$', 'exports', 'require'],
+          },
+        },
+      }) ],
     },
     plugins: [
       new webpack.DefinePlugin({
