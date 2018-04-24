@@ -45,6 +45,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.net.HttpHeaders.PROXY_AUTHORIZATION;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -121,7 +122,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     }
 
     public static class ProxyAuthenticator implements Authenticator {
-        private static final String PROXY_AUTHORIZATION = "Proxy-Authorization";
         private final String credentials;
 
         ProxyAuthenticator(String user, String password) {
