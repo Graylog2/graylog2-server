@@ -297,7 +297,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     className="row"
   >
     <div
-      className="col-sm-7 col-sm-offset-1"
+      className="col-sm-8 col-sm-offset-1"
     >
       <h2>
         Entity list
@@ -609,7 +609,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     className="row"
   >
     <div
-      className="col-sm-7 col-sm-offset-1"
+      className="col-sm-8 col-sm-offset-1"
     >
       <h2>
         Entity list
