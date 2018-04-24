@@ -33,28 +33,6 @@ class ContentPackApplyParameter extends React.Component {
     };
   }
 
-  _getConfigKeys = (parentKeys = '', config = this.props.entity.data) => {
-    if (!config) {
-      return parentKeys;
-    }
-    const keys = Object.keys(config);
-    if (!keys || keys.length <= 0) {
-      return parentKeys;
-    }
-    const result = keys.map((key) => {
-      let newKeys = parentKeys.repeat(1);
-      const newKey = newKeys.length <= 0 ? key : `.${key}`;
-      newKeys = newKeys.concat(newKey);
-      const value = ObjectUtils.getValue(config, key);
-      if (typeof value === 'object' && !Array.isArray(value)) {
-        return this._getConfigKeys(newKeys, value);
-      } else {
-        return newKeys;
-      }
-    });
-    return [].concat(...result);
-  };
-
   _configKeyRowFormatter = (paramMap) => {
     return (
       <tr key={paramMap.configKey}>
@@ -88,7 +66,7 @@ class ContentPackApplyParameter extends React.Component {
   };
 
   render() {
-    const configKeys = this._getConfigKeys();
+    const configKeys = ObjectUtils.getPaths(this.props.entity.data);
     const emptyOption = (<option key="EMPTY" value="">Choose..</option>);
     const configOptions = [emptyOption].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
     const parameterOptions = [emptyOption].concat(this.props.parameters.map(key => <option key={key.name} value={key.name}>{key.name}</option>));

@@ -93,7 +93,7 @@ class ContentPackParameters extends React.Component {
     this.props.onStateChange({ contentPack: newContentPack });
   };
 
-  _parameterRowFormater = (parameter) => {
+  _parameterRowFormatter = (parameter) => {
     return (
       <tr key={parameter.title}>
         <td>{parameter.title}</td>
@@ -243,12 +243,12 @@ class ContentPackParameters extends React.Component {
               sortByKey="title"
               filterKeys={[]}
               rows={this.props.contentPack.parameters}
-              dataRowFormatter={this._parameterRowFormater}
+              dataRowFormatter={this._parameterRowFormatter}
             />
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1} sm={7}>
+          <Col smOffset={1} sm={8}>
             <h2>Entity list</h2>
             <br />
             <DataTable
