@@ -83,7 +83,14 @@ const ConfigurationForm = createReactClass({
   },
 
   _sortByOptionality(x1, x2) {
-    return (this.state.configFields[x1].is_optional - this.state.configFields[x2].is_optional);
+    let diff = this.state.configFields[x1.name].is_optional - this.state.configFields[x2.name].is_optional;
+
+    if (!diff) {
+      // Sort equal fields stably
+      diff = x1.pos - x2.pos;
+    }
+
+    return diff;
   },
 
   _save() {
@@ -153,9 +160,12 @@ const ConfigurationForm = createReactClass({
       shouldAutoFocus = false;
     }
 
-    const configFieldKeys = $.map(this.state.configFields, (v, k) => k).sort(this._sortByOptionality);
+    const configFieldKeys = $.map(this.state.configFields, (field, name) => name)
+      .map((name, pos) => ({ name: name, pos: pos }))
+      .sort(this._sortByOptionality);
+
     const configFields = configFieldKeys.map((key) => {
-      const configField = this._renderConfigField(this.state.configFields[key], key, shouldAutoFocus);
+      const configField = this._renderConfigField(this.state.configFields[key.name], key.name, shouldAutoFocus);
       if (shouldAutoFocus) {
         shouldAutoFocus = false;
       }
