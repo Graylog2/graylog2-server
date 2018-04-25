@@ -180,12 +180,73 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-offset-1"
+      className=""
     >
       <h2>
         Content Pack selection
       </h2>
-      <br />
+    </div>
+  </div>
+  <form
+    id="filter-form"
+    onSubmit={[Function]}
+  >
+    <div
+      className="row"
+    >
+      <div
+        className=""
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className="col-sm-1 control-label"
+            htmlFor="filter-input"
+          >
+            Filter
+          </label>
+          <div
+            className="col-sm-4"
+          >
+            <input
+              className="form-control"
+              id="filter-input"
+              label="Filter"
+              maxLength={250}
+              name="filter-input"
+              onChange={[Function]}
+              placeholder=""
+              type="text"
+              value=""
+            />
+            
+          </div>
+        </div>
+        <button
+          className="btn btn-default"
+          disabled={false}
+          type="submit"
+        >
+          Filter
+        </button>
+        <button
+          className="btn btn-default"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  </form>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-8 col-sm-offset-1"
+    >
       <ul
         className="list"
       />
@@ -374,12 +435,73 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-offset-1"
+      className=""
     >
       <h2>
         Content Pack selection
       </h2>
-      <br />
+    </div>
+  </div>
+  <form
+    id="filter-form"
+    onSubmit={[Function]}
+  >
+    <div
+      className="row"
+    >
+      <div
+        className=""
+      >
+        <div
+          className="form-group"
+        >
+          <label
+            className="col-sm-1 control-label"
+            htmlFor="filter-input"
+          >
+            Filter
+          </label>
+          <div
+            className="col-sm-4"
+          >
+            <input
+              className="form-control"
+              id="filter-input"
+              label="Filter"
+              maxLength={250}
+              name="filter-input"
+              onChange={[Function]}
+              placeholder=""
+              type="text"
+              value=""
+            />
+            
+          </div>
+        </div>
+        <button
+          className="btn btn-default"
+          disabled={false}
+          type="submit"
+        >
+          Filter
+        </button>
+        <button
+          className="btn btn-default"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  </form>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-8 col-sm-offset-1"
+    >
       <ul
         className="list"
       >
