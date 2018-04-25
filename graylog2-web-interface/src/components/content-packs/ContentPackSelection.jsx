@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
+import { ExpandableList, ExpandableListItem } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
-import { ExpandableList, ExpandableListItem } from "components/common";
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
@@ -18,6 +18,7 @@ class ContentPackSelection extends React.Component {
   static defaultProps = {
     onStateChange: () => {},
     entities: {},
+    selectedEntities: {},
   };
 
   static _toDisplayTitle(title) {
@@ -30,7 +31,17 @@ class ContentPackSelection extends React.Component {
     this._bindValue = this._bindValue.bind(this);
     this.state = {
       contentPack: ObjectUtils.clone(this.props.contentPack),
+      filteredEntities: ObjectUtils.clone(this.props.entities),
+      filter: '',
+      isFiltered: false,
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ filteredEntities: nextProps.entities });
+    if (this.state.isFiltered) {
+      this._filterEntities(this.state.filter);
+    }
   }
 
   _updateField(name, value) {
@@ -91,9 +102,40 @@ class ContentPackSelection extends React.Component {
     return this.props.selectedEntities[type].length === this.props.entities[type].length;
   }
 
+  _onFilterEntities = (e) => {
+    e.preventDefault();
+    this._filterEntities(this.state.filter);
+  };
+
+  _onSetFilter = (e) => {
+    this.setState({ filter: e.target.value });
+  };
+
+  _onClearFilter = () => {
+    this.setState({ filter: '' });
+    this._filterEntities();
+  };
+
+  _filterEntities = () => {
+    const filter = this.state.filter;
+    if (filter.length <= 0) {
+      this.setState({ filteredEntities: ObjectUtils.clone(this.props.entities), isFiltered: false });
+      return;
+    }
+    const filtered = Object.keys(this.props.entities).reduce((result, type) => {
+      const filteredEntities = ObjectUtils.clone(result);
+      filteredEntities[type] = this.props.entities[type].filter((entity) => {
+        const regexp = RegExp(filter, 'i');
+        return regexp.test(entity.title);
+      });
+      return filteredEntities;
+    }, {});
+    this.setState({ filteredEntities: filtered, isFiltered: true });
+  };
+
   render() {
-    const entitiesComponent = Object.keys(this.props.entities || {}).map((entityType) => {
-      const group = this.props.entities[entityType];
+    const entitiesComponent = Object.keys(this.state.filteredEntities || {}).map((entityType) => {
+      const group = this.state.filteredEntities[entityType];
       const entities = group.map((entity) => {
         const checked = this._isSelected(entity);
         return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
@@ -102,11 +144,16 @@ class ContentPackSelection extends React.Component {
                                     expandable={false}
                                     header={entity.title} />);
       });
+      if (group.length <= 0) {
+        return null;
+      }
       return (
         <ExpandableListItem key={entityType}
                             onChange={() => this._updateSelectionGroup(entityType)}
                             indetermined={this._isUndetermined(entityType)}
                             checked={this._isGroupSelected(entityType)}
+                            stayExpanded={this.state.isFiltered}
+                            expanded={this.state.isFiltered}
                             header={ContentPackSelection._toDisplayTitle(entityType)}>
           <ExpandableList>
             {entities}
@@ -182,9 +229,29 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1}>
+          <Col>
             <h2>Content Pack selection</h2>
-            <br />
+          </Col>
+        </Row>
+        <form id={'filter-form'} onSubmit={this._onFilterEntities} >
+          <Row>
+            <Col>
+              <Input name="filter-input"
+                     id="filter-input"
+                     type="text"
+                     maxLength={250}
+                     value={this.state.filter}
+                     onChange={this._onSetFilter}
+                     labelClassName="col-sm-1"
+                     wrapperClassName="col-sm-4"
+                     label="Filter" />
+              <Button type="submit">Filter</Button>
+              <Button onClick={this._onClearFilter}>Clear</Button>
+            </Col>
+          </Row>
+        </form>
+        <Row>
+          <Col smOffset={1} sm={8}>
             <ExpandableList>
               {entitiesComponent}
             </ExpandableList>

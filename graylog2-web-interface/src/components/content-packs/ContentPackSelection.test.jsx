@@ -115,4 +115,27 @@ describe('<ContentPackSelection />', () => {
     wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
     expect(changeFn.mock.calls.length).toBe(1);
   });
+
+  it('should filter expandableList of content selection', () => {
+    const contentPack = {};
+    const breq = {
+      title: 'breq',
+      type: 'spaceship',
+      id: 'beef123',
+    };
+    const falcon = {
+      title: 'falcon',
+      type: 'spaceship',
+      id: 'beef124',
+    };
+    const entities = { spaceship: [breq, falcon] };
+    const wrapper = mount(
+      <ContentPackSelection contentPack={contentPack}
+                            entities={entities} />);
+    wrapper.find('div.fa-stack').simulate('click');
+    expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
+    wrapper.find('input#filter-input').simulate('change', { target: { value: 'falcon' } });
+    wrapper.find('form#filter-form').simulate('submit');
+    expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
+  });
 });
