@@ -16,12 +16,8 @@
  */
 package org.graylog2.plugin.inputs;
 
-import java.util.Locale;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class Converter {
 
     public enum Type {
@@ -48,8 +44,8 @@ public abstract class Converter {
         this.config = config;
     }
 
-    public String getType() {
-        return this.type.toString().toLowerCase(Locale.ENGLISH);
+    public Type getType() {
+        return type;
     }
 
     public Map<String, Object> getConfig() {
