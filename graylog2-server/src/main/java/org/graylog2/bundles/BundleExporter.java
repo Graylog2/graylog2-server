@@ -16,7 +16,6 @@
  */
 package org.graylog2.bundles;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -27,6 +26,7 @@ import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -42,7 +42,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -141,7 +140,7 @@ public class BundleExporter {
         bundle.setTitle(dto.title());
         bundle.setDescription(dto.description());
         bundle.setName(dto.name());
-        bundle.setConfig(objectMapper.convertValue(dto.config(), new TypeReference<Map<String, Object>>(){}));
+        bundle.setConfig(objectMapper.convertValue(dto.config(), TypeReferences.MAP_STRING_OBJECT));
 
         return bundle;
     }
@@ -174,7 +173,7 @@ public class BundleExporter {
         bundle.setTitle(dto.title());
         bundle.setDescription(dto.description());
         bundle.setName(dto.name());
-        bundle.setConfig(objectMapper.convertValue(dto.config(), new TypeReference<Map<String, Object>>(){}));
+        bundle.setConfig(objectMapper.convertValue(dto.config(), TypeReferences.MAP_STRING_OBJECT));
 
         return bundle;
     }
@@ -317,8 +316,7 @@ public class BundleExporter {
         final ImmutableList.Builder<Converter> converterBuilder = ImmutableList.builder();
         for (org.graylog2.plugin.inputs.Converter converter : converters) {
             final Converter converterDescription = new Converter();
-            final org.graylog2.plugin.inputs.Converter.Type type =
-                    org.graylog2.plugin.inputs.Converter.Type.valueOf(converter.getType().toUpperCase(Locale.ENGLISH));
+            final org.graylog2.plugin.inputs.Converter.Type type = converter.getType();
 
             converterDescription.setType(type);
             converterDescription.setConfiguration(converter.getConfig());

@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.beats;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.logging.LoggingHandler;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,8 +86,7 @@ public class BeatsFrameDecoderTest {
         final ByteBuf resultBuffer = channel.readInbound();
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
-        final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
-        });
+        final Map<String, Object> result = objectMapper.readValue(resultBytes, TypeReferences.MAP_STRING_OBJECT);
         assertThat(result)
                 .hasSize(1)
                 .containsEntry("answer", 42);
@@ -127,8 +126,7 @@ public class BeatsFrameDecoderTest {
         final ByteBuf resultBuffer = channel.readInbound();
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
-        final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
-        });
+        final Map<String, Object> result = objectMapper.readValue(resultBytes, TypeReferences.MAP_STRING_OBJECT);
         assertThat(result).isEqualTo(data);
     }
 
@@ -173,8 +171,7 @@ public class BeatsFrameDecoderTest {
         final ByteBuf resultBuffer = channel.readInbound();
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
-        final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
-        });
+        final Map<String, Object> result = objectMapper.readValue(resultBytes, TypeReferences.MAP_STRING_OBJECT);
         assertThat(result)
                 .hasSize(1)
                 .containsEntry("answer", 42);
@@ -229,8 +226,7 @@ public class BeatsFrameDecoderTest {
         for (ByteBuf resultBuffer : received) {
             final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
             resultBuffer.readBytes(resultBytes);
-            final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
-            });
+            final Map<String, Object> result = objectMapper.readValue(resultBytes, TypeReferences.MAP_STRING_OBJECT);
             assertThat(result).isEqualTo(data);
         }
     }

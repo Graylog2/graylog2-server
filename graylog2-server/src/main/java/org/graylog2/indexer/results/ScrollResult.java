@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.results;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -26,6 +25,7 @@ import io.searchbox.core.ClearScroll;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.graylog2.jackson.TypeReferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +37,6 @@ import java.util.stream.StreamSupport;
 
 public class ScrollResult extends IndexQueryResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
-    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
-    };
     private static final String DEFAULT_SCROLL = "1m";
 
     public interface Factory {
@@ -88,7 +86,7 @@ public class ScrollResult extends IndexQueryResult {
             hits = StreamSupport.stream(search.getJsonObject().path("hits").path("hits").spliterator(), false)
                     .map(hit -> ResultMessage.parseFromSource(hit.path("_id").asText(),
                             hit.path("_index").asText(),
-                            objectMapper.convertValue(hit.get("_source"), MAP_TYPE_REFERENCE)))
+                            objectMapper.convertValue(hit.get("_source"), TypeReferences.MAP_STRING_OBJECT)))
                     .collect(Collectors.toList());
         } else {
             // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
