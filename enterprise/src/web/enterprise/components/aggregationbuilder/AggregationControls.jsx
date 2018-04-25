@@ -9,6 +9,7 @@ import ColumnPivotSelect from './ColumnPivotSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import { FieldList } from './AggregationBuilderPropTypes';
+import AggregationWidgetConfig from '../../logic/aggregationbuilder/AggregationWidgetConfig';
 
 export default class AggregationControls extends React.Component {
   static propTypes = {
@@ -33,39 +34,38 @@ export default class AggregationControls extends React.Component {
   constructor(props) {
     super(props);
 
-    const { children, fields, onChange, ...rest } = props;
-    this.state = rest;
+    const { columnPivots, rowPivots, sort, series, visualization } = props;
+    const config = new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization);
+    this.state = { config };
   }
 
   _onColumnPivotChange = (columnPivots) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { columnPivots }));
+    this.setState(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }), this._propagateState);
   };
 
   _onRowPivotChange = (rowPivots) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { rowPivots }));
+    this.setState(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }), this._propagateState);
   };
 
   _onSeriesChange = (series) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { series: series.split(',') }));
+    this.setState(state => ({ config: state.config.toBuilder().series(series.split(',')).build() }), this._propagateState);
   };
 
   _onSortChange = (sort) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { sort: sort.split(',') }));
+    this.setState(state => ({ config: state.config.toBuilder().sort(sort.split(',')).build() }), this._propagateState);
   };
 
   _onVisualizationChange = (visualization) => {
-    this.setState(state => this._mutateStateAndPropagate(state, { visualization: visualization }));
+    this.setState(state => ({ config: state.config.toBuilder().visualization(visualization).build() }), this._propagateState);
   };
 
-  _mutateStateAndPropagate(state, stateDelta) {
-    const newState = Object.assign({}, state, stateDelta);
-    this.props.onChange(newState);
-    return newState;
+  _propagateState() {
+    this.props.onChange(this.state.config);
   }
 
   render() {
     const { children, fields } = this.props;
-    const { columnPivots, rowPivots, series, sort, visualization } = this.state;
+    const { columnPivots, rowPivots, series, sort, visualization } = this.state.config.toObject();
     const formattedFields = fields
       .map(fieldType => fieldType.get('field_name'))
       .map(v => ({ label: v, value: v }))

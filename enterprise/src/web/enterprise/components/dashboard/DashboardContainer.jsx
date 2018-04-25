@@ -76,14 +76,13 @@ const DashboardContainer = createReactClass({
       const result = widgetWithResult.get('result');
       const searchTypes = result.get('searchTypes');
 
-      const widget = Object.assign({}, widgetDef.toJS());
-      const widgetType = widgetDefinition(widget.type);
+      const widgetType = widgetDefinition(widgetDef.type);
       const dataTransformer = widgetType.searchResultTransformer || (x => x);
-      const widgetData = (widgetMapping[widgetDef.get('id')] || []).map(searchTypeId => searchTypes[searchTypeId]);
+      const widgetData = (widgetMapping[widgetDef.id] || []).map(searchTypeId => searchTypes[searchTypeId]);
       if (widgetData) {
-        widgets[widget.id] = widget;
-        data[widget.id] = dataTransformer(widgetData, widgetDef.toJS());
-        if (widget.type === 'messages' && widgetData.fields) {
+        widgets[widgetDef.id] = widgetDef;
+        data[widgetDef.id] = dataTransformer(widgetData, widgetDef.toJSON());
+        if (widgetDef.type === 'messages' && widgetData.fields) {
           fields = new Immutable.Map(widgetData.fields);
         }
       }

@@ -28,7 +28,7 @@ export default class SearchRequest {
       parameters: new Immutable.Set(parameters.valueSeq()).toJS(),
       queries: queries.map((query, id) => {
         const searchTypes = widgets.get(id, new Immutable.Map())
-          .map(widget => widgetDefinition(widget.get('type')).searchTypes(widget.get('config')).map(searchType => Object.assign(searchType, { widgetId: widget.get('id') })))
+          .map(widget => widgetDefinition(widget.type).searchTypes(widget.config).map(searchType => Object.assign(searchType, { widgetId: widget.id })))
           .reduce((acc, cur) => acc.merge(cur), Immutable.Set());
         const filter = _filtersForQuery(filters.get(id, new Immutable.Map()));
         return {

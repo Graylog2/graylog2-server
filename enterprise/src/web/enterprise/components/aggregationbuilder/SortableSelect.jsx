@@ -8,6 +8,7 @@ import { pivotForField } from 'enterprise/logic/searchtypes/aggregation/PivotGen
 import ConfigurablePivot from './ConfigurablePivot';
 
 import styles from './SortableSelect.css';
+import Pivot from '../../logic/aggregationbuilder/Pivot';
 
 const _onChange = (fields, newValue, onChange) => {
   const newFields = newValue.map(v => v.value);
@@ -26,11 +27,11 @@ const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
   onChange(newItems.join(','));
 };
 
-const configFor = ({ value }, values) => values.find(({ field }) => field === value).config;
+const configFor = ({ value }, values) => value === '' ? {} : values.find(({ field }) => field === value).config;
 const newPivotConfigChange = (values, value, newPivotConfig, onChange) => {
   const newValues = values.map((pivot) => {
     if (pivot.field === value.value) {
-      return Object.assign({}, pivot, newPivotConfig);
+      return new Pivot(pivot.field, pivot.type, newPivotConfig.config);
     }
     return pivot;
   });

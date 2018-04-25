@@ -1,8 +1,10 @@
+import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
+
 export const pivotForField = (fieldName) => {
   switch (fieldName) {
     case 'timestamp':
-      return { field: fieldName, type: 'time', config: { interval: { value: 1, unit: 'minutes' } } };
+      return new Pivot(fieldName, 'time', { interval: { value: 1, unit: 'minutes' } });
     default:
-      return { field: fieldName, type: 'values', config: {} };
+      return new Pivot(fieldName, 'values');
   }
 };

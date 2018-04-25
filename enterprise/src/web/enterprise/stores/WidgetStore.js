@@ -33,7 +33,7 @@ export default Reflux.createStore({
     if (widget.id === undefined) {
       throw new Error('Unable to add widget without id to query.');
     }
-    this.widgets = this.widgets.setIn([viewId, queryId, widget.id], new Immutable.Map(widget));
+    this.widgets = this.widgets.setIn([viewId, queryId, widget.id], widget);
     this._trigger();
   },
   duplicate(viewId, queryId, widgetId) {
@@ -41,8 +41,8 @@ export default Reflux.createStore({
     if (!widget) {
       throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
     }
-    const duplicatedWidget = widget.set('id', uuid());
-    this.widgets = this.widgets.setIn([viewId, queryId, duplicatedWidget.get('id')], duplicatedWidget);
+    const duplicatedWidget = widget.duplicate(uuid());
+    this.widgets = this.widgets.setIn([viewId, queryId, duplicatedWidget.id], duplicatedWidget);
     this._trigger();
     return duplicatedWidget;
   },
@@ -59,7 +59,7 @@ export default Reflux.createStore({
     this._trigger();
   },
   updateConfig(viewId, queryId, widgetId, config) {
-    this.widgets = this.widgets.setIn([viewId, queryId, widgetId, 'config'], config);
+    this.widgets = this.widgets.updateIn([viewId, queryId, widgetId], widget => widget.toBuilder().config(config).build());
     this._trigger();
   },
   _trigger() {

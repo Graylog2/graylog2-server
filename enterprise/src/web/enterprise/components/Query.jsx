@@ -25,14 +25,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, queryId
   const widgets = {};
   const data = {};
 
-  widgetDefs.forEach((widgetDef) => {
-    const widget = Object.assign({}, widgetDef.toJS());
+  widgetDefs.forEach((widget) => {
     const widgetType = widgetDefinition(widget.type);
     const dataTransformer = widgetType.searchResultTransformer || (x => x);
-    const widgetData = (widgetMapping[widgetDef.get('id')] || []).map(searchTypeId => searchTypes[searchTypeId]);
+    const widgetData = (widgetMapping[widget.id] || []).map(searchTypeId => searchTypes[searchTypeId]);
     if (widgetData) {
       widgets[widget.id] = widget;
-      data[widget.id] = dataTransformer(widgetData, widgetDef.toJS());
+      data[widget.id] = dataTransformer(widgetData, widget);
     }
   });
   const positions = view.get('positions')[queryId];

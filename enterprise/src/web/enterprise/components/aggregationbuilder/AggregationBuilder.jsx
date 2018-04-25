@@ -38,7 +38,7 @@ export default class AggregationBuilder extends React.Component {
       </FullSizeContainer>
     );
     const content = this.props.editing ? (
-      <AggregationControls fields={fields} onChange={onChange} {...config}>
+      <AggregationControls fields={fields} onChange={onChange} {...config.toObject()}>
         {children}
       </AggregationControls>
     ) : children;

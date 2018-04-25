@@ -15,7 +15,7 @@ const ViewActions = Reflux.createActions({
 const mutateWidgets = (widgets, widgetFilters) => {
   return widgets.map((widget) => {
     const newWidgetConfig = {};
-    const config = widget.get('config');
+    const config = widget.config;
     Object.keys(config).forEach((widgetConfigKey) => {
       const newWidgetConfigKey = widgetConfigKey.replace(/([A-Z])/g, (_, wordStart) => `_${wordStart.toLowerCase()}`);
       newWidgetConfig[newWidgetConfigKey] = config[widgetConfigKey];
@@ -23,7 +23,7 @@ const mutateWidgets = (widgets, widgetFilters) => {
     const cleanedWidget = widget.delete('title')
       .delete('computationTimeRange')
       .update('type', type => type.toLowerCase());
-    const filter = widgetFilters.get(widget.get('id'));
+    const filter = widgetFilters.get(widget.id);
     const finalWidget = filter ? cleanedWidget.set('filter', filter) : cleanedWidget;
     return Object.assign({}, finalWidget.toJS(), { config: newWidgetConfig });
   });
@@ -52,7 +52,7 @@ const _prepareViewRequest = (id, currentViewStore, view, widgets, dashboardWidge
   const { search_id } = search.result.result;
   const state = widgets.map((queryWidgets, queryId) => {
     return {
-      widgets: mutateWidgets(queryWidgets.valueSeq(), widgetFilters).toJS(),
+      widgets: queryWidgets.valueSeq(),
       positions: positions[queryId] || {},
       widget_mapping: widgetMapping.filter((_, widgetId) => queryWidgets.has(widgetId)).toJS(),
       selected_fields: fields.get(queryId, Immutable.List()).toJS(),

@@ -10,14 +10,19 @@ import TitlesActions from 'enterprise/actions/TitlesActions';
 import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
 import WidgetFilterActions from '../../actions/WidgetFilterActions';
 import QueryFiltersActions from '../../actions/QueryFiltersActions';
+import AggregationWidget from '../aggregationbuilder/AggregationWidget';
+import MessagesWidget from '../aggregationbuilder/MessagesWidget';
+import Widget from '../aggregationbuilder/Widget';
 
-const mutateWidgetKeys = (widget) => {
-  const newWidget = Object.assign({}, widget, { config: {} });
-  Object.keys(widget.config).forEach((widgetConfigKey) => {
-    const newWidgetConfigKey = widgetConfigKey.replace(/_(\w)/g, (_, wordStart) => wordStart.toUpperCase());
-    newWidget.config[newWidgetConfigKey] = widget.config[widgetConfigKey];
-  });
-  return newWidget;
+const deserializeWidget = (value) => {
+  switch (value.type) {
+    case 'aggregation':
+      return AggregationWidget.fromJSON(value);
+    case 'messages':
+      return MessagesWidget.fromJSON(value);
+    default:
+      return Widget.fromJSON(value);
+  }
 };
 
 export default class ViewDeserializer {
@@ -79,7 +84,7 @@ export default class ViewDeserializer {
         Object.keys(viewState).forEach((queryId) => {
           const widgets = {};
           viewState[queryId].widgets.forEach((widget) => {
-            widgets[widget.id] = new Immutable.Map(mutateWidgetKeys(widget));
+            widgets[widget.id] = deserializeWidget(widget);
             if (widget.filter) {
               WidgetFilterActions.change(widget.id, widget.filter);
             }

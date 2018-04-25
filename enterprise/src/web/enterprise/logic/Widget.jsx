@@ -1,5 +1,9 @@
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { pivotForField } from './searchtypes/aggregation/PivotGenerator';
+import AggregationWidget from './aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';
+import Widget from './aggregationbuilder/Widget';
+import MessagesWidgetConfig from './aggregationbuilder/MessagesWidgetConfig';
 
 const widgetsKey = 'enterpriseWidgets';
 
@@ -9,32 +13,22 @@ export function widgetDefinition(type) {
 }
 
 export const messageList = (id, fields = []) => {
-  return {
-    id: id,
-    type: 'messages',
-    config: {
-      fields: fields,
-      showMessageRow: true,
-    },
-  };
+  return new Widget(id, 'messages', new MessagesWidgetConfig(fields, true));
 };
 
 export const resultHistogram = (id) => {
-  return {
-    id: id,
-    type: 'AGGREGATION',
-    config: {
-      rowPivots: [
-        pivotForField('timestamp'),
-      ],
-      series: [
-        'count()',
-      ],
-      columnPivots: [],
-      sort: [],
-      visualization: 'bar',
-    },
+  const config = {
+    rowPivots: [
+      pivotForField('timestamp'),
+    ],
+    series: [
+      'count()',
+    ],
+    columnPivots: [],
+    sort: [],
+    visualization: 'bar',
   };
+  return new AggregationWidget(id, new AggregationWidgetConfig(config.columnPivots, config.rowPivots, config.series, config.sort, config.visualization));
 };
 
 const createWidgetDefinitions = (timeRange, fields) => {
