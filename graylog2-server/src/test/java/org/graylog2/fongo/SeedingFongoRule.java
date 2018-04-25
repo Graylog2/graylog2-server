@@ -16,7 +16,6 @@
  */
 package org.graylog2.fongo;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fakemongo.junit.FongoRule;
 import com.google.common.io.Resources;
@@ -25,6 +24,7 @@ import org.bson.Document;
 import org.bson.json.JsonWriterSettings;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionForTests;
+import org.graylog2.jackson.TypeReferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +50,6 @@ import java.util.Map;
  */
 public class SeedingFongoRule extends FongoRule {
     private static final Logger LOG = LoggerFactory.getLogger(SeedingFongoRule.class);
-
-    private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {
-    };
 
     private final List<String> seeds = new ArrayList<>();
     private final String dbName;
@@ -95,7 +92,7 @@ public class SeedingFongoRule extends FongoRule {
                 .indent(true)
                 .build();
         final byte[] bytes = Resources.toByteArray(Resources.getResource(seed));
-        final Map<String, Object> map = objectMapper.readValue(bytes, MAP_TYPE);
+        final Map<String, Object> map = objectMapper.readValue(bytes, TypeReferences.MAP_STRING_OBJECT);
 
         for (String collectionName : map.keySet()) {
             @SuppressWarnings("unchecked")

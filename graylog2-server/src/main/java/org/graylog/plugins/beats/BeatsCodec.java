@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.beats;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -59,8 +59,7 @@ public class BeatsCodec extends AbstractCodec {
         final byte[] payload = rawMessage.getPayload();
         final Map<String, Object> event;
         try {
-            event = objectMapper.readValue(payload, new TypeReference<Map<String, Object>>() {
-            });
+            event = objectMapper.readValue(payload, TypeReferences.MAP_STRING_OBJECT);
         } catch (IOException e) {
             LOG.error("Couldn't decode raw message {}", rawMessage);
             return null;

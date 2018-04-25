@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indices;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -48,6 +47,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -292,8 +292,7 @@ public class IndicesIT extends ElasticsearchBase {
 
             final JsonNode beforeTemplate = getTemplate(templateName);
             final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
-            final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, new TypeReference<Map<String, Object>>() {
-            });
+            final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, TypeReferences.MAP_STRING_OBJECT);
             assertThat(actualMapping).isEqualTo(beforeMapping);
 
             indices.create("index_template_test", indexSet);
@@ -305,8 +304,7 @@ public class IndicesIT extends ElasticsearchBase {
             assertThat(actualAfterMapping).hasSize(1);
             assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
 
-            final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, new TypeReference<Map<String, Object>>() {
-            });
+            final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
             final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
             assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
         } finally {
