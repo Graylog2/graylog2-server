@@ -14,6 +14,7 @@ const VisualizationTypeSelect = ({ onChange, value }) => {
     <Select placeholder="Visualization type"
             options={visualizationTypes}
             onChange={onChange}
+            clearable={false}
             value={value} />
   );
 };
