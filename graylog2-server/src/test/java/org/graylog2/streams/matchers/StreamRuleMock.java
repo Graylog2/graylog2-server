@@ -45,6 +45,7 @@ public class StreamRuleMock implements StreamRule {
         this.inverted = (Boolean) rule.get(StreamRuleImpl.FIELD_INVERTED);
         this.contentPack = (String) rule.get(StreamRuleImpl.FIELD_CONTENT_PACK);
         this.streamId = (String) rule.get(StreamRuleImpl.FIELD_STREAM_ID);
+        this.description = (String) rule.get(StreamRuleImpl.FIELD_DESCRIPTION);
     }
 
     @Override
