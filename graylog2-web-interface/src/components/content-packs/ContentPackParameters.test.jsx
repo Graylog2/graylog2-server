@@ -19,7 +19,7 @@ describe('<ContentPackParameters />', () => {
     const entity = {
       id: '111-beef',
       v: '1.0',
-      data: { name: 'Input', title: 'A good input', configuration: { listen_address: '1.2.3.4', port: '23'} },
+      data: { name: 'Input', title: 'A good input', configuration: { listen_address: '1.2.3.4', port: '23' } },
     };
     const contentPack = {
       parameters: [{
@@ -92,5 +92,58 @@ describe('<ContentPackParameters />', () => {
     wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
     wrapper.find('form').at(0).simulate('submit');
     expect(changeFn.mock.calls.length).toBe(0);
+  });
+
+  describe('validation', () => {
+    let wrapper;
+
+    beforeEach(() => {
+      const contentPack = {
+        parameters: [],
+        entities: [],
+      };
+
+      wrapper = mount(<ContentPackParameters contentPack={contentPack} />);
+      wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
+      wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
+      wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
+    });
+
+    afterEach(() => {
+      wrapper = undefined;
+    });
+
+    it('should validate the parameter input from type double', () => {
+      wrapper.find('select#type').simulate('change', { target: { name: 'type', value: 'double' } });
+      wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual('This is not a double value.');
+      wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: '1.0' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(4).text())
+        .toEqual('Give a default value if the parameter is not optional.');
+    });
+
+    it('should validate the parameter input from type double', () => {
+      wrapper.find('select#type').simulate('change', { target: { name: 'type', value: 'integer' } });
+      wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual('This is not an integer value.');
+      wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: '1' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(4).text())
+        .toEqual('Give a default value if the parameter is not optional.');
+    });
+
+    it('should validate the parameter input from type double', () => {
+      wrapper.find('select#type').simulate('change', { target: { name: 'type', value: 'boolean' } });
+      wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual('This is not a boolean value. It must be either true or false.');
+      wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'true' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(4).text())
+        .toEqual('Give a default value if the parameter is not optional.');
+    });
   });
 });
