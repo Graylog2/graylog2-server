@@ -81,10 +81,11 @@ class EditPatternModal extends React.Component {
   };
 
   _testPattern = () => {
-    if (this.props.name === '' || this.props.pattern === '') {
-      this.setState({error: true, error_message: 'To test the pattern a name and a pattern must be given!' });
+    if (this.state.name === '' || this.state.pattern === '') {
+      this.setState({ error: true, error_message: 'To test the pattern a name and a pattern must be given!' });
+      return;
     } else {
-      this.setState({error: false, error_message: '' });
+      this.setState({ error: false, error_message: '' });
     }
     this.props.testPattern(this.state, (response) => {
       this.setState({ test_result: JSON.stringify(response, null, 2) });
