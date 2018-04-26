@@ -134,11 +134,13 @@ class ContentPackParameters extends React.Component {
     );
 
     const disableBtn = this.props.contentPack.parameters.length <= 0;
+    const appliedParameterCount = (this.props.appliedParameter[entity.id] || []).length;
     return (
       <tr key={entity.data.title}>
         <td>{entity.data.title}</td>
         <td>{entity.type}</td>
         <td>{entity.data.description || entity.data.name}</td>
+        <td>{appliedParameterCount}</td>
         <td>
           <Button bsStyle="primary"
                   bsSize="small"
@@ -305,12 +307,12 @@ class ContentPackParameters extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1} sm={8}>
+          <Col smOffset={1} sm={9}>
             <h2>Entity list</h2>
             <br />
             <DataTable
               id="entity-list"
-              headers={['Title', 'Type', 'Description', 'Action']}
+              headers={['Title', 'Type', 'Description', 'Applied Parameter', 'Action']}
               sortByKey="type"
               filterKeys={[]}
               rows={this.props.contentPack.entities}
