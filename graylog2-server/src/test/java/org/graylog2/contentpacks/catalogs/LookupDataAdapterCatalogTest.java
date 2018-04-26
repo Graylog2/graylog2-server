@@ -23,7 +23,6 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.codecs.LookupDataAdapterCodec;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -61,12 +60,6 @@ public class LookupDataAdapterCatalogTest {
         final LookupDataAdapterCodec codec = new LookupDataAdapterCodec(objectMapper, dataAdapterService);
 
         catalog = new LookupDataAdapterCatalog(dataAdapterService, codec);
-    }
-
-    @Test
-    public void supports() {
-        assertThat(catalog.supports(ModelType.of("foobar"))).isFalse();
-        assertThat(catalog.supports(ModelType.of("lookup_adapter"))).isTrue();
     }
 
     @Test

@@ -23,7 +23,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.contentpacks.codecs.DashboardCodec;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -73,12 +72,6 @@ public class DashboardCatalogTest {
         final DashboardCodec codec = new DashboardCodec(objectMapper, dashboardService, widgetCreator, timeRangeFactory);
 
         catalog = new DashboardCatalog(dashboardService, codec);
-    }
-
-    @Test
-    public void supports() {
-        assertThat(catalog.supports(ModelType.of("foobar"))).isFalse();
-        assertThat(catalog.supports(ModelType.of("dashboard"))).isTrue();
     }
 
     @Test

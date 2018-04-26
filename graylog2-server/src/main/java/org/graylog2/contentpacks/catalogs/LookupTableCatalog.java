@@ -16,7 +16,10 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.codecs.LookupTableCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -46,11 +49,6 @@ public class LookupTableCatalog implements EntityCatalog {
     }
 
     @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
-    }
-
-    @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return lookupTableService.findAll().stream()
                 .map(codec::createExcerpt)
@@ -64,19 +62,20 @@ public class LookupTableCatalog implements EntityCatalog {
     }
 
     @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
         final ModelId modelId = entityDescriptor.id();
         final Optional<LookupTableDto> lookupTableDto = lookupTableService.get(modelId.id());
 
-        final ImmutableSet.Builder<EntityDescriptor> dependencies = ImmutableSet.<EntityDescriptor>builder();
-
         lookupTableDto.map(LookupTableDto::dataAdapterId)
                 .map(dataAdapterId -> EntityDescriptor.create(ModelId.of(dataAdapterId), ModelTypes.LOOKUP_ADAPTER))
-                .ifPresent(dependencies::add);
+                .ifPresent(dataAdapter -> mutableGraph.putEdge(entityDescriptor, dataAdapter));
         lookupTableDto.map(LookupTableDto::cacheId)
                 .map(cacheId -> EntityDescriptor.create(ModelId.of(cacheId), ModelTypes.LOOKUP_CACHE))
-                .ifPresent(dependencies::add);
+                .ifPresent(cache -> mutableGraph.putEdge(entityDescriptor, cache));
 
-        return dependencies.build();
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }

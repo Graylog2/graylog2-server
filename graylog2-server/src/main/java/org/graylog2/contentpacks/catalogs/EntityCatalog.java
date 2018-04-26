@@ -16,7 +16,10 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.model.ModelType;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -25,11 +28,13 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EntityCatalog {
-    boolean supports(ModelType modelType);
-
     Set<EntityExcerpt> listEntityExcerpts();
 
     Optional<Entity> collectEntity(EntityDescriptor entityDescriptor);
 
-    Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor);
+    default Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
 }

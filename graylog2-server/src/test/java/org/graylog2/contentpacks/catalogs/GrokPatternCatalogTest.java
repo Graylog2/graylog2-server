@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.graylog2.contentpacks.codecs.GrokPatternCodec;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -49,12 +48,6 @@ public class GrokPatternCatalogTest {
         grokPatternService = new InMemoryGrokPatternService();
         final GrokPatternCodec codec = new GrokPatternCodec(objectMapper, grokPatternService);
         catalog = new GrokPatternCatalog(grokPatternService, codec);
-    }
-
-    @Test
-    public void supports() {
-        assertThat(catalog.supports(ModelType.of("foobar"))).isFalse();
-        assertThat(catalog.supports(ModelType.of("grok_pattern"))).isTrue();
     }
 
     @Test

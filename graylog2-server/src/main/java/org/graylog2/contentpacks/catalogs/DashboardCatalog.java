@@ -26,14 +26,17 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.database.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DashboardCatalog implements EntityCatalog {
+    private static final Logger LOG = LoggerFactory.getLogger(DashboardCatalog.class);
+
     public static final ModelType TYPE = ModelTypes.DASHBOARD;
 
     private final DashboardService dashboardService;
@@ -44,11 +47,6 @@ public class DashboardCatalog implements EntityCatalog {
                             DashboardCodec codec) {
         this.dashboardService = dashboardService;
         this.codec = codec;
-    }
-
-    @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
     }
 
     @Override
@@ -65,12 +63,8 @@ public class DashboardCatalog implements EntityCatalog {
             final Dashboard dashboard = dashboardService.load(modelId.id());
             return Optional.of(codec.encode(dashboard));
         } catch (NotFoundException e) {
+            LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
             return Optional.empty();
         }
-    }
-
-    @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
-        return Collections.emptySet();
     }
 }

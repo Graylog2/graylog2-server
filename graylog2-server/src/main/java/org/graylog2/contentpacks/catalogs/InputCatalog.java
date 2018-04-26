@@ -29,7 +29,6 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,11 +44,6 @@ public class InputCatalog implements EntityCatalog {
                         InputCodec codec) {
         this.inputService = inputService;
         this.codec = codec;
-    }
-
-    @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
     }
 
     @Override
@@ -71,10 +65,5 @@ public class InputCatalog implements EntityCatalog {
         } catch (NotFoundException e) {
             return Optional.empty();
         }
-    }
-
-    @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
-        return Collections.emptySet();
     }
 }

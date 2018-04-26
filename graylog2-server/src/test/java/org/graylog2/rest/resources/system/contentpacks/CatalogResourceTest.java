@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.catalogs.CatalogIndex;
 import org.graylog2.contentpacks.catalogs.EntityCatalog;
 import org.graylog2.contentpacks.model.ModelId;
@@ -88,7 +90,9 @@ public class CatalogResourceTest {
                 .id(ModelId.of("1234567890"))
                 .type(ModelType.of("test"))
                 .build();
-        final ImmutableSet<EntityDescriptor> entityDescriptors = ImmutableSet.of(entityDescriptor);
+        final MutableGraph<EntityDescriptor> entityDescriptors = GraphBuilder.directed().build();
+        entityDescriptors.addNode(entityDescriptor);
+
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of("1234567890"))
                 .type(ModelType.of("test"))
@@ -97,7 +101,7 @@ public class CatalogResourceTest {
         when(mockEntityCatalog.resolve(entityDescriptor)).thenReturn(entityDescriptors);
         when(mockEntityCatalog.collectEntity(entityDescriptor)).thenReturn(Optional.of(entity));
 
-        final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors);
+        final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 
         final CatalogResolveResponse catalogResolveResponse = catalogResource.resolveEntities(request);
 

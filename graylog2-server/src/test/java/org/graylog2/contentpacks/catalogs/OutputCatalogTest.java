@@ -23,7 +23,6 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.codecs.OutputCodec;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -74,12 +73,6 @@ public class OutputCatalogTest {
         final OutputCodec codec = new OutputCodec(objectMapper, outputService);
 
         catalog = new OutputCatalog(outputService, codec);
-    }
-
-    @Test
-    public void supports() {
-        assertThat(catalog.supports(ModelType.of("foobar"))).isFalse();
-        assertThat(catalog.supports(ModelType.of("output"))).isTrue();
     }
 
     @Test
