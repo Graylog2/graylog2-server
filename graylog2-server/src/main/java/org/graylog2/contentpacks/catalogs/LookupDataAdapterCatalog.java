@@ -26,7 +26,6 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.lookup.db.DBDataAdapterService;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,11 +44,6 @@ public class LookupDataAdapterCatalog implements EntityCatalog {
     }
 
     @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
-    }
-
-    @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return dataAdapterService.findAll().stream()
                 .map(codec::createExcerpt)
@@ -60,10 +54,5 @@ public class LookupDataAdapterCatalog implements EntityCatalog {
     public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         return dataAdapterService.get(modelId.id()).map(codec::encode);
-    }
-
-    @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
-        return Collections.emptySet();
     }
 }

@@ -23,7 +23,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.contentpacks.codecs.InputCodec;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -92,12 +91,6 @@ public class InputCatalogTest {
         final InputCodec codec = new InputCodec(objectMapper, inputService, inputRegistry, messageInputFactory, extractorFactory, converterFactory, serverStatus);
 
         catalog = new InputCatalog(inputService, codec);
-    }
-
-    @Test
-    public void supports() {
-        assertThat(catalog.supports(ModelType.of("foobar"))).isFalse();
-        assertThat(catalog.supports(ModelType.of("input"))).isTrue();
     }
 
     @Test

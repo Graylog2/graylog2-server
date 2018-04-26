@@ -26,14 +26,17 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GrokPatternCatalog implements EntityCatalog {
+    private static final Logger LOG = LoggerFactory.getLogger(GrokPatternCatalog.class);
+
     public static final ModelType TYPE = ModelTypes.GROK_PATTERN;
 
     private final GrokPatternService grokPatternService;
@@ -44,11 +47,6 @@ public class GrokPatternCatalog implements EntityCatalog {
                               GrokPatternCodec codec) {
         this.grokPatternService = grokPatternService;
         this.codec = codec;
-    }
-
-    @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
     }
 
     @Override
@@ -65,12 +63,8 @@ public class GrokPatternCatalog implements EntityCatalog {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
             return Optional.of(codec.encode(grokPattern));
         } catch (NotFoundException e) {
+            LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
             return Optional.empty();
         }
-    }
-
-    @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
-        return Collections.emptySet();
     }
 }

@@ -17,10 +17,16 @@
 package org.graylog2.contentpacks.catalogs;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.ElementOrder;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -29,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class CatalogIndex {
+    private static final Logger LOG = LoggerFactory.getLogger(CatalogIndex.class);
+
     private final Map<ModelType, EntityCatalog> catalogs;
 
     @Inject
@@ -43,27 +51,49 @@ public class CatalogIndex {
     }
 
     public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
-        final Set<EntityDescriptor> resolvableEntities = new HashSet<>(unresolvedEntities);
-        final Set<EntityDescriptor> resolvedEntities = new HashSet<>();
+        final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
+                .allowsSelfLoops(false)
+                .nodeOrder(ElementOrder.insertion())
+                .build();
+        unresolvedEntities.forEach(dependencyGraph::addNode);
 
-        while (!resolvableEntities.isEmpty()) {
-            for (EntityDescriptor entityDescriptor : resolvableEntities) {
-                final EntityCatalog catalog = catalogs.get(entityDescriptor.type());
-                final Set<EntityDescriptor> resolutionResult = catalog.resolve(entityDescriptor);
-                resolvableEntities.addAll(resolutionResult);
-                resolvedEntities.add(entityDescriptor);
+        final HashSet<EntityDescriptor> resolvedEntities = new HashSet<>();
+        resolveDependencyGraph(dependencyGraph, resolvedEntities);
+
+        LOG.debug("Final dependency graph: {}", dependencyGraph);
+
+        return dependencyGraph.nodes();
+    }
+
+    private void resolveDependencyGraph(MutableGraph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
+        for (EntityDescriptor entityDescriptor : dependencyGraph.nodes()) {
+            LOG.debug("Resolving entity {}", entityDescriptor);
+            if (resolvedEntities.contains(entityDescriptor)) {
+                LOG.debug("Entity {} already resolved, skipping.", entityDescriptor);
+                continue;
             }
 
-            resolvableEntities.removeAll(resolvedEntities);
-        }
+            final EntityCatalog catalog = catalogs.getOrDefault(entityDescriptor.type(), UnsupportedEntityCatalog.INSTANCE);
+            final Graph<EntityDescriptor> graph = catalog.resolve(entityDescriptor);
+            LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
 
-        return resolvedEntities;
+            mergeGraphs(dependencyGraph, graph);
+            LOG.trace("New dependency graph: {}", dependencyGraph);
+
+            resolvedEntities.add(entityDescriptor);
+            resolveDependencyGraph(dependencyGraph, resolvedEntities);
+        }
+    }
+
+    private void mergeGraphs(MutableGraph<EntityDescriptor> g1, Graph<EntityDescriptor> g2) {
+        LOG.trace("Merging {} with {}", g1, g2);
+        g2.edges().forEach(edge -> g1.putEdge(edge.nodeU(), edge.nodeV()));
     }
 
     public Set<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
         final ImmutableSet.Builder<Entity> resultBuilder = ImmutableSet.builder();
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            final EntityCatalog catalog = catalogs.get(entityDescriptor.type());
+            final EntityCatalog catalog = catalogs.getOrDefault(entityDescriptor.type(), UnsupportedEntityCatalog.INSTANCE);
 
             catalog.collectEntity(entityDescriptor).ifPresent(resultBuilder::add);
         }

@@ -16,43 +16,37 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
-import org.graylog2.contentpacks.codecs.LookupCacheCodec;
-import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.ModelTypes;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-import org.graylog2.lookup.db.DBCacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class LookupCacheCatalog implements EntityCatalog {
-    public static final ModelType TYPE = ModelTypes.LOOKUP_CACHE;
+public class UnsupportedEntityCatalog implements EntityCatalog {
+    private static final Logger LOG = LoggerFactory.getLogger(UnsupportedEntityCatalog.class);
 
-    private final DBCacheService cacheService;
-    private final LookupCacheCodec codec;
-
-    @Inject
-    public LookupCacheCatalog(DBCacheService cacheService,
-                              LookupCacheCodec codec) {
-        this.cacheService = cacheService;
-        this.codec = codec;
-    }
+    public static final UnsupportedEntityCatalog INSTANCE = new UnsupportedEntityCatalog();
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return cacheService.findAll().stream()
-                .map(codec::createExcerpt)
-                .collect(Collectors.toSet());
+        return Collections.emptySet();
     }
 
     @Override
     public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
-        final ModelId modelId = entityDescriptor.id();
-        return cacheService.get(modelId.id()).map(codec::encode);
+        LOG.warn("Couldn't collect entity {}", entityDescriptor);
+        return Optional.empty();
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        LOG.warn("Couldn't resolve entity {}", entityDescriptor);
+        return GraphBuilder.directed().build();
     }
 }

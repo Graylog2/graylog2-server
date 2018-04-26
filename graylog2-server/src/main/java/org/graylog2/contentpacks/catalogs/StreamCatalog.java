@@ -16,6 +16,10 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.codecs.StreamCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -27,14 +31,17 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StreamCatalog implements EntityCatalog {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamCatalog.class);
+
     public static final ModelType TYPE = ModelTypes.STREAM;
 
     private final StreamService streamService;
@@ -45,11 +52,6 @@ public class StreamCatalog implements EntityCatalog {
                          StreamCodec codec) {
         this.streamService = streamService;
         this.codec = codec;
-    }
-
-    @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
     }
 
     @Override
@@ -66,22 +68,28 @@ public class StreamCatalog implements EntityCatalog {
             final Stream stream = streamService.load(modelId.id());
             return Optional.of(codec.encode(stream));
         } catch (NotFoundException e) {
+            LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();
         }
     }
 
     @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            return stream.getOutputs().stream()
+            stream.getOutputs().stream()
                     .map(Output::getId)
                     .map(ModelId::of)
                     .map(id -> EntityDescriptor.create(id, ModelTypes.OUTPUT))
-                    .collect(Collectors.toSet());
+                    .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));
         } catch (NotFoundException e) {
-            return Collections.emptySet();
+            LOG.debug("Couldn't find stream {}", entityDescriptor, e);
         }
+
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }

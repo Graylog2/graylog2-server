@@ -24,7 +24,6 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.codecs.StreamCodec;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -109,12 +108,6 @@ public class StreamCatalogTest {
         );
 
         catalog = new StreamCatalog(streamService, codec);
-    }
-
-    @Test
-    public void supports() {
-        assertThat(catalog.supports(ModelType.of("foobar"))).isFalse();
-        assertThat(catalog.supports(ModelType.of("stream"))).isTrue();
     }
 
     @Test

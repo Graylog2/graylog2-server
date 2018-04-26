@@ -26,14 +26,17 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.streams.OutputService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OutputCatalog implements EntityCatalog {
+    private static final Logger LOG = LoggerFactory.getLogger(OutputCatalog.class);
+
     public static final ModelType TYPE = ModelTypes.OUTPUT;
 
     private final OutputService outputService;
@@ -44,11 +47,6 @@ public class OutputCatalog implements EntityCatalog {
                          OutputCodec codec) {
         this.outputService = outputService;
         this.codec = codec;
-    }
-
-    @Override
-    public boolean supports(ModelType modelType) {
-        return TYPE.equals(modelType);
     }
 
     @Override
@@ -65,12 +63,8 @@ public class OutputCatalog implements EntityCatalog {
             final Output output = outputService.load(modelId.id());
             return Optional.of(codec.encode(output));
         } catch (NotFoundException e) {
+            LOG.debug("Couldn't find output {}", entityDescriptor, e);
             return Optional.empty();
         }
-    }
-
-    @Override
-    public Set<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
-        return Collections.emptySet();
     }
 }
