@@ -10,7 +10,7 @@ class EditPatternModal extends React.Component {
     name: PropTypes.string,
     pattern: PropTypes.string,
     create: PropTypes.bool,
-    sample_data: PropTypes.string,
+    sampleData: PropTypes.string,
     savePattern: PropTypes.func.isRequired,
     testPattern: PropTypes.func,
     validPatternName: PropTypes.func.isRequired,
@@ -21,7 +21,7 @@ class EditPatternModal extends React.Component {
     name: '',
     pattern: '',
     create: false,
-    sample_data: '',
+    sampleData: '',
     testPattern: () => {},
   };
 
@@ -29,7 +29,7 @@ class EditPatternModal extends React.Component {
     id: this.props.id,
     name: this.props.name,
     pattern: this.props.pattern,
-    sample_data: this.props.sample_data,
+    sampleData: this.props.sampleData,
     test_result: '',
     error: false,
     error_message: '',
@@ -54,7 +54,7 @@ class EditPatternModal extends React.Component {
   };
 
   _onSampleDataChange = (event) => {
-    this.setState({ sample_data: event.target.value });
+    this.setState({ sampleData: event.target.value });
   };
 
   _getId = (prefixIdName) => {
@@ -68,7 +68,7 @@ class EditPatternModal extends React.Component {
   _saved = () => {
     this._closeModal();
     if (this.props.create) {
-      this.setState({ name: '', pattern: '', sample_data: '', test_result: '' });
+      this.setState({ name: '', pattern: '', sampleData: '', test_result: '' });
     }
   };
 
@@ -81,6 +81,11 @@ class EditPatternModal extends React.Component {
   };
 
   _testPattern = () => {
+    if (this.props.name === '' || this.props.pattern === '') {
+      this.setState({error: true, error_message: 'To test the pattern a name and a pattern must be given!' });
+    } else {
+      this.setState({error: false, error_message: '' });
+    }
     this.props.testPattern(this.state, (response) => {
       this.setState({ test_result: JSON.stringify(response, null, 2) });
     });
@@ -120,11 +125,11 @@ class EditPatternModal extends React.Component {
                    value={this.state.pattern}
                    required />
             <Input type="textarea"
-                   id={this._getId('sample_data')}
+                   id={this._getId('sampleData')}
                    label="Sample Data"
                    help="Here you can add sample data to test your pattern"
                    onChange={this._onSampleDataChange}
-                   value={this.state.sample_data} />
+                   value={this.state.sampleData} />
             <Button bsStyle="info" onClick={this._testPattern}>Test with Sample Data</Button>
             <br />
             <br />

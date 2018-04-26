@@ -14,7 +14,7 @@ interface GrokPattern {
 interface GrokPatternTest {
   name: string,
   pattern: string,
-  sample_data: string,
+  sampleData: string,
 }
 
 const GrokPatternsStore = {
@@ -54,7 +54,7 @@ const GrokPatternsStore = {
         name: pattern.name,
         pattern: pattern.pattern
       },
-      sample_data: pattern.sample_data
+      sampleData: pattern.sampleData
     };
 
     fetchDefault('POST', URLUtils.qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)

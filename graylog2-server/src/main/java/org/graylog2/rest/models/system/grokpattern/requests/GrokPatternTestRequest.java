@@ -36,7 +36,7 @@ public abstract class GrokPatternTestRequest {
 
     @JsonCreator
     public static GrokPatternTestRequest create(@JsonProperty("grok_pattern") GrokPattern grokPattern,
-                                         @JsonProperty("sample_data") String sampleData) {
+                                         @JsonProperty("sampleData") String sampleData) {
        return new AutoValue_GrokPatternTestRequest(grokPattern, sampleData);
     }
 }
