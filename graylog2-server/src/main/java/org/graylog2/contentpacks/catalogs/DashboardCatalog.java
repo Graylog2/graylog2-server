@@ -16,6 +16,10 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.codecs.DashboardCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -25,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +38,8 @@ import javax.inject.Inject;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class DashboardCatalog implements EntityCatalog {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardCatalog.class);
@@ -66,5 +73,29 @@ public class DashboardCatalog implements EntityCatalog {
             LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
+        final ModelId modelId = entityDescriptor.id();
+        try {
+            final Dashboard dashboard = dashboardService.load(modelId.id());
+            for (DashboardWidget widget : dashboard.getWidgets().values()) {
+                final String streamId = (String) widget.getConfig().get("stream_id");
+                if (!isNullOrEmpty(streamId)) {
+                    LOG.debug("Adding stream <{}> as dependency of widget <{}> on dashboard <{}>",
+                            streamId, widget.getId(), dashboard.getId());
+                    final EntityDescriptor stream = EntityDescriptor.create(ModelId.of(streamId), ModelTypes.STREAM);
+                    mutableGraph.putEdge(entityDescriptor, stream);
+                }
+            }
+        } catch (NotFoundException e) {
+            LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
+        }
+
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }

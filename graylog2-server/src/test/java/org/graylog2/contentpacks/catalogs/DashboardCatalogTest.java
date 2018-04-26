@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.catalogs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -90,7 +91,7 @@ public class DashboardCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.OUTPUT));
+        final Optional<Entity> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD));
         assertThat(collectedEntity)
                 .isPresent()
                 .containsInstanceOf(EntityV1.class);
@@ -101,6 +102,17 @@ public class DashboardCatalogTest {
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         assertThat(dashboardEntity.title()).isEqualTo("Test");
         assertThat(dashboardEntity.description()).isEqualTo("Description");
-        assertThat(dashboardEntity.widgets()).hasSize(5);
+        assertThat(dashboardEntity.widgets()).hasSize(6);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolve() {
+        final EntityDescriptor dashboardEntity = EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD);
+        final EntityDescriptor streamEntity = EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM);
+
+        final Graph<EntityDescriptor> graph = catalog.resolve(dashboardEntity);
+        assertThat(graph.nodes())
+                .containsOnly(dashboardEntity, streamEntity);
     }
 }

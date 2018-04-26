@@ -108,6 +108,28 @@
             "interval": "minute",
             "relative": 1800
           }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Quick values (Stream)",
+          "id": "7a1ac5ab-72c8-47a3-a4b3-8a6b10fcefdf",
+          "type": "QUICKVALUES",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "action",
+            "stream_id": "5adf23894b900a0fdb4e517d",
+            "query": "",
+            "show_data_table": true,
+            "limit": 5,
+            "show_pie_chart": true,
+            "sort_order": "desc",
+            "stacked_fields": "",
+            "data_table_limit": 50
+          }
         }
       ]
     }
