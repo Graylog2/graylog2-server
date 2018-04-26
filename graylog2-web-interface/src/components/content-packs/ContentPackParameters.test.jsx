@@ -11,7 +11,7 @@ describe('<ContentPackParameters />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} />);
+    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -50,7 +50,7 @@ describe('<ContentPackParameters />', () => {
       }],
       entities: [],
     };
-    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} />);
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} appliedParameter={{}} />);
     wrapper.find('button[children="Delete"]').simulate('click');
     expect(changeFn.mock.calls.length).toBe(1);
   });
@@ -70,7 +70,7 @@ describe('<ContentPackParameters />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} />);
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} appliedParameter={{}} />);
     wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
     wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
     wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
@@ -86,7 +86,7 @@ describe('<ContentPackParameters />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} />);
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} appliedParameter={{}} />);
     wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
     wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
     wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
@@ -99,11 +99,11 @@ describe('<ContentPackParameters />', () => {
 
     beforeEach(() => {
       const contentPack = {
-        parameters: [],
+        parameters: [{ name: 'hans', title: 'hans', description: 'hans' }],
         entities: [],
       };
 
-      wrapper = mount(<ContentPackParameters contentPack={contentPack} />);
+      wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
       wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
       wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
       wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
@@ -111,6 +111,20 @@ describe('<ContentPackParameters />', () => {
 
     afterEach(() => {
       wrapper = undefined;
+    });
+
+    it('should validate the parameter name', () => {
+      wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'hans' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(1).text()).toEqual('The parameter name must be unique.');
+
+      wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'hans-dampf' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(1).text()).toEqual('The parameter name must only contain A-Z, a-z, 0-9 and _');
+
+      wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'dampf' } });
+      wrapper.find('form').at(0).simulate('submit');
+      expect(wrapper.find('span.help-block').at(1).text()).toEqual('This is used as the parameter reference and must not contain a space.');
     });
 
     it('should validate the parameter input from type double', () => {

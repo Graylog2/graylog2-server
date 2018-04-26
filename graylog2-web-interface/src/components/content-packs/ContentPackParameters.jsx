@@ -34,18 +34,11 @@ class ContentPackParameters extends React.Component {
     this.state = {
       newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
       defaultValueError: undefined,
+      nameError: undefined,
     };
 
     this._addNewParameter = this._addNewParameter.bind(this);
     this._bindValue = this._bindValue.bind(this);
-  }
-
-  _validateParameter() {
-    const param = this.state.newParameter;
-    if (!param.name || !param.title || !param.description) {
-      return false;
-    }
-    return this._validateDefaultValue();
   }
 
   _updateField(name, value) {
@@ -159,6 +152,31 @@ class ContentPackParameters extends React.Component {
     );
   };
 
+  _validateParameter() {
+    const param = this.state.newParameter;
+    if (!param.name || !param.title || !param.description) {
+      return false;
+    }
+    return this._validateDefaultValue() && this._validateName();
+  }
+
+  _validateName = () => {
+    const value = this.state.newParameter.name;
+    if (value.match(/\W/)) {
+      this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
+      return false;
+    }
+
+    if (this.props.contentPack.parameters
+      .findIndex((parameter) => { return parameter.name === value; }) >= 0) {
+      this.setState({ nameError: 'The parameter name must be unique.' });
+      return false;
+    }
+
+    this.setState({ nameError: undefined });
+    return true;
+  };
+
   _validateDefaultValue = () => {
     const value = this.state.newParameter.default_value;
     if (value) {
@@ -216,12 +234,14 @@ class ContentPackParameters extends React.Component {
                        id="name"
                        type="text"
                        maxLength={250}
+                       bsStyle={this.state.nameError ? 'error' : null}
                        value={this.state.newParameter.name}
                        onChange={this._bindValue}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Name"
-                       help="This is used as the parameter reference and must not contain a space."
+                       help={this.state.nameError ? this.state.nameError :
+                         'This is used as the parameter reference and must not contain a space.'}
                        required />
                 <Input name="description"
                        id="description"
