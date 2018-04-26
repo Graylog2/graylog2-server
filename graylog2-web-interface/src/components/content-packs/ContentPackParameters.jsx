@@ -33,6 +33,7 @@ class ContentPackParameters extends React.Component {
     super(props);
     this.state = {
       newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
+      defaultValueError: undefined,
     };
 
     this._addNewParameter = this._addNewParameter.bind(this);
@@ -44,7 +45,7 @@ class ContentPackParameters extends React.Component {
     if (!param.name || !param.title || !param.description) {
       return false;
     }
-    return true;
+    return this._validateDefaultValue();
   }
 
   _updateField(name, value) {
@@ -59,6 +60,7 @@ class ContentPackParameters extends React.Component {
 
   _addNewParameter(e) {
     e.preventDefault();
+
     if (!this._validateParameter()) {
       return;
     }
@@ -157,6 +159,39 @@ class ContentPackParameters extends React.Component {
     );
   };
 
+  _validateDefaultValue = () => {
+    const value = this.state.newParameter.default_value;
+    if (value) {
+      switch (this.state.newParameter.type) {
+        case 'integer': {
+          if (`${parseInt(value, 10)}` !== value) {
+            this.setState({ defaultValueError: 'This is not an integer value.' });
+            return false;
+          }
+          break;
+        }
+        case 'double': {
+          if (isNaN(value)) {
+            this.setState({ defaultValueError: 'This is not a double value.' });
+            return false;
+          }
+          break;
+        }
+        case 'boolean': {
+          if (value !== 'true' && value !== 'false') {
+            this.setState({ defaultValueError: 'This is not a boolean value. It must be either true or false.' });
+            return false;
+          }
+          break;
+        }
+        default:
+          break;
+      }
+    }
+    this.setState({ defaultValueError: undefined });
+    return true;
+  };
+
   render() {
     return (
       <div>
@@ -218,12 +253,14 @@ class ContentPackParameters extends React.Component {
                        id="default_value"
                        type="text"
                        maxLength={250}
+                       bsStyle={this.state.defaultValueError ? 'error' : null}
                        value={this.state.newParameter.default_value}
                        onChange={this._bindValue}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"
                        label="Default value"
-                       help="Give a default value if the parameter is not optional." />
+                       help={this.state.defaultValueError ? this.state.defaultValueError :
+                         'Give a default value if the parameter is not optional.'} />
                 <Row>
                   <Col smOffset={10}>
                     <Button bsStyle="info" type="submit">Add Parameter</Button>
