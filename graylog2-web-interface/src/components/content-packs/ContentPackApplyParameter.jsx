@@ -69,7 +69,7 @@ class ContentPackApplyParameter extends React.Component {
     const configKeys = ObjectUtils.getPaths(this.props.entity.data);
     const emptyOption = (<option key="EMPTY" value="">Choose..</option>);
     const configOptions = [emptyOption].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
-    const parameterOptions = [emptyOption].concat(this.props.parameters.map(key => <option key={key.name} value={key.name}>{key.name}</option>));
+    const parameterOptions = [emptyOption].concat(this.props.parameters.map(key => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));
     return (
       <div>
         <form className="apply-parameter-form" id="apply-parameter-form" onSubmit={this._applyParameter}>
