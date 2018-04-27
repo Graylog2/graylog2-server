@@ -16,57 +16,80 @@
  */
 package org.graylog2.inputs.converters;
 
-import org.assertj.jodatime.api.Assertions;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.YearMonth;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.jodatime.api.Assertions.assertThat;
 
 public class DateConverterTest {
+    @Before
+    public void setUp() {
+        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2017-01-01T00:00:00.000Z").getMillis());
+    }
+
+    @After
+    public void tearDown() {
+        DateTimeUtils.setCurrentMillisSystem();
+    }
+
     @Test
     public void testBasicConvert() throws Exception {
-        // .startsWith() because of possibly different timezones per test environment.
         final DateConverter converter = new DateConverter(config("YYYY MMM dd HH:mm:ss", null, null));
-        final Object result = converter.convert("2013 Aug 15 23:15:16");
-        assertThat(result).isNotNull();
-        assertThat(String.valueOf(result)).startsWith("2013-08-15T23:15:16.000");
+        final DateTime result = (DateTime) converter.convert("2013 Aug 15 23:15:16");
+        assertThat(result)
+                .isNotNull()
+                .isEqualTo("2013-08-15T23:15:16.000Z");
     }
 
     @Test
     public void testAnotherBasicConvert() throws Exception {
         final DateConverter converter = new DateConverter(config("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ", "Etc/UTC", null));
         final DateTime date = (DateTime) converter.convert("2014-05-19T00:30:43.116+00:00");
-        assertThat(date).isNotNull();
-        Assertions.assertThat(date).isEqualTo(new DateTime(2014, 5, 19, 0, 30, 43, 116, DateTimeZone.UTC));
+        assertThat(date)
+                .isNotNull()
+                .isEqualTo("2014-05-19T00:30:43.116Z");
+    }
 
+    @Test
+    public void testNullInput() throws Exception {
+        final DateConverter converter = new DateConverter(config("yyyy-MM-dd'T'HH:mm:ss.SSSZ", null, null));
+        assertThat((DateTime) converter.convert(null)).isNull();
+    }
+
+    @Test
+    public void testEmptyInput() throws Exception {
+        final DateConverter converter = new DateConverter(config("yyyy-MM-dd'T'HH:mm:ss.SSSZ", null, null));
+        assertThat((DateTime) converter.convert("")).isNull();
     }
 
     @Test
     public void testConvertWithoutYear() throws Exception {
-        final int year = YearMonth.now(DateTimeZone.UTC).getYear();
         final DateConverter converter = new DateConverter(config("dd-MM HH:mm:ss", "Etc/UTC", null));
         final DateTime date = (DateTime) converter.convert("19-05 10:20:30");
-        assertThat(date).isNotNull();
-        Assertions.assertThat(date).isEqualTo(new DateTime(year, 5, 19, 10, 20, 30, DateTimeZone.UTC));
+        assertThat(date)
+                .isNotNull()
+                .isEqualTo("2017-05-19T10:20:30.000Z");
     }
 
     @Test(expected = ConfigurationException.class)
     public void testWithEmptyDateFormat() throws Exception {
-        assertThat(new DateConverter(config("", null, null)).convert("foo")).isNull();
+        final DateConverter converter = new DateConverter(config("", null, null));
+        assertThat((DateTime) converter.convert("foo")).isNull();
     }
 
     @Test(expected = ConfigurationException.class)
     public void testWithNullDateFormat() throws Exception {
-        assertThat(new DateConverter(config(null, null, null)).convert("foo")).isNull();
+        final DateConverter dateConverter = new DateConverter(config(null, null, null));
+        assertThat((DateTime) dateConverter.convert("foo")).isNull();
     }
 
     @Test
@@ -75,58 +98,59 @@ public class DateConverterTest {
         final Converter c = new DateConverter(config("YYYY-MM-dd HH:mm:ss", timeZone.toString(), null));
 
         final DateTime dateOnly = (DateTime) c.convert("2014-03-12 10:00:00");
-        assertThat(dateOnly.getZone()).isEqualTo(timeZone);
-
-        Assertions.assertThat(dateOnly)
-                .isEqualTo(new DateTime(2014, 3, 12, 10, 0, 0, timeZone))
-                .isBefore(new DateTime(2014, 3, 13, 10, 0, 0, timeZone));
+        assertThat(dateOnly).isEqualTo("2014-03-12T10:00:00.000+12:00");
 
         final DateTime dateTime = (DateTime) c.convert("2014-03-12 12:34:00");
-        assertThat(dateTime.getZone()).isEqualTo(timeZone);
-        Assertions.assertThat(dateTime)
-                .isEqualTo(new DateTime(2014, 3, 12, 12, 34, 0, timeZone));
+        assertThat(dateTime).isEqualTo("2014-03-12T12:34:00.000+12:00");
     }
 
     @Test
     public void convertUsesEtcUTCIfTimeZoneSettingIsEmpty() throws Exception {
         final Converter c = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "", null));
-        final DateTime dateOnly = (DateTime) c.convert("2014-03-12 10:00:00");
-        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
+        final DateTime dateTime = (DateTime) c.convert("2014-03-12 10:00:00");
+        assertThat(dateTime).isEqualTo("2014-03-12T10:00:00.000Z");
     }
 
     @Test
     public void convertUsesEtcUTCIfTimeZoneSettingIsBlank() throws Exception {
         final Converter c = new DateConverter(config("YYYY-MM-dd HH:mm:ss", " ", null));
-        final DateTime dateOnly = (DateTime) c.convert("2014-03-12 10:00:00");
-        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
+        final DateTime dateTime = (DateTime) c.convert("2014-03-12 10:00:00");
+        assertThat(dateTime).isEqualTo("2014-03-12T10:00:00.000Z");
     }
 
     @Test
     public void convertUsesEtcUTCIfTimeZoneSettingIsInvalid() throws Exception {
         final Converter c = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "TEST", null));
-        final DateTime dateOnly = (DateTime) c.convert("2014-03-12 10:00:00");
-        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
+        final DateTime dateTime = (DateTime) c.convert("2014-03-12 10:00:00");
+        assertThat(dateTime).isEqualTo("2014-03-12T10:00:00.000Z");
+    }
+
+    @Test
+    public void convertIgnoresTZIfDatePatternContainsTZ() throws Exception {
+        final Converter c = new DateConverter(config("YYYY-MM-dd'T'HH:mm:ss.SSSZ", "Etc/UTC", null));
+        final DateTime actual = (DateTime) c.convert("2014-03-12T10:00:00.000+06:00");
+        assertThat(actual).isEqualTo("2014-03-12T10:00:00.000+06:00");
     }
 
     @Test
     public void convertUsesEnglishIfLocaleIsNull() throws Exception {
         final Converter c = new DateConverter(config("dd/MMM/YYYY HH:mm:ss Z", null, null));
-        final DateTime dateOnly = (DateTime) c.convert("11/May/2017 15:10:48 +0200");
-        Assertions.assertThat(dateOnly).isEqualTo(new DateTime(2017, 5, 11, 13, 10, 48, DateTimeZone.UTC));
+        final DateTime dateTime = (DateTime) c.convert("11/May/2017 15:10:48 +0200");
+        assertThat(dateTime).isEqualTo("2017-05-11T13:10:48.000Z");
     }
 
     @Test
     public void convertUsesEnglishIfLocaleIsInvalid() throws Exception {
         final Converter c = new DateConverter(config("dd/MMM/YYYY HH:mm:ss Z", null, "Wurstweck"));
-        final DateTime dateOnly = (DateTime) c.convert("11/May/2017 15:10:48 +0200");
-        Assertions.assertThat(dateOnly).isEqualTo(new DateTime(2017, 5, 11, 13, 10, 48, DateTimeZone.UTC));
+        final DateTime dateTime = (DateTime) c.convert("11/May/2017 15:10:48 +0200");
+        assertThat(dateTime).isEqualTo("2017-05-11T13:10:48.000Z");
     }
 
     @Test
     public void convertUsesCustomLocale() throws Exception {
         final Converter c = new DateConverter(config("dd/MMM/YYYY HH:mm:ss Z", null, "de-DE"));
-        final DateTime dateOnly = (DateTime) c.convert("11/März/2017 15:10:48 +0200");
-        Assertions.assertThat(dateOnly).isEqualTo(new DateTime(2017, 3, 11, 13, 10, 48, DateTimeZone.UTC));
+        final DateTime dateTime = (DateTime) c.convert("11/März/2017 15:10:48 +0200");
+        assertThat(dateTime).isEqualTo("2017-03-11T13:10:48.000Z");
     }
 
     /**
@@ -136,18 +160,15 @@ public class DateConverterTest {
     public void issue2648() throws Exception {
         final Converter utc = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "UTC", null));
         final DateTime utcDate = (DateTime) utc.convert("2016-08-10 12:00:00");
-        assertThat(utcDate.getZone()).isEqualTo(DateTimeZone.UTC);
-        assertThat(utcDate.getZone().getOffsetFromLocal(0L)).isEqualTo(0);
+        assertThat(utcDate).isEqualTo("2016-08-10T12:00:00.000Z");
 
         final Converter cet = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "CET", null));
         final DateTime cetDate = (DateTime) cet.convert("2016-08-10 12:00:00");
-        assertThat(cetDate.getZone()).isEqualTo(DateTimeZone.forID("CET"));
-        assertThat(cetDate.getZone().getOffsetFromLocal(0L)).isEqualTo((int) Duration.standardHours(1L).getMillis());
+        assertThat(cetDate).isEqualTo(new DateTime("2016-08-10T12:00:00.000", DateTimeZone.forID("CET")));
 
         final Converter berlin = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "Europe/Berlin", null));
         final DateTime berlinDate = (DateTime) berlin.convert("2016-08-10 12:00:00");
-        assertThat(berlinDate.getZone()).isEqualTo(DateTimeZone.forID("Europe/Berlin"));
-        assertThat(berlinDate.getZone().getOffsetFromLocal(0L)).isEqualTo((int) Duration.standardHours(1L).getMillis());
+        assertThat(berlinDate).isEqualTo(new DateTime("2016-08-10T12:00:00.000", DateTimeZone.forID("Europe/Berlin")));
     }
 
     private Map<String, Object> config(final String dateFormat, final String timeZone, final String locale) {
