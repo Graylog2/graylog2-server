@@ -82,7 +82,7 @@ const SideBar = createReactClass({
               </div>
 
               <PanelGroup accordion activeKey={this.state.activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
-                <Panel eventKey="metadata" header="View Description">
+                <Panel eventKey="metadata" header="View Description2">
                   {viewDescription}
                 </Panel>
                 <Panel eventKey="fields" header="Fields">

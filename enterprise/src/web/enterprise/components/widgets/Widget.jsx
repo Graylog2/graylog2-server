@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { MenuItem } from 'react-bootstrap';
 
 import connect from 'stores/connect';
 import UserNotification from 'util/UserNotification';
@@ -17,6 +18,7 @@ import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
 
 import styles from './Widget.css';
+import EditWidgetFrame from './EditWidgetFrame';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -81,6 +83,39 @@ class Widget extends React.Component {
     const VisComponent = Widget._visualizationForType(widget.type);
     const { editing } = this.state;
     const filter = this.props.widgetFilters.get(id, '');
+    const visualization = (
+      <VisComponent id={id}
+                    editing={editing}
+                    title={widget.title}
+                    config={config}
+                    data={data}
+                    fields={fields}
+                    height={height}
+                    width={width}
+                    filter={filter}
+                    onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
+                    onFinishEditing={this._onToggleEdit}
+                    computationTimeRange={computationTimeRange} />
+    );
+    const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
+    if (editing) {
+      return (
+        <EditWidgetFrame widgetId={id}>
+          <WidgetHeader title={title}
+                        onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
+                        editing={editing}>
+            <WidgetFilterMenu onChange={newFilter => WidgetFilterActions.change(id, newFilter)} value={filter}>
+              <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+            </WidgetFilterMenu>
+            {' '}
+            <WidgetActionDropdown element={widgetActionDropdownCaret}>
+              <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
+            </WidgetActionDropdown>
+          </WidgetHeader>
+          {visualization}
+        </EditWidgetFrame>
+      );
+    }
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
         <WidgetHeader title={title}
@@ -90,27 +125,16 @@ class Widget extends React.Component {
             <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
           </WidgetFilterMenu>
           {' '}
-          <WidgetActionDropdown editing={editing}
-                                onAddToDashboard={() => this._onAddToDashboard(id)}
-                                onDelete={() => this._onDelete(widget)}
-                                onDuplicate={() => this._onDuplicate(id)}
-                                onToggleEdit={this._onToggleEdit}>
-            <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />
+          <WidgetActionDropdown element={widgetActionDropdownCaret}>
+            <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+            <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+            <MenuItem divider />
+            <MenuItem onSelect={() => this._onAddToDashboard(id)}>Add to dashboard</MenuItem>
+            <MenuItem divider />
+            <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
           </WidgetActionDropdown>
         </WidgetHeader>
-
-        <VisComponent id={id}
-                      editing={editing}
-                      title={widget.title}
-                      config={config}
-                      data={data}
-                      fields={fields}
-                      height={height}
-                      width={width}
-                      filter={filter}
-                      onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
-                      onFinishEditing={this._onToggleEdit}
-                      computationTimeRange={computationTimeRange} />
+        {visualization}
       </WidgetFrame>
     );
   }

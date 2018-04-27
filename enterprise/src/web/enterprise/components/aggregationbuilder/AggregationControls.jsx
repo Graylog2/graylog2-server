@@ -92,10 +92,10 @@ export default class AggregationControls extends React.Component {
           </Col>
         </Row>
         <Row style={{ height: 'calc(100% - 60px)' }}>
-          <Col md={3}>
+          <Col md={2}>
             <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series.join(',')} />
           </Col>
-          <Col md={9} style={{ height: '100%' }}>
+          <Col md={10} style={{ height: '100%' }}>
             {children}
           </Col>
         </Row>

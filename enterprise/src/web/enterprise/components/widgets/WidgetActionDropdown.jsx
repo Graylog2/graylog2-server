@@ -30,19 +30,14 @@ WidgetActionToggle.defaultProps = {
   onClick: () => {},
 };
 
-const WidgetActionDropdown = ({ children, editing, onAddToDashboard, onDelete, onDuplicate, onToggleEdit }) => (
+const WidgetActionDropdown = ({ children, element }) => (
   <Dropdown componentClass="span" id="widget-action-dropdown">
     <WidgetActionToggle bsRole="toggle">
-      {children}
+      {element}
     </WidgetActionToggle>
     <Dropdown.Menu className={styles.widgetActionDropdownMenu}>
       <MenuItem header>Actions</MenuItem>
-      <MenuItem onSelect={onToggleEdit}>{editing ? 'Finish Editing' : 'Edit'}</MenuItem>
-      <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
-      <MenuItem divider />
-      <MenuItem onSelect={onAddToDashboard}>Add to dashboard</MenuItem>
-      <MenuItem divider />
-      <MenuItem onSelect={onDelete}>Delete</MenuItem>
+      {children}
     </Dropdown.Menu>
   </Dropdown>
 );
@@ -50,15 +45,10 @@ const WidgetActionDropdown = ({ children, editing, onAddToDashboard, onDelete, o
 
 WidgetActionDropdown.propTypes = {
   children: PropTypes.node.isRequired,
-  editing: PropTypes.bool,
-  onAddToDashboard: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onDuplicate: PropTypes.func.isRequired,
-  onToggleEdit: PropTypes.func.isRequired,
+  element: PropTypes.node.isRequired,
 };
 
 WidgetActionDropdown.defaultProps = {
-  editing: false,
 };
 
 export default WidgetActionDropdown;
