@@ -33,6 +33,7 @@ const ApiRoutes = {
   },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
+    queryEntities: () => { return { url: '/system/catalog' }; },
   },
   CodecTypesController: {
     list: () => { return { url: '/system/codecs/types/all' }; },
