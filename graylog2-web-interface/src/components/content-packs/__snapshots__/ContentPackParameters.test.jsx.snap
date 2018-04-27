@@ -297,7 +297,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     className="row"
   >
     <div
-      className="col-sm-8 col-sm-offset-1"
+      className="col-sm-9 col-sm-offset-1"
     >
       <h2>
         Entity list
@@ -329,6 +329,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       Description
                     </th>
                     <th>
+                      Applied Parameter
+                    </th>
+                    <th>
                       Action
                     </th>
                   </tr>
@@ -341,6 +344,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     <td />
                     <td>
                       Input
+                    </td>
+                    <td>
+                      0
                     </td>
                     <td>
                       <button
@@ -609,7 +615,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     className="row"
   >
     <div
-      className="col-sm-8 col-sm-offset-1"
+      className="col-sm-9 col-sm-offset-1"
     >
       <h2>
         Entity list

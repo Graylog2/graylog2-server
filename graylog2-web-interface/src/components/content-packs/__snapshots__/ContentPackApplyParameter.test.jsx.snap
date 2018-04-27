@@ -96,7 +96,10 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               <option
                 value="PORT"
               >
+                Port
+                 (
                 PORT
+                )
               </option>
             </select>
             
