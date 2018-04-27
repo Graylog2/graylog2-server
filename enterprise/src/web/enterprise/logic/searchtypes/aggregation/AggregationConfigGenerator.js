@@ -24,27 +24,30 @@ const _typeForField = (field, { interval }) => {
   }
 };
 
-const _group = (fieldNames, series) => {
-  if (fieldNames.length > 0) {
-    const { field, config } = fieldNames.shift();
-    return [
-      Object.assign({
-        field,
-        metrics: series.map(s => _parseSeries(s)),
-        groups: fieldNames.length > 0 ? _group(fieldNames, series) : [],
-      },
-      _typeForField(field, config)),
-    ];
-  }
-  return [];
+const _groupDefinition = (pivot, series, groups) => {
+  const { field, config } = pivot;
+  return Object.assign(
+    {
+      field,
+      metrics: series.map(s => _parseSeries(s)),
+      groups,
+    },
+    _typeForField(field, config),
+  );
 };
 
-export default ({ rowPivots, series }) => {
-  const fieldNames = rowPivots.slice();
+const _group = (rowPivots, columnPivots, series) => {
+  if (rowPivots.length > 0) {
+    return [_groupDefinition(rowPivots.shift(), series, rowPivots.length >= 0 ? _group(rowPivots, columnPivots, series) : [])];
+  }
+  return columnPivots.map(pivot => _groupDefinition(pivot, series, []));
+};
+
+export default ({ columnPivots, rowPivots, series }) => {
   return [{
     type: 'aggregation',
     config: {
-      groups: _group(fieldNames, series),
+      groups: _group(rowPivots.slice(0), columnPivots.slice(0), series),
     },
   }];
 };

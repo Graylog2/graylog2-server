@@ -3,25 +3,25 @@ import normalizeRows from './NormalizeRows';
 describe('NormalizeRows', () => {
   it('should normalize empty array', () => {
     const data = [];
-    const result = normalizeRows(['controller'], ['count'], data);
+    const result = normalizeRows(['controller'], [], ['count'], data);
     expect(result).toHaveLength(0);
     expect(result).toEqual([]);
   });
   it('should normalize flat array', () => {
     const data = [{ controller: 'PostsController', count: 3232 }, { controller: 'UsersController', count: 3288 }, { controller: 'LoginController', count: 218 }];
-    const result = normalizeRows(['controller'], ['count'], data);
+    const result = normalizeRows(['controller'], [], ['count'], data);
     expect(result).toHaveLength(3);
     expect(result).toEqual(data);
   });
   it('should normalize flat array without fields', () => {
     const data = [{ controller: 'PostsController', count: 3232 }, { controller: 'UsersController', count: 3288 }, { controller: 'LoginController', count: 218 }];
-    const result = normalizeRows([], ['count'], data);
+    const result = normalizeRows([], ['count'], [], data);
     expect(result).toHaveLength(0);
     expect(result).toEqual([]);
   });
   it('should normalize flat array without series', () => {
     const data = [{ controller: 'PostsController', count: 3232 }, { controller: 'UsersController', count: 3288 }, { controller: 'LoginController', count: 218 }];
-    const result = normalizeRows(['controller'], [], data);
+    const result = normalizeRows(['controller'], [], [], data);
     const expected = [{ controller: 'PostsController' }, { controller: 'UsersController' }, { controller: 'LoginController' }];
     expect(result).toHaveLength(3);
     expect(result).toEqual(expected);
@@ -40,7 +40,7 @@ describe('NormalizeRows', () => {
       { controller: 'LoginController', action: 'index', count: 423 },
       { controller: 'LoginController', action: 'edit', count: 168 },
     ];
-    const result = normalizeRows(['controller', 'action'], ['count'], data);
+    const result = normalizeRows(['controller', 'action'], [], ['count'], data);
     expect(result).toHaveLength(3 * 2);
     expect(result).toEqual(expected);
   });
@@ -58,7 +58,7 @@ describe('NormalizeRows', () => {
       { controller: 'LoginController', action: 'index', count: 423 },
       { controller: 'LoginController', action: 'edit', count: 168 },
     ];
-    const result = normalizeRows(['controller', 'action'], ['count', 'sum(took_ms)'], data);
+    const result = normalizeRows(['controller', 'action'], [], ['count', 'sum(took_ms)'], data);
     expect(result).toHaveLength(3 * 2);
     expect(result).toEqual(expected);
   });
@@ -76,7 +76,7 @@ describe('NormalizeRows', () => {
       { controller: 'LoginController', action: 'index', count: 423, 'sum(took_ms)': 28283 },
       { controller: 'LoginController', action: 'edit', count: 168, 'sum(took_ms)': 3828 },
     ];
-    const result = normalizeRows(['controller', 'action'], ['count', 'sum(took_ms)'], data);
+    const result = normalizeRows(['controller', 'action'], [], ['count', 'sum(took_ms)'], data);
     expect(result).toHaveLength(3 * 2);
     expect(result).toEqual(expected);
   });
@@ -86,7 +86,7 @@ describe('NormalizeRows', () => {
       { controller: 'UsersController', action: [{ action: 'index', count: 876, 'sum(took_ms)': 312038 }, { action: 'edit', count: 564, 'sum(took_ms)': 75472 }], count: 3288 },
       { controller: 'LoginController', action: [{ action: 'index', count: 423, 'sum(took_ms)': 28283 }, { action: 'edit', count: 168, 'sum(took_ms)': 3828 }], count: 218 },
     ];
-    const result = normalizeRows(['controller', 'missing'], ['count', 'sum(took_ms)'], data);
+    const result = normalizeRows(['controller', 'missing'], [], ['count', 'sum(took_ms)'], data);
     expect(result).toHaveLength(0);
     expect(result).toEqual([]);
   });

@@ -11,11 +11,11 @@ const _parseSeries = (s) => {
   return definition;
 };
 
-const _formatBucket = (fieldNames, series, buckets) => {
-  if (fieldNames.length === 0) {
+const _formatBucket = (rowPivots, columnPivots, series, buckets) => {
+  if (rowPivots.length === 0) {
     return [];
   }
-  const fieldName = fieldNames.shift();
+  const fieldName = rowPivots.shift();
   return buckets.map((bucket) => {
     const result = {};
     series.forEach((seriesName, idx) => {
@@ -25,18 +25,25 @@ const _formatBucket = (fieldNames, series, buckets) => {
       }
     });
     result[fieldName] = bucket.key;
-    if (fieldNames.length > 0 && bucket.groups[0]) {
-      result[fieldNames[0]] = _formatBucket(fieldNames.slice(), series, bucket.groups[0].buckets);
+    if (rowPivots.length > 0 && bucket.groups[0]) {
+      result[rowPivots[0]] = _formatBucket(rowPivots.slice(), columnPivots, series, bucket.groups[0].buckets);
+    }
+
+    if (rowPivots.length === 0 && columnPivots.length > 0) {
+      columnPivots.forEach((columnPivotName, idx) => {
+        if (bucket && bucket.groups && bucket.groups[idx]) {
+          result[columnPivotName] = _formatBucket([columnPivotName], [], series, bucket.groups[idx].buckets);
+        }
+      });
     }
     return result;
   });
 };
 
 export default (data, widget) => {
-  const { rowPivots, series } = widget.config;
-  const fieldNames = rowPivots.map(({ field }) => field);
+  const { columnPivots, rowPivots, series } = widget.config;
   if (data && data[0] && data[0].groups[0]) {
-    const buckets = _formatBucket(fieldNames, series, data[0].groups[0].buckets);
+    const buckets = _formatBucket(rowPivots.map(({ field }) => field), columnPivots.map(({ field }) => field), series, data[0].groups[0].buckets);
     return [{ results: buckets }];
   }
   return [];

@@ -8,7 +8,6 @@ import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConf
 export default function (viewId, queryId, field) {
   const newWidget = new AggregationWidget(
     uuid(),
-    'aggregation',
     new AggregationWidgetConfig(
       [],
       [pivotForField(field)],
