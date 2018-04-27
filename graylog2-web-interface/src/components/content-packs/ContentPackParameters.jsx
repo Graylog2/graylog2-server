@@ -293,7 +293,7 @@ class ContentPackParameters extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1} sm={7}>
+          <Col smOffset={1} sm={9}>
             <h2>Parameters list</h2>
             <br />
             <DataTable

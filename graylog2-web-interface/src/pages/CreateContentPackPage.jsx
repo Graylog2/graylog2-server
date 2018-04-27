@@ -98,7 +98,8 @@ const CreateContentPackPage = createReactClass({
     const entities = ObjectUtils.clone(this.state.fetchedEntities);
     const preparedEntities = entities.map((entity) => {
       const parameters = this.state.appliedParameter[entity.id] || [];
-      const entityData = ObjectUtils.clone(entity.data);
+      const newEntity = ObjectUtils.clone(entity);
+      const entityData = newEntity.data;
       const configKeys = ObjectUtils.getPaths(entityData);
       configKeys.forEach((path) => {
         const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path });
@@ -111,7 +112,8 @@ const CreateContentPackPage = createReactClass({
         }
         ObjectUtils.setValue(entityData, path, newValue);
       });
-      return entityData;
+      newEntity.data = entityData;
+      return newEntity;
     });
     newContentPack.entities = preparedEntities;
     this.setState({ contentPack: newContentPack });
@@ -183,6 +185,7 @@ const CreateContentPackPage = createReactClass({
               </div>
             </AutoAffix>
           </Wizard>
+        <textarea value={JSON.stringify(this.state.contentPack, null, 2)} />
         </span>
       </DocumentTitle>
     );
