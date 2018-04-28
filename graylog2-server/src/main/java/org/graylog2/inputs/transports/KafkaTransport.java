@@ -82,6 +82,14 @@ public class KafkaTransport extends ThrottleableTransport {
 
     public static final String CK_BOOTSTRAP = "bootstrap_server";
 
+    public static final String CK_SSL = "ssl";
+    public static final String CK_SSL_KEYSTORE_LOCATION="ssl_keystore_location";
+    public static final String CK_SSL_KEYSTORE_PASSWORD="ssl_keystore_password";
+    public static final String CK_SSL_KEY_PASSWORD="ssl_key_password";
+    public static final String CK_SSL_TRUSTSTORE_LOCATION="ssl_truststore_location";
+    public static final String CK_SSL_TRUSTSTORE_PASSWORD="ssl_truststore_password";
+    public static final String CK_SSL_ENABLED_PROTOCOL="ssl_enabled_protocol";
+
     // See https://kafka.apache.org/090/documentation.html for available values for "auto.offset.reset".
     private static final Map<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
             "latest", "Automatically reset the offset to the latest offset",
@@ -199,8 +207,19 @@ public class KafkaTransport extends ThrottleableTransport {
         props.put("consumer.timeout.ms", "1000");
         props.put("bootstrap.servers", configuration.getString(CK_BOOTSTRAP));
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,ByteArrayDeserializer.class.getName());
-
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,ByteArrayDeserializer.class.getName());
+
+        // SSL seettings
+
+        if(configuration.getString(CK_SSL).equals("true")) {
+            props.put("ssl.keystore.location", configuration.getString(CK_SSL_KEYSTORE_LOCATION));
+            props.put("ssl.keystore.password", configuration.getString(CK_SSL_KEYSTORE_PASSWORD));
+            props.put("ssl.key.password", configuration.getString(CK_SSL_KEY_PASSWORD));
+            props.put("ssl.truststore.location", configuration.getString(CK_SSL_TRUSTSTORE_LOCATION));
+            props.put("ssl.truststore.password", configuration.getString(CK_SSL_TRUSTSTORE_PASSWORD));
+            props.put("ssl.enabled.protocols", configuration.getString(CK_SSL_ENABLED_PROTOCOL));
+            props.put("security.protocol", "SSL");
+        }
 
         final int numThreads = configuration.getInt(CK_THREADS);
         consumer = new KafkaConsumer<>(props);
@@ -383,7 +402,7 @@ public class KafkaTransport extends ThrottleableTransport {
                     "Every topic that matches this regular expression will be consumed.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 
-            /*
+
             cr.addField(new TextField(
                     CK_SSL,
                     "SSL",
@@ -432,7 +451,7 @@ public class KafkaTransport extends ThrottleableTransport {
                     "TLSv1.2",
                     "Enabled Protocols for SSL, required when SSL is true",
                     ConfigurationField.Optional.OPTIONAL));
-*/
+
 
             cr.addField(new NumberField(
                     CK_FETCH_MIN_BYTES,
