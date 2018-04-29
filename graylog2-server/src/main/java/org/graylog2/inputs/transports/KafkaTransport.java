@@ -31,7 +31,11 @@ import kafka.consumer.ConsumerTimeoutException;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
-import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
@@ -282,7 +286,6 @@ public class KafkaTransport extends ThrottleableTransport {
                                 // final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
 
                                 final byte[] bytes = consumerIterator.next().value();
-                                LOG.info("Message is " + new String(bytes));
 
                                 // it is possible that the message is null
                                 if (bytes == null) {
