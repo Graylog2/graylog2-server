@@ -282,7 +282,6 @@ public class KafkaTransport extends ThrottleableTransport {
                                 // final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
 
                                 final byte[] bytes = consumerIterator.next().value();
-                                LOG.info("Message is " + new String(bytes));
 
                                 // it is possible that the message is null
                                 if (bytes == null) {
