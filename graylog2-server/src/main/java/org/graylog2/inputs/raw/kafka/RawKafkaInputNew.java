@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.syslog.kafka;
+package org.graylog2.inputs.raw.kafka;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.codecs.SyslogCodec;
-import org.graylog2.inputs.transports.KafkaLegacyTransport;
+import org.graylog2.inputs.codecs.RawCodec;
+import org.graylog2.inputs.transports.KafkaNewTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -30,17 +30,17 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 import javax.inject.Inject;
 
-public class SyslogKafkaInputLegacy extends MessageInput {
-    private static final String NAME = "Syslog Kafka Legacy";
+public class RawKafkaInputNew extends MessageInput {
+    private static final String NAME = "Raw/Plaintext Kafka New";
 
     @AssistedInject
-    public SyslogKafkaInputLegacy(@Assisted Configuration configuration,
-                                  MetricRegistry metricRegistry,
-                                  KafkaLegacyTransport.Factory transport,
-                                  SyslogCodec.Factory codec,
-                                  LocalMetricRegistry localRegistry,
-                                  Config config,
-                                  Descriptor descriptor, ServerStatus serverStatus) {
+    public RawKafkaInputNew(@Assisted Configuration configuration,
+                            MetricRegistry metricRegistry,
+                            KafkaNewTransport.Factory transport,
+                            RawCodec.Factory codec,
+                            LocalMetricRegistry localRegistry,
+                            Config config,
+                            Descriptor descriptor, ServerStatus serverStatus) {
         this(metricRegistry,
                 configuration,
                 transport.create(configuration),
@@ -50,20 +50,20 @@ public class SyslogKafkaInputLegacy extends MessageInput {
                 descriptor, serverStatus);
     }
 
-    protected SyslogKafkaInputLegacy(MetricRegistry metricRegistry,
-                                     Configuration configuration,
-                                     KafkaLegacyTransport kafkaTransport,
-                                     SyslogCodec codec,
-                                     LocalMetricRegistry localRegistry,
-                                     MessageInput.Config config,
-                                     MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
+    protected RawKafkaInputNew(MetricRegistry metricRegistry,
+                               Configuration configuration,
+                               KafkaNewTransport kafkaTransport,
+                               RawCodec codec,
+                               LocalMetricRegistry localRegistry,
+                               MessageInput.Config config,
+                               MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, configuration, kafkaTransport, localRegistry, codec, config, descriptor, serverStatus);
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<SyslogKafkaInputLegacy> {
+    public interface Factory extends MessageInput.Factory<RawKafkaInputNew> {
         @Override
-        SyslogKafkaInputLegacy create(Configuration configuration);
+        RawKafkaInputNew create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -82,7 +82,7 @@ public class SyslogKafkaInputLegacy extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(KafkaLegacyTransport.Factory transport, SyslogCodec.Factory codec) {
+        public Config(KafkaNewTransport.Factory transport, RawCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }
