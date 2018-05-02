@@ -55,7 +55,8 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     @GET
     public Set<FieldTypeDTO> allFieldTypes() {
-        return mergeCompoundFieldTypes(indexFieldTypesService.streamAll()
+        return mergeCompoundFieldTypes(indexFieldTypesService.findAll()
+                .stream()
                 .map(IndexFieldTypesDTO::fields)
                 .flatMap(Collection::stream));
     }
@@ -73,7 +74,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
                 })
                 .filter(Objects::nonNull)
                 .map(indexSet -> indexSet.getIndexSet().getConfig().id())
-                .flatMap(this.indexFieldTypesService::streamForIndexSet)
+                .flatMap(indexSetId -> this.indexFieldTypesService.findForIndexSet(indexSetId).stream())
                 .map(IndexFieldTypesDTO::fields)
                 .flatMap(Collection::stream));
     }
