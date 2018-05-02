@@ -5,7 +5,7 @@ import CurrentViewActions from 'enterprise/actions/CurrentViewActions';
 
 export default Reflux.createStore({
   listenables: [CurrentViewActions],
-  state: new Immutable.Map(),
+  state: new Immutable.Map({ dirty: false }),
 
   getInitialState() {
     return this.state.toJS();
