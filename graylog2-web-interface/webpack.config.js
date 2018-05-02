@@ -4,6 +4,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -97,8 +98,10 @@ const webpackConfig = {
 };
 
 if (TARGET === 'start') {
+  // eslint-disable-next-line no-console
   console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
+    mode: 'development',
     devtool: 'eval',
     output: {
       path: BUILD_PATH,
@@ -116,22 +119,28 @@ if (TARGET === 'start') {
 }
 
 if (TARGET === 'build') {
+  // eslint-disable-next-line no-console
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
   module.exports = merge(webpackConfig, {
+    mode: 'production',
+    optimization: {
+      minimizer: [new UglifyJsPlugin({
+        uglifyOptions: {
+          minimize: true,
+          sourceMap: true,
+          compress: {
+            warnings: false,
+          },
+          mangle: {
+            reserved: ['$super', '$', 'exports', 'require'],
+          },
+        },
+      })],
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-      new webpack.optimize.UglifyJsPlugin({
-        minimize: true,
-        sourceMap: true,
-        compress: {
-          warnings: false,
-        },
-        mangle: {
-          except: ['$super', '$', 'exports', 'require'],
-        },
       }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
@@ -141,6 +150,7 @@ if (TARGET === 'build') {
 }
 
 if (TARGET === 'test') {
+  // eslint-disable-next-line no-console
   console.error('Running test/ci mode');
   module.exports = merge(webpackConfig, {
     module: {
