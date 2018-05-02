@@ -5,16 +5,16 @@ import { Button } from 'react-bootstrap';
 import TimeHistogramPivot from './pivottypes/TimeHistogramPivot';
 import NoConfigurationPivot from './pivottypes/NoConfigurationPivot';
 
-const _configurationComponentByType = (fieldName, value, onChange) => {
-  switch (fieldName) {
-    case 'timestamp': return <TimeHistogramPivot onChange={onChange} value={value} />;
+const _configurationComponentByType = (type, value, onChange) => {
+  switch (type) {
+    case 'date': return <TimeHistogramPivot onChange={onChange} value={value} />;
     default: return <NoConfigurationPivot />;
   }
 };
 
 export default class PivotConfiguration extends React.Component {
   static propTypes = {
-    field: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     config: PropTypes.shape({
       type: PropTypes.string.isRequired,
     }).isRequired,
@@ -33,9 +33,9 @@ export default class PivotConfiguration extends React.Component {
   _onChange = config => this.setState({ config });
 
   render() {
-    const { field } = this.props;
+    const { type } = this.props;
     const { config } = this.state;
-    const typeSpecificConfiguration = _configurationComponentByType(field, config, this._onChange);
+    const typeSpecificConfiguration = _configurationComponentByType(type, config, this._onChange);
     return (
       <span>
         {typeSpecificConfiguration}

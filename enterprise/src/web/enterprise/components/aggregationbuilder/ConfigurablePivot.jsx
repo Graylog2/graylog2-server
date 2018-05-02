@@ -4,9 +4,12 @@ import Select from 'react-select';
 import { Popover } from 'react-bootstrap';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
-import PivotConfiguration from './PivotConfiguration';
+import connect from 'stores/connect';
 
-export default class ConfigurablePivot extends React.Component {
+import PivotConfiguration from './PivotConfiguration';
+import FieldTypesStore from '../../stores/FieldTypesStore';
+
+class ConfigurablePivot extends React.Component {
   static propTypes = {};
 
   constructor(props, context) {
@@ -26,7 +29,8 @@ export default class ConfigurablePivot extends React.Component {
   };
 
   render() {
-    const { value, config } = this.props;
+    const { value, config, fields } = this.props;
+    const fieldType = fields.filter(v => v.get('field_name') === value.label).getIn([0, 'physical_type'], 'unknown');
     const popover = this.state.isOpen && (
       <Portal>
         <Position
@@ -34,7 +38,7 @@ export default class ConfigurablePivot extends React.Component {
           placement="bottom"
           target={this.target}>
           <Popover title="Pivot Configuration">
-            <PivotConfiguration field={value.value} config={config} onClose={this._onClose} />
+            <PivotConfiguration field={value.value} type={fieldType} config={config} onClose={this._onClose} />
           </Popover>
         </Position>
       </Portal>
@@ -48,4 +52,6 @@ export default class ConfigurablePivot extends React.Component {
       </span>
     );
   }
-};
+}
+
+export default connect(ConfigurablePivot, { fields: FieldTypesStore });
