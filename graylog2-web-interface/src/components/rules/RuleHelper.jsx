@@ -10,6 +10,7 @@ import ObjectUtils from 'util/ObjectUtils';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PaginatedList, Spinner } from 'components/common';
+import { Input } from 'components/bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
 
@@ -29,6 +30,9 @@ const RuleHelper = createReactClass({
       filteredEntries: undefined,
       currentPage: 1,
       pageSize: 10,
+      filter: '',
+      filteredDescriptors: undefined,
+      pageBeforeFilter: undefined,
     };
   },
 
@@ -56,17 +60,17 @@ end`,
   },
 
   _functionSignature(descriptor) {
-    const args = descriptor.params.map(p => { return p.optional ? `[${p.name}]` : p.name; });
-    return <code>{`${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`}</code>;
+    const args = descriptor.params.map((p) => { return p.optional ? `[${p.name}]` : p.name; });
+    return `${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`;
   },
 
   _parameters(descriptor) {
-    return descriptor.params.map(p => {
+    return descriptor.params.map((p) => {
       return (
         <tr key={p.name}>
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{this._niceType(p.type)}</td>
-          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <i className="fa fa-check"/>}</td>
+          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <i className="fa fa-check" />}</td>
           <td>{p.description}</td>
         </tr>);
     });
@@ -89,7 +93,7 @@ end`,
                 </tr>
               </thead>
               <tbody>
-              {this._parameters(d)}
+                {this._parameters(d)}
               </tbody>
             </Table>
           </td>
@@ -97,7 +101,7 @@ end`,
       }
       return (<tbody key={d.name}>
         <tr onClick={() => this._toggleFunctionDetail(d.name)} className={RuleHelperStyle.clickableRow}>
-          <td className={RuleHelperStyle.functionTableCell}>{this._functionSignature(d)}</td>
+          <td className={RuleHelperStyle.functionTableCell}><code>{this._functionSignature(d)}</code></td>
           <td>{d.description}</td>
         </tr>
         {details}
@@ -109,12 +113,39 @@ end`,
     this.setState({ currentPage: newPage, pageSize: pageSize });
   },
 
+  _filterDescriptors(e) {
+    const filter = e.target.value;
+    if (!this.state.functionDescriptors) {
+      return;
+    }
+    if (filter.length <= 0) {
+      this.setState({
+        filteredDescriptors: this.state.functionDescriptors,
+        filter: '',
+        currentPage: this.state.pageBeforeFilter || 1,
+        pageBeforeFilter: undefined,
+      });
+      return;
+    }
+    const filteredDescriptiors = this.state.functionDescriptors.filter((descriptor) => {
+      const regexp = RegExp(filter);
+      return regexp.test(this._functionSignature(descriptor)) || regexp.test(descriptor.description);
+    });
+    this.setState({
+      filteredDescriptors: filteredDescriptiors,
+      filter: filter,
+      pageBeforeFilter: this.pageBeforeFilter || this.state.currentPage,
+      currentPage: 1,
+    });
+  },
+
   render() {
     if (!this.state.functionDescriptors) {
       return <Spinner />;
     }
 
-    const pagedEntries = this.state.functionDescriptors.slice((this.state.currentPage - 1) * this.state.pageSize, this.state.currentPage * this.state.pageSize);
+    const functionDescriptors = this.state.filteredDescriptors || this.state.functionDescriptors;
+    const pagedEntries = functionDescriptors.slice((this.state.currentPage - 1) * this.state.pageSize, this.state.currentPage * this.state.pageSize);
 
     return (
       <Panel header="Rules quick reference">
@@ -131,23 +162,42 @@ end`,
           <Col md={12}>
             <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
               <Tab eventKey={1} title="Functions">
-                <p className={RuleHelperStyle.marginTab}>
-                  This is a list of all available functions in pipeline rules. Click on a row to see more information
-                  about the function parameters.
-                </p>
-                <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
-                  <PaginatedList totalItems={this.state.functionDescriptors.length} pageSize={this.state.pageSize} onChange={this._onPageChange} showPageSizeSelect={false}>
-                    <Table condensed>
-                      <thead>
-                        <tr>
-                          <th>Function</th>
-                          <th>Description</th>
-                        </tr>
-                      </thead>
-                      {this._renderFunctions(pagedEntries)}
-                    </Table>
-                  </PaginatedList>
-                </div>
+                <Row>
+                  <Col sm={12}>
+                    <p className={RuleHelperStyle.marginTab}>
+                      This is a list of all available functions in pipeline rules. Click on a row to see more information
+                      about the function parameters.
+                    </p>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={12}>
+                    <form className="form-horizontal" onSubmit={(e) => { e.preventDefault(); }}>
+                      <Input
+                        id="filter-descriptors"
+                        type="text"
+                        wrapperClassName="col-sm-4"
+                        labelClassName="col-sm-1"
+                        label="Filter"
+                        value={this.state.filter}
+                        onChange={this._filterDescriptors}
+                      />
+                    </form>
+                    <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
+                      <PaginatedList totalItems={functionDescriptors.length} pageSize={this.state.pageSize} onChange={this._onPageChange} showPageSizeSelect={false}>
+                        <Table condensed>
+                          <thead>
+                            <tr>
+                              <th>Function</th>
+                              <th>Description</th>
+                            </tr>
+                          </thead>
+                          {this._renderFunctions(pagedEntries)}
+                        </Table>
+                      </PaginatedList>
+                    </div>
+                  </Col>
+                </Row>
               </Tab>
               <Tab eventKey={2} title="Example">
                 <p className={RuleHelperStyle.marginTab}>
