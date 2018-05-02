@@ -20,7 +20,7 @@ class ConfigurablePivot extends React.Component {
   }
 
   _onClick = () => {
-    this.setState({ isOpen: true });
+    this.setState(state => ({ isOpen: !state.isOpen }));
   };
 
   _onClose = (config) => {
