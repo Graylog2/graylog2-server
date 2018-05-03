@@ -1,5 +1,5 @@
-import loadable from 'loadable-components';
-const SourceCodeEditor = loadable(() => import('./SourceCodeEditor'));
+import loadAsync from 'routing/loadAsync';
+const SourceCodeEditor = loadAsync(() => import('./SourceCodeEditor'));
 
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as ColorPicker } from './ColorPicker';

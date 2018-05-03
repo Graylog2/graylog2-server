@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Modal, Well } from 'react-bootstrap';
-import { DocumentTitle } from 'components/common';
+import DocumentTitle from 'components/common/DocumentTitle';
 
 import URLUtils from 'util/URLUtils';
 

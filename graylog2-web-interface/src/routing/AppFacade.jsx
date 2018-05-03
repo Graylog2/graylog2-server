@@ -1,7 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import loadable from 'loadable-components';
+
+import loadAsync from 'routing/loadAsync';
 
 import 'bootstrap/less/bootstrap.less';
 import 'font-awesome/css/font-awesome.css';
@@ -18,9 +19,9 @@ const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const LoginPage = loadable(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
-const LoadingPage = loadable(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
-const LoggedInPage = loadable(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
+const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
+const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
+const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
 
 const AppFacade = createReactClass({
   displayName: 'AppFacade',

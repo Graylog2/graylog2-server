@@ -1,62 +1,65 @@
-import loadable from 'loadable-components';
+import loadAsync from 'routing/loadAsync';
 
-const AlertConditionsPage = loadable(() => import('./AlertConditionsPage'));
-const AlertNotificationsPage = loadable(() => import('./AlertNotificationsPage'));
-const AlertsPage = loadable(() => import('./AlertsPage'));
-const AuthenticationPage = loadable(() => import('./AuthenticationPage'));
-const ConfigurationsPage = loadable(() => import('./ConfigurationsPage'));
-const ContentPacksPage = loadable(() => import('./ContentPacksPage'));
-const CreateExtractorsPage = loadable(() => import('./CreateExtractorsPage'));
-const CreateUsersPage = loadable(() => import('./CreateUsersPage'));
-const DashboardsPage = loadable(() => import('./DashboardsPage'));
-const DelegatedSearchPage = loadable(() => import('./DelegatedSearchPage'));
-const EditAlertConditionPage = loadable(() => import('./EditAlertConditionPage'));
-const EditExtractorsPage = loadable(() => import('./EditExtractorsPage'));
-const EditTokensPage = loadable(() => import('./EditTokensPage'));
-const EditUsersPage = loadable(() => import('./EditUsersPage'));
-const EnterprisePage = loadable(() => import('./EnterprisePage'));
-const ExportContentPackPage = loadable(() => import('./ExportContentPackPage'));
-const ExportExtractorsPage = loadable(() => import('./ExportExtractorsPage'));
-const ExtractorsPage = loadable(() => import('./ExtractorsPage'));
-const GettingStartedPage = loadable(() => import('./GettingStartedPage'));
-const GrokPatternsPage = loadable(() => import('./GrokPatternsPage'));
-const ImportExtractorsPage = loadable(() => import('./ImportExtractorsPage'));
-const IndexerFailuresPage = loadable(() => import('./IndexerFailuresPage'));
-const IndexSetConfigurationPage = loadable(() => import('./IndexSetConfigurationPage'));
-const IndexSetCreationPage = loadable(() => import('./IndexSetCreationPage'));
-const IndexSetPage = loadable(() => import('./IndexSetPage'));
-const IndicesPage = loadable(() => import('./IndicesPage'));
-const InputsPage = loadable(() => import('./InputsPage'));
-const LoggersPage = loadable(() => import('./LoggersPage'));
-const LUTCachesPage = loadable(() => import('./LUTCachesPage'));
-const LUTDataAdaptersPage = loadable(() => import('./LUTDataAdaptersPage'));
-const LUTTablesPage = loadable(() => import('./LUTTablesPage'));
-const NewAlertConditionPage = loadable(() => import('./NewAlertConditionPage'));
-const NewAlertNotificationPage = loadable(() => import('./NewAlertNotificationPage'));
-const NodeInputsPage = loadable(() => import('./NodeInputsPage'));
-const NodesPage = loadable(() => import('./NodesPage'));
-const NotFoundPage = loadable(() => import('./NotFoundPage'));
-const PipelineDetailsPage = loadable(() => import('./PipelineDetailsPage'));
-const PipelinesOverviewPage = loadable(() => import('./PipelinesOverviewPage'));
-const RolesPage = loadable(() => import('./RolesPage'));
-const RuleDetailsPage = loadable(() => import('./RuleDetailsPage'));
-const RulesPage = loadable(() => import('./RulesPage'));
-const ShowAlertPage = loadable(() => import('./ShowAlertPage'));
-const ShowDashboardPage = loadable(() => import('./ShowDashboardPage'));
-const ShowMessagePage = loadable(() => import('./ShowMessagePage'));
-const ShowMetricsPage = loadable(() => import('./ShowMetricsPage'));
-const ShowNodePage = loadable(() => import('./ShowNodePage'));
-const SimulatorPage = loadable(() => import('./SimulatorPage'));
-const SourcesPage = loadable(() => import('./SourcesPage'));
-const StartPage = loadable(() => import('./StartPage'));
-const StreamEditPage = loadable(() => import('./StreamEditPage'));
-const StreamOutputsPage = loadable(() => import('./StreamOutputsPage'));
-const StreamSearchPage = loadable(() => import('./StreamSearchPage'));
-const StreamsPage = loadable(() => import('./StreamsPage'));
-const SystemOutputsPage = loadable(() => import('./SystemOutputsPage'));
-const SystemOverviewPage = loadable(() => import('./SystemOverviewPage'));
-const ThreadDumpPage = loadable(() => import('./ThreadDumpPage'));
-const UsersPage = loadable(() => import('./UsersPage'));
+const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
+const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
+const AlertsPage = loadAsync(() => import('./AlertsPage'));
+const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
+const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
+const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
+const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
+const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
+const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
+const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
+const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
+const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
+const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
+const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
+const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
+const ExportContentPackPage = loadAsync(() => import('./ExportContentPackPage'));
+const ExportExtractorsPage = loadAsync(() => import('./ExportExtractorsPage'));
+const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
+const GettingStartedPage = loadAsync(() => import('./GettingStartedPage'));
+const GrokPatternsPage = loadAsync(() => import('./GrokPatternsPage'));
+const ImportExtractorsPage = loadAsync(() => import('./ImportExtractorsPage'));
+const IndexerFailuresPage = loadAsync(() => import('./IndexerFailuresPage'));
+const IndexSetConfigurationPage = loadAsync(() => import('./IndexSetConfigurationPage'));
+const IndexSetCreationPage = loadAsync(() => import('./IndexSetCreationPage'));
+const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
+const IndicesPage = loadAsync(() => import('./IndicesPage'));
+const InputsPage = loadAsync(() => import('./InputsPage'));
+const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
+const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
+const LoggersPage = loadAsync(() => import('./LoggersPage'));
+const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
+const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
+const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
+const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
+const NewAlertConditionPage = loadAsync(() => import('./NewAlertConditionPage'));
+const NewAlertNotificationPage = loadAsync(() => import('./NewAlertNotificationPage'));
+const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
+const NodesPage = loadAsync(() => import('./NodesPage'));
+const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
+const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
+const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
+const RolesPage = loadAsync(() => import('./RolesPage'));
+const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
+const RulesPage = loadAsync(() => import('./RulesPage'));
+const ShowAlertPage = loadAsync(() => import('./ShowAlertPage'));
+const ShowDashboardPage = loadAsync(() => import('./ShowDashboardPage'));
+const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
+const ShowMetricsPage = loadAsync(() => import('./ShowMetricsPage'));
+const ShowNodePage = loadAsync(() => import('./ShowNodePage'));
+const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
+const SourcesPage = loadAsync(() => import('./SourcesPage'));
+const StartPage = loadAsync(() => import('./StartPage'));
+const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
+const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
+const StreamSearchPage = loadAsync(() => import('./StreamSearchPage'));
+const StreamsPage = loadAsync(() => import('./StreamsPage'));
+const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
+const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
+const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
+const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
   AlertConditionsPage,
@@ -86,7 +89,10 @@ export {
   IndexSetPage,
   IndicesPage,
   InputsPage,
+  LoadingPage,
+  LoggedInPage,
   LoggersPage,
+  LoginPage,
   LUTCachesPage,
   LUTDataAdaptersPage,
   LUTTablesPage,
