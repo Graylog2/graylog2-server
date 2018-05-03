@@ -18,12 +18,12 @@ Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../
 
 Help us build the future of log management and be part of a project that is used by thousands of people out there every day.
 
-Follow the [contributors guide](https://graylog.org/get-involved) and read [the contributing instructions](CONTRIBUTING.md) to get started.
+Follow the [contributors guide](https://www.graylog.org/community) and read [the contributing instructions](CONTRIBUTING.md) to get started.
 
 
 ## Staying in Touch
 
-Come chat with us in the [`#graylog` channel on freenode IRC](https://webchat.freenode.net/?channels=%23graylog) or write an [email to the mailing list](https://groups.google.com/forum/#!forum/graylog2).
+Come chat with us in the [`#graylog` channel on freenode IRC](https://webchat.freenode.net/?channels=%23graylog) or create a topic in our [community discussion forums](https://community.graylog.org/).
 
 
 ## Miscellaneous
