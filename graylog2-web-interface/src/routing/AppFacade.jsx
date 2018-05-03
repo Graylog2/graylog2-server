@@ -1,15 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
-import LoadingPage from 'react-proxy?name=LoadingPage!pages/LoadingPage';
-import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
-import ServerUnavailablePage from 'pages/ServerUnavailablePage';
-
-import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
-const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import loadable from 'loadable-components';
 
 import 'bootstrap/less/bootstrap.less';
 import 'font-awesome/css/font-awesome.css';
@@ -18,6 +10,17 @@ import 'stylesheets/bootstrap-submenus.less';
 import 'toastr/toastr.less';
 import 'rickshaw/rickshaw.css';
 import 'stylesheets/graylog2.less';
+
+import ServerUnavailablePage from 'pages/ServerUnavailablePage';
+import StoreProvider from 'injection/StoreProvider';
+
+const SessionStore = StoreProvider.getStore('Session');
+const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
+const LoginPage = loadable(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
+const LoadingPage = loadable(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
+const LoggedInPage = loadable(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
 
 const AppFacade = createReactClass({
   displayName: 'AppFacade',
