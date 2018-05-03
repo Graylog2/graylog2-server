@@ -15,6 +15,8 @@ const GeoIpResolverConfig = createReactClass({
     updateConfig: PropTypes.func.isRequired,
   },
 
+  inputs: {},
+
   getDefaultProps() {
     return {
       config: {
