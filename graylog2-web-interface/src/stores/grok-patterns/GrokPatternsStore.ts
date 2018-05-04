@@ -124,7 +124,16 @@ const GrokPatternsStore = {
 
   bulkImport(patterns: string, replaceAll: boolean) {
     var failCallback = (error) => {
-      UserNotification.error("Importing Grok pattern file failed with status: " + error.message,
+      let err_message = error.message;
+      let err_body = error.additional.body;
+      if (err_body && err_body.validation_errors && err_body.validation_errors._) {
+        err_message = "";
+        const errors = err_body.validation_errors._;
+        for(let i = 0, len = errors.length; i < len; i++) {
+          err_message = err_message.concat(errors[i].error);
+        }
+      }
+      UserNotification.error("Importing Grok pattern file failed with status: " + err_message,
         "Could not load Grok patterns");
     };
 
