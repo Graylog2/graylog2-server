@@ -24,9 +24,16 @@ const GrokPatterns = createReactClass({
     this.loadData();
   },
 
+  componentWillUnmount() {
+    if (this.loadPromise) {
+      this.loadPromise.cancel();
+    }
+  },
+
   loadData() {
-    GrokPatternsStore.loadPatterns((patterns) => {
-      if (this.isMounted()) {
+    this.loadPromise = GrokPatternsStore.loadPatterns((patterns) => {
+      if (!this.loadPromise.isCancelled()) {
+        this.loadPromise = undefined;
         this.setState({
           patterns: patterns,
         });

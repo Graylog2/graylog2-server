@@ -26,7 +26,7 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
     // get the current list of patterns and sort it by name
-    fetchDefault('GET', this.URL).then(
+    return fetchDefault('GET', this.URL).then(
       (resp: any) => {
         const patterns = resp.patterns;
         patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
