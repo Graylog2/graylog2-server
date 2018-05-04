@@ -91,7 +91,7 @@ public class InMemoryGrokPatternServiceTest {
         // save should validate
         try {
             service.save(GrokPattern.create("INVALID", "*"));
-            fail("Show throw ValidationException");
+            fail("Should throw ValidationException");
         } catch (ValidationException ignored) {
         }
     }
@@ -110,6 +110,22 @@ public class InMemoryGrokPatternServiceTest {
         // replaced all patterns
         service.saveAll(patterns, true);
         assertThat(service.loadAll()).hasSize(2);
+    }
+
+    @Test
+    public void validateAll() throws Exception {
+        Collection<GrokPattern> patternsRight = ImmutableList.of(GrokPattern.create("1", ".*"),
+                GrokPattern.create("2", ".+"));
+        final boolean result = service.validateAll(patternsRight);
+        assertThat(result).isTrue();
+
+        Collection<GrokPattern> patternsWrong = ImmutableList.of(GrokPattern.create("1", "***"),
+                GrokPattern.create("2", ".+"));
+        try {
+            service.validateAll(patternsWrong);
+            fail("Should throw ValidationException");
+        } catch (Exception ignored) {
+        }
     }
 
     @Test

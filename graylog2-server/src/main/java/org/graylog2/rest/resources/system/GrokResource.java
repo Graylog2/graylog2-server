@@ -68,7 +68,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 
@@ -119,7 +118,7 @@ public class GrokResource extends RestResource {
         Map<String, Object> result;
         try {
             result = grokPatternService.match(request.grokPattern(), request.sampleData());
-        } catch (GrokException | PatternSyntaxException e) {
+        } catch (GrokException | IllegalArgumentException e) {
             Map<String, String> error = ImmutableMap.of("message", e.getMessage());
 
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
@@ -155,15 +154,16 @@ public class GrokResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final Set<String> updatedPatternNames = Sets.newHashSet();
+        try {
+            if (!grokPatternService.validateAll(patternList.patterns())) {
+                throw new ValidationException("Invalid pattern contained. Did not save any patterns.");
+            }
+        } catch (GrokException | IllegalArgumentException e) {
+            throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
+        }
+
         for (final GrokPattern pattern : patternList.patterns()) {
             updatedPatternNames.add(pattern.name());
-            try {
-                if (!grokPatternService.validate(pattern)) {
-                    throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
-                }
-            } catch (GrokException | PatternSyntaxException e) {
-                throw new ValidationException("Invalid pattern " + pattern + "Did not save any patterns\n" + e.getMessage());
-            }
         }
 
         grokPatternService.saveAll(patternList.patterns(), replace);
@@ -182,17 +182,19 @@ public class GrokResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final List<GrokPattern> grokPatterns = readGrokPatterns(patternsFile);
+
         if (!grokPatterns.isEmpty()) {
+            try {
+                if (!grokPatternService.validateAll(grokPatterns)) {
+                    throw new ValidationException("Invalid pattern contained. Did not save any patterns.");
+                }
+            } catch (GrokException | IllegalArgumentException e) {
+                throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
+            }
+
             final Set<String> updatedPatternNames = Sets.newHashSetWithExpectedSize(grokPatterns.size());
             for (final GrokPattern pattern : grokPatterns) {
                 updatedPatternNames.add(pattern.name());
-                try {
-                    if (!grokPatternService.validate(pattern)) {
-                        throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
-                    }
-                } catch (GrokException | PatternSyntaxException e) {
-                    throw new ValidationException("Invalid pattern " + pattern + "Did not save any patterns\n" + e.getMessage());
-                }
             }
 
             grokPatternService.saveAll(grokPatterns, replace);

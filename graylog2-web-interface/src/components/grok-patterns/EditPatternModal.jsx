@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
-import { Button } from 'react-bootstrap';
+import { Button, Panel } from 'react-bootstrap';
 
 class EditPatternModal extends React.Component {
   static propTypes = {
@@ -31,6 +31,7 @@ class EditPatternModal extends React.Component {
     pattern: this.props.pattern,
     sampleData: this.props.sampleData,
     test_result: '',
+    test_error: undefined,
     error: false,
     error_message: '',
   };
@@ -88,7 +89,9 @@ class EditPatternModal extends React.Component {
       this.setState({ error: false, error_message: '' });
     }
     this.props.testPattern(this.state, (response) => {
-      this.setState({ test_result: JSON.stringify(response, null, 2) });
+      this.setState({ test_result: JSON.stringify(response, null, 2), test_error: undefined });
+    }, (errMessage) => {
+      this.setState({ test_result: '', test_error: errMessage });
     });
   };
 
@@ -125,6 +128,11 @@ class EditPatternModal extends React.Component {
                    onChange={this._onPatternChange}
                    value={this.state.pattern}
                    required />
+            { this.state.test_error &&
+            <Panel bsStyle="danger" header="Grok Error">
+              <code style={{ display: 'block', whiteSpace: 'pre-wrap' }} >{this.state.test_error}</code>
+            </Panel>
+            }
             <Input type="textarea"
                    id={this._getId('sampleData')}
                    label="Sample Data"

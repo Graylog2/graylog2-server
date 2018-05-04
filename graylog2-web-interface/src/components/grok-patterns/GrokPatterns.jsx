@@ -46,10 +46,8 @@ const GrokPatterns = createReactClass({
     });
   },
 
-  testPattern(pattern, callback) {
-    GrokPatternsStore.testPattern(pattern, (response) => {
-      callback(response);
-    });
+  testPattern(pattern, callback, errCallback) {
+    GrokPatternsStore.testPattern(pattern, callback, errCallback);
   },
 
   confirmedRemove(pattern) {

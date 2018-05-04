@@ -38,6 +38,8 @@ public interface GrokPatternService {
 
     boolean validate(GrokPattern pattern) throws GrokException;
 
+    boolean validateAll(Collection<GrokPattern> patterns) throws GrokException;
+
     int delete(String patternId);
 
     int deleteAll();

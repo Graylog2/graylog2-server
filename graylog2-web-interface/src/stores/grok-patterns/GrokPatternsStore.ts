@@ -38,15 +38,14 @@ const GrokPatternsStore = {
       failCallback);
   },
 
-  testPattern(pattern: GrokPatternTest, callback: (response) => void, errCallback: (response) => void) {
+  testPattern(pattern: GrokPatternTest, callback: (response) => void, errCallback: (err_message) => void) {
     const failCallback = (error) => {
       let err_message = error.message;
       let err_body = error.additional.body;
       if (err_body && err_body.message) {
           err_message = error.additional.body.message;
       }
-      UserNotification.error(`Testing Grok pattern "${pattern.name}" failed with status: ${err_message}`,
-        "Could not test Grok pattern");
+      errCallback(err_message);
     };
 
     const requestPatternTest = {

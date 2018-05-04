@@ -138,6 +138,27 @@ public class InMemoryGrokPatternService implements GrokPatternService {
     }
 
     @Override
+    public boolean validateAll(Collection<GrokPattern> newPatterns) throws GrokException {
+        final Set<GrokPattern> patterns = loadAll();
+        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
+
+        for(GrokPattern newPattern : newPatterns) {
+            final boolean fieldsMissing = Strings.isNullOrEmpty(newPattern.name()) || Strings.isNullOrEmpty(newPattern.pattern());
+            if (fieldsMissing) {
+                return false;
+            }
+            grokCompiler.register(newPattern.name(), newPattern.pattern());
+        }
+        for(GrokPattern storedPattern : patterns) {
+            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
+        }
+        for(GrokPattern newPattern : newPatterns) {
+            grokCompiler.compile("%{" + newPattern.name() + "}");
+        }
+        return true;
+    }
+
+    @Override
     public int delete(String patternId) {
         return store.remove(patternId) == null ? 0 : 1;
     }
