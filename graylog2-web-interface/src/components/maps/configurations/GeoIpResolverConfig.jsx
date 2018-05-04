@@ -35,13 +35,13 @@ const GeoIpResolverConfig = createReactClass({
   },
 
   componentWillReceiveProps(newProps) {
-    this.setState({config: ObjectUtils.clone(newProps.config)});
+    this.setState({ config: ObjectUtils.clone(newProps.config) });
   },
 
   _updateConfigField(field, value) {
     const update = ObjectUtils.clone(this.state.config);
     update[field] = value;
-    this.setState({config: update});
+    this.setState({ config: update });
   },
 
   _onCheckboxClick(field, ref) {
@@ -84,12 +84,12 @@ const GeoIpResolverConfig = createReactClass({
   _availableDatabaseTypes() {
     // TODO: Support country database as well.
     return [
-      {value: 'MAXMIND_CITY', label: 'City database'},
+      { value: 'MAXMIND_CITY', label: 'City database' },
     ];
   },
 
   _activeDatabaseType(type) {
-    return this._availableDatabaseTypes().filter((t) => t.value === type)[0].label;
+    return this._availableDatabaseTypes().filter(t => t.value === type)[0].label;
   },
 
   render() {
@@ -142,7 +142,7 @@ const GeoIpResolverConfig = createReactClass({
             <Input id="maxmind-db-path"
                    type="text"
                    label="Path to the MaxMind database"
-                   help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank">MaxMind</a>.</span>}
+                   help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank" rel="noopener noreferrer">MaxMind</a>.</span>}
                    name="db_path"
                    value={this.state.config.db_path}
                    onChange={this._onUpdate('db_path')}/>
