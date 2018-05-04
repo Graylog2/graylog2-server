@@ -15,8 +15,6 @@ const GeoIpResolverConfig = createReactClass({
     updateConfig: PropTypes.func.isRequired,
   },
 
-  inputs: {},
-
   getDefaultProps() {
     return {
       config: {
@@ -38,6 +36,8 @@ const GeoIpResolverConfig = createReactClass({
     this.setState({ config: ObjectUtils.clone(newProps.config) });
   },
 
+  inputs: {},
+
   _updateConfigField(field, value) {
     const update = ObjectUtils.clone(this.state.config);
     update[field] = value;
@@ -47,12 +47,6 @@ const GeoIpResolverConfig = createReactClass({
   _onCheckboxClick(field, ref) {
     return () => {
       this._updateConfigField(field, this.inputs[ref].getChecked());
-    };
-  },
-
-  _onSelect(field) {
-    return (selection) => {
-      this._updateConfigField(field, selection);
     };
   },
 
@@ -145,7 +139,7 @@ const GeoIpResolverConfig = createReactClass({
                    help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank" rel="noopener noreferrer">MaxMind</a>.</span>}
                    name="db_path"
                    value={this.state.config.db_path}
-                   onChange={this._onUpdate('db_path')}/>
+                   onChange={this._onUpdate('db_path')} />
           </fieldset>
         </BootstrapModalForm>
       </div>
