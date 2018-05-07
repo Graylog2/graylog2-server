@@ -25,6 +25,8 @@ public interface RuleService {
 
     RuleDao load(String id) throws NotFoundException;
 
+    RuleDao loadByName(String name) throws NotFoundException;
+
     Collection<RuleDao> loadAll();
 
     void delete(String id);

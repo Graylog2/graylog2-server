@@ -72,6 +72,16 @@ public class MongoDbRuleService implements RuleService {
     }
 
     @Override
+    public RuleDao loadByName(String name) throws NotFoundException {
+        final DBQuery.Query query = DBQuery.is("title", name);
+        final RuleDao rule = dbCollection.findOne(query);
+        if (rule == null) {
+            throw new NotFoundException("No rule with name " + name);
+        }
+        return rule;
+    }
+
+    @Override
     public Collection<RuleDao> loadAll() {
         try(DBCursor<RuleDao> ruleDaos = dbCollection.find().sort(DBSort.asc("title"))) {
             return ImmutableSet.copyOf((Iterable<RuleDao>) ruleDaos);

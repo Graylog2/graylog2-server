@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 public class InMemoryRuleServiceTest {
@@ -71,6 +72,21 @@ public class InMemoryRuleServiceTest {
             fail("Deleted rules should not be found anymore");
         } catch (NotFoundException ignored) {
         }
+    }
+
+    @Test
+    public void loadByName() throws NotFoundException {
+        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null);
+        final RuleDao savedRule = service.save(rule);
+        final RuleDao loadedRule = service.loadByName(savedRule.title());
+        assertThat(loadedRule).isEqualTo(savedRule);
+    }
+
+    @Test
+    public void loadByNameNotFound() {
+        assertThatThrownBy(() -> service.loadByName("Foobar"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("No rule with name Foobar");
     }
 
     @Test
