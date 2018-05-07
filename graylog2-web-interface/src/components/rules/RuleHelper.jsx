@@ -9,8 +9,7 @@ import RulesActions from 'actions/rules/RulesActions';
 import ObjectUtils from 'util/ObjectUtils';
 
 import DocumentationLink from 'components/support/DocumentationLink';
-import { PaginatedList, Spinner } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { PaginatedList, Spinner, FilterInput } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 
@@ -113,8 +112,7 @@ end`,
     this.setState({ currentPage: newPage, pageSize: pageSize });
   },
 
-  _filterDescriptors(e) {
-    const filter = e.target.value;
+  _filterDescriptors(filter) {
     if (!this.state.functionDescriptors) {
       return;
     }
@@ -172,17 +170,7 @@ end`,
                 </Row>
                 <Row>
                   <Col sm={12}>
-                    <form className="form-horizontal" onSubmit={(e) => { e.preventDefault(); }}>
-                      <Input
-                        id="filter-descriptors"
-                        type="text"
-                        wrapperClassName="col-sm-4"
-                        labelClassName="col-sm-1"
-                        label="Filter"
-                        value={this.state.filter}
-                        onChange={this._filterDescriptors}
-                      />
-                    </form>
+                    <FilterInput onChange={this._filterDescriptors} />
                     <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
                       <PaginatedList totalItems={functionDescriptors.length} pageSize={this.state.pageSize} onChange={this._onPageChange} showPageSizeSelect={false}>
                         <Table condensed>
