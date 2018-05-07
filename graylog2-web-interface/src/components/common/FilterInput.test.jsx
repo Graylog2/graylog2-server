@@ -25,7 +25,7 @@ describe('<FilterInput />', () => {
     const changeFn = jest.fn((value) => {
       expect(value).toEqual('kaladin');
     });
-    const wrapper = mount(<FilterInput onChange={changeFn} />)
+    const wrapper = mount(<FilterInput onChange={changeFn} />);
 
     wrapper.find('input').simulate('change', { target: { value: 'kaladin' } });
     expect(changeFn.mock.calls.length).toBe(1);
