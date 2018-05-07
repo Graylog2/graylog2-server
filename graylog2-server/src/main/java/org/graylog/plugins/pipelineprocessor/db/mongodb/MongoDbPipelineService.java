@@ -25,6 +25,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.mongojack.DBCursor;
+import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
@@ -63,6 +64,16 @@ public class MongoDbPipelineService implements PipelineService {
         final PipelineDao pipeline = dbCollection.findOneById(id);
         if (pipeline == null) {
             throw new NotFoundException("No pipeline with id " + id);
+        }
+        return pipeline;
+    }
+
+    @Override
+    public PipelineDao loadByName(String name) throws NotFoundException {
+        final DBQuery.Query query = DBQuery.is("title", name);
+        final PipelineDao pipeline = dbCollection.findOne(query);
+        if (pipeline == null) {
+            throw new NotFoundException("No pipeline with name " + name);
         }
         return pipeline;
     }

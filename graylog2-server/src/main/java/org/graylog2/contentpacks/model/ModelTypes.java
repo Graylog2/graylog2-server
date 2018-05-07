@@ -24,5 +24,7 @@ public interface ModelTypes {
     ModelType LOOKUP_TABLE = ModelType.of("lookup_table");
     ModelType INPUT = ModelType.of("input");
     ModelType OUTPUT = ModelType.of("output");
+    ModelType PIPELINE = ModelType.of("pipeline");
+    ModelType PIPELINE_RULE = ModelType.of("pipeline_rule");
     ModelType STREAM = ModelType.of("stream");
 }

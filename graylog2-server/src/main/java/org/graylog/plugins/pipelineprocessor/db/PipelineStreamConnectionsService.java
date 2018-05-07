@@ -28,5 +28,7 @@ public interface PipelineStreamConnectionsService {
 
     Set<PipelineConnections> loadAll();
 
+    Set<PipelineConnections> loadByPipelineId(String pipelineId);
+
     void delete(String streamId);
 }

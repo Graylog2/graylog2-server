@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -53,7 +54,6 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
         dbCollection.createIndex(DBSort.asc("stream_id"), new BasicDBObject("unique", true));
     }
 
-
     @Override
     public PipelineConnections save(PipelineConnections connections) {
         PipelineConnections existingConnections = dbCollection.findOne(DBQuery.is("stream_id", connections.streamId()));
@@ -82,6 +82,19 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
             return ImmutableSet.copyOf((Iterable<PipelineConnections>) connections);
         } catch (MongoException e) {
             log.error("Unable to load pipeline connections", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public Set<PipelineConnections> loadByPipelineId(String pipelineId) {
+        // Thanks, MongoJack!
+        // https://github.com/mongojack/mongojack/issues/12
+        final DBObject query = new BasicDBObject("pipeline_ids", new BasicDBObject("$in", Collections.singleton(pipelineId)));
+        try (DBCursor<PipelineConnections> pipelineConnections = dbCollection.find(query)) {
+            return ImmutableSet.copyOf((Iterable<PipelineConnections>) pipelineConnections);
+        } catch (MongoException e) {
+            log.error("Unable to load pipeline connections for pipeline ID " + pipelineId, e);
             return Collections.emptySet();
         }
     }

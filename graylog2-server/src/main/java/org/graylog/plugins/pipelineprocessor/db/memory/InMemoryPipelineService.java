@@ -65,6 +65,15 @@ public class InMemoryPipelineService implements PipelineService {
     }
 
     @Override
+    public PipelineDao loadByName(String name) throws NotFoundException {
+        final String id = titleToId.get(name);
+        if (id == null) {
+            throw new NotFoundException("No pipeline with name " + name);
+        }
+        return load(id);
+    }
+
+    @Override
     public Collection<PipelineDao> loadAll() {
         return ImmutableSet.copyOf(store.values());
     }

@@ -25,6 +25,8 @@ public interface PipelineService {
 
     PipelineDao load(String id) throws NotFoundException;
 
+    PipelineDao loadByName(String name) throws NotFoundException;
+
     Collection<PipelineDao> loadAll();
 
     void delete(String id);

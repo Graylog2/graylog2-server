@@ -24,6 +24,8 @@ import org.graylog2.contentpacks.catalogs.LookupCacheCatalog;
 import org.graylog2.contentpacks.catalogs.LookupDataAdapterCatalog;
 import org.graylog2.contentpacks.catalogs.LookupTableCatalog;
 import org.graylog2.contentpacks.catalogs.OutputCatalog;
+import org.graylog2.contentpacks.catalogs.PipelineCatalog;
+import org.graylog2.contentpacks.catalogs.PipelineRuleCatalog;
 import org.graylog2.contentpacks.catalogs.StreamCatalog;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.plugin.PluginModule;
@@ -44,6 +46,8 @@ public class ContentPacksModule extends PluginModule {
         addEntityCatalog(LookupDataAdapterCatalog.TYPE, LookupDataAdapterCatalog.class);
         addEntityCatalog(LookupTableCatalog.TYPE, LookupTableCatalog.class);
         addEntityCatalog(OutputCatalog.TYPE, OutputCatalog.class);
+        addEntityCatalog(PipelineCatalog.TYPE, PipelineCatalog.class);
+        addEntityCatalog(PipelineRuleCatalog.TYPE, PipelineRuleCatalog.class);
         addEntityCatalog(StreamCatalog.TYPE, StreamCatalog.class);
     }
 }
