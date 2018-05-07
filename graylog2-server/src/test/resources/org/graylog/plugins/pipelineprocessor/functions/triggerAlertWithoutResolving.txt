@@ -1,0 +1,6 @@
+rule "trigger alert without resolving"
+when true
+then
+    let alert_ids = trigger_alert(resolve: false);
+    set_field("alert_ids", alert_ids);
+end

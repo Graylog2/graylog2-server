@@ -17,17 +17,27 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AbstractAlertCondition;
+import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class DummyAlertCondition extends AbstractAlertCondition {
-    final String description = "Dummy alert to test notifications";
+    private final String description;
+    private final List<MessageSummary> messageSummaries;
+
+    public DummyAlertCondition(Stream stream, String id, String description, List<MessageSummary> messageSummaries, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
+        super(stream, id, Type.DUMMY.toString(), createdAt, creatorUserId, parameters, title);
+        this.description = description;
+        this.messageSummaries = messageSummaries;
+    }
 
     public DummyAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
-        super(stream, id, Type.DUMMY.toString(), createdAt, creatorUserId, parameters, title);
+        this(stream, id, "Dummy alert to test notifications", Collections.emptyList(), createdAt, creatorUserId, parameters, title);
     }
 
     @Override
@@ -37,6 +47,6 @@ public class DummyAlertCondition extends AbstractAlertCondition {
 
     @Override
     public CheckResult runCheck() {
-        return new CheckResult(true, this, this.description, Tools.nowUTC(), null);
+        return new CheckResult(true, this, this.description, Tools.nowUTC(), messageSummaries);
     }
 }

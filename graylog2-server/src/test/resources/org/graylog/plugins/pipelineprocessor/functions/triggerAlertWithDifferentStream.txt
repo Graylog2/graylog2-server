@@ -1,0 +1,6 @@
+rule "trigger alert with different stream"
+when true
+then
+    let alert_ids = trigger_alert(stream_name: "some name");
+    set_field("alert_ids", alert_ids);
+end
