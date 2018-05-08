@@ -92,12 +92,21 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     public List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException {
         final ImmutableList.Builder<GrokPattern> savedPatterns = ImmutableList.builder();
 
+        try {
+            if (!validateAll(patterns)) {
+                throw new ValidationException("Invalid patterns");
+            }
+        } catch (GrokException | PatternSyntaxException e) {
+            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
+        }
+
         if (replace) {
             deleteAll();
         }
 
         for (final GrokPattern pattern : patterns) {
-            savedPatterns.add(save(pattern));
+            final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
+            savedPatterns.add(result.getSavedObject());
         }
 
         return savedPatterns.build();

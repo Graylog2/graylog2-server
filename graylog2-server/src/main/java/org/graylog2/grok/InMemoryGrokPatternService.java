@@ -94,15 +94,14 @@ public class InMemoryGrokPatternService implements GrokPatternService {
     @Override
     public List<GrokPattern> saveAll(Collection<GrokPattern> patterns,
                                      boolean replace) throws ValidationException {
-        for (GrokPattern pattern : patterns) {
-            try {
-                if (!validate(pattern)) {
-                    throw new ValidationException("Pattern " + pattern.name() + " invalid.");
-                }
-            } catch (GrokException | PatternSyntaxException e) {
-                throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
+        try {
+            if (!validateAll(patterns)) {
+                throw new ValidationException("Patterns invalid.");
             }
+        } catch (GrokException | PatternSyntaxException e) {
+            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
         }
+
         if (replace) {
             deleteAll();
         }
