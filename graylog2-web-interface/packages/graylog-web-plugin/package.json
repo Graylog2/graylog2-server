@@ -34,7 +34,7 @@
     "README.md"
   ],
   "dependencies": {
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.2.3",
     "babel-preset-env": "^1.6.1",
     "eslint": "^4.3.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
