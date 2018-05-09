@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.rest.models.system.contenpacks.responses.CatalogIndexResponse;
 import org.graylog2.rest.models.system.contenpacks.responses.CatalogResolveRequest;
 import org.graylog2.rest.models.system.contenpacks.responses.CatalogResolveResponse;
@@ -98,8 +99,9 @@ public class CatalogResourceTest {
                 .type(ModelType.of("test"))
                 .data(new ObjectNode(JsonNodeFactory.instance).put("test", "1234"))
                 .build();
+        final EntityWithConstraints entityWithConstraints = EntityWithConstraints.create(entity);
         when(mockEntityCatalog.resolve(entityDescriptor)).thenReturn(entityDescriptors);
-        when(mockEntityCatalog.collectEntity(entityDescriptor)).thenReturn(Optional.of(entity));
+        when(mockEntityCatalog.collectEntity(entityDescriptor)).thenReturn(Optional.of(entityWithConstraints));
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.plugin.Version;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_GraylogVersionConstraint.Builder.class)
@@ -34,6 +35,12 @@ public abstract class GraylogVersionConstraint implements Constraint {
 
     public static Builder builder() {
         return new AutoValue_GraylogVersionConstraint.Builder();
+    }
+
+    public static GraylogVersionConstraint currentGraylogVersion() {
+        return builder()
+                .version(Version.CURRENT_CLASSPATH.toString())
+                .build();
     }
 
     @AutoValue.Builder

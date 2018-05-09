@@ -23,6 +23,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -41,7 +42,7 @@ public class LookupTableCodec implements EntityCodec<LookupTableDto> {
     }
 
     @Override
-    public Entity encode(LookupTableDto lookupTableDto) {
+    public EntityWithConstraints encode(LookupTableDto lookupTableDto) {
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
                 lookupTableDto.name(),
                 lookupTableDto.title(),
@@ -53,12 +54,12 @@ public class LookupTableCodec implements EntityCodec<LookupTableDto> {
                 lookupTableDto.defaultMultiValue(),
                 lookupTableDto.defaultMultiValueType());
         final JsonNode data = objectMapper.convertValue(lookupTableEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(lookupTableDto.id()))
                 .type(ModelTypes.LOOKUP_TABLE)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     @Override

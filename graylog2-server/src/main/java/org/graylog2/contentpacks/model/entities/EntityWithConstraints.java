@@ -14,16 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks.codecs;
+package org.graylog2.contentpacks.model.entities;
 
-import org.graylog2.contentpacks.model.entities.Entity;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import com.google.auto.value.AutoValue;
+import org.graylog2.contentpacks.model.constraints.Constraint;
 
-public interface EntityCodec<T> {
-    EntityWithConstraints encode(T nativeEntity);
+import java.util.Collections;
+import java.util.Set;
 
-    T decode(Entity entity);
+@AutoValue
+public abstract class EntityWithConstraints {
+    public abstract Entity entity();
 
-    EntityExcerpt createExcerpt(T nativeEntity);
+    public abstract Set<Constraint> constraints();
+
+    public static EntityWithConstraints create(Entity entity, Set<Constraint> constraints) {
+        return new AutoValue_EntityWithConstraints(entity, constraints);
+    }
+
+    public static EntityWithConstraints create(Entity entity) {
+        return create(entity, Collections.emptySet());
+    }
 }

@@ -25,10 +25,10 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.codecs.StreamCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
@@ -131,12 +131,13 @@ public class StreamCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/streams.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM));
+        final Optional<EntityWithConstraints> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM));
         assertThat(collectedEntity)
                 .isPresent()
+                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf23894b900a0fdb4e517d"));
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM);
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);

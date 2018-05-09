@@ -20,9 +20,9 @@ import org.graylog2.contentpacks.codecs.GrokPatternCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
@@ -57,7 +57,7 @@ public class GrokPatternCatalog implements EntityCatalog {
     }
 
     @Override
-    public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());

@@ -25,6 +25,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
@@ -86,9 +87,10 @@ public class GrokPatternCatalogTest {
                 .data(entityData)
                 .build();
 
-        final Optional<Entity> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
+        final Optional<EntityWithConstraints> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
         assertThat(collectedEntity)
                 .isPresent()
+                .map(EntityWithConstraints::entity)
                 .contains(expectedEntity);
     }
 }

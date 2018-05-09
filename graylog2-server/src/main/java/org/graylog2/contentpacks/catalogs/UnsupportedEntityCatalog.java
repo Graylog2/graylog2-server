@@ -21,6 +21,7 @@ import com.google.common.graph.GraphBuilder;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class UnsupportedEntityCatalog implements EntityCatalog {
     }
 
     @Override
-    public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
         LOG.warn("Couldn't collect entity {}", entityDescriptor);
         return Optional.empty();
     }

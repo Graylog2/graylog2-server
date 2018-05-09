@@ -26,10 +26,10 @@ import org.graylog2.contentpacks.codecs.DashboardCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
-import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
@@ -91,12 +91,13 @@ public class DashboardCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD));
+        final Optional<EntityWithConstraints> collectedEntity = catalog.collectEntity(EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD));
         assertThat(collectedEntity)
                 .isPresent()
+                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("5a82f5974b900a7a97caa1e5"));
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD);
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);

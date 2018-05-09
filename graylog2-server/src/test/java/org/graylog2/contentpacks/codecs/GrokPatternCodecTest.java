@@ -22,6 +22,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
@@ -46,7 +47,8 @@ public class GrokPatternCodecTest {
     @Test
     public void encode() {
         final GrokPattern grokPattern = GrokPattern.create("01234567890", "name", "pattern", null);
-        final Entity entity = codec.encode(grokPattern);
+        final EntityWithConstraints entityWithConstraints = codec.encode(grokPattern);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("01234567890"));

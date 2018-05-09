@@ -22,6 +22,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -65,7 +66,8 @@ public class LookupTableCodecTest {
                 .defaultMultiValue("default-multi")
                 .defaultMultiValueType(LookupDefaultValue.Type.STRING)
                 .build();
-        final Entity entity = codec.encode(lookupTableDto);
+        final EntityWithConstraints entityWithConstraints = codec.encode(lookupTableDto);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));

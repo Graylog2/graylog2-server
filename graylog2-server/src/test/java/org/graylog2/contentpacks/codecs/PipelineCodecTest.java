@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -68,7 +69,8 @@ public class PipelineCodecTest {
         final PipelineConnections connections = PipelineConnections.create("id", "stream-1234", Collections.singleton("pipeline-1234"));
         connectionsService.save(connections);
 
-        final Entity entity = codec.encode(pipeline);
+        final EntityWithConstraints entityWithConstraints = codec.encode(pipeline);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("title"));

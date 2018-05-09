@@ -23,6 +23,7 @@ import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 
 import java.util.Optional;
 import java.util.Set;
@@ -30,7 +31,7 @@ import java.util.Set;
 public interface EntityCatalog {
     Set<EntityExcerpt> listEntityExcerpts();
 
-    Optional<Entity> collectEntity(EntityDescriptor entityDescriptor);
+    Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor);
 
     default Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();

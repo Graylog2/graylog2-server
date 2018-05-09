@@ -23,6 +23,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
@@ -44,7 +45,7 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
     }
 
     @Override
-    public Entity encode(DataAdapterDto dataAdapterDto) {
+    public EntityWithConstraints encode(DataAdapterDto dataAdapterDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(dataAdapterDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupDataAdapterEntity lookupDataAdapterEntity = LookupDataAdapterEntity.create(
@@ -53,12 +54,12 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
                 dataAdapterDto.description(),
                 configuration);
         final JsonNode data = objectMapper.convertValue(lookupDataAdapterEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(dataAdapterDto.id()))
                 .type(ModelTypes.LOOKUP_ADAPTER)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     @Override

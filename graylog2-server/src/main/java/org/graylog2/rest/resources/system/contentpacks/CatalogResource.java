@@ -25,7 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.contentpacks.catalogs.CatalogIndex;
-import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.rest.models.system.contenpacks.responses.CatalogIndexResponse;
@@ -74,8 +74,8 @@ public class CatalogResource {
             @Valid @NotNull CatalogResolveRequest request) {
         final Set<EntityDescriptor> requestedEntities = request.entities();
         final Set<EntityDescriptor> resolvedEntities = catalogIndex.resolveEntities(requestedEntities);
-        final Set<Entity> entities = catalogIndex.collectEntities(resolvedEntities);
+        final EntitiesWithConstraints entitiesWithConstraints = catalogIndex.collectEntities(resolvedEntities);
 
-        return CatalogResolveResponse.create(entities);
+        return CatalogResolveResponse.create(entitiesWithConstraints.constraints(), entitiesWithConstraints.entities());
     }
 }

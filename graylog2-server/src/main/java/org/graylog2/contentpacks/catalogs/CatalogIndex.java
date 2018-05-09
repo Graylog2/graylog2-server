@@ -22,6 +22,9 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
+import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -90,14 +93,19 @@ public class CatalogIndex {
         g2.edges().forEach(edge -> g1.putEdge(edge.nodeU(), edge.nodeV()));
     }
 
-    public Set<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
-        final ImmutableSet.Builder<Entity> resultBuilder = ImmutableSet.builder();
+    public EntitiesWithConstraints collectEntities(Collection<EntityDescriptor> resolvedEntities) {
+        final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
+        final ImmutableSet.Builder<Constraint> constraints = ImmutableSet.<Constraint>builder()
+                .add(GraylogVersionConstraint.currentGraylogVersion());
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
             final EntityCatalog catalog = catalogs.getOrDefault(entityDescriptor.type(), UnsupportedEntityCatalog.INSTANCE);
 
-            catalog.collectEntity(entityDescriptor).ifPresent(resultBuilder::add);
+            catalog.collectEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
+                entities.add(entityWithConstraints.entity());
+                constraints.addAll(entityWithConstraints.constraints());
+            });
         }
 
-        return resultBuilder.build();
+        return EntitiesWithConstraints.create(entities.build(), constraints.build());
     }
 }

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 
 import java.util.Collection;
@@ -28,11 +29,15 @@ import java.util.Collection;
 @JsonAutoDetect
 @AutoValue
 public abstract class CatalogResolveResponse {
+    @JsonProperty("constraints")
+    public abstract ImmutableSet<Constraint> constraints();
+
     @JsonProperty("entities")
     public abstract ImmutableSet<Entity> entities();
 
     @JsonCreator
-    public static CatalogResolveResponse create(@JsonProperty("entities") Collection<Entity> entities) {
-        return new AutoValue_CatalogResolveResponse(ImmutableSet.copyOf(entities));
+    public static CatalogResolveResponse create(@JsonProperty("constraints") Collection<Constraint> constraints,
+                                                @JsonProperty("entities") Collection<Entity> entities) {
+        return new AutoValue_CatalogResolveResponse(ImmutableSet.copyOf(constraints), ImmutableSet.copyOf(entities));
     }
 }

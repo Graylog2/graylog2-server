@@ -23,6 +23,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -57,7 +58,7 @@ public class StreamCodec implements EntityCodec<Stream> {
     }
 
     @Override
-    public Entity encode(Stream stream) {
+    public EntityWithConstraints encode(Stream stream) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
@@ -75,12 +76,12 @@ public class StreamCodec implements EntityCodec<Stream> {
                 stream.getRemoveMatchesFromDefaultStream());
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(stream.getId()))
                 .type(ModelTypes.STREAM)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     private StreamRuleEntity encodeStreamRule(StreamRule streamRule) {

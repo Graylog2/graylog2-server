@@ -23,6 +23,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
@@ -43,19 +44,19 @@ public class OutputCodec implements EntityCodec<Output> {
     }
 
     @Override
-    public Entity encode(Output output) {
+    public EntityWithConstraints encode(Output output) {
         final OutputEntity outputEntity = OutputEntity.create(
                 output.getTitle(),
                 output.getType(),
                 output.getConfiguration()
         );
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(output.getId()))
                 .type(ModelTypes.OUTPUT)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     @Override

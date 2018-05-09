@@ -23,6 +23,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
@@ -44,7 +45,7 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
     }
 
     @Override
-    public Entity encode(CacheDto cacheDto) {
+    public EntityWithConstraints encode(CacheDto cacheDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(
@@ -53,13 +54,12 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
                 cacheDto.description(),
                 configuration);
         final JsonNode data = objectMapper.convertValue(lookupCacheEntity, JsonNode.class);
-
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(cacheDto.id()))
                 .type(ModelTypes.LOOKUP_CACHE)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     @Override

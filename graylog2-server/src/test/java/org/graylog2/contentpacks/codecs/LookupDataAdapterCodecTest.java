@@ -22,6 +22,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
@@ -60,7 +61,8 @@ public class LookupDataAdapterCodecTest {
                 .description("Data Adapter Description")
                 .config(new FallbackAdapterConfig())
                 .build();
-        final Entity entity = codec.encode(dataAdapterDto);
+        final EntityWithConstraints entityWithConstraints = codec.encode(dataAdapterDto);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(dataAdapterDto.id()));

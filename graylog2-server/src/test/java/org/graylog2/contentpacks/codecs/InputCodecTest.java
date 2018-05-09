@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.inputs.InputImpl;
@@ -83,7 +84,8 @@ public class InputCodecTest {
         final InputImpl input = new InputImpl(fields);
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
-        final Entity entity = codec.encode(inputWithExtractors);
+        final EntityWithConstraints entityWithConstraints = codec.encode(inputWithExtractors);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(input.getId()));
