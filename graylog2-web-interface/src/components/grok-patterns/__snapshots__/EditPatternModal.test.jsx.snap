@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<EditPatternModal /> should render a modal button with as create 1`] = `
+<span>
+  <button
+    className="btn btn-success"
+    onClick={[Function]}
+  >
+    Create pattern
+  </button>
+</span>
+`;
+
+exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
+<span>
+  <button
+    className="btn btn-info btn-xs"
+    onClick={[Function]}
+  >
+    <span>
+      Edit
+    </span>
+  </button>
+</span>
+`;

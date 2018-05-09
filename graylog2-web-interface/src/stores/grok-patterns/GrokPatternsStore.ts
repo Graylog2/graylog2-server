@@ -1,5 +1,6 @@
 const UserNotification = require("util/UserNotification");
 const URLUtils = require('util/URLUtils');
+const ApiRoutes = require('routing/ApiRoutes');
 
 const fetchDefault = require('logic/rest/FetchProvider').default;
 const fetchPlainText = require('logic/rest/FetchProvider').fetchPlainText;
@@ -8,6 +9,12 @@ interface GrokPattern {
   id: string;
   name: string;
   pattern: string;
+}
+
+interface GrokPatternTest {
+  name: string,
+  pattern: string,
+  sampleData: string,
 }
 
 const GrokPatternsStore = {
@@ -19,7 +26,7 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
     // get the current list of patterns and sort it by name
-    fetchDefault('GET', this.URL).then(
+    return fetchDefault('GET', this.URL).then(
       (resp: any) => {
         const patterns = resp.patterns;
         patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
@@ -31,10 +38,44 @@ const GrokPatternsStore = {
       failCallback);
   },
 
+  testPattern(pattern: GrokPatternTest, callback: (response) => void, errCallback: (err_message) => void) {
+    const failCallback = (error) => {
+      let err_message = error.message;
+      let err_body = error.additional.body;
+      if (err_body && err_body.message) {
+          err_message = error.additional.body.message;
+      }
+      errCallback(err_message);
+    };
+
+    const requestPatternTest = {
+      grok_pattern: {
+        name: pattern.name,
+        pattern: pattern.pattern
+      },
+      sampleData: pattern.sampleData
+    };
+
+    fetchDefault('POST', URLUtils.qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
+      .then(
+        response => {
+          callback(response);
+          return response;
+        },
+        failCallback
+      );
+
+  },
+
   savePattern(pattern: GrokPattern, callback: () => void) {
-    var failCallback = (error) => {
-      UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + error.message,
-        "Could not save Grok pattern");
+    const failCallback = (error) => {
+      let err_message = error.message;
+      let err_body = error.additional.body;
+      if (err_body && err_body.message) {
+        err_message = error.additional.body.message;
+      }
+      UserNotification.error(`Testing Grok pattern "${pattern.name}" failed with status: ${err_message}`,
+        "Could not test Grok pattern");
     };
 
     const requestPattern = {
@@ -83,7 +124,16 @@ const GrokPatternsStore = {
 
   bulkImport(patterns: string, replaceAll: boolean) {
     var failCallback = (error) => {
-      UserNotification.error("Importing Grok pattern file failed with status: " + error.message,
+      let err_message = error.message;
+      let err_body = error.additional.body;
+      if (err_body && err_body.validation_errors && err_body.validation_errors._) {
+        err_message = "";
+        const errors = err_body.validation_errors._;
+        for(let i = 0, len = errors.length; i < len; i++) {
+          err_message = err_message.concat(errors[i].error);
+        }
+      }
+      UserNotification.error("Importing Grok pattern file failed with status: " + err_message,
         "Could not load Grok patterns");
     };
 

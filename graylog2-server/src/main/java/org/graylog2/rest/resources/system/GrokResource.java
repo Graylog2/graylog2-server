@@ -17,26 +17,33 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.GrokPatternsChangedEvent;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.rest.models.system.responses.GrokPatternList;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -57,6 +64,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,6 +81,7 @@ public class GrokResource extends RestResource {
 
     private final GrokPatternService grokPatternService;
     private final ClusterEventBus clusterBus;
+    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
     @Inject
     public GrokResource(GrokPatternService grokPatternService, ClusterEventBus clusterBus) {
@@ -98,6 +107,23 @@ public class GrokResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_READ);
 
         return grokPatternService.load(patternId);
+    }
+
+    @POST
+    @Timed
+    @Path("/test")
+    @NoAuditEvent("Only used to test pattern.")
+    @ApiOperation(value = "Test pattern with sample data")
+    public Response testPattern(@ApiParam(name = "pattern", required = true) GrokPatternTestRequest request) {
+        Map<String, Object> result;
+        try {
+            result = grokPatternService.match(request.grokPattern(), request.sampleData());
+        } catch (GrokException | IllegalArgumentException e) {
+            Map<String, String> error = ImmutableMap.of("message", e.getMessage());
+
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(error).build());
+        }
+        return Response.ok(result).build();
     }
 
     @POST
@@ -128,11 +154,16 @@ public class GrokResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final Set<String> updatedPatternNames = Sets.newHashSet();
+        try {
+            if (!grokPatternService.validateAll(patternList.patterns())) {
+                throw new ValidationException("Invalid pattern contained. Did not save any patterns.");
+            }
+        } catch (GrokException | IllegalArgumentException e) {
+            throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
+        }
+
         for (final GrokPattern pattern : patternList.patterns()) {
             updatedPatternNames.add(pattern.name());
-            if (!grokPatternService.validate(pattern)) {
-                throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
-            }
         }
 
         grokPatternService.saveAll(patternList.patterns(), replace);
@@ -151,13 +182,19 @@ public class GrokResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         final List<GrokPattern> grokPatterns = readGrokPatterns(patternsFile);
+
         if (!grokPatterns.isEmpty()) {
+            try {
+                if (!grokPatternService.validateAll(grokPatterns)) {
+                    throw new ValidationException("Invalid pattern contained. Did not save any patterns.");
+                }
+            } catch (GrokException | IllegalArgumentException e) {
+                throw new ValidationException("Invalid pattern. Did not save any patterns\n" + e.getMessage());
+            }
+
             final Set<String> updatedPatternNames = Sets.newHashSetWithExpectedSize(grokPatterns.size());
             for (final GrokPattern pattern : grokPatterns) {
                 updatedPatternNames.add(pattern.name());
-                if (!grokPatternService.validate(pattern)) {
-                    throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
-                }
             }
 
             grokPatternService.saveAll(grokPatterns, replace);

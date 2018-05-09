@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog2.rest.models.system.grokpattern.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,16 +23,20 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.grok.GrokPattern;
 
-import java.util.Collection;
-
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class GrokPatternList {
-    
+public abstract class GrokPatternTestRequest {
+
     @JsonProperty
-    public abstract Collection<GrokPattern> patterns();
+    public abstract GrokPattern grokPattern();
+
+    @JsonProperty
+    public abstract String sampleData();
 
     @JsonCreator
-    public static GrokPatternList create(@JsonProperty("patterns") Collection<GrokPattern> patternList) {return new AutoValue_GrokPatternList(patternList);}
+    public static GrokPatternTestRequest create(@JsonProperty("grok_pattern") GrokPattern grokPattern,
+                                         @JsonProperty("sampleData") String sampleData) {
+       return new AutoValue_GrokPatternTestRequest(grokPattern, sampleData);
+    }
 }

@@ -23,7 +23,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -78,10 +80,18 @@ public class InMemoryGrokPatternServiceTest {
 
         assertThat(loaded).isEqualTo(updated);
 
+        //check that using stored patterns works
+        final GrokPattern newPattern = service.save(GrokPattern.create("NEWONE", "%{OTHERNAME}"));
+
+        final GrokPattern newLoaded = service.load(newPattern.id());
+
+        assertThat(newLoaded).isEqualTo(newPattern);
+
+
         // save should validate
         try {
             service.save(GrokPattern.create("INVALID", "*"));
-            fail("Show throw ValidationException");
+            fail("Should throw ValidationException");
         } catch (ValidationException ignored) {
         }
     }
@@ -100,6 +110,22 @@ public class InMemoryGrokPatternServiceTest {
         // replaced all patterns
         service.saveAll(patterns, true);
         assertThat(service.loadAll()).hasSize(2);
+    }
+
+    @Test
+    public void validateAll() throws Exception {
+        Collection<GrokPattern> patternsRight = ImmutableList.of(GrokPattern.create("1", ".*"),
+                GrokPattern.create("2", ".+"));
+        final boolean result = service.validateAll(patternsRight);
+        assertThat(result).isTrue();
+
+        Collection<GrokPattern> patternsWrong = ImmutableList.of(GrokPattern.create("1", "***"),
+                GrokPattern.create("2", ".+"));
+        try {
+            service.validateAll(patternsWrong);
+            fail("Should throw ValidationException");
+        } catch (Exception ignored) {
+        }
     }
 
     @Test
@@ -130,4 +156,13 @@ public class InMemoryGrokPatternServiceTest {
         assertThat(service.loadAll()).isEmpty();
     }
 
+    @Test
+    public void match() throws Exception {
+        final String name = "IP";
+        final String sampleData = "1.2.3.4";
+        final Map<String, Object> expectedResult = Collections.singletonMap("IP", "1.2.3.4");
+        GrokPattern grokPattern = GrokPattern.create(name, "\\d.\\d.\\d.\\d");
+        final Map<String, Object> result = service.match(grokPattern, sampleData);
+        assertThat(result).isEqualTo(expectedResult);
+    }
 }

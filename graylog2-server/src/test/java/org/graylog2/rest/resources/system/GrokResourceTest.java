@@ -22,6 +22,7 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.GrokPatternsChangedEvent;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,11 +86,12 @@ public class GrokResourceTest {
         final String patterns = Arrays.stream(GROK_LINES).collect(Collectors.joining("\n"));
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
-        when(grokPatternService.validate(expectedPattern)).thenReturn(true);
+        final List<GrokPattern> patternList = Collections.singletonList(expectedPattern);
+        when(grokPatternService.validateAll(patternList)).thenReturn(true);
 
         final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
 
-        verify(grokPatternService, times(1)).validate(expectedPattern);
+        verify(grokPatternService, times(1)).validateAll(patternList);
         verify(grokPatternService, times(1)).saveAll(Collections.singletonList(expectedPattern), true);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
@@ -102,12 +105,13 @@ public class GrokResourceTest {
         final String patterns = Arrays.stream(GROK_LINES).collect(Collectors.joining("\r"));
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
-        when(grokPatternService.validate(expectedPattern)).thenReturn(true);
+        final List<GrokPattern> patternList = Collections.singletonList(expectedPattern);
+        when(grokPatternService.validateAll(patternList)).thenReturn(true);
 
         final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
 
-        verify(grokPatternService, times(1)).validate(expectedPattern);
-        verify(grokPatternService, times(1)).saveAll(Collections.singletonList(expectedPattern), true);
+        verify(grokPatternService, times(1)).validateAll(patternList);
+        verify(grokPatternService, times(1)).saveAll(patternList, true);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
@@ -120,11 +124,12 @@ public class GrokResourceTest {
         final String patterns = Arrays.stream(GROK_LINES).collect(Collectors.joining("\r\n"));
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
-        when(grokPatternService.validate(expectedPattern)).thenReturn(true);
+        final List<GrokPattern> patternList = Collections.singletonList(expectedPattern);
+        when(grokPatternService.validateAll(patternList)).thenReturn(true);
 
         final Response response = grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
 
-        verify(grokPatternService, times(1)).validate(expectedPattern);
+        verify(grokPatternService, times(1)).validateAll(patternList);
         verify(grokPatternService, times(1)).saveAll(Collections.singletonList(expectedPattern), true);
 
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
@@ -138,10 +143,11 @@ public class GrokResourceTest {
         final String patterns = Arrays.stream(GROK_LINES).collect(Collectors.joining("\n"));
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(patterns.getBytes(StandardCharsets.UTF_8));
         final GrokPattern expectedPattern = GrokPattern.create("TEST_PATTERN_0", "Foo");
-        when(grokPatternService.validate(expectedPattern)).thenReturn(false);
+        final List<GrokPattern> patternList = Collections.singletonList(expectedPattern);
+        when(grokPatternService.validateAll(patternList)).thenReturn(false);
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Invalid pattern " + expectedPattern + ". Did not save any patterns.");
+        expectedException.expectMessage("Invalid pattern contained. Did not save any patterns.");
 
         grokResource.bulkUpdatePatternsFromTextFile(inputStream, true);
     }
@@ -159,6 +165,19 @@ public class GrokResourceTest {
         assertThat(response.getStatusInfo()).isEqualTo(Response.Status.ACCEPTED);
         assertThat(response.hasEntity()).isFalse();
         assertThat(subscriber.events).isEmpty();
+    }
+
+    @Test
+    public void testPatternWithSampleData() throws Exception {
+        final String sampleData = "1.2.3.4";
+        final GrokPattern grokPattern = GrokPattern.create("IP", "\\d.\\d.\\d.\\d");
+        final GrokPatternTestRequest grokPatternTestRequest = GrokPatternTestRequest.create(grokPattern, sampleData);
+        final Map<String, Object> expectedReturn = Collections.singletonMap("IP", "1.2.3.4");
+
+        when(grokPatternService.match(grokPattern, sampleData)).thenReturn(expectedReturn);
+        final Response response = grokResource.testPattern(grokPatternTestRequest);
+        assertThat(response.hasEntity()).isTrue();
+        assertThat(response.getEntity()).isEqualTo(expectedReturn);
     }
 
     static class GrokPatternsChangedEventSubscriber {

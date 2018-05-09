@@ -19,6 +19,7 @@ package org.graylog2.grok;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.thekraken.grok.api.Grok;
 import io.thekraken.grok.api.GrokCompiler;
 import io.thekraken.grok.api.exception.GrokException;
 import org.bson.types.ObjectId;
@@ -36,8 +37,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MongoDbGrokPatternService implements GrokPatternService {
     public static final String GROK_PATTERNS = "grok_patterns";
@@ -73,8 +77,12 @@ public class MongoDbGrokPatternService implements GrokPatternService {
 
     @Override
     public GrokPattern save(GrokPattern pattern) throws ValidationException {
-        if (!validate(pattern)) {
-            throw new ValidationException("Invalid pattern " + pattern);
+        try {
+            if (!validate(pattern)) {
+                throw new ValidationException("Invalid pattern " + pattern);
+            }
+        } catch (GrokException | PatternSyntaxException e) {
+            throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
         }
         final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
         return result.getSavedObject();
@@ -84,31 +92,71 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     public List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException {
         final ImmutableList.Builder<GrokPattern> savedPatterns = ImmutableList.builder();
 
+        try {
+            if (!validateAll(patterns)) {
+                throw new ValidationException("Invalid patterns");
+            }
+        } catch (GrokException | PatternSyntaxException e) {
+            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
+        }
+
         if (replace) {
             deleteAll();
         }
 
         for (final GrokPattern pattern : patterns) {
-            savedPatterns.add(save(pattern));
+            final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
+            savedPatterns.add(result.getSavedObject());
         }
 
         return savedPatterns.build();
     }
 
     @Override
-    public boolean validate(GrokPattern pattern) {
-        final boolean fieldsMissing = !(Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern()));
-        try {
-            final GrokCompiler grok = GrokCompiler.newInstance();
-            grok.register(pattern.name(), pattern.pattern());
-            grok.compile("%{" + pattern.name() + "}");
-        } catch (GrokException ignored) {
-            // this only checks for null or empty again.
-        } catch (PatternSyntaxException e) {
-            log.warn("Invalid regular expression syntax for '" + pattern.name() + "' with pattern " + pattern.pattern(), e);
-            return false;
+    public Map<String, Object> match(GrokPattern pattern, String sampleData) throws GrokException {
+        final Set<GrokPattern> patterns = loadAll();
+        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
+        grokCompiler.register(pattern.name(), pattern.pattern());
+        for(GrokPattern storedPattern : patterns) {
+            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
-        return fieldsMissing;
+        Grok grok = grokCompiler.compile("%{" + pattern.name() + "}");
+        return grok.capture(sampleData);
+    }
+
+    @Override
+    public boolean validate(GrokPattern pattern) throws GrokException {
+        checkNotNull(pattern, "A pattern must be given");
+        final Set<GrokPattern> patterns = loadAll();
+        final boolean fieldsMissing = Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern());
+        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
+        grokCompiler.register(pattern.name(), pattern.pattern());
+        for(GrokPattern storedPattern : patterns) {
+            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
+        }
+        grokCompiler.compile("%{" + pattern.name() + "}");
+        return !fieldsMissing;
+    }
+
+    @Override
+    public boolean validateAll(Collection<GrokPattern> newPatterns) throws GrokException {
+        final Set<GrokPattern> patterns = loadAll();
+        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
+
+        for(GrokPattern newPattern : newPatterns) {
+            final boolean fieldsMissing = Strings.isNullOrEmpty(newPattern.name()) || Strings.isNullOrEmpty(newPattern.pattern());
+            if (fieldsMissing) {
+                return false;
+            }
+            grokCompiler.register(newPattern.name(), newPattern.pattern());
+        }
+        for(GrokPattern storedPattern : patterns) {
+            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
+        }
+        for(GrokPattern newPattern : newPatterns) {
+            grokCompiler.compile("%{" + newPattern.name() + "}");
+        }
+        return true;
     }
 
     @Override
