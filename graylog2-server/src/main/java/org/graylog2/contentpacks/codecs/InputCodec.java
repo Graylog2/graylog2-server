@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.database.NotFoundException;
@@ -88,7 +89,7 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
     }
 
     @Override
-    public Entity encode(InputWithExtractors inputWithExtractors) {
+    public EntityWithConstraints encode(InputWithExtractors inputWithExtractors) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
@@ -105,12 +106,12 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
                 input.isGlobal(),
                 extractors);
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(input.getId()))
                 .type(ModelTypes.INPUT)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     private ExtractorEntity encodeExtractor(Extractor extractor) {

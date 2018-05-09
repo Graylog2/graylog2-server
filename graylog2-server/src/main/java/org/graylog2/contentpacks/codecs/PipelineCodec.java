@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -50,7 +51,7 @@ public class PipelineCodec implements EntityCodec<PipelineDao> {
     }
 
     @Override
-    public Entity encode(PipelineDao pipelineDao) {
+    public EntityWithConstraints encode(PipelineDao pipelineDao) {
         final Set<String> connectedStreams = connectedStreams(pipelineDao.id());
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 pipelineDao.title(),
@@ -58,12 +59,12 @@ public class PipelineCodec implements EntityCodec<PipelineDao> {
                 pipelineDao.source(),
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(pipelineDao.title()))
                 .type(ModelTypes.PIPELINE)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     private Set<String> connectedStreams(String pipelineId) {

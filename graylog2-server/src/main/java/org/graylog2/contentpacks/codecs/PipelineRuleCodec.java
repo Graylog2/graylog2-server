@@ -25,6 +25,7 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -42,18 +43,18 @@ public class PipelineRuleCodec implements EntityCodec<RuleDao> {
     }
 
     @Override
-    public Entity encode(RuleDao ruleDao) {
+    public EntityWithConstraints encode(RuleDao ruleDao) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
                 ruleDao.title(),
                 ruleDao.description(),
                 ruleDao.source());
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(ruleDao.title()))
                 .type(ModelTypes.PIPELINE_RULE)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     @Override

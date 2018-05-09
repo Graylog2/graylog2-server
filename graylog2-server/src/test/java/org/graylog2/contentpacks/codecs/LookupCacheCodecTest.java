@@ -22,6 +22,7 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
@@ -60,7 +61,8 @@ public class LookupCacheCodecTest {
                 .description("Cache Description")
                 .config(new FallbackCacheConfig())
                 .build();
-        final Entity entity = codec.encode(cacheDto);
+        final EntityWithConstraints entityWithConstraints = codec.encode(cacheDto);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));

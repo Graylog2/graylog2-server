@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.model.entities.DashboardWidgetEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
@@ -68,7 +69,7 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
     }
 
     @Override
-    public Entity encode(Dashboard dashboard) {
+    public EntityWithConstraints encode(Dashboard dashboard) {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
@@ -79,12 +80,12 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
                 dashboard.getDescription(),
                 dashboardWidgets);
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
-
-        return EntityV1.builder()
+        final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(dashboard.getId()))
                 .type(ModelTypes.DASHBOARD)
                 .data(data)
                 .build();
+        return EntityWithConstraints.create(entity);
     }
 
     private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position) {

@@ -32,9 +32,9 @@ import org.graylog2.contentpacks.codecs.PipelineCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class PipelineCatalog implements EntityCatalog {
     }
 
     @Override
-    public Optional<Entity> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());

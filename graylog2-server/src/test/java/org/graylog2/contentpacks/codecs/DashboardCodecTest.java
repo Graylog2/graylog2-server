@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.DashboardEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
@@ -100,7 +101,8 @@ public class DashboardCodecTest {
         final DashboardImpl dashboard = new DashboardImpl(fields);
         dashboard.addWidget(dashboardWidget);
 
-        final Entity entity = codec.encode(dashboard);
+        final EntityWithConstraints entityWithConstraints = codec.encode(dashboard);
+        final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(dashboard.getId()));
@@ -125,13 +127,12 @@ public class DashboardCodecTest {
                     });
                     assertThat(widget.configuration()).containsEntry("some-setting", "foobar");
                     try {
-                        assertThat(widget.timeRange()).isEqualTo(AbsoluteRange.create("2018-04-09T16:00:00.000Z","2018-04-09T17:00:00.000Z"));
+                        assertThat(widget.timeRange()).isEqualTo(AbsoluteRange.create("2018-04-09T16:00:00.000Z", "2018-04-09T17:00:00.000Z"));
                     } catch (InvalidRangeParametersException e) {
                         throw new AssertionError(e);
                     }
                 });
     }
-
 
     @Test
     public void createExcerpt() {
