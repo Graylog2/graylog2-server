@@ -7,7 +7,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const ContentPacksActions = ActionsProvider.getActions('ContentPacks');
 
-const ContentPacksStores = Reflux.createStore({
+const ContentPacksStore = Reflux.createStore({
   listenables: [ContentPacksActions],
 
   get(contentPackId) {
@@ -53,4 +53,4 @@ const ContentPacksStores = Reflux.createStore({
   },
 });
 
-export default ContentPacksStores;
+export default ContentPacksStore;

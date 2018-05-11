@@ -9,7 +9,7 @@ import ObjectUtils from 'util/ObjectUtils';
 
 const CatalogActions = ActionsProvider.getActions('Catalog');
 
-const CatalogStores = Reflux.createStore({
+const CatalogStore = Reflux.createStore({
   listenables: [CatalogActions],
 
   showEntityIndex() {
@@ -26,6 +26,8 @@ const CatalogStores = Reflux.createStore({
   },
 
   getSelectedEntities(requestedEntities) {
+    /* The API will not accept the title in the request payload, so I have
+       to remove it. Also I need to flatten it. */
     const payload = Object.keys(requestedEntities).reduce((result, key) => {
       return result.concat(requestedEntities[key].map((entity) => {
         const newEntity = ObjectUtils.clone(entity);
@@ -36,11 +38,10 @@ const CatalogStores = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
     const promise = fetch('POST', url, { entities: payload })
       .then((entities) => {
-        this.trigger({ fetchedEntities: entities.entities });
         return entities.entities;
       });
     CatalogActions.getSelectedEntities.promise(promise);
   },
 });
 
-export default CatalogStores;
+export default CatalogStore;
