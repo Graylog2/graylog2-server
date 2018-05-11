@@ -21,7 +21,7 @@ const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 
 const CreateContentPackPage = createReactClass({
-  displayName: 'ShowContentPackPage',
+  displayName: 'CreateContentPackPage',
   mixins: [Reflux.connect(CatalogStore)],
 
   getInitialState() {
@@ -33,6 +33,11 @@ const CreateContentPackPage = createReactClass({
         requires: [],
         parameters: [],
         entities: [],
+        name: '',
+        summary: '',
+        description: '',
+        vendor: '',
+        url: '',
       },
       selectedEntities: {},
       selectedStep: undefined,
@@ -83,16 +88,6 @@ const CreateContentPackPage = createReactClass({
         });
   },
 
-  _selectionComponent() {
-    return (
-      <ContentPackSelection contentPack={this.state.contentPack}
-                            selectedEntities={this.state.selectedEntities}
-                            onStateChange={this._onStateChanged}
-                            entities={this.state.entityIndex}
-      />
-    );
-  },
-
   _prepareForPreview() {
     const newContentPack = ObjectUtils.clone(this.state.contentPack);
     const entities = ObjectUtils.clone(this.state.fetchedEntities);
@@ -102,7 +97,7 @@ const CreateContentPackPage = createReactClass({
       const entityData = newEntity.data;
       const configKeys = ObjectUtils.getPaths(entityData);
       configKeys.forEach((path) => {
-        const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path });
+        const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path; });
         let newValue;
         if (index >= 0) {
           newValue = { type: 'parameter', value: parameters[index].paramName };
@@ -124,12 +119,12 @@ const CreateContentPackPage = createReactClass({
       case 'parameters': {
         const newContentPack = ObjectUtils.clone(this.state.contentPack);
         newContentPack.entities = this.state.fetchedEntities || [];
-        this.setState({contentPack: newContentPack});
+        this.setState({ contentPack: newContentPack });
         if (Object.keys(this.state.selectedEntities).length > 0) {
           CatalogActions.getSelectedEntities(this.state.selectedEntities).then((fetchedEntities) => {
             const contentPack = ObjectUtils.clone(this.state.contentPack);
             contentPack.entities = fetchedEntities;
-            this.setState({contentPack: contentPack});
+            this.setState({ contentPack: contentPack, fetchedEntities: fetchedEntities });
           });
         }
         break;
@@ -153,10 +148,22 @@ const CreateContentPackPage = createReactClass({
   },
 
   render() {
+    const selectionComponent = (
+      <ContentPackSelection contentPack={this.state.contentPack}
+                            selectedEntities={this.state.selectedEntities}
+                            onStateChange={this._onStateChanged}
+                            entities={this.state.entityIndex} />);
+    const parameterComponent = (
+      <ContentPackParameters contentPack={this.state.contentPack}
+                             onStateChange={this._onStateChanged}
+                             appliedParameter={this.state.appliedParameter} />);
+    const previewComponent = (
+      <ContentPackPreview contentPack={this.state.contentPack}
+                          onSave={this._onSave} />);
     const steps = [
-      { key: 'selection', title: 'Content Selection', component: (this._selectionComponent()) },
-      { key: 'parameters', title: 'Parameters', component: (<ContentPackParameters contentPack={this.state.contentPack} onStateChange={this._onStateChanged} appliedParameter={this.state.appliedParameter} />), disabled: this._disableNextStep() },
-      { key: 'preview', title: 'Preview', component: (<ContentPackPreview contentPack={this.state.contentPack} onSave={this._onSave} />), disabled: this._disableNextStep() },
+      { key: 'selection', title: 'Content Selection', component: selectionComponent },
+      { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableNextStep() },
+      { key: 'preview', title: 'Preview', component: previewComponent, disabled: this._disableNextStep() },
     ];
 
     return (
@@ -169,7 +176,7 @@ const CreateContentPackPage = createReactClass({
 
             <span>
               Find more content packs in {' '}
-              <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
+              <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
 
             <div>
@@ -185,7 +192,6 @@ const CreateContentPackPage = createReactClass({
               </div>
             </AutoAffix>
           </Wizard>
-        <textarea value={JSON.stringify(this.state.contentPack, null, 2)} />
         </span>
       </DocumentTitle>
     );
