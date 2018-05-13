@@ -40,6 +40,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -112,9 +113,9 @@ public class PipelineCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("Test"));
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE);
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
-        assertThat(pipelineEntity.title()).isEqualTo("Test");
-        assertThat(pipelineEntity.description()).isEqualTo("Description");
-        assertThat(pipelineEntity.source()).startsWith("pipeline \"Test\"");
+        assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("Test"));
+        assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("Description"));
+        assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("pipeline \"Test\"");
     }
 
     @Test

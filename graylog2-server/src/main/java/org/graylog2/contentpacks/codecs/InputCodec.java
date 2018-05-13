@@ -30,12 +30,14 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -59,6 +61,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class InputCodec implements EntityCodec<InputWithExtractors> {
     private static final Logger LOG = LoggerFactory.getLogger(InputCodec.class);
@@ -93,17 +97,18 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
-        final Map<String, String> staticFields = objectMapper.convertValue(input.getStaticFields(), TypeReferences.MAP_STRING_STRING);
-        final Map<String, Object> configuration = objectMapper.convertValue(input.getConfiguration(), TypeReferences.MAP_STRING_OBJECT);
+        final Map<String, ValueReference> staticFields = input.getStaticFields().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, kv -> ValueReference.of(kv.getValue())));
+        final ReferenceMap configuration = toReferenceMap(input.getConfiguration());
         final List<ExtractorEntity> extractors = inputWithExtractors.extractors().stream()
                 .map(this::encodeExtractor)
                 .collect(Collectors.toList());
         final InputEntity inputEntity = InputEntity.create(
-                input.getTitle(),
+                ValueReference.of(input.getTitle()),
                 configuration,
                 staticFields,
-                input.getType(),
-                input.isGlobal(),
+                ValueReference.of(input.getType()),
+                ValueReference.of(input.isGlobal()),
                 extractors);
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
@@ -119,47 +124,47 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
                 .map(this::encodeConverter)
                 .collect(Collectors.toList());
         return ExtractorEntity.create(
-                extractor.getTitle(),
-                extractor.getType(),
-                extractor.getCursorStrategy(),
-                extractor.getTargetField(),
-                extractor.getSourceField(),
-                extractor.getExtractorConfig(),
+                ValueReference.of(extractor.getTitle()),
+                ValueReference.of(extractor.getType()),
+                ValueReference.of(extractor.getCursorStrategy()),
+                ValueReference.of(extractor.getTargetField()),
+                ValueReference.of(extractor.getSourceField()),
+                toReferenceMap(extractor.getExtractorConfig()),
                 converters,
-                extractor.getConditionType(),
-                extractor.getConditionValue(),
-                Ints.saturatedCast(extractor.getOrder()));
+                ValueReference.of(extractor.getConditionType()),
+                ValueReference.of(extractor.getConditionValue()),
+                ValueReference.of(Ints.saturatedCast(extractor.getOrder())));
     }
 
     private ConverterEntity encodeConverter(Converter converter) {
         return ConverterEntity.create(
-                converter.getType(),
-                converter.getConfig());
+                ValueReference.of(converter.getType()),
+                toReferenceMap(converter.getConfig()));
     }
 
 
     @Override
-    public InputWithExtractors decode(Entity entity) {
+    public InputWithExtractors decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
 
-    private InputWithExtractors decodeEntityV1(EntityV1 entity) {
+    private InputWithExtractors decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
-        final Map<String, String> staticFields = inputEntity.staticFields();
+        final Map<String, ValueReference> staticFields = inputEntity.staticFields();
         final String username = "admin"; // TODO: Pass along user name
 
         final MessageInput messageInput;
         try {
             messageInput = createMessageInput(
-                    inputEntity.title(),
-                    inputEntity.type(),
-                    inputEntity.global(),
-                    inputEntity.configuration(),
+                    inputEntity.title().asString(parameters),
+                    inputEntity.type().asString(parameters),
+                    inputEntity.global().asBoolean(parameters),
+                    toValueMap(inputEntity.configuration(), parameters),
                     username);
         } catch (Exception e) {
             throw new RuntimeException("Couldn't create input", e);
@@ -173,13 +178,13 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
         }
 
         try {
-            addStaticFields(input, messageInput, staticFields);
+            addStaticFields(input, messageInput, staticFields, parameters);
         } catch (ValidationException e) {
             throw new RuntimeException("Couldn't add static fields to input", e);
         }
         final List<Extractor> extractors;
         try {
-            extractors = createExtractors(input, inputEntity.extractors(), username);
+            extractors = createExtractors(input, inputEntity.extractors(), username, parameters);
         } catch (Exception e) {
             throw new RuntimeException("Couldn't create extractors", e);
         }
@@ -222,24 +227,27 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
     }
 
 
-    private List<Extractor> createExtractors(final Input input, final List<ExtractorEntity> extractorEntities, final String username)
+    private List<Extractor> createExtractors(final Input input,
+                                             final List<ExtractorEntity> extractorEntities,
+                                             final String username,
+                                             final Map<String, FilledParameter<?>> parameters)
             throws org.graylog2.plugin.inputs.Extractor.ReservedFieldException, org.graylog2.ConfigurationException,
             ExtractorFactory.NoSuchExtractorException, ValidationException {
         final ImmutableList.Builder<Extractor> result = ImmutableList.builder();
         for (ExtractorEntity extractorEntity : extractorEntities) {
-            final List<Converter> converters = createConverters(extractorEntity.converters());
+            final List<Converter> converters = createConverters(extractorEntity.converters(), parameters);
             final Extractor extractor = addExtractor(
                     input,
-                    extractorEntity.title(),
-                    extractorEntity.order(),
-                    extractorEntity.cursorStrategy(),
-                    extractorEntity.type(),
-                    extractorEntity.sourceField(),
-                    extractorEntity.targetField(),
-                    extractorEntity.configuration(),
+                    extractorEntity.title().asString(parameters),
+                    extractorEntity.order().asInteger(parameters),
+                    extractorEntity.cursorStrategy().asEnum(parameters, Extractor.CursorStrategy.class),
+                    extractorEntity.type().asEnum(parameters, Extractor.Type.class),
+                    extractorEntity.sourceField().asString(parameters),
+                    extractorEntity.targetField().asString(parameters),
+                    toValueMap(extractorEntity.configuration(), parameters),
                     converters,
-                    extractorEntity.conditionType(),
-                    extractorEntity.conditionValue(),
+                    extractorEntity.conditionType().asEnum(parameters, Extractor.ConditionType.class),
+                    extractorEntity.conditionValue().asString(parameters),
                     username);
             result.add(extractor);
         }
@@ -283,12 +291,15 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
     }
 
 
-    private List<Converter> createConverters(final List<ConverterEntity> requestedConverters) {
+    private List<Converter> createConverters(final List<ConverterEntity> requestedConverters,
+                                             final Map<String, FilledParameter<?>> parameters) {
         final ImmutableList.Builder<Converter> converters = ImmutableList.builder();
 
         for (final ConverterEntity converterEntity : requestedConverters) {
             try {
-                final Converter converter = converterFactory.create(converterEntity.type(), converterEntity.configuration());
+                final Converter converter = converterFactory.create(
+                        converterEntity.type().asEnum(parameters, Converter.Type.class),
+                        toValueMap(converterEntity.configuration(), parameters));
                 converters.add(converter);
             } catch (ConverterFactory.NoSuchConverterException e) {
                 LOG.warn("No such converter [" + converterEntity.type() + "]. Skipping.", e);
@@ -300,10 +311,12 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
         return converters.build();
     }
 
-    private void addStaticFields(final Input input, final MessageInput messageInput, final Map<String, String> staticFields)
+    private void addStaticFields(final Input input, final MessageInput messageInput,
+                                 final Map<String, ValueReference> staticFields,
+                                 final Map<String, FilledParameter<?>> parameters)
             throws ValidationException {
-        for (Map.Entry<String, String> staticField : staticFields.entrySet()) {
-            addStaticField(input, messageInput, staticField.getKey(), staticField.getValue());
+        for (Map.Entry<String, ValueReference> staticField : staticFields.entrySet()) {
+            addStaticField(input, messageInput, staticField.getKey(), staticField.getValue().asString(parameters));
         }
     }
 

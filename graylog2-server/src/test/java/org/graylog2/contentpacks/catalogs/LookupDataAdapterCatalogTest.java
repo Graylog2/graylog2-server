@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -88,8 +89,8 @@ public class LookupDataAdapterCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf24a04b900a0fdb4e52c8"));
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER);
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
-        assertThat(lookupDataAdapterEntity.name()).isEqualTo("http-dsv");
-        assertThat(lookupDataAdapterEntity.title()).isEqualTo("HTTP DSV");
-        assertThat(lookupDataAdapterEntity.description()).isEqualTo("HTTP DSV");
+        assertThat(lookupDataAdapterEntity.name()).isEqualTo(ValueReference.of("http-dsv"));
+        assertThat(lookupDataAdapterEntity.title()).isEqualTo(ValueReference.of("HTTP DSV"));
+        assertThat(lookupDataAdapterEntity.description()).isEqualTo(ValueReference.of("HTTP DSV"));
     }
 }

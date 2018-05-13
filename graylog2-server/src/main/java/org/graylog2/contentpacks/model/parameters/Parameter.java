@@ -16,22 +16,23 @@
  */
 package org.graylog2.contentpacks.model.parameters;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog2.contentpacks.model.Typed;
+import org.graylog2.contentpacks.model.entities.references.ValueTyped;
 
 import java.util.Optional;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = Parameter.FIELD_META_TYPE)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = Parameter.FIELD_TYPE)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BooleanParameter.class, name = BooleanParameter.TYPE_NAME),
         @JsonSubTypes.Type(value = DoubleParameter.class, name = DoubleParameter.TYPE_NAME),
+        @JsonSubTypes.Type(value = FloatParameter.class, name = FloatParameter.TYPE_NAME),
         @JsonSubTypes.Type(value = IntegerParameter.class, name = IntegerParameter.TYPE_NAME),
+        @JsonSubTypes.Type(value = LongParameter.class, name = LongParameter.TYPE_NAME),
         @JsonSubTypes.Type(value = StringParameter.class, name = StringParameter.TYPE_NAME),
 })
-public interface Parameter<T> extends Typed {
+public interface Parameter<T> extends ValueTyped {
     String FIELD_NAME = "name";
     String FIELD_TITLE = "title";
     String FIELD_DESCRIPTION = "description";
@@ -49,10 +50,7 @@ public interface Parameter<T> extends Typed {
     @JsonProperty(FIELD_DEFAULT_VALUE)
     Optional<T> defaultValue();
 
-    @JsonIgnore
-    Class<? extends T> valueClass();
-
-    interface ParameterBuilder<SELF> extends TypeBuilder<SELF> {
+    interface ParameterBuilder<SELF, T> extends TypeBuilder<SELF> {
         @JsonProperty(FIELD_NAME)
         SELF name(String name);
 
@@ -62,6 +60,11 @@ public interface Parameter<T> extends Typed {
         @JsonProperty(FIELD_DESCRIPTION)
         SELF description(String description);
 
+        // It would be nicer to use
+        //     SELF defaultValue(T defaultValue);
+        // but this isn't possible until the following issues have been fixed:
+        // https://github.com/google/auto/issues/627
+        // https://github.com/google/auto/pull/515
         @JsonProperty(FIELD_DEFAULT_VALUE)
         SELF defaultValue(Optional defaultValue);
     }

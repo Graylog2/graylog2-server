@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.streams.Stream;
 
 import javax.validation.constraints.NotBlank;
@@ -34,16 +35,16 @@ import java.util.Set;
 public abstract class StreamEntity {
     @JsonProperty("title")
     @NotBlank
-    public abstract String title();
+    public abstract ValueReference title();
 
     @JsonProperty("description")
-    public abstract String description();
+    public abstract ValueReference description();
 
     @JsonProperty("disabled")
-    public abstract boolean disabled();
+    public abstract ValueReference disabled();
 
     @JsonProperty("matching_type")
-    public abstract Stream.MatchingType matchingType();
+    public abstract ValueReference matchingType();
 
     @JsonProperty("stream_rules")
     @NotNull
@@ -51,24 +52,24 @@ public abstract class StreamEntity {
 
     @JsonProperty("outputs")
     @NotNull
-    public abstract Set<String> outputs();
+    public abstract Set<ValueReference> outputs();
 
     @JsonProperty("default_stream")
-    public abstract boolean defaultStream();
+    public abstract ValueReference defaultStream();
 
     @JsonProperty("remove_matches")
-    public abstract boolean removeMatches();
+    public abstract ValueReference removeMatches();
 
     @JsonCreator
     public static StreamEntity create(
-            @JsonProperty("title") @NotBlank String title,
-            @JsonProperty("description") String description,
-            @JsonProperty("disabled") boolean disabled,
-            @JsonProperty("matching_type") Stream.MatchingType matchingType,
+            @JsonProperty("title") @NotBlank ValueReference title,
+            @JsonProperty("description") ValueReference description,
+            @JsonProperty("disabled") ValueReference disabled,
+            @JsonProperty("matching_type") ValueReference matchingType,
             @JsonProperty("stream_rules") @NotNull List<StreamRuleEntity> streamRules,
-            @JsonProperty("outputs") @NotNull Set<String> outputs,
-            @JsonProperty("default_stream") boolean defaultStream,
-            @JsonProperty("remove_matches") boolean removeMatches) {
+            @JsonProperty("outputs") @NotNull Set<ValueReference> outputs,
+            @JsonProperty("default_stream") ValueReference defaultStream,
+            @JsonProperty("remove_matches") ValueReference removeMatches) {
         return new AutoValue_StreamEntity(
                 title,
                 description,

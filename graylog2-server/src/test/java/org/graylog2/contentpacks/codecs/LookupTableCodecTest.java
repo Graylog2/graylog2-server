@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -75,15 +76,15 @@ public class LookupTableCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entityV1.data(), LookupTableEntity.class);
-        assertThat(lookupTableEntity.name()).isEqualTo("lookup-table-name");
-        assertThat(lookupTableEntity.title()).isEqualTo("Lookup Table Title");
-        assertThat(lookupTableEntity.description()).isEqualTo("Lookup Table Description");
-        assertThat(lookupTableEntity.dataAdapterName()).isEqualTo("data-adapter-1234");
-        assertThat(lookupTableEntity.cacheName()).isEqualTo("cache-1234");
-        assertThat(lookupTableEntity.defaultSingleValue()).isEqualTo("default-single");
-        assertThat(lookupTableEntity.defaultSingleValueType()).isEqualTo(LookupDefaultValue.Type.STRING);
-        assertThat(lookupTableEntity.defaultMultiValue()).isEqualTo("default-multi");
-        assertThat(lookupTableEntity.defaultMultiValueType()).isEqualTo(LookupDefaultValue.Type.STRING);
+        assertThat(lookupTableEntity.name()).isEqualTo(ValueReference.of("lookup-table-name"));
+        assertThat(lookupTableEntity.title()).isEqualTo(ValueReference.of("Lookup Table Title"));
+        assertThat(lookupTableEntity.description()).isEqualTo(ValueReference.of("Lookup Table Description"));
+        assertThat(lookupTableEntity.dataAdapterName()).isEqualTo(ValueReference.of("data-adapter-1234"));
+        assertThat(lookupTableEntity.cacheName()).isEqualTo(ValueReference.of("cache-1234"));
+        assertThat(lookupTableEntity.defaultSingleValue()).isEqualTo(ValueReference.of("default-single"));
+        assertThat(lookupTableEntity.defaultSingleValueType()).isEqualTo(ValueReference.of(LookupDefaultValue.Type.STRING));
+        assertThat(lookupTableEntity.defaultMultiValue()).isEqualTo(ValueReference.of("default-multi"));
+        assertThat(lookupTableEntity.defaultMultiValueType()).isEqualTo(ValueReference.of(LookupDefaultValue.Type.STRING));
     }
 
     @Test

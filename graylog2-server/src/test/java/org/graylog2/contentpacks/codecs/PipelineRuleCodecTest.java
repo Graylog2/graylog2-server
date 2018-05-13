@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,6 +34,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,9 +71,9 @@ public class PipelineRuleCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
-        assertThat(pipelineEntity.title()).isEqualTo("title");
-        assertThat(pipelineEntity.description()).isEqualTo("description");
-        assertThat(pipelineEntity.source()).startsWith("rule \"debug\"\n");
+        assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("title"));
+        assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("description"));
+        assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("rule \"debug\"\n");
     }
 
     @Test

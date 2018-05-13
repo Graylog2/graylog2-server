@@ -27,10 +27,13 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 public class PipelineRuleCodec implements EntityCodec<RuleDao> {
     private final ObjectMapper objectMapper;
@@ -45,9 +48,9 @@ public class PipelineRuleCodec implements EntityCodec<RuleDao> {
     @Override
     public EntityWithConstraints encode(RuleDao ruleDao) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
-                ruleDao.title(),
-                ruleDao.description(),
-                ruleDao.source());
+                ValueReference.of(ruleDao.title()),
+                ValueReference.of(ruleDao.description()),
+                ValueReference.of(ruleDao.source()));
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(ruleDao.title()))
@@ -58,21 +61,22 @@ public class PipelineRuleCodec implements EntityCodec<RuleDao> {
     }
 
     @Override
-    public RuleDao decode(Entity entity) {
+    public RuleDao decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private RuleDao decodeEntityV1(EntityV1 entity) {
+    private RuleDao decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final DateTime now = Tools.nowUTC();
         final PipelineRuleEntity ruleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);
+        final ValueReference description = ruleEntity.description();
         final RuleDao ruleDao = RuleDao.builder()
-                .title(ruleEntity.title())
-                .description(ruleEntity.description())
-                .source(ruleEntity.source())
+                .title(ruleEntity.title().asString(parameters))
+                .description(description == null ? null : description.asString(parameters))
+                .source(ruleEntity.source().asString(parameters))
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();

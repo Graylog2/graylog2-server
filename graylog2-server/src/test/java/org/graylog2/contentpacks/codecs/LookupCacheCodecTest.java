@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.lookup.FallbackCacheConfig;
@@ -70,10 +71,10 @@ public class LookupCacheCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entityV1.data(), LookupCacheEntity.class);
-        assertThat(lookupCacheEntity.name()).isEqualTo("cache-name");
-        assertThat(lookupCacheEntity.title()).isEqualTo("Cache Title");
-        assertThat(lookupCacheEntity.description()).isEqualTo("Cache Description");
-        assertThat(lookupCacheEntity.configuration()).containsEntry("type", null);
+        assertThat(lookupCacheEntity.name()).isEqualTo(ValueReference.of("cache-name"));
+        assertThat(lookupCacheEntity.title()).isEqualTo(ValueReference.of("Cache Title"));
+        assertThat(lookupCacheEntity.description()).isEqualTo(ValueReference.of("Cache Description"));
+        assertThat(lookupCacheEntity.configuration()).containsEntry("type", ValueReference.of("FallbackCacheConfig"));
     }
 
     @Test

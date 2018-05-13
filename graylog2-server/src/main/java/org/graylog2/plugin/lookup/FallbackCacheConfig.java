@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FallbackCacheConfig implements LookupCacheConfiguration {
 
     @JsonProperty
-    private String type;
+    private String type = "FallbackCacheConfig";
 
     @Override
     public String type() {

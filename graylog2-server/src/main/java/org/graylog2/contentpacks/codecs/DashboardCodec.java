@@ -27,6 +27,9 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.TimeRangeEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
@@ -49,6 +52,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class DashboardCodec implements EntityCodec<Dashboard> {
     private final ObjectMapper objectMapper;
@@ -76,8 +82,8 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
                 .map(widget -> encodeWidget(widget.getValue(), positionsById.get(widget.getKey())))
                 .collect(Collectors.toList());
         final DashboardEntity dashboardEntity = DashboardEntity.create(
-                dashboard.getTitle(),
-                dashboard.getDescription(),
+                ValueReference.of(dashboard.getTitle()),
+                ValueReference.of(dashboard.getDescription()),
                 dashboardWidgets);
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
@@ -90,41 +96,42 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
 
     private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position) {
         return DashboardWidgetEntity.create(
-                widget.getDescription(),
-                widget.getType(),
-                widget.getCacheTime(),
-                widget.getTimeRange(),
-                widget.getConfig(),
+                ValueReference.of(widget.getDescription()),
+                ValueReference.of(widget.getType()),
+                ValueReference.of(widget.getCacheTime()),
+                TimeRangeEntity.of(widget.getTimeRange()),
+                toReferenceMap(widget.getConfig()),
                 encodePosition(position));
     }
 
     @Nullable
     private DashboardWidgetEntity.Position encodePosition(@Nullable WidgetPosition position) {
         return position == null ? null : DashboardWidgetEntity.Position.create(
-                position.width(),
-                position.height(),
-                position.row(),
-                position.col());
+                ValueReference.of(position.width()),
+                ValueReference.of(position.height()),
+                ValueReference.of(position.row()),
+                ValueReference.of(position.col()));
     }
 
     @Override
-    public Dashboard decode(Entity entity) {
+    public Dashboard decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Dashboard decodeEntityV1(EntityV1 entity) {
+    private Dashboard decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final Dashboard dashboard;
         try {
             dashboard = createDashboard(
-                    dashboardEntity.title(),
-                    dashboardEntity.description(),
+                    dashboardEntity.title().asString(parameters),
+                    dashboardEntity.description().asString(parameters),
                     dashboardEntity.widgets(),
-                    "admin" // TODO: Pass along user
+                    "admin", // TODO: Pass along user
+                    parameters
             );
         } catch (Exception e) {
             throw new RuntimeException("Couldn't create dashboard", e);
@@ -137,7 +144,8 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
             final String title,
             final String description,
             final List<DashboardWidgetEntity> widgets,
-            final String username)
+            final String username,
+            final Map<String, FilledParameter<?>> parameters)
             throws ValidationException, DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         // Create dashboard.
         final Map<String, Object> dashboardData = new HashMap<>();
@@ -152,19 +160,19 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
         final ImmutableList.Builder<WidgetPositionsRequest.WidgetPosition> widgetPositions = ImmutableList.builder();
         for (DashboardWidgetEntity widgetEntity : widgets) {
             final DashboardWidget widget = createDashboardWidget(
-                    widgetEntity.type(),
-                    widgetEntity.description(),
-                    widgetEntity.configuration(),
-                    widgetEntity.cacheTime(),
+                    widgetEntity.type().asString(parameters),
+                    widgetEntity.description().asString(parameters),
+                    toValueMap(widgetEntity.configuration(), parameters),
+                    widgetEntity.cacheTime().asInteger(parameters),
                     username);
             dashboardService.addWidget(dashboard, widget);
 
             widgetEntity.position().ifPresent(position -> widgetPositions.add(WidgetPositionsRequest.WidgetPosition.create(
                     widget.getId(),
-                    position.col(),
-                    position.row(),
-                    position.height(),
-                    position.width())));
+                    position.col().asInteger(parameters),
+                    position.row().asInteger(parameters),
+                    position.height().asInteger(parameters),
+                    position.width().asInteger(parameters))));
         }
 
         // FML: We need to reload the dashboard because not all fields (I'm looking at you, "widgets") is set in the

@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -88,8 +89,8 @@ public class LookupCacheCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf24b24b900a0fdb4e52dd"));
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE);
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
-        assertThat(lookupCacheEntity.name()).isEqualTo("no-op-cache");
-        assertThat(lookupCacheEntity.title()).isEqualTo("No-op cache");
-        assertThat(lookupCacheEntity.description()).isEqualTo("No-op cache");
+        assertThat(lookupCacheEntity.name()).isEqualTo(ValueReference.of("no-op-cache"));
+        assertThat(lookupCacheEntity.title()).isEqualTo(ValueReference.of("No-op cache"));
+        assertThat(lookupCacheEntity.description()).isEqualTo(ValueReference.of("No-op cache"));
     }
 }

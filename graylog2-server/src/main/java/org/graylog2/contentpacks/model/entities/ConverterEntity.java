@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.inputs.Converter;
+import org.graylog2.contentpacks.model.entities.references.Reference;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
 
@@ -30,14 +32,14 @@ import java.util.Map;
 @JsonAutoDetect
 public abstract class ConverterEntity {
     @JsonProperty("type")
-    public abstract Converter.Type type();
+    public abstract ValueReference type();
 
     @JsonProperty("configuration")
-    public abstract Map<String, Object> configuration();
+    public abstract ReferenceMap configuration();
 
     @JsonCreator
-    public static ConverterEntity create(@JsonProperty("type") Converter.Type type,
-                                         @JsonProperty("configuration") Map<String, Object> configuration) {
+    public static ConverterEntity create(@JsonProperty("type") ValueReference type,
+                                         @JsonProperty("configuration") ReferenceMap configuration) {
         return new AutoValue_ConverterEntity(type, configuration);
     }
 }

@@ -31,6 +31,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -38,6 +39,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -94,8 +96,8 @@ public class PipelineRuleCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("debug"));
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE);
         final PipelineRuleEntity pipelineRuleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);
-        assertThat(pipelineRuleEntity.title()).isEqualTo("debug");
-        assertThat(pipelineRuleEntity.description()).isEqualTo("Debug");
-        assertThat(pipelineRuleEntity.source()).startsWith("rule \"debug\"\n");
+        assertThat(pipelineRuleEntity.title()).isEqualTo(ValueReference.of("debug"));
+        assertThat(pipelineRuleEntity.description()).isEqualTo(ValueReference.of("Debug"));
+        assertThat(pipelineRuleEntity.source().asString(Collections.emptyMap())).startsWith("rule \"debug\"\n");
     }
 }

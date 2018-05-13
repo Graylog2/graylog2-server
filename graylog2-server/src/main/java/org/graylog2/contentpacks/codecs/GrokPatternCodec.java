@@ -25,11 +25,14 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 public class GrokPatternCodec implements EntityCodec<GrokPattern> {
     private final ObjectMapper objectMapper;
@@ -43,7 +46,9 @@ public class GrokPatternCodec implements EntityCodec<GrokPattern> {
 
     @Override
     public EntityWithConstraints encode(GrokPattern grokPattern) {
-        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(grokPattern.name(), grokPattern.pattern());
+        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(
+                ValueReference.of(grokPattern.name()),
+                ValueReference.of(grokPattern.pattern()));
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(grokPattern.id()))
@@ -54,17 +59,19 @@ public class GrokPatternCodec implements EntityCodec<GrokPattern> {
     }
 
     @Override
-    public GrokPattern decode(Entity entity) {
+    public GrokPattern decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private GrokPattern decodeEntityV1(EntityV1 entity) {
+    private GrokPattern decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
-        final GrokPattern grokPattern = GrokPattern.create(grokPatternEntity.name(), grokPatternEntity.pattern());
+        final GrokPattern grokPattern = GrokPattern.create(
+                grokPatternEntity.name().asString(parameters),
+                grokPatternEntity.pattern().asString(parameters));
 
         try {
             return grokPatternService.save(grokPattern);

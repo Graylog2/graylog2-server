@@ -26,10 +26,13 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.streams.StreamRuleService;
@@ -37,6 +40,7 @@ import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,18 +66,19 @@ public class StreamCodec implements EntityCodec<Stream> {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
-        final Set<String> outputIds = stream.getOutputs().stream()
+        final Set<ValueReference> outputIds = stream.getOutputs().stream()
                 .map(Output::getId)
+                .map(ValueReference::of)
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
-                stream.getTitle(),
-                stream.getDescription(),
-                stream.getDisabled(),
-                stream.getMatchingType(),
+                ValueReference.of(stream.getTitle()),
+                ValueReference.of(stream.getDescription()),
+                ValueReference.of(stream.getDisabled()),
+                ValueReference.of(stream.getMatchingType()),
                 streamRules,
                 outputIds,
-                stream.isDefaultStream(),
-                stream.getRemoveMatchesFromDefaultStream());
+                ValueReference.of(stream.isDefaultStream()),
+                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
@@ -86,32 +91,32 @@ public class StreamCodec implements EntityCodec<Stream> {
 
     private StreamRuleEntity encodeStreamRule(StreamRule streamRule) {
         return StreamRuleEntity.create(
-                streamRule.getType(),
-                streamRule.getField(),
-                streamRule.getValue(),
-                streamRule.getInverted(),
-                streamRule.getDescription());
+                ValueReference.of(streamRule.getType()),
+                ValueReference.of(streamRule.getField()),
+                ValueReference.of(streamRule.getValue()),
+                ValueReference.of(streamRule.getInverted()),
+                ValueReference.of(streamRule.getDescription()));
     }
 
     @Override
-    public Stream decode(Entity entity) {
+    public Stream decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private Stream decodeEntityV1(EntityV1 entity) {
+    private Stream decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
-                streamEntity.title(),
-                streamEntity.description(),
+                streamEntity.title().asString(parameters),
+                streamEntity.description().asString(parameters),
                 null, // ignored
                 null,
-                streamEntity.matchingType().name(),
-                streamEntity.removeMatches(),
+                streamEntity.matchingType().asString(parameters),
+                streamEntity.removeMatches().asBoolean(parameters),
                 indexSetService.getDefault().id());
 
         // TODO: Pass along user
@@ -119,11 +124,11 @@ public class StreamCodec implements EntityCodec<Stream> {
 
         for (StreamRuleEntity streamRuleEntity : streamEntity.streamRules()) {
             final CreateStreamRuleRequest createStreamRuleRequest = CreateStreamRuleRequest.create(
-                    streamRuleEntity.type().getValue(),
-                    streamRuleEntity.value(),
-                    streamRuleEntity.field(),
-                    streamRuleEntity.inverted(),
-                    streamRuleEntity.description());
+                    streamRuleEntity.type().asEnum(parameters, StreamRuleType.class).getValue(),
+                    streamRuleEntity.value().asString(parameters),
+                    streamRuleEntity.field().asString(parameters),
+                    streamRuleEntity.inverted().asBoolean(parameters),
+                    streamRuleEntity.description().asString(parameters));
             streamRuleService.create(stream.getId(), createStreamRuleRequest);
         }
 
