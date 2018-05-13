@@ -44,6 +44,7 @@ import java.net.SocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -125,7 +126,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
 
     public static class ProxyAuthenticator implements Authenticator {
         private static final Logger LOG = LoggerFactory.getLogger(ProxyAuthenticator.class);
-        private static final String AUTH_BASIC = "Basic";
+        private static final String AUTH_BASIC = "basic";
 
         private final String credentials;
 
@@ -138,6 +139,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         public Request authenticate(@Nonnull Route route, @Nonnull Response response) throws IOException {
             final Set<String> authenticationMethods = response.challenges().stream()
                     .map(Challenge::scheme)
+                    .map(s -> s.toLowerCase(Locale.ROOT))
                     .collect(Collectors.toSet());
 
             if (!authenticationMethods.contains(AUTH_BASIC)) {
