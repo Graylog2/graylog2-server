@@ -23,18 +23,18 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.entities.AbsoluteRange;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.timeranges.TimeRangeFactory;
 import org.joda.time.DateTime;
@@ -90,7 +90,7 @@ public class DashboardCodecTest {
                 "description",
                 120,
                 ImmutableMap.of("some-setting", "foobar"),
-                AbsoluteRange.create(DateTime.parse("2018-04-09T16:00:00.000Z"), DateTime.parse("2018-04-09T17:00:00.000Z")),
+                org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange.create(DateTime.parse("2018-04-09T16:00:00.000Z"), DateTime.parse("2018-04-09T17:00:00.000Z")),
                 "admin"
         );
         final Map<String, Object> fields = ImmutableMap.of(
@@ -110,27 +110,27 @@ public class DashboardCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entityV1.data(), DashboardEntity.class);
-        assertThat(dashboardEntity.title()).isEqualTo("Dashboard Title");
-        assertThat(dashboardEntity.description()).isEqualTo("Dashboard Description");
+        assertThat(dashboardEntity.title()).isEqualTo(ValueReference.of("Dashboard Title"));
+        assertThat(dashboardEntity.description()).isEqualTo(ValueReference.of("Dashboard Description"));
         assertThat(dashboardEntity.widgets())
                 .hasSize(1)
                 .first()
                 .satisfies(widget -> {
-                    assertThat(widget.type()).isEqualTo("some-type");
-                    assertThat(widget.description()).isEqualTo("description");
-                    assertThat(widget.cacheTime()).isEqualTo(120);
+                    assertThat(widget.type()).isEqualTo(ValueReference.of("some-type"));
+                    assertThat(widget.description()).isEqualTo(ValueReference.of("description"));
+                    assertThat(widget.cacheTime()).isEqualTo(ValueReference.of(120));
                     assertThat(widget.position()).hasValueSatisfying(position -> {
-                        assertThat(position.width()).isEqualTo(2);
-                        assertThat(position.height()).isEqualTo(2);
-                        assertThat(position.row()).isEqualTo(1);
-                        assertThat(position.col()).isEqualTo(1);
+                        assertThat(position.width()).isEqualTo(ValueReference.of(2));
+                        assertThat(position.height()).isEqualTo(ValueReference.of(2));
+                        assertThat(position.row()).isEqualTo(ValueReference.of(1));
+                        assertThat(position.col()).isEqualTo(ValueReference.of(1));
                     });
-                    assertThat(widget.configuration()).containsEntry("some-setting", "foobar");
-                    try {
-                        assertThat(widget.timeRange()).isEqualTo(AbsoluteRange.create("2018-04-09T16:00:00.000Z", "2018-04-09T17:00:00.000Z"));
-                    } catch (InvalidRangeParametersException e) {
-                        throw new AssertionError(e);
-                    }
+                    assertThat(widget.configuration()).containsEntry("some-setting", ValueReference.of("foobar"));
+                    final AbsoluteRange expectedTimeRange = AbsoluteRange.of(
+                            org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange.create(
+                                    DateTime.parse("2018-04-09T16:00:00.000Z"), DateTime.parse("2018-04-09T17:00:00.000Z"))
+                    );
+                    assertThat(widget.timeRange()).isEqualTo(expectedTimeRange);
                 });
     }
 

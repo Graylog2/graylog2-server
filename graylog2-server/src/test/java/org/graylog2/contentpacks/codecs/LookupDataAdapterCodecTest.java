@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.lookup.FallbackAdapterConfig;
@@ -70,10 +71,10 @@ public class LookupDataAdapterCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entityV1.data(), LookupDataAdapterEntity.class);
-        assertThat(lookupDataAdapterEntity.name()).isEqualTo("data-adapter-name");
-        assertThat(lookupDataAdapterEntity.title()).isEqualTo("Data Adapter Title");
-        assertThat(lookupDataAdapterEntity.description()).isEqualTo("Data Adapter Description");
-        assertThat(lookupDataAdapterEntity.configuration()).containsEntry("type", null);
+        assertThat(lookupDataAdapterEntity.name()).isEqualTo(ValueReference.of("data-adapter-name"));
+        assertThat(lookupDataAdapterEntity.title()).isEqualTo(ValueReference.of("Data Adapter Title"));
+        assertThat(lookupDataAdapterEntity.description()).isEqualTo(ValueReference.of("Data Adapter Description"));
+        assertThat(lookupDataAdapterEntity.configuration()).containsEntry("type", ValueReference.of("FallbackAdapterConfig"));
     }
 
     @Test

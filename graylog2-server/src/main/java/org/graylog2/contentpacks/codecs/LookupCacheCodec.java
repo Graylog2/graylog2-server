@@ -25,6 +25,8 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
@@ -32,6 +34,9 @@ import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
 import javax.inject.Inject;
 import java.util.Map;
+
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class LookupCacheCodec implements EntityCodec<CacheDto> {
     private final ObjectMapper objectMapper;
@@ -49,10 +54,10 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(
-                cacheDto.name(),
-                cacheDto.title(),
-                cacheDto.description(),
-                configuration);
+                ValueReference.of(cacheDto.name()),
+                ValueReference.of(cacheDto.title()),
+                ValueReference.of(cacheDto.description()),
+                toReferenceMap(configuration));
         final JsonNode data = objectMapper.convertValue(lookupCacheEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(cacheDto.id()))
@@ -63,22 +68,22 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
     }
 
     @Override
-    public CacheDto decode(Entity entity) {
+    public CacheDto decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private CacheDto decodeEntityV1(EntityV1 entity) {
+    private CacheDto decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
-        final LookupCacheConfiguration configuration = objectMapper.convertValue(lookupCacheEntity.configuration(), LookupCacheConfiguration.class);
+        final LookupCacheConfiguration configuration = objectMapper.convertValue(toValueMap(lookupCacheEntity.configuration(), parameters), LookupCacheConfiguration.class);
         final CacheDto cacheDto = CacheDto.builder()
-                .name(lookupCacheEntity.name())
-                .title(lookupCacheEntity.title())
-                .description(lookupCacheEntity.description())
+                .name(lookupCacheEntity.name().asString(parameters))
+                .title(lookupCacheEntity.title().asString(parameters))
+                .description(lookupCacheEntity.description().asString(parameters))
                 .config(configuration)
                 .build();
 
@@ -92,6 +97,5 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
                 .type(ModelTypes.LOOKUP_CACHE)
                 .title(cacheDto.title())
                 .build();
-
     }
 }

@@ -25,12 +25,18 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.graylog2.streams.OutputService;
 
 import javax.inject.Inject;
+import java.util.Map;
+
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class OutputCodec implements EntityCodec<Output> {
     private final ObjectMapper objectMapper;
@@ -46,9 +52,9 @@ public class OutputCodec implements EntityCodec<Output> {
     @Override
     public EntityWithConstraints encode(Output output) {
         final OutputEntity outputEntity = OutputEntity.create(
-                output.getTitle(),
-                output.getType(),
-                output.getConfiguration()
+                ValueReference.of(output.getTitle()),
+                ValueReference.of(output.getType()),
+                toReferenceMap(output.getConfiguration())
         );
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
@@ -60,21 +66,21 @@ public class OutputCodec implements EntityCodec<Output> {
     }
 
     @Override
-    public Output decode(Entity entity) {
+    public Output decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private Output decodeEntityV1(EntityV1 entity) {
+    private Output decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         final CreateOutputRequest createOutputRequest = CreateOutputRequest.create(
-                outputEntity.title(),
-                outputEntity.type(),
-                outputEntity.configuration(),
+                outputEntity.title().asString(parameters),
+                outputEntity.type().asString(parameters),
+                toValueMap(outputEntity.configuration(), parameters),
                 null // TODO
         );
         try {

@@ -25,6 +25,8 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
@@ -32,6 +34,9 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 
 import javax.inject.Inject;
 import java.util.Map;
+
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
+import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
     private final ObjectMapper objectMapper;
@@ -49,10 +54,10 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(dataAdapterDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupDataAdapterEntity lookupDataAdapterEntity = LookupDataAdapterEntity.create(
-                dataAdapterDto.name(),
-                dataAdapterDto.title(),
-                dataAdapterDto.description(),
-                configuration);
+                ValueReference.of(dataAdapterDto.name()),
+                ValueReference.of(dataAdapterDto.title()),
+                ValueReference.of(dataAdapterDto.description()),
+                toReferenceMap(configuration));
         final JsonNode data = objectMapper.convertValue(lookupDataAdapterEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(dataAdapterDto.id()))
@@ -63,22 +68,22 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
     }
 
     @Override
-    public DataAdapterDto decode(Entity entity) {
+    public DataAdapterDto decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private DataAdapterDto decodeEntityV1(EntityV1 entity) {
+    private DataAdapterDto decodeEntityV1(EntityV1 entity, final Map<String, FilledParameter<?>> parameters) {
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
-        final LookupDataAdapterConfiguration configuration = objectMapper.convertValue(lookupDataAdapterEntity.configuration(), LookupDataAdapterConfiguration.class);
+        final LookupDataAdapterConfiguration configuration = objectMapper.convertValue(toValueMap(lookupDataAdapterEntity.configuration(), parameters), LookupDataAdapterConfiguration.class);
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
-                .name(lookupDataAdapterEntity.name())
-                .title(lookupDataAdapterEntity.title())
-                .description(lookupDataAdapterEntity.description())
+                .name(lookupDataAdapterEntity.name().asString(parameters))
+                .title(lookupDataAdapterEntity.title().asString(parameters))
+                .description(lookupDataAdapterEntity.description().asString(parameters))
                 .config(configuration)
                 .build();
 

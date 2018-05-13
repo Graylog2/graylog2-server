@@ -37,6 +37,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.Reference;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -49,22 +52,22 @@ import java.util.Map;
 public abstract class InputEntity {
     @JsonProperty("title")
     @NotBlank
-    public abstract String title();
+    public abstract ValueReference title();
 
     @JsonProperty("configuration")
     @NotNull
-    public abstract Map<String, Object> configuration();
+    public abstract ReferenceMap configuration();
 
     @JsonProperty("static_fields")
     @NotNull
-    public abstract Map<String, String> staticFields();
+    public abstract Map<String, ValueReference> staticFields();
 
     @JsonProperty("type")
     @NotBlank
-    public abstract String type();
+    public abstract ValueReference type();
 
     @JsonProperty("global")
-    public abstract boolean global();
+    public abstract ValueReference global();
 
     @JsonProperty("extractors")
     @NotNull
@@ -72,11 +75,11 @@ public abstract class InputEntity {
 
     @JsonCreator
     public static InputEntity create(
-            @JsonProperty("title") @NotBlank String title,
-            @JsonProperty("configuration") @NotNull Map<String, Object> configuration,
-            @JsonProperty("static_fields") @NotNull Map<String, String> staticFields,
-            @JsonProperty("type") @NotBlank String type,
-            @JsonProperty("global") boolean global,
+            @JsonProperty("title") @NotBlank ValueReference title,
+            @JsonProperty("configuration") @NotNull ReferenceMap configuration,
+            @JsonProperty("static_fields") @NotNull Map<String, ValueReference> staticFields,
+            @JsonProperty("type") @NotBlank ValueReference type,
+            @JsonProperty("global") ValueReference global,
             @JsonProperty("extractors") @NotNull List<ExtractorEntity> extractors) {
         return new AutoValue_InputEntity(title, configuration, staticFields, type, global, extractors);
     }

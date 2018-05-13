@@ -42,8 +42,14 @@
         "title": "GELF Input",
         "type": "org.graylog2.inputs.gelf.udp.GELFUDPInput",
         "configuration": {
-          "port": "$GELF_PORT$",
-          "bind_address": "0.0.0.0"
+          "port": {
+            "type": "parameter",
+            "value": "GELF_PORT"
+          },
+          "bind_address": {
+            "type": "string",
+            "value": "0.0.0.0"
+          }
         },
         "extractors": [],
         "static_fields": []
@@ -54,10 +60,22 @@
       "type": "lookup_table",
       "id": "311d9e16-e4d9-485d-a916-337fb4ca0e8b",
       "data": {
-        "title": "OTX API - IP",
-        "name": "otx-api-ip",
-        "cache_id": "911da25d-74e2-4364-b88e-7930368f6e56",
-        "data_adapter_id": "2562ac46-65f1-454c-89e1-e9be96bfd5e7"
+        "title": {
+          "type": "string",
+          "value": "OTX API - IP"
+        },
+        "name": {
+          "type": "string",
+          "value": "otx-api-ip"
+        },
+        "cache_id": {
+          "type": "string",
+          "value": "911da25d-74e2-4364-b88e-7930368f6e56"
+        },
+        "data_adapter_id": {
+          "type": "string",
+          "value": "2562ac46-65f1-454c-89e1-e9be96bfd5e7"
+        }
       }
     },
     {
@@ -65,11 +83,23 @@
       "type": "lookup_cache",
       "id": "911da25d-74e2-4364-b88e-7930368f6e56",
       "data": {
-        "title": "OTX IP Cache",
-        "name": "otx-api-ip-cache",
+        "title": {
+          "type": "string",
+          "value": "OTX IP Cache"
+        },
+        "name": {
+          "type": "string",
+          "value": "otx-api-ip-cache"
+        },
         "config": {
-          "type": "guava_cache",
-          "max_size": 1000
+          "type": {
+            "type": "string",
+            "value": "guava_cache"
+          },
+          "max_size": {
+            "type": "integer",
+            "value": 1000
+          }
         }
       }
     },
@@ -78,12 +108,27 @@
       "type": "lookup_adapter",
       "id": "2562ac46-65f1-454c-89e1-e9be96bfd5e7",
       "data": {
-        "title": "OTX IP Adapter",
-        "name": "otx-api-ip-adapter",
+        "title": {
+          "type": "string",
+          "value": "OTX IP Adapter"
+        },
+        "name": {
+          "type": "string",
+          "value": "otx-api-ip-adapter"
+        },
         "config": {
-          "type": "otx-api",
-          "api_url": "https://otx.alienvault.com",
-          "api_key": "$OTX_API_KEY$"
+          "type": {
+            "type": "string",
+            "value": "otx-api"
+          },
+          "api_url": {
+            "type": "string",
+            "value": "https://otx.alienvault.com"
+          },
+          "api_key": {
+            "type": "parameter",
+            "value": "OTX_API_KEY"
+          }
         }
       }
     },
@@ -92,8 +137,14 @@
       "type": "pipeline_connection",
       "id": "726b6e09-4199-4ef4-8d69-275ebfe06d31",
       "data": {
-        "pipeline_id": "37f26b0a-e4ab-41ff-985c-0dd4a01ff10c",
-        "stream_id": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3"
+        "pipeline_id": {
+          "type": "string",
+          "value": "37f26b0a-e4ab-41ff-985c-0dd4a01ff10c"
+        },
+        "stream_id": {
+          "type": "string",
+          "value": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3"
+        }
       }
     },
     {
@@ -101,7 +152,10 @@
       "type": "pipeline",
       "id": "37f26b0a-e4ab-41ff-985c-0dd4a01ff10c",
       "data": {
-        "stream_id": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3"
+        "stream_id": {
+          "type": "string",
+          "value": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3"
+        }
       }
     },
     {

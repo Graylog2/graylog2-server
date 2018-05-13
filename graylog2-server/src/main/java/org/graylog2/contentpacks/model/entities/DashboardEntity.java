@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,10 +33,10 @@ import java.util.List;
 public abstract class DashboardEntity {
     @JsonProperty("title")
     @NotBlank
-    public abstract String title();
+    public abstract ValueReference title();
 
     @JsonProperty("description")
-    public abstract String description();
+    public abstract ValueReference description();
 
     @JsonProperty("widgets")
     @NotNull
@@ -43,8 +44,8 @@ public abstract class DashboardEntity {
 
     @JsonCreator
     public static DashboardEntity create(
-            @JsonProperty("title") @NotBlank String title,
-            @JsonProperty("description") String description,
+            @JsonProperty("title") @NotBlank ValueReference title,
+            @JsonProperty("description") ValueReference description,
             @JsonProperty("widgets") @NotNull List<DashboardWidgetEntity> widgets) {
         return new AutoValue_DashboardEntity(title, description, widgets);
     }

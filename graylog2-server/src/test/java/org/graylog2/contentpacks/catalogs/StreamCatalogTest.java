@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
@@ -141,9 +142,9 @@ public class StreamCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf23894b900a0fdb4e517d"));
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM);
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
-        assertThat(streamEntity.title()).isEqualTo("Test");
-        assertThat(streamEntity.description()).isEqualTo("Description");
-        assertThat(streamEntity.matchingType()).isEqualTo(Stream.MatchingType.AND);
+        assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Test"));
+        assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Description"));
+        assertThat(streamEntity.matchingType()).isEqualTo(ValueReference.of(Stream.MatchingType.AND));
         assertThat(streamEntity.streamRules()).hasSize(7);
     }
 }

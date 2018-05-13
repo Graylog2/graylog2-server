@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -35,12 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GrokPatternCodecTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private InMemoryGrokPatternService grokPatternService;
     private GrokPatternCodec codec;
 
     @Before
     public void setUp() {
-        grokPatternService = new InMemoryGrokPatternService();
+        final InMemoryGrokPatternService grokPatternService = new InMemoryGrokPatternService();
         codec = new GrokPatternCodec(objectMapper, grokPatternService);
     }
 
@@ -56,8 +56,8 @@ public class GrokPatternCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
-        assertThat(grokPatternEntity.name()).isEqualTo("name");
-        assertThat(grokPatternEntity.pattern()).isEqualTo("pattern");
+        assertThat(grokPatternEntity.name()).isEqualTo(ValueReference.of("name"));
+        assertThat(grokPatternEntity.pattern()).isEqualTo(ValueReference.of("pattern"));
     }
 
     @Test

@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
@@ -124,10 +125,10 @@ public class InputCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf25294b900a0fdb4e5365"));
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT);
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
-        assertThat(inputEntity.title()).isEqualTo("Global Random HTTP");
-        assertThat(inputEntity.type()).isEqualTo("org.graylog2.inputs.random.FakeHttpMessageInput");
-        assertThat(inputEntity.global()).isTrue();
-        assertThat(inputEntity.staticFields()).containsEntry("custom_field", "foobar");
+        assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Global Random HTTP"));
+        assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.random.FakeHttpMessageInput"));
+        assertThat(inputEntity.global()).isEqualTo(ValueReference.of(true));
+        assertThat(inputEntity.staticFields()).containsEntry("custom_field", ValueReference.of("foobar"));
         assertThat(inputEntity.configuration()).isNotEmpty();
         assertThat(inputEntity.extractors()).hasSize(5);
     }

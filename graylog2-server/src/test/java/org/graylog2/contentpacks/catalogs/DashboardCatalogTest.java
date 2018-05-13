@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
@@ -101,8 +102,8 @@ public class DashboardCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5a82f5974b900a7a97caa1e5"));
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD);
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
-        assertThat(dashboardEntity.title()).isEqualTo("Test");
-        assertThat(dashboardEntity.description()).isEqualTo("Description");
+        assertThat(dashboardEntity.title()).isEqualTo(ValueReference.of("Test"));
+        assertThat(dashboardEntity.description()).isEqualTo(ValueReference.of("Description"));
         assertThat(dashboardEntity.widgets()).hasSize(6);
     }
 

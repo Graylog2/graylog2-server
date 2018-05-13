@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.Reference;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
 
@@ -29,23 +32,23 @@ import java.util.Map;
 @JsonAutoDetect
 public abstract class LookupDataAdapterEntity {
     @JsonProperty("name")
-    public abstract String name();
+    public abstract ValueReference name();
 
     @JsonProperty("title")
-    public abstract String title();
+    public abstract ValueReference title();
 
     @JsonProperty("description")
-    public abstract String description();
+    public abstract ValueReference description();
 
     @JsonProperty("configuration")
-    public abstract Map<String, Object> configuration();
+    public abstract ReferenceMap configuration();
 
     @JsonCreator
     public static LookupDataAdapterEntity create(
-            @JsonProperty("name") String name,
-            @JsonProperty("title") String title,
-            @JsonProperty("description") String description,
-            @JsonProperty("configuration") Map<String, Object> configuration) {
+            @JsonProperty("name") ValueReference name,
+            @JsonProperty("title") ValueReference title,
+            @JsonProperty("description") ValueReference description,
+            @JsonProperty("configuration") ReferenceMap configuration) {
         return new AutoValue_LookupDataAdapterEntity(name, title, description, configuration);
     }
 }

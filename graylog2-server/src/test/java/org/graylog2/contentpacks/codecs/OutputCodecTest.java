@@ -25,6 +25,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -77,9 +78,9 @@ public class OutputCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final OutputEntity outputEntity = objectMapper.convertValue(entityV1.data(), OutputEntity.class);
-        assertThat(outputEntity.title()).isEqualTo("Output Title");
-        assertThat(outputEntity.type()).isEqualTo("org.graylog2.output.SomeOutputClass");
-        assertThat(outputEntity.configuration()).containsEntry("some-setting", "foobar");
+        assertThat(outputEntity.title()).isEqualTo(ValueReference.of("Output Title"));
+        assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.output.SomeOutputClass"));
+        assertThat(outputEntity.configuration()).containsEntry("some-setting", ValueReference.of("foobar"));
     }
 
     @Test

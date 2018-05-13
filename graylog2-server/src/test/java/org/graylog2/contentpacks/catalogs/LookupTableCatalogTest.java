@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -88,8 +89,8 @@ public class LookupTableCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf24dd4b900a0fdb4e530d"));
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
-        assertThat(lookupTableEntity.name()).isEqualTo("http-dsv-no-cache");
-        assertThat(lookupTableEntity.title()).isEqualTo("HTTP DSV without Cache");
-        assertThat(lookupTableEntity.description()).isEqualTo("HTTP DSV without Cache");
+        assertThat(lookupTableEntity.name()).isEqualTo(ValueReference.of("http-dsv-no-cache"));
+        assertThat(lookupTableEntity.title()).isEqualTo(ValueReference.of("HTTP DSV without Cache"));
+        assertThat(lookupTableEntity.description()).isEqualTo(ValueReference.of("HTTP DSV without Cache"));
     }
 }

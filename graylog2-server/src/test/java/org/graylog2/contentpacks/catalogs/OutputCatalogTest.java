@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -101,8 +102,8 @@ public class OutputCatalogTest {
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf239e4b900a0fdb4e5197"));
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT);
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
-        assertThat(outputEntity.title()).isEqualTo("STDOUT");
-        assertThat(outputEntity.type()).isEqualTo("org.graylog2.outputs.LoggingOutput");
+        assertThat(outputEntity.title()).isEqualTo(ValueReference.of("STDOUT"));
+        assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.outputs.LoggingOutput"));
         assertThat(outputEntity.configuration()).isNotEmpty();
     }
 }

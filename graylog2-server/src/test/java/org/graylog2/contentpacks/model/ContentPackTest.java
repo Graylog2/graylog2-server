@@ -27,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.parameters.BooleanParameter;
 import org.graylog2.contentpacks.model.parameters.DoubleParameter;
 import org.graylog2.contentpacks.model.parameters.IntegerParameter;
@@ -119,6 +120,22 @@ public class ContentPackTest {
         final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);
 
+        final ImmutableMap<String, Object> expectedLookupTable = ImmutableMap.of(
+                "title", ValueReference.of("OTX API - IP"),
+                "name", ValueReference.of("otx-api-ip"),
+                "cache_id", ValueReference.of("911da25d-74e2-4364-b88e-7930368f6e56"),
+                "data_adapter_id", ValueReference.of("2562ac46-65f1-454c-89e1-e9be96bfd5e7")
+        );
+
+        final ImmutableMap<String, Object> expectedLookupDataAdapter = ImmutableMap.of(
+                "title", ValueReference.of("OTX IP Adapter"),
+                "name", ValueReference.of("otx-api-ip-adapter"),
+                "config", ImmutableMap.of(
+                        "type", ValueReference.of("otx-api"),
+                        "api_url", ValueReference.of("https://otx.alienvault.com"),
+                        "api_key", ValueReference.createParameter("OTX_API_KEY"))
+        );
+
         final ContentPackV1 contentPackV1 = (ContentPackV1) contentPack;
         assertThat(contentPackV1).isNotNull();
         assertThat(contentPackV1.version()).isEqualTo(ModelVersion.of("1"));
@@ -149,11 +166,13 @@ public class ContentPackTest {
                         .version(ModelVersion.of("1"))
                         .id(ModelId.of("311d9e16-e4d9-485d-a916-337fb4ca0e8b"))
                         .type(ModelType.of("lookup_table"))
-                        .data(objectMapper.createObjectNode()
-                                .put("title", "OTX API - IP")
-                                .put("name", "otx-api-ip")
-                                .put("cache_id", "911da25d-74e2-4364-b88e-7930368f6e56")
-                                .put("data_adapter_id", "2562ac46-65f1-454c-89e1-e9be96bfd5e7"))
+                        .data(objectMapper.convertValue(expectedLookupTable, JsonNode.class))
+                        .build(),
+                EntityV1.builder()
+                        .version(ModelVersion.of("1"))
+                        .id(ModelId.of("2562ac46-65f1-454c-89e1-e9be96bfd5e7"))
+                        .type(ModelType.of("lookup_adapter"))
+                        .data(objectMapper.convertValue(expectedLookupDataAdapter, JsonNode.class))
                         .build()
         );
     }

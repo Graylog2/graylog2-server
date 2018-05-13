@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.contentpacks.model.entities.references.Reference;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -35,34 +37,34 @@ import java.util.Optional;
 public abstract class DashboardWidgetEntity {
     @JsonProperty("description")
     @NotNull
-    public abstract String description();
+    public abstract ValueReference description();
 
     @JsonProperty("type")
     @NotBlank
-    public abstract String type();
+    public abstract ValueReference type();
 
     @JsonProperty("cache_time")
     @PositiveOrZero
-    public abstract int cacheTime();
+    public abstract ValueReference cacheTime();
 
     @JsonProperty("time_range")
     @NotNull
-    public abstract TimeRange timeRange();
+    public abstract TimeRangeEntity timeRange();
 
     @JsonProperty("configuration")
     @NotNull
-    public abstract Map<String, Object> configuration();
+    public abstract ReferenceMap configuration();
 
     @JsonProperty("position")
     public abstract Optional<Position> position();
 
     @JsonCreator
     public static DashboardWidgetEntity create(
-            @JsonProperty("description") @NotNull String description,
-            @JsonProperty("type") @NotBlank String type,
-            @JsonProperty("cache_time") @PositiveOrZero int cacheTime,
-            @JsonProperty("time_range") @NotNull TimeRange timeRange,
-            @JsonProperty("configuration") @NotNull Map<String, Object> configuration,
+            @JsonProperty("description") @NotNull ValueReference description,
+            @JsonProperty("type") @NotBlank ValueReference type,
+            @JsonProperty("cache_time") @PositiveOrZero ValueReference cacheTime,
+            @JsonProperty("time_range") @NotNull TimeRangeEntity timeRange,
+            @JsonProperty("configuration") @NotNull ReferenceMap configuration,
             @JsonProperty("position") Position position) {
         return new AutoValue_DashboardWidgetEntity(description, type, cacheTime, timeRange, configuration, Optional.ofNullable(position));
     }
@@ -73,25 +75,25 @@ public abstract class DashboardWidgetEntity {
     public static abstract class Position {
         @JsonProperty("width")
         @PositiveOrZero
-        public abstract int width();
+        public abstract ValueReference width();
 
         @JsonProperty("height")
         @PositiveOrZero
-        public abstract int height();
+        public abstract ValueReference height();
 
         @JsonProperty("row")
         @PositiveOrZero
-        public abstract int row();
+        public abstract ValueReference row();
 
         @JsonProperty("col")
         @PositiveOrZero
-        public abstract int col();
+        public abstract ValueReference col();
 
         @JsonCreator
-        public static Position create(@JsonProperty("width") @PositiveOrZero int width,
-                                      @JsonProperty("height") @PositiveOrZero int height,
-                                      @JsonProperty("row") @PositiveOrZero int row,
-                                      @JsonProperty("col") @PositiveOrZero int col) {
+        public static Position create(@JsonProperty("width") @PositiveOrZero ValueReference width,
+                                      @JsonProperty("height") @PositiveOrZero ValueReference height,
+                                      @JsonProperty("row") @PositiveOrZero ValueReference row,
+                                      @JsonProperty("col") @PositiveOrZero ValueReference col) {
             return new AutoValue_DashboardWidgetEntity_Position(width, height, row, col);
         }
     }

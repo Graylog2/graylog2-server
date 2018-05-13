@@ -19,11 +19,14 @@ package org.graylog2.contentpacks.codecs;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
+
+import java.util.Map;
 
 public interface EntityCodec<T> {
     EntityWithConstraints encode(T nativeEntity);
 
-    T decode(Entity entity);
+    T decode(Entity entity, Map<String, FilledParameter<?>> parameters);
 
     EntityExcerpt createExcerpt(T nativeEntity);
 }

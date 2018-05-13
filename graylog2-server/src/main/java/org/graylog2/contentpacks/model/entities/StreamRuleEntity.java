@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,29 +32,29 @@ import javax.validation.constraints.NotNull;
 public abstract class StreamRuleEntity {
     @JsonProperty("type")
     @NotNull
-    public abstract StreamRuleType type();
+    public abstract ValueReference type();
 
     @JsonProperty("field")
     @NotBlank
-    public abstract String field();
+    public abstract ValueReference field();
 
     @JsonProperty("value")
     @NotNull
-    public abstract String value();
+    public abstract ValueReference value();
 
     @JsonProperty("inverted")
-    public abstract boolean inverted();
+    public abstract ValueReference inverted();
 
     @JsonProperty("description")
-    public abstract String description();
+    public abstract ValueReference description();
 
     @JsonCreator
     public static StreamRuleEntity create(
-            @JsonProperty("type") @NotNull StreamRuleType type,
-            @JsonProperty("field") @NotBlank String field,
-            @JsonProperty("value") @NotNull String value,
-            @JsonProperty("inverted") boolean inverted,
-            @JsonProperty("description") String description) {
+            @JsonProperty("type") @NotNull ValueReference type,
+            @JsonProperty("field") @NotBlank ValueReference field,
+            @JsonProperty("value") @NotNull ValueReference value,
+            @JsonProperty("inverted") ValueReference inverted,
+            @JsonProperty("description") ValueReference description) {
         return new AutoValue_StreamRuleEntity(type, field, value, inverted, description);
     }
 }

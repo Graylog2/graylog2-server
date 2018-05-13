@@ -29,10 +29,13 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,11 +55,11 @@ public class PipelineCodec implements EntityCodec<PipelineDao> {
 
     @Override
     public EntityWithConstraints encode(PipelineDao pipelineDao) {
-        final Set<String> connectedStreams = connectedStreams(pipelineDao.id());
+        final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id());
         final PipelineEntity pipelineEntity = PipelineEntity.create(
-                pipelineDao.title(),
-                pipelineDao.description(),
-                pipelineDao.source(),
+                ValueReference.of(pipelineDao.title()),
+                ValueReference.of(pipelineDao.description()),
+                ValueReference.of(pipelineDao.source()),
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
@@ -67,29 +70,31 @@ public class PipelineCodec implements EntityCodec<PipelineDao> {
         return EntityWithConstraints.create(entity);
     }
 
-    private Set<String> connectedStreams(String pipelineId) {
+    private Set<ValueReference> connectedStreams(String pipelineId) {
         final Set<PipelineConnections> connections = connectionsService.loadByPipelineId(pipelineId);
         return connections.stream()
                 .map(PipelineConnections::streamId)
+                .map(ValueReference::of)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public PipelineDao decode(Entity entity) {
+    public PipelineDao decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity);
+            return decodeEntityV1((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private PipelineDao decodeEntityV1(EntityV1 entity) {
+    private PipelineDao decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
         final DateTime now = Tools.nowUTC();
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
+        final ValueReference description = pipelineEntity.description();
         final PipelineDao pipelineDao = PipelineDao.builder()
-                .title(pipelineEntity.title())
-                .description(pipelineEntity.description())
-                .source(pipelineEntity.source())
+                .title(pipelineEntity.title().asString(parameters))
+                .description(description == null ? null : description.asString(parameters))
+                .source(pipelineEntity.source().asString(parameters))
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();

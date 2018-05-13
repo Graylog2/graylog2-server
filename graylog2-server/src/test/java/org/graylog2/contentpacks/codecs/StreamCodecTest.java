@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
@@ -100,9 +101,9 @@ public class StreamCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final StreamEntity streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntity.class);
-        assertThat(streamEntity.title()).isEqualTo("Stream Title");
-        assertThat(streamEntity.description()).isEqualTo("Stream Description");
-        assertThat(streamEntity.disabled()).isFalse();
+        assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Stream Title"));
+        assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Stream Description"));
+        assertThat(streamEntity.disabled()).isEqualTo(ValueReference.of(false));
         assertThat(streamEntity.streamRules()).hasSize(1);
     }
 

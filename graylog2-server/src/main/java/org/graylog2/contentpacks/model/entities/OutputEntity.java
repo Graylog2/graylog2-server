@@ -21,10 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
 
 @AutoValue
 @WithBeanGetter
@@ -32,21 +33,21 @@ import java.util.Map;
 public abstract class OutputEntity {
     @JsonProperty("title")
     @NotBlank
-    public abstract String title();
+    public abstract ValueReference title();
 
     @JsonProperty("type")
     @NotBlank
-    public abstract String type();
+    public abstract ValueReference type();
 
     @JsonProperty("configuration")
     @NotNull
-    public abstract Map<String, Object> configuration();
+    public abstract ReferenceMap configuration();
 
     @JsonCreator
     public static OutputEntity create(
-            @JsonProperty("title") @NotBlank String title,
-            @JsonProperty("type") @NotBlank String type,
-            @JsonProperty("configuration") @NotNull Map<String, Object> configuration) {
+            @JsonProperty("title") @NotBlank ValueReference title,
+            @JsonProperty("type") @NotBlank ValueReference type,
+            @JsonProperty("configuration") @NotNull ReferenceMap configuration) {
         return new AutoValue_OutputEntity(title, type, configuration);
     }
 }

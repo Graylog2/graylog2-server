@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -31,23 +32,23 @@ import java.util.Set;
 @WithBeanGetter
 public abstract class PipelineEntity {
     @JsonProperty("title")
-    public abstract String title();
+    public abstract ValueReference title();
 
     @JsonProperty("description")
     @Nullable
-    public abstract String description();
+    public abstract ValueReference description();
 
     @JsonProperty("source")
-    public abstract String source();
+    public abstract ValueReference source();
 
     @JsonProperty("connected_streams")
-    public abstract Set<String> connectedStreams();
+    public abstract Set<ValueReference> connectedStreams();
 
     @JsonCreator
-    public static PipelineEntity create(@JsonProperty("title") String title,
-                                        @JsonProperty("description") @Nullable String description,
-                                        @JsonProperty("source") String source,
-                                        @JsonProperty("connected_streams") Set<String> connectedStreams) {
+    public static PipelineEntity create(@JsonProperty("title") ValueReference title,
+                                        @JsonProperty("description") @Nullable ValueReference description,
+                                        @JsonProperty("source") ValueReference source,
+                                        @JsonProperty("connected_streams") Set<ValueReference> connectedStreams) {
         return new AutoValue_PipelineEntity(title, description, source, connectedStreams == null ? Collections.emptySet() : connectedStreams);
     }
 }

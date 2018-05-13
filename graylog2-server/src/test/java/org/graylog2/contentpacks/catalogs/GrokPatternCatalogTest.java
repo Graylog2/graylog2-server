@@ -16,8 +16,9 @@
  */
 package org.graylog2.contentpacks.catalogs;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.contentpacks.codecs.GrokPatternCodec;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -26,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
@@ -33,6 +35,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -78,9 +81,10 @@ public class GrokPatternCatalogTest {
         grokPatternService.save(GrokPattern.create("Test1", "[a-z]+"));
         grokPatternService.save(GrokPattern.create("Test2", "[a-z]+"));
 
-        final ObjectNode entityData = objectMapper.createObjectNode()
-                .put("name", "Test1")
-                .put("pattern", "[a-z]+");
+        final Map<String, Object> entity = ImmutableMap.of(
+                "name", ValueReference.of("Test1"),
+                "pattern", ValueReference.of("[a-z]+"));
+        final JsonNode entityData = objectMapper.convertValue(entity, JsonNode.class);
         final Entity expectedEntity = EntityV1.builder()
                 .type(ModelTypes.GROK_PATTERN)
                 .id(ModelId.of("1"))

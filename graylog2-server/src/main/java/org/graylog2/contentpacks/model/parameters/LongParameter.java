@@ -18,28 +18,23 @@ package org.graylog2.contentpacks.model.parameters;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.entities.references.ValueType;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_LongParameter.Builder.class)
 public abstract class LongParameter implements Parameter<Long> {
     static final String TYPE_NAME = "long";
 
-    @Override
-    public Class<? extends Long> valueClass() {
-        return Long.class;
-    }
-
     public static Builder builder() {
         return new AutoValue_LongParameter.Builder();
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements ParameterBuilder<Builder> {
+    public abstract static class Builder implements ParameterBuilder<Builder, Long> {
         abstract LongParameter autoBuild();
 
         public LongParameter build() {
-            type(ModelType.of(TYPE_NAME));
+            valueType(ValueType.LONG);
             return autoBuild();
         }
     }

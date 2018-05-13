@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
@@ -93,8 +94,8 @@ public class InputCodecTest {
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
-        assertThat(inputEntity.title()).isEqualTo("Input Title");
-        assertThat(inputEntity.type()).isEqualTo("org.graylog2.inputs.SomeInput");
+        assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Input Title"));
+        assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.SomeInput"));
         assertThat(inputEntity.configuration()).isEmpty();
     }
 
