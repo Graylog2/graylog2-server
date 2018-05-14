@@ -54,11 +54,6 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               >
                 configuration.listen_address
               </option>
-              <option
-                value="configuration.port"
-              >
-                configuration.port
-              </option>
             </select>
             
           </span>
