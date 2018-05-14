@@ -58,7 +58,14 @@ class ContentPackApplyParameter extends React.Component {
     if (!this._valuesSelected()) {
       return;
     }
+    const configKeyIndex = this.props.appliedParameter.findIndex((appliedParameter) => {
+      return appliedParameter.configKey === this.state.config_key;
+    });
+    if (configKeyIndex >= 0) {
+      return;
+    }
     this.props.onParameterApply(this.state.config_key, this.state.parameter);
+    this.setState({ config_key: '', parameter: '' });
   };
 
   _parameterClear = (configKey) => {
@@ -66,7 +73,11 @@ class ContentPackApplyParameter extends React.Component {
   };
 
   render() {
-    const configKeys = ObjectUtils.getPaths(this.props.entity.data);
+    const configKeys = ObjectUtils.getPaths(this.props.entity.data).filter((configKey) => {
+      return this.props.appliedParameter.findIndex((paramMap) => {
+        return configKey === paramMap.configKey;
+      }) < 0;
+    });
     const emptyOption = (<option key="EMPTY" value="">Choose..</option>);
     const configOptions = [emptyOption].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
     const parameterOptions = [emptyOption].concat(this.props.parameters.map(key => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));

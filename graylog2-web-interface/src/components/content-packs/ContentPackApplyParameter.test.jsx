@@ -49,6 +49,25 @@ describe('<ContentPackApplyParameter />', () => {
     expect(applyFn.mock.calls.length).toBe(1);
   });
 
+  it('should apply a parameter only once', () => {
+    const applyFn = jest.fn((configKey, paramName) => {
+      expect(configKey).toEqual('configuration.port');
+      expect(paramName).toEqual('PORT');
+    });
+
+    const wrapper = mount(<ContentPackApplyParameter
+      entity={entity}
+      parameters={[parameter]}
+      appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
+      onParameterApply={applyFn}
+    />);
+
+    wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
+    wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
+    wrapper.find('form').simulate('submit');
+    expect(applyFn.mock.calls.length).toBe(0);
+  });
+
   it('should clear a parameter', () => {
     const clearFn = jest.fn((configKey) => {
       expect(configKey).toEqual('configuration.port');
