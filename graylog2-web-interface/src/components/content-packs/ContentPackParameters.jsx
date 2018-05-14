@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import lodash from 'lodash';
 
 import { Row, Col, Button, Modal } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -73,18 +74,13 @@ class ContentPackParameters extends React.Component {
 
   _onParameterClear = (id, configKey) => {
     const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
-    const indexToRemove = newAppliedParameter[id].findIndex((paramMap) => { return paramMap.configKey === configKey; });
-    newAppliedParameter[id].splice(indexToRemove, 1);
+    lodash.remove(newAppliedParameter[id], (paramMap) => { return paramMap.configKey === configKey; });
     this.props.onStateChange({ appliedParameter: newAppliedParameter });
   };
 
   _deleteParameter = (parameter) => {
     const newContentPack = ObjectUtils.clone(this.props.contentPack);
-    const indexToDelete = newContentPack.parameters.map(p => p.name).indexOf(parameter.name);
-    if (indexToDelete < 0) {
-      return;
-    }
-    newContentPack.parameters.splice(indexToDelete, 1);
+    lodash.remove(newContentPack.parameters, (param) => { return param.name === parameter.name; });
     this.props.onStateChange({ contentPack: newContentPack });
   };
 
