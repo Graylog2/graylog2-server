@@ -24,13 +24,6 @@ const ApiRoutes = {
     available: () => { return { url: '/alerts/conditions/types' }; },
     list: () => { return { url: '/alerts/conditions' }; },
   },
-  BundlesApiController: {
-    apply: (bundleId) => { return { url: `/system/bundles/${bundleId}/apply` }; },
-    create: () => { return { url: '/system/bundles' }; },
-    delete: (bundleId) => { return { url: `/system/bundles/${bundleId}` }; },
-    export: () => { return { url: '/system/bundles/export' }; },
-    list: () => { return { url: '/system/bundles' }; },
-  },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
     queryEntities: () => { return { url: '/system/catalog' }; },
