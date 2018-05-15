@@ -65,7 +65,7 @@ class Widget extends React.Component {
     this.setState(state => ({ editing: !state.editing }));
   };
 
-  _onAddToDashboard = (widgetId) => {
+  _onAddToOverview = (widgetId) => {
     CurrentWidgetsActions.addToDashboard(widgetId)
       .then(
         () => UserNotification.success('Added widget to dashboard.', 'Success!'),
@@ -129,7 +129,7 @@ class Widget extends React.Component {
             <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
             <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
             <MenuItem divider />
-            <MenuItem onSelect={() => this._onAddToDashboard(id)}>Add to dashboard</MenuItem>
+            <MenuItem onSelect={() => this._onAddToOverview(id)}>Add to overview</MenuItem>
             <MenuItem divider />
             <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
           </WidgetActionDropdown>

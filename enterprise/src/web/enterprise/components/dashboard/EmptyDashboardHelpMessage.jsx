@@ -3,11 +3,11 @@ import React from 'react';
 import PageHeader from 'components/common/PageHeader';
 
 const EmptyDashboardHelpMessage = () => (
-  <PageHeader title="Empty Dashboard">
+  <PageHeader title="Empty Overview">
     <span>
-      This dashboard is empty, because no widgets have been added to it.
+      This overview is empty, because no widgets have been added to it.
       <p />
-      Add widgets by clicking &quot;Add to dashboard&quot; in the widget&apos;s menu.
+      Add widgets by clicking &quot;Add to overview&quot; in the widget&apos;s menu.
     </span>
   </PageHeader>
 );
