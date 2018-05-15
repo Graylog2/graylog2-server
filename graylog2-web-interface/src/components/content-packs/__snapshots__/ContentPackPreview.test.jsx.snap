@@ -3,65 +3,76 @@
 exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
 <div>
   <div
-    id="content-pack-details"
+    className="row"
   >
-    <h2>
-      Details
-    </h2>
-    <small>
-      Version: 
-    </small>
-    <div>
-      <dl
-        className="deflist"
-      >
-        <dt>
-          Name:
-        </dt>
-         
-        <dd>
-           
-        </dd>
-        <dt>
-          Summary:
-        </dt>
-         
-        <dd>
-           
-        </dd>
-        <dt>
-          Vendor:
-        </dt>
-         
-        <dd>
-           
-        </dd>
-        <dt>
-          URL:
-        </dt>
-         
-        <dd>
-          <a
-            href={undefined}
-          />
-           
-        </dd>
-      </dl>
-    </div>
-    <br />
-    <br />
-    <br />
-    <h3>
-      Description
-    </h3>
-    <br />
     <div
-      dangerouslySetInnerHTML={
-        Object {
-          "__html": "",
-        }
-      }
-    />
+      className="col-sm-offset-1"
+    >
+      <div
+        id="content-pack-details"
+      >
+        <h2>
+          Details
+        </h2>
+        <br />
+        <div>
+          <dl
+            className="deflist"
+          >
+            <dt>
+              Version:
+            </dt>
+             
+            <dd />
+            <dt>
+              Name:
+            </dt>
+             
+            <dd>
+               
+            </dd>
+            <dt>
+              Summary:
+            </dt>
+             
+            <dd>
+               
+            </dd>
+            <dt>
+              Vendor:
+            </dt>
+             
+            <dd>
+               
+            </dd>
+            <dt>
+              URL:
+            </dt>
+             
+            <dd>
+              <a
+                href={undefined}
+              />
+               
+            </dd>
+          </dl>
+        </div>
+        <br />
+        <br />
+        <br />
+        <h3>
+          Description
+        </h3>
+        <br />
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "",
+            }
+          }
+        />
+      </div>
+    </div>
   </div>
   <button
     className="btn btn-default"
@@ -78,79 +89,90 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
 exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
 <div>
   <div
-    id="content-pack-details"
+    className="row"
   >
-    <h2>
-      Details
-    </h2>
-    <small>
-      Version: 
-    </small>
-    <div>
-      <dl
-        className="deflist"
-      >
-        <dt>
-          Name:
-        </dt>
-         
-        <dd>
-          name
-           
-        </dd>
-        <dt>
-          Summary:
-        </dt>
-         
-        <dd>
-          summmary
-           
-        </dd>
-        <dt>
-          Vendor:
-        </dt>
-         
-        <dd>
-          vendor
-           
-        </dd>
-        <dt>
-          URL:
-        </dt>
-         
-        <dd>
-          <a
-            href="http://example.com"
-          >
-            http://example.com
-          </a>
-           
-        </dd>
-        <span>
-          <dt>
-            Parameters:
-          </dt>
-           
-          <dd>
-            0
-          </dd>
-        </span>
-      </dl>
-    </div>
-    <br />
-    <br />
-    <br />
-    <h3>
-      Description
-    </h3>
-    <br />
     <div
-      dangerouslySetInnerHTML={
-        Object {
-          "__html": "<p>descr</p>",
-        }
-      }
-    />
+      className="col-sm-offset-1"
+    >
+      <div
+        id="content-pack-details"
+      >
+        <h2>
+          Details
+        </h2>
+        <br />
+        <div>
+          <dl
+            className="deflist"
+          >
+            <dt>
+              Version:
+            </dt>
+             
+            <dd />
+            <dt>
+              Name:
+            </dt>
+             
+            <dd>
+              name
+               
+            </dd>
+            <dt>
+              Summary:
+            </dt>
+             
+            <dd>
+              summmary
+               
+            </dd>
+            <dt>
+              Vendor:
+            </dt>
+             
+            <dd>
+              vendor
+               
+            </dd>
+            <dt>
+              URL:
+            </dt>
+             
+            <dd>
+              <a
+                href="http://example.com"
+              >
+                http://example.com
+              </a>
+               
+            </dd>
+            <span>
+              <dt>
+                Parameters:
+              </dt>
+               
+              <dd>
+                0
+              </dd>
+            </span>
+          </dl>
+        </div>
+        <br />
+        <br />
+        <br />
+        <h3>
+          Description
+        </h3>
+        <br />
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "<p>descr</p>",
+            }
+          }
+        />
+      </div>
+    </div>
   </div>
   <button
     className="btn btn-default"

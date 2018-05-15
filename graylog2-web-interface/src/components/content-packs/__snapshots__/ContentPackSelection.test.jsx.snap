@@ -6,7 +6,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     className="row"
   >
     <div
-      className="col-lg-8"
+      className="col-lg-8 col-sm-offset-1"
     >
       <h2>
         General Information
@@ -180,7 +180,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     className="row"
   >
     <div
-      className=""
+      className="col-sm-offset-1"
     >
       <h2>
         Content Pack selection
@@ -195,7 +195,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
       className="row"
     >
       <div
-        className=""
+        className="col-sm-offset-1"
       >
         <div
           className="form-group"
@@ -261,7 +261,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     className="row"
   >
     <div
-      className="col-lg-8"
+      className="col-lg-8 col-sm-offset-1"
     >
       <h2>
         General Information
@@ -435,7 +435,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     className="row"
   >
     <div
-      className=""
+      className="col-sm-offset-1"
     >
       <h2>
         Content Pack selection
@@ -450,7 +450,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
       className="row"
     >
       <div
-        className=""
+        className="col-sm-offset-1"
       >
         <div
           className="form-group"

@@ -165,7 +165,7 @@ class ContentPackSelection extends React.Component {
     return (
       <div>
         <Row>
-          <Col lg={8}>
+          <Col smOffset={1} lg={8}>
             <h2>General Information</h2>
             <br />
             <form className="form-horizontal content-selection-form" id="content-selection-form" onSubmit={(e) => { e.preventDefault(); }}>
@@ -229,13 +229,13 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col smOffset={1}>
             <h2>Content Pack selection</h2>
           </Col>
         </Row>
         <form id={'filter-form'} onSubmit={this._onFilterEntities} >
           <Row>
-            <Col>
+            <Col smOffset={1}>
               <Input name="filter-input"
                      id="filter-input"
                      type="text"

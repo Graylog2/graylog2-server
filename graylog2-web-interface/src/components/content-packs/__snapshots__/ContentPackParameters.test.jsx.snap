@@ -6,220 +6,23 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     className="row"
   >
     <div
-      className="col-lg-8"
-    >
-      <h2>
-        Create parameters
-      </h2>
-      <br />
-      <form
-        className="form-horizontal parameter-form"
-        id="parameter-form"
-        onSubmit={[Function]}
-      >
-        <fieldset>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="title"
-            >
-              Title
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="title"
-                label="Title"
-                maxLength={250}
-                name="title"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                Give a descriptive title for this content pack.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="name"
-                label="Name"
-                maxLength={250}
-                name="name"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                This is used as the parameter reference and must not contain a space.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="description"
-                label="Description"
-                maxLength={250}
-                name="description"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                Give a description explaining what will be done with this parameter.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="type"
-            >
-              Value Type
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <select
-                className="form-control"
-                id="type"
-                label="Value Type"
-                name="type"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value="string"
-              >
-                <option
-                  value="string"
-                >
-                  String
-                </option>
-                <option
-                  value="integer"
-                >
-                  Integer
-                </option>
-                <option
-                  value="double"
-                >
-                  Double
-                </option>
-                <option
-                  value="boolean"
-                >
-                  Boolean
-                </option>
-              </select>
-              <span
-                className="help-block"
-              >
-                Give the type of the parameter.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="default_value"
-            >
-              Default value
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="default_value"
-                label="Default value"
-                maxLength={250}
-                name="default_value"
-                onChange={[Function]}
-                placeholder=""
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                Give a default value if the parameter is not optional.
-              </span>
-            </div>
-          </div>
-          <div
-            className="row"
-          >
-            <div
-              className="col-sm-offset-10"
-            >
-              <button
-                className="btn btn-info"
-                disabled={false}
-                type="submit"
-              >
-                Add Parameter
-              </button>
-            </div>
-          </div>
-        </fieldset>
-      </form>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
       className="col-sm-9 col-sm-offset-1"
     >
       <h2>
         Parameters list
       </h2>
+      <br />
+      <span>
+        <button
+          className="btn btn-sm btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Create parameter
+        </button>
+      </span>
+      <br />
       <br />
       <div>
         <div
@@ -283,6 +86,16 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       >
                         Delete
                       </button>
+                      <span>
+                        <button
+                          className="btn btn-sm btn-info"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                      </span>
                     </td>
                   </tr>
                 </tbody>
@@ -376,220 +189,23 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     className="row"
   >
     <div
-      className="col-lg-8"
-    >
-      <h2>
-        Create parameters
-      </h2>
-      <br />
-      <form
-        className="form-horizontal parameter-form"
-        id="parameter-form"
-        onSubmit={[Function]}
-      >
-        <fieldset>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="title"
-            >
-              Title
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="title"
-                label="Title"
-                maxLength={250}
-                name="title"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                Give a descriptive title for this content pack.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="name"
-                label="Name"
-                maxLength={250}
-                name="name"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                This is used as the parameter reference and must not contain a space.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="description"
-                label="Description"
-                maxLength={250}
-                name="description"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                Give a description explaining what will be done with this parameter.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="type"
-            >
-              Value Type
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <select
-                className="form-control"
-                id="type"
-                label="Value Type"
-                name="type"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value="string"
-              >
-                <option
-                  value="string"
-                >
-                  String
-                </option>
-                <option
-                  value="integer"
-                >
-                  Integer
-                </option>
-                <option
-                  value="double"
-                >
-                  Double
-                </option>
-                <option
-                  value="boolean"
-                >
-                  Boolean
-                </option>
-              </select>
-              <span
-                className="help-block"
-              >
-                Give the type of the parameter.
-              </span>
-            </div>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="col-sm-3 control-label"
-              htmlFor="default_value"
-            >
-              Default value
-            </label>
-            <div
-              className="col-sm-9"
-            >
-              <input
-                className="form-control"
-                id="default_value"
-                label="Default value"
-                maxLength={250}
-                name="default_value"
-                onChange={[Function]}
-                placeholder=""
-                type="text"
-                value=""
-              />
-              <span
-                className="help-block"
-              >
-                Give a default value if the parameter is not optional.
-              </span>
-            </div>
-          </div>
-          <div
-            className="row"
-          >
-            <div
-              className="col-sm-offset-10"
-            >
-              <button
-                className="btn btn-info"
-                disabled={false}
-                type="submit"
-              >
-                Add Parameter
-              </button>
-            </div>
-          </div>
-        </fieldset>
-      </form>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
       className="col-sm-9 col-sm-offset-1"
     >
       <h2>
         Parameters list
       </h2>
+      <br />
+      <span>
+        <button
+          className="btn btn-sm btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Create parameter
+        </button>
+      </span>
+      <br />
       <br />
       <div>
         <div
@@ -603,7 +219,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               id="parameter-list"
             >
               <p>
-                No data available.
+                To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
               </p>
             </div>
           </div>
