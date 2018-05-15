@@ -200,6 +200,7 @@ public class AbstractTcpTransportTest {
     }
 
     @Test
+    @Ignore("Disabled test due to being unreliable. For details see https://github.com/Graylog2/graylog2-server/issues/4791.")
     public void testConnectionCounter() throws Exception {
         final Configuration configuration = new Configuration(ImmutableMap.of(
                 "bind_address", "127.0.0.1",
