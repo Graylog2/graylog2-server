@@ -10,6 +10,7 @@ import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidget
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import ViewsActions from 'enterprise/actions/ViewsActions';
 import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
+import EmptyDashboardHelpMessage from './EmptyDashboardHelpMessage';
 
 const DashboardContainer = createReactClass({
   propTypes: {
@@ -61,7 +62,7 @@ const DashboardContainer = createReactClass({
 
     if (!viewDashboardWidgets) {
       // No dashboard widgets defined
-      return null;
+      return <EmptyDashboardHelpMessage />;
     }
 
     const widgetsWithResults = viewDashboardWidgets.map((value, widgetId) => {
