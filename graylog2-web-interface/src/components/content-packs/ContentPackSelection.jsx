@@ -38,7 +38,7 @@ class ContentPackSelection extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ filteredEntities: nextProps.entities });
+    this.setState({ filteredEntities: nextProps.entities, contentPack: nextProps.contentPack });
     if (this.state.isFiltered) {
       this._filterEntities(this.state.filter);
     }

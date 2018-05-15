@@ -4,7 +4,9 @@ import React from 'react';
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
 import { Row, Col, Button, DropdownButton, MenuItem, Pagination } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
+
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
@@ -69,6 +71,9 @@ class ContentPacksList extends React.Component {
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
                 <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Remove all</MenuItem>
+                <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
+                  <MenuItem>Edit</MenuItem>
+                </LinkContainer>
                 <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
               </DropdownButton>
               {downloadModal}
