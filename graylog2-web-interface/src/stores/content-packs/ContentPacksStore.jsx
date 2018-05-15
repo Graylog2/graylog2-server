@@ -24,6 +24,17 @@ const ContentPacksStore = Reflux.createStore({
     ContentPacksActions.get.promise(promise);
   },
 
+  getRev(contentPackId, contentPackRev) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.getRev(contentPackId, contentPackRev).url);
+    const promise = fetch('GET', url)
+      .then((result) => {
+        this.trigger({ contentPack: result });
+        return result;
+      });
+
+    ContentPacksActions.getRev.promise(promise);
+  },
+
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.list().url);
     const promise = fetch('GET', url)

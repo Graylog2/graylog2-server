@@ -31,7 +31,9 @@ const CatalogStore = Reflux.createStore({
     const payload = Object.keys(requestedEntities).reduce((result, key) => {
       return result.concat(requestedEntities[key].map((entity) => {
         const newEntity = ObjectUtils.clone(entity);
-        delete newEntity.title;
+        if (newEntity.title) {
+          delete newEntity.title;
+        }
         return newEntity;
       }));
     }, []);
