@@ -3,11 +3,11 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 
-import ContentPackAddParameter from 'components/content-packs/ContentPackEditParameter';
+import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
-describe('<ContentPackAddParameters />', () => {
+describe('<ContentPackEditParameters />', () => {
   it('should render with empty parameters', () => {
-    const wrapper = renderer.create(<ContentPackAddParameter />);
+    const wrapper = renderer.create(<ContentPackEditParameter />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -19,7 +19,7 @@ describe('<ContentPackAddParameters />', () => {
       type: 'string',
       default_value: 'test',
     }];
-    const wrapper = renderer.create(<ContentPackAddParameter parameters={parameters} />);
+    const wrapper = renderer.create(<ContentPackEditParameter parameters={parameters} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -34,7 +34,7 @@ describe('<ContentPackAddParameters />', () => {
       });
     });
 
-    const wrapper = mount(<ContentPackAddParameter onUpdateParameter={changeFn} />);
+    const wrapper = mount(<ContentPackEditParameter onUpdateParameter={changeFn} />);
     wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
     wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
     wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
@@ -46,12 +46,24 @@ describe('<ContentPackAddParameters />', () => {
   it('should not create a parameter if name is missing', () => {
     const changeFn = jest.fn();
 
-    const wrapper = mount(<ContentPackAddParameter onUpdateParameter={changeFn} />);
+    const wrapper = mount(<ContentPackEditParameter onUpdateParameter={changeFn} />);
     wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
     wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
     wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
     wrapper.find('form').at(0).simulate('submit');
     expect(changeFn.mock.calls.length).toBe(0);
+  });
+
+  it('should validate with existing names when editing a parameter', () => {
+    const parameters = [
+      { name: 'hans', title: 'hans', description: 'hans' },
+      { name: 'franz', title: 'franz', description: 'franz' },
+    ];
+
+    const wrapper = mount(<ContentPackEditParameter parameters={parameters} parameterToEdit={parameters[0]} />);
+    wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'franz' } });
+    wrapper.find('form').at(0).simulate('submit');
+    expect(wrapper.find('span.help-block').at(1).text()).toEqual('The parameter name must be unique.');
   });
 
   describe('validation', () => {
@@ -60,7 +72,7 @@ describe('<ContentPackAddParameters />', () => {
     beforeEach(() => {
       const parameters = [{ name: 'hans', title: 'hans', description: 'hans' }];
 
-      wrapper = mount(<ContentPackAddParameter parameters={parameters} />);
+      wrapper = mount(<ContentPackEditParameter parameters={parameters} />);
       wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
       wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
       wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });

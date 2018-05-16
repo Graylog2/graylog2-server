@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ContentPackAddParameters /> should render a parameter 1`] = `
+exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
 <div>
   <h2>
     Create parameter
@@ -206,7 +206,7 @@ exports[`<ContentPackAddParameters /> should render a parameter 1`] = `
 </div>
 `;
 
-exports[`<ContentPackAddParameters /> should render with empty parameters 1`] = `
+exports[`<ContentPackEditParameters /> should render with empty parameters 1`] = `
 <div>
   <h2>
     Create parameter
