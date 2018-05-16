@@ -130,7 +130,7 @@ const SelectPopover = createReactClass({
   renderDataFilter(items) {
     return (
       <FormGroup controlId="dataFilterInput" className={style.dataFilterInput}>
-        <FormControl type="text" placeholder={this.props.filterPlaceholder} onChange={this.handleFilterChange(items)} />
+        <FormControl type="text" placeholder={this.props.filterPlaceholder} value={this.state.filterText} onChange={this.handleFilterChange(items)} />
       </FormGroup>
     );
   },
