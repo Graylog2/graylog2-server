@@ -122,6 +122,31 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
+    public void testSuccessfulProxyConnectionWithAuthenticationMechanismUppercase() throws IOException, InterruptedException {
+        server.enqueue(proxyAuthenticateMockResponse("BASIC"));
+        server.enqueue(successfulMockResponse());
+
+        final URI proxyURI = URI.create("http://user:password@" + server.getHostName() + ":" + server.getPort());
+        final Response response = client(proxyURI).newCall(request()).execute();
+        assertThat(response.isSuccessful()).isTrue();
+        final ResponseBody body = response.body();
+        assertThat(body).isNotNull();
+        assertThat(body.string()).isEqualTo("Test");
+
+        assertThat(server.getRequestCount()).isEqualTo(2);
+        final RecordedRequest unauthenticatedRequest = server.takeRequest();
+        assertThat(unauthenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(unauthenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(unauthenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isNull();
+        final RecordedRequest authenticatedRequest = server.takeRequest();
+        assertThat(authenticatedRequest.getMethod()).isEqualTo("GET");
+        assertThat(authenticatedRequest.getPath()).isEqualTo("http://www.example.com/");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.HOST)).isEqualTo("www.example.com");
+        assertThat(authenticatedRequest.getHeader(HttpHeaders.PROXY_AUTHORIZATION)).isEqualTo(Credentials.basic("user", "password"));
+    }
+
+    @Test
     public void testFailingProxyConnectionWithoutAuthentication() throws IOException, InterruptedException {
         server.enqueue(failedMockResponse());
 
@@ -165,7 +190,7 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
-    public void testFailingProxyConnectionWithAuthenticationAndUnsupportedScheme() throws IOException, InterruptedException {
+    public void testFailingProxyConnectionWithAuthenticationAndUnsupportedScheme() throws IOException {
         server.enqueue(proxyAuthenticateMockResponse("Bearer"));
 
         final URI proxyURI = URI.create("http://user:password@" + server.getHostName() + ":" + server.getPort());
