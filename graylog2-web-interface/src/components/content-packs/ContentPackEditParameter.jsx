@@ -118,9 +118,10 @@ class ContentPackEditParameter extends React.Component {
   };
 
   render() {
+    const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
     return (
       <div>
-        <h2>Create parameter</h2>
+        <h2>{header}</h2>
         <br />
         <form className="form-horizontal parameter-form" id="parameter-form" onSubmit={this._addNewParameter}>
           <fieldset>

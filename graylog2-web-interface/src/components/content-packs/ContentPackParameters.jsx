@@ -155,7 +155,7 @@ class ContentPackParameters extends React.Component {
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Apply Parameter</Modal.Title>
+          <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ContentPackEditParameter parameters={this.props.contentPack.parameters}
