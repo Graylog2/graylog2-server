@@ -38,7 +38,7 @@ class ContentPackApplyParameter extends React.Component {
       <tr key={paramMap.configKey}>
         <td>{paramMap.configKey}</td>
         <td>{paramMap.paramName}</td>
-        <td><Button bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td>
+        <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td>
       </tr>
     );
   };
@@ -110,8 +110,8 @@ class ContentPackApplyParameter extends React.Component {
             <Col sm={1} />
           </Row>
           <Row>
-            <Col smOffset={1} sm={3}>
-              <Button disabled={!this._valuesSelected()} type="submit">Apply</Button>
+            <Col smOffset={10} sm={2}>
+              <Button bsStyle="primary" disabled={!this._valuesSelected()} type="submit">Apply</Button>
             </Col>
           </Row>
         </form>
