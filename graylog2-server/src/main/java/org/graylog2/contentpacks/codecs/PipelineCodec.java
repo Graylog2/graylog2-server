@@ -79,7 +79,7 @@ public class PipelineCodec implements EntityCodec<PipelineDao> {
     }
 
     @Override
-    public PipelineDao decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public PipelineDao decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {

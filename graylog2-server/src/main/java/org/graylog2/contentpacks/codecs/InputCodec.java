@@ -144,19 +144,18 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
 
 
     @Override
-    public InputWithExtractors decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public InputWithExtractors decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
 
-    private InputWithExtractors decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private InputWithExtractors decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
         final Map<String, ValueReference> staticFields = inputEntity.staticFields();
-        final String username = "admin"; // TODO: Pass along user name
 
         final MessageInput messageInput;
         try {

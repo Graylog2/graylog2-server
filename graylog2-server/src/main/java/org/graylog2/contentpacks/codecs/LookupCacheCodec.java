@@ -68,7 +68,7 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
     }
 
     @Override
-    public CacheDto decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public CacheDto decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {

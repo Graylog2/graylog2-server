@@ -99,16 +99,16 @@ public class StreamCodec implements EntityCodec<Stream> {
     }
 
     @Override
-    public Stream decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public Stream decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private Stream decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private Stream decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
@@ -118,9 +118,7 @@ public class StreamCodec implements EntityCodec<Stream> {
                 streamEntity.matchingType().asString(parameters),
                 streamEntity.removeMatches().asBoolean(parameters),
                 indexSetService.getDefault().id());
-
-        // TODO: Pass along user
-        final Stream stream = streamService.create(createStreamRequest, "admin");
+        final Stream stream = streamService.create(createStreamRequest, username);
 
         for (StreamRuleEntity streamRuleEntity : streamEntity.streamRules()) {
             final CreateStreamRuleRequest createStreamRuleRequest = CreateStreamRuleRequest.create(

@@ -68,7 +68,7 @@ public class LookupTableCodec implements EntityCodec<LookupTableDto> {
     }
 
     @Override
-    public LookupTableDto decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public LookupTableDto decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {

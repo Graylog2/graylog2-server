@@ -26,7 +26,7 @@ import java.util.Map;
 public interface EntityCodec<T> {
     EntityWithConstraints encode(T nativeEntity);
 
-    T decode(Entity entity, Map<String, FilledParameter<?>> parameters);
+    T decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username);
 
     EntityExcerpt createExcerpt(T nativeEntity);
 }
