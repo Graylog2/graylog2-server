@@ -114,15 +114,15 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
     }
 
     @Override
-    public Dashboard decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public Dashboard decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Dashboard decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private Dashboard decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
         DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final Dashboard dashboard;
         try {
@@ -130,7 +130,7 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
                     dashboardEntity.title().asString(parameters),
                     dashboardEntity.description().asString(parameters),
                     dashboardEntity.widgets(),
-                    "admin", // TODO: Pass along user
+                    username,
                     parameters
             );
         } catch (Exception e) {

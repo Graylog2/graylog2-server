@@ -68,7 +68,7 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
     }
 
     @Override
-    public DataAdapterDto decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public DataAdapterDto decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {

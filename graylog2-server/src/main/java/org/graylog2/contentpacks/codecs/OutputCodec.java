@@ -66,16 +66,16 @@ public class OutputCodec implements EntityCodec<Output> {
     }
 
     @Override
-    public Output decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public Output decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private Output decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private Output decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         final CreateOutputRequest createOutputRequest = CreateOutputRequest.create(
                 outputEntity.title().asString(parameters),
@@ -84,8 +84,7 @@ public class OutputCodec implements EntityCodec<Output> {
                 null // TODO
         );
         try {
-            // TODO: Pass along user
-            return outputService.create(createOutputRequest, "admin");
+            return outputService.create(createOutputRequest, username);
         } catch (ValidationException e) {
             throw new IllegalArgumentException(e);
         }

@@ -61,7 +61,7 @@ public class PipelineRuleCodec implements EntityCodec<RuleDao> {
     }
 
     @Override
-    public RuleDao decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public RuleDao decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {

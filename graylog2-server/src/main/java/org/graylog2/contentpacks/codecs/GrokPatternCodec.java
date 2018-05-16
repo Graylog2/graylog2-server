@@ -59,7 +59,7 @@ public class GrokPatternCodec implements EntityCodec<GrokPattern> {
     }
 
     @Override
-    public GrokPattern decode(Entity entity, Map<String, FilledParameter<?>> parameters) {
+    public GrokPattern decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {
