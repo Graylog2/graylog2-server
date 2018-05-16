@@ -3,9 +3,7 @@ import React from 'react';
 import lodash from 'lodash';
 
 import { Row, Col, Button, Modal } from 'react-bootstrap';
-import { Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
-import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
@@ -42,13 +40,24 @@ class ContentPackParameters extends React.Component {
 
   _addNewParameter = (newParameter, oldParameter) => {
     const newContentPack = ObjectUtils.clone(this.props.contentPack);
+    const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
     if (oldParameter) {
+      /* If the name of the parameter changed we need to update the reference in appliedParameter */
+      Object.keys(newAppliedParameter).forEach((id) => {
+        newAppliedParameter[id] = newAppliedParameter[id].map((paramMap) => {
+          if (paramMap.paramName === oldParameter.name) {
+            return { configKey: paramMap.configKey, paramName: newParameter.name };
+          }
+          return paramMap;
+        });
+      });
+      /* If we update a parameter we remove the old one first */
       lodash.remove(newContentPack.parameters, (parameter) => {
         return parameter.name === oldParameter.name;
       });
     }
     newContentPack.parameters.push(newParameter);
-    this.props.onStateChange({ contentPack: newContentPack });
+    this.props.onStateChange({ contentPack: newContentPack, appliedParameter: newAppliedParameter });
   };
 
   _onParameterApply = (id, configKey, paramName) => {
@@ -67,8 +76,16 @@ class ContentPackParameters extends React.Component {
 
   _deleteParameter = (parameter) => {
     const newContentPack = ObjectUtils.clone(this.props.contentPack);
+    const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
+    /* If we delete a parameter we need to remove the reference from appliedParameter */
+    Object.keys(newAppliedParameter).forEach((id) => {
+      lodash.remove(newAppliedParameter[id], (paramMap) => { return paramMap.paramName === parameter.name; });
+      if (newAppliedParameter[id].length <= 0) {
+        delete newAppliedParameter[id];
+      }
+    });
     lodash.remove(newContentPack.parameters, (param) => { return param.name === parameter.name; });
-    this.props.onStateChange({ contentPack: newContentPack });
+    this.props.onStateChange({ contentPack: newContentPack, appliedParameter: newAppliedParameter });
   };
 
   _parameterRowFormatter = (parameter) => {

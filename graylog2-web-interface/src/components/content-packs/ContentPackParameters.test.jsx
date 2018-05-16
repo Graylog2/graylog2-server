@@ -38,6 +38,7 @@ describe('<ContentPackParameters />', () => {
   it('should delete a parameter', () => {
     const changeFn = jest.fn((newState) => {
       expect(newState.contentPack.parameters).toEqual([]);
+      expect(newState.appliedParameter).toEqual({});
     });
 
     const contentPack = {
@@ -50,10 +51,11 @@ describe('<ContentPackParameters />', () => {
       }],
       entities: [],
     };
-    const wrapper = mount(<ContentPackParameters contentPack={contentPack} onStateChange={changeFn} appliedParameter={{}} />);
+    const appliedParameter = { '111-beef': [{ configKey: 'title', paramName: 'A parameter name' }] };
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack}
+                                                 onStateChange={changeFn}
+                                                 appliedParameter={appliedParameter} />);
     wrapper.find('button[children="Delete"]').simulate('click');
     expect(changeFn.mock.calls.length).toBe(1);
   });
-
-
 });
