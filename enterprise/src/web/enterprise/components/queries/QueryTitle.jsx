@@ -23,7 +23,15 @@ class QueryTitle extends React.Component {
 
   _onChange = (evt) => {
     evt.preventDefault();
+    evt.stopPropagation();
     this.setState({ value: evt.target.value });
+  };
+
+  _onClose = (evt) => {
+    const { onClose } = this.props;
+    evt.preventDefault();
+    evt.stopPropagation();
+    onClose();
   };
 
   _onSubmit = (e) => {
@@ -36,7 +44,6 @@ class QueryTitle extends React.Component {
   };
 
   render() {
-    const { onClose } = this.props;
     const { editing, value } = this.state;
     const valueField = editing ? (
       <form onSubmit={this._onSubmit}>
@@ -58,10 +65,7 @@ class QueryTitle extends React.Component {
         {!editing && <i className="fa fa-times"
                         role="button"
                         tabIndex={0}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onClose();
-                        }} />}
+                        onClick={this._onClose} />}
       </span>
     );
   }
