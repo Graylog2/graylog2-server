@@ -318,6 +318,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   style={undefined}
                 >
                   <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
@@ -414,6 +430,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Remove all
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
                   </a>
                 </li>
                 <li
@@ -532,6 +564,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   style={undefined}
                 >
                   <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
@@ -634,6 +682,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Remove all
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
                   </a>
                 </li>
                 <li
@@ -763,6 +827,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   style={undefined}
                 >
                   <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
@@ -878,6 +958,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   style={undefined}
                 >
                   <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
@@ -974,6 +1070,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Remove all
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
                   </a>
                 </li>
                 <li
@@ -1092,6 +1204,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   style={undefined}
                 >
                   <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
@@ -1194,6 +1322,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Remove all
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
                   </a>
                 </li>
                 <li
@@ -1315,6 +1459,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Remove all
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                  style={undefined}
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Edit
                   </a>
                 </li>
                 <li

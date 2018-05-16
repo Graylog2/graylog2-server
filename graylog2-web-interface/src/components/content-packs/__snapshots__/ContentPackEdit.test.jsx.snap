@@ -1,0 +1,987 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
+<div
+  className="content row"
+>
+  <div
+    className="subnavigation col-md-2"
+  >
+    <ul
+      className="nav nav-pills nav-stacked"
+      role={null}
+    >
+      <li
+        className="active"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Content Selection
+        </a>
+      </li>
+      <li
+        className="disabled"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+          style={
+            Object {
+              "pointerEvents": "none",
+            }
+          }
+          tabIndex={-1}
+        >
+          Parameters
+        </a>
+      </li>
+      <li
+        className="disabled"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+          style={
+            Object {
+              "pointerEvents": "none",
+            }
+          }
+          tabIndex={-1}
+        >
+          Preview
+        </a>
+      </li>
+    </ul>
+    <br />
+    <div
+      className="row"
+    >
+      <div
+        className="col-xs-6"
+      >
+        <button
+          className="btn btn-sm btn-info"
+          disabled={true}
+          onClick={[Function]}
+          type="button"
+        >
+          Previous
+        </button>
+      </div>
+      <div
+        className="text-right col-xs-6"
+      >
+        <button
+          className="btn btn-sm btn-info"
+          disabled={true}
+          onClick={[Function]}
+          type="button"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    className="col-md-6"
+  >
+    <div>
+      <div
+        className="row"
+      >
+        <div
+          className="col-lg-8 col-sm-offset-1"
+        >
+          <h2>
+            General Information
+          </h2>
+          <br />
+          <form
+            className="form-horizontal content-selection-form"
+            id="content-selection-form"
+            onSubmit={[Function]}
+          >
+            <fieldset>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="name"
+                >
+                  Name
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="name"
+                    label="Name"
+                    maxLength={250}
+                    name="name"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value=""
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Give a descriptive name for this content pack.
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="summary"
+                >
+                  Summary
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="summary"
+                    label="Summary"
+                    maxLength={250}
+                    name="summary"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value=""
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Give a short summary of the content pack.
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="description"
+                >
+                  Description
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <textarea
+                    className="form-control"
+                    id="description"
+                    label="Description"
+                    name="description"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="textarea"
+                    value=""
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Give a long description of the content pack in markdown.
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="vendor"
+                >
+                  Vendor
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="vendor"
+                    label="Vendor"
+                    maxLength={250}
+                    name="vendor"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value=""
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Who did this content pack and how can he be reached. e.g Name and eMail
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="url"
+                >
+                  URL
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="url"
+                    label="URL"
+                    maxLength={250}
+                    name="url"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value=""
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Where can I find the content pack. e.g. github url
+                  </span>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-offset-1"
+        >
+          <h2>
+            Content Pack selection
+          </h2>
+        </div>
+      </div>
+      <form
+        id="filter-form"
+        onSubmit={[Function]}
+      >
+        <div
+          className="row"
+        >
+          <div
+            className="col-sm-offset-1"
+          >
+            <div
+              className="form-group"
+            >
+              <label
+                className="col-sm-1 control-label"
+                htmlFor="filter-input"
+              >
+                Filter
+              </label>
+              <div
+                className="col-sm-4"
+              >
+                <input
+                  className="form-control"
+                  id="filter-input"
+                  label="Filter"
+                  maxLength={250}
+                  name="filter-input"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="text"
+                  value=""
+                />
+                
+              </div>
+            </div>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </form>
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-8 col-sm-offset-1"
+        >
+          <ul
+            className="list"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="col-md-3"
+  >
+    <div>
+      <div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-sm-offset-1"
+          >
+            <div
+              id="content-pack-details"
+            >
+              <h2>
+                Details
+              </h2>
+              <br />
+              <div>
+                <dl
+                  className="deflist"
+                >
+                  <dt>
+                    Version:
+                  </dt>
+                   
+                  <dd>
+                    1
+                  </dd>
+                  <dt>
+                    Name:
+                  </dt>
+                   
+                  <dd>
+                    
+                     
+                  </dd>
+                  <dt>
+                    Summary:
+                  </dt>
+                   
+                  <dd>
+                    
+                     
+                  </dd>
+                  <dt>
+                    Vendor:
+                  </dt>
+                   
+                  <dd>
+                    
+                     
+                  </dd>
+                  <dt>
+                    URL:
+                  </dt>
+                   
+                  <dd>
+                    <a
+                      href=""
+                    >
+                      
+                    </a>
+                     
+                  </dd>
+                  <span>
+                    <dt>
+                      ID:
+                    </dt>
+                     
+                    <dd>
+                      <code>
+                        9950ba5a-0887-40a9-2b8f-8b50292cc7fb
+                      </code>
+                    </dd>
+                  </span>
+                  <span>
+                    <dt>
+                      Parameters:
+                    </dt>
+                     
+                    <dd>
+                      0
+                    </dd>
+                  </span>
+                  <span>
+                    <dt>
+                      Entities:
+                    </dt>
+                     
+                    <dd>
+                      0
+                    </dd>
+                  </span>
+                </dl>
+              </div>
+              <br />
+              <br />
+              <br />
+              <h3>
+                Description
+              </h3>
+              <br />
+              <div
+                dangerouslySetInnerHTML={
+                  Object {
+                    "__html": "",
+                  }
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackEdit /> should render spinner with no content pack 1`] = `
+<span>
+  <i
+    className="fa fa-spin fa-spinner"
+  />
+   
+  Loading...
+</span>
+`;
+
+exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
+<div
+  className="content row"
+>
+  <div
+    className="subnavigation col-md-2"
+  >
+    <ul
+      className="nav nav-pills nav-stacked"
+      role={null}
+    >
+      <li
+        className="active"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Content Selection
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Parameters
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Preview
+        </a>
+      </li>
+    </ul>
+    <br />
+    <div
+      className="row"
+    >
+      <div
+        className="col-xs-6"
+      >
+        <button
+          className="btn btn-sm btn-info"
+          disabled={true}
+          onClick={[Function]}
+          type="button"
+        >
+          Previous
+        </button>
+      </div>
+      <div
+        className="text-right col-xs-6"
+      >
+        <button
+          className="btn btn-sm btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    className="col-md-6"
+  >
+    <div>
+      <div
+        className="row"
+      >
+        <div
+          className="col-lg-8 col-sm-offset-1"
+        >
+          <h2>
+            General Information
+          </h2>
+          <br />
+          <form
+            className="form-horizontal content-selection-form"
+            id="content-selection-form"
+            onSubmit={[Function]}
+          >
+            <fieldset>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="name"
+                >
+                  Name
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="name"
+                    label="Name"
+                    maxLength={250}
+                    name="name"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value="Content Pack the movie"
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Give a descriptive name for this content pack.
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="summary"
+                >
+                  Summary
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="summary"
+                    label="Summary"
+                    maxLength={250}
+                    name="summary"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value="A old content pack"
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Give a short summary of the content pack.
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="description"
+                >
+                  Description
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <textarea
+                    className="form-control"
+                    id="description"
+                    label="Description"
+                    name="description"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="textarea"
+                    value="## No one dares"
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Give a long description of the content pack in markdown.
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="vendor"
+                >
+                  Vendor
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="vendor"
+                    label="Vendor"
+                    maxLength={250}
+                    name="vendor"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value="Beinstein"
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Who did this content pack and how can he be reached. e.g Name and eMail
+                  </span>
+                </div>
+              </div>
+              <div
+                className="form-group"
+              >
+                <label
+                  className="col-sm-3 control-label"
+                  htmlFor="url"
+                >
+                  URL
+                </label>
+                <div
+                  className="col-sm-9"
+                >
+                  <input
+                    className="form-control"
+                    id="url"
+                    label="URL"
+                    maxLength={250}
+                    name="url"
+                    onChange={[Function]}
+                    placeholder=""
+                    required={true}
+                    type="text"
+                    value="http://beinstein.com"
+                  />
+                  <span
+                    className="help-block"
+                  >
+                    Where can I find the content pack. e.g. github url
+                  </span>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-offset-1"
+        >
+          <h2>
+            Content Pack selection
+          </h2>
+        </div>
+      </div>
+      <form
+        id="filter-form"
+        onSubmit={[Function]}
+      >
+        <div
+          className="row"
+        >
+          <div
+            className="col-sm-offset-1"
+          >
+            <div
+              className="form-group"
+            >
+              <label
+                className="col-sm-1 control-label"
+                htmlFor="filter-input"
+              >
+                Filter
+              </label>
+              <div
+                className="col-sm-4"
+              >
+                <input
+                  className="form-control"
+                  id="filter-input"
+                  label="Filter"
+                  maxLength={250}
+                  name="filter-input"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="text"
+                  value=""
+                />
+                
+              </div>
+            </div>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </form>
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-8 col-sm-offset-1"
+        >
+          <ul
+            className="list"
+          >
+            <li
+              className="listItem"
+            >
+              <div
+                className="listItemContainer"
+              >
+                <label
+                  className="checkbox-inline"
+                  style={undefined}
+                  title=""
+                >
+                  <input
+                    checked={true}
+                    disabled={false}
+                    onChange={[Function]}
+                    type="checkbox"
+                  />
+                </label>
+                <div
+                  className="expandBoxContainer"
+                >
+                  <div
+                    className="fa-stack expandBox"
+                    onClick={[Function]}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <i
+                      className="fa fa-circle-thin fa-stack-1x iconBackground"
+                    />
+                    <i
+                      className="fa fa-stack-1x fa-angle-up"
+                    />
+                  </div>
+                </div>
+                <span
+                  className="header"
+                >
+                  Dashboard
+                </span>
+              </div>
+              <div
+                className="expandableContent"
+              />
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="col-md-3"
+  >
+    <div>
+      <div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-sm-offset-1"
+          >
+            <div
+              id="content-pack-details"
+            >
+              <h2>
+                Details
+              </h2>
+              <br />
+              <div>
+                <dl
+                  className="deflist"
+                >
+                  <dt>
+                    Version:
+                  </dt>
+                   
+                  <dd>
+                    1
+                  </dd>
+                  <dt>
+                    Name:
+                  </dt>
+                   
+                  <dd>
+                    Content Pack the movie
+                     
+                  </dd>
+                  <dt>
+                    Summary:
+                  </dt>
+                   
+                  <dd>
+                    A old content pack
+                     
+                  </dd>
+                  <dt>
+                    Vendor:
+                  </dt>
+                   
+                  <dd>
+                    Beinstein
+                     
+                  </dd>
+                  <dt>
+                    URL:
+                  </dt>
+                   
+                  <dd>
+                    <a
+                      href="http://beinstein.com"
+                    >
+                      http://beinstein.com
+                    </a>
+                     
+                  </dd>
+                  <span>
+                    <dt>
+                      ID:
+                    </dt>
+                     
+                    <dd>
+                      <code>
+                        9950ba5a-0887-40a9-2b8f-8b50292cc7fb
+                      </code>
+                    </dd>
+                  </span>
+                  <span>
+                    <dt>
+                      Parameters:
+                    </dt>
+                     
+                    <dd>
+                      1
+                    </dd>
+                  </span>
+                  <span>
+                    <dt>
+                      Entities:
+                    </dt>
+                     
+                    <dd>
+                      1
+                    </dd>
+                  </span>
+                </dl>
+              </div>
+              <br />
+              <br />
+              <br />
+              <h3>
+                Description
+              </h3>
+              <br />
+              <div
+                dangerouslySetInnerHTML={
+                  Object {
+                    "__html": "<h2>No one dares</h2>",
+                  }
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

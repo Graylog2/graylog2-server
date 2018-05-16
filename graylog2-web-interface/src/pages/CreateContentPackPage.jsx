@@ -37,6 +37,7 @@ const CreateContentPackPage = createReactClass({
       appliedParameter: {},
       selectedEntities: {},
       selectedStep: undefined,
+      entityIndex: undefined,
     };
   },
 
