@@ -112,76 +112,78 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     <div
       className="col-sm-9 col-sm-offset-1"
     >
-      <h2>
-        Entity list
-      </h2>
-      <br />
       <div>
-        <div
-          className="row "
-        >
+        <h2>
+          Entity list
+        </h2>
+        <br />
+        <div>
           <div
-            className="col-md-12"
+            className="row "
           >
             <div
-              className="data-table table-responsive"
-              id="entity-list"
+              className="col-md-12"
             >
-              <table
-                className="table undefined"
+              <div
+                className="data-table table-responsive"
+                id="entity-list"
               >
-                <thead>
-                  <tr>
-                    <th>
-                      Title
-                    </th>
-                    <th>
-                      Type
-                    </th>
-                    <th>
-                      Description
-                    </th>
-                    <th>
-                      Applied Parameter
-                    </th>
-                    <th>
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      A good input
-                    </td>
-                    <td />
-                    <td>
-                      Input
-                    </td>
-                    <td>
-                      0
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Apply Parameter
-                      </button>
-                      <button
-                        className="btn btn-sm btn-info"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Show config
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                <table
+                  className="table undefined"
+                >
+                  <thead>
+                    <tr>
+                      <th>
+                        Title
+                      </th>
+                      <th>
+                        Type
+                      </th>
+                      <th>
+                        Description
+                      </th>
+                      <th>
+                        Applied Parameter
+                      </th>
+                      <th>
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        A good input
+                      </td>
+                      <td />
+                      <td>
+                        Input
+                      </td>
+                      <td>
+                        0
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Apply Parameter
+                        </button>
+                        <button
+                          className="btn btn-sm btn-info"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Show config
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -241,24 +243,26 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     <div
       className="col-sm-9 col-sm-offset-1"
     >
-      <h2>
-        Entity list
-      </h2>
-      <br />
       <div>
-        <div
-          className="row "
-        >
+        <h2>
+          Entity list
+        </h2>
+        <br />
+        <div>
           <div
-            className="col-md-12"
+            className="row "
           >
             <div
-              className="data-table table-responsive"
-              id="entity-list"
+              className="col-md-12"
             >
-              <p>
-                No data available.
-              </p>
+              <div
+                className="data-table table-responsive"
+                id="entity-list"
+              >
+                <p>
+                  No data available.
+                </p>
+              </div>
             </div>
           </div>
         </div>

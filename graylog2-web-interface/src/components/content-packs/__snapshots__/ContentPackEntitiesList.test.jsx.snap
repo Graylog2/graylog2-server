@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
+<div>
+  <h2>
+    Entity list
+  </h2>
+  <br />
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="entity-list"
+        >
+          <p>
+            No data available.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackEntitiesList /> should render with entities and parameters without readOnly 1`] = `
+<div>
+  <h2>
+    Entity list
+  </h2>
+  <br />
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="entity-list"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Title
+                </th>
+                <th>
+                  Type
+                </th>
+                <th>
+                  Description
+                </th>
+                <th>
+                  Applied Parameter
+                </th>
+                <th>
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  A good input
+                </td>
+                <td />
+                <td>
+                  Input
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Apply Parameter
+                  </button>
+                  <button
+                    className="btn btn-sm btn-info"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Show config
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

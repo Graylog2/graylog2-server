@@ -12,7 +12,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
         className="row"
       >
         <div
-          className="col-sm-offset-1"
+          className="col-sm-9 col-sm-offset-1"
         >
           <div
             id="content-pack-details"
@@ -135,7 +135,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
         className="row"
       >
         <div
-          className="col-sm-offset-1"
+          className="col-sm-9 col-sm-offset-1"
         >
           <div
             id="content-pack-details"

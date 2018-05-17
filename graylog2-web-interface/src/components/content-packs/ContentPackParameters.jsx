@@ -7,9 +7,8 @@ import DataTable from 'components/common/DataTable';
 import ObjectUtils from 'util/ObjectUtils';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
-import ContentPackEntityConfig from "./ContentPackEntityConfig";
+import ContentPackEntitiesList from './ContentPackEntitiesList';
 
 class ContentPackParameters extends React.Component {
   static propTypes = {
@@ -104,94 +103,6 @@ class ContentPackParameters extends React.Component {
     );
   };
 
-  _entityRowFormatter = (entity) => {
-    let applyModalRef;
-    const applyParamComponent = (<ContentPackApplyParameter
-      parameters={this.props.contentPack.parameters}
-      entity={entity}
-      appliedParameter={this.props.appliedParameter[entity.id]}
-      onParameterApply={(key, value) => { this._onParameterApply(entity.id, key, value); }}
-      onParameterClear={(key) => { this._onParameterClear(entity.id, key); }}
-    />);
-
-    const closeModal = () => {
-      applyModalRef.close();
-    };
-
-    const open = () => {
-      applyModalRef.open();
-    };
-
-    const applyModal = (
-      <BootstrapModalWrapper ref={(node) => { applyModalRef = node; }} bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title>Apply Parameter</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {applyParamComponent}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={closeModal}>Close</Button>
-        </Modal.Footer>
-      </BootstrapModalWrapper>
-    );
-
-    let showModalRef;
-    const entityComponent = (<ContentPackEntityConfig
-      appliedParameter={this.props.appliedParameter[entity.id]}
-      parameters={this.props.contentPack.parameters}
-      entity={entity}
-    />);
-
-    const closeShowModal = () => {
-      showModalRef.close();
-    };
-
-    const openShowModal = () => {
-      showModalRef.open();
-    };
-
-    const showModal = (
-      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title>Apply Parameter</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {entityComponent}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={closeShowModal}>Close</Button>
-        </Modal.Footer>
-      </BootstrapModalWrapper>
-    );
-
-    const disableBtn = this.props.contentPack.parameters.length <= 0;
-    const appliedParameterCount = (this.props.appliedParameter[entity.id] || []).length;
-    return (
-      <tr key={entity.id}>
-        <td>{(entity.data.title || {}).value}</td>
-        <td>{entity.type}</td>
-        <td>{(entity.data.description || entity.data.name || {}).value}</td>
-        <td>{appliedParameterCount}</td>
-        <td>
-          <Button bsStyle="primary"
-                  bsSize="small"
-                  disabled={disableBtn}
-                  onClick={() => { open(); }}>
-            Apply Parameter
-          </Button>
-          <Button bsStyle="info"
-                  bsSize="small"
-                  onClick={() => { openShowModal(); }}>
-            Show config
-          </Button>
-        </td>
-        {applyModal}
-        {showModal}
-      </tr>
-    );
-  };
-
   _parameterModal(parameter) {
     let modalRef;
 
@@ -261,16 +172,8 @@ class ContentPackParameters extends React.Component {
         </Row>
         <Row>
           <Col smOffset={1} sm={9}>
-            <h2>Entity list</h2>
-            <br />
-            <DataTable
-              id="entity-list"
-              headers={['Title', 'Type', 'Description', 'Applied Parameter', 'Action']}
-              sortByKey="type"
-              filterKeys={[]}
-              rows={this.props.contentPack.entities}
-              dataRowFormatter={this._entityRowFormatter}
-            />
+            <ContentPackEntitiesList contentPack={this.props.contentPack}
+                                     appliedParameter={this.props.appliedParameter} />
           </Col>
         </Row>
       </div>
