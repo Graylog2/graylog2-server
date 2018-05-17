@@ -8,6 +8,7 @@ import 'enterprise/components/searchbar/queryinput/ace-queryinput';
 import 'brace/ext/language_tools';
 
 import AceEditor from 'react-ace';
+import SearchBarAutoCompletions from './SearchBarAutocompletions';
 
 const _completions = (fields) => {
   return (editor, session, pos, prefix, callback) => {
@@ -24,27 +25,13 @@ const _completions = (fields) => {
   };
 };
 
-const _snippets = {
-  getCompletions: _completions([]),
-};
-
-const _extractFields = (queryResult) => {
-  if (!queryResult) {
-    return new Immutable.Map();
-  }
-  // TODO this requires that each query actually has a message list available.
-  const searchTypes = queryResult.searchTypes;
-  // TODO how do we deal with multiple lists? is that even useful?
-  const messagesSearchType = _.find(searchTypes, t => t.type === 'messages');
-  return messagesSearchType !== undefined ? messagesSearchType.fields : new Immutable.Map();
-};
-
 class QueryInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
       value: props.value,
     };
+    this.completer = new SearchBarAutoCompletions();
   }
 
   componentDidMount() {
@@ -56,11 +43,9 @@ class QueryInput extends Component {
 
     this.editor.editor.setFontSize(16);
 
-    this.editor.editor.completers.push(_snippets);
+    this.editor.editor.completers.push(this.completer);
   }
   componentWillReceiveProps(nextProps) {
-    const fields = _extractFields(nextProps.result);
-    _snippets.getCompletions = _completions(fields);
     if (nextProps.value !== this.state.value) {
       this.setState({ value: nextProps.value });
     }
