@@ -38,10 +38,7 @@ const CatalogStore = Reflux.createStore({
       }));
     }, []);
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
-    const promise = fetch('POST', url, { entities: payload })
-      .then((entities) => {
-        return entities.entities;
-      });
+    const promise = fetch('POST', url, { entities: payload });
     CatalogActions.getSelectedEntities.promise(promise);
   },
 });

@@ -84,10 +84,11 @@ const CreateContentPackPage = createReactClass({
   },
 
   _getEntities(selectedEntities) {
-    CatalogActions.getSelectedEntities(selectedEntities).then((fetchedEntities) => {
+    CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
       const contentPack = ObjectUtils.clone(this.state.contentPack);
-      contentPack.entities = fetchedEntities;
-      this.setState({ contentPack: contentPack, fetchedEntities: fetchedEntities });
+      contentPack.entities = result.entities;
+      contentPack.requires = result.constraints;
+      this.setState({ contentPack: contentPack, fetchedEntities: result.entities });
     });
   },
 

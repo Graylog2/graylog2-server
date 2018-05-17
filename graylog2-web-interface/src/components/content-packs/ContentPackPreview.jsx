@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
+import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 
 class ContentPackPreview extends React.Component {
   static propTypes = {
@@ -17,7 +18,14 @@ class ContentPackPreview extends React.Component {
   render() {
     return (
       <div>
-        <ContentPackDetails contentPack={this.props.contentPack} />
+        <Row>
+          <Col sm={6}>
+            <ContentPackDetails contentPack={this.props.contentPack} />
+          </Col>
+          <Col sm={6}>
+            <ContentPackConstraints constraints={this.props.contentPack.requires} isFullFilled />
+          </Col>
+        </Row>
         <Button id="create" onClick={this.props.onSave}>Create</Button>
       </div>
     );
