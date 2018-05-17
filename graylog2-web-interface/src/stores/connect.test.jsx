@@ -23,22 +23,20 @@ const SimpleStore = Reflux.createStore({
   },
 });
 
-class SimpleComponentWithDummyStore extends React.Component {
-  static propTypes = {
-    simpleStore: PropTypes.shape({ foo: PropTypes.number }),
-  };
-  static defaultProps = {
-    simpleStore: undefined,
-  };
-
-  render() {
-    const { simpleStore } = this.props;
-    if (simpleStore && simpleStore.value) {
-      return <span>Value is: {simpleStore.value}</span>;
-    }
-    return <span>No value.</span>;
+const SimpleComponentWithDummyStore = ({ simpleStore }) => {
+  if (simpleStore && simpleStore.value) {
+    return <span>Value is: {simpleStore.value}</span>;
   }
-}
+  return <span>No value.</span>;
+};
+
+SimpleComponentWithDummyStore.propTypes = {
+  simpleStore: PropTypes.shape({ foo: PropTypes.number }),
+};
+
+SimpleComponentWithDummyStore.defaultProps = {
+  simpleStore: undefined,
+};
 
 describe('connect()', () => {
   it('does not do anything if no stores are provided', () => {
@@ -72,5 +70,26 @@ describe('connect()', () => {
     expect(wrapper).toHaveText('Value is: 42');
     SimpleStore.reset();
     expect(wrapper).toHaveText('No value.');
+  });
+
+  it('allows mangling of props before passing them', () => {
+    const Component = connect(
+      SimpleComponentWithDummyStore,
+      { simpleStore: SimpleStore },
+      ({ simpleStore }) => (simpleStore && { simpleStore: { value: simpleStore.value * 2 } }),
+    );
+    const wrapper = mount(<Component />);
+    SimpleStore.setValue(42);
+    expect(wrapper).toHaveText('Value is: 84');
+  });
+
+  it('adds meaningful name to wrapper component', () => {
+    const Component = connect(SimpleComponentWithDummyStore, { simpleStore: SimpleStore });
+    expect(Component.displayName).toEqual('ConnectStoresWrapper[SimpleComponentWithDummyStore] stores=simpleStore');
+  });
+
+  it('does not fail when anonymous component is passed', () => {
+    const Component = connect(() => <span>hello!</span>, { simpleStore: SimpleStore });
+    expect(Component.displayName).toEqual('ConnectStoresWrapper[Unknown/Anonymous] stores=simpleStore');
   });
 });
