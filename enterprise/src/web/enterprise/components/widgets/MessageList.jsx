@@ -10,13 +10,11 @@ import Field from 'enterprise/components/Field';
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-import CombinedProvider from 'injection/CombinedProvider';
 import { QueriesStore } from 'enterprise/stores/QueriesStore';
 import { SelectedFieldsStore } from '../../stores/SelectedFieldsStore';
 import { ViewStore } from '../../stores/ViewStore';
 import { SearchConfigStore } from '../../stores/SearchConfigStore';
 
-const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
@@ -91,6 +89,10 @@ const MessageList = createReactClass({
     });
   },
 
+  _fieldTypeFor(fieldName, fields) {
+    return fields.find(f => f.get('field_name') === fieldName).get('physical_type', 'unknown')
+  },
+
   render() {
     const pageSize = this.props.pageSize || 7;
     const messages = this.props.data.messages || [];
@@ -123,13 +125,13 @@ const MessageList = createReactClass({
               <table className="table table-condensed messages">
                 <thead>
                   <tr>
-                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={activeQuery} /></th>
+                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={activeQuery} type={this._fieldTypeFor('timestamp', fields)} /></th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
                           style={this._columnStyle(selectedFieldName)}>
                           <Field interactive
-                                 type={fields.find(f => f.get('field_name') === selectedFieldName).get('physical_type', 'unknown')}
+                                 type={this._fieldTypeFor(selectedFieldName, fields)}
                                  name={selectedFieldName}
                                  queryId={activeQuery}
                                  viewId={view.id} />

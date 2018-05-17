@@ -146,11 +146,13 @@ QueryInput.propTypes = {
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   result: PropTypes.object,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
 };
 
 QueryInput.defaultProps = {
   result: undefined,
+  value: '',
+  placeholder: '',
 };
 
 export default QueryInput;

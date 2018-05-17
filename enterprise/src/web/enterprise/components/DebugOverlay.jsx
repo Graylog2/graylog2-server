@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import { Modal } from 'react-bootstrap';
 
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import { SearchStore } from 'enterprise/stores/SearchStore';
+import connect from 'stores/connect';
 
 const DebugOverlay = createReactClass({
   displayName: 'DebugOverlay',
@@ -15,11 +15,6 @@ const DebugOverlay = createReactClass({
     onClose: PropTypes.func,
   },
 
-  mixins: [
-    Reflux.connect(ViewStore, 'views'),
-    Reflux.connect(SearchStore, 'searches'),
-  ],
-
   getDefaultProps() {
     return {
       onClose: () => {},
@@ -27,16 +22,9 @@ const DebugOverlay = createReactClass({
   },
 
   render() {
-    const state = {
-      view: this.state.views,
-      searches: {
-        search: this.state.searches.search,
-        widgetMapping: this.state.searches.widgetMapping,
-      },
-    };
     const modalBody = this.props.show && (
       <textarea disabled style={{ height: '600', width: '100%' }}>
-        {JSON.stringify(state, null, 2)}
+        {JSON.stringify(this.props, null, 2)}
       </textarea>
     );
     return (
@@ -49,4 +37,4 @@ const DebugOverlay = createReactClass({
   },
 });
 
-export default DebugOverlay;
+export default connect(DebugOverlay, { views: ViewStore, searches: SearchStore });

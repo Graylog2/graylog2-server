@@ -5,16 +5,18 @@ import styles from './EditableTitle.css';
 
 export default class EditableTitle extends React.Component {
   static propTypes = {
-    onChange: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
+    onChange: PropTypes.func,
     value: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
-    onClose: () => {},
+    disabled: false,
   };
 
   state = {
     editing: false,
+    onChange: () => {},
     value: this.props.value,
   };
 
@@ -23,7 +25,9 @@ export default class EditableTitle extends React.Component {
   }
 
   _toggleEditing = () => {
-    this.setState(state => ({ editing: !state.editing }));
+    if (!this.props.disabled) {
+      this.setState(state => ({ editing: !state.editing }));
+    }
   };
 
   _onChange = (evt) => {
@@ -31,7 +35,7 @@ export default class EditableTitle extends React.Component {
     this.setState({ value: evt.target.value });
   };
 
-  _onSubmit = (e) => {
+  _onSubmit = () => {
     if (this.state.value !== '') {
       this.props.onChange(this.state.value);
     } else {

@@ -35,6 +35,7 @@ const ViewManagementStore = Reflux.createStore({
   get(viewId) {
     const promise = fetch('GET', `${viewsUrl}/${viewId}`);
     ViewManagementActions.get.promise(promise);
+    return promise;
   },
 
   save(view) {

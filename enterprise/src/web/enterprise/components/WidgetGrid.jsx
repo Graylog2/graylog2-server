@@ -25,18 +25,18 @@ class WidgetGrid extends React.Component {
   }
 
   static propTypes = {
-    locked: PropTypes.bool,
-    onPositionsChange: PropTypes.func,
-    widgets: WidgetsMap.isRequired,
-    positions: PositionsMap.isRequired,
     data: WidgetDataMap.isRequired,
+    locked: PropTypes.bool,
+    onPositionsChange: PropTypes.func.isRequired,
+    positions: PositionsMap,
+    staticWidgets: PropTypes.arrayOf(PropTypes.node),
+    widgets: WidgetsMap.isRequired,
   };
 
   static defaultProps = {
     locked: true,
+    staticWidgets: [],
     positions: {},
-    onPositionsChange: () => {
-    },
   };
 
   state = {
@@ -88,7 +88,8 @@ class WidgetGrid extends React.Component {
     return returnedWidgets;
   };
 
-  render = () => {
+  render() {
+    const { staticWidgets } = this.props;
     const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data);
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer locked={this.props.locked}
@@ -101,8 +102,9 @@ class WidgetGrid extends React.Component {
     ) : null;
     return (
       <Row>
-        <div className="dashboard" style={{ width: '1185px' }}>
+        <div className="dashboard" style={{ marginLeft: '-20px' }}>
           {grid}
+          {staticWidgets}
         </div>
       </Row>
     );

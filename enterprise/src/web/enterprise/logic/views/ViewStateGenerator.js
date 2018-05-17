@@ -1,18 +1,15 @@
 import ViewState from './ViewState';
-import { messageList, resultHistogram } from '../Widget';
+import { resultHistogram } from '../Widget';
 
 const _defaultWidgets = () => {
   const histogram = resultHistogram();
-  const messages = messageList();
   const widgets = [
     histogram,
-    messages,
   ];
 
   const titles = {
     widget: {
       [histogram.id]: 'Message Count',
-      [messages.id]: 'Messages',
     },
   };
 
@@ -21,13 +18,7 @@ const _defaultWidgets = () => {
       col: 1,
       row: 1,
       height: 2,
-      width: 4,
-    },
-    [messages.id]: {
-      col: 1,
-      row: 2,
-      height: 6,
-      width: 6,
+      width: Infinity,
     },
   };
 

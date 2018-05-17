@@ -52,6 +52,7 @@ const SearchResult = (props) => {
   const searchConfig = configurations.searchesClusterConfig;
 
   const currentResults = results ? results.forId(queryId) : undefined;
+  const allFields = fieldTypes.all;
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
   const positions = viewState.state && viewState.state.widgetPositions;
 
@@ -60,7 +61,8 @@ const SearchResult = (props) => {
   const disableSearch = _disableSearch(undeclaredParameters, parameterBindings);
 
   const content = currentResults ? (
-    <QueryWithWidgets fields={queryFields}
+    <QueryWithWidgets allFields={allFields}
+                      fields={queryFields}
                       onToggleMessages={onToggleMessages}
                       queryId={queryId}
                       results={currentResults}

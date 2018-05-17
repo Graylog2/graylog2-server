@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'enterprise/stores/TitlesStore';
@@ -24,9 +25,9 @@ const onSelectQuery = (queryId, executeSearch) => {
   }
 };
 
-const onSaveView = (view) => {
+const onSaveView = (view, router) => {
   ViewManagementActions.save(view)
-    .then(savedView => this.props.router.push(Routes.pluginRoute('VIEWS_VIEWID')(savedView.id)))
+    .then(savedView => router.push(Routes.pluginRoute('VIEWS_VIEWID')(savedView.id)))
     .then(() => UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!'))
     .then(() => ViewStore.load(view));
 };
@@ -44,7 +45,7 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   }
 };
 
-const QueryBar = ({ children, onExecute, queries, queryTitles, viewMetadata }) => {
+const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetadata }) => {
   const { activeQuery } = viewMetadata;
   const childrenWithQueryId = React.cloneElement(children, { queryId: activeQuery });
   const selectQueryAndExecute = queryId => onSelectQuery(queryId, onExecute);
@@ -54,7 +55,7 @@ const QueryBar = ({ children, onExecute, queries, queryTitles, viewMetadata }) =
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
-               onSaveView={onSaveView}
+               onSaveView={view => onSaveView(view, router)}
                onRemove={queryId => onCloseTab(queryId, activeQuery, queries)}>
       {childrenWithQueryId}
     </QueryTabs>
@@ -62,4 +63,4 @@ const QueryBar = ({ children, onExecute, queries, queryTitles, viewMetadata }) =
 };
 
 
-export default connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore });
+export default withRouter(connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore }));

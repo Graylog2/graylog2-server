@@ -9,7 +9,7 @@ import style from 'pages/ShowDashboardPage.css';
 import { ReactGridContainer } from 'components/common';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import DashboardWidget from './DashboardWidget';
-import { PositionsMap, WidgetsMap, WidgetDataMap } from '../widgets/WidgetPropTypes';
+import { ImmutablePositionsMap, WidgetsMap, WidgetDataMap } from '../widgets/WidgetPropTypes';
 import { TitlesStore } from '../../stores/TitlesStore';
 
 const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
@@ -30,7 +30,7 @@ class DashboardWidgetGrid extends React.Component {
     onPositionsChange: PropTypes.func.isRequired,
     onWidgetDelete: PropTypes.func.isRequired,
     widgets: WidgetsMap.isRequired,
-    positions: PositionsMap.isRequired,
+    positions: ImmutablePositionsMap.isRequired,
     data: WidgetDataMap.isRequired,
     titles: PropTypes.instanceOf(Immutable.Map),
     fields: PropTypes.instanceOf(Immutable.Map),

@@ -1,10 +1,10 @@
 import React from 'react';
-import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
+import connect from 'stores/connect';
 import DebugOverlay from 'enterprise/components/DebugOverlay';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
@@ -13,9 +13,6 @@ const QueryTabActions = createReactClass({
   propTypes: {
     onSaveView: PropTypes.func.isRequired,
   },
-  mixins: [
-    Reflux.connect(ViewStore, 'view'),
-  ],
 
   getInitialState() {
     return {
@@ -58,7 +55,7 @@ const QueryTabActions = createReactClass({
   },
 
   render() {
-    const { view } = this.state.view;
+    const { view } = this.props.view;
     const onSave = () => this.handleSaveView(view);
     return (
       <span>
@@ -77,4 +74,4 @@ const QueryTabActions = createReactClass({
   },
 });
 
-export default QueryTabActions;
+export default connect(QueryTabActions, { view: ViewStore });

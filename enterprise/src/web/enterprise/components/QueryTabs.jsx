@@ -52,7 +52,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 };
 
 QueryTabs.propTypes = {
-  children: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   onSaveView: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,

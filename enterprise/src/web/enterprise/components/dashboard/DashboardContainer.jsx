@@ -13,7 +13,9 @@ import EmptyDashboardHelpMessage from './EmptyDashboardHelpMessage';
 
 const DashboardContainer = createReactClass({
   propTypes: {
-    dashboardWidgets: PropTypes.instanceOf(Immutable.Map).isRequired,
+    dashboardWidgets: PropTypes.shape({
+      dashboardWidgets: PropTypes.instanceOf(Immutable.Map).isRequired,
+    }).isRequired,
     widgetMapping: PropTypes.object,
     results: PropTypes.object,
   },
@@ -54,7 +56,7 @@ const DashboardContainer = createReactClass({
     const data = {};
     let fields = new Immutable.Map();
 
-    if (!dashboardWidgets) {
+    if (!dashboardWidgets || dashboardWidgets.isEmpty()) {
       // No dashboard widgets defined
       return <EmptyDashboardHelpMessage />;
     }
