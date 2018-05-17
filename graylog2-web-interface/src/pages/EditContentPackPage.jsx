@@ -155,7 +155,6 @@ const EditContentPackPage = createReactClass({
                            appliedParameter={this.state.appliedParameter}
                            onSave={this._onSave}
           />
-          <textarea value={JSON.stringify(this.state.contentPack, null, 2)} />
         </span>
       </DocumentTitle>
     );
