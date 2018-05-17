@@ -6,16 +6,21 @@ import { Row, Col } from 'react-bootstrap';
 
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
+import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 import 'components/content-packs/ContentPackDetails.css';
 
 class ContentPackDetails extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
+    verbose: PropTypes.bool,
     offset: PropTypes.number,
+    showConstraints: PropTypes.bool,
   };
 
   static defaultProps = {
     offset: 1,
+    verbose: false,
+    showConstraints: false,
   };
 
   render() {
@@ -24,7 +29,7 @@ class ContentPackDetails extends React.Component {
 
     return (
       <Row>
-        <Col smOffset={this.props.offset}>
+        <Col smOffset={this.props.offset} sm={9}>
           <div id="content-pack-details">
             <h2>Details</h2>
             <br />
@@ -36,21 +41,24 @@ class ContentPackDetails extends React.Component {
                 <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
                 <dt>URL:</dt> <dd><a href={contentPack.url}>{contentPack.url}</a>&nbsp;</dd>
                 { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
-                { contentPack.parameters && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
-                { contentPack.entities && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
+                { contentPack.parameters && !this.props.verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
+                { contentPack.entities && !this.props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
               </dl>
             </div>
             <br />
             { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
             <br />
             <br />
-            { contentPack.constraints &&
+            { contentPack.requires && this.props.showConstraints &&
             <div>
               <h3>Constrains</h3>
               <br />
-              <ContentPackConstraints constraints={contentPack.constraints} />
+              <ContentPackConstraints constraints={contentPack.requires} />
               <br />
             </div>
+            }
+            { contentPack.entities &&
+              <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
             }
             <h3>Description</h3>
             <br />
