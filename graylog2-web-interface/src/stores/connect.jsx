@@ -48,8 +48,7 @@ export default (Component, stores, mapProps = props => props) => {
         if (store === undefined) {
           // eslint-disable-next-line no-console
           console.error(`Error: The store passed for the \`${key}\` property is not defined. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
-        }
-        else if (isFunction(store.getInitialState)) {
+        } else if (isFunction(store.getInitialState)) {
           this.state[key] = store.getInitialState();
         }
       });
