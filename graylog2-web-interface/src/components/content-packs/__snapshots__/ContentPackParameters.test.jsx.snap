@@ -170,6 +170,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       >
                         Apply Parameter
                       </button>
+                      <button
+                        className="btn btn-sm btn-info"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Show config
+                      </button>
                     </td>
                   </tr>
                 </tbody>
