@@ -1,12 +1,10 @@
-import ExtendedSearchPage from 'enterprise/ExtendedSearchPage';
 import ViewManagementPage from 'enterprise/ViewManagementPage';
-import { AlertStatus, Histogram, MessageList, SearchSidebarWidget } from 'enterprise/components/widgets';
+import { AlertStatus, MessageList } from 'enterprise/components/widgets';
 import GroupByHandler from 'enterprise/logic/searchtypes/GroupByHandler';
 import { DateHistogramHandler, MessageListHandler } from 'enterprise/logic/searchtypes';
 import DataTable from 'enterprise/components/datatable/DataTable';
 import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
-import FieldHistogramTransformer from 'enterprise/logic/searchresulttransformers/FieldHistogramTransformer';
 import AggregationHandler from 'enterprise/logic/searchtypes/AggregationHandler';
 import AggregationTransformer from 'enterprise/logic/searchresulttransformers/AggregationTransformer';
 import AggregationBuilder from 'enterprise/components/aggregationbuilder/AggregationBuilder';
@@ -17,10 +15,16 @@ import PieVisualization from 'enterprise/components/visualizations/pie/PieVisual
 import ShowViewPage from 'enterprise/ShowViewPage';
 import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
 import NewSearchPage from 'enterprise/NewSearchPage';
+import Widget from './logic/widgets/Widget';
+import AggregationWidget from './logic/aggregationbuilder/AggregationWidget';
+import MessagesWidget from './logic/widgets/MessagesWidget';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
 const showViewsPath = `${viewsPath}/:viewId`;
+
+Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
+Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 
 export default {
   pages: {

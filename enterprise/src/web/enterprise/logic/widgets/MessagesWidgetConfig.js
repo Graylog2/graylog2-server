@@ -22,6 +22,7 @@ export default class MessagesWidgetConfig {
   }
 
   toBuilder() {
+    // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
@@ -34,6 +35,7 @@ export default class MessagesWidgetConfig {
   }
 
   static fromJSON(value) {
+    // eslint-disable-next-line camelcase
     const { show_message_row, fields } = value;
 
     return new MessagesWidgetConfig(fields, show_message_row);

@@ -5,12 +5,13 @@ import uuid from 'uuid/v4';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
-import WidgetActions from 'enterprise/actions/WidgetActions';
+import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import AggregateActionHandler from '../../logic/fieldactions/AggregateActionHandler';
+import MessagesWidget from '../../logic/widgets/MessagesWidget';
+import MessagesWidgetConfig from '../../logic/widgets/MessagesWidgetConfig';
 
 const AddWidgetButton = createReactClass({
   propTypes: {
-    viewId: PropTypes.string.isRequired,
     queryId: PropTypes.string.isRequired,
   },
 
@@ -19,11 +20,12 @@ const AddWidgetButton = createReactClass({
   },
 
   onCreateAggregation() {
-    AggregateActionHandler(this.props.viewId, this.props.queryId, 'timestamp');
+    AggregateActionHandler(this.props.queryId, 'timestamp');
   },
 
   onCreateAlertStatus() {
-    WidgetActions.create(this.props.viewId, this.props.queryId, {
+    // TODO: Replace with proper object.
+    WidgetActions.create({
       id: uuid(),
       title: 'Alert Status',
       type: 'ALERT_STATUS',
@@ -38,15 +40,7 @@ const AddWidgetButton = createReactClass({
   },
 
   onCreateMessageTable() {
-    WidgetActions.create(this.props.viewId, this.props.queryId, {
-      id: uuid(),
-      title: 'Messages',
-      type: 'MESSAGES',
-      config: {
-        fields: [],
-        showMessageRow: true,
-      },
-    });
+    WidgetActions.create(new MessagesWidget(uuid(), new MessagesWidgetConfig([], true)));
   },
 
   render() {

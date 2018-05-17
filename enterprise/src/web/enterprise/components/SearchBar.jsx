@@ -7,18 +7,18 @@ import Immutable from 'immutable';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import { Spinner } from 'components/common';
 
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
 import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
-import QueriesActions from 'enterprise/actions/QueriesActions';
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+import { QueriesActions } from 'enterprise/stores/QueriesStore';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import StreamsFilter from './searchbar/StreamsFilter';
-import QueryFiltersActions from '../actions/QueryFiltersActions';
-import QueryFiltersStore from '../stores/QueryFiltersStore';
+import { QueryFiltersActions, QueryFiltersStore } from '../stores/QueryFiltersStore';
+import { CurrentQueryStore } from '../stores/CurrentQueryStore';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
 
@@ -30,7 +30,7 @@ const SearchBar = createReactClass({
   },
 
   mixins: [
-    Reflux.connect(CurrentViewStore, 'currentView'),
+    Reflux.connect(CurrentQueryStore, 'currentQuery'),
     Reflux.connect(QueryFiltersStore, 'queryFilters'),
   ],
 
@@ -60,26 +60,30 @@ const SearchBar = createReactClass({
     this.props.onExecute();
   },
 
-  _getSavedSearchesSelector() {
-  },
-
   render() {
-    const { rangeParams, rangeType, query, id } = this.props.query.toObject();
-    const { streams } = this.state.queryFilters.get(id, new Immutable.Map()).toObject();
-    const { selectedView } = this.state.currentView;
+    if (!this.state.currentQuery) {
+      return <Spinner />;
+    }
+    const { timerange, query, id } = this.state.currentQuery;
+    const rangeParams = Immutable.Map({ range: timerange.range });
+    const rangeType = timerange.type;
+    const streams = this.state.queryFilters.getIn([id, 'filters'], Immutable.List())
+      .filter(f => f.get('type') === 'stream')
+      .map(f => f.get('id'))
+      .toJS();
 
     return (
       <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
         <Col md={12}>
-          <Row className={"no-bm"}>
+          <Row className="no-bm">
             <Col md={12}>
               <form method="GET" onSubmit={this._performSearch}>
 
-                <Row className={"no-bm extended-search-query-metadata"}>
+                <Row className="no-bm extended-search-query-metadata">
                   <Col md={4}>
-                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(selectedView, id, newRangeType)}
+                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType)}
                                            value={rangeType} />
-                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(selectedView, id, key, value)}
+                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value)}
                                     rangeType={rangeType}
                                     rangeParams={rangeParams}
                                     config={this.props.config} />
@@ -87,12 +91,12 @@ const SearchBar = createReactClass({
 
                   <Col md={8}>
                     <StreamsFilter value={streams}
-                               streams={this.state.availableStreams}
-                               onChange={value => QueryFiltersActions.streams(selectedView, id, value)} />
+                                   streams={this.state.availableStreams}
+                                   onChange={value => QueryFiltersActions.streams(id, value)} />
                   </Col>
                 </Row>
 
-                <Row className={"no-bm"}>
+                <Row className="no-bm">
                   <Col md={12}>
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
@@ -101,9 +105,9 @@ const SearchBar = createReactClass({
                     </div>
                     <SearchButton running={this.state.running} disabled={this.props.disableSearch} />
 
-                    <QueryInput value={query}
+                    <QueryInput value={query.query_string}
                                 placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                onChange={value => QueriesActions.query(selectedView, id, value)}
+                                onChange={value => QueriesActions.query(id, value)}
                                 onExecute={this.props.onExecute}
                                 result={this.props.results} />
                   </Col>

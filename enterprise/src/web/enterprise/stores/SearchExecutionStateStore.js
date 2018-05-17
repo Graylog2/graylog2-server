@@ -1,8 +1,8 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 
-import SearchExecutionStateActions from 'enterprise/actions/SearchExecutionStateActions';
-import SearchParameterStore from './SearchParameterStore';
+import { SearchParameterStore } from './SearchParameterStore';
+import { ViewMetadataStore } from './ViewMetadataStore';
 
 const defaultExecutionState = Immutable.fromJS({
   parameter_bindings: {},
@@ -24,17 +24,32 @@ const getParameterBindingsAsMap = bindings => bindings.flatMap((value, name) => 
 
 export { newParameterBindingValue, setParameterBindings, getParameterBindings, getParameterBindingsAsMap, getParameterBindingValue };
 
-export default Reflux.createStore({
+export const SearchExecutionStateActions = Reflux.createActions([
+  'bindParameterValue',
+  'setParameterValues',
+  'replace',
+  'clear',
+]);
+
+export const SearchExecutionStateStore = Reflux.createStore({
   listenables: [SearchExecutionStateActions],
 
   executionState: defaultExecutionState,
 
   init() {
     this.listenTo(SearchParameterStore, this.handleSearchParameterChange, this.handleSearchParameterChange);
+    this.listenTo(ViewMetadataStore, this.handleViewMetadataChange, this.handleViewMetadataChange);
   },
 
   getInitialState() {
     return this.executionState;
+  },
+
+  handleViewMetadataChange({ id }) {
+    if (this.viewId !== id) {
+      this.clear();
+    }
+    this.viewId = id;
   },
 
   handleSearchParameterChange(parameters) {

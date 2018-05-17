@@ -7,15 +7,14 @@ import QueryTitle from 'enterprise/components/queries/QueryTitle';
 
 const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView, renderDashboardTab }) => {
   const queryTitles = titles;
-  const queryTabs = queries.toArray().map((query, index) => {
-    const id = query.get('id');
-    const title = queryTitles.getIn([id, 'tab', 'title'], `Query#${index + 1}`);
+  const queryTabs = queries.map((id, index) => {
+    const title = queryTitles.get(id, `Query#${index + 1}`);
     const tabTitle = <QueryTitle value={title} onChange={newTitle => onTitleChange(id, newTitle)} onClose={() => onRemove(id)} />;
     return (
       <Tab key={id}
            eventKey={id}
            title={tabTitle}>
-        {id === selectedQuery && children(query, index)}
+        {id === selectedQuery && children(id, index)}
       </Tab>
     );
   });

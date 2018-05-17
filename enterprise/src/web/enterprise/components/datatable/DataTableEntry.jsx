@@ -5,7 +5,7 @@ import { get } from 'lodash';
 
 import connect from 'stores/connect';
 import Value from 'enterprise/components/Value';
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 
 const _c = (field, value) => ({ field, value });
 
@@ -25,7 +25,7 @@ class DataTableEntry extends React.Component {
     const classes = 'message-group';
     const item = this.props.item;
     const { columnPivots, fields, series, columnPivotValues } = this.props;
-    const { selectedQuery } = this.props.currentView;
+    const { activeQuery } = this.props.currentView;
     const columns = [];
     fields.toSeq().forEach(fieldName => columns.push(_c(fieldName, item[fieldName])));
     columnPivots.forEach((fieldName) => {
@@ -35,11 +35,11 @@ class DataTableEntry extends React.Component {
     return (
       <tbody className={classes}>
         <tr className="fields-row">
-          {columns.map(({ field, value }) => this._column(field, value, selectedQuery))}
+          {columns.map(({ field, value }) => this._column(field, value, activeQuery))}
         </tr>
       </tbody>
     );
   }
 }
 
-export default connect(DataTableEntry, { currentView: CurrentViewStore });
+export default connect(DataTableEntry, { currentView: ViewMetadataStore });

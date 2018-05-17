@@ -11,9 +11,9 @@ import Field from 'enterprise/components/Field';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import CombinedProvider from 'injection/CombinedProvider';
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
-import QueriesStore from 'enterprise/stores/QueriesStore';
-import CurrentSelectedFieldsStore from '../../stores/CurrentSelectedFieldsStore';
+import { QueriesStore } from 'enterprise/stores/QueriesStore';
+import { SelectedFieldsStore } from '../../stores/SelectedFieldsStore';
+import { ViewStore } from '../../stores/ViewStore';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const { ConfigurationsStore } = CombinedProvider.get('Configurations');
@@ -34,8 +34,8 @@ const MessageList = createReactClass({
 
   mixins: [
     Reflux.connect(ConfigurationsStore, 'configurations'),
-    Reflux.connect(CurrentSelectedFieldsStore, 'selectedFields'),
-    Reflux.connect(CurrentViewStore, 'currentView'),
+    Reflux.connect(SelectedFieldsStore, 'selectedFields'),
+    Reflux.connect(ViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
   ],
 
@@ -115,7 +115,7 @@ const MessageList = createReactClass({
       });
     const { selectedFields } = this.state;
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
-    const { selectedQuery, selectedView } = this.state.currentView;
+    const { activeQuery, view } = this.state.currentView;
     return (
       <span>
         <MessageTablePaginator currentPage={Number(this.state.currentPage)}
@@ -130,7 +130,7 @@ const MessageList = createReactClass({
               <table className="table table-condensed messages">
                 <thead>
                   <tr>
-                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={selectedQuery} /></th>
+                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={activeQuery} /></th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
@@ -138,8 +138,8 @@ const MessageList = createReactClass({
                           <Field interactive
                                  type={fields.find(f => f.get('field_name') === selectedFieldName).get('physical_type', 'unknown')}
                                  name={selectedFieldName}
-                                 queryId={selectedQuery}
-                                 viewId={selectedView} />
+                                 queryId={activeQuery}
+                                 viewId={view.id} />
                         </th>
                       );
                     })}

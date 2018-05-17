@@ -5,12 +5,9 @@ import { MenuItem } from 'react-bootstrap';
 import connect from 'stores/connect';
 import UserNotification from 'util/UserNotification';
 import { widgetDefinition } from 'enterprise/logic/Widget';
-import CurrentWidgetsActions from 'enterprise/actions/CurrentWidgetsActions';
-import CurrentWidgetsStore from 'enterprise/stores/CurrentWidgetsStore';
-import CurrentTitlesActions from 'enterprise/actions/CurrentTitlesActions';
-import CurrentTitlesStore from 'enterprise/stores/CurrentTitlesStore';
-import WidgetFilterActions from 'enterprise/actions/WidgetFilterActions';
-import WidgetFilterStore from 'enterprise/stores/WidgetFilterStore';
+import { WidgetActions } from 'enterprise/stores/WidgetStore';
+import { TitlesActions } from 'enterprise/stores/TitlesStore';
+import { DashboardWidgetsActions } from 'enterprise/stores/DashboardWidgetsStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -19,6 +16,7 @@ import WidgetActionDropdown from './WidgetActionDropdown';
 
 import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
+import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -53,20 +51,20 @@ class Widget extends React.Component {
 
   _onDelete = (widget) => {
     if (window.confirm(`Are you sure you want to remove the widget "${this.props.title}"?`)) {
-      CurrentWidgetsActions.remove(widget.id);
+      WidgetActions.remove(widget.id);
     }
   };
 
   _onDuplicate = (widgetId) => {
-    CurrentWidgetsActions.duplicate(widgetId);
+    WidgetActions.duplicate(widgetId);
   };
 
   _onToggleEdit = () => {
     this.setState(state => ({ editing: !state.editing }));
   };
 
-  _onAddToOverview = (widgetId) => {
-    CurrentWidgetsActions.addToDashboard(widgetId)
+  _onAddToOverview = (queryId, widgetId) => {
+    DashboardWidgetsActions.addToDashboard(queryId, widgetId)
       .then(
         () => UserNotification.success('Added widget to dashboard.', 'Success!'),
         e => UserNotification.error(`Failed adding widget to dashboard: ${e}`, 'Error!'),
@@ -74,15 +72,15 @@ class Widget extends React.Component {
   };
 
   _onWidgetConfigChange = (widgetId, config) => {
-    CurrentWidgetsActions.updateConfig(widgetId, config);
+    WidgetActions.updateConfig(widgetId, config);
   };
 
   render() {
     const { id, widget, data, height, width, fields, onSizeChange, title } = this.props;
-    const { config, computationTimeRange } = widget;
+    const { config, computationTimeRange, filter } = widget;
     const VisComponent = Widget._visualizationForType(widget.type);
     const { editing } = this.state;
-    const filter = this.props.widgetFilters.get(id, '');
+    const { activeQuery } = this.props.view;
     const visualization = (
       <VisComponent id={id}
                     editing={editing}
@@ -102,9 +100,9 @@ class Widget extends React.Component {
       return (
         <EditWidgetFrame widgetId={id}>
           <WidgetHeader title={title}
-                        onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
+                        onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                         editing={editing}>
-            <WidgetFilterMenu onChange={newFilter => WidgetFilterActions.change(id, newFilter)} value={filter}>
+            <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
               <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
             </WidgetFilterMenu>
             {' '}
@@ -119,9 +117,9 @@ class Widget extends React.Component {
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
         <WidgetHeader title={title}
-                      onRename={newTitle => CurrentTitlesActions.set('widget', id, newTitle)}
+                      onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                       editing={editing}>
-          <WidgetFilterMenu onChange={newFilter => WidgetFilterActions.change(id, newFilter)} value={filter}>
+          <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
             <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
           </WidgetFilterMenu>
           {' '}
@@ -129,7 +127,7 @@ class Widget extends React.Component {
             <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
             <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
             <MenuItem divider />
-            <MenuItem onSelect={() => this._onAddToOverview(id)}>Add to overview</MenuItem>
+            <MenuItem onSelect={() => this._onAddToOverview(activeQuery, id)}>Add to overview</MenuItem>
             <MenuItem divider />
             <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
           </WidgetActionDropdown>
@@ -140,4 +138,4 @@ class Widget extends React.Component {
   }
 };
 
-export default connect(Widget, { widgetFilters: WidgetFilterStore });
+export default connect(Widget, { view: ViewMetadataStore });

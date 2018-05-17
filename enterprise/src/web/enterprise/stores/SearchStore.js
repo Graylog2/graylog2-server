@@ -1,19 +1,16 @@
 import Reflux from 'reflux';
 import Bluebird from 'bluebird';
-import _ from 'lodash';
+import { debounce, get, isEqual } from 'lodash';
 
-import SearchMetadataActions from 'enterprise/actions/SearchMetadataActions';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import SearchJobActions from 'enterprise/actions/SearchJobActions';
-import SearchJobStore from 'enterprise/stores/SearchJobStore';
-import SearchParameterStore from 'enterprise/stores/SearchParameterStore';
-import SearchActions from 'enterprise/actions/SearchActions';
-import SearchRequest from 'enterprise/logic/SearchRequest';
+
+import { SearchMetadataActions } from 'enterprise/stores/SearchMetadataStore';
+import { SearchJobActions } from 'enterprise/stores/SearchJobStore';
+import { ViewStore, ViewActions } from 'enterprise/stores/ViewStore';
 import SearchResult from 'enterprise/logic/SearchResult';
-import WidgetStore from './WidgetStore';
-import QueriesStore from './QueriesStore';
-import QueryFiltersStore from './QueryFiltersStore';
+import { SearchExecutionStateStore } from './SearchExecutionStateStore';
+import SearchActions from '../actions/SearchActions';
 
 const displayError = (error) => {
   console.log(error);
@@ -23,42 +20,42 @@ Bluebird.config({ cancellation: true });
 
 const searchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 
-export default Reflux.createStore({
+export { SearchActions };
+
+export const SearchStore = Reflux.createStore({
   listenables: [SearchActions],
   executePromise: null,
 
   init() {
-    this.listenTo(WidgetStore, this.onWidgetStoreUpdate, this.onWidgetStoreUpdate);
-    this.listenTo(QueriesStore, this.onQueriesStoreUpdate, this.onQueriesStoreUpdate);
-    this.listenTo(QueryFiltersStore, this.onQueryFiltersStoreUpdate, this.onQueryFiltersStoreUpdate);
-    this.listenTo(SearchParameterStore, this.onSearchParameterUpdate, this.onSearchParameterUpdate);
+    this.listenTo(ViewStore, this.onViewStoreUpdate, this.onViewStoreUpdate);
+    this.listenTo(SearchExecutionStateStore, this.onSearchExecutionStateUpdate, this.onSearchExecutionStateUpdate);
   },
 
-  _debouncedParse: _.debounce((queries, parameters, widgets, filters) => {
-    const search = new SearchRequest(queries, parameters, widgets, filters);
+  getInitialState() {
+    return this._state();
+  },
+
+  _debouncedParse: debounce((search) => {
     SearchMetadataActions.parseSearch(search);
   }, 500),
 
-  onWidgetStoreUpdate(widgets) {
-    this.widgets = widgets;
-    this.onUpdate();
+  onViewStoreUpdate({ view }) {
+    this.view = view;
+    const search = get(view, 'search');
+    if (!isEqual(this.search, search)) {
+      this.search = search;
+      this.onUpdate(search);
+      this._trigger();
+    }
   },
-  onQueriesStoreUpdate(queries) {
-    this.queries = queries;
-    this.onUpdate();
-  },
-  onQueryFiltersStoreUpdate(filters) {
-    this.filters = filters;
-    this.onUpdate();
-  },
-  onSearchParameterUpdate(parameters) {
-    this.parameters = parameters;
-    this.onUpdate();
+  onSearchExecutionStateUpdate(executionState) {
+    this.executionState = executionState;
   },
 
-  onUpdate() {
-    if (this.queries && this.queries.size > 0) {
-      this._debouncedParse(this.queries, this.parameters, this.widgets, this.filters);
+  onUpdate(search) {
+    const { queries } = search;
+    if (queries && queries.size > 0) {
+      this._debouncedParse(this.search);
     }
   },
 
@@ -67,34 +64,49 @@ export default Reflux.createStore({
     SearchActions.get.promise(promise);
   },
 
-  trackJobStatus(job, searchRequest, search) {
+  trackJobStatus(job, search) {
     return new Bluebird((resolve) => {
       if (job && job.execution.done) {
-        return resolve(new SearchResult(searchRequest, job));
+        return resolve(new SearchResult(job));
       }
       return resolve(Bluebird.delay(250)
         .then(() => SearchJobActions.jobStatus(job.id))
-        .then(jobStatus => this.trackJobStatus(jobStatus, searchRequest, search)));
+        .then(jobStatus => this.trackJobStatus(jobStatus, search)));
     });
   },
 
-  trackJob(search, searchRequest, executionState) {
-    return SearchJobActions.run(search.id, executionState).then(job => this.trackJobStatus(job, searchRequest, search));
+  trackJob(search, executionState) {
+    return SearchJobActions.run(search, executionState).then(job => this.trackJobStatus(job, search));
   },
 
   execute(executionState) {
     if (this.executePromise) {
       this.executePromise.cancel();
     }
-    const searchRequest = new SearchRequest(this.queries, this.parameters, this.widgets, this.filters);
-    this.executePromise = SearchJobActions.create(searchRequest)
-      .then(({ request, search }) => this.trackJob(search, request, executionState), displayError)
-      .then((result) => {
-        this.trigger({ result });
-        this.executePromise = undefined;
-        return result;
-      }, displayError);
+    if (this.search) {
+      const { widgetMapping } = this.view;
+      this.executePromise = SearchJobActions.create(this.search)
+        .then(({ search }) => this.trackJob(search, executionState), displayError)
+        .then((result) => {
+          this.result = result;
+          this.widgetMapping = widgetMapping;
+          this._trigger();
+          this.executePromise = undefined;
+          return { result, widgetMapping };
+        }, displayError);
+    }
 
     SearchActions.execute.promise(this.executePromise);
+  },
+
+  parameters(newParameters) {
+    const newSearch = this.search.toBuilder().parameters(newParameters).build();
+    ViewActions.search(newSearch);
+  },
+  _state() {
+    return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
+  },
+  _trigger() {
+    this.trigger(this._state());
   },
 });

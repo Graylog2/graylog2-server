@@ -10,7 +10,7 @@ import { ReactGridContainer } from 'components/common';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import DashboardWidget from './DashboardWidget';
 import { PositionsMap, WidgetsMap, WidgetDataMap } from '../widgets/WidgetPropTypes';
-import CurrentDashboardTitlesStore from '../../stores/CurrentDashboardTitlesStore';
+import { TitlesStore } from '../../stores/TitlesStore';
 
 const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -93,7 +93,7 @@ class DashboardWidgetGrid extends React.Component {
   };
 
   render = () => {
-    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data);
+    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions.toJS(), this.props.data);
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer locked={this.props.locked}
                           positions={positions}
@@ -113,4 +113,4 @@ class DashboardWidgetGrid extends React.Component {
   };
 }
 
-export default connect(DashboardWidgetGrid, { titles: CurrentDashboardTitlesStore });
+export default connect(DashboardWidgetGrid, { titles: TitlesStore });

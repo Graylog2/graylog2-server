@@ -9,7 +9,7 @@ import ReactGridContainer from './ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
-import CurrentTitlesStore from '../stores/CurrentTitlesStore';
+import { TitlesStore } from '../stores/TitlesStore';
 
 const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -109,4 +109,4 @@ class WidgetGrid extends React.Component {
   };
 }
 
-export default connect(WidgetGrid, { titles: CurrentTitlesStore });
+export default connect(WidgetGrid, { titles: TitlesStore });

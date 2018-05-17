@@ -4,8 +4,6 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import Immutable from 'immutable';
 
-import SearchMetadataActions from '../actions/SearchMetadataActions';
-
 const parseSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search/metadata');
 const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/metadata/${id}`);
 
@@ -14,7 +12,12 @@ const getUsedParameters = metadata => metadata.getIn(['parameters', 'used'], Imm
 
 export { getUndeclaredParameters, getUsedParameters };
 
-export default Reflux.createStore({
+export const SearchMetadataActions = Reflux.createActions({
+  parseSearch: { asyncResult: true },
+  parseSearchId: { asyncResult: true },
+});
+
+export const SearchMetadataStore = Reflux.createStore({
   listenables: [SearchMetadataActions],
 
   state: Immutable.fromJS({
@@ -51,7 +54,7 @@ export default Reflux.createStore({
   },
 
   parseSearch(searchRequest) {
-    const promise = fetch('POST', parseSearchUrl, searchRequest.toRequest())
+    const promise = fetch('POST', parseSearchUrl, JSON.stringify(searchRequest))
       .then((metadata) => {
         this.state = this.state.set('parameters', this._postProcess(metadata));
         this._trigger();

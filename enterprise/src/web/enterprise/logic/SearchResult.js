@@ -14,8 +14,7 @@ const _searchTypePlugin = (type) => {
 };
 
 class SearchResult {
-  constructor(searchRequest, result) {
-    this.searchRequest = searchRequest;
+  constructor(result) {
     this.result = result;
 
     this.results = _.mapValues(result.results, (queryResult) => {
@@ -33,10 +32,6 @@ class SearchResult {
 
   forId(queryId) {
     return this.results[queryId];
-  }
-
-  widgetMapping() {
-    return this.searchRequest.getWidgetMapping();
   }
 }
 

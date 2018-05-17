@@ -5,7 +5,7 @@ import { OverlayTrigger, Popover } from 'react-bootstrap';
 import connect from 'stores/connect';
 
 import QueryInput from '../searchbar/QueryInput';
-import SearchStore from '../../stores/SearchStore';
+import { SearchStore } from '../../stores/SearchStore';
 
 import style from './WidgetFilterMenu.css';
 

@@ -1,42 +1,59 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
+import { isEqual } from 'lodash';
 
-import QueryFiltersActions from '../actions/QueryFiltersActions';
-import CurrentViewStore from './CurrentViewStore';
+import { QueriesActions, QueriesStore } from './QueriesStore';
 
-export default Reflux.createStore({
+const _streamFilters = (selectedStreams) => {
+  return selectedStreams.map(stream => ({ type: 'stream', id: stream }));
+};
+
+const _filtersForQuery = (streams) => {
+  const streamFilters = _streamFilters(streams);
+  if (streamFilters.length === 0) {
+    return null;
+  }
+
+  return {
+    type: 'or',
+    filters: streamFilters,
+  };
+};
+
+export const QueryFiltersActions = Reflux.createActions([
+  'streams',
+]);
+
+export const QueryFiltersStore = Reflux.createStore({
   listenables: [QueryFiltersActions],
-  queryFilters: new Immutable.Map(),
-  selectedView: undefined,
+  queries: Immutable.Map(),
 
   init() {
-    this.listenTo(CurrentViewStore, this.onCurrentViewStoreChange, this.onCurrentViewStoreChange);
+    this.listenTo(QueriesStore, this.onQueriesStoreChange, this.onQueriesStoreChange);
   },
 
   getInitialState() {
-    if (this.selectedView) {
-      return this.queryFilters.get(this.selectedView, new Immutable.Map());
-    }
-    return new Immutable.Map();
+    return this._state();
   },
-
-  onCurrentViewStoreChange(state) {
-    if (this.selectedView !== state.selectedView) {
-      this.selectedView = state.selectedView;
+  onQueriesStoreChange(newQueries) {
+    const newFilters = newQueries.map(q => q.filter);
+    const oldFilters = this.queries.map(q => q.filter);
+    if (!isEqual(newFilters, oldFilters)) {
+      this.queries = newQueries;
       this._trigger();
     }
   },
 
-  streams(viewId, queryId, streams) {
-    this.queryFilters = this.queryFilters.setIn([viewId, queryId, 'streams'], streams);
-    this._trigger();
+  streams(queryId, streams) {
+    const streamFilter = _filtersForQuery(streams);
+    const newQuery = this.queries.get(queryId).toBuilder().filter(streamFilter).build();
+    QueriesActions.update(queryId, newQuery);
   },
 
+  _state() {
+    return this.queries.map(q => q.filter).filter(f => f !== undefined);
+  },
   _trigger() {
-    if (this.selectedView) {
-      this.trigger(this.queryFilters.get(this.selectedView, new Immutable.Map()));
-    } else {
-      this.trigger(new Immutable.Map());
-    }
+    this.trigger(this._state());
   },
 });

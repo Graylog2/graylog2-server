@@ -1,29 +1,55 @@
+// @flow
+
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import { Set } from 'immutable';
+import { get, isEqual } from 'lodash';
 
-import CurrentViewStore from './CurrentViewStore';
-import SelectedFieldsActions from '../actions/SelectedFieldsActions';
+import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
+import type ViewState from '../logic/views/ViewState';
 
-export default Reflux.createStore({
+type StateUpdate = {
+  activeQuery: string,
+  state: ViewState,
+};
+
+export const SelectedFieldsActions = Reflux.createActions([
+  'add',
+  'remove',
+  'toggle',
+]);
+
+export const SelectedFieldsStore = Reflux.createStore({
   listenables: [SelectedFieldsActions],
-  selectedFields: new Immutable.Map(),
-  selectedQuery: undefined,
+  selectedFields: undefined,
+
+  init() {
+    this.listenTo(CurrentViewStateStore, this.onViewStoreChange, this.onViewStoreChange);
+  },
 
   getInitialState() {
     return this._state();
   },
 
-  add(queryId, field) {
-    this.selectedFields = this.selectedFields.update(queryId, new Immutable.Set(), fields => fields.add(field));
-    this._trigger();
+  onViewStoreChange(newState: StateUpdate) {
+    const selectedFields = Set(get(newState, 'state.fields'));
+    if (!isEqual(this.selectedFields, selectedFields)) {
+      this.selectedFields = selectedFields;
+      this._trigger();
+    }
   },
-  remove(queryId, field) {
-    this.selectedFields = this.selectedFields.update(queryId, new Immutable.Set(), fields => fields.remove(field));
-    this._trigger();
+
+  add(field: string) {
+    CurrentViewStateActions.fields(this.selectedFields.add(field));
   },
-  set(queryId, fields) {
-    this.selectedFields = this.selectedFields.set(queryId, new Immutable.Set(fields));
-    this._trigger();
+  remove(field: string) {
+    CurrentViewStateActions.fields(this.selectedFields.remove(field));
+  },
+  toggle(field: string) {
+    if (this.selectedFields.contains(field)) {
+      this.remove(field);
+    } else {
+      this.add(field);
+    }
   },
 
   _state() {

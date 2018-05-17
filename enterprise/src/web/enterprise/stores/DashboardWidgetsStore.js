@@ -1,40 +1,82 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
+import { get, isEqual } from 'lodash';
 
-import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
+import { ViewActions, ViewStore } from './ViewStore';
+import { WidgetActions } from './WidgetStore';
+import DashboardWidget from '../logic/views/DashboardWidget';
 
-export default Reflux.createStore({
+export const DashboardWidgetsActions = Reflux.createActions([
+  'addToDashboard',
+  'removeFromDashboard',
+  'positions',
+]);
+
+export const DashboardWidgetsStore = Reflux.createStore({
   listenables: [DashboardWidgetsActions],
 
-  widgets: new Immutable.Map(),
+  widgets: Immutable.Map(),
+  dashboardState: undefined,
+  allWidgets: Immutable.Map(),
 
   init() {
-    // TODO: Listen on widgets store to remove widgets here when they are removed from a query tab
-    // this.listenTo(CurrentViewStore, this.onCurrentViewStoreChange, this.onCurrentViewStoreChange);
+    this.listenTo(ViewStore, this.onViewStoreChange, this.onViewStoreChange);
+    WidgetActions.remove.listen(this.removeFromDashboard);
   },
 
   getInitialState() {
-    return this.widgets;
+    return this._state();
   },
 
+  onViewStoreChange({ view }) {
+    this.dashboardState = get(view, 'dashboardState');
+    const newWidgets = get(this.dashboardState, 'widgets', Immutable.Map());
+    const newPositions = get(this.dashboardState, 'positions', Immutable.Map());
+    const allWidgets = Immutable.Map(
+      get(view, 'state', Immutable.Map())
+        .valueSeq()
+        .map(s => Immutable.fromJS(s.widgets))
+        .flatten()
+        .map(w => [w.id, w])
+        .toList(),
+    );
+    if (!isEqual(newWidgets, this.widgets) || !isEqual(this.allWidgets, allWidgets) || !isEqual(this._positions, newPositions)) {
+      this.widgets = newWidgets;
+      this.allWidgets = allWidgets;
+      this._positions = newPositions;
+      this._trigger();
+    }
+  },
+
+  _state() {
+    return {
+      dashboardWidgets: this.widgets,
+      widgetDefs: this.allWidgets,
+      positions: this._positions,
+    };
+  },
   _trigger() {
-    this.trigger(this.widgets);
+    this.trigger(this._state());
   },
 
-  load(viewId, widgets) {
-    widgets.entrySeq().forEach(([widgetId, widget]) => {
-      this.widgets = this.widgets.setIn([viewId, widgetId], { widgetId: widgetId, queryId: widget.query_id });
-    });
-    this._trigger();
+  addToDashboard(queryId, widgetId) {
+    const newDashboardState = this.dashboardState.toBuilder()
+      .widgets(this.widgets.set(widgetId, DashboardWidget.create(widgetId, queryId)))
+      .build();
+    ViewActions.dashboardState(newDashboardState);
   },
 
-  addToDashboard(viewId, queryId, widgetId) {
-    this.widgets = this.widgets.setIn([viewId, widgetId], { queryId: queryId, widgetId: widgetId });
-    this._trigger();
+  positions(newPositions) {
+    const newDashboardState = this.dashboardState.toBuilder()
+      .positions(Immutable.fromJS(newPositions))
+      .build();
+    ViewActions.dashboardState(newDashboardState);
   },
 
-  removeFromDashboard(viewId, widgetId) {
-    this.widgets = this.widgets.deleteIn([viewId, widgetId]);
-    this._trigger();
+  removeFromDashboard(widgetId) {
+    const newDashboardState = this.dashboardState.toBuilder()
+      .widgets(this.widgets.delete(widgetId))
+      .build();
+    ViewActions.dashboardState(newDashboardState);
   },
 });

@@ -1,11 +1,11 @@
 import Reflux from 'reflux';
 
-export default Reflux.createActions([
-  'create',
-  'load',
-  'query',
-  'rangeType',
-  'rangeParams',
-  'remove',
-  'update',
-]);
+export const QueriesActions = Reflux.createActions({
+  create: { asyncResult: true },
+  load: {},
+  query: {},
+  rangeType: {},
+  rangeParams: {},
+  remove: {},
+  update: {},
+});

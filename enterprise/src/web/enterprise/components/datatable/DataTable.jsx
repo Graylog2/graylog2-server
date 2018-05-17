@@ -5,9 +5,9 @@ import Immutable from 'immutable';
 import expandRows from 'enterprise/logic/ExpandRows';
 import connect from 'stores/connect';
 import Field from 'enterprise/components/Field';
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
 import Value from 'enterprise/components/Value';
 import DataTableEntry from './DataTableEntry';
+import { ViewStore } from '../../stores/ViewStore';
 
 class DataTable extends React.Component {
   static propTypes = {
@@ -33,13 +33,13 @@ class DataTable extends React.Component {
 
   _headerField = (field, span = 1) => (
     <th key={field} colSpan={span} style={{ left: '0px' }}>
-      <Field name={field} queryId={this.props.currentView.selectedQuery}>{field}</Field>
+      <Field name={field} queryId={this.props.currentView.activeQuery}>{field}</Field>
     </th>
   );
 
   _headerFieldForValue = (field, value, span = 1) => (
     <th key={`${field}-${value}`} colSpan={span} style={{ left: '0px' }}>
-      <Value field={field} value={value} queryId={this.props.currentView.selectedQuery}>{value}</Value>
+      <Value field={field} value={value} queryId={this.props.currentView.activeQuery}>{value}</Value>
     </th>
   );
 
@@ -106,4 +106,4 @@ class DataTable extends React.Component {
   }
 }
 
-export default connect(DataTable, { currentView: CurrentViewStore });
+export default connect(DataTable, { currentView: ViewStore });

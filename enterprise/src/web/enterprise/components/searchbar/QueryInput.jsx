@@ -61,6 +61,9 @@ class QueryInput extends Component {
   componentWillReceiveProps(nextProps) {
     const fields = _extractFields(nextProps.result);
     _snippets.getCompletions = _completions(fields);
+    if (nextProps.value !== this.state.value) {
+      this.setState({ value: nextProps.value });
+    }
   }
 
   _placeholderNode(placeholder) {
@@ -84,7 +87,7 @@ class QueryInput extends Component {
   _bindEditor(editor) {
     if (editor) {
       this.editor = editor;
-      if (!this.addedPlaceholder && !this.state.value) {
+      if (!this.addedPlaceholder && !this.state.value && !this.isFocussed) {
         this._addPlaceholder(editor.editor);
         this.addedPlaceholder = true;
       }
@@ -96,6 +99,7 @@ class QueryInput extends Component {
   };
 
   _onBlur = () => {
+    this.isFocussed = false;
     const editor = this.editor.editor;
     const shouldShow = !editor.session.getValue().length;
     const nodeExists = editor.renderer.emptyMessageNode;
@@ -105,6 +109,7 @@ class QueryInput extends Component {
   };
 
   _onFocus = () => {
+    this.isFocussed = true;
     const editor = this.editor.editor;
     const nodeExists = editor.renderer.emptyMessageNode;
     if (nodeExists) {
@@ -137,6 +142,7 @@ class QueryInput extends Component {
                    enableBasicAutocompletion
                    enableLiveAutocompletion
                    editorProps={{
+                     $blockScrolling: Infinity,
                      selectionStyle: 'line',
                    }}
                    fontSize={13}

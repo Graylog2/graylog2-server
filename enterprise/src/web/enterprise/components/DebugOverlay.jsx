@@ -2,16 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
-import QueriesStore from 'enterprise/stores/QueriesStore';
-import SearchStore from 'enterprise/stores/SearchStore';
-import WidgetStore from 'enterprise/stores/WidgetStore';
-import ViewsStore from 'enterprise/stores/ViewsStore';
-import SelectedFieldsStore from 'enterprise/stores/SelectedFieldsStore';
-import TitlesStore from 'enterprise/stores/TitlesStore';
-import WidgetFilterStore from '../stores/WidgetFilterStore';
+import { ViewStore } from 'enterprise/stores/ViewStore';
+import { SearchStore } from 'enterprise/stores/SearchStore';
 
 const DebugOverlay = createReactClass({
   displayName: 'DebugOverlay',
@@ -22,14 +16,8 @@ const DebugOverlay = createReactClass({
   },
 
   mixins: [
-    Reflux.connect(CurrentViewStore, 'currentView'),
-    Reflux.connect(QueriesStore, 'queries'),
-    Reflux.connect(SearchStore, 'search'),
-    Reflux.connect(SelectedFieldsStore, 'selectedFields'),
-    Reflux.connect(TitlesStore, 'titles'),
-    Reflux.connect(ViewsStore, 'views'),
-    Reflux.connect(WidgetFilterStore, 'widgetFilters'),
-    Reflux.connect(WidgetStore, 'widgets'),
+    Reflux.connect(ViewStore, 'views'),
+    Reflux.connect(SearchStore, 'searches'),
   ],
 
   getDefaultProps() {
@@ -39,12 +27,22 @@ const DebugOverlay = createReactClass({
   },
 
   render() {
+    const state = {
+      view: this.state.views,
+      searches: {
+        search: this.state.searches.search,
+        widgetMapping: this.state.searches.widgetMapping,
+      },
+    };
+    const modalBody = this.props.show && (
+      <textarea disabled style={{ height: '600', width: '100%' }}>
+        {JSON.stringify(state, null, 2)}
+      </textarea>
+    );
     return (
       <Modal onHide={this.props.onClose} show={this.props.show}>
         <Modal.Body>
-          <textarea disabled style={{ height: '600', width: '100%' }}>
-            {JSON.stringify(this.state, null, 2)}
-          </textarea>
+          {modalBody}
         </Modal.Body>
       </Modal>
     );

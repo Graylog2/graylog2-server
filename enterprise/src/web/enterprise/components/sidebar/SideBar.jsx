@@ -53,7 +53,7 @@ const SideBar = createReactClass({
   },
 
   formatViewDescription(view) {
-    const { description } = view.toObject();
+    const { description } = view;
     if (description) {
       return <span>{description}</span>;
     }
@@ -61,20 +61,20 @@ const SideBar = createReactClass({
   },
 
   render() {
-    const { results, view, viewId, queryId } = this.props;
-    const viewDescription = this.formatViewDescription(view);
+    const { results, viewMetadata, queryId } = this.props;
+    const viewDescription = this.formatViewDescription(viewMetadata);
     return (
       <div className={styles.sidebarContainer}>
         <AutoAffix viewportOffsetTop={46}>
           <div id="sidebar">
             <div className={`content-col ${styles.sidebarContent}`} ref="sidebar">
-              <span className={"pull-right"}>
-                <AddWidgetButton viewId={viewId} queryId={queryId} />
+              <span className="pull-right">
+                <AddWidgetButton queryId={queryId} />
               </span>
 
               <div className={styles.viewMetadata}>
-                <h3>{view.get('title') || defaultNewViewTitle}</h3>
-                <small>{view.get('summary') || defaultNewViewSummary}</small>
+                <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
+                <small>{viewMetadata.summary || defaultNewViewSummary}</small>
               </div>
 
               <div className={styles.viewMetadata}>

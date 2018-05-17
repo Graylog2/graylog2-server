@@ -7,12 +7,11 @@ import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import Field from 'enterprise/components/Field';
 import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
-import CurrentSelectedFieldsActions from 'enterprise/actions/CurrentSelectedFieldsActions';
-import CurrentSelectedFieldsStore from 'enterprise/stores/CurrentSelectedFieldsStore';
+import { SelectedFieldsActions } from 'enterprise/stores/SelectedFieldsStore';
 
 import styles from './FieldList.css';
 import FieldTypeIcon from './FieldTypeIcon';
+import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 
 const FieldList = createReactClass({
   propTypes: {
@@ -20,7 +19,7 @@ const FieldList = createReactClass({
     fields: PropTypes.object.isRequired,
     selectedFields: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentViewStore, 'currentView')],
+  mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
 
   componentDidMount() {
     this._updateHeight();
@@ -28,7 +27,7 @@ const FieldList = createReactClass({
   },
 
   componentDidUpdate(prevProps) {
-    if (this.props.maximumHeight !== prevProps.maximumHeight) {
+    if (!isNaN(this.props.maximumHeight) && this.props.maximumHeight !== prevProps.maximumHeight) {
       this._updateHeight();
     }
   },
@@ -50,7 +49,7 @@ const FieldList = createReactClass({
     const maxHeight = this.props.maximumHeight -
       fieldsContainer.getBoundingClientRect().top;
 
-    this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
+    this.setState({ maxFieldsHeight: Math.max(isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   },
 
   _renderField({ fields, fieldType, selectedQuery, selectedView, selectedFields }) {
@@ -62,7 +61,7 @@ const FieldList = createReactClass({
       <li key={`field-${name}`} className={styles.fieldListItem} >
         <FieldSelected name={name}
                        selected={selectedFields.contains(name)}
-                       onToggleSelected={CurrentSelectedFieldsActions.toggle} />
+                       onToggleSelected={SelectedFieldsActions.toggle} />
         {' '}
         <FieldTypeIcon type={type} />
         {' '}
@@ -82,8 +81,8 @@ const FieldList = createReactClass({
     if (!fields) {
       return <span>No field information available.</span>;
     }
-    const selectedQuery = this.state.currentView.selectedQuery;
-    const selectedView = this.state.currentView.selectedView;
+    const selectedQuery = this.state.viewMetadata.activeQuery;
+    const selectedView = this.state.viewMetadata.id;
     const fieldList = allFields
       .sort()
       .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, selectedFields, fields }));

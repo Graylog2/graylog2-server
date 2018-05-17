@@ -7,18 +7,18 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader } from 'components/common';
 
-import { ViewStore, ViewActions } from 'enterprise/stores/ViewManagementStore';
+import { ViewManagementStore, ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
 import ViewList from 'enterprise/components/views/ViewList';
 
 const ViewManagementPage = createReactClass({
-  mixins: [Reflux.connect(ViewStore, 'views')],
+  mixins: [Reflux.connect(ViewManagementStore, 'views')],
 
   handleSearch(query, page, perPage) {
-    return ViewActions.search(query, page, perPage);
+    return ViewManagementActions.search(query, page, perPage);
   },
 
   handleViewDelete(view) {
-    return ViewActions.delete(view);
+    return ViewManagementActions.delete(view);
   },
 
   render() {

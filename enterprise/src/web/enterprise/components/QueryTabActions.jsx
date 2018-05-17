@@ -5,10 +5,8 @@ import createReactClass from 'create-react-class';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
-
 import DebugOverlay from 'enterprise/components/DebugOverlay';
-import ViewsStore from 'enterprise/stores/ViewsStore';
+import { ViewStore } from 'enterprise/stores/ViewStore';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 
 const QueryTabActions = createReactClass({
@@ -16,8 +14,7 @@ const QueryTabActions = createReactClass({
     onSaveView: PropTypes.func.isRequired,
   },
   mixins: [
-    Reflux.connect(CurrentViewStore, 'currentView'),
-    Reflux.connect(ViewsStore, 'views'),
+    Reflux.connect(ViewStore, 'view'),
   ],
 
   getInitialState() {
@@ -57,16 +54,15 @@ const QueryTabActions = createReactClass({
   },
 
   _isNewView(view) {
-    return !view.has('title');
+    return !view.title;
   },
 
   render() {
-    const { views, currentView } = this.state;
-    const view = views.get(currentView.selectedView);
+    const { view } = this.state.view;
     const onSave = () => this.handleSaveView(view);
     return (
       <span>
-        <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle={"info"}>
+        <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle="info">
           <MenuItem onSelect={this.handleEdit} disabled={this._isNewView(view)}>Edit</MenuItem>
           <MenuItem onSelect={onSave} disabled={this._isNewView(view)}>Save</MenuItem>
           <MenuItem onSelect={this.handleSaveAs}>Save as</MenuItem>

@@ -1,17 +1,22 @@
 import Reflux from 'reflux';
-import _ from 'lodash';
 
-import SearchJobActions from 'enterprise/actions/SearchJobActions';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
-
-import SearchRequest from 'enterprise/logic/SearchRequest';
+import Search from '../logic/search/Search';
 
 const createSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 const executeQueryUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/${id}/execute`);
 const jobStatusUrl = jobId => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/status/${jobId}`);
 
-export default Reflux.createStore({
+
+export const SearchJobActions = Reflux.createActions({
+  create: { asyncResult: true },
+  run: { asyncResult: true },
+  jobStatus: { asyncResult: true },
+  remove: { asyncResult: true },
+});
+
+export const SearchJobStore = Reflux.createStore({
   listenables: [SearchJobActions],
 
   state: {
@@ -27,56 +32,23 @@ export default Reflux.createStore({
   },
 
   create(searchRequest) {
-    const promise = fetch('POST', createSearchUrl, searchRequest.toRequest())
-      .then((search) => {
-        this.state.searches[search.id] = search;
-        this._trigger();
-        return { request: searchRequest, search: search };
+    const promise = fetch('POST', createSearchUrl, JSON.stringify(searchRequest))
+      .then((response) => {
+        const search = Search.fromJSON(response);
+        return { search: search };
       });
     SearchJobActions.create.promise(promise);
   },
 
-  run(searchId, executionState) {
-    const query = this.state.searches[searchId];
-    if (!query) {
-      SearchJobActions.run.promise(Promise.reject());
-    } else {
-      const executionStateValue = executionState ? executionState.toJS() : {};
-      const promise = fetch('POST', executeQueryUrl(searchId), executionStateValue)
-        .then((job) => {
-          this.state.jobs[job.id] = job;
-          this._trigger();
-          return job;
-        });
-      SearchJobActions.run.promise(promise);
-    }
+  run(search, executionState) {
+    const executionStateValue = executionState ? executionState.toJS() : {};
+    const promise = fetch('POST', executeQueryUrl(search.id), executionStateValue);
+    SearchJobActions.run.promise(promise);
   },
 
   jobStatus(jobId) {
-    const promise = fetch('GET', jobStatusUrl(jobId))
-      .then((jobStatus) => {
-        // transform the queryResult to something more usable and also check the structure here.
-        const [id, searchId, done, failed] = _.at(jobStatus, ['id', 'search_id', 'execution.done', 'execution.complete_exceptionally']);
-        this.state.jobs[id] = {
-          id: id,
-          searchId: searchId,
-          done: done,
-          failed: failed,
-          results: jobStatus.results,
-        };
-        this._trigger();
-        return jobStatus;
-      });
+    const promise = fetch('GET', jobStatusUrl(jobId));
     SearchJobActions.jobStatus.promise(promise);
-  },
-
-  remove(id) {
-    delete this.state.searches[id];
-    this._trigger();
-  },
-
-  _trigger() {
-    this.trigger(this.state);
   },
 
 });

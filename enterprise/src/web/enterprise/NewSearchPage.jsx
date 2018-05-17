@@ -1,9 +1,8 @@
 import React from 'react';
 
-import ExtendedSearchPage from './ExtendedSearchPage';
-import ViewsActions from './actions/ViewsActions';
-import ViewsStore from './stores/ViewsStore';
 import { Spinner } from 'components/common';
+import ExtendedSearchPage from './ExtendedSearchPage';
+import { ViewActions } from './stores/ViewStore';
 
 export default class NewSearchPage extends React.Component {
   static propTypes = {};
@@ -16,7 +15,7 @@ export default class NewSearchPage extends React.Component {
   }
 
   componentDidMount() {
-    ViewsActions.create().then(() => this.setState({ loaded: true }));
+    ViewActions.create().then(() => this.setState({ loaded: true }));
   }
 
   render() {

@@ -8,14 +8,11 @@ import { Col } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidgetGrid';
 import { widgetDefinition } from 'enterprise/logic/Widget';
-import ViewsActions from 'enterprise/actions/ViewsActions';
-import DashboardWidgetsActions from 'enterprise/actions/DashboardWidgetsActions';
+import { DashboardWidgetsActions } from 'enterprise/stores/DashboardWidgetsStore';
 import EmptyDashboardHelpMessage from './EmptyDashboardHelpMessage';
 
 const DashboardContainer = createReactClass({
   propTypes: {
-    view: PropTypes.instanceOf(Immutable.Map).isRequired,
-    widgets: PropTypes.instanceOf(Immutable.Map).isRequired,
     dashboardWidgets: PropTypes.instanceOf(Immutable.Map).isRequired,
     widgetMapping: PropTypes.object,
     results: PropTypes.object,
@@ -32,42 +29,39 @@ const DashboardContainer = createReactClass({
     return {};
   },
 
-  updatePositions(view, newPositions) {
-    const updatedView = view.set('dashboardPositions', newPositions);
-    ViewsActions.update(updatedView.get('id'), updatedView);
+  updatePositions(newPositions) {
+    DashboardWidgetsActions.positions(newPositions);
   },
 
-  handlePositionsChange(positions, view) {
+  handlePositionsChange(positions) {
     const newPositions = {};
     positions.forEach(({ col, height, row, width, id }) => {
       newPositions[id] = { col, height, row, width };
     });
-    this.updatePositions(view, newPositions);
+    this.updatePositions(newPositions);
   },
 
-  handleWidgetDelete(view, widgetId) {
-    DashboardWidgetsActions.removeFromDashboard(view.get('id'), widgetId);
+  handleWidgetDelete(widgetId, positions) {
+    DashboardWidgetsActions.removeFromDashboard(widgetId);
 
-    const positions = view.get('dashboardPositions', {});
-    delete positions[widgetId];
-    this.updatePositions(view, positions);
+    const newPositions = Object.assign({}, positions);
+    delete newPositions[widgetId];
+    this.updatePositions(newPositions);
   },
 
-  renderWidgetGrid(widgetDefs, dashboardWidgets, widgetMapping, queryResults, view) {
+  renderWidgetGrid(widgetDefs, dashboardWidgets, widgetMapping, queryResults, positions) {
     const widgets = {};
     const data = {};
     let fields = new Immutable.Map();
 
-    const viewDashboardWidgets = dashboardWidgets.get(view.get('id'));
-
-    if (!viewDashboardWidgets) {
+    if (!dashboardWidgets) {
       // No dashboard widgets defined
       return <EmptyDashboardHelpMessage />;
     }
 
-    const widgetsWithResults = viewDashboardWidgets.map((value, widgetId) => {
+    const widgetsWithResults = dashboardWidgets.map((value, widgetId) => {
       let m = new Immutable.Map();
-      m = m.set('widget', widgetDefs.getIn([value.queryId, widgetId]));
+      m = m.set('widget', widgetDefs.get(widgetId));
       m = m.set('result', new Immutable.Map(queryResults[value.queryId]));
       return m;
     });
@@ -88,27 +82,26 @@ const DashboardContainer = createReactClass({
         }
       }
     });
-    const positions = view.get('dashboardPositions');
     return (
       <DashboardWidgetGrid fields={fields}
-                           viewId={view.get('id')}
                            locked={false}
                            widgets={widgets}
                            positions={positions}
                            data={data}
-                           onWidgetDelete={widget => this.handleWidgetDelete(view, widget)}
-                           onPositionsChange={p => this.handlePositionsChange(p, view)} />
+                           onWidgetDelete={widget => this.handleWidgetDelete(widget, positions)}
+                           onPositionsChange={this.handlePositionsChange} />
     );
   },
 
   render() {
-    const { widgets, dashboardWidgets, widgetMapping, results, view } = this.props;
+    const { widgetMapping, results } = this.props;
+    const { dashboardWidgets, widgetDefs, positions } = this.props.dashboardWidgets;
 
     if (!results.results) {
       return <Col md={12}><Spinner /></Col>;
     }
 
-    const widgetGrid = this.renderWidgetGrid(widgets, dashboardWidgets, widgetMapping, results.results, view);
+    const widgetGrid = this.renderWidgetGrid(widgetDefs, dashboardWidgets, widgetMapping.toJS(), results.results, positions);
 
     return (
       <Col md={12}>

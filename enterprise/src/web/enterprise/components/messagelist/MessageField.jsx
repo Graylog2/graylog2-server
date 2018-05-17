@@ -4,21 +4,21 @@ import React from 'react';
 import connect from 'stores/connect';
 import Field from 'enterprise/components/Field';
 import Value from 'enterprise/components/Value';
-import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+import { ViewStore } from '../../stores/ViewStore';
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
 const MessageField = ({ fieldName, fieldType, message, value, currentView }) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
-  const { selectedQuery } = currentView;
+  const { activeQuery } = currentView;
 
   return (
     <span>
       <dt>
-        <Field interactive queryId={selectedQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
+        <Field interactive queryId={activeQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
       </dt>
       <dd>
-        <Value queryId={selectedQuery} field={fieldName} value={innerValue} type={fieldType}>{innerValue}</Value>
+        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType}>{innerValue}</Value>
       </dd>
     </span>
   );
@@ -30,4 +30,4 @@ MessageField.propTypes = {
   value: PropTypes.any.isRequired,
 };
 
-export default connect(MessageField, { currentView: CurrentViewStore });
+export default connect(MessageField, { currentView: ViewStore });

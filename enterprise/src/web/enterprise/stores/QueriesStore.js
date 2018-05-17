@@ -1,93 +1,76 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
+import { isEqual } from 'lodash';
 
-import QueriesActions from 'enterprise/actions/QueriesActions';
-import CurrentViewStore from './CurrentViewStore';
+import { ViewActions, ViewStore } from './ViewStore';
+import Search from '../logic/search/Search';
+import { QueriesActions } from '../actions/QueriesActions';
 
-export default Reflux.createStore({
+export { QueriesActions } from '../actions/QueriesActions';
+export const QueriesStore = Reflux.createStore({
   listenables: [QueriesActions],
   queries: new Immutable.Map(),
-  selectedView: undefined,
+  search: Search.create(),
 
   init() {
-    this.listenTo(CurrentViewStore, this.onCurrentViewStoreChange, this.onCurrentViewStoreChange);
+    this.listenTo(ViewStore, this.onViewStoreChange, this.onViewStoreChange);
   },
 
   getInitialState() {
-    if (this.selectedView) {
-      return this.queries.get(this.selectedView);
-    }
-    return new Immutable.Map();
+    return this._state();
   },
 
-  onCurrentViewStoreChange(state) {
-    if (this.selectedView !== state.selectedView) {
-      this.selectedView = state.selectedView;
+  onViewStoreChange(state) {
+    const { view } = state;
+    if (!view || !view.search) {
+      return;
+    }
+    const { search } = view;
+    this.search = search;
+
+    const { queries } = search;
+    const newQueries = Immutable.Map(queries.map(q => [q.id, q]));
+
+    if (!isEqual(newQueries, this.queries)) {
+      this.queries = newQueries;
       this._trigger();
     }
   },
 
-  create(viewId, query) {
-    if (query.id === undefined) {
-      throw new Error('Unable to add query without id to view.');
-    }
-    this.queries = this.queries.updateIn([viewId, query.id], (value) => {
-      if (value !== undefined) {
-        throw new Error(`Unable to add query with id <${query.id}>, it is already present in view with id <${viewId}>.`);
-      }
-      return new Immutable.Map(query);
-    });
-    this._trigger();
+  remove(queryId) {
+    const newQueries = this.queries.remove(queryId);
+    this._propagateQueryChange(newQueries);
   },
-  load(viewId, queries) {
-    this.queries = this.queries.set(viewId, queries);
-    this._trigger();
-  },
-  remove(viewId, queryId) {
-    this.queries = this.queries.removeIn([viewId, queryId]);
-    this._trigger();
-  },
-  update(viewId, queryId, query) {
-    this.queries = this.queries.setIn([viewId, queryId], new Immutable.Map(query));
-    this._trigger();
+  update(queryId, query) {
+    const newQueries = this.queries.set(queryId, query);
+    this._propagateQueryChange(newQueries);
   },
 
-  query(viewId, queryId, query) {
-    this.queries = this.queries.setIn([viewId, queryId, 'query'], query);
-    this._trigger();
+  query(queryId, query) {
+    const activeQuery = this.queries.get(queryId);
+    const newQuery = activeQuery.toBuilder().query(Object.assign({}, activeQuery.query, { query_string: query })).build();
+    const newQueries = this.queries.set(queryId, newQuery);
+    this._propagateQueryChange(newQueries);
   },
-  rangeParams(viewId, queryId, key, value) {
-    this.queries = this.queries.setIn([viewId, queryId, 'rangeParams', key], value);
-    this._trigger();
+  rangeParams(queryId, key, value) {
+    const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { [key]: value })).build());
+    this._propagateQueryChange(newQueries);
   },
-  rangeType(viewId, queryId, type) {
-    this.queries = this.queries.setIn([viewId, queryId, 'rangeType'], type);
-    this._trigger();
-  },
-
-  toggleField(viewId, queryId, field) {
-    if (this.queries.getIn([viewId, queryId, 'fields']).contains(field)) {
-      this.removeField(viewId, queryId, field);
-    } else {
-      this.addField(viewId, queryId, field);
-    }
+  rangeType(queryId, type) {
+    const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { type })).build());
+    this._propagateQueryChange(newQueries);
   },
 
-  addField(viewId, queryId, field) {
-    this.queries = this.queries.updateIn([viewId, queryId, 'fields'], fields => fields.add(field));
-    this._trigger();
+  _propagateQueryChange(newQueries) {
+    const newSearch = this.search.toBuilder().queries(newQueries.valueSeq().toList()).build();
+    return ViewActions.search(newSearch);
   },
 
-  removeField(viewId, queryId, field) {
-    this.queries = this.queries.updateIn([viewId, queryId, 'fields'], fields => fields.delete(field));
-    this._trigger();
+  _state() {
+    return this.queries;
   },
 
   _trigger() {
-    if (this.selectedView) {
-      this.trigger(this.queries.get(this.selectedView, new Immutable.Map()));
-    } else {
-      this.trigger(new Immutable.Map());
-    }
+    this.trigger(this._state());
   },
 });

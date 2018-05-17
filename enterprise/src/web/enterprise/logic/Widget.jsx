@@ -1,9 +1,11 @@
+import uuid from 'uuid/v4';
+
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { pivotForField } from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';
-import Widget from './aggregationbuilder/Widget';
-import MessagesWidgetConfig from './aggregationbuilder/MessagesWidgetConfig';
+import MessagesWidget from './widgets/MessagesWidget';
+import MessagesWidgetConfig from './widgets/MessagesWidgetConfig';
 
 const widgetsKey = 'enterpriseWidgets';
 
@@ -12,11 +14,11 @@ export function widgetDefinition(type) {
     .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase())
 }
 
-export const messageList = (id, fields = []) => {
-  return new Widget(id, 'messages', new MessagesWidgetConfig(fields, true));
+export const messageList = (id = uuid(), fields = []) => {
+  return new MessagesWidget(id, new MessagesWidgetConfig(fields, true));
 };
 
-export const resultHistogram = (id) => {
+export const resultHistogram = (id = uuid()) => {
   const config = {
     rowPivots: [
       pivotForField('timestamp'),

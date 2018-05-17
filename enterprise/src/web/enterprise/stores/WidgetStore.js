@@ -1,72 +1,85 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import uuid from 'uuid/v4';
+import { get, isEqual } from 'lodash';
 
-import WidgetActions from 'enterprise/actions/WidgetActions';
-import CurrentViewStore from './CurrentViewStore';
+import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
-export default Reflux.createStore({
+export const WidgetActions = Reflux.createActions([
+  'create',
+  'duplicate',
+  'filter',
+  'load',
+  'remove',
+  'update',
+  'updateConfig',
+]);
+
+export const WidgetStore = Reflux.createStore({
   listenables: [WidgetActions],
 
   widgets: new Immutable.Map(),
-  selectedView: undefined,
+  activeQuery: undefined,
 
   init() {
-    this.listenTo(CurrentViewStore, this.onCurrentViewStoreChange, this.onCurrentViewStoreChange);
+    this.listenTo(CurrentViewStateStore, this.onCurrentViewStateChange, this.onCurrentViewStateChange);
   },
 
   getInitialState() {
-    if (this.selectedView) {
-      return this.widgets.get(this.selectedView);
-    }
-    return new Immutable.Map();
+    return this.widgets;
   },
 
-  onCurrentViewStoreChange(state) {
-    if (this.selectedView !== state.selectedView) {
-      this.selectedView = state.selectedView;
+  onCurrentViewStateChange(newState) {
+    const { activeQuery, state } = newState;
+    this.activeQuery = activeQuery;
+
+    const activeWidgets = get(state, 'widgets', []);
+    const widgets = Immutable.Map(activeWidgets.map(w => [w.id, w]));
+
+    if (!isEqual(widgets, this.widgets)) {
+      this.widgets = Immutable.Map(widgets);
       this._trigger();
     }
   },
 
-  create(viewId, queryId, widget) {
+  create(widget) {
     if (widget.id === undefined) {
       throw new Error('Unable to add widget without id to query.');
     }
-    this.widgets = this.widgets.setIn([viewId, queryId, widget.id], widget);
-    this._trigger();
+    this.widgets = this.widgets.set(widget.id, widget);
+    this._updateWidgets();
   },
-  duplicate(viewId, queryId, widgetId) {
-    const widget = this.widgets.getIn([viewId, queryId, widgetId]);
+  duplicate(widgetId) {
+    const widget = this.widgets.get(widgetId);
     if (!widget) {
       throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
     }
     const duplicatedWidget = widget.duplicate(uuid());
-    this.widgets = this.widgets.setIn([viewId, queryId, duplicatedWidget.id], duplicatedWidget);
-    this._trigger();
+    this.widgets = this.widgets.set(duplicatedWidget, duplicatedWidget);
+    this._updateWidgets();
     return duplicatedWidget;
   },
-  load(viewId, queryId, widgets) {
-    this.widgets = this.widgets.setIn([viewId, queryId], widgets);
-    this._trigger();
+  filter(widgetId, filter) {
+    this.widgets = this.widgets.update(widgetId, widget => widget.toBuilder().filter(filter).build());
+    this._updateWidgets(this.widgets);
   },
-  remove(viewId, queryId, widgetId) {
-    this.widgets = this.widgets.removeIn([viewId, queryId, widgetId]);
-    this._trigger();
+  remove(widgetId) {
+    this.widgets = this.widgets.remove(widgetId);
+    this._updateWidgets();
   },
-  update(viewId, queryId, widgetId, widget) {
-    this.widgets = this.widgets.setIn([viewId, queryId, widgetId], widget);
-    this._trigger();
+  update(widgetId, widget) {
+    this.widgets = this.widgets.set(widgetId, widget);
+    this._updateWidgets();
   },
-  updateConfig(viewId, queryId, widgetId, config) {
-    this.widgets = this.widgets.updateIn([viewId, queryId, widgetId], widget => widget.toBuilder().config(config).build());
-    this._trigger();
+  updateConfig(widgetId, config) {
+    this.widgets = this.widgets.update(widgetId, widget => widget.toBuilder().config(config).build());
+    this._updateWidgets();
+  },
+  _updateWidgets() {
+    const widgets = this.widgets.valueSeq().toList();
+    CurrentViewStateActions.widgets(widgets);
   },
   _trigger() {
-    if (this.selectedView) {
-      this.trigger(this.widgets.get(this.selectedView, new Immutable.Map()));
-    } else {
-      this.trigger(new Immutable.Map());
-    }
+    this.trigger(this.widgets);
   },
 });

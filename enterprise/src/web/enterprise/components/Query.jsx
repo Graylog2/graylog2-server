@@ -1,27 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 
 import { widgetDefinition } from 'enterprise/logic/Widget';
-import ViewsActions from 'enterprise/actions/ViewsActions';
-
 import WidgetGrid from 'enterprise/components/WidgetGrid';
+import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore';
 
-const _onPositionsChange = (positions, view, queryId) => {
-  const newPositions = {};
-  positions.forEach(({ col, height, row, width, id }) => {
-    newPositions[id] = { col, height, row, width };
-  });
-  const updatedView = view.update('positions', (p) => {
-    p[queryId] = newPositions;
-    return p;
-  });
-  ViewsActions.update(updatedView.get('id'), updatedView);
+const _onPositionsChange = (positions) => {
+  const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, { col, height, row, width }])).toJS();
+  CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, queryId, fields, allFields) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, positions, queryId, fields, allFields) => {
   const widgets = {};
   const data = {};
 
@@ -34,7 +27,6 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, queryId
       data[widget.id] = dataTransformer(widgetData, widget);
     }
   });
-  const positions = view.get('positions')[queryId];
   return (
     <WidgetGrid fields={fields}
                 allFields={allFields}
@@ -42,14 +34,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, view, queryId
                 widgets={widgets}
                 positions={positions}
                 data={data}
-                onPositionsChange={p => _onPositionsChange(p, view, queryId)} />
+                onPositionsChange={p => _onPositionsChange(p)} />
   );
 };
 
-const Query = ({ children, allFields, fields, results, view, widgetMapping, widgets, query }) => {
+const Query = ({ children, allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (results) {
-    const queryId = query.get('id');
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping, results.searchTypes, view, queryId, fields, allFields, );
+    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results.searchTypes, positions, queryId, fields, allFields, );
     return (
       <span>
         <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
@@ -70,10 +61,10 @@ Query.propTypes = {
   children: PropTypes.node.isRequired,
   fields: PropTypes.object.isRequired,
   results: PropTypes.object.isRequired,
-  view: PropTypes.object.isRequired,
+  positions: PropTypes.object.isRequired,
   widgetMapping: PropTypes.object.isRequired,
   widgets: PropTypes.object.isRequired,
-  query: PropTypes.object.isRequired,
+  queryId: PropTypes.string.isRequired,
 };
 
 export default Query;

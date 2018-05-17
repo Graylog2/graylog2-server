@@ -1,6 +1,6 @@
 import uuid from 'uuid/v4';
 
-import WidgetActions from 'enterprise/actions/WidgetActions';
+import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { pivotForField } from '../searchtypes/aggregation/PivotGenerator';
 
 export default function (viewId, queryId, field) {
@@ -15,5 +15,5 @@ export default function (viewId, queryId, field) {
       visualization: 'line',
     },
   };
-  WidgetActions.create(viewId, queryId, widget);
+  WidgetActions.create(widget);
 }
