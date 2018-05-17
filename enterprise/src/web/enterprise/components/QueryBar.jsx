@@ -37,7 +37,9 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   }
   QueriesActions.remove(queryId);
   if (queryId === currentQuery) {
-    const newQuery = queries.remove(queryId).first();
+    const currentQueryIdIndex = queries.indexOf(queryId);
+    const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
+    const newQuery = queries.remove(queryId).get(newQueryIdIndex);
     ViewActions.selectQuery(newQuery);
   }
 };
