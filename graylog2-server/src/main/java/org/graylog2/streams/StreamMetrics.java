@@ -46,10 +46,10 @@ public class StreamMetrics {
         getIncomingMeter(streamId).mark();
     }
 
-    public Timer getExecutionTimer(String streamRuleId) {
+    public Timer getExecutionTimer(String streamId, String streamRuleId) {
         Timer timer = this.streamExecutionTimers.get(streamRuleId);
         if (timer == null) {
-            timer = metricRegistry.timer(MetricRegistry.name(StreamRule.class, streamRuleId, "executionTime"));
+            timer = metricRegistry.timer(MetricRegistry.name(Stream.class, streamId, "StreamRule", streamRuleId, "executionTime"));
             this.streamExecutionTimers.put(streamRuleId, timer);
         }
 
