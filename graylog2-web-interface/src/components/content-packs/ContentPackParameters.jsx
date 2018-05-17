@@ -168,8 +168,8 @@ class ContentPackParameters extends React.Component {
     const disableBtn = this.props.contentPack.parameters.length <= 0;
     const appliedParameterCount = (this.props.appliedParameter[entity.id] || []).length;
     return (
-      <tr key={entity.data.title.value}>
-        <td>{entity.data.title.value}</td>
+      <tr key={entity.id}>
+        <td>{(entity.data.title || {}).value}</td>
         <td>{entity.type}</td>
         <td>{(entity.data.description || entity.data.name || {}).value}</td>
         <td>{appliedParameterCount}</td>
