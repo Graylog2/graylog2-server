@@ -73,11 +73,15 @@ class ContentPackApplyParameter extends React.Component {
   };
 
   render() {
-    const configKeys = ObjectUtils.getPaths(this.props.entity.data).filter((configKey) => {
-      return this.props.appliedParameter.findIndex((paramMap) => {
-        return configKey === paramMap.configKey;
-      }) < 0;
-    });
+    const typeRegExp = RegExp(/\.type$/);
+    const configKeys = ObjectUtils.getPaths(this.props.entity.data)
+      .filter(configKey => typeRegExp.test(configKey))
+      .map((configKey) => { return configKey.replace(typeRegExp, ''); })
+      .filter((configKey) => {
+        return this.props.appliedParameter.findIndex((paramMap) => {
+          return configKey === paramMap.configKey;
+        }) < 0;
+      });
     const emptyOption = (<option key="EMPTY" value="">Choose..</option>);
     const configOptions = [emptyOption].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
     const parameterOptions = [emptyOption].concat(this.props.parameters.map(key => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));
