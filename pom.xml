@@ -162,7 +162,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <nosqlunit-elasticsearch-http.version>1.0.0-4+jackson</nosqlunit-elasticsearch-http.version>
         <restassured.version>2.9.0</restassured.version>
-        <system-rules.version>1.17.1</system-rules.version>
+        <system-rules.version>1.18.0</system-rules.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v8.11.2</nodejs.version>
