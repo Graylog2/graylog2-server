@@ -4,8 +4,9 @@ import { Tab, Tabs } from 'react-bootstrap';
 
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
+import OverviewTab from './dashboard/OverviewTab';
 
-const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView, renderDashboardTab }) => {
+const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView }) => {
   const queryTitles = titles;
   const queryTabs = queries.map((id, index) => {
     const title = queryTitles.get(id, `Query#${index + 1}`);
@@ -13,8 +14,10 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
     return (
       <Tab key={id}
            eventKey={id}
-           title={tabTitle}>
-        {id === selectedQuery && children(id, index)}
+           title={tabTitle}
+           mountOnEnter
+           unmountOnExit>
+        {children}
       </Tab>
     );
   });
@@ -23,7 +26,11 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
       Overview
     </span>
   );
-  const dashboardTab = <Tab key="dashboard" eventKey="dashboard" title={dashboardTitle} mountOnEnter unmountOnExit>{renderDashboardTab()}</Tab>;
+  const dashboardTab = (
+    <Tab key="dashboard" eventKey="dashboard" title={dashboardTitle} mountOnEnter unmountOnExit>
+      <OverviewTab />
+    </Tab>
+  );
   const newTab = <Tab key="new" eventKey="new" title="+" />;
 
   const tabs = [dashboardTab, queryTabs, newTab];

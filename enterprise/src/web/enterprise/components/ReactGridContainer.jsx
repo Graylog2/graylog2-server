@@ -8,6 +8,7 @@ import 'react-resizable/css/styles.css';
 import style from 'components/common/ReactGridContainer.css';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
+WidthAdjustedReactGridLayout.displayName = 'WidthAdjustedReactGridLayout';
 
 const COLUMN_WIDTH = 175;
 const ROW_HEIGHT = 100;

@@ -14,9 +14,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { QueriesStore } from 'enterprise/stores/QueriesStore';
 import { SelectedFieldsStore } from '../../stores/SelectedFieldsStore';
 import { ViewStore } from '../../stores/ViewStore';
+import { SearchConfigStore } from '../../stores/SearchConfigStore';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
-const { ConfigurationsStore } = CombinedProvider.get('Configurations');
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
@@ -33,7 +33,7 @@ const MessageList = createReactClass({
   },
 
   mixins: [
-    Reflux.connect(ConfigurationsStore, 'configurations'),
+    Reflux.connect(SearchConfigStore, 'configurations'),
     Reflux.connect(SelectedFieldsStore, 'selectedFields'),
     Reflux.connect(ViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
@@ -50,14 +50,7 @@ const MessageList = createReactClass({
     return {
       currentPage: 1,
       expandedMessages: Immutable.Set(),
-      configurations: {
-        searchesClusterConfig: {},
-      },
     };
-  },
-
-  componentDidMount() {
-    return ConfigurationActions.listSearchesClusterConfig();
   },
 
   _columnStyle(fieldName) {

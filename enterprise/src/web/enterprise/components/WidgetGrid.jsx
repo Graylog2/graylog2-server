@@ -101,7 +101,7 @@ class WidgetGrid extends React.Component {
     ) : null;
     return (
       <Row>
-        <div className="dashboard">
+        <div className="dashboard" style={{ width: '1185px' }}>
           {grid}
         </div>
       </Row>

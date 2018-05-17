@@ -86,7 +86,7 @@ const SideBar = createReactClass({
                   {viewDescription}
                 </Panel>
                 <Panel eventKey="fields" header="Fields">
-                  {this.props.children({ maximumHeight: this.state.availableHeight })}
+                  {React.cloneElement(this.props.children, { maximumHeight: this.state.availableHeight })}
                 </Panel>
               </PanelGroup>
             </div>
