@@ -9,6 +9,7 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
+import ContentPackEntityConfig from "./ContentPackEntityConfig";
 
 class ContentPackParameters extends React.Component {
   static propTypes = {
@@ -104,7 +105,7 @@ class ContentPackParameters extends React.Component {
   };
 
   _entityRowFormatter = (entity) => {
-    let modalRef;
+    let applyModalRef;
     const applyParamComponent = (<ContentPackApplyParameter
       parameters={this.props.contentPack.parameters}
       entity={entity}
@@ -114,15 +115,15 @@ class ContentPackParameters extends React.Component {
     />);
 
     const closeModal = () => {
-      modalRef.close();
+      applyModalRef.close();
     };
 
     const open = () => {
-      modalRef.open();
+      applyModalRef.open();
     };
 
-    const modal = (
-      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+    const applyModal = (
+      <BootstrapModalWrapper ref={(node) => { applyModalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Apply Parameter</Modal.Title>
         </Modal.Header>
@@ -131,6 +132,35 @@ class ContentPackParameters extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={closeModal}>Close</Button>
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
+
+    let showModalRef;
+    const entityComponent = (<ContentPackEntityConfig
+      appliedParameter={this.props.appliedParameter[entity.id]}
+      parameters={this.props.contentPack.parameters}
+      entity={entity}
+    />);
+
+    const closeShowModal = () => {
+      showModalRef.close();
+    };
+
+    const openShowModal = () => {
+      showModalRef.open();
+    };
+
+    const showModal = (
+      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
+        <Modal.Header closeButton>
+          <Modal.Title>Apply Parameter</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {entityComponent}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeShowModal}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -150,8 +180,14 @@ class ContentPackParameters extends React.Component {
                   onClick={() => { open(); }}>
             Apply Parameter
           </Button>
+          <Button bsStyle="info"
+                  bsSize="small"
+                  onClick={() => { openShowModal(); }}>
+            Show config
+          </Button>
         </td>
-        {modal}
+        {applyModal}
+        {showModal}
       </tr>
     );
   };
