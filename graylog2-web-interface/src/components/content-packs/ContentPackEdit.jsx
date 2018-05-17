@@ -49,21 +49,23 @@ class ContentPackEdit extends React.Component {
   }
 
   _prepareForPreview() {
+    const typeRegExp = RegExp(/\.type$/);
     const newContentPack = ObjectUtils.clone(this.props.contentPack);
     const entities = ObjectUtils.clone(this.props.fetchedEntities);
     newContentPack.entities = entities.map((entity) => {
       const parameters = this.props.appliedParameter[entity.id] || [];
       const newEntity = ObjectUtils.clone(entity);
       const entityData = newEntity.data;
-      const configKeys = ObjectUtils.getPaths(entityData);
+      const configKeys = ObjectUtils.getPaths(entityData)
+        .filter(configKey => typeRegExp.test(configKey))
+        .map((configKey) => { return configKey.replace(typeRegExp, ''); });
       configKeys.forEach((path) => {
         const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path; });
         let newValue;
         if (index >= 0) {
           newValue = { type: 'parameter', value: parameters[index].paramName };
         } else {
-          const currentValue = ObjectUtils.getValue(entityData, path);
-          newValue = { type: 'value', value: currentValue };
+          newValue = ObjectUtils.getValue(entityData, path);
         }
         ObjectUtils.setValue(entityData, path, newValue);
       });
