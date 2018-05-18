@@ -99,7 +99,7 @@ const ShowContentPackPage = createReactClass({
               </div>
             </Col>
             <Col md={8} className="content">
-              <ContentPackDetails contentPack={contentPack[selectedVersion]} showConstraints />
+              <ContentPackDetails contentPack={contentPack[selectedVersion]} showConstraints verbose />
             </Col>
           </Row>
         </span>

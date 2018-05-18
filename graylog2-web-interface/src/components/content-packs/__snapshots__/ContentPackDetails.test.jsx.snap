@@ -92,30 +92,6 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
       <br />
       <br />
       <br />
-      <div>
-        <h2>
-          Entity list
-        </h2>
-        <br />
-        <div>
-          <div
-            className="row "
-          >
-            <div
-              className="col-md-12"
-            >
-              <div
-                className="data-table table-responsive"
-                id="entity-list"
-              >
-                <p>
-                  No data available.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       <h3>
         Description
       </h3>

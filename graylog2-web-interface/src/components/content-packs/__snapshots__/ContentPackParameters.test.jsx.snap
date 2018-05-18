@@ -8,98 +8,102 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     <div
       className="col-sm-9 col-sm-offset-1"
     >
-      <h2>
-        Parameters list
-      </h2>
-      <br />
-      <span>
-        <button
-          className="btn btn-sm btn-info"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Create parameter
-        </button>
-      </span>
-      <br />
-      <br />
       <div>
-        <div
-          className="row "
-        >
+        <h2>
+          Parameters list
+        </h2>
+        <br />
+        <span>
+          <button
+            className="btn btn-sm btn-info"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Create parameter
+          </button>
+        </span>
+        <span>
+          <br />
+          <br />
+        </span>
+        <div>
           <div
-            className="col-md-12"
+            className="row "
           >
             <div
-              className="data-table table-responsive"
-              id="parameter-list"
+              className="col-md-12"
             >
-              <table
-                className="table undefined"
+              <div
+                className="data-table table-responsive"
+                id="parameter-list"
               >
-                <thead>
-                  <tr>
-                    <th>
-                      Title
-                    </th>
-                    <th>
-                      Name
-                    </th>
-                    <th>
-                      Description
-                    </th>
-                    <th>
-                      Value Type
-                    </th>
-                    <th>
-                      Default Value
-                    </th>
-                    <th>
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      A parameter title
-                    </td>
-                    <td>
-                      A parameter name
-                    </td>
-                    <td>
-                      A parameter descriptions
-                    </td>
-                    <td>
-                      string
-                    </td>
-                    <td>
-                      test
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-primary"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Delete
-                      </button>
-                      <span>
+                <table
+                  className="table undefined"
+                >
+                  <thead>
+                    <tr>
+                      <th>
+                        Title
+                      </th>
+                      <th>
+                        Name
+                      </th>
+                      <th>
+                        Description
+                      </th>
+                      <th>
+                        Value Type
+                      </th>
+                      <th>
+                        Default Value
+                      </th>
+                      <th>
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        A parameter title
+                      </td>
+                      <td>
+                        A parameter name
+                      </td>
+                      <td>
+                        A parameter descriptions
+                      </td>
+                      <td>
+                        string
+                      </td>
+                      <td>
+                        test
+                      </td>
+                      <td>
                         <button
-                          className="btn btn-sm btn-info"
+                          className="btn btn-sm btn-primary"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
                         >
-                          Edit
+                          Delete
                         </button>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                        <span>
+                          <button
+                            className="btn btn-sm btn-info"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            Edit
+                          </button>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -201,36 +205,40 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     <div
       className="col-sm-9 col-sm-offset-1"
     >
-      <h2>
-        Parameters list
-      </h2>
-      <br />
-      <span>
-        <button
-          className="btn btn-sm btn-info"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Create parameter
-        </button>
-      </span>
-      <br />
-      <br />
       <div>
-        <div
-          className="row "
-        >
+        <h2>
+          Parameters list
+        </h2>
+        <br />
+        <span>
+          <button
+            className="btn btn-sm btn-info"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Create parameter
+          </button>
+        </span>
+        <span>
+          <br />
+          <br />
+        </span>
+        <div>
           <div
-            className="col-md-12"
+            className="row "
           >
             <div
-              className="data-table table-responsive"
-              id="parameter-list"
+              className="col-md-12"
             >
-              <p>
-                To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
-              </p>
+              <div
+                className="data-table table-responsive"
+                id="parameter-list"
+              >
+                <p>
+                  To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -12,11 +12,14 @@ class ContentPackEntitiesList extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,
     appliedParameter: PropTypes.object,
+    onParameterApply: PropTypes.func,
+    onParameterClear: PropTypes.func,
     readOnly: PropTypes.bool,
   };
 
   static defaultProps = {
     appliedParameter: {},
+    onParameterClear: () => {},
     readOnly: false,
   };
 
@@ -26,8 +29,8 @@ class ContentPackEntitiesList extends React.Component {
       parameters={this.props.contentPack.parameters}
       entity={entity}
       appliedParameter={this.props.appliedParameter[entity.id]}
-      onParameterApply={(key, value) => { this._onParameterApply(entity.id, key, value); }}
-      onParameterClear={(key) => { this._onParameterClear(entity.id, key); }}
+      onParameterApply={(key, value) => { this.props.onParameterApply(entity.id, key, value); }}
+      onParameterClear={(key) => { this.props.onParameterClear(entity.id, key); }}
     />);
 
     const closeModal = () => {

@@ -2,13 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
 
-import { Row, Col, Button, Modal } from 'react-bootstrap';
-import DataTable from 'components/common/DataTable';
+import { Row, Col, Button } from 'react-bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 import ContentPackEntitiesList from './ContentPackEntitiesList';
+import ContentPackParameterList from './ContentPackParameterList';
 
 class ContentPackParameters extends React.Component {
   static propTypes = {
@@ -88,91 +86,22 @@ class ContentPackParameters extends React.Component {
     this.props.onStateChange({ contentPack: newContentPack, appliedParameter: newAppliedParameter });
   };
 
-  _parameterRowFormatter = (parameter) => {
-    return (
-      <tr key={parameter.title}>
-        <td>{parameter.title}</td>
-        <td>{parameter.name}</td>
-        <td>{parameter.description}</td>
-        <td>{parameter.type}</td>
-        <td>{parameter.default_value}</td>
-        <td>
-          <Button bsStyle="primary" bsSize="small" onClick={() => { this._deleteParameter(parameter); }}>Delete</Button>{this._parameterModal(parameter)}
-        </td>
-      </tr>
-    );
-  };
-
-  _parameterModal(parameter) {
-    let modalRef;
-
-    const closeModal = () => {
-      modalRef.close();
-    };
-
-    const open = () => {
-      modalRef.open();
-    };
-    const size = parameter ? 'small' : 'small';
-    const name = parameter ? 'Edit' : 'Create parameter';
-
-    const modal = (
-      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title>Parameter</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ContentPackEditParameter parameters={this.props.contentPack.parameters}
-                                    onUpdateParameter={(newParameter) => {
-                                      this._addNewParameter(newParameter, parameter);
-                                      if (parameter) {
-                                        closeModal();
-                                      }
-                                    }}
-                                    parameterToEdit={parameter} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={closeModal}>Close</Button>
-        </Modal.Footer>
-      </BootstrapModalWrapper>
-    );
-
-    return (
-      <span>
-        <Button bsStyle="info"
-                bsSize={size}
-                onClick={() => { open(); }}>
-          {name}
-        </Button>
-        {modal}
-      </span>
-    );
-  }
-
   render() {
     return (
       <div>
         <Row>
           <Col smOffset={1} sm={9}>
-            <h2>Parameters list</h2>
-            <br />
-            {this._parameterModal()}
-            <br />
-            <br />
-            <DataTable
-              id="parameter-list"
-              headers={['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Action']}
-              sortByKey="title"
-              noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
-              filterKeys={[]}
-              rows={this.props.contentPack.parameters}
-              dataRowFormatter={this._parameterRowFormatter}
+            <ContentPackParameterList contentPack={this.props.contentPack}
+                                      onAddParameter={this._addNewParameter}
+                                      onDeleteParameter={this._deleteParameter}
             />
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} sm={9}>
             <ContentPackEntitiesList contentPack={this.props.contentPack}
+                                     onParameterClear={this._onParameterClear}
+                                     onParameterApply={this._onParameterApply}
                                      appliedParameter={this.props.appliedParameter} />
           </Col>
         </Row>

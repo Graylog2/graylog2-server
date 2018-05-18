@@ -7,6 +7,7 @@ import { Row, Col } from 'react-bootstrap';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
+import ContentPackParameterList from 'components/content-packs/ContentPackParameterList';
 import 'components/content-packs/ContentPackDetails.css';
 
 class ContentPackDetails extends React.Component {
@@ -57,8 +58,11 @@ class ContentPackDetails extends React.Component {
               <br />
             </div>
             }
-            { contentPack.entities &&
+            { contentPack.entities && this.props.verbose &&
               <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
+            }
+            { contentPack.parameters && this.props.verbose &&
+              <ContentPackParameterList contentPack={this.props.contentPack} readOnly />
             }
             <h3>Description</h3>
             <br />
