@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import lodash from 'lodash';
 
 import { Row, Col, Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -82,9 +83,19 @@ class ContentPackApplyParameter extends React.Component {
           return configKey === paramMap.configKey;
         }) < 0;
       });
-    const emptyOption = (<option key="EMPTY" value="">Choose..</option>);
-    const configOptions = [emptyOption].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
-    const parameterOptions = [emptyOption].concat(this.props.parameters.map(key => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));
+    const emptyOption = (name) => { return (<option key="EMPTY" value="">{name}</option>); };
+    const configOptions = [emptyOption('Choose Config Key')].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
+    let parameters = this.props.parameters;
+    let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';
+    if (this.state.config_key !== '' && parameters.length > 0) {
+      const configKeyType = ObjectUtils.getValue(this.props.entity.data, this.state.config_key).type;
+      if (['string', 'integer', 'boolean', 'double'].findIndex(type => type === configKeyType) >= 0) {
+        parameters = parameters.filter(parameter => parameter.type === configKeyType);
+      }
+      emptyName = parameters.length <= 0 ? `No parameter from type ${configKeyType}` : 'Choose...';
+    }
+    const parameterOptions = [emptyOption(emptyName)]
+      .concat(parameters.map(key => <option key={key.name} value={key.name}>{key.title} ({key.name})</option>));
     return (
       <div>
         <form className="apply-parameter-form" id="apply-parameter-form" onSubmit={this._applyParameter}>
