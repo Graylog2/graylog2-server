@@ -47,7 +47,7 @@ describe('<ContentPackVersions />', () => {
       expect(revision).toEqual(1);
     });
     const wrapper = mount(<ContentPackVersions onDeletePack={deleteFn} contentPack={contentPack} />);
-    wrapper.find('a[children="Remove"]').at(0).simulate('click');
+    wrapper.find('button[children="Delete"]').at(0).simulate('click');
     expect(deleteFn.mock.calls.length).toBe(1);
   });
 });
