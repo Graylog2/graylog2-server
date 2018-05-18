@@ -37,7 +37,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               <option
                 value=""
               >
-                Choose..
+                Choose Config Key
               </option>
               <option
                 value="name"
@@ -86,7 +86,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               <option
                 value=""
               >
-                Choose..
+                Choose...
               </option>
               <option
                 value="PORT"
@@ -221,7 +221,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
               <option
                 value=""
               >
-                Choose..
+                Choose Config Key
               </option>
               <option
                 value="name"
@@ -275,7 +275,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
               <option
                 value=""
               >
-                Choose..
+                Create a parameter first
               </option>
             </select>
             
