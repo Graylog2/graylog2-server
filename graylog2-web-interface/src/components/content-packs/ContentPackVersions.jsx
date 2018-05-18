@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
 import './ContentPackVersions.css';
@@ -51,12 +51,9 @@ class ContentPackVersions extends React.Component {
         </td>
         <td>{pack.rev}</td>
         <td className="text-right">
-          <Button bsStyle="info" bsSize="small">View</Button>
+          <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</Button>
           &nbsp;
-          <DropdownButton id={`more-actions-${pack.id + pack.rev}`} title="More Actions" bsSize="small" pullRight>
-            <MenuItem onSelect={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Remove</MenuItem>
-            <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
-          </DropdownButton>
+          <Button bsStyle="info" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
         </td>
         {downloadModal}
       </tr>

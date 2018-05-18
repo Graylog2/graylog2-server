@@ -47,70 +47,22 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                 className="text-right"
               >
                 <button
-                  className="btn btn-sm btn-info"
+                  className="btn btn-sm btn-primary"
                   disabled={false}
+                  onClick={[Function]}
                   type="button"
                 >
-                  View
+                  Delete
                 </button>
                  
-                <div
-                  className="dropdown btn-group btn-group-sm"
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
                 >
-                  <button
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    className="dropdown-toggle btn btn-sm btn-default"
-                    disabled={false}
-                    id="more-actions-11"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="button"
-                    type="button"
-                  >
-                    More Actions
-                     
-                    <span
-                      className="caret"
-                    />
-                  </button>
-                  <ul
-                    aria-labelledby="more-actions-11"
-                    className="dropdown-menu dropdown-menu-right"
-                    role="menu"
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Remove
-                      </a>
-                    </li>
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Download
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                  Download
+                </button>
               </td>
             </tr>
             <tr>
@@ -129,70 +81,22 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                 className="text-right"
               >
                 <button
-                  className="btn btn-sm btn-info"
+                  className="btn btn-sm btn-primary"
                   disabled={false}
+                  onClick={[Function]}
                   type="button"
                 >
-                  View
+                  Delete
                 </button>
                  
-                <div
-                  className="dropdown btn-group btn-group-sm"
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
                 >
-                  <button
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    className="dropdown-toggle btn btn-sm btn-default"
-                    disabled={false}
-                    id="more-actions-12"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="button"
-                    type="button"
-                  >
-                    More Actions
-                     
-                    <span
-                      className="caret"
-                    />
-                  </button>
-                  <ul
-                    aria-labelledby="more-actions-12"
-                    className="dropdown-menu dropdown-menu-right"
-                    role="menu"
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Remove
-                      </a>
-                    </li>
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Download
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                  Download
+                </button>
               </td>
             </tr>
             <tr>
@@ -211,70 +115,22 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                 className="text-right"
               >
                 <button
-                  className="btn btn-sm btn-info"
+                  className="btn btn-sm btn-primary"
                   disabled={false}
+                  onClick={[Function]}
                   type="button"
                 >
-                  View
+                  Delete
                 </button>
                  
-                <div
-                  className="dropdown btn-group btn-group-sm"
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
                 >
-                  <button
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    className="dropdown-toggle btn btn-sm btn-default"
-                    disabled={false}
-                    id="more-actions-13"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="button"
-                    type="button"
-                  >
-                    More Actions
-                     
-                    <span
-                      className="caret"
-                    />
-                  </button>
-                  <ul
-                    aria-labelledby="more-actions-13"
-                    className="dropdown-menu dropdown-menu-right"
-                    role="menu"
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Remove
-                      </a>
-                    </li>
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Download
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                  Download
+                </button>
               </td>
             </tr>
             <tr>
@@ -293,70 +149,22 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                 className="text-right"
               >
                 <button
-                  className="btn btn-sm btn-info"
+                  className="btn btn-sm btn-primary"
                   disabled={false}
+                  onClick={[Function]}
                   type="button"
                 >
-                  View
+                  Delete
                 </button>
                  
-                <div
-                  className="dropdown btn-group btn-group-sm"
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
                 >
-                  <button
-                    aria-expanded={false}
-                    aria-haspopup={true}
-                    className="dropdown-toggle btn btn-sm btn-default"
-                    disabled={false}
-                    id="more-actions-14"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="button"
-                    type="button"
-                  >
-                    More Actions
-                     
-                    <span
-                      className="caret"
-                    />
-                  </button>
-                  <ul
-                    aria-labelledby="more-actions-14"
-                    className="dropdown-menu dropdown-menu-right"
-                    role="menu"
-                  >
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Remove
-                      </a>
-                    </li>
-                    <li
-                      className=""
-                      role="presentation"
-                      style={undefined}
-                    >
-                      <a
-                        href="#"
-                        onClick={[Function]}
-                        onKeyDown={[Function]}
-                        role="menuitem"
-                        tabIndex="-1"
-                      >
-                        Download
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                  Download
+                </button>
               </td>
             </tr>
           </tbody>
