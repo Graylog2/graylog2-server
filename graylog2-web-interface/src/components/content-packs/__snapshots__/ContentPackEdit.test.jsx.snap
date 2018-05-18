@@ -451,30 +451,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
               <br />
               <br />
               <br />
-              <div>
-                <h2>
-                  Entity list
-                </h2>
-                <br />
-                <div>
-                  <div
-                    className="row "
-                  >
-                    <div
-                      className="col-md-12"
-                    >
-                      <div
-                        className="data-table table-responsive"
-                        id="entity-list"
-                      >
-                        <p>
-                          No data available.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
               <h3>
                 Description
               </h3>
@@ -990,66 +966,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
               <br />
               <br />
               <br />
-              <div>
-                <h2>
-                  Entity list
-                </h2>
-                <br />
-                <div>
-                  <div
-                    className="row "
-                  >
-                    <div
-                      className="col-md-12"
-                    >
-                      <div
-                        className="data-table table-responsive"
-                        id="entity-list"
-                      >
-                        <table
-                          className="table undefined"
-                        >
-                          <thead>
-                            <tr>
-                              <th>
-                                Title
-                              </th>
-                              <th>
-                                Type
-                              </th>
-                              <th>
-                                Description
-                              </th>
-                              <th>
-                                Action
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td />
-                              <td>
-                                dashboard
-                              </td>
-                              <td />
-                              <td>
-                                <button
-                                  className="btn btn-sm btn-info"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Show config
-                                </button>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
               <h3>
                 Description
               </h3>
