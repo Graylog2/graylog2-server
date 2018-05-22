@@ -73,7 +73,7 @@ class ContentPackEntitiesList extends React.Component {
     const showModal = (
       <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Apply Parameter</Modal.Title>
+          <Modal.Title>Entity Config</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {entityComponent}

@@ -21,6 +21,18 @@ class ContentPackParameterList extends React.Component {
     onAddParameter: () => {},
   };
 
+  static _convertToString(parameter) {
+    switch (parameter.type) {
+      case 'integer':
+      case 'double':
+        return parameter.default_value.toString();
+      case 'boolean':
+        return parameter.default_value ? 'true' : 'false';
+      default:
+        return parameter.default_value;
+    }
+  }
+
   _parameterRowFormatter = (parameter) => {
     return (
       <tr key={parameter.title}>
@@ -28,7 +40,7 @@ class ContentPackParameterList extends React.Component {
         <td>{parameter.name}</td>
         <td>{parameter.description}</td>
         <td>{parameter.type}</td>
-        <td>{parameter.default_value}</td>
+        <td>{ContentPackParameterList._convertToString(parameter)}</td>
         {!this.props.readOnly &&
         <td>
           <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeleteParameter(parameter); }}>
