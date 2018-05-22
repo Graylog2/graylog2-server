@@ -16,6 +16,7 @@ import { isFunction } from 'lodash';
  *
  * @param {Object} Component - The component which should be connected to the stores.
  * @param {Object} stores - A mapping of desired props keys to stores.
+ * @param {Function} mapProps - A function which is executed before props are passed to the component.
  * @returns {Object} - A React component wrapping the passed component.
  *
  * @example
@@ -23,11 +24,12 @@ import { isFunction } from 'lodash';
  * // Connecting the `SamplesComponent` class to the `SamplesStore`, hooking up its state to the `samples` prop and
  * // waiting for the store to settle down.
  *
- * connect(SamplesComponent, { samples: SamplesStore }, [SamplesActions.list])
+ * connect(SamplesComponent, { samples: SamplesStore }, ({ samples }) => ({ samples: samples.filter(sample => sample.id === 4) }))
  *
  */
-export default (Component, stores) => {
-  return class ConnectStoresWrapper extends React.Component {
+export default (Component, stores, mapProps = props => props) => {
+  const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
+  class ConnectStoresWrapper extends React.Component {
     constructor(props) {
       super(props);
 
@@ -43,7 +45,10 @@ export default (Component, stores) => {
       // Retrieving initial state from each configured store
       Object.keys(stores).forEach((key) => {
         const store = stores[key];
-        if (isFunction(store.getInitialState)) {
+        if (store === undefined) {
+          // eslint-disable-next-line no-console
+          console.error(`Error: The store passed for the \`${key}\` property is not defined. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+        } else if (isFunction(store.getInitialState)) {
           this.state[key] = store.getInitialState();
         }
       });
@@ -69,7 +74,10 @@ export default (Component, stores) => {
         storeProps[key] = this.state[key];
       });
 
-      return <Component {...storeProps} {...this.props} />;
+      return <Component {...mapProps(storeProps)} {...this.props} />;
     }
-  };
+  }
+  ConnectStoresWrapper.displayName = `ConnectStoresWrapper[${wrappedComponentName}] stores=${Object.keys(stores)}`;
+
+  return ConnectStoresWrapper;
 };
