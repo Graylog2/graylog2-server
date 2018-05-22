@@ -29,8 +29,8 @@ describe('<ContentPackEditParameters />', () => {
         name: 'name',
         title: 'title',
         description: 'descr',
-        type: 'string',
-        default_value: 'test',
+        type: 'integer',
+        default_value: 1,
       });
     });
 
@@ -38,7 +38,8 @@ describe('<ContentPackEditParameters />', () => {
     wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
     wrapper.find('input#title').simulate('change', { target: { name: 'title', value: 'title' } });
     wrapper.find('input#description').simulate('change', { target: { name: 'description', value: 'descr' } });
-    wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
+    wrapper.find('select#type').simulate('change', { target: { name: 'type', value: 'integer' } });
+    wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: '1' } });
     wrapper.find('form').at(0).simulate('submit');
     expect(changeFn.mock.calls.length).toBe(1);
   });

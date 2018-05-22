@@ -28,6 +28,22 @@ class ContentPackEditParameter extends React.Component {
     default_value: '',
   };
 
+  static _convertDefaultValue(parameter) {
+    const type = parameter.type;
+    const defaultValue = parameter.default_value;
+
+    switch (type) {
+      case 'integer':
+        return parseInt(defaultValue, 10);
+      case 'double':
+        return parseFloat(defaultValue);
+      case 'boolean':
+        return defaultValue === 'true';
+      default:
+        return defaultValue;
+    }
+  }
+
   constructor(props) {
     super(props);
 
@@ -55,7 +71,11 @@ class ContentPackEditParameter extends React.Component {
       return;
     }
 
-    this.props.onUpdateParameter(this.state.newParameter);
+    const realDefaultValue = ContentPackEditParameter._convertDefaultValue(this.state.newParameter);
+    const updatedParameter = ObjectUtils.clone(this.state.newParameter);
+    updatedParameter.default_value = realDefaultValue;
+    this.props.onUpdateParameter(updatedParameter);
+
     this.setState({ newParameter: ObjectUtils.clone(ContentPackEditParameter.emptyParameter) });
   };
 
