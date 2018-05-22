@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import connect from 'stores/connect';
 import style from 'pages/ShowDashboardPage.css';
-import ReactGridContainer from './ReactGridContainer';
+import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
@@ -92,11 +92,12 @@ class WidgetGrid extends React.Component {
     const { staticWidgets } = this.props;
     const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data);
     const grid = widgets && widgets.length > 0 ? (
-      <ReactGridContainer locked={this.props.locked}
+      <ReactGridContainer animate={false}
+                          locked={this.props.locked}
+                          measureBeforeMount
+                          onPositionsChange={this.props.onPositionsChange}
                           positions={positions}
-                          animate={false}
-                          useDragHandle=".widget-drag-handle"
-                          onPositionsChange={this.props.onPositionsChange}>
+                          useDragHandle=".widget-drag-handle">
         {widgets}
       </ReactGridContainer>
     ) : null;
