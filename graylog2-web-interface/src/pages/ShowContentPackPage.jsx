@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+import lodash from 'lodash';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -53,12 +54,18 @@ const ShowContentPackPage = createReactClass({
     }
   },
 
+  _getLastVersion() {
+    return lodash.last(Object.keys(this.state.contentPack).filter(key => !isNaN(key)).sort());
+  },
+
   render() {
     if (!this.state.contentPack) {
       return (<Spinner />);
     }
 
     const { contentPack, selectedVersion } = this.state;
+    const lastVersion = this._getLastVersion();
+    const lastPack = contentPack[lastVersion];
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -75,6 +82,9 @@ const ShowContentPackPage = createReactClass({
             <div>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
                 <Button bsStyle="info" bsSize="large">Content Packs</Button>
+              </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(lastPack.id), encodeURIComponent(lastPack.rev))}>
+                <Button bsStyle="primary" bsSize="large">Edit</Button>
               </LinkContainer>
             </div>
           </PageHeader>
