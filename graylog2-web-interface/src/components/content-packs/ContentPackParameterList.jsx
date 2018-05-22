@@ -87,7 +87,7 @@ class ContentPackParameterList extends React.Component {
   }
 
   render() {
-    const headers = this.readOnly ?
+    const headers = this.props.readOnly ?
       ['Title', 'Name', 'Description', 'Value Type', 'Default Value'] :
       ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Action'];
     return (

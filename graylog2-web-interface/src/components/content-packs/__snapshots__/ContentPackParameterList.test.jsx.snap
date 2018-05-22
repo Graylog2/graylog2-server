@@ -105,9 +105,6 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                 <th>
                   Default Value
                 </th>
-                <th>
-                  Action
-                </th>
               </tr>
             </thead>
             <tbody>
