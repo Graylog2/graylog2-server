@@ -99,6 +99,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
@@ -223,6 +224,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Uncapitalize.NAME, new Uncapitalize());
         functions.put(Uppercase.NAME, new Uppercase());
         functions.put(KeyValue.NAME, new KeyValue());
+        functions.put(Join.NAME, new Join());
         functions.put(Split.NAME, new Split());
         functions.put(StartsWith.NAME, new StartsWith());
 
@@ -511,16 +513,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();
-        assertThat(message.getField("limit_0")).isInstanceOf(String[].class);
-        assertThat((String[]) message.getField("limit_0"))
+        assertThat(message.getField("limit_0"))
+                .asList()
                 .isNotEmpty()
                 .containsExactly("foo", "bar", "baz");
-        assertThat(message.getField("limit_1")).isInstanceOf(String[].class);
-        assertThat((String[]) message.getField("limit_1"))
+        assertThat(message.getField("limit_1"))
+                .asList()
                 .isNotEmpty()
                 .containsExactly("foo:bar:baz");
-        assertThat(message.getField("limit_2")).isInstanceOf(String[].class);
-        assertThat((String[]) message.getField("limit_2"))
+        assertThat(message.getField("limit_2"))
+                .asList()
                 .isNotEmpty()
                 .containsExactly("foo", "bar|baz");
     }
