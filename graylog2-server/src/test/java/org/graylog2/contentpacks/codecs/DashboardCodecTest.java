@@ -23,7 +23,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.entities.AbsoluteRange;
+import org.graylog2.contentpacks.model.entities.AbsoluteRangeEntity;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -35,6 +35,7 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.timeranges.TimeRangeFactory;
 import org.joda.time.DateTime;
@@ -90,7 +91,7 @@ public class DashboardCodecTest {
                 "description",
                 120,
                 ImmutableMap.of("some-setting", "foobar"),
-                org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange.create(DateTime.parse("2018-04-09T16:00:00.000Z"), DateTime.parse("2018-04-09T17:00:00.000Z")),
+                AbsoluteRange.create(DateTime.parse("2018-04-09T16:00:00.000Z"), DateTime.parse("2018-04-09T17:00:00.000Z")),
                 "admin"
         );
         final Map<String, Object> fields = ImmutableMap.of(
@@ -126,8 +127,8 @@ public class DashboardCodecTest {
                         assertThat(position.col()).isEqualTo(ValueReference.of(1));
                     });
                     assertThat(widget.configuration()).containsEntry("some-setting", ValueReference.of("foobar"));
-                    final AbsoluteRange expectedTimeRange = AbsoluteRange.of(
-                            org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange.create(
+                    final AbsoluteRangeEntity expectedTimeRange = AbsoluteRangeEntity.of(
+                            AbsoluteRange.create(
                                     DateTime.parse("2018-04-09T16:00:00.000Z"), DateTime.parse("2018-04-09T17:00:00.000Z"))
                     );
                     assertThat(widget.timeRange()).isEqualTo(expectedTimeRange);

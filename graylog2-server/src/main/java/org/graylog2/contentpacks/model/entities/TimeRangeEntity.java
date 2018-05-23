@@ -18,26 +18,31 @@ package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog2.contentpacks.model.Typed;
+import com.fasterxml.jackson.databind.annotation.JsonTypeResolver;
+import org.graylog2.contentpacks.jackson.ValueReferenceTypeResolverBuilder;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = Typed.FIELD_META_TYPE, visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CUSTOM, include = JsonTypeInfo.As.WRAPPER_OBJECT, property = TypedEntity.FIELD_META_TYPE, visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(name = AbsoluteRange.TYPE, value = AbsoluteRange.class),
-        @JsonSubTypes.Type(name = RelativeRange.TYPE, value = RelativeRange.class),
-        @JsonSubTypes.Type(name = KeywordRange.TYPE, value = KeywordRange.class)
+        @JsonSubTypes.Type(name = AbsoluteRangeEntity.TYPE, value = AbsoluteRangeEntity.class),
+        @JsonSubTypes.Type(name = RelativeRangeEntity.TYPE, value = RelativeRangeEntity.class),
+        @JsonSubTypes.Type(name = KeywordRangeEntity.TYPE, value = KeywordRangeEntity.class)
 })
-public abstract class TimeRangeEntity implements Typed {
-    interface TimeRangeBuilder<SELF> extends Typed.TypeBuilder<SELF> {
+@JsonTypeResolver(ValueReferenceTypeResolverBuilder.class)
+public abstract class TimeRangeEntity implements TypedEntity {
+    interface TimeRangeBuilder<SELF> extends TypedEntity.TypeBuilder<SELF> {
     }
 
     public static TimeRangeEntity of(TimeRange timeRange) {
-        if (timeRange instanceof org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange) {
-            return AbsoluteRange.of((org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange) timeRange);
-        } else if (timeRange instanceof org.graylog2.plugin.indexer.searches.timeranges.KeywordRange) {
-            return KeywordRange.of((org.graylog2.plugin.indexer.searches.timeranges.KeywordRange) timeRange);
-        } else if (timeRange instanceof org.graylog2.plugin.indexer.searches.timeranges.RelativeRange) {
-            return RelativeRange.of((org.graylog2.plugin.indexer.searches.timeranges.RelativeRange) timeRange);
+        if (timeRange instanceof AbsoluteRange) {
+            return AbsoluteRangeEntity.of((AbsoluteRange) timeRange);
+        } else if (timeRange instanceof KeywordRange) {
+            return KeywordRangeEntity.of((KeywordRange) timeRange);
+        } else if (timeRange instanceof RelativeRange) {
+            return RelativeRangeEntity.of((RelativeRange) timeRange);
         } else {
             throw new IllegalArgumentException("Unknown time range type " + timeRange.getClass());
         }

@@ -20,39 +20,39 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 
 @AutoValue
 @JsonAutoDetect
-@JsonDeserialize(builder = AutoValue_KeywordRange.Builder.class)
-public abstract class KeywordRange extends TimeRangeEntity {
-    static final String TYPE = "keyword";
-    private static final String FIELD_KEYWORD = "keyword";
+@JsonDeserialize(builder = AutoValue_RelativeRangeEntity.Builder.class)
+public abstract class RelativeRangeEntity extends TimeRangeEntity {
+    static final String TYPE = "relative";
+    private static final String FIELD_RANGE = "range";
 
-    @JsonProperty(FIELD_KEYWORD)
-    public abstract ValueReference keyword();
+    @JsonProperty(FIELD_RANGE)
+    public abstract ValueReference range();
 
-    public static KeywordRange of(org.graylog2.plugin.indexer.searches.timeranges.KeywordRange keywordRange) {
-        final String keyword = keywordRange.keyword();
+    public static RelativeRangeEntity of(RelativeRange relativeRange) {
+        final int range = relativeRange.getRange();
         return builder()
-                .keyword(ValueReference.of(keyword))
+                .range(ValueReference.of(range))
                 .build();
     }
 
-    static KeywordRange.Builder builder() {
-        return new AutoValue_KeywordRange.Builder();
+    static RelativeRangeEntity.Builder builder() {
+        return new AutoValue_RelativeRangeEntity.Builder();
     }
 
     @AutoValue.Builder
     abstract static class Builder implements TimeRangeBuilder<Builder> {
-        @JsonProperty(FIELD_KEYWORD)
-        abstract Builder keyword(ValueReference keyword);
+        @JsonProperty(FIELD_RANGE)
+        abstract Builder range(ValueReference range);
 
-        abstract KeywordRange autoBuild();
+        abstract RelativeRangeEntity autoBuild();
 
-        KeywordRange build() {
-            type(ModelType.of(TYPE));
+        RelativeRangeEntity build() {
+            type(ModelTypeEntity.of(TYPE));
             return autoBuild();
         }
     }
