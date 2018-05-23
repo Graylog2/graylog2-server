@@ -89,12 +89,9 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
           </span>
         </dl>
       </div>
-      <br />
-      <br />
-      <br />
-      <h3>
+      <h2>
         Description
-      </h3>
+      </h2>
       <br />
       <div
         dangerouslySetInnerHTML={
@@ -103,6 +100,9 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
           }
         }
       />
+      <br />
+      <br />
+      <br />
     </div>
   </div>
 </div>

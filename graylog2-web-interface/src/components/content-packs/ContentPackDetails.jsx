@@ -46,14 +46,15 @@ class ContentPackDetails extends React.Component {
                 { contentPack.entities && !this.props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
               </dl>
             </div>
+            <h2>Description</h2>
+            <br />
+            <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
             <br />
             { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
             <br />
             <br />
             { contentPack.requires && this.props.showConstraints &&
             <div>
-              <h3>Constrains</h3>
-              <br />
               <ContentPackConstraints constraints={contentPack.requires} />
               <br />
             </div>
@@ -64,9 +65,6 @@ class ContentPackDetails extends React.Component {
             { contentPack.parameters && this.props.verbose &&
               <ContentPackParameterList contentPack={this.props.contentPack} readOnly />
             }
-            <h3>Description</h3>
-            <br />
-            <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
           </div>
         </Col>
       </Row>

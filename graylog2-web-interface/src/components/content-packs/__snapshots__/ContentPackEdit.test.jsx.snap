@@ -448,12 +448,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </span>
                 </dl>
               </div>
-              <br />
-              <br />
-              <br />
-              <h3>
+              <h2>
                 Description
-              </h3>
+              </h2>
               <br />
               <div
                 dangerouslySetInnerHTML={
@@ -462,6 +459,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   }
                 }
               />
+              <br />
+              <br />
+              <br />
             </div>
           </div>
         </div>
@@ -963,12 +963,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </span>
                 </dl>
               </div>
-              <br />
-              <br />
-              <br />
-              <h3>
+              <h2>
                 Description
-              </h3>
+              </h2>
               <br />
               <div
                 dangerouslySetInnerHTML={
@@ -977,6 +974,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   }
                 }
               />
+              <br />
+              <br />
+              <br />
             </div>
           </div>
         </div>
