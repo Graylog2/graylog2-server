@@ -76,6 +76,7 @@ class ContentPackEditParameter extends React.Component {
     updatedParameter.default_value = realDefaultValue;
     this.props.onUpdateParameter(updatedParameter);
 
+    this.titleInput.getInputDOMNode().focus();
     this.setState({ newParameter: ObjectUtils.clone(ContentPackEditParameter.emptyParameter) });
   };
 
@@ -145,7 +146,8 @@ class ContentPackEditParameter extends React.Component {
         <br />
         <form className="form-horizontal parameter-form" id="parameter-form" onSubmit={this._addNewParameter}>
           <fieldset>
-            <Input name="title"
+            <Input ref={(node) => { this.titleInput = node; }}
+                   name="title"
                    id="title"
                    type="text"
                    maxLength={250}
