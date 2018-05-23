@@ -15,6 +15,13 @@ class ContentPackPreview extends React.Component {
     onSave: () => {},
   };
 
+  _renderDownload() {
+    const contentPackEncoded = encodeURIComponent(JSON.stringify(this.props.contentPack, null, 2));
+    const href = `data:text/plain;charset=utf-8,${contentPackEncoded}`;
+    const filename = `content-pack-${this.props.contentPack.id}-${this.props.contentPack.rev}.json`;
+    return (<a download={filename} href={href} ><Button id="download" bsStyle="info">Download</Button></a>);
+  }
+
   render() {
     return (
       <div>
@@ -26,7 +33,12 @@ class ContentPackPreview extends React.Component {
             <ContentPackConstraints constraints={this.props.contentPack.requires} isFullFilled />
           </Col>
         </Row>
-        <Button id="create" onClick={this.props.onSave}>Create</Button>
+        <Row>
+          <Col sm={6}>
+            <Button id="create" bsStyle="primary" onClick={this.props.onSave}>Create</Button>&nbsp;
+            {this._renderDownload()}
+          </Col>
+        </Row>
       </div>
     );
   }

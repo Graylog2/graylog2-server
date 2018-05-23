@@ -6,6 +6,7 @@ import createReactClass from 'create-react-class';
 import Routes from 'routing/Routes';
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import history from 'util/History';
 
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -104,6 +105,7 @@ const EditContentPackPage = createReactClass({
       .then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
+          history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         },
         (response) => {
           const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
