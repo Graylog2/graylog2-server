@@ -6,18 +6,18 @@ import { Row, Col } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import EntityList from 'components/common/EntityList';
-import InputListItem from './InputListItem';
 import { IfPermitted, Spinner, FilterInput } from 'components/common';
-import CreateInputControl from './CreateInputControl';
-
-import InputsListStyle from './InputsList.css';
+import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+import InputListItem from './InputListItem';
+import CreateInputControl from './CreateInputControl';
+import InputsListStyle from './InputsList.css';
+
 const InputsActions = ActionsProvider.getActions('Inputs');
 const SingleNodeActions = ActionsProvider.getActions('SingleNode');
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
-import StoreProvider from 'injection/StoreProvider';
 const InputsStore = StoreProvider.getStore('Inputs');
 const SingleNodeStore = StoreProvider.getStore('SingleNode');
 
@@ -30,6 +30,10 @@ const InputsList = createReactClass({
   },
 
   mixins: [Reflux.connect(SingleNodeStore), Reflux.listenTo(InputsStore, '_splitInputs')],
+
+  defaultProps: {
+    node: undefined,
+  },
 
   getInitialState() {
     return {
@@ -133,7 +137,8 @@ const InputsList = createReactClass({
               &nbsp;
               <small>{this.state.globalInputs.length} configured{this._nodeAffix()}</small>
             </h2>
-            <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
+            <EntityList bsNoItemsStyle="info"
+                        noItemsText="There are no global inputs."
                         items={this.state.filteredGlobalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
@@ -144,7 +149,8 @@ const InputsList = createReactClass({
               &nbsp;
               <small>{this.state.localInputs.length} configured{this._nodeAffix()}</small>
             </h2>
-            <EntityList bsNoItemsStyle="info" noItemsText={`There are no local inputs${this._nodeAffix()}.`}
+            <EntityList bsNoItemsStyle="info"
+                        noItemsText={`There are no local inputs${this._nodeAffix()}.`}
                         items={this.state.filteredLocalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
