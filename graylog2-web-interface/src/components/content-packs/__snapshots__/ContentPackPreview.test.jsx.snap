@@ -63,12 +63,9 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 </dd>
               </dl>
             </div>
-            <br />
-            <br />
-            <br />
-            <h3>
+            <h2>
               Description
-            </h3>
+            </h2>
             <br />
             <div
               dangerouslySetInnerHTML={
@@ -77,6 +74,9 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 }
               }
             />
+            <br />
+            <br />
+            <br />
           </div>
         </div>
       </div>
@@ -213,6 +213,17 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 </dd>
               </dl>
             </div>
+            <h2>
+              Description
+            </h2>
+            <br />
+            <div
+              dangerouslySetInnerHTML={
+                Object {
+                  "__html": "<p>descr</p>",
+                }
+              }
+            />
             <br />
             <br />
             <br />
@@ -240,17 +251,6 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 </div>
               </div>
             </div>
-            <h3>
-              Description
-            </h3>
-            <br />
-            <div
-              dangerouslySetInnerHTML={
-                Object {
-                  "__html": "<p>descr</p>",
-                }
-              }
-            />
           </div>
         </div>
       </div>
