@@ -17,16 +17,22 @@ class FilterInput extends React.Component {
     onChange: PropTypes.func.isRequired,
     /** The optional label for the filter. Default is 'Filter' */
     filterLabel: PropTypes.string,
+    /** Placeholder of the filter input */
+    placeholder: PropTypes.string,
     /** The wrapperClassName of the Input for styling */
     wrapperClassName: PropTypes.string,
     /** The labelClassName of the Input for styling */
     labelClassName: PropTypes.string,
+    /** Add a class name to style the from group containing the filter input */
+    formGroupClassName: PropTypes.string,
   };
 
   static defaultProps = {
     filterLabel: 'Filter',
     wrapperClassName: 'col-sm-4',
     labelClassName: 'col-sm-1',
+    formGroupClassName: undefined,
+    placeholder: '',
   };
 
   constructor(props) {
@@ -49,6 +55,8 @@ class FilterInput extends React.Component {
         <Input
           id="filter-descriptors"
           type="text"
+          formGroupClassName={this.props.formGroupClassName}
+          placeholder={this.props.placeholder}
           wrapperClassName={this.props.wrapperClassName}
           labelClassName={this.props.labelClassName}
           label={this.props.filterLabel}

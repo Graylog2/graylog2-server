@@ -1,0 +1,8 @@
+:local(.filterLabel) {
+    margin-left: 20px;
+    float: left;
+}
+
+:local(.formGroup) {
+    margin-bottom: 0px;
+}

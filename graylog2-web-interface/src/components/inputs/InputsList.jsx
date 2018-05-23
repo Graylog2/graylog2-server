@@ -7,8 +7,10 @@ import naturalSort from 'javascript-natural-sort';
 
 import EntityList from 'components/common/EntityList';
 import InputListItem from './InputListItem';
-import { IfPermitted, Spinner } from 'components/common';
+import { IfPermitted, Spinner, FilterInput } from 'components/common';
 import CreateInputControl from './CreateInputControl';
+
+import InputsListStyle from './InputsList.css';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -33,6 +35,8 @@ const InputsList = createReactClass({
     return {
       globalInputs: undefined,
       localInputs: undefined,
+      filteredGlobalInputs: undefined,
+      filteredLocalInputs: undefined,
     };
   },
 
@@ -55,7 +59,12 @@ const InputsList = createReactClass({
       localInputs = localInputs.filter(input => input.node === this.props.node.node_id);
     }
 
-    this.setState({ globalInputs: globalInputs, localInputs: localInputs });
+    this.setState({
+      globalInputs: globalInputs,
+      filteredGlobalInputs: globalInputs,
+      localInputs: localInputs,
+      filteredLocalInputs: localInputs,
+    });
   },
 
   _isLoading() {
@@ -68,6 +77,33 @@ const InputsList = createReactClass({
 
   _nodeAffix() {
     return (this.props.node ? ' on this node' : '');
+  },
+
+  _onFilterInputs(filter) {
+    const { globalInputs, localInputs } = this.state;
+    const regExp = RegExp(filter, 'i');
+
+    if (!globalInputs || !localInputs) {
+      return;
+    }
+
+    if (filter.length <= 0) {
+      this.setState({
+        filteredGlobalInputs: globalInputs,
+        filteredLocalInputs: localInputs,
+      });
+      return;
+    }
+
+    const filterMethod = (input) => {
+      return regExp.test(input.title);
+    };
+    const filteredGlobalInputs = this.state.globalInputs.filter(filterMethod);
+    const filteredLocalInputs = this.state.localInputs.filter(filterMethod);
+    this.setState({
+      filteredGlobalInputs: filteredGlobalInputs,
+      filteredLocalInputs: filteredLocalInputs,
+    });
   },
 
   render() {
@@ -83,6 +119,13 @@ const InputsList = createReactClass({
         </IfPermitted>
         }
 
+        <Row id="filter-input" className="content input-new">
+          <FilterInput filterLabel="Filter Inputs"
+                       labelClassName={InputsListStyle.filterLabel}
+                       formGroupClassName={InputsListStyle.formGroup}
+                       placeholder="Title of searched input"
+                       onChange={this._onFilterInputs} />
+        </Row>
         <Row id="global-inputs" className="content input-list">
           <Col md={12}>
             <h2>
@@ -91,7 +134,7 @@ const InputsList = createReactClass({
               <small>{this.state.globalInputs.length} configured{this._nodeAffix()}</small>
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
-                        items={this.state.globalInputs.map(input => this._formatInput(input))} />
+                        items={this.state.filteredGlobalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
         <Row id="local-inputs" className="content input-list">
@@ -102,7 +145,7 @@ const InputsList = createReactClass({
               <small>{this.state.localInputs.length} configured{this._nodeAffix()}</small>
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText={`There are no local inputs${this._nodeAffix()}.`}
-                        items={this.state.localInputs.map(input => this._formatInput(input))} />
+                        items={this.state.filteredLocalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
       </div>

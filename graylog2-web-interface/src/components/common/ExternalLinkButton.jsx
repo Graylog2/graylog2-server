@@ -31,7 +31,7 @@ class ExternalLinkButton extends React.Component {
 
   static defaultProps = {
     bsStyle: 'default',
-    bsSize: '',
+    bsSize: undefined,
     target: '_blank',
     iconClass: 'fa-external-link',
     className: '',
