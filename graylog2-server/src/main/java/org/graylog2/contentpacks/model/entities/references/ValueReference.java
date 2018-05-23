@@ -102,6 +102,15 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
+    public String asString() {
+        switch (valueType()) {
+            case STRING:
+                return String.class.cast(value());
+            default:
+                throw new IllegalStateException("Expected value reference of type STRING but got " + valueType());
+        }
+    }
+
     private <S> S asType(Map<String, FilledParameter<?>> parameters, Class<S> type) {
         if (valueType() == ValueType.PARAMETER) {
             final String value = String.class.cast(value());

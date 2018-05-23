@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AbsoluteRangeTest {
+public class AbsoluteRangeEntityTest {
     @Test
     public void testStringParse() throws Exception {
         final AbsoluteRange range1 = AbsoluteRange.create("2016-03-24T00:00:00.000Z", "2016-03-24T23:59:59.000Z");

@@ -20,14 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.format.ISODateTimeFormat;
 
 @AutoValue
 @JsonAutoDetect
-@JsonDeserialize(builder = AutoValue_AbsoluteRange.Builder.class)
-public abstract class AbsoluteRange extends TimeRangeEntity {
+@JsonDeserialize(builder = AutoValue_AbsoluteRangeEntity.Builder.class)
+public abstract class AbsoluteRangeEntity extends TimeRangeEntity {
     static final String TYPE = "absolute";
     private static final String FIELD_FROM = "from";
     private static final String FIELD_TO = "to";
@@ -38,7 +38,7 @@ public abstract class AbsoluteRange extends TimeRangeEntity {
     @JsonProperty(FIELD_TO)
     public abstract ValueReference to();
 
-    public static AbsoluteRange of(org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange absoluteRange) {
+    public static AbsoluteRangeEntity of(AbsoluteRange absoluteRange) {
         final String from = absoluteRange.from().toString(ISODateTimeFormat.dateTime());
         final String to = absoluteRange.to().toString(ISODateTimeFormat.dateTime());
         return builder()
@@ -47,8 +47,8 @@ public abstract class AbsoluteRange extends TimeRangeEntity {
                 .build();
     }
 
-    static AbsoluteRange.Builder builder() {
-        return new AutoValue_AbsoluteRange.Builder();
+    static AbsoluteRangeEntity.Builder builder() {
+        return new AutoValue_AbsoluteRangeEntity.Builder();
     }
 
     @AutoValue.Builder
@@ -59,10 +59,10 @@ public abstract class AbsoluteRange extends TimeRangeEntity {
         @JsonProperty(FIELD_TO)
         abstract Builder to(ValueReference to);
 
-        abstract AbsoluteRange autoBuild();
+        abstract AbsoluteRangeEntity autoBuild();
 
-        AbsoluteRange build() {
-            type(ModelType.of(TYPE));
+        AbsoluteRangeEntity build() {
+            type(ModelTypeEntity.of(TYPE));
             return autoBuild();
         }
     }
