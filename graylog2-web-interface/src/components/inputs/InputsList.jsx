@@ -12,7 +12,6 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
-import InputsListStyle from './InputsList.css';
 
 const InputsActions = ActionsProvider.getActions('Inputs');
 const SingleNodeActions = ActionsProvider.getActions('SingleNode');
@@ -43,6 +42,7 @@ const InputsList = createReactClass({
       localInputs: undefined,
       filteredGlobalInputs: undefined,
       filteredLocalInputs: undefined,
+      filter: undefined,
     };
   },
 
@@ -67,14 +67,14 @@ const InputsList = createReactClass({
 
     this.setState({
       globalInputs: globalInputs,
-      filteredGlobalInputs: globalInputs,
       localInputs: localInputs,
-      filteredLocalInputs: localInputs,
     });
+    this._onFilterInputs(this.state.filter);
   },
 
   _isLoading() {
-    return !(this.state.localInputs && this.state.globalInputs && this.state.node);
+    return !(this.state.localInputs && this.state.globalInputs && this.state.node && this.state.filteredLocalInputs &&
+      this.state.filteredGlobalInputs);
   },
 
   _formatInput(input) {
@@ -90,16 +90,21 @@ const InputsList = createReactClass({
     const regExp = RegExp(filter, 'i');
 
     if (!globalInputs || !localInputs) {
-      resetLoadingState();
+      if (resetLoadingState) {
+        resetLoadingState();
+      }
       return;
     }
 
-    if (filter.length <= 0) {
+    if (!filter || filter.length <= 0) {
       this.setState({
         filteredGlobalInputs: globalInputs,
         filteredLocalInputs: localInputs,
+        filter: undefined,
       });
-      resetLoadingState();
+      if (resetLoadingState) {
+        resetLoadingState();
+      }
       return;
     }
 
@@ -112,7 +117,9 @@ const InputsList = createReactClass({
       filteredGlobalInputs: filteredGlobalInputs,
       filteredLocalInputs: filteredLocalInputs,
     });
-    resetLoadingState();
+    if (resetLoadingState) {
+      resetLoadingState();
+    }
   },
 
   _onFilterReset() {
@@ -120,6 +127,7 @@ const InputsList = createReactClass({
     this.setState({
       filteredGlobalInputs: globalInputs,
       filteredLocalInputs: localInputs,
+      filter: undefined,
     });
   },
 
@@ -136,39 +144,32 @@ const InputsList = createReactClass({
         </IfPermitted>
         }
 
-        <Row id="filter-input" className="content input-new">
-          <Col>
+        <Row id="filter-input" className="content input-list">
+          <Col md={12}>
             <SearchForm onSearch={this._onFilterInputs}
-                        label="Filter inputs"
                         topMargin={0}
                         onReset={this._onFilterReset}
-                        wrapperClass={InputsListStyle.filterWrapper}
                         searchButtonLabel="Filter"
-                        placeholder="Search by title"
-            />
-          </Col>
-        </Row>
-        <Row id="global-inputs" className="content input-list">
-          <Col md={12}>
-            <h2>
+                        placeholder="Filter by title" />
+            <br />
+            <h1>
               Global inputs
               &nbsp;
               <small>{this.state.globalInputs.length} configured{this._nodeAffix()}</small>
-            </h2>
+            </h1>
             <EntityList bsNoItemsStyle="info"
-                        noItemsText="There are no global inputs."
+                        noItemsText={this.state.globalInputs.length <= 0 ? 'There are no global inputs.' :
+                          'No global inputs match the filter'}
                         items={this.state.filteredGlobalInputs.map(input => this._formatInput(input))} />
-          </Col>
-        </Row>
-        <Row id="local-inputs" className="content input-list">
-          <Col md={12}>
-            <h2>
+            <br />
+            <h1>
               Local inputs
               &nbsp;
               <small>{this.state.localInputs.length} configured{this._nodeAffix()}</small>
-            </h2>
+            </h1>
             <EntityList bsNoItemsStyle="info"
-                        noItemsText={`There are no local inputs${this._nodeAffix()}.`}
+                        noItemsText={this.state.localInputs.length <= 0 ? 'There are no local inputs.' :
+                          'No local inputs match the filter'}
                         items={this.state.filteredLocalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
