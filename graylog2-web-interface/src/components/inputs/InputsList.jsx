@@ -6,7 +6,7 @@ import { Row, Col } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import EntityList from 'components/common/EntityList';
-import { IfPermitted, Spinner, FilterInput } from 'components/common';
+import { IfPermitted, Spinner, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -31,8 +31,10 @@ const InputsList = createReactClass({
 
   mixins: [Reflux.connect(SingleNodeStore), Reflux.listenTo(InputsStore, '_splitInputs')],
 
-  defaultProps: {
-    node: undefined,
+  getDefaultProps() {
+    return {
+      node: undefined,
+    };
   },
 
   getInitialState() {
@@ -83,11 +85,12 @@ const InputsList = createReactClass({
     return (this.props.node ? ' on this node' : '');
   },
 
-  _onFilterInputs(filter) {
+  _onFilterInputs(filter, resetLoadingState) {
     const { globalInputs, localInputs } = this.state;
     const regExp = RegExp(filter, 'i');
 
     if (!globalInputs || !localInputs) {
+      resetLoadingState();
       return;
     }
 
@@ -96,6 +99,7 @@ const InputsList = createReactClass({
         filteredGlobalInputs: globalInputs,
         filteredLocalInputs: localInputs,
       });
+      resetLoadingState();
       return;
     }
 
@@ -107,6 +111,15 @@ const InputsList = createReactClass({
     this.setState({
       filteredGlobalInputs: filteredGlobalInputs,
       filteredLocalInputs: filteredLocalInputs,
+    });
+    resetLoadingState();
+  },
+
+  _onFilterReset() {
+    const { globalInputs, localInputs } = this.state;
+    this.setState({
+      filteredGlobalInputs: globalInputs,
+      filteredLocalInputs: localInputs,
     });
   },
 
@@ -124,11 +137,16 @@ const InputsList = createReactClass({
         }
 
         <Row id="filter-input" className="content input-new">
-          <FilterInput filterLabel="Filter Inputs"
-                       labelClassName={InputsListStyle.filterLabel}
-                       formGroupClassName={InputsListStyle.formGroup}
-                       placeholder="Title of searched input"
-                       onChange={this._onFilterInputs} />
+          <Col>
+            <SearchForm onSearch={this._onFilterInputs}
+                        label="Filter inputs"
+                        topMargin={0}
+                        onReset={this._onFilterReset}
+                        wrapperClass={InputsListStyle.filterWrapper}
+                        searchButtonLabel="Filter"
+                        placeholder="Search by title"
+            />
+          </Col>
         </Row>
         <Row id="global-inputs" className="content input-list">
           <Col md={12}>
