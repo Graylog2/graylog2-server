@@ -1,0 +1,126 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackInstall /> should render a install 1`] = `
+<div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-offset-1"
+    >
+      <h2>
+        Configure Parameter
+      </h2>
+      <br />
+      <br />
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-3 control-label"
+          htmlFor="PARAM"
+        >
+          A parameter
+        </label>
+        <div
+          className="col-sm-7"
+        >
+          <input
+            className="form-control"
+            id="PARAM"
+            label="A parameter"
+            maxLength={250}
+            name="PARAM"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            type="text"
+            value="parameter"
+          />
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-10 col-sm-offset-1"
+    >
+      <div>
+        <h2>
+          Entity list
+        </h2>
+        <br />
+        <div>
+          <div
+            className="row "
+          >
+            <div
+              className="col-md-12"
+            >
+              <div
+                className="data-table table-responsive"
+                id="entity-list"
+              >
+                <table
+                  className="table undefined"
+                >
+                  <thead>
+                    <tr>
+                      <th>
+                        Title
+                      </th>
+                      <th>
+                        Type
+                      </th>
+                      <th>
+                        Description
+                      </th>
+                      <th>
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        franz
+                      </td>
+                      <td />
+                      <td />
+                      <td>
+                        <button
+                          className="btn btn-sm btn-info"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Show config
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="pull-right"
+      >
+        <button
+          className="btn btn-primary"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Install
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;

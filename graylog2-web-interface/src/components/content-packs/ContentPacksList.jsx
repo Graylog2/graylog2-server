@@ -3,24 +3,28 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
-import { Row, Col, Button, DropdownButton, MenuItem, Pagination } from 'react-bootstrap';
+import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPacksListStyle from './ContentPacksList.css';
+import ContentPackInstall from './ContentPackInstall';
 
 class ContentPacksList extends React.Component {
   static propTypes = {
     contentPacks: PropTypes.arrayOf(PropTypes.object),
     onDeletePack: PropTypes.func,
+    onInstall: PropTypes.func,
   };
 
   static defaultProps = {
     contentPacks: [],
     onDeletePack: () => {},
+    onInstall: () => {},
   };
 
   constructor(props) {
@@ -41,12 +45,41 @@ class ContentPacksList extends React.Component {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
   }
 
+  _installModal(item) {
+    let modalRef;
+
+    const closeModal = () => {
+      modalRef.close();
+    };
+
+    const open = () => {
+      modalRef.open();
+    };
+
+    const modal = (
+      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+        <Modal.Header closeButton>
+          <Modal.Title>Install</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ContentPackInstall contentPack={item} onInstall={this.props.onInstall} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeModal}>Close</Button>
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
+
+    return { openFunc: open, installModal: modal };
+  }
+
   _formatItems(items) {
     const begin = (this.state.pageSize * (this.state.currentPage - 1));
     const end = begin + this.state.pageSize;
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => {
+      const { openFunc, installModal } = this._installModal(item);
       let downloadRef;
       const downloadModal = (<ContentPackDownloadControl
         ref={(node) => { downloadRef = node; }}
@@ -67,7 +100,8 @@ class ContentPacksList extends React.Component {
             <Col md={3} className="text-right">
               {updateButton}
               &nbsp;
-              <Button bsStyle="info" bsSize="small">Install</Button>
+              <Button bsStyle="info" bsSize="small" onClick={openFunc}>Install</Button>
+              {installModal}
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
                 <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Remove all</MenuItem>
