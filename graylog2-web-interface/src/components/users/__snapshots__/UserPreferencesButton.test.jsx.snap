@@ -47,6 +47,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
             autoFocus={true}
             backdrop={true}
             bsClass="modal"
+            bsSize="large"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}
