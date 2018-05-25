@@ -33,6 +33,10 @@ const ContentPacksPage = createReactClass({
     }
   },
 
+  _installContentPack(contentPackId, contentPackRev, parameters) {
+    ContentPacksActions.install(contentPackId, contentPackRev, parameters);
+  },
+
   render() {
     if (!this.state.contentPacks) {
       return (<Spinner />);
@@ -67,6 +71,7 @@ const ContentPacksPage = createReactClass({
                 <ContentPacksList
                   contentPacks={this.state.contentPacks}
                   onDeletePack={this._deleteContentPack}
+                  onInstall={this._installContentPack}
                 />
               </div>
             </Col>
