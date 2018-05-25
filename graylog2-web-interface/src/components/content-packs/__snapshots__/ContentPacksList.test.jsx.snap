@@ -267,6 +267,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -387,6 +388,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -513,6 +515,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -639,6 +642,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -776,6 +780,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -907,6 +912,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -1027,6 +1033,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -1153,6 +1160,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -1279,6 +1287,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
@@ -1416,6 +1425,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             <button
               className="btn btn-sm btn-info"
               disabled={false}
+              onClick={[Function]}
               type="button"
             >
               Install
