@@ -41,7 +41,7 @@ public class ESValuesHandler implements ESAggregationSpecHandler<ValuesGroup, Te
         return Optional.of(StreamEx.of(aggregationSpec.subAggregations().iterator())
                 .map(spec -> searchTypeHandler
                         .handlerForType(spec.type())
-                        .createAggregation(searchTypeHandler.nextName(), spec, searchTypeHandler, queryContext))
+                        .createAggregation(queryContext.nextName(), spec, searchTypeHandler, queryContext))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .reduce(terms, AggregationBuilder::subAggregation)

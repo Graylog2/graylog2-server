@@ -11,6 +11,7 @@ import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryConte
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.enterprise.search.searchtypes.aggregation.Aggregation;
 import org.graylog.plugins.enterprise.search.searchtypes.aggregation.AggregationSpec;
+import org.graylog.plugins.enterprise.search.util.UniqueNamer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,18 +89,5 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
                 return groups.build();
             }
         };
-    }
-
-    public String nextName() {
-        return namer.nextName();
-    }
-
-    /* not thread safe, just a convenience class */
-    private static class UniqueNamer {
-        private long i = 0;
-
-        public String nextName() {
-            return "agg_" + i++;
-        }
     }
 }
