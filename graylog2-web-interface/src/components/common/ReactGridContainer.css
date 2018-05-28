@@ -13,3 +13,7 @@
 :local(.reactGridLayout) .react-grid-placeholder {
     background: #16ACE3;
 }
+
+:local(.reactGridLayout) .actions {
+    cursor: default;
+}
