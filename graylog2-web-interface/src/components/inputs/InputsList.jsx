@@ -116,6 +116,7 @@ const InputsList = createReactClass({
     this.setState({
       filteredGlobalInputs: filteredGlobalInputs,
       filteredLocalInputs: filteredLocalInputs,
+      filter: filter,
     });
     if (resetLoadingState) {
       resetLoadingState();
@@ -152,21 +153,22 @@ const InputsList = createReactClass({
                         searchButtonLabel="Filter"
                         placeholder="Filter by title" />
             <br />
-            <h1>
+            <h2>
               Global inputs
               &nbsp;
               <small>{this.state.globalInputs.length} configured{this._nodeAffix()}</small>
-            </h1>
+            </h2>
             <EntityList bsNoItemsStyle="info"
                         noItemsText={this.state.globalInputs.length <= 0 ? 'There are no global inputs.' :
                           'No global inputs match the filter'}
                         items={this.state.filteredGlobalInputs.map(input => this._formatInput(input))} />
             <br />
-            <h1>
+            <br />
+            <h2>
               Local inputs
               &nbsp;
               <small>{this.state.localInputs.length} configured{this._nodeAffix()}</small>
-            </h1>
+            </h2>
             <EntityList bsNoItemsStyle="info"
                         noItemsText={this.state.localInputs.length <= 0 ? 'There are no local inputs.' :
                           'No local inputs match the filter'}

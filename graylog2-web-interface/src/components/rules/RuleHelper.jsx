@@ -185,7 +185,11 @@ end`,
                                 searchButtonLabel="Filter"
                                 onReset={this._onFilterReset} />
                     <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
-                      <PaginatedList totalItems={functionDescriptors.length} pageSize={this.state.pageSize} onChange={this._onPageChange} showPageSizeSelect={false}>
+                      <PaginatedList totalItems={functionDescriptors.length}
+                                     pageSize={this.state.pageSize}
+                                     onChange={this._onPageChange}
+                                     activePage={this.state.currentPage}
+                                     showPageSizeSelect={false}>
                         <Table condensed>
                           <thead>
                             <tr>
