@@ -9,7 +9,7 @@ import RulesActions from 'actions/rules/RulesActions';
 import ObjectUtils from 'util/ObjectUtils';
 
 import DocumentationLink from 'components/support/DocumentationLink';
-import { PaginatedList, Spinner, FilterInput } from 'components/common';
+import { PaginatedList, Spinner, SearchForm } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 
@@ -137,6 +137,15 @@ end`,
     });
   },
 
+  _onFilterReset() {
+    this.setState({
+      filteredDescriptors: this.state.functionDescriptors,
+      filter: '',
+      currentPage: this.state.pageBeforeFilter || 1,
+      pageBeforeFilter: undefined,
+    });
+  },
+
   render() {
     if (!this.state.functionDescriptors) {
       return <Spinner />;
@@ -170,9 +179,17 @@ end`,
                 </Row>
                 <Row>
                   <Col sm={12}>
-                    <FilterInput onChange={this._filterDescriptors} />
+                    <SearchForm onSearch={this._filterDescriptors}
+                                label="Filter rules"
+                                topMargin={0}
+                                searchButtonLabel="Filter"
+                                onReset={this._onFilterReset} />
                     <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
-                      <PaginatedList totalItems={functionDescriptors.length} pageSize={this.state.pageSize} onChange={this._onPageChange} showPageSizeSelect={false}>
+                      <PaginatedList totalItems={functionDescriptors.length}
+                                     pageSize={this.state.pageSize}
+                                     onChange={this._onPageChange}
+                                     activePage={this.state.currentPage}
+                                     showPageSizeSelect={false}>
                         <Table condensed>
                           <thead>
                             <tr>
