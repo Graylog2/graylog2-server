@@ -1,17 +1,4 @@
-import { pivotForField } from './PivotGenerator';
-
-const seriesRegex = /^(\w+)\((\w*)\)$/;
-
-const _parseSeries = (s) => {
-  const result = seriesRegex.exec(s);
-  const definition = {
-    type: result[1],
-  };
-  if (result[2] !== '') {
-    definition.field = result[2];
-  }
-  return definition;
-};
+import * as Series from 'enterprise/components/visualizations/Series';
 
 const formatInterval = ({ value, unit }) => `${value}${unit[0]}`;
 
@@ -29,7 +16,7 @@ const _groupDefinition = (pivot, series, groups) => {
   return Object.assign(
     {
       field,
-      metrics: series.map(s => _parseSeries(s)),
+      metrics: series.map(s => Series.parseSeries(s)),
       groups,
     },
     _typeForField(field, config),

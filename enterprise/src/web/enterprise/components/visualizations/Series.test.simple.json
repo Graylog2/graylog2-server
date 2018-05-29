@@ -1,0 +1,88 @@
+[
+  {
+    "key": [
+      "2018-05-24T14:03:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 2696,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 239622,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 118,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 6580,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 3680,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 327284,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:03:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 4490,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 384742,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  }
+
+]

@@ -1,35 +1,26 @@
+import { flatten, setWith } from 'lodash';
+
 const expandRows = (fieldNames, columnFieldNames, series, rows, expanded = []) => {
+  if (!rows) {
+    return [];
+  }
   if (fieldNames.length === 0) {
     return [];
   }
 
-  const fieldName = fieldNames.shift();
   rows.forEach((row) => {
+    const { values } = row;
     const result = {};
 
-    series.forEach((seriesName) => {
-      result[seriesName] = row[seriesName];
+    row.key.forEach((key, idx) => {
+      result[fieldNames[idx]] = key;
     });
-    result[fieldName] = row[fieldName];
 
-    if (fieldNames.length === 0 && columnFieldNames.length > 0) {
-      columnFieldNames.forEach((columnFieldName) => {
-        const columnPivotField = row[columnFieldName] || [];
-        const columnPivotValueMap = {};
-        if (columnPivotField && columnPivotField.forEach) {
-          columnPivotField.forEach((v) => {
-            columnPivotValueMap[v[columnFieldName]] = Object.assign({}, v);
-          });
-          result[columnFieldName] = columnPivotValueMap;
-        }
-      });
-    }
-
+    values.forEach(({ key, value }) => {
+      const translatedKeys = flatten(key.map((k, idx) => (idx < key.length - 1 && columnFieldNames[idx] ? [columnFieldNames[idx], k] : k)));
+      setWith(result, translatedKeys, value, Object);
+    });
     expanded.push(result);
-
-    if (fieldNames.length > 0 && row[fieldNames[0]]) {
-      expandRows(fieldNames.slice(), columnFieldNames, series, row[fieldNames[0]], expanded);
-    }
   });
   return expanded;
 };

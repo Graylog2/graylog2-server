@@ -1,0 +1,62 @@
+[
+  {
+    "type": "scatter",
+    "name": "index-count()",
+    "x": [
+      "2018-05-24T14:03:00.000Z-PostsController"
+    ],
+    "y": [
+      2696
+    ]
+  },
+  {
+    "type": "scatter",
+    "name": "index-sum(took_ms)",
+    "x": [
+      "2018-05-24T14:03:00.000Z-PostsController"
+    ],
+    "y": [
+      239622
+    ]
+  },
+  {
+    "type": "scatter",
+    "name": "edit-count()",
+    "x": [
+      "2018-05-24T14:03:00.000Z-PostsController"
+    ],
+    "y": [
+      118
+    ]
+  },
+  {
+    "type": "scatter",
+    "name": "edit-sum(took_ms)",
+    "x": [
+      "2018-05-24T14:03:00.000Z-PostsController"
+    ],
+    "y": [
+      6580
+    ]
+  },
+  {
+    "type": "scatter",
+    "name": "count()",
+    "x": [
+      "2018-05-24T14:03:00.000Z-PostsController"
+    ],
+    "y": [
+      3680
+    ]
+  },
+  {
+    "type": "scatter",
+    "name": "sum(took_ms)",
+    "x": [
+      "2018-05-24T14:03:00.000Z-PostsController"
+    ],
+    "y": [
+      327284
+    ]
+  }
+]

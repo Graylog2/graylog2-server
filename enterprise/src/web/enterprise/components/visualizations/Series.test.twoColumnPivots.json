@@ -1,0 +1,628 @@
+[
+  {
+    "key": [
+      "2018-05-28T11:20:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 922,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 56,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 978,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 276,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 276,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 220,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 220,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 42,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 42,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 1516,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:21:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 5020,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 386,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5406,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1540,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1540,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1410,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1410,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 264,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 264,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8622,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:22:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 5100,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 398,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5498,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1520,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1520,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1364,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1364,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 216,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 216,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8600,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:23:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 4954,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 354,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5308,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1580,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1580,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1480,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1480,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 246,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 246,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8617,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:24:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 4986,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 342,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5328,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1708,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1708,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1354,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1354,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 222,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 222,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8614,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:25:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 4071,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 293,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 4364,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1295,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1295,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1095,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1095,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 234,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 234,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 6993,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 42962,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  }
+]

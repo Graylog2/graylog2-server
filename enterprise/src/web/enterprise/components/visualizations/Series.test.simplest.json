@@ -1,0 +1,80 @@
+[
+  {
+    "key": [
+      "index"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 27142,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "show"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 7826,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "login"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 6626,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "edit"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 1246,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 42851,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  }
+]

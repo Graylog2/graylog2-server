@@ -1,14 +1,10 @@
 import ViewManagementPage from 'enterprise/ViewManagementPage';
 import { AlertStatus, MessageList } from 'enterprise/components/widgets';
-import GroupByHandler from 'enterprise/logic/searchtypes/GroupByHandler';
-import { DateHistogramHandler, MessageListHandler } from 'enterprise/logic/searchtypes';
+import { MessageListHandler } from 'enterprise/logic/searchtypes';
 import DataTable from 'enterprise/components/datatable/DataTable';
 import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
-import AggregationHandler from 'enterprise/logic/searchtypes/AggregationHandler';
-import AggregationTransformer from 'enterprise/logic/searchresulttransformers/AggregationTransformer';
 import AggregationBuilder from 'enterprise/components/aggregationbuilder/AggregationBuilder';
-import AggregationConfigGenerator from 'enterprise/logic/searchtypes/aggregation/AggregationConfigGenerator';
 import BarVisualization from 'enterprise/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'enterprise/components/visualizations/line/LineVisualization';
 import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
@@ -18,6 +14,9 @@ import NewSearchPage from 'enterprise/NewSearchPage';
 import Widget from './logic/widgets/Widget';
 import AggregationWidget from './logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from './logic/widgets/MessagesWidget';
+import PivotConfigGenerator from './logic/searchtypes/aggregation/PivotConfigGenerator';
+import PivotHandler from './logic/searchtypes/pivot/PivotHandler';
+import PivotTransformer from './logic/searchresulttransformers/PivotTransformer';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -58,8 +57,8 @@ export default {
       defaultHeight: 4,
       defaultWidth: 4,
       visualizationComponent: AggregationBuilder,
-      searchResultTransformer: AggregationTransformer,
-      searchTypes: AggregationConfigGenerator,
+      searchResultTransformer: PivotTransformer,
+      searchTypes: PivotConfigGenerator,
       titleGenerator: widget => `Aggregating ${widget.config.series} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`,
     },
     {
@@ -82,27 +81,9 @@ export default {
       },
     },
     {
-      type: 'date_histogram',
-      handler: DateHistogramHandler,
-      defaults: {
-        interval: 'MINUTE',
-      },
-    },
-    {
-      type: 'group_by',
-      handler: GroupByHandler,
-      defaults: {
-        limit: 150,
-        operation: 'COUNT',
-        order: 'ASC',
-      },
-    },
-    {
-      type: 'aggregation',
-      handler: AggregationHandler,
-      defaults: {
-        groups: [],
-      },
+      type: 'pivot',
+      handler: PivotHandler,
+      defaults: {},
     },
   ],
   fieldActions: [
