@@ -41,6 +41,7 @@ import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -54,6 +55,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,13 +82,14 @@ public class InputCatalogTest {
     private InputCatalog catalog;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final GrokPatternService grokPatternService = new InMemoryGrokPatternService();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final GrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         grokPatternService.save(GrokPattern.create("GREEDY", ".*"));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternService, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        final ClusterEventBus clusterEventBus = new ClusterEventBus();
         final InputService inputService = new InputServiceImpl(mongoRule.getMongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
         final InputRegistry inputRegistry = new InputRegistry();
         final InputCodec codec = new InputCodec(objectMapper, inputService, inputRegistry, messageInputFactory, extractorFactory, converterFactory, serverStatus);

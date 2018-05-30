@@ -28,7 +28,7 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternService;
-import org.graylog2.grok.GrokPatternsChangedEvent;
+import org.graylog2.grok.GrokPatternsUpdatedEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
@@ -341,7 +341,7 @@ public class BundleImporter {
             createdGrokPatterns.put(grokPattern.name(), createdGrokPattern);
         }
 
-        clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), createdGrokPatterns.keySet()));
+        clusterBus.post(GrokPatternsUpdatedEvent.create(createdGrokPatterns.keySet()));
     }
 
     private org.graylog2.grok.GrokPattern createGrokPattern(String bundleId, GrokPattern grokPattern) throws ValidationException {

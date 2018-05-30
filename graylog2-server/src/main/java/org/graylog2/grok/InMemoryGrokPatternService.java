@@ -17,33 +17,38 @@
 package org.graylog2.grok;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.krakens.grok.api.Grok;
 import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 public class InMemoryGrokPatternService implements GrokPatternService {
-    private static final Logger LOG = LoggerFactory.getLogger(InMemoryGrokPatternService.class);
-
     // poor man's id generator
-    private AtomicLong idGen = new AtomicLong(0);
+    private final AtomicLong idGen = new AtomicLong(0);
 
-    private final ConcurrentMap<String, GrokPattern> store = new MapMaker().makeMap();
+    private final ConcurrentMap<String, GrokPattern> store = new ConcurrentHashMap<>();
+    private final ClusterEventBus clusterBus;
+
+    @Inject
+    public InMemoryGrokPatternService(ClusterEventBus clusterBus) {
+        this.clusterBus = clusterBus;
+    }
 
     @Override
     public GrokPattern load(String patternId) throws NotFoundException {
@@ -83,6 +88,8 @@ public class InMemoryGrokPatternService implements GrokPatternService {
             toSave = pattern;
         }
         store.put(toSave.id(), toSave);
+        clusterBus.post(GrokPatternsUpdatedEvent.create(ImmutableSet.of(toSave.name())));
+
         return toSave;
     }
 
@@ -115,16 +122,26 @@ public class InMemoryGrokPatternService implements GrokPatternService {
             deleteAll();
         }
 
-        return patterns.stream()
+        final List<GrokPattern> grokPatterns = patterns.stream()
                 .map(this::uncheckedSave)
                 .collect(Collectors.toList());
+
+        final Set<String> patternNames = grokPatterns.stream()
+                .map(GrokPattern::name)
+                .collect(Collectors.toSet());
+
+        if (!patternNames.isEmpty()) {
+            clusterBus.post(GrokPatternsUpdatedEvent.create(patternNames));
+        }
+
+        return grokPatterns;
     }
 
     @Override
     public Map<String, Object> match(GrokPattern pattern, String sampleData) throws GrokException {
         final Set<GrokPattern> patterns = loadAll();
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-        for(GrokPattern storedPattern : patterns) {
+        for (GrokPattern storedPattern : patterns) {
             grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
         grokCompiler.register(pattern.name(), pattern.pattern());
@@ -137,7 +154,7 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         final Set<GrokPattern> patterns = loadAll();
         final boolean fieldsMissing = Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern());
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-        for(GrokPattern storedPattern : patterns) {
+        for (GrokPattern storedPattern : patterns) {
             grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
         grokCompiler.register(pattern.name(), pattern.pattern());
@@ -150,17 +167,17 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         final Set<GrokPattern> patterns = loadAll();
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
 
-        for(GrokPattern newPattern : newPatterns) {
+        for (GrokPattern newPattern : newPatterns) {
             final boolean fieldsMissing = Strings.isNullOrEmpty(newPattern.name()) || Strings.isNullOrEmpty(newPattern.pattern());
             if (fieldsMissing) {
                 return false;
             }
             grokCompiler.register(newPattern.name(), newPattern.pattern());
         }
-        for(GrokPattern storedPattern : patterns) {
+        for (GrokPattern storedPattern : patterns) {
             grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
-        for(GrokPattern newPattern : newPatterns) {
+        for (GrokPattern newPattern : newPatterns) {
             grokCompiler.compile("%{" + newPattern.name() + "}");
         }
         return true;
@@ -168,14 +185,26 @@ public class InMemoryGrokPatternService implements GrokPatternService {
 
     @Override
     public int delete(String patternId) {
-        return store.remove(patternId) == null ? 0 : 1;
+        final GrokPattern grokPattern = store.remove(patternId);
+        if (grokPattern != null) {
+            clusterBus.post(GrokPatternsDeletedEvent.create(ImmutableSet.of(grokPattern.name())));
+        }
+
+        return grokPattern == null ? 0 : 1;
     }
 
     @Override
     public int deleteAll() {
-        final int size = store.size();
-        store.clear();
-        return size;
+        final Set<String> patternNames = store.values().stream()
+                .map(GrokPattern::name)
+                .collect(Collectors.toSet());
+
+        if (!patternNames.isEmpty()) {
+            store.clear();
+            clusterBus.post(GrokPatternsDeletedEvent.create(patternNames));
+        }
+
+        return patternNames.size();
     }
 
     private String createId() {

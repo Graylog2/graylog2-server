@@ -28,9 +28,11 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +40,7 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,8 +51,10 @@ public class GrokPatternCatalogTest {
     private GrokPatternCatalog catalog;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
-        grokPatternService = new InMemoryGrokPatternService();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         final GrokPatternCodec codec = new GrokPatternCodec(objectMapper, grokPatternService);
         catalog = new GrokPatternCatalog(grokPatternService, codec);
     }

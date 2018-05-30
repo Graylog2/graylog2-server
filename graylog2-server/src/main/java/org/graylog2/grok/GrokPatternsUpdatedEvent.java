@@ -20,23 +20,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
-public abstract class GrokPatternsChangedEvent {
-
-    @JsonProperty
-    public abstract Set<String> deletedPatterns();
-
-    @JsonProperty
-    public abstract Set<String> updatedPatterns();
+public abstract class GrokPatternsUpdatedEvent {
+    @JsonProperty("patterns")
+    public abstract Set<String> patterns();
 
     @JsonCreator
-    public static GrokPatternsChangedEvent create(@JsonProperty("deleted_patterns") Set<String> deletedPatterns, @JsonProperty("updated_patterns") Set<String> updatedPatterns) {
-        return new AutoValue_GrokPatternsChangedEvent(deletedPatterns, updatedPatterns);
+    public static GrokPatternsUpdatedEvent create(@JsonProperty("patterns") Set<String> patterns) {
+        return new AutoValue_GrokPatternsUpdatedEvent(patterns);
     }
 }

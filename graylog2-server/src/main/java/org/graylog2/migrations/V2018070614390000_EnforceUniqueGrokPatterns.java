@@ -25,7 +25,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.grok.GrokPatternsChangedEvent;
+import org.graylog2.grok.GrokPatternsDeletedEvent;
 import org.graylog2.grok.MongoDbGrokPatternService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -106,7 +105,7 @@ public class V2018070614390000_EnforceUniqueGrokPatterns extends Migration {
         collection.createIndex(Indexes.ascending("name"), indexOptions);
 
         if (!duplicatePatterns.isEmpty()) {
-            clusterEventBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), ImmutableSet.copyOf(duplicatePatterns.values())));
+            clusterEventBus.post(GrokPatternsDeletedEvent.create(ImmutableSet.copyOf(duplicatePatterns.values())));
         }
 
         indexCreated = true;
