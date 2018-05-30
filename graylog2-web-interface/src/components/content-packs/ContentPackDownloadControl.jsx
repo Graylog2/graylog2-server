@@ -50,7 +50,7 @@ class ContentPackDownloadControl extends React.Component {
       'Please click the download link below. Your browser may ask for your username and password to ' +
       'download the JSON file.');
     return (
-      <BootstrapModalWrapper ref={(node) => { this.downloadModal = node; }}>
+      <BootstrapModalWrapper ref={(node) => { this.downloadModal = node; }} bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Export search results as CSV</Modal.Title>
         </Modal.Header>

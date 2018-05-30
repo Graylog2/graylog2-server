@@ -133,7 +133,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                 id="entity-list"
               >
                 <table
-                  className="table undefined"
+                  className="table scrollable"
                 >
                   <thead>
                     <tr>
@@ -167,22 +167,27 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         0
                       </td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-primary"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="button"
+                        <div
+                          className="btn-toolbar"
+                          role="toolbar"
                         >
-                          Apply Parameter
-                        </button>
-                        <button
-                          className="btn btn-sm btn-info"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="button"
-                        >
-                          Show config
-                        </button>
+                          <button
+                            className="btn btn-xs btn-primary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            Apply Parameter
+                          </button>
+                          <button
+                            className="btn btn-xs btn-info"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            Show
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </tbody>

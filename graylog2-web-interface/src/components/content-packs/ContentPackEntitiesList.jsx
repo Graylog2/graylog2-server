@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
 import DataTable from 'components/common/DataTable';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
+
+import ContentPackEntitiesListStyle from './ContentPackEntitiesList.css';
 
 class ContentPackEntitiesList extends React.Component {
   static propTypes = {
@@ -20,6 +22,7 @@ class ContentPackEntitiesList extends React.Component {
   static defaultProps = {
     appliedParameter: {},
     onParameterClear: () => {},
+    onParameterApply: () => {},
     readOnly: false,
   };
 
@@ -93,21 +96,23 @@ class ContentPackEntitiesList extends React.Component {
         <td>{(entity.data.description || entity.data.name || {}).value}</td>
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
-          {!this.props.readOnly &&
-          <Button bsStyle="primary"
-                  bsSize="small"
-                  disabled={disableBtn}
-                  onClick={() => {
-                    open();
-                  }}>
-            Apply Parameter
-          </Button>
-          }
-          <Button bsStyle="info"
-                  bsSize="small"
-                  onClick={() => { openShowModal(); }}>
-            Show config
-          </Button>
+          <ButtonToolbar>
+            {!this.props.readOnly &&
+            <Button bsStyle="primary"
+                    bsSize="xs"
+                    disabled={disableBtn}
+                    onClick={() => {
+                      open();
+                    }}>
+              Apply Parameter
+            </Button>
+            }
+            <Button bsStyle="info"
+                    bsSize="xs"
+                    onClick={() => { openShowModal(); }}>
+              Show
+            </Button>
+          </ButtonToolbar>
         </td>
         {!this.props.readOnly && applyModal}
         {showModal}
@@ -127,6 +132,7 @@ class ContentPackEntitiesList extends React.Component {
         <DataTable
           id="entity-list"
           headers={headers}
+          className={ContentPackEntitiesListStyle.scrollable}
           sortByKey="type"
           filterKeys={[]}
           rows={this.props.contentPack.entities}

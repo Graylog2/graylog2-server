@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
@@ -46,6 +46,14 @@ class ContentPackInstall extends React.Component {
     };
   }
 
+  onInstall = () => {
+    if (this._validateInput()) {
+      const contentPackId = this.props.contentPack.id;
+      const contentPackRev = this.props.contentPack.rev;
+      this.props.onInstall(contentPackId, contentPackRev, this.state.parameterInput);
+    }
+  };
+
   _getValue = (name, value) => {
     const newParameterInput = this.state.parameterInput;
     newParameterInput[name] = value;
@@ -64,14 +72,6 @@ class ContentPackInstall extends React.Component {
     }, {});
     this.setState({ errorMessages: errors });
     return Object.keys(errors).length <= 0;
-  };
-
-  _onInstall = () => {
-    if (this._validateInput()) {
-      const contentPackId = this.props.contentPack.id;
-      const contentPackRev = this.props.contentPack.rev;
-      this.props.onInstall(contentPackId, contentPackRev, this.state.parameterInput);
-    }
   };
 
   renderParameter(parameter) {
@@ -110,12 +110,6 @@ class ContentPackInstall extends React.Component {
       <Row>
         <Col smOffset={1} sm={10}>
           <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
-          <div className="pull-right">
-            <Button bsStyle="primary"
-                    onClick={this._onInstall}>
-              Install
-            </Button>
-          </div>
         </Col>
       </Row>
     </div>);

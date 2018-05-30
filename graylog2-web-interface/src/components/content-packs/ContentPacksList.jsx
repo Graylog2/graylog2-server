@@ -3,7 +3,7 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
-import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal } from 'react-bootstrap';
+import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
@@ -47,6 +47,7 @@ class ContentPacksList extends React.Component {
 
   _installModal(item) {
     let modalRef;
+    let installRef;
 
     const closeModal = () => {
       modalRef.close();
@@ -56,16 +57,28 @@ class ContentPacksList extends React.Component {
       modalRef.open();
     };
 
+    const onInstall = () => {
+      installRef.onInstall();
+      modalRef.close();
+    };
+
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Install</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ContentPackInstall contentPack={item} onInstall={this.props.onInstall} />
+          <ContentPackInstall ref={(node) => { installRef = node; }}
+                              contentPack={item}
+                              onInstall={this.props.onInstall} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={closeModal}>Close</Button>
+          <div className="pull-right">
+            <ButtonToolbar>
+              <Button bsStyle="primary" onClick={onInstall}>Install</Button>
+              <Button onClick={closeModal}>Close</Button>
+            </ButtonToolbar>
+          </div>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -160,6 +173,16 @@ class ContentPacksList extends React.Component {
       </select>
     </span>);
 
+    const noContentMessage = this.props.contentPacks.length <= 0 ?
+      'No content packs found. Please create or upload one' :
+      'No matching content packs found';
+    const content = this.state.filteredContentPacks.length <= 0 ?
+      (<div>{noContentMessage}</div>) :
+      (<ControlledTableList>
+        <ControlledTableList.Header />
+        {this._formatItems(this.state.filteredContentPacks)}
+      </ControlledTableList>);
+
     return (
       <div>
         <Row className="row-sm">
@@ -181,10 +204,7 @@ class ContentPacksList extends React.Component {
             {pageSizeSelector}
           </Col>
         </Row>
-        <ControlledTableList>
-          <ControlledTableList.Header />
-          {this._formatItems(this.state.filteredContentPacks)}
-        </ControlledTableList>
+        {content}
         <Row className="row-sm">
           <Col md={5} />
           <Col md={5}>
