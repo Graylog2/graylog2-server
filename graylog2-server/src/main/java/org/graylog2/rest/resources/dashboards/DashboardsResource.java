@@ -20,7 +20,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,10 +31,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
-import org.graylog2.dashboards.events.DashboardDeletedEvent;
-import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -74,18 +70,12 @@ public class DashboardsResource extends RestResource {
 
     private final DashboardService dashboardService;
     private final ActivityWriter activityWriter;
-    private final ClusterEventBus clusterEventBus;
-    private final EventBus serverEventBus;
 
     @Inject
     public DashboardsResource(DashboardService dashboardService,
-                              ActivityWriter activityWriter,
-                              ClusterEventBus clusterEventBus,
-                              EventBus serverEventBus) {
+                              ActivityWriter activityWriter) {
         this.dashboardService = dashboardService;
         this.activityWriter = activityWriter;
-        this.clusterEventBus = clusterEventBus;
-        this.serverEventBus = serverEventBus;
     }
 
     @POST
@@ -162,14 +152,11 @@ public class DashboardsResource extends RestResource {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);
-        dashboard.getWidgets().values().forEach((widget) -> this.clusterEventBus.post(WidgetUpdatedEvent.create(widget)));
         dashboardService.destroy(dashboard);
 
         final String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DashboardsResource.class));
-
-        this.serverEventBus.post(DashboardDeletedEvent.create(dashboard.getId()));
     }
 
     @PUT

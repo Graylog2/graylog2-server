@@ -52,4 +52,6 @@ public interface DashboardService extends PersistedService {
      * @return the total number of dashboards
      */
     long count();
+
+    int destroy(Dashboard model);
 }

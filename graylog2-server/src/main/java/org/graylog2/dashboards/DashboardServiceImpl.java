@@ -17,17 +17,21 @@
 package org.graylog2.dashboards;
 
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.dashboards.widgets.WidgetPosition;
+import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
@@ -50,11 +54,18 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
     private final DashboardWidgetCreator dashboardWidgetCreator;
 
+    private final ClusterEventBus clusterEventBus;
+    private final EventBus serverEventBus;
+
     @Inject
     public DashboardServiceImpl(MongoConnection mongoConnection,
-                                DashboardWidgetCreator dashboardWidgetCreator) {
+                                DashboardWidgetCreator dashboardWidgetCreator,
+                                ClusterEventBus clusterEventBus,
+                                EventBus serverEventBus) {
         super(mongoConnection);
         this.dashboardWidgetCreator = dashboardWidgetCreator;
+        this.clusterEventBus = clusterEventBus;
+        this.serverEventBus = serverEventBus;
     }
 
     @Override
@@ -184,5 +195,22 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     @Override
     public long count() {
         return totalCount(DashboardImpl.class);
+    }
+
+    @Override
+    public int destroy(Dashboard dashboard) {
+        final String dashboardId = dashboard.getId();
+        final Set<String> widgetIds = dashboard.getWidgets().values().stream()
+                .map(DashboardWidget::getId)
+                .collect(Collectors.toSet());
+
+        final int destroyedDashboards = super.destroy(dashboard);
+
+        for (String widgetId : widgetIds) {
+            clusterEventBus.post(WidgetUpdatedEvent.create(widgetId));
+        }
+        serverEventBus.post(DashboardDeletedEvent.create(dashboardId));
+
+        return destroyedDashboards;
     }
 }
