@@ -144,7 +144,7 @@ const EditContentPackPage = createReactClass({
 
             <div>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info" bsSize="large">Content Packs</Button>
+                <Button bsStyle="info">Content Packs</Button>
               </LinkContainer>
             </div>
           </PageHeader>

@@ -58,7 +58,7 @@ class ContentPackUploadControls extends React.Component {
   render() {
     return (
       <span>
-        <Button id="upload-content-pack-button" bsStyle="info" bsSize="large" onClick={this._openModal}>Upload</Button>
+        <Button id="upload-content-pack-button" bsStyle="info" onClick={this._openModal}>Upload</Button>
         <BootstrapModalForm
           ref={(node) => { this.uploadModal = node; }}
           onSubmitForm={this._save}

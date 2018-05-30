@@ -65,7 +65,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                 id="entity-list"
               >
                 <table
-                  className="table undefined"
+                  className="table scrollable"
                 >
                   <thead>
                     <tr>
@@ -91,14 +91,19 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                       <td />
                       <td />
                       <td>
-                        <button
-                          className="btn btn-sm btn-info"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="button"
+                        <div
+                          className="btn-toolbar"
+                          role="toolbar"
                         >
-                          Show config
-                        </button>
+                          <button
+                            className="btn btn-xs btn-info"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            Show
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -107,18 +112,6 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
             </div>
           </div>
         </div>
-      </div>
-      <div
-        className="pull-right"
-      >
-        <button
-          className="btn btn-primary"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Install
-        </button>
       </div>
     </div>
   </div>

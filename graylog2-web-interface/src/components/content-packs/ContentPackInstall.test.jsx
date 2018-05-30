@@ -39,7 +39,7 @@ describe('<ContentPackInstall />', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-  it('should call install when clicked', () => {
+  it('should call install when called', () => {
     const installFn = jest.fn((id, rev, param) => {
       expect(id).toBe('1');
       expect(rev).toBe(2);
@@ -47,7 +47,7 @@ describe('<ContentPackInstall />', () => {
     });
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
-    wrapper.find("button[children='Install']").simulate('click');
+    wrapper.instance().onInstall();
     expect(installFn.mock.calls.length).toBe(1);
   });
 
@@ -56,7 +56,7 @@ describe('<ContentPackInstall />', () => {
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
     wrapper.find('input').at(0).simulate('change', { target: { value: '' } });
-    wrapper.find("button[children='Install']").simulate('click');
+    wrapper.instance().onInstall();
     expect(installFn.mock.calls.length).toBe(0);
   });
 });

@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
 
@@ -79,14 +79,14 @@ const ShowContentPackPage = createReactClass({
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
 
-            <div>
+            <ButtonToolbar>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                <Button bsStyle="info" bsSize="large">Content Packs</Button>
+                <Button bsStyle="info">Content Packs</Button>
               </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(lastPack.id), encodeURIComponent(lastPack.rev))}>
-                <Button bsStyle="primary" bsSize="large">Edit</Button>
+                <Button bsStyle="primary">Edit</Button>
               </LinkContainer>
-            </div>
+            </ButtonToolbar>
           </PageHeader>
 
           <Row>

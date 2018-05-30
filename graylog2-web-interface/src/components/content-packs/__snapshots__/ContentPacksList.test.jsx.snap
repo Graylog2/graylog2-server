@@ -1868,19 +1868,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
     </div>
   </div>
   <div>
-    <div
-      className="list-group"
-    >
-      <span
-        className="listGroupHeader list-group-item"
-      >
-        <div
-          className="headerWrapper"
-        >
-          
-        </div>
-      </span>
-    </div>
+    No content packs found. Please create or upload one
   </div>
   <div
     className="row-sm row"

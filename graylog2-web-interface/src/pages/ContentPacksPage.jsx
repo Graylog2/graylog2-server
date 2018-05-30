@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import Routes from 'routing/Routes';
 
 import Spinner from 'components/common/Spinner';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -55,18 +55,16 @@ const ContentPacksPage = createReactClass({
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
 
-            <div>
+            <ButtonToolbar>
               <ContentPackUploadControls />
-              &nbsp;
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
-                <Button bsStyle="success" bsSize="large">Create a content pack</Button>
+                <Button bsStyle="success">Create a content pack</Button>
               </LinkContainer>
-            </div>
+            </ButtonToolbar>
           </PageHeader>
 
           <Row className="content">
             <Col md={12}>
-
               <div id="react-configuration-bundles">
                 <ContentPacksList
                   contentPacks={this.state.contentPacks}

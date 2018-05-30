@@ -1,0 +1,13 @@
+:local(.scrollable) tbody {
+    height: 300px;
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: scroll;
+    display:block;
+}
+
+:local(.scrollable) thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}

@@ -19,12 +19,14 @@ class BootstrapModalForm extends React.Component {
     submitButtonDisabled: false,
     onModalOpen: () => {},
     onModalClose: () => {},
+    bsSize: 'lg',
     onSubmitForm: undefined,
     onCancel: () => {},
     bsSize: undefined,
   };
 
   static propTypes = {
+    bsSize: PropTypes.oneOf(['lg', 'large', 'sm', 'small']),
     /* Modal title */
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
     /* Form contents, included in the modal body */
