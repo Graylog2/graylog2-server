@@ -48,7 +48,7 @@ export default class AggregationControls extends React.Component {
   };
 
   _onSeriesChange = (series) => {
-    this.setState(state => ({ config: state.config.toBuilder().series(series.split(',')).build() }), this._propagateState);
+    this.setState(state => ({ config: state.config.toBuilder().series(series).build() }), this._propagateState);
   };
 
   _onSortChange = (sort) => {
@@ -93,7 +93,7 @@ export default class AggregationControls extends React.Component {
         </Row>
         <Row style={{ height: 'calc(100% - 60px)' }}>
           <Col md={2}>
-            <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series.join(',')} />
+            <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series} />
           </Col>
           <Col md={10} style={{ height: '100%' }}>
             {children}

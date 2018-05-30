@@ -4,12 +4,14 @@ import PropTypes from 'prop-types';
 import Select from 'components/common/Select';
 import { FieldList } from './AggregationBuilderPropTypes';
 
+const parseSeries = (series) => series ? series.split(',') : [];
+
 const SeriesSelect = ({ fields, onChange, series }) => (
   <Select placeholder="Series"
           allowCreate
-          onChange={onChange}
+          onChange={newSeries => onChange(parseSeries(newSeries))}
           options={fields}
-          value={series}
+          value={series.join(',')}
           multi />
 );
 
