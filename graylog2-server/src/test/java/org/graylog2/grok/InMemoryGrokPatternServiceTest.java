@@ -19,6 +19,7 @@ package org.graylog2.grok;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -37,7 +39,8 @@ public class InMemoryGrokPatternServiceTest {
 
     @Before
     public void setup() {
-        service = new InMemoryGrokPatternService();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        service = new InMemoryGrokPatternService(clusterEventBus);
     }
 
     @Test

@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.tools;
 
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
@@ -24,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,11 +34,13 @@ public class GrokTesterResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
+    private ClusterEventBus clusterEventBus;
     private GrokTesterResource resource;
 
     @Before
     public void setUp() throws Exception {
-        final InMemoryGrokPatternService grokPatternService = new InMemoryGrokPatternService();
+        clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final InMemoryGrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         grokPatternService.save(GrokPattern.create("NUMBER", "[0-9]+"));
         resource = new GrokTesterResource(grokPatternService);
     }

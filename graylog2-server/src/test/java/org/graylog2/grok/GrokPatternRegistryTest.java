@@ -19,7 +19,6 @@ package org.graylog2.grok;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.thekraken.grok.api.Grok;
-import io.thekraken.grok.api.exception.GrokException;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +63,7 @@ public class GrokPatternRegistryTest {
     public void grokPatternsChanged() {
         final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("NEW_PATTERN", "\\w+"));
         when(grokPatternService.loadAll()).thenReturn(newPatterns);
-        eventBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), Collections.singleton("NEW_PATTERN")));
+        eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("NEW_PATTERN")));
 
         assertThat(grokPatternRegistry.patterns()).isEqualTo(newPatterns);
     }
@@ -83,7 +82,7 @@ public class GrokPatternRegistryTest {
 
         final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
         when(grokPatternService.loadAll()).thenReturn(newPatterns);
-        eventBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), Collections.singleton("EMPTY")));
+        eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("EMPTY")));
 
         grokPatternRegistry.cachedGrokForPattern("%{EMPTY}");
     }
@@ -102,7 +101,7 @@ public class GrokPatternRegistryTest {
 
         final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
         when(grokPatternService.loadAll()).thenReturn(newPatterns);
-        eventBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), Collections.singleton("EMPTY")));
+        eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("EMPTY")));
 
         grokPatternRegistry.cachedGrokForPattern("%{EMPTY}", true);
     }
