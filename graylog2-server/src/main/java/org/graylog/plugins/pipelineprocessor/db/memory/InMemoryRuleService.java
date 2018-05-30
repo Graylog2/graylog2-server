@@ -21,11 +21,15 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -33,12 +37,18 @@ import java.util.stream.Collectors;
  * A RuleService that does not persist any data, but simply keeps it in memory.
  */
 public class InMemoryRuleService implements RuleService {
-
     // poor man's id generator
-    private AtomicLong idGen = new AtomicLong(0);
+    private final AtomicLong idGen = new AtomicLong(0);
 
-    private Map<String, RuleDao> store = new MapMaker().makeMap();
-    private Map<String, String> titleToId = new MapMaker().makeMap();
+    private final Map<String, RuleDao> store = new ConcurrentHashMap<>();
+    private final Map<String, String> titleToId = new ConcurrentHashMap<>();
+
+    private final ClusterEventBus clusterBus;
+
+    @Inject
+    public InMemoryRuleService(ClusterEventBus clusterBus) {
+        this.clusterBus = clusterBus;
+    }
 
     @Override
     public RuleDao save(RuleDao rule) {
@@ -54,6 +64,8 @@ public class InMemoryRuleService implements RuleService {
         }
         titleToId.put(toSave.title(), toSave.id());
         store.put(toSave.id(), toSave);
+
+        clusterBus.post(RulesChangedEvent.updatedRuleId(toSave.id()));
 
         return toSave;
     }
@@ -91,6 +103,7 @@ public class InMemoryRuleService implements RuleService {
         if (removed != null) {
             titleToId.remove(removed.title());
         }
+        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
     }
 
     @Override

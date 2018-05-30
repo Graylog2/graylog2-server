@@ -30,6 +30,9 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.events.ClusterEvent;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,6 +42,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,8 +58,10 @@ public class PipelineCodecTest {
     private PipelineCodec codec;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() {
-        connectionsService = new InMemoryPipelineStreamConnectionsService();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        connectionsService = new InMemoryPipelineStreamConnectionsService(clusterEventBus);
         codec = new PipelineCodec(objectMapper, pipelineService, connectionsService);
     }
 

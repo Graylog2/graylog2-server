@@ -21,9 +21,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -45,21 +47,29 @@ public class MongoDbRuleService implements RuleService {
     private static final String COLLECTION = "pipeline_processor_rules";
 
     private final JacksonDBCollection<RuleDao, String> dbCollection;
+    private final ClusterEventBus clusterBus;
 
     @Inject
-    public MongoDbRuleService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        dbCollection = JacksonDBCollection.wrap(
+    public MongoDbRuleService(MongoConnection mongoConnection,
+                              MongoJackObjectMapperProvider mapper,
+                              ClusterEventBus clusterBus) {
+        this.dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
                 RuleDao.class,
                 String.class,
                 mapper.get());
+        this.clusterBus = clusterBus;
         dbCollection.createIndex(DBSort.asc("title"), new BasicDBObject("unique", true));
     }
 
     @Override
     public RuleDao save(RuleDao rule) {
         final WriteResult<RuleDao, String> save = dbCollection.save(rule);
-        return save.getSavedObject();
+        final RuleDao savedRule = save.getSavedObject();
+
+        clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+
+        return savedRule;
     }
 
     @Override
@@ -97,6 +107,7 @@ public class MongoDbRuleService implements RuleService {
         if (result.getN() != 1) {
             log.error("Unable to delete rule {}", id);
         }
+        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
     }
 
     @Override

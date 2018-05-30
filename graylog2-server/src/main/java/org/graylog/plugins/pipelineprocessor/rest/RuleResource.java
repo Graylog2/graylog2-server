@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
-import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,14 +26,12 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -69,17 +66,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     private final RuleService ruleService;
     private final PipelineRuleParser pipelineRuleParser;
-    private final EventBus clusterBus;
     private final FunctionRegistry functionRegistry;
 
     @Inject
     public RuleResource(RuleService ruleService,
                         PipelineRuleParser pipelineRuleParser,
-                        ClusterEventBus clusterBus,
                         FunctionRegistry functionRegistry) {
         this.ruleService = ruleService;
         this.pipelineRuleParser = pipelineRuleParser;
-        this.clusterBus = clusterBus;
         this.functionRegistry = functionRegistry;
     }
 
@@ -104,8 +98,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .modifiedAt(now)
                 .build();
         final RuleDao save = ruleService.save(newRuleSource);
-        // TODO determine which pipelines could change because of this new rule (there could be pipelines referring to a previously unresolved rule)
-        clusterBus.post(RulesChangedEvent.updatedRuleId(save.id()));
+
         log.debug("Created new rule {}", save);
         return RuleSource.fromDao(pipelineRuleParser, save);
     }
@@ -186,9 +179,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
         final RuleDao savedRule = ruleService.save(toSave);
 
-        // TODO determine which pipelines could change because of this updated rule
-        clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
-
         return RuleSource.fromDao(pipelineRuleParser, savedRule);
     }
 
@@ -200,9 +190,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_DELETE, id);
         ruleService.load(id);
         ruleService.delete(id);
-
-        // TODO determine which pipelines could change because of this deleted rule, causing them to recompile
-        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
     }
 
 

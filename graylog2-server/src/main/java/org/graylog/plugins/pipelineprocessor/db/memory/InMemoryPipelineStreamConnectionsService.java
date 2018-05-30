@@ -18,9 +18,12 @@ package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,11 +31,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class InMemoryPipelineStreamConnectionsService implements PipelineStreamConnectionsService {
-
     // poor man's id generator
-    private AtomicLong idGen = new AtomicLong(0);
+    private final AtomicLong idGen = new AtomicLong(0);
 
-    private Map<String, PipelineConnections> store = new ConcurrentHashMap<>();
+    private final Map<String, PipelineConnections> store = new ConcurrentHashMap<>();
+    private final ClusterEventBus clusterBus;
+
+    @Inject
+    public InMemoryPipelineStreamConnectionsService(ClusterEventBus clusterBus) {
+        this.clusterBus = clusterBus;
+    }
 
     @Override
     public PipelineConnections save(PipelineConnections connections) {
@@ -40,6 +48,7 @@ public class InMemoryPipelineStreamConnectionsService implements PipelineStreamC
                 ? connections
                 : connections.toBuilder().id(createId()).build();
         store.put(toSave.id(), toSave);
+        clusterBus.post(PipelineConnectionsChangedEvent.create(toSave.streamId(), toSave.pipelineIds()));
 
         return toSave;
     }
@@ -69,7 +78,10 @@ public class InMemoryPipelineStreamConnectionsService implements PipelineStreamC
     public void delete(String streamId) {
         try {
             final PipelineConnections connections = load(streamId);
+            final Set<String> pipelineIds = connections.pipelineIds();
+
             store.remove(connections.id());
+            clusterBus.post(PipelineConnectionsChangedEvent.create(streamId, pipelineIds));
         } catch (NotFoundException e) {
             // Do nothing
         }

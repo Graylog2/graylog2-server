@@ -21,9 +21,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
 public class MongoDbPipelineService implements PipelineService {
     private static final Logger log = LoggerFactory.getLogger(MongoDbPipelineService.class);
@@ -42,21 +45,29 @@ public class MongoDbPipelineService implements PipelineService {
     private static final String COLLECTION = "pipeline_processor_pipelines";
 
     private final JacksonDBCollection<PipelineDao, String> dbCollection;
+    private final ClusterEventBus clusterBus;
 
     @Inject
-    public MongoDbPipelineService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        dbCollection = JacksonDBCollection.wrap(
+    public MongoDbPipelineService(MongoConnection mongoConnection,
+                                  MongoJackObjectMapperProvider mapper,
+                                  ClusterEventBus clusterBus) {
+        this.dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
                 PipelineDao.class,
                 String.class,
                 mapper.get());
+        this.clusterBus = clusterBus;
         dbCollection.createIndex(DBSort.asc("title"), new BasicDBObject("unique", true));
     }
 
     @Override
     public PipelineDao save(PipelineDao pipeline) {
         final WriteResult<PipelineDao, String> save = dbCollection.save(pipeline);
-        return save.getSavedObject();
+        final PipelineDao savedPipeline = save.getSavedObject();
+
+        clusterBus.post(PipelinesChangedEvent.updatedPipelineId(savedPipeline.id()));
+
+        return savedPipeline;
     }
 
     @Override
@@ -81,7 +92,7 @@ public class MongoDbPipelineService implements PipelineService {
     @Override
     public Collection<PipelineDao> loadAll() {
         try (DBCursor<PipelineDao> daos = dbCollection.find()) {
-            return ImmutableSet.copyOf((Iterable<PipelineDao>) daos);
+            return ImmutableSet.copyOf((Iterator<PipelineDao>) daos);
         } catch (MongoException e) {
             log.error("Unable to load pipelines", e);
             return Collections.emptySet();
@@ -91,5 +102,6 @@ public class MongoDbPipelineService implements PipelineService {
     @Override
     public void delete(String id) {
         dbCollection.removeById(id);
+        clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
     }
 }

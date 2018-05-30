@@ -17,25 +17,34 @@
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.MapMaker;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A PipelineService that does not persist any data, but simply keeps it in memory.
  */
 public class InMemoryPipelineService implements PipelineService {
-
     // poor man's id generator
-    private AtomicLong idGen = new AtomicLong(0);
+    private final AtomicLong idGen = new AtomicLong(0);
 
-    private Map<String, PipelineDao> store = new MapMaker().makeMap();
-    private Map<String, String> titleToId = new MapMaker().makeMap();
+    private final Map<String, PipelineDao> store = new ConcurrentHashMap<>();
+    private final Map<String, String> titleToId = new ConcurrentHashMap<>();
+
+    private final ClusterEventBus clusterBus;
+
+    @Inject
+    public InMemoryPipelineService(ClusterEventBus clusterBus) {
+        this.clusterBus = clusterBus;
+    }
 
     @Override
     public PipelineDao save(PipelineDao pipeline) {
@@ -51,6 +60,8 @@ public class InMemoryPipelineService implements PipelineService {
         }
         titleToId.put(toSave.title(), toSave.id());
         store.put(toSave.id(), toSave);
+
+        clusterBus.post(PipelinesChangedEvent.updatedPipelineId(toSave.id()));
 
         return toSave;
     }
@@ -88,6 +99,8 @@ public class InMemoryPipelineService implements PipelineService {
         if (removed != null) {
             titleToId.remove(removed.title());
         }
+
+        clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
     }
 
     private String createId() {

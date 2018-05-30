@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,10 +25,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -60,17 +57,14 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;
     private final StreamService streamService;
-    private final EventBus clusterBus;
 
     @Inject
     public PipelineConnectionsResource(PipelineStreamConnectionsService connectionsService,
                                        PipelineService pipelineService,
-                                       StreamService streamService,
-                                       ClusterEventBus clusterBus) {
+                                       StreamService streamService) {
         this.connectionsService = connectionsService;
         this.pipelineService = pipelineService;
         this.streamService = streamService;
-        this.clusterBus = clusterBus;
     }
 
     @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
@@ -89,7 +83,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             checkPermission(PipelineRestPermissions.PIPELINE_READ, s);
             pipelineService.load(s);
         }
-        return savePipelineConnections(connection);
+        return connectionsService.save(connection);
     }
 
     @ApiOperation(value = "Connect streams to a processing pipeline", notes = "")
@@ -118,7 +112,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
                 pipelineConnection.toBuilder().pipelineIds(pipelines).build();
 
                 updatedConnections.add(pipelineConnection);
-                savePipelineConnections(pipelineConnection);
+                connectionsService.save(pipelineConnection);
                 LOG.debug("Deleted stream {} connection with pipeline {}", pipelineConnection.streamId(), pipelineId);
             }
         }
@@ -141,7 +135,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             updatedConnection.toBuilder().pipelineIds(pipelines).build();
 
             updatedConnections.add(updatedConnection);
-            savePipelineConnections(updatedConnection);
+            connectionsService.save(updatedConnection);
             LOG.debug("Added stream {} connection with pipeline {}", streamId, pipelineId);
         }
 
@@ -191,12 +185,6 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         }
 
         return filteredConnections;
-    }
-
-    private PipelineConnections savePipelineConnections(PipelineConnections connection) {
-        final PipelineConnections save = connectionsService.save(connection);
-        clusterBus.post(PipelineConnectionsChangedEvent.create(save.streamId(), save.pipelineIds()));
-        return save;
     }
 
 }
