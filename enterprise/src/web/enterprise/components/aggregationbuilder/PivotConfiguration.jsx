@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import TimeHistogramPivot from './pivottypes/TimeHistogramPivot';
 import NoConfigurationPivot from './pivottypes/NoConfigurationPivot';
+import FieldType from '../../logic/fieldtypes/FieldType';
 
 const _configurationComponentByType = (type, value, onChange) => {
-  switch (type) {
+  switch (type.type) {
     case 'date': return <TimeHistogramPivot onChange={onChange} value={value} />;
     default: return <NoConfigurationPivot />;
   }
@@ -14,7 +15,7 @@ const _configurationComponentByType = (type, value, onChange) => {
 
 export default class PivotConfiguration extends React.Component {
   static propTypes = {
-    type: PropTypes.string.isRequired,
+    type: PropTypes.instanceOf(FieldType).isRequired,
     config: PropTypes.shape({
       type: PropTypes.string.isRequired,
     }).isRequired,

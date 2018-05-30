@@ -3,18 +3,17 @@ import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
 import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 
 const _fieldResult = (field, score = 1) => {
-  // eslint-disable-next-line camelcase
-  const { field_name, physical_type } = field.toObject();
+  const { name, type } = field;
   return {
-    name: field_name,
-    value: field_name,
+    name: name,
+    value: name,
     score,
-    meta: physical_type,
+    meta: type.type,
   };
 };
 
 const _matchesFieldName = (prefix) => {
-  return field => (field.get('field_name').indexOf(prefix) >= 0);
+  return field => (field.name.indexOf(prefix) >= 0);
 };
 
 export default class SearchBarAutoCompletions {

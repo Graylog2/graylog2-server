@@ -7,6 +7,7 @@ import connect from 'stores/connect';
 import WidgetHeader from '../widgets/WidgetHeader';
 import MessageList from '../widgets/MessageList';
 import { FieldTypesStore } from '../../stores/FieldTypesStore';
+import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
 
 const StaticMessageList = ({ showMessages, onToggleMessages, fieldTypes, messages }) => (
   <div className={style.widgetContainer}>
@@ -21,7 +22,7 @@ const StaticMessageList = ({ showMessages, onToggleMessages, fieldTypes, message
 
 StaticMessageList.propTypes = {
   fieldTypes: PropTypes.shape({
-    all: ImmutablePropTypes.listOf(ImmutablePropTypes.map),
+    all: ImmutablePropTypes.listOf(PropTypes.instanceOf(FieldTypeMapping)),
   }).isRequired,
   messages: PropTypes.shape({
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,

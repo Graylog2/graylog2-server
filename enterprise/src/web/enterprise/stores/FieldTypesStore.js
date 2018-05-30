@@ -4,6 +4,7 @@ import Immutable from 'immutable';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import { QueryFiltersStore } from './QueryFiltersStore';
+import FieldTypeMapping from '../logic/fieldtypes/FieldTypeMapping';
 
 const fieldTypesUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/fields');
 
@@ -46,10 +47,12 @@ export const FieldTypesStore = Reflux.createStore({
   },
 
   all() {
-    const promise = fetch('GET', fieldTypesUrl).then((response) => {
-      this.all = Immutable.fromJS(response);
-      this._trigger();
-    });
+    const promise = fetch('GET', fieldTypesUrl)
+      .then(this._deserializeFieldTypes)
+      .then((response) => {
+        this.all = Immutable.fromJS(response);
+        this._trigger();
+      });
 
     FieldTypesActions.all.promise(promise);
 
@@ -57,7 +60,13 @@ export const FieldTypesStore = Reflux.createStore({
   },
 
   forStreams(streams) {
-    return fetch('POST', fieldTypesUrl, { streams: streams });
+    return fetch('POST', fieldTypesUrl, { streams: streams })
+      .then(this._deserializeFieldTypes);
+  },
+
+  _deserializeFieldTypes(response) {
+    return response
+      .map(fieldTypeMapping => FieldTypeMapping.fromJSON(fieldTypeMapping));
   },
 
   _state() {

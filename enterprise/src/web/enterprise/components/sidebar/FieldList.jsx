@@ -53,9 +53,8 @@ const FieldList = createReactClass({
   },
 
   _renderField({ fields, fieldType, selectedQuery, selectedView, selectedFields }) {
-    const name = fieldType.get('field_name');
-    const type = fieldType.get('physical_type');
-    const disabled = !fields.find(f => f.get('field_name') === name);
+    const { name, type } = fieldType;
+    const disabled = !fields.find(f => f.name === name);
 
     return (
       <li key={`field-${name}`} className={styles.fieldListItem} >

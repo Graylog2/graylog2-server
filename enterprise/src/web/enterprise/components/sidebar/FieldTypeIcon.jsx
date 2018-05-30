@@ -2,14 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import styles from './FieldTypeIcon.css';
+import FieldType from '../../logic/fieldtypes/FieldType';
 
 const iconClass = (type) => {
   switch (type) {
-    case 'keyword':
+    case 'string':
       return 'font';
-    case 'text':
-      return 'paragraph';
+    case 'byte':
+    case 'double':
+    case 'float':
+    case 'int':
     case 'long':
+    case 'short':
       return 'line-chart';
     case 'date':
       return 'calendar';
@@ -18,11 +22,11 @@ const iconClass = (type) => {
   }
 };
 const FieldTypeIcon = ({ type }) => {
-  return <i className={`fa fa-${iconClass(type)} ${styles.fieldTypeIcon}`} />;
+  return <i className={`fa fa-${iconClass(type.type)} ${styles.fieldTypeIcon}`} />;
 };
 
 FieldTypeIcon.propTypes = {
-  type: PropTypes.string.isRequired,
+  type: PropTypes.instanceOf(FieldType).isRequired,
 };
 
 export default FieldTypeIcon;

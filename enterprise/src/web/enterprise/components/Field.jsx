@@ -7,6 +7,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import OverlayDropdown from './OverlayDropdown';
 
 import style from './Field.css';
+import FieldType from '../logic/fieldtypes/FieldType';
 
 export default class Field extends React.Component {
   static propTypes = {
@@ -15,8 +16,7 @@ export default class Field extends React.Component {
     name: PropTypes.string.isRequired,
     menuContainer: PropTypes.object,
     queryId: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    viewId: PropTypes.string,
+    type: PropTypes.instanceOf(FieldType).isRequired,
   };
 
   static defaultProps = {
@@ -37,7 +37,7 @@ export default class Field extends React.Component {
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
   render() {
-    const { children, disabled, menuContainer, name, queryId, type, viewId } = this.props;
+    const { children, disabled, menuContainer, name, queryId, type } = this.props;
     const element = children || name;
     const wrappedElement = disabled ? <span className={style.disabled}>{element}</span> : element;
     const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
@@ -60,7 +60,7 @@ export default class Field extends React.Component {
                        menuContainer={menuContainer} >
         <div style={{ marginBottom: '10px' }}>
           <span className={style.dropdownheader}>
-            {name} = {type}
+            {name} = {type.type}
           </span>
         </div>
 

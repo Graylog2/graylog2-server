@@ -9,6 +9,7 @@ import connect from 'stores/connect';
 
 import PivotConfiguration from './PivotConfiguration';
 import { FieldTypesStore } from '../../stores/FieldTypesStore';
+import FieldType from '../../logic/fieldtypes/FieldType';
 
 class ConfigurablePivot extends React.Component {
   static propTypes = {};
@@ -31,7 +32,8 @@ class ConfigurablePivot extends React.Component {
 
   render() {
     const { value, config, fields } = this.props;
-    const fieldType = fields.all.filter(v => v.get('field_name') === value.label).getIn([0, 'physical_type'], 'unknown');
+    const fieldTypes = fields.all.filter(v => v.name === value.label);
+    const fieldType = fieldTypes.isEmpty() ? FieldType.Unknown : fieldTypes.first().type;
     const popover = this.state.isOpen && (
       <Portal>
         <Position

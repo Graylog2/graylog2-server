@@ -91,7 +91,7 @@ export default {
       type: 'chart',
       title: 'Chart',
       handler: ChartActionHandler,
-      condition: ({ type }) => type === 'long',
+      condition: ({ type }) => type.isNumeric(),
     },
     {
       type: 'aggregate',

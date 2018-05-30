@@ -14,6 +14,7 @@ import { QueriesStore } from 'enterprise/stores/QueriesStore';
 import { SelectedFieldsStore } from '../../stores/SelectedFieldsStore';
 import { ViewStore } from '../../stores/ViewStore';
 import { SearchConfigStore } from '../../stores/SearchConfigStore';
+import FieldType from '../../logic/fieldtypes/FieldType';
 
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
@@ -90,7 +91,7 @@ const MessageList = createReactClass({
   },
 
   _fieldTypeFor(fieldName, fields) {
-    return fields.find(f => f.get('field_name') === fieldName).get('physical_type', 'unknown')
+    return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
   },
 
   render() {
