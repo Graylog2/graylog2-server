@@ -33,6 +33,8 @@ import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -42,6 +44,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,8 +61,13 @@ public class PipelineRuleCatalogTest {
     private PipelineRuleCatalog catalog;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
-        final RuleService ruleService = new MongoDbRuleService(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final RuleService ruleService = new MongoDbRuleService(
+                mongoRule.getMongoConnection(),
+                new MongoJackObjectMapperProvider(objectMapper),
+                clusterEventBus);
         final PipelineRuleCodec codec = new PipelineRuleCodec(objectMapper, ruleService);
 
         catalog = new PipelineRuleCatalog(ruleService, codec);

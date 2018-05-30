@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.db.memory;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -33,7 +34,7 @@ public class InMemoryRuleServiceTest {
 
     @Before
     public void setup() {
-        service = new InMemoryRuleService();
+        service = new InMemoryRuleService(new ClusterEventBus());
     }
 
     @Test

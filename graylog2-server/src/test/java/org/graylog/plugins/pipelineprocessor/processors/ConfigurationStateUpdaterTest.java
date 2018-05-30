@@ -48,6 +48,7 @@ import org.graylog.plugins.pipelineprocessor.db.memory.InMemoryServicesModule;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.Tools;
@@ -76,6 +77,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Ignore("code generation disabled")
@@ -96,6 +98,7 @@ public class ConfigurationStateUpdaterTest {
                 binder -> binder.bindConstant().annotatedWith(Names.named("cached_stageiterators")).to(true),
                 binder -> binder.bindConstant().annotatedWith(Names.named("processbuffer_processors")).to(1),
                 binder -> binder.bind(StreamService.class).to(DummyStreamService.class),
+                binder -> binder.bind(ClusterEventBus.class).toInstance(new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor())),
                 binder -> binder.bind(GrokPatternService.class).to(InMemoryGrokPatternService.class),
                 binder -> binder.bind(FunctionRegistry.class).asEagerSingleton(),
                 binder -> binder.bind(MetricRegistry.class).toProvider(MetricRegistryProvider.class).asEagerSingleton()
