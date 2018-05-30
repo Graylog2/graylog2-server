@@ -25,6 +25,7 @@ import org.graylog2.grok.GrokPatternsUpdatedEvent;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,6 +70,7 @@ public class GrokResourceTest {
     }
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() {
         final ClusterEventBus clusterBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         grokPatternService = new InMemoryGrokPatternService(clusterBus);

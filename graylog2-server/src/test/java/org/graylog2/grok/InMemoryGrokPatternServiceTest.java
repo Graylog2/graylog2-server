@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +39,7 @@ public class InMemoryGrokPatternServiceTest {
     private InMemoryGrokPatternService service;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setup() {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         service = new InMemoryGrokPatternService(clusterEventBus);

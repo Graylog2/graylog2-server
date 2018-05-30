@@ -26,7 +26,9 @@ import org.bson.Document;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -36,6 +38,7 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,13 +53,19 @@ public class MongoDbGrokPatternServiceTest {
 
     private MongoDbGrokPatternService service;
     private MongoCollection<Document> collection;
+    private ClusterEventBus clusterEventBus;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
-        service = new MongoDbGrokPatternService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider);
+        clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        service = new MongoDbGrokPatternService(
+                mongoRule.getMongoConnection(),
+                mongoJackObjectMapperProvider,
+                clusterEventBus);
         collection = mongoRule
                 .getMongoConnection()
                 .getMongoDatabase()
