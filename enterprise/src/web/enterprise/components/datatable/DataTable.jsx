@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import Immutable from 'immutable';
 import { flatten, get, isEqual, last, uniqWith } from 'lodash';
 
@@ -7,19 +8,30 @@ import expandRows from 'enterprise/logic/ExpandRows';
 import connect from 'stores/connect';
 import Field from 'enterprise/components/Field';
 import Value from 'enterprise/components/Value';
+import { ViewStore } from 'enterprise/stores/ViewStore';
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import DataTableEntry from './DataTableEntry';
-import { ViewStore } from '../../stores/ViewStore';
 import { AggregationType } from '../aggregationbuilder/AggregationBuilderPropTypes';
 
 class DataTable extends React.Component {
   static propTypes = {
-    data: PropTypes.arrayOf(PropTypes.object).isRequired,
     config: AggregationType.isRequired,
+    currentView: PropTypes.shape({
+      activeQuery: PropTypes.string.isRequired,
+    }).isRequired,
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    fields: ImmutablePropTypes.listOf(PropTypes.instanceOf(FieldTypeMapping)).isRequired,
+  };
+
+  _fieldTypeFor = (field) => {
+    const fieldType = this.props.fields.find(f => f.name === field);
+    return fieldType ? fieldType.type : FieldType.Unknown;
   };
 
   _headerField = (field, prefix = '', span = 1) => (
     <th key={`${prefix}${field}`} colSpan={span} style={{ left: '0px' }}>
-      <Field name={field} queryId={this.props.currentView.activeQuery}>{field}</Field>
+      <Field name={field} queryId={this.props.currentView.activeQuery} type={this._fieldTypeFor(field)}>{field}</Field>
     </th>
   );
 
