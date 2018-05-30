@@ -17,13 +17,16 @@
 package org.graylog2.dashboards;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -34,6 +37,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,8 +59,15 @@ public class DashboardServiceImplTest {
     private DashboardWidgetCreator dashboardWidgetCreator;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUpService() {
-        this.dashboardService = new DashboardServiceImpl(mongoRule.getMongoConnection(), dashboardWidgetCreator);
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final EventBus serverEventBus = new EventBus("server-event-bus");
+        dashboardService = new DashboardServiceImpl(
+                mongoRule.getMongoConnection(),
+                dashboardWidgetCreator,
+                clusterEventBus,
+                serverEventBus);
     }
 
     @Test

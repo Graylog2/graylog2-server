@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.catalogs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -36,6 +37,8 @@ import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.timeranges.TimeRangeFactory;
 import org.junit.Before;
@@ -45,6 +48,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,13 +68,16 @@ public class DashboardCatalogTest {
     private DashboardCatalog catalog;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final TimeRangeFactory timeRangeFactory = new TimeRangeFactory();
         final WidgetCacheTime widgetCacheTime = new WidgetCacheTime(Duration.minutes(5L), 120);
         final WidgetCacheTime.Factory widgetCacheTimeFactory = mock(WidgetCacheTime.Factory.class);
         when(widgetCacheTimeFactory.create(anyInt())).thenReturn(widgetCacheTime);
         final DashboardWidgetCreator widgetCreator = new DashboardWidgetCreator(widgetCacheTimeFactory, timeRangeFactory);
-        final DashboardService dashboardService = new DashboardServiceImpl(mongoRule.getMongoConnection(), widgetCreator);
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final EventBus serverEventBus = new EventBus("server-event-bus");
+        final DashboardService dashboardService = new DashboardServiceImpl(mongoRule.getMongoConnection(), widgetCreator, clusterEventBus, serverEventBus);
         final DashboardCodec codec = new DashboardCodec(objectMapper, dashboardService, widgetCreator, timeRangeFactory);
 
         catalog = new DashboardCatalog(dashboardService, codec);
