@@ -1,5 +1,5 @@
 import React from 'react';
-import { trim } from 'lodash';
+import { isEqual, trim } from 'lodash';
 
 import Spinner from 'components/common/Spinner';
 import { FieldList } from 'enterprise/components/sidebar';
@@ -38,58 +38,65 @@ const ConnectedFieldList = connect(FieldList, { selectedFields: SelectedFieldsSt
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore });
 const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
 
-const SearchResult = (props) => {
-  const { parameterBindings, queryId } = props;
-  const { configurations, fieldTypes, searches, searchMetadata, showMessages, viewState } = props;
-  const { onExecute, onHandleParameterSave, onToggleMessages } = props;
-
-  if (!configurations.searchesClusterConfig || !fieldTypes) {
-    return <Spinner />;
+class SearchResult extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return !isEqual(nextProps, this.props);
   }
 
-  const results = searches && searches.result;
-  const widgetMapping = searches && searches.widgetMapping;
-  const searchConfig = configurations.searchesClusterConfig;
+  render() {
+    const props = this.props;
+    const { parameterBindings, queryId } = props;
+    const { configurations, fieldTypes, searches, searchMetadata, showMessages, viewState } = props;
+    const { onExecute, onHandleParameterSave, onToggleMessages } = props;
 
-  const currentResults = results ? results.forId(queryId) : undefined;
-  const allFields = fieldTypes.all;
-  const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
-  const positions = viewState.state && viewState.state.widgetPositions;
+    if (!configurations.searchesClusterConfig || !fieldTypes) {
+      return <Spinner />;
+    }
 
-  const usedParameters = getUsedParameters(searchMetadata);
-  const undeclaredParameters = getUndeclaredParameters(searchMetadata);
-  const disableSearch = _disableSearch(undeclaredParameters, parameterBindings);
+    const results = searches && searches.result;
+    const widgetMapping = searches && searches.widgetMapping;
+    const searchConfig = configurations.searchesClusterConfig;
 
-  const content = currentResults ? (
-    <QueryWithWidgets allFields={allFields}
-                      fields={queryFields}
-                      onToggleMessages={onToggleMessages}
-                      queryId={queryId}
-                      results={currentResults}
-                      showMessages={showMessages}
-                      positions={positions}
-                      widgetMapping={widgetMapping}>
-      <ConnectedSideBar queryId={queryId} results={currentResults}>
-        <ConnectedFieldList allFields={fieldTypes.all}
-                            fields={queryFields} />
-      </ConnectedSideBar>
-    </QueryWithWidgets>
-  ) : <Spinner />;
+    const currentResults = results ? results.forId(queryId) : undefined;
+    const allFields = fieldTypes.all;
+    const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
+    const positions = viewState.state && viewState.state.widgetPositions;
 
-  return (
-    <span>
-      <SearchBar config={searchConfig}
-                 results={currentResults}
-                 disableSearch={disableSearch}
-                 onExecute={onExecute} />
-      <ParameterBar usedParameters={usedParameters}
-                    undeclaredParameters={undeclaredParameters}
-                    onParameterSave={onHandleParameterSave} />
-      {content}
-      <SearchLoadingIndicator />
-    </span>
-  );
-};
+    const usedParameters = getUsedParameters(searchMetadata);
+    const undeclaredParameters = getUndeclaredParameters(searchMetadata);
+    const disableSearch = _disableSearch(undeclaredParameters, parameterBindings);
+
+    const content = currentResults ? (
+      <QueryWithWidgets allFields={allFields}
+                        fields={queryFields}
+                        onToggleMessages={onToggleMessages}
+                        queryId={queryId}
+                        results={currentResults}
+                        showMessages={showMessages}
+                        positions={positions}
+                        widgetMapping={widgetMapping}>
+        <ConnectedSideBar queryId={queryId} results={currentResults}>
+          <ConnectedFieldList allFields={fieldTypes.all}
+                              fields={queryFields} />
+        </ConnectedSideBar>
+      </QueryWithWidgets>
+    ) : <Spinner />;
+
+    return (
+      <span>
+        <SearchBar config={searchConfig}
+                   results={currentResults}
+                   disableSearch={disableSearch}
+                   onExecute={onExecute} />
+        <ParameterBar usedParameters={usedParameters}
+                      undeclaredParameters={undeclaredParameters}
+                      onParameterSave={onHandleParameterSave} />
+        {content}
+        <SearchLoadingIndicator />
+      </span>
+    );
+  };
+}
 
 export default connect(SearchResult, {
   configurations: SearchConfigStore,
@@ -97,4 +104,4 @@ export default connect(SearchResult, {
   searches: SearchStore,
   searchMetadata: SearchMetadataStore,
   viewState: CurrentViewStateStore,
-});
+}, props => Object.assign({}, props, { searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping } }));
