@@ -83,7 +83,7 @@ const FieldList = createReactClass({
     const selectedQuery = this.state.viewMetadata.activeQuery;
     const selectedView = this.state.viewMetadata.id;
     const fieldList = allFields
-      .sort()
+      .sortBy(field => field.name)
       .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, selectedFields, fields }));
     return (
       <ul ref={(elem) => { this.fieldList = elem; }}
