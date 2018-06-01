@@ -235,30 +235,6 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
             <br />
             <br />
             <br />
-            <div>
-              <h2>
-                Parameters list
-              </h2>
-              <br />
-              <div>
-                <div
-                  className="row "
-                >
-                  <div
-                    className="col-md-12"
-                  >
-                    <div
-                      className="data-table table-responsive"
-                      id="parameter-list"
-                    >
-                      <p>
-                        To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

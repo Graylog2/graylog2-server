@@ -55,8 +55,11 @@ class Wizard extends React.Component {
 
   _disableButton = (direction) => {
     const len = this.props.steps.length;
-    const position = direction === 'next' ? (len - 1) : 0;
-    return this.props.steps[position].key === this.state.selectedStep || this.props.steps[position].disabled;
+    const disabledPosition = direction === 'next' ? (len - 1) : 0;
+    const currentPosition = this.props.steps.findIndex(step => step.key === this.state.selectedStep);
+    const otherPosition = direction === 'next' ? (currentPosition + 1) : (currentPosition - 1);
+    const otherStep = (this.props.steps[otherPosition] || {});
+    return this.props.steps[disabledPosition].key === this.state.selectedStep || otherStep.disabled;
   };
 
   _onNext = () => {
@@ -72,6 +75,7 @@ class Wizard extends React.Component {
   };
 
   render() {
+    const middleSize = this.props.children ? 6 : 10;
     return (
       <Row className="content">
         <Col md={2} className={WizardStyle.subnavigation}>
@@ -90,7 +94,7 @@ class Wizard extends React.Component {
             </Col>
           </Row>
         </Col>
-        <Col md={6}>
+        <Col md={middleSize}>
           {this.props.steps[this._getSelectedIndex()].component}
         </Col>
         {this.props.children &&

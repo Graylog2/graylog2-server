@@ -520,7 +520,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           </a>
         </li>
         <li
-          className=""
+          className="disabled"
           role="presentation"
           style={undefined}
         >
@@ -529,6 +529,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
             onClick={[Function]}
             onKeyDown={[Function]}
             role="button"
+            style={
+              Object {
+                "pointerEvents": "none",
+              }
+            }
+            tabIndex={-1}
           >
             Preview
           </a>
