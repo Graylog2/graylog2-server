@@ -46,8 +46,8 @@ export const WidgetStore = Reflux.createStore({
     if (widget.id === undefined) {
       throw new Error('Unable to add widget without id to query.');
     }
-    this.widgets = this.widgets.set(widget.id, widget);
-    this._updateWidgets();
+    const newWidgets = this.widgets.set(widget.id, widget);
+    this._updateWidgets(newWidgets);
   },
   duplicate(widgetId) {
     const widget = this.widgets.get(widgetId);
@@ -55,28 +55,28 @@ export const WidgetStore = Reflux.createStore({
       throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
     }
     const duplicatedWidget = widget.duplicate(uuid());
-    this.widgets = this.widgets.set(duplicatedWidget, duplicatedWidget);
-    this._updateWidgets();
+    const newWidgets = this.widgets.set(duplicatedWidget, duplicatedWidget);
+    this._updateWidgets(newWidgets);
     return duplicatedWidget;
   },
   filter(widgetId, filter) {
-    this.widgets = this.widgets.update(widgetId, widget => widget.toBuilder().filter(filter).build());
-    this._updateWidgets(this.widgets);
+    const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().filter(filter).build());
+    this._updateWidgets(newWidgets);
   },
   remove(widgetId) {
-    this.widgets = this.widgets.remove(widgetId);
-    this._updateWidgets();
+    const newWidgets = this.widgets.remove(widgetId);
+    this._updateWidgets(newWidgets);
   },
   update(widgetId, widget) {
-    this.widgets = this.widgets.set(widgetId, widget);
-    this._updateWidgets();
+    const newWidgets = this.widgets.set(widgetId, widget);
+    this._updateWidgets(newWidgets);
   },
   updateConfig(widgetId, config) {
-    this.widgets = this.widgets.update(widgetId, widget => widget.toBuilder().config(config).build());
-    this._updateWidgets();
+    const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().config(config).build());
+    this._updateWidgets(newWidgets);
   },
-  _updateWidgets() {
-    const widgets = this.widgets.valueSeq().toList();
+  _updateWidgets(newWidgets) {
+    const widgets = newWidgets.valueSeq().toList();
     CurrentViewStateActions.widgets(widgets);
   },
   _trigger() {
