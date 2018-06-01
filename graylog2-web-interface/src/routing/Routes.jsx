@@ -129,6 +129,16 @@ const Routes = {
       SIMULATOR: '/system/pipelines/simulate',
     },
     ENTERPRISE: '/system/enterprise',
+    SIDECARS: {
+      OVERVIEW: '/system/sidecars',
+      STATUS: sidecarId => `/system/sidecars/${sidecarId}/status`,
+      ADMINISTRATION: '/system/sidecars/administration',
+      CONFIGURATION: '/system/sidecars/configuration',
+      NEW_CONFIGURATION: '/system/sidecars/configuration/new',
+      EDIT_CONFIGURATION: configurationId => `/system/sidecars/configuration/edit/${configurationId}`,
+      NEW_COLLECTOR: '/system/sidecars/collector/new',
+      EDIT_COLLECTOR: collectorId => `/system/sidecars/collector/edit/${collectorId}`,
+    }
   },
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);

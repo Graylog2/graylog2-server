@@ -1,0 +1,15 @@
+:local(.marginQuickReferenceText) {
+    margin-top: 5px;
+}
+
+:local(.marginTab) {
+    margin-top: 10px;
+}
+
+:local(.exampleFunction) {
+    white-space: pre-wrap;
+}
+
+.panel-body h3 {
+    margin-bottom: 5px;
+}

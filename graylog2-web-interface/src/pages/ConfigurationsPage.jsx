@@ -13,6 +13,8 @@ const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
+import SidecarConfig from 'components/configurations/SidecarConfig';
+
 import {} from 'components/maps/configurations'
 
 const ConfigurationsPage = createReactClass({
@@ -29,6 +31,7 @@ const ConfigurationsPage = createReactClass({
     this.style.use();
     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
     ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
+    ConfigurationActions.list(this.SIDECAR_CONFIG);
 
     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
       ConfigurationActions.list(systemConfig.configType);
@@ -42,8 +45,10 @@ const ConfigurationsPage = createReactClass({
   style: require('!style/useable!css!components/configurations/ConfigurationStyles.css'),
   SEARCHES_CLUSTER_CONFIG: 'org.graylog2.indexer.searches.SearchesClusterConfig',
   MESSAGE_PROCESSORS_CONFIG: 'org.graylog2.messageprocessors.MessageProcessorsConfig',
+  SIDECAR_CONFIG: 'org.graylog.plugins.sidecar.system.SidecarConfiguration',
 
   _getConfig(configType) {
+    console.log(this.state.configuration);
     if (this.state.configuration && this.state.configuration[configType]) {
       return this.state.configuration[configType];
     }
@@ -97,8 +102,10 @@ const ConfigurationsPage = createReactClass({
   render() {
     const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
     const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
+    const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
+    let sidecarConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -114,6 +121,14 @@ const ConfigurationsPage = createReactClass({
       );
     } else {
       messageProcessorsConfigComponent = (<Spinner />);
+    }
+    if (sidecarConfig) {
+      sidecarConfigComponent = (
+        <SidecarConfig config={sidecarConfig}
+                       updateConfig={this._onUpdate(this.SIDECAR_CONFIG)} />
+      );
+    } else {
+      sidecarConfigComponent = (<Spinner />);
     }
 
     const pluginConfigRows = this._pluginConfigRows();
@@ -133,6 +148,9 @@ const ConfigurationsPage = createReactClass({
             </Col>
             <Col md={6}>
               {messageProcessorsConfigComponent}
+            </Col>
+            <Col md={6}>
+              {sidecarConfigComponent}
             </Col>
           </Row>
 
