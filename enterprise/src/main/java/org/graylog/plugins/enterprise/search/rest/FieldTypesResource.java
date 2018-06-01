@@ -11,7 +11,9 @@ import org.graylog2.indexer.fieldtypes.FieldTypes;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
@@ -24,7 +26,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
@@ -46,7 +47,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
         this.fieldTypeMapper = fieldTypeMapper;
     }
 
-    private Set<MappedFieldTypeDTO> mergeCompoundFieldTypes(Stream<MappedFieldTypeDTO> stream) {
+    private Set<MappedFieldTypeDTO> mergeCompoundFieldTypes(java.util.stream.Stream<MappedFieldTypeDTO> stream) {
         return stream.collect(Collectors.groupingBy(MappedFieldTypeDTO::name, Collectors.toSet()))
                 .entrySet()
                 .stream()
@@ -76,29 +77,50 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     @GET
     public Set<MappedFieldTypeDTO> allFieldTypes() {
-        return mergeCompoundFieldTypes(indexFieldTypesService.findAll()
+        if (allowedToReadStream("*")) {
+            return mergeCompoundFieldTypes(indexFieldTypesService.findAll()
+                    .stream()
+                    .map(IndexFieldTypesDTO::fields)
+                    .flatMap(Collection::stream)
+                    .map(this::mapPhysicalFieldType));
+        }
+        final Set<String> allowedStreams = streamService.loadAll()
                 .stream()
-                .map(IndexFieldTypesDTO::fields)
-                .flatMap(Collection::stream)
-                .map(this::mapPhysicalFieldType));
+                .map(Stream::getId)
+                .filter(this::allowedToReadStream)
+                .collect(Collectors.toSet());
+
+        return fieldTypesByStreamIds(allowedStreams);
+    }
+
+    private boolean allowedToReadStream(String streamId) {
+        return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
     @POST
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
-        return mergeCompoundFieldTypes(request.streams()
-                .stream()
-                .map(streamId -> {
-                    try {
-                        return streamService.load(streamId);
-                    } catch (NotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .filter(Objects::nonNull)
-                .map(indexSet -> indexSet.getIndexSet().getConfig().id())
-                .flatMap(indexSetId -> this.indexFieldTypesService.findForIndexSet(indexSetId).stream())
-                .map(IndexFieldTypesDTO::fields)
-                .flatMap(Collection::stream)
-                .map(this::mapPhysicalFieldType));
+        request.streams().forEach(s -> checkPermission(RestPermissions.STREAMS_READ, s));
+
+        return fieldTypesByStreamIds(request.streams());
+    }
+
+    private Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Set<String> streamIds) {
+        return mergeCompoundFieldTypes(
+                streamIds
+                        .stream()
+                        .map(streamId -> {
+                            try {
+                                return streamService.load(streamId);
+                            } catch (NotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .filter(Objects::nonNull)
+                        .map(indexSet -> indexSet.getIndexSet().getConfig().id())
+                        .flatMap(indexSetId -> this.indexFieldTypesService.findForIndexSet(indexSetId).stream())
+                        .map(IndexFieldTypesDTO::fields)
+                        .flatMap(Collection::stream)
+                        .map(this::mapPhysicalFieldType)
+        );
     }
 }
