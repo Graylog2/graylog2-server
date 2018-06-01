@@ -97,8 +97,30 @@ class Widget extends React.Component {
     );
     const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
     if (editing) {
+      let editWidgetFrame = null;
       return (
         <EditWidgetFrame widgetId={id}>
+          <span ref={(elem) => { editWidgetFrame = elem; }}>
+            <WidgetHeader title={title}
+                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                          editing={editing}>
+              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+              </WidgetFilterMenu>
+              {' '}
+              <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => editWidgetFrame}>
+                <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
+              </WidgetActionDropdown>
+            </WidgetHeader>
+            {visualization}
+          </span>
+        </EditWidgetFrame>
+      );
+    }
+    let container = null;
+    return (
+      <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
+        <span ref={(elem) => { container = elem; }}>
           <WidgetHeader title={title}
                         onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                         editing={editing}>
@@ -106,33 +128,17 @@ class Widget extends React.Component {
               <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
             </WidgetFilterMenu>
             {' '}
-            <WidgetActionDropdown element={widgetActionDropdownCaret}>
-              <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
+            <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => container}>
+              <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+              <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+              <MenuItem divider />
+              <MenuItem onSelect={() => this._onAddToOverview(activeQuery, id)}>Add to overview</MenuItem>
+              <MenuItem divider />
+              <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
             </WidgetActionDropdown>
           </WidgetHeader>
           {visualization}
-        </EditWidgetFrame>
-      );
-    }
-    return (
-      <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-        <WidgetHeader title={title}
-                      onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                      editing={editing}>
-          <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-            <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-          </WidgetFilterMenu>
-          {' '}
-          <WidgetActionDropdown element={widgetActionDropdownCaret}>
-            <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-            <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-            <MenuItem divider />
-            <MenuItem onSelect={() => this._onAddToOverview(activeQuery, id)}>Add to overview</MenuItem>
-            <MenuItem divider />
-            <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-          </WidgetActionDropdown>
-        </WidgetHeader>
-        {visualization}
+        </span>
       </WidgetFrame>
     );
   }
