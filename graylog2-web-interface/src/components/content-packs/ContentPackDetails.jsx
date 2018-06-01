@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { markdown } from 'markdown';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Well } from 'react-bootstrap';
 
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
@@ -48,7 +48,9 @@ class ContentPackDetails extends React.Component {
             </div>
             <h2>Description</h2>
             <br />
-            <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
+            <Well>
+              <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
+            </Well>
             <br />
             { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
             <br />

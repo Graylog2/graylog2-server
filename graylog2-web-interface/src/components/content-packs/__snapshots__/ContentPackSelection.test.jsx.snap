@@ -13,7 +13,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
       </h2>
       <br />
       <form
-        className="form-horizontal content-selection-form"
+        className="content-selection-form"
         id="content-selection-form"
         onSubmit={[Function]}
       >
@@ -22,14 +22,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="name"
             >
               Name
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="name"
@@ -47,20 +45,18 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
               >
                 Give a descriptive name for this content pack.
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="summary"
             >
               Summary
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="summary"
@@ -78,20 +74,18 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
               >
                 Give a short summary of the content pack.
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="description"
             >
               Description
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <textarea
                 className="form-control"
                 id="description"
@@ -100,6 +94,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 onChange={[Function]}
                 placeholder=""
                 required={true}
+                rows={6}
                 type="textarea"
                 value={undefined}
               />
@@ -108,20 +103,18 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
               >
                 Give a long description of the content pack in markdown.
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="vendor"
             >
               Vendor
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="vendor"
@@ -139,20 +132,18 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
               >
                 Who did this content pack and how can he be reached. e.g Name and eMail
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="url"
             >
               URL
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="url"
@@ -170,7 +161,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
               >
                 Where can I find the content pack. e.g. github url
               </span>
-            </div>
+            </span>
           </div>
         </fieldset>
       </form>
@@ -268,7 +259,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
       </h2>
       <br />
       <form
-        className="form-horizontal content-selection-form"
+        className="content-selection-form"
         id="content-selection-form"
         onSubmit={[Function]}
       >
@@ -277,14 +268,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="name"
             >
               Name
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="name"
@@ -302,20 +291,18 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
               >
                 Give a descriptive name for this content pack.
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="summary"
             >
               Summary
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="summary"
@@ -333,20 +320,18 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
               >
                 Give a short summary of the content pack.
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="description"
             >
               Description
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <textarea
                 className="form-control"
                 id="description"
@@ -355,6 +340,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 onChange={[Function]}
                 placeholder=""
                 required={true}
+                rows={6}
                 type="textarea"
                 value="descr"
               />
@@ -363,20 +349,18 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
               >
                 Give a long description of the content pack in markdown.
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="vendor"
             >
               Vendor
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="vendor"
@@ -394,20 +378,18 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
               >
                 Who did this content pack and how can he be reached. e.g Name and eMail
               </span>
-            </div>
+            </span>
           </div>
           <div
             className="form-group"
           >
             <label
-              className="col-sm-3 control-label"
+              className="control-label"
               htmlFor="url"
             >
               URL
             </label>
-            <div
-              className="col-sm-9"
-            >
+            <span>
               <input
                 className="form-control"
                 id="url"
@@ -425,7 +407,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
               >
                 Where can I find the content pack. e.g. github url
               </span>
-            </div>
+            </span>
           </div>
         </fieldset>
       </form>

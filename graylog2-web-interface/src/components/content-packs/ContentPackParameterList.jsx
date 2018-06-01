@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import DataTable from 'components/common/DataTable';
 
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
+
+import ContentPackParameterListStyle from './ContentPackParameterList.css';
 
 class ContentPackParameterList extends React.Component {
   static propTypes = {
@@ -43,9 +45,11 @@ class ContentPackParameterList extends React.Component {
         <td>{ContentPackParameterList._convertToString(parameter)}</td>
         {!this.props.readOnly &&
         <td>
-          <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeleteParameter(parameter); }}>
-            Delete
-          </Button>{this._parameterModal(parameter)}
+          <ButtonToolbar>
+            <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeleteParameter(parameter); }}>
+              Delete
+            </Button>{this._parameterModal(parameter)}
+          </ButtonToolbar>
         </td>
         }
       </tr>
@@ -54,6 +58,7 @@ class ContentPackParameterList extends React.Component {
 
   _parameterModal(parameter) {
     let modalRef;
+    let editParameter;
 
     const closeModal = () => {
       modalRef.close();
@@ -62,6 +67,11 @@ class ContentPackParameterList extends React.Component {
     const open = () => {
       modalRef.open();
     };
+
+    const addParameter = () => {
+      editParameter.addNewParameter();
+    };
+
     const size = parameter ? 'small' : 'small';
     const name = parameter ? 'Edit' : 'Create parameter';
 
@@ -71,30 +81,32 @@ class ContentPackParameterList extends React.Component {
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ContentPackEditParameter parameters={this.props.contentPack.parameters}
+          <ContentPackEditParameter ref={(node) => { editParameter = node; }}
+                                    parameters={this.props.contentPack.parameters}
                                     onUpdateParameter={(newParameter) => {
                                       this.props.onAddParameter(newParameter, parameter);
-                                      if (parameter) {
-                                        closeModal();
-                                      }
+                                      closeModal();
                                     }}
                                     parameterToEdit={parameter} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={closeModal}>Close</Button>
+          <div className="pull-right">
+            <ButtonToolbar>
+              <Button bsStyle="primary" onClick={addParameter}>Save</Button>
+              <Button onClick={closeModal}>Close</Button>
+            </ButtonToolbar>
+          </div>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
 
     return (
-      <span>
-        <Button bsStyle="info"
-                bsSize={size}
-                onClick={() => { open(); }}>
-          {name}
-        </Button>
+      <Button bsStyle="info"
+              bsSize={size}
+              onClick={() => { open(); }}>
+        {name}
         {modal}
-      </span>
+      </Button>
     );
   }
 
@@ -111,6 +123,7 @@ class ContentPackParameterList extends React.Component {
         <DataTable
           id="parameter-list"
           headers={headers}
+          className={ContentPackParameterListStyle.scrollable}
           sortByKey="title"
           noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
           filterKeys={[]}

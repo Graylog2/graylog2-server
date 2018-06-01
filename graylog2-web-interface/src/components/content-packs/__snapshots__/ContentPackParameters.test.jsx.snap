@@ -13,16 +13,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
           Parameters list
         </h2>
         <br />
-        <span>
-          <button
-            className="btn btn-sm btn-info"
-            disabled={false}
-            onClick={[Function]}
-            type="button"
-          >
-            Create parameter
-          </button>
-        </span>
+        <button
+          className="btn btn-sm btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Create parameter
+        </button>
         <span>
           <br />
           <br />
@@ -39,7 +37,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                 id="parameter-list"
               >
                 <table
-                  className="table undefined"
+                  className="table scrollable"
                 >
                   <thead>
                     <tr>
@@ -81,15 +79,18 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         test
                       </td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-primary"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="button"
+                        <div
+                          className="btn-toolbar"
+                          role="toolbar"
                         >
-                          Delete
-                        </button>
-                        <span>
+                          <button
+                            className="btn btn-sm btn-primary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            Delete
+                          </button>
                           <button
                             className="btn btn-sm btn-info"
                             disabled={false}
@@ -98,7 +99,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           >
                             Edit
                           </button>
-                        </span>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -215,16 +216,14 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
           Parameters list
         </h2>
         <br />
-        <span>
-          <button
-            className="btn btn-sm btn-info"
-            disabled={false}
-            onClick={[Function]}
-            type="button"
-          >
-            Create parameter
-          </button>
-        </span>
+        <button
+          className="btn btn-sm btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          Create parameter
+        </button>
         <span>
           <br />
           <br />

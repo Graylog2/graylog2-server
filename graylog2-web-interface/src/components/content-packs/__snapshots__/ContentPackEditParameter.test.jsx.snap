@@ -7,7 +7,7 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
   </h2>
   <br />
   <form
-    className="form-horizontal parameter-form"
+    className="parameter-form"
     id="parameter-form"
     onSubmit={[Function]}
   >
@@ -16,14 +16,12 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="title"
         >
           Title
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="title"
@@ -41,20 +39,18 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
           >
             Give a descriptive title for this content pack.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="name"
         >
           Name
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="name"
@@ -72,20 +68,18 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
           >
             This is used as the parameter reference and must not contain a space.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="description"
         >
           Description
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="description"
@@ -103,20 +97,18 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
           >
             Give a description explaining what will be done with this parameter.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="type"
         >
           Value Type
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <select
             className="form-control"
             id="type"
@@ -154,20 +146,18 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
           >
             Give the type of the parameter.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="default_value"
         >
           Default value
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="default_value"
@@ -184,22 +174,7 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
           >
             Give a default value if the parameter is not optional.
           </span>
-        </div>
-      </div>
-      <div
-        className="row"
-      >
-        <div
-          className="col-sm-offset-10"
-        >
-          <button
-            className="btn btn-info"
-            disabled={false}
-            type="submit"
-          >
-            Save
-          </button>
-        </div>
+        </span>
       </div>
     </fieldset>
   </form>
@@ -213,7 +188,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
   </h2>
   <br />
   <form
-    className="form-horizontal parameter-form"
+    className="parameter-form"
     id="parameter-form"
     onSubmit={[Function]}
   >
@@ -222,14 +197,12 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="title"
         >
           Title
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="title"
@@ -247,20 +220,18 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           >
             Give a descriptive title for this content pack.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="name"
         >
           Name
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="name"
@@ -278,20 +249,18 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           >
             This is used as the parameter reference and must not contain a space.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="description"
         >
           Description
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="description"
@@ -309,20 +278,18 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           >
             Give a description explaining what will be done with this parameter.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="type"
         >
           Value Type
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <select
             className="form-control"
             id="type"
@@ -360,20 +327,18 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           >
             Give the type of the parameter.
           </span>
-        </div>
+        </span>
       </div>
       <div
         className="form-group"
       >
         <label
-          className="col-sm-3 control-label"
+          className="control-label"
           htmlFor="default_value"
         >
           Default value
         </label>
-        <div
-          className="col-sm-9"
-        >
+        <span>
           <input
             className="form-control"
             id="default_value"
@@ -390,22 +355,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           >
             Give a default value if the parameter is not optional.
           </span>
-        </div>
-      </div>
-      <div
-        className="row"
-      >
-        <div
-          className="col-sm-offset-10"
-        >
-          <button
-            className="btn btn-info"
-            disabled={false}
-            type="submit"
-          >
-            Save
-          </button>
-        </div>
+        </span>
       </div>
     </fieldset>
   </form>
