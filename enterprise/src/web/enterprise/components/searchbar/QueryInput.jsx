@@ -49,6 +49,16 @@ class QueryInput extends Component {
     if (nextProps.value !== this.state.value) {
       this.setState({ value: nextProps.value });
     }
+    if (this.editor) {
+      const { editor } = this.editor;
+      if (nextProps.value && this._placeholderExists(editor)) {
+        this._removePlaceholder(this.editor.editor);
+      }
+
+      if (!nextProps.value && !this.isFocussed && !this._placeholderExists(editor)) {
+        this._addPlaceholder(editor);
+      }
+    }
   }
 
   _placeholderNode(placeholder) {
@@ -61,21 +71,30 @@ class QueryInput extends Component {
   }
 
   _addPlaceholder = (editor) => {
-    const node = this._placeholderNode(this.props.placeholder);
-    editor.renderer.emptyMessageNode = node;
-    editor.renderer.scroller.appendChild(node);
+    if (!editor.renderer.emptyMessageNode) {
+      const node = this._placeholderNode(this.props.placeholder);
+      editor.renderer.emptyMessageNode = node;
+      editor.renderer.scroller.appendChild(node);
+    }
+  };
+
+  _removePlaceholder = (editor) => {
+    if (editor.renderer.emptyMessageNode) {
+      editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
+      editor.renderer.emptyMessageNode = null;
+    }
+  };
+
+  _placeholderExists = (editor) => {
+    const { emptyMessageNode } = editor.renderer;
+    return emptyMessageNode !== undefined && emptyMessageNode !== null;
   };
 
   editor = undefined;
-  addedPlaceholder = false;
 
   _bindEditor(editor) {
     if (editor) {
       this.editor = editor;
-      if (!this.addedPlaceholder && !this.state.value && !this.isFocussed) {
-        this._addPlaceholder(editor.editor);
-        this.addedPlaceholder = true;
-      }
     }
   }
 
@@ -87,8 +106,7 @@ class QueryInput extends Component {
     this.isFocussed = false;
     const editor = this.editor.editor;
     const shouldShow = !editor.session.getValue().length;
-    const nodeExists = editor.renderer.emptyMessageNode;
-    if (shouldShow && !nodeExists) {
+    if (shouldShow && !this._placeholderExists(editor)) {
       this._addPlaceholder(editor);
     }
   };
@@ -96,10 +114,8 @@ class QueryInput extends Component {
   _onFocus = () => {
     this.isFocussed = true;
     const editor = this.editor.editor;
-    const nodeExists = editor.renderer.emptyMessageNode;
-    if (nodeExists) {
-      editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
-      editor.renderer.emptyMessageNode = null;
+    if (this._placeholderExists(editor)) {
+      this._removePlaceholder(editor);
     }
   };
 

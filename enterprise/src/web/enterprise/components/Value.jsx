@@ -38,10 +38,10 @@ export default class Value extends React.Component {
     const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
       const onSelect = (event) => {
         this._onMenuToggle();
-        valueAction.handler(queryId, event.field);
+        valueAction.handler(queryId, event.field, event.value);
       };
       return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
-                        eventKey={{ action: valueAction.type, field }}
+                        eventKey={{ field, value }}
                         onSelect={onSelect}>{valueAction.title}</MenuItem>);
     });
 

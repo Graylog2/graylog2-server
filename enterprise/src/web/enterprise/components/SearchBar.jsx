@@ -21,12 +21,16 @@ import { QueryFiltersActions, QueryFiltersStore } from '../stores/QueryFiltersSt
 import { CurrentQueryStore } from '../stores/CurrentQueryStore';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
+import ScrollToHint from './common/ScrollToHint';
 
 const SearchBar = createReactClass({
   displayName: 'SearchBar',
 
   propTypes: {
+    config: PropTypes.object.isRequired,
     disableSearch: PropTypes.bool,
+    onExecute: PropTypes.func.isRequired,
+    results: PropTypes.object,
   },
 
   mixins: [
@@ -37,6 +41,7 @@ const SearchBar = createReactClass({
   getDefaultProps() {
     return {
       disableSearch: false,
+      results: {},
     };
   },
 
@@ -73,50 +78,52 @@ const SearchBar = createReactClass({
       .toJS();
 
     return (
-      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
-        <Col md={12}>
-          <Row className="no-bm">
-            <Col md={12}>
-              <form method="GET" onSubmit={this._performSearch}>
+      <ScrollToHint value={query.query_string}>
+        <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+          <Col md={12}>
+            <Row className="no-bm">
+              <Col md={12}>
+                <form method="GET" onSubmit={this._performSearch}>
 
-                <Row className="no-bm extended-search-query-metadata">
-                  <Col md={4}>
-                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType)}
-                                           value={rangeType} />
-                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value)}
-                                    rangeType={rangeType}
-                                    rangeParams={rangeParams}
-                                    config={this.props.config} />
-                  </Col>
+                  <Row className="no-bm extended-search-query-metadata">
+                    <Col md={4}>
+                      <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType)}
+                                             value={rangeType} />
+                      <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value)}
+                                      rangeType={rangeType}
+                                      rangeParams={rangeParams}
+                                      config={this.props.config} />
+                    </Col>
 
-                  <Col md={8}>
-                    <StreamsFilter value={streams}
-                                   streams={this.state.availableStreams}
-                                   onChange={value => QueryFiltersActions.streams(id, value)} />
-                  </Col>
-                </Row>
+                    <Col md={8}>
+                      <StreamsFilter value={streams}
+                                     streams={this.state.availableStreams}
+                                     onChange={value => QueryFiltersActions.streams(id, value)} />
+                    </Col>
+                  </Row>
 
-                <Row className="no-bm">
-                  <Col md={12}>
-                    <div className="pull-right search-help">
-                      <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                                         title="Search query syntax documentation"
-                                         text={<i className="fa fa-lightbulb-o" />} />
-                    </div>
-                    <SearchButton running={this.state.running} disabled={this.props.disableSearch} />
+                  <Row className="no-bm">
+                    <Col md={12}>
+                      <div className="pull-right search-help">
+                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                           title="Search query syntax documentation"
+                                           text={<i className="fa fa-lightbulb-o" />} />
+                      </div>
+                      <SearchButton running={this.state.running} disabled={this.props.disableSearch} />
 
-                    <QueryInput value={query.query_string}
-                                placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                onChange={value => QueriesActions.query(id, value)}
-                                onExecute={this.props.onExecute}
-                                result={this.props.results} />
-                  </Col>
-                </Row>
-              </form>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+                      <QueryInput value={query.query_string}
+                                  placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                  onChange={value => QueriesActions.query(id, value)}
+                                  onExecute={this.props.onExecute}
+                                  result={this.props.results} />
+                    </Col>
+                  </Row>
+                </form>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </ScrollToHint>
     );
   },
 });

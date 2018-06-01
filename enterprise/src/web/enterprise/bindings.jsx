@@ -1,22 +1,28 @@
-import ViewManagementPage from 'enterprise/ViewManagementPage';
-import { AlertStatus, MessageList } from 'enterprise/components/widgets';
 import { MessageListHandler } from 'enterprise/logic/searchtypes';
-import DataTable from 'enterprise/components/datatable/DataTable';
-import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
+
+import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
+import AddToQueryHandler from 'enterprise/logic/valueactions/AddToQueryHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
+import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
+
 import AggregationBuilder from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+
 import BarVisualization from 'enterprise/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'enterprise/components/visualizations/line/LineVisualization';
 import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
+
 import ShowViewPage from 'enterprise/ShowViewPage';
-import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
 import NewSearchPage from 'enterprise/NewSearchPage';
-import Widget from './logic/widgets/Widget';
-import AggregationWidget from './logic/aggregationbuilder/AggregationWidget';
-import MessagesWidget from './logic/widgets/MessagesWidget';
 import PivotConfigGenerator from './logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from './logic/searchtypes/pivot/PivotHandler';
 import PivotTransformer from './logic/searchresulttransformers/PivotTransformer';
+import ViewManagementPage from 'enterprise/ViewManagementPage';
+
+import { AlertStatus, MessageList } from 'enterprise/components/widgets';
+import Widget from 'enterprise/logic/widgets/Widget';
+import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
+import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
+import DataTable from 'enterprise/components/datatable/DataTable';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -116,6 +122,11 @@ export default {
     {
       type: 'search',
       title: 'Search for values like this',
+    },
+    {
+      type: 'add-to-query',
+      title: 'Add to query',
+      handler: new AddToQueryHandler().handle,
     },
   ],
   visualizationTypes: [
