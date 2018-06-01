@@ -61,7 +61,6 @@ class DataTable extends React.Component {
     filterLabel: 'Filter',
     displayKey: 'value',
     noDataText: 'No data available.',
-    className: '',
     rowClassName: '',
     useResponsiveTable: true,
     headerCellFormatter: (header) => { return (<th>{header}</th>); },

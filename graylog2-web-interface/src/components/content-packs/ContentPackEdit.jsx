@@ -37,15 +37,19 @@ class ContentPackEdit extends React.Component {
     super(props);
 
     this.state = {
-      selectedStep: undefined,
+      selectedStep: 'selection',
     };
   }
 
-  _disableNextStep() {
+  _disableParameters() {
     const content = this.props.contentPack;
     const selection = Object.keys(this.props.selectedEntities).length !== 0;
     return !(content.name && content.summary && content.description && content.vendor &&
       selection);
+  }
+
+  _disablePreview() {
+    return this.state.selectedStep === 'selection' || !this.state.selectedStep;
   }
 
   _prepareForPreview() {
@@ -117,18 +121,18 @@ class ContentPackEdit extends React.Component {
                           onSave={this.props.onSave} />);
     const steps = [
       { key: 'selection', title: 'Content Selection', component: selectionComponent },
-      { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableNextStep() },
-      { key: 'preview', title: 'Preview', component: previewComponent, disabled: this._disableNextStep() },
+      { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableParameters() },
+      { key: 'preview', title: 'Preview', component: previewComponent, disabled: this._disablePreview() },
     ];
 
     return (
       <div>
         <Wizard steps={steps} onStepChange={this._stepChanged} affixed>
-          <AutoAffix viewportOffsetTop={65}>
+          {this.state.selectedStep !== 'preview' ? <AutoAffix viewportOffsetTop={65}>
             <div>
-              {this.state.selectedStep !== 'preview' && <ContentPackDetails contentPack={this.props.contentPack} />}
+              <ContentPackDetails contentPack={this.props.contentPack} />
             </div>
-          </AutoAffix>
+          </AutoAffix> : undefined}
         </Wizard>
         <ScrollButton possition="middle" />
       </div>

@@ -61,10 +61,10 @@ class ContentPackDetails extends React.Component {
               <br />
             </div>
             }
-            { contentPack.entities && this.props.verbose &&
+            { contentPack.entities && contentPack.entities.length > 0 && this.props.verbose &&
               <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
             }
-            { contentPack.parameters && this.props.verbose &&
+            { contentPack.parameters && contentPack.parameters.length > 0 && this.props.verbose &&
               <ContentPackParameterList contentPack={this.props.contentPack} readOnly />
             }
           </div>

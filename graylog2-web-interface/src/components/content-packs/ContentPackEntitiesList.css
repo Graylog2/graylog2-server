@@ -5,7 +5,7 @@
     display:block;
 }
 
-:local(.scrollable) thead, tbody tr {
+:local(.scrollable) thead, :local(.scrollable) tbody tr {
     display:table;
     width:100%;
     table-layout:fixed;

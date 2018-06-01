@@ -96,7 +96,7 @@ describe('<Wizard />', () => {
     expect(changeFn.mock.calls.length).toBe(1);
   });
 
-  it('should respect disabled flat for a step', () => {
+  it('should respect disabled flag for a step', () => {
     steps[1].disabled = true;
     steps[2].disabled = true;
     const wrapper = mount(<Wizard steps={steps} />);
