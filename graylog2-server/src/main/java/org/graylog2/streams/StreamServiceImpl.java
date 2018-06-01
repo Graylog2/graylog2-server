@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -49,6 +50,7 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
+import org.graylog2.streams.events.StreamDeletedEvent;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,14 +256,19 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
             super.destroy(streamRule);
         }
+
+        final String streamId = stream.getId();
         for (Notification notification : notificationService.all()) {
             Object rawValue = notification.getDetail("stream_id");
-            if (rawValue != null && rawValue.toString().equals(stream.getId())) {
+            if (rawValue != null && rawValue.toString().equals(streamId)) {
                 LOG.debug("Removing notification that references stream: {}", notification);
                 notificationService.destroy(notification);
             }
         }
         super.destroy(stream);
+
+        clusterEventBus.post(StreamsChangedEvent.create(streamId));
+        clusterEventBus.post(StreamDeletedEvent.create(streamId));
     }
 
     public void update(Stream stream, String title, String description) throws ValidationException {
@@ -279,13 +286,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public void pause(Stream stream) throws ValidationException {
         stream.setDisabled(true);
-        save(stream);
+        final String streamId = save(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(streamId));
     }
 
     @Override
     public void resume(Stream stream) throws ValidationException {
         stream.setDisabled(false);
-        save(stream);
+        final String streamId = save(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(streamId));
     }
 
     @Override
@@ -417,6 +426,19 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
                 new BasicDBObject("$addToSet", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, new ObjectId(output.getId())))
         );
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
+    }
+
+    @Override
+    public void addOutputs(ObjectId streamId, Collection<ObjectId> outputIds) {
+        final BasicDBList outputs = new BasicDBList();
+        outputs.addAll(outputIds);
+
+        collection(StreamImpl.class).update(
+                new BasicDBObject("_id", streamId),
+                new BasicDBObject("$addToSet", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, outputs))
+        );
+        clusterEventBus.post(StreamsChangedEvent.create(streamId.toHexString()));
     }
 
     @Override
@@ -425,6 +447,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
                 new BasicDBObject("$pull", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, new ObjectId(output.getId())))
         );
+
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }
 
     @Override
@@ -455,5 +479,26 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     public List<Stream> loadAllWithIndexSet(String indexSetId) {
         final Map<String, Object> query = new BasicDBObject(StreamImpl.FIELD_INDEX_SET_ID, indexSetId);
         return loadAll(query);
+    }
+
+    @Override
+    public String save(Stream stream) throws ValidationException {
+        final String savedStreamId = super.save(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
+
+        return savedStreamId;
+    }
+
+    @Override
+    public String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException {
+        final String savedStreamId = super.save(stream);
+        final Set<StreamRule> rules = streamRules.stream()
+                .map(rule -> streamRuleService.copy(savedStreamId, rule))
+                .collect(Collectors.toSet());
+        streamRuleService.save(rules);
+
+        clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
+
+        return savedStreamId;
     }
 }

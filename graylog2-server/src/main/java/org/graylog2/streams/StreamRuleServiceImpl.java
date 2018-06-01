@@ -17,6 +17,7 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -25,23 +26,31 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.streams.events.StreamsChangedEvent;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StreamRuleServiceImpl extends PersistedServiceImpl implements StreamRuleService {
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public StreamRuleServiceImpl(MongoConnection mongoConnection) {
+    public StreamRuleServiceImpl(MongoConnection mongoConnection,
+                                 ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         collection(StreamRuleImpl.class).createIndex(StreamRuleImpl.FIELD_STREAM_ID);
+        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
@@ -66,16 +75,68 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     }
 
     @Override
-    public StreamRule create(String streamId, CreateStreamRuleRequest cr) {
+    public StreamRule create(@Nullable String streamId, CreateStreamRuleRequest cr) {
         Map<String, Object> streamRuleData = Maps.newHashMap();
         streamRuleData.put(StreamRuleImpl.FIELD_TYPE, cr.type());
         streamRuleData.put(StreamRuleImpl.FIELD_VALUE, cr.value());
         streamRuleData.put(StreamRuleImpl.FIELD_FIELD, cr.field());
         streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, cr.inverted());
-        streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
         streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, cr.description());
 
+        if (streamId != null) {
+            streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
+        }
+
         return new StreamRuleImpl(streamRuleData);
+    }
+
+    @Override
+    public StreamRule copy(@Nullable String streamId, StreamRule streamRule) {
+        Map<String, Object> streamRuleData = Maps.newHashMap();
+        streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
+        streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
+        streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
+        streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.getInverted());
+        streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
+
+        if (streamId != null) {
+            streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
+        }
+
+        return new StreamRuleImpl(streamRuleData);
+    }
+
+    @Override
+    public String save(StreamRule streamRule) throws ValidationException {
+        final String streamId = streamRule.getStreamId();
+        final String savedStreamRuleId = super.save(streamRule);
+        clusterEventBus.post(StreamsChangedEvent.create(streamId));
+
+        return savedStreamRuleId;
+    }
+
+    @Override
+    public Set<String> save(Collection<StreamRule> streamRules) throws ValidationException {
+        final ImmutableSet.Builder<String> streamIds = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> streamRuleIds = ImmutableSet.builder();
+        for (StreamRule streamRule : streamRules) {
+            final String streamId = streamRule.getStreamId();
+            final String savedStreamRuleId = super.save(streamRule);
+            streamIds.add(streamId);
+            streamRuleIds.add(savedStreamRuleId);
+        }
+        clusterEventBus.post(StreamsChangedEvent.create(streamIds.build()));
+
+        return streamRuleIds.build();
+    }
+
+    @Override
+    public int destroy(StreamRule streamRule) {
+        final String streamId = streamRule.getStreamId();
+        final int deletedStreamRules = super.destroy(streamRule);
+        clusterEventBus.post(StreamsChangedEvent.create(streamId));
+
+        return deletedStreamRules;
     }
 
     @Override

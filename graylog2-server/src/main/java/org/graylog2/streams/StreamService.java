@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams;
 
+import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.PersistedService;
@@ -34,6 +35,10 @@ public interface StreamService extends PersistedService {
     Stream create(Map<String, Object> fields);
 
     Stream create(CreateStreamRequest request, String userId);
+
+    String save(Stream stream) throws ValidationException;
+
+    String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException;
 
     Stream load(String id) throws NotFoundException;
 
@@ -75,6 +80,8 @@ public interface StreamService extends PersistedService {
     void removeAlertReceiver(Stream stream, String type, String name);
 
     void addOutput(Stream stream, Output output);
+
+    void addOutputs(ObjectId streamId, Collection<ObjectId> outputIds);
 
     void removeOutput(Stream stream, Output output);
 
