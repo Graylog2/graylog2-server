@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
 
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
+import { BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
@@ -31,6 +32,7 @@ class ContentPackParameters extends React.Component {
     super(props);
     this.state = {
       newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
+      parameterToDelete: undefined,
       defaultValueError: undefined,
       nameError: undefined,
     };
@@ -84,6 +86,27 @@ class ContentPackParameters extends React.Component {
     });
     lodash.remove(newContentPack.parameters, (param) => { return param.name === parameter.name; });
     this.props.onStateChange({ contentPack: newContentPack, appliedParameter: newAppliedParameter });
+    this._closeConfirmModal();
+  };
+
+  _confirmationModal = () => {
+    return (
+      <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+                             title="Confirm deletion"
+                             onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
+                             onCancel={this._closeConfirmModal}>
+        {`Are you sure you want to do delete this parameter: ${(this.state.parameterToDelete || {}).title}?`}
+      </BootstrapModalConfirm>);
+  };
+
+  _openConfirmModal = (parameter) => {
+    this.setState({ parameterToDelete: parameter });
+    this.modal.open();
+  };
+
+  _closeConfirmModal = () => {
+    this.setState({ parameterToDelete: undefined });
+    this.modal.close();
   };
 
   render() {
@@ -93,8 +116,9 @@ class ContentPackParameters extends React.Component {
           <Col smOffset={1} sm={9}>
             <ContentPackParameterList contentPack={this.props.contentPack}
                                       onAddParameter={this._addNewParameter}
-                                      onDeleteParameter={this._deleteParameter}
+                                      onDeleteParameter={this._openConfirmModal}
             />
+            {this._confirmationModal()}
           </Col>
         </Row>
         <Row>
