@@ -41,6 +41,7 @@ import com.google.inject.Injector;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.assertj.core.api.Assertions;
+import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
@@ -163,6 +164,16 @@ public class ConfigurationStateUpdaterTest {
         }
 
         @Override
+        public String save(Stream stream) throws ValidationException {
+            return this.save((Persisted) stream);
+        }
+
+        @Override
+        public String saveWithRules(Stream stream, Collection<StreamRule> streamRules) throws ValidationException {
+            return save(stream);
+        }
+
+        @Override
         public void destroy(Stream stream) throws NotFoundException {
             if (store.remove(stream.getId()) == null) {
                 throw new NotFoundException();
@@ -252,6 +263,11 @@ public class ConfigurationStateUpdaterTest {
 
         @Override
         public void addOutput(Stream stream, Output output) {
+            throw new IllegalStateException("no implemented");
+        }
+
+        @Override
+        public void addOutputs(ObjectId streamId, Collection<ObjectId> outputIds) {
             throw new IllegalStateException("no implemented");
         }
 

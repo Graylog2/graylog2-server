@@ -38,6 +38,7 @@ import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -57,6 +58,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,10 +91,11 @@ public class StreamCatalogTest {
     private StreamCatalog catalog;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final MongoConnection mongoConnection = mongoRule.getMongoConnection();
-        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(mongoConnection);
-        final ClusterEventBus clusterEventBus = new ClusterEventBus();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(mongoConnection, clusterEventBus);
         final StreamService streamService = new StreamServiceImpl(
                 mongoConnection,
                 streamRuleService,

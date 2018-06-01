@@ -18,13 +18,16 @@ package org.graylog2.streams;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface StreamRuleService extends PersistedService {
     StreamRule load(String id) throws NotFoundException;
@@ -33,7 +36,15 @@ public interface StreamRuleService extends PersistedService {
 
     StreamRule create(Map<String, Object> data);
 
-    StreamRule create(String streamId, CreateStreamRuleRequest request);
+    StreamRule create(@Nullable String streamId, CreateStreamRuleRequest request);
+
+    StreamRule copy(@Nullable String streamId, StreamRule streamRule);
+
+    String save(StreamRule streamRule) throws ValidationException;
+
+    Set<String> save(Collection<StreamRule> streamRules) throws ValidationException;
+
+    int destroy(StreamRule streamRule);
 
     List<StreamRule> loadForStreamId(String streamId);
 
