@@ -168,7 +168,7 @@ class ContentPackSelection extends React.Component {
           <Col smOffset={1} lg={8}>
             <h2>General Information</h2>
             <br />
-            <form className="form-horizontal content-selection-form" id="content-selection-form" onSubmit={(e) => { e.preventDefault(); }}>
+            <form className="content-selection-form" id="content-selection-form" onSubmit={(e) => { e.preventDefault(); }}>
               <fieldset>
                 <Input name="name"
                        id="name"
@@ -176,8 +176,6 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={this.state.contentPack.name}
                        onChange={this._bindValue}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
                        label="Name"
                        help="Give a descriptive name for this content pack."
                        required />
@@ -187,8 +185,6 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={this.state.contentPack.summary}
                        onChange={this._bindValue}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
                        label="Summary"
                        help="Give a short summary of the content pack."
                        required />
@@ -197,8 +193,7 @@ class ContentPackSelection extends React.Component {
                        type="textarea"
                        value={this.state.contentPack.description}
                        onChange={this._bindValue}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
+                       rows={6}
                        label="Description"
                        help="Give a long description of the content pack in markdown."
                        required />
@@ -208,8 +203,6 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={this.state.contentPack.vendor}
                        onChange={this._bindValue}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
                        label="Vendor"
                        help="Who did this content pack and how can he be reached. e.g Name and eMail"
                        required />
@@ -219,8 +212,6 @@ class ContentPackSelection extends React.Component {
                        maxLength={250}
                        value={this.state.contentPack.url}
                        onChange={this._bindValue}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
                        label="URL"
                        help="Where can I find the content pack. e.g. github url"
                        required />

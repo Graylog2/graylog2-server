@@ -33,16 +33,14 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
     Parameters list
   </h2>
   <br />
-  <span>
-    <button
-      className="btn btn-sm btn-info"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      Create parameter
-    </button>
-  </span>
+  <button
+    className="btn btn-sm btn-info"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Create parameter
+  </button>
   <span>
     <br />
     <br />
@@ -86,7 +84,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
           id="parameter-list"
         >
           <table
-            className="table undefined"
+            className="table scrollable"
           >
             <thead>
               <tr>
@@ -140,16 +138,14 @@ exports[`<ContentPackParameterList /> should render with parameters without read
     Parameters list
   </h2>
   <br />
-  <span>
-    <button
-      className="btn btn-sm btn-info"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
-    >
-      Create parameter
-    </button>
-  </span>
+  <button
+    className="btn btn-sm btn-info"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Create parameter
+  </button>
   <span>
     <br />
     <br />
@@ -166,7 +162,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           id="parameter-list"
         >
           <table
-            className="table undefined"
+            className="table scrollable"
           >
             <thead>
               <tr>
@@ -208,15 +204,18 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   test
                 </td>
                 <td>
-                  <button
-                    className="btn btn-sm btn-primary"
-                    disabled={false}
-                    onClick={[Function]}
-                    type="button"
+                  <div
+                    className="btn-toolbar"
+                    role="toolbar"
                   >
-                    Delete
-                  </button>
-                  <span>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Delete
+                    </button>
                     <button
                       className="btn btn-sm btn-info"
                       disabled={false}
@@ -225,7 +224,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                     >
                       Edit
                     </button>
-                  </span>
+                  </div>
                 </td>
               </tr>
             </tbody>
