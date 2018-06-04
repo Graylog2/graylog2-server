@@ -17,12 +17,10 @@
 package org.graylog2.migrations;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.V20161216123500_Succeeded;
-import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,17 +42,14 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
     private final ElasticsearchConfiguration elasticsearchConfiguration;
     private final IndexSetService indexSetService;
     private final ClusterConfigService clusterConfigService;
-    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public V20161216123500_DefaultIndexSetMigration(final ElasticsearchConfiguration elasticsearchConfiguration,
                                                     final IndexSetService indexSetService,
-                                                    final ClusterConfigService clusterConfigService,
-                                                    final ClusterEventBus clusterEventBus) {
+                                                    final ClusterConfigService clusterConfigService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.indexSetService = indexSetService;
         this.clusterConfigService = clusterConfigService;
-        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
@@ -97,9 +92,6 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
                 .build();
 
         final IndexSetConfig savedConfig = indexSetService.save(updatedConfig);
-
-        // Publish event to cluster event bus so the stream router will reload.
-        clusterEventBus.post(IndexSetCreatedEvent.create(savedConfig));
 
         LOG.debug("Successfully updated index set: {}", savedConfig);
     }
