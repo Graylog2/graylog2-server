@@ -13,7 +13,7 @@ describe('Input', () => {
 
   it('renders a addon after the input if addonAfter is passed', () => {
     const wrapper = mount(<Input id="inputWithAddon" type="text" addonAfter={'.00'} />);
-    const addon = wrapper.find('span.input-group-addon')
+    const addon = wrapper.find('span.input-group-addon');
     expect(addon).toExist();
     expect(addon).toHaveText('.00');
     expect(wrapper).toMatchSnapshot();

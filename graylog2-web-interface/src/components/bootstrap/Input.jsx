@@ -174,6 +174,7 @@ class Input extends React.Component {
       case 'radio':
         return this._renderRadioGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, help, controlProps);
       default:
+        // eslint-disable-next-line no-console
         console.warn(`Unsupported input type ${type}`);
     }
 
