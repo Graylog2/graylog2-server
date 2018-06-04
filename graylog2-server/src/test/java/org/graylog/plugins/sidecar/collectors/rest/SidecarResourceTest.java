@@ -25,10 +25,11 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
 import org.graylog.plugins.sidecar.rest.resources.SidecarResource;
-import org.graylog.plugins.sidecar.rest.responses.SidecarListResponse;
 import org.graylog.plugins.sidecar.services.ActionService;
 import org.graylog.plugins.sidecar.services.SidecarService;
+import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -65,24 +66,19 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     @Mock
     private ClusterConfigService clusterConfigService;
 
+    @Mock
+    private SidecarConfiguration sidecarConfiguration;
+
     @Before
     public void setUp() throws Exception {
         this.sidecars = getDummyCollectorList();
+        when(clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration())).thenReturn(sidecarConfiguration);
+        when(sidecarConfiguration.sidecarUpdateInterval()).thenReturn(Period.seconds(30));
         this.resource = new SidecarResource(
                 sidecarService,
                 actionService,
                 clusterConfigService,
                 statusMapper);
-        when(sidecarService.all()).thenReturn(sidecars);
-    }
-
-    @Test
-    public void testList() throws Exception {
-        final SidecarListResponse response = this.resource.all();
-
-        assertNotNull(response);
-        assertNotNull(response.sidecars());
-        assertEquals("Collector list should be of same size as dummy list", sidecars.size(), response.sidecars().size());
     }
 
     @Test(expected = NotFoundException.class)

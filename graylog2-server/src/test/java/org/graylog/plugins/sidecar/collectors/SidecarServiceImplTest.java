@@ -133,7 +133,7 @@ public class SidecarServiceImplTest {
     @Test
     @UsingDataSet(locations = "collectorsMultipleDocuments.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testFindById() throws Exception {
-        final String collector1id = "collector1id";
+        final String collector1id = "uniqueid1";
 
         final Sidecar sidecar = this.sidecarService.findByNodeId(collector1id);
 
@@ -156,7 +156,7 @@ public class SidecarServiceImplTest {
     @ShouldMatchDataSet
     public void testDestroy() throws Exception {
         final Sidecar sidecar = mock(Sidecar.class);
-        when(sidecar.nodeId()).thenReturn("collector2id");
+        when(sidecar.id()).thenReturn("581b3bff8e4dc4270055dfcb");
 
         final int result = this.sidecarService.delete(sidecar.id());
 
