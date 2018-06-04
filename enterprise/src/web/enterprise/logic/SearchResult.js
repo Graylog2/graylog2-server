@@ -18,10 +18,13 @@ class SearchResult {
     this.result = result;
 
     this.results = _.mapValues(result.results, (queryResult) => {
+      // eslint-disable-next-line camelcase
+      const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
       return {
         query: queryResult.query,
-        duration: queryResult.execution_stats.duration,
-        timestamp: queryResult.execution_stats.timestamp,
+        duration,
+        timestamp,
+        effectiveTimerange: effective_timerange,
         searchTypes: _.mapValues(queryResult.search_types, (searchType) => {
           // each search type has a custom data structure attached to it, let the plugin convert the value
           return _searchTypePlugin(searchType.type).convert(searchType);

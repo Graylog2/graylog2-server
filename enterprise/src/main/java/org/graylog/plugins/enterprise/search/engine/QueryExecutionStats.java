@@ -17,6 +17,9 @@ public abstract class QueryExecutionStats {
     @JsonProperty("timestamp")
     public abstract DateTime timestamp();
 
+    @JsonProperty("effective_timerange")
+    public abstract EffectiveTimeRange effectiveTimeRange();
+
     public static QueryExecutionStats empty() {
         return builder().build();
     }
@@ -37,6 +40,7 @@ public abstract class QueryExecutionStats {
         public static Builder create() {
             return new AutoValue_QueryExecutionStats.Builder()
                     .timestamp(DateTime.now(UTC))
+                    .effectiveTimeRange(EffectiveTimeRange.create(DateTime.now(UTC), DateTime.now(UTC)))
                     .duration(0L);
         }
 
@@ -45,6 +49,9 @@ public abstract class QueryExecutionStats {
 
         @JsonProperty("timestamp")
         public abstract Builder timestamp(DateTime timestamp);
+
+        @JsonProperty("effective_timerange")
+        public abstract Builder effectiveTimeRange(EffectiveTimeRange effectiveTimeRange);
 
         public abstract QueryExecutionStats build();
     }

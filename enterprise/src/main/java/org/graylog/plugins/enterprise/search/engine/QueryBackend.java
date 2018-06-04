@@ -37,7 +37,11 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
         final QueryResult result = doRun(job, query, (T) generatedQueryContext, predecessorResults);
         stopwatch.stop();
         return result.toBuilder()
-                .executionStats(statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS)).build())
+                .executionStats(
+                        statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS))
+                                .effectiveTimeRange(EffectiveTimeRange.create(query.timerange().getFrom(), query.timerange().getTo()))
+                                .build()
+                )
                 .build();
     }
 

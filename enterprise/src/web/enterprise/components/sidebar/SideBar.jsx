@@ -10,6 +10,7 @@ import { Panel, PanelGroup } from 'react-bootstrap';
 import { AddWidgetButton, SearchResultOverview } from 'enterprise/components/sidebar';
 
 import styles from './SideBar.css';
+import SearchDetails from './SearchDetails';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
@@ -84,6 +85,9 @@ const SideBar = createReactClass({
               <PanelGroup accordion activeKey={this.state.activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
                 <Panel eventKey="metadata" header="View Description">
                   {viewDescription}
+                </Panel>
+                <Panel eventKey="search-details" header="Search Details">
+                  <SearchDetails results={results} />
                 </Panel>
                 <Panel eventKey="fields" header="Fields">
                   {React.cloneElement(this.props.children, { maximumHeight: this.state.availableHeight })}
