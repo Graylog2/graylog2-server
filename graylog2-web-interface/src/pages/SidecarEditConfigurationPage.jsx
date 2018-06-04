@@ -34,7 +34,7 @@ const SidecarEditConfigurationPage = React.createClass({
   style: require('!style/useable!css!components/sidecars/styles/SidecarStyles.css'),
 
   _reloadConfiguration() {
-    CollectorConfigurationsActions.getConfiguration(this.props.params.id).then(this._setConfiguration);
+    CollectorConfigurationsActions.getConfiguration(this.props.params.configurationId).then(this._setConfiguration);
   },
 
   _setConfiguration(configuration) {

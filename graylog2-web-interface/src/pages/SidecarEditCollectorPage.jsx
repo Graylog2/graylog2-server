@@ -32,7 +32,7 @@ const SidecarEditCollectorPage = React.createClass({
   style: require('!style/useable!css!components/sidecars/styles/SidecarStyles.css'),
 
   _reloadCollector() {
-    CollectorsActions.getCollector(this.props.params.id).then(this._setCollector);
+    CollectorsActions.getCollector(this.props.params.collectorId).then(this._setCollector);
   },
 
   _setCollector(collector) {

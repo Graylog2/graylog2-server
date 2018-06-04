@@ -36,7 +36,7 @@ const SidecarStatusPage = React.createClass({
   },
 
   reloadSidecar() {
-    SidecarsActions.getSidecar(this.props.params.id).then(sidecar => this.setState({ sidecar }));
+    SidecarsActions.getSidecar(this.props.params.sidecarId).then(sidecar => this.setState({ sidecar }));
   },
 
   render() {
