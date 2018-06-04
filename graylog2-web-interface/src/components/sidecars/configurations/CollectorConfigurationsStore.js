@@ -4,8 +4,9 @@ import URI from 'urijs';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import CollectorConfigurationsActions from './CollectorConfigurationsActions';
+const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const CollectorConfigurationsStore = Reflux.createStore({
   listenables: [CollectorConfigurationsActions],

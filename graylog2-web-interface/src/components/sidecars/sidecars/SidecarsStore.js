@@ -3,8 +3,9 @@ import URI from 'urijs';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import SidecarsActions from './SidecarsActions';
+const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const SidecarsStore = Reflux.createStore({
   listenables: [SidecarsActions],

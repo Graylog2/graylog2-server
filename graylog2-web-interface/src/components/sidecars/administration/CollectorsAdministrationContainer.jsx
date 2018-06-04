@@ -5,16 +5,14 @@ import Reflux from 'reflux';
 import lodash from 'lodash';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
 import CollectorsAdministration from './CollectorsAdministration';
 
-import CollectorsActions from 'components/sidecars/configurations/CollectorsActions';
-import CollectorsStore from 'components/sidecars/configurations/CollectorsStore';
-import AdministrationActions from './AdministrationActions';
-import AdministrationStore from './AdministrationStore';
-import CollectorConfigurationsActions from 'components/sidecars/configurations/CollectorConfigurationsActions';
-import CollectorConfigurationsStore from 'components/sidecars/configurations/CollectorConfigurationsStore';
-import SidecarsActions from 'components/sidecars/sidecars/SidecarsActions';
+const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
+const { AdministrationStore, AdministrationActions } = CombinedProvider.get('Administration');
+const { CollectorConfigurationsStore, CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const CollectorsAdministrationContainer = createReactClass({
   propTypes: {

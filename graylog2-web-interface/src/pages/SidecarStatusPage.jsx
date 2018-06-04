@@ -8,10 +8,11 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import SidecarsActions from 'components/sidecars/sidecars/SidecarsActions';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
+
+const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const SidecarStatusPage = React.createClass({
   propTypes: {

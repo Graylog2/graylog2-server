@@ -5,9 +5,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import CollectorsActions from 'components/sidecars/configurations/CollectorsActions';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
+
+const { CollectorsActions } = CombinedProvider.get('Collectors');
 
 const SidecarEditCollectorPage = React.createClass({
   propTypes: {

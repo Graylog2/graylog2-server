@@ -7,7 +7,7 @@ import DocsHelper from 'util/DocsHelper';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import SidecarListContainer from '../components/sidecars/sidecars/SidecarListContainer';
+import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 
 import Routes from 'routing/Routes';
 

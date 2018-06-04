@@ -2,10 +2,10 @@ import React from 'react';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import SidecarList from './SidecarList';
-import SidecarsStore from './SidecarsStore';
-import SidecarsActions from './SidecarsActions';
+
+const { SidecarsStore, SidecarsActions } = CombinedProvider.get('Sidecars');
 
 const SidecarListContainer = React.createClass({
   mixins: [Reflux.connect(SidecarsStore)],

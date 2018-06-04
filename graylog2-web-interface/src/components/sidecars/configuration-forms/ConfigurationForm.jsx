@@ -9,12 +9,12 @@ import { Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import SourceViewModal from './SourceViewModal';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 
-import CollectorsActions from 'components/sidecars/configurations/CollectorsActions';
-import CollectorsStore from 'components/sidecars/configurations/CollectorsStore';
-import CollectorConfigurationsActions from 'components/sidecars/configurations/CollectorConfigurationsActions';
+const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
+const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const ConfigurationForm = React.createClass({
   mixins: [Reflux.connect(CollectorsStore)],

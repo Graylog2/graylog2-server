@@ -3,13 +3,11 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import ConfigurationList from './ConfigurationList';
 
-import CollectorConfigurationsStore from './CollectorConfigurationsStore';
-import CollectorsStore from './CollectorsStore';
-import CollectorsActions from './CollectorsActions';
-import CollectorConfigurationsActions from './CollectorConfigurationsActions';
+const { CollectorConfigurationsStore, CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
+const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 
 const ConfigurationListContainer = createReactClass({
   mixins: [Reflux.connect(CollectorConfigurationsStore, 'configurations'), Reflux.connect(CollectorsStore, 'collectors')],

@@ -3,8 +3,9 @@ import lodash from 'lodash';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import AdministrationActions from './AdministrationActions';
+const { AdministrationActions } = CombinedProvider.get('Administration');
 
 const AdministrationStore = Reflux.createStore({
   listenables: [AdministrationActions],

@@ -4,8 +4,9 @@ import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import CollectorConfigurationsActions from 'components/sidecars/configurations/CollectorConfigurationsActions';
+const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const SourceViewModal = React.createClass({
   propTypes: {

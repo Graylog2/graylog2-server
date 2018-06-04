@@ -2,10 +2,10 @@ import React from 'react';
 import { Button, Table } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
-
-import CollectorConfigurationsActions from 'components/sidecars/configurations/CollectorConfigurationsActions';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import SourceViewModal from './SourceViewModal';
+
+const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const IncludesHelper = React.createClass({
   getInitialState() {

@@ -5,11 +5,12 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-
-import CollectorConfigurationsActions from 'components/sidecars/configurations/CollectorConfigurationsActions';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
+
+const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const SidecarEditConfigurationPage = React.createClass({
   propTypes: {
