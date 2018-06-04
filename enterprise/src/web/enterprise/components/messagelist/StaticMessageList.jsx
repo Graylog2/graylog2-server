@@ -13,7 +13,7 @@ const StaticMessageList = ({ showMessages, onToggleMessages, fieldTypes, message
   <div className={style.widgetContainer}>
     <div className="widget">
       <span style={{ fontSize: 10 }} onClick={onToggleMessages}><i className="fa fa-bars pull-right" /></span>
-      {showMessages ? <WidgetHeader title="Messages" /> :
+      {showMessages ? <WidgetHeader hideDragHandle title="All Messages" /> :
         <span style={{ fontSize: 12 }}>Messages</span>}
       {showMessages && <MessageList data={messages} fields={fieldTypes.all} pageSize={100} />}
     </div>

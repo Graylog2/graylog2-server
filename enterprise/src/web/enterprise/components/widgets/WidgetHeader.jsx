@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import EditableTitle from 'enterprise/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
 
-const WidgetHeader = ({ children, onRename, title }) => (
+const WidgetHeader = ({ children, onRename, hideDragHandle, title }) => (
   <div className={styles.widgetHeader}>
-    <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}
+    {hideDragHandle || <i className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />}{' '}
     <EditableTitle disabled={!onRename} value={title} onChange={onRename} />
     <span className={`pull-right ${styles.widgetActionDropdown}`}>
       {children}
@@ -17,13 +17,14 @@ const WidgetHeader = ({ children, onRename, title }) => (
 WidgetHeader.propTypes = {
   children: PropTypes.node,
   onRename: PropTypes.func,
+  hideDragHandle: PropTypes.bool,
   title: PropTypes.node.isRequired,
 };
 
 WidgetHeader.defaultProps = {
   children: null,
-  editing: false,
   onRename: undefined,
+  hideDragHandle: false,
 };
 
 export default WidgetHeader;
