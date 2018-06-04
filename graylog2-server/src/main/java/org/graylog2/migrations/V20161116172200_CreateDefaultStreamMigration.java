@@ -19,14 +19,12 @@ package org.graylog2.migrations;
 import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.events.StreamsChangedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -44,15 +42,12 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161116172200_CreateDefaultStreamMigration.class);
 
     private final StreamService streamService;
-    private final ClusterEventBus clusterEventBus;
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
     public V20161116172200_CreateDefaultStreamMigration(StreamService streamService,
-                                                        ClusterEventBus clusterEventBus,
                                                         IndexSetRegistry indexSetRegistry) {
         this.streamService = streamService;
-        this.clusterEventBus = clusterEventBus;
         this.indexSetRegistry = indexSetRegistry;
     }
 
@@ -93,7 +88,5 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
         } catch (ValidationException e) {
             LOG.error("Couldn't create default stream! This is a bug!");
         }
-
-        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }
 }
