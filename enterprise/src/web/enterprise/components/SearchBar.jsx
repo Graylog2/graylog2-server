@@ -14,13 +14,11 @@ import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
 import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import CombinedProvider from 'injection/CombinedProvider';
 
 import StreamsFilter from './searchbar/StreamsFilter';
 import { QueryFiltersActions, QueryFiltersStore } from '../stores/QueryFiltersStore';
 import { CurrentQueryStore } from '../stores/CurrentQueryStore';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import { StreamsStore } from '../stores/StreamsStore';
 import ScrollToHint from './common/ScrollToHint';
 
 const SearchBar = createReactClass({
@@ -35,6 +33,7 @@ const SearchBar = createReactClass({
 
   mixins: [
     Reflux.connect(CurrentQueryStore, 'currentQuery'),
+    Reflux.connectFilter(StreamsStore, 'availableStreams', ({ streams }) => streams.map(stream => ({ key: stream.title, value: stream.id }))),
     Reflux.connect(QueryFiltersStore, 'queryFilters'),
   ],
 
@@ -49,15 +48,7 @@ const SearchBar = createReactClass({
     return {
       savedSearch: '',
       keywordPreview: Immutable.Map(),
-      availableStreams: [],
     };
-  },
-
-  componentDidMount() {
-    StreamsStore.listStreams().then((streams) => {
-      const availableStreams = streams.map(stream => ({ key: stream.title, value: stream.id }));
-      this.setState({ availableStreams });
-    });
   },
 
   _performSearch(event) {

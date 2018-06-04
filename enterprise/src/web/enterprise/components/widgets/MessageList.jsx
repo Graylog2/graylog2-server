@@ -15,6 +15,7 @@ import { SelectedFieldsStore } from '../../stores/SelectedFieldsStore';
 import { ViewStore } from '../../stores/ViewStore';
 import { SearchConfigStore } from '../../stores/SearchConfigStore';
 import FieldType from '../../logic/fieldtypes/FieldType';
+import { StreamsStore } from '../../stores/StreamsStore';
 
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
@@ -34,6 +35,7 @@ const MessageList = createReactClass({
   mixins: [
     Reflux.connect(SearchConfigStore, 'configurations'),
     Reflux.connect(SelectedFieldsStore, 'selectedFields'),
+    Reflux.connect(StreamsStore, 'availableStreams'),
     Reflux.connect(ViewStore, 'currentView'),
     Reflux.connect(QueriesStore, 'queries'),
   ],
@@ -109,9 +111,10 @@ const MessageList = createReactClass({
           index: m.index,
         };
       });
-    const { selectedFields } = this.state;
+    const { availableStreams, selectedFields } = this.state;
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
     const { activeQuery, view } = this.state.currentView;
+    const { streams } = availableStreams;
     return (
       <span>
         <MessageTablePaginator currentPage={Number(this.state.currentPage)}
@@ -152,8 +155,8 @@ const MessageList = createReactClass({
                                        expanded={this.state.expandedMessages.contains(`${message.index}-${message.id}`)}
                                        toggleDetail={this._toggleMessageDetail}
                                        inputs={new Immutable.Map()}
-                                       streams={new Immutable.Map()}
-                                       allStreams={new Immutable.List()}
+                                       streams={Immutable.Map(streams.map(stream => [stream.id, stream]))}
+                                       allStreams={Immutable.List(streams)}
                                        allStreamsLoaded
                                        nodes={new Immutable.Map()}
                                        highlight={false}

@@ -4,7 +4,6 @@ import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem, Label } from '
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import StoreProvider from 'injection/StoreProvider';
 import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'enterprise/components/messagelist';
 import { Spinner, ClipboardButton, Timestamp } from 'components/common';
@@ -12,8 +11,6 @@ import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import Link from 'enterprise/components/Link';
 
 import Routes from 'routing/Routes';
-
-const StreamsStore = StoreProvider.getStore('Streams');
 
 class MessageDetail extends React.Component {
   static propTypes = {
@@ -39,23 +36,6 @@ class MessageDetail extends React.Component {
     allStreamsLoaded: false,
     allStreams: Immutable.List(),
     showOriginal: false,
-  };
-
-  componentDidMount() {
-    if (this.props.allStreams === undefined) {
-      // our parent does not provide allStreams for the test against stream menu, we have to load it ourselves
-      // this can happen if the component is used outside the regular search result
-      // only load the streams per page
-      if (this.state.allStreamsLoaded || this.props.disableTestAgainstStream) {
-        return;
-      }
-      const promise = StreamsStore.listStreams();
-      promise.done(streams => this._onStreamsLoaded(streams));
-    }
-  }
-
-  _onStreamsLoaded = (streams) => {
-    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
   };
 
   _inputName = (inputId) => {
@@ -176,7 +156,7 @@ class MessageDetail extends React.Component {
       );
     }
 
-    const streamIds = Immutable.Set(this.props.message.stream_ids);
+    const streamIds = Immutable.Set(this.props.message.fields.streams);
     const streams = streamIds.map((id) => {
       const stream = this.props.streams.get(id);
       if (stream !== undefined) {
@@ -264,7 +244,7 @@ class MessageDetail extends React.Component {
           </dl>
         </Col>
         <Col md={9}>
-          <div ref="messageList">
+          <div>
             <MessageFields message={this.props.message}
                            fields={this.props.fields}
                            possiblyHighlight={this.props.possiblyHighlight}
