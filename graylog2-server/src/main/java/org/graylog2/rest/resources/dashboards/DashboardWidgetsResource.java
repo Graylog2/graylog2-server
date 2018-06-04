@@ -32,9 +32,7 @@ import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.dashboards.widgets.WidgetResultCache;
-import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
@@ -74,19 +72,16 @@ public class DashboardWidgetsResource extends RestResource {
     private final ActivityWriter activityWriter;
     private final WidgetResultCache widgetResultCache;
     private final DashboardService dashboardService;
-    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DashboardWidgetsResource(DashboardWidgetCreator dashboardWidgetCreator,
                                     ActivityWriter activityWriter,
                                     WidgetResultCache widgetResultCache,
-                                    DashboardService dashboardService,
-                                    ClusterEventBus clusterEventBus) {
+                                    DashboardService dashboardService) {
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.activityWriter = activityWriter;
         this.widgetResultCache = widgetResultCache;
         this.dashboardService = dashboardService;
-        this.clusterEventBus = clusterEventBus;
     }
 
     @POST
@@ -184,7 +179,6 @@ public class DashboardWidgetsResource extends RestResource {
 
         final DashboardWidget widget = dashboard.getWidget(widgetId);
         dashboardService.removeWidget(dashboard, widget);
-        this.clusterEventBus.post(WidgetUpdatedEvent.create(widget));
 
         final String msg = "Deleted widget <" + widgetId + "> from dashboard <" + dashboardId + ">. Reason: REST request.";
         LOG.info(msg);
@@ -252,7 +246,6 @@ public class DashboardWidgetsResource extends RestResource {
 
             dashboardService.removeWidget(dashboard, widget);
             dashboardService.addWidget(dashboard, updatedWidget);
-            this.clusterEventBus.post(WidgetUpdatedEvent.create(updatedWidget));
         } catch (DashboardWidget.NoSuchWidgetTypeException e2) {
             LOG.error("No such widget type.", e2);
             throw new BadRequestException(e2);
@@ -329,7 +322,6 @@ public class DashboardWidgetsResource extends RestResource {
         }
 
         dashboardService.updateWidgetCacheTime(dashboard, widget, uwr.cacheTime());
-        this.clusterEventBus.post(WidgetUpdatedEvent.create(widget));
 
         LOG.info("Updated cache time of widget <" + widgetId + "> on dashboard <" + dashboardId + "> to " +
                 "[" + uwr.cacheTime() + "]. Reason: REST request.");

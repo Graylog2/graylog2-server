@@ -166,12 +166,14 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     public void addWidget(Dashboard dashboard, DashboardWidget widget) throws ValidationException {
         embed(dashboard, DashboardImpl.EMBEDDED_WIDGETS, widget);
         dashboard.addWidget(widget);
+        clusterEventBus.post(WidgetUpdatedEvent.create(widget));
     }
 
     @Override
     public void removeWidget(Dashboard dashboard, DashboardWidget widget) {
         removeEmbedded(dashboard, DashboardImpl.EMBEDDED_WIDGETS, widget.getId());
         dashboard.removeWidget(widget);
+        clusterEventBus.post(WidgetUpdatedEvent.create(widget));
     }
 
     @Deprecated
