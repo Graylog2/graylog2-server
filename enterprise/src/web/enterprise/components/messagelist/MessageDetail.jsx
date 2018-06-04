@@ -16,20 +16,38 @@ class MessageDetail extends React.Component {
   static propTypes = {
     allStreams: PropTypes.object,
     allStreamsLoaded: PropTypes.bool,
-    fields: PropTypes.object.isRequired,
-    disableTestAgainstStream: PropTypes.bool,
-    disableSurroundingSearch: PropTypes.bool,
-    expandAllRenderAsync: PropTypes.bool,
-    showTimestamp: PropTypes.bool,
-    disableFieldActions: PropTypes.bool,
-    possiblyHighlight: PropTypes.func,
-    inputs: PropTypes.object,
-    nodes: PropTypes.object,
-    message: PropTypes.object,
-    streams: PropTypes.object,
     customFieldActions: PropTypes.node,
-    searchConfig: PropTypes.object,
+    disableFieldActions: PropTypes.bool,
     disableMessageActions: PropTypes.bool,
+    disableSurroundingSearch: PropTypes.bool,
+    disableTestAgainstStream: PropTypes.bool,
+    expandAllRenderAsync: PropTypes.bool,
+    fields: PropTypes.object.isRequired,
+    inputs: PropTypes.object,
+    message: PropTypes.object,
+    nodes: PropTypes.object,
+    possiblyHighlight: PropTypes.func,
+    searchConfig: PropTypes.object,
+    showTimestamp: PropTypes.bool,
+    streams: PropTypes.object,
+  };
+
+  static defaultProps = {
+    allStreams: {},
+    allStreamsLoaded: true,
+    customFieldActions: null,
+    disableFieldActions: false,
+    disableMessageActions: false,
+    disableSurroundingSearch: false,
+    disableTestAgainstStream: false,
+    expandAllRenderAsync: false,
+    inputs: {},
+    message: {},
+    nodes: {},
+    possiblyHighlight: () => {},
+    searchConfig: {},
+    showTimestamp: true,
+    streams: {},
   };
 
   state = {
@@ -96,7 +114,9 @@ class MessageDetail extends React.Component {
     });
 
     return (
-      <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream"
+      <DropdownButton pullRight
+                      bsSize="small"
+                      title="Test against stream"
                       id="select-stream-dropdown">
         { streamList }
         { (!streamList && !this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner" />
@@ -106,25 +126,27 @@ class MessageDetail extends React.Component {
     );
   };
 
-  _formatMessageActions = () => {
+  // eslint-disable-next-line camelcase
+  _formatMessageActions = ({ index, id, fields, decoration_stats }) => {
     if (this.props.disableMessageActions) {
       return <ButtonGroup className="pull-right" bsSize="small" />;
     }
 
-    const messageUrl = this.props.message.index ? Routes.message_show(this.props.message.index, this.props.message.id) : '#';
+    const messageUrl = index ? Routes.message_show(index, id) : '#';
 
     let surroundingSearchButton;
     if (!this.props.disableSurroundingSearch) {
       surroundingSearchButton = (
-        <SurroundingSearchButton id={this.props.message.id}
-                                 timestamp={this.props.message.timestamp}
+        <SurroundingSearchButton id={id}
+                                 timestamp={fields.timestamp}
                                  searchConfig={this.props.searchConfig}
-                                 messageFields={this.props.message.fields} />
+                                 messageFields={fields} />
       );
     }
 
     let showChanges = null;
-    if (this.props.message.decoration_stats) {
+    // eslint-disable-next-line camelcase
+    if (decoration_stats) {
       showChanges = <Button onClick={this._toggleShowOriginal} active={this.state.showOriginal}>Show changes</Button>;
     }
 
@@ -144,9 +166,38 @@ class MessageDetail extends React.Component {
     this.setState({ showOriginal: !this.state.showOriginal });
   };
 
+  _formatReceivedBy = (sourceNodeId, sourceInputId) => {
+    if (!sourceNodeId) {
+      return null;
+    }
+
+    return (
+      <div>
+        <dt>Received by</dt>
+        <dd>
+          <em>{this._inputName(sourceInputId)}</em>{' '}
+          on {this._nodeName(sourceNodeId)}
+        </dd>
+      </div>
+    );
+  };
+
+  _formatMessageTitle = (index, id) => {
+    if (index) {
+      return (
+        <LinkContainer to={Routes.message_show(index, id)}>
+          <Link href="#">{id}</Link>
+        </LinkContainer>
+      );
+    }
+    return <span>{id} <Label bsStyle="warning">Not stored</Label></span>;
+  };
+
   render() {
+    const { expandAllRenderAsync, message } = this.props;
+    const { fields, index, id } = message;
     // Short circuit when all messages are being expanded at the same time
-    if (this.props.expandAllRenderAsync) {
+    if (expandAllRenderAsync) {
       return (
         <Row>
           <Col md={12}>
@@ -156,106 +207,75 @@ class MessageDetail extends React.Component {
       );
     }
 
-    const streamIds = Immutable.Set(this.props.message.fields.streams);
-    const streams = streamIds.map((id) => {
-      const stream = this.props.streams.get(id);
+    const streamIds = Immutable.Set(fields.streams);
+    const streams = streamIds.map((streamId) => {
+      const stream = this.props.streams.get(streamId);
       if (stream !== undefined) {
         return <li key={stream.id}><StreamLink stream={stream} /></li>;
       }
       return null;
     });
 
-    // Legacy
-    let viaRadio = this.props.message.source_radio_id;
-    if (viaRadio) {
-      viaRadio = (
-        <span>
-          via <em>{this._inputName(this.props.message.source_radio_input_id)}</em> on
-          radio {this._nodeName(this.props.message.source_radio_id)}
-        </span>
-      );
-    }
-
     let timestamp = null;
     if (this.props.showTimestamp) {
       timestamp = [];
-      const rawTimestamp = this.props.message.fields.timestamp;
+      const rawTimestamp = fields.timestamp;
 
       timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
       timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
     }
 
-    let receivedBy;
-    if (this.props.message.source_input_id && this.props.message.source_node_id && this.props.nodes) {
-      receivedBy = (
-        <div>
-          <dt>Received by</dt>
-          <dd>
-            <em>{this._inputName(this.props.message.source_input_id)}</em>{' '}
-            on {this._nodeName(this.props.message.source_node_id)}
-            { viaRadio && <br /> }
-            {viaRadio}
-          </dd>
-        </div>
-      );
-    } else {
-      receivedBy = null;
-    }
+    // eslint-disable-next-line camelcase
+    const { gl2_source_node, gl2_source_input } = fields;
+    const receivedBy = this._formatReceivedBy(gl2_source_node, gl2_source_input);
 
-    let messageTitle;
-    if (this.props.message.index) {
-      messageTitle = (
-        <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-          <Link href="#">{this.props.message.id}</Link>
-        </LinkContainer>
-      );
-    } else {
-      messageTitle = <span>{this.props.message.id} <Label bsStyle="warning">Not stored</Label></span>;
-    }
+    const messageTitle = this._formatMessageTitle(index, id);
 
-    return (<div>
-      <Row className="row-sm">
-        <Col md={12}>
-          {this._formatMessageActions()}
-          <h3 className="message-details-title">
-            <i className="fa fa-envelope" />
-            &nbsp;
-            {messageTitle}
-          </h3>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={3}>
-          <dl className="message-details">
-            {timestamp}
-            {receivedBy}
+    return (
+      <div>
+        <Row className="row-sm">
+          <Col md={12}>
+            {this._formatMessageActions(message)}
+            <h3 className="message-details-title">
+              <i className="fa fa-envelope" />
+              &nbsp;
+              {messageTitle}
+            </h3>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={3}>
+            <dl className="message-details">
+              {timestamp}
+              {receivedBy}
 
-            <dt>Stored in index</dt>
-            <dd>{this.props.message.index ? this.props.message.index : 'Message is not stored'}</dd>
+              <dt>Stored in index</dt>
+              <dd>{index || 'Message is not stored'}</dd>
 
-            { streamIds.size > 0 && <dt>Routed into streams</dt> }
-            { streamIds.size > 0 &&
-            <dd className="stream-list">
-              <ul>
-                {streams}
-              </ul>
-            </dd>
-            }
-          </dl>
-        </Col>
-        <Col md={9}>
-          <div>
-            <MessageFields message={this.props.message}
-                           fields={this.props.fields}
-                           possiblyHighlight={this.props.possiblyHighlight}
-                           disableFieldActions={this.props.disableFieldActions}
-                           customFieldActions={this.props.customFieldActions}
-                           showDecoration={this.state.showOriginal}
-            />
-          </div>
-        </Col>
-      </Row>
-    </div>);
+              {streamIds.size > 0 && <dt>Routed into streams</dt>}
+              {streamIds.size > 0 &&
+              <dd className="stream-list">
+                <ul>
+                  {streams}
+                </ul>
+              </dd>
+              }
+            </dl>
+          </Col>
+          <Col md={9}>
+            <div>
+              <MessageFields message={message}
+                             fields={this.props.fields}
+                             possiblyHighlight={this.props.possiblyHighlight}
+                             disableFieldActions={this.props.disableFieldActions}
+                             customFieldActions={this.props.customFieldActions}
+                             showDecoration={this.state.showOriginal}
+              />
+            </div>
+          </Col>
+        </Row>
+      </div>
+    );
   }
 }
 

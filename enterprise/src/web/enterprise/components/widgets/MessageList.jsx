@@ -8,18 +8,18 @@ import { MessageTableEntry } from 'enterprise/components/messagelist';
 import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
 
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 import { QueriesStore } from 'enterprise/stores/QueriesStore';
-import { SelectedFieldsStore } from '../../stores/SelectedFieldsStore';
-import { ViewStore } from '../../stores/ViewStore';
-import { SearchConfigStore } from '../../stores/SearchConfigStore';
+import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
+import { ViewStore } from 'enterprise/stores/ViewStore';
+import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 import FieldType from '../../logic/fieldtypes/FieldType';
-import { StreamsStore } from '../../stores/StreamsStore';
+import { StreamsStore } from 'enterprise/stores/StreamsStore';
 
-const RefreshActions = ActionsProvider.getActions('Refresh');
-
-const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
+const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
+const { NodesStore } = CombinedProvider.get('Nodes');
+const { RefreshActions } = CombinedProvider.get('Refresh');
+const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 
 const MessageList = createReactClass({
   displayName: 'MessageList',
@@ -28,11 +28,14 @@ const MessageList = createReactClass({
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
+    fields: PropTypes.arrayOf(PropTypes.object).isRequired,
     filter: PropTypes.string,
     pageSize: PropTypes.number.isRequired,
   },
 
   mixins: [
+    Reflux.connect(InputsStore, 'inputs'),
+    Reflux.connect(NodesStore, 'nodes'),
     Reflux.connect(SearchConfigStore, 'configurations'),
     Reflux.connect(SelectedFieldsStore, 'selectedFields'),
     Reflux.connect(StreamsStore, 'availableStreams'),
@@ -52,6 +55,10 @@ const MessageList = createReactClass({
       currentPage: 1,
       expandedMessages: Immutable.Set(),
     };
+  },
+
+  componentDidMount() {
+    InputsActions.list();
   },
 
   _columnStyle(fieldName) {
@@ -112,9 +119,15 @@ const MessageList = createReactClass({
         };
       });
     const { availableStreams, selectedFields } = this.state;
+    const { inputs } = this.state.inputs || { inputs: [] };
+    const inputsMap = Immutable.Map(inputs.map(input => [input.id, input]));
+    const { nodes } = this.state.nodes;
+    const nodesMap = Immutable.Map(nodes);
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
     const { activeQuery, view } = this.state.currentView;
     const { streams } = availableStreams;
+    const streamsMap = Immutable.Map(streams.map(stream => [stream.id, stream]));
+    const allStreams = Immutable.List(streams);
     return (
       <span>
         <MessageTablePaginator currentPage={Number(this.state.currentPage)}
@@ -145,20 +158,21 @@ const MessageList = createReactClass({
                   </tr>
                 </thead>
                 {messageSlice.map((message) => {
+                  const messageKey = `${message.index}-${message.id}`;
                   return (
-                    <MessageTableEntry key={`${message.index}-${message.id}`}
+                    <MessageTableEntry key={messageKey}
                                        fields={fields}
                                        disableSurroundingSearch
                                        message={message}
                                        showMessageRow={selectedFields.contains('message')}
                                        selectedFields={selectedColumns}
-                                       expanded={this.state.expandedMessages.contains(`${message.index}-${message.id}`)}
+                                       expanded={this.state.expandedMessages.contains(messageKey)}
                                        toggleDetail={this._toggleMessageDetail}
-                                       inputs={new Immutable.Map()}
-                                       streams={Immutable.Map(streams.map(stream => [stream.id, stream]))}
-                                       allStreams={Immutable.List(streams)}
+                                       inputs={inputsMap}
+                                       streams={streamsMap}
+                                       allStreams={allStreams}
                                        allStreamsLoaded
-                                       nodes={new Immutable.Map()}
+                                       nodes={nodesMap}
                                        highlight={false}
                                        expandAllRenderAsync={false}
                                        searchConfig={this.state.configurations.searchesClusterConfig} />
