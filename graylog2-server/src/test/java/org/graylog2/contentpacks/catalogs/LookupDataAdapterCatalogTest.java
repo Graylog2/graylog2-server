@@ -31,7 +31,9 @@ import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -40,6 +42,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,8 +59,13 @@ public class LookupDataAdapterCatalogTest {
     private LookupDataAdapterCatalog catalog;
 
     @Before
+    @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
-        final DBDataAdapterService dataAdapterService = new DBDataAdapterService(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final DBDataAdapterService dataAdapterService = new DBDataAdapterService(
+                mongoRule.getMongoConnection(),
+                new MongoJackObjectMapperProvider(objectMapper),
+                clusterEventBus);
         final LookupDataAdapterCodec codec = new LookupDataAdapterCodec(objectMapper, dataAdapterService);
 
         catalog = new LookupDataAdapterCatalog(dataAdapterService, codec);
