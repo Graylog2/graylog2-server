@@ -49,11 +49,11 @@ const ConfigurationRow = React.createClass({
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
               <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">Edit</Button>
             </LinkContainer>
-            <DropdownButton id={`more-actions-${this.props.configuration.id}`}
+            <DropdownButton id={`more-actions-${configuration.id}`}
                             title="More actions"
                             bsSize="xsmall"
                             pullRight>
-              <CopyConfigurationModal id={this.props.configuration.id}
+              <CopyConfigurationModal id={configuration.id}
                                       validateConfiguration={this.props.validateConfiguration}
                                       copyConfiguration={this.props.onCopy} />
               <MenuItem divider />
