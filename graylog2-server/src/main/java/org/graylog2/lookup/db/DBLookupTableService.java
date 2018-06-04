@@ -22,7 +22,10 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.lookup.events.LookupTablesDeleted;
+import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -37,17 +40,18 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DBLookupTableService {
-
     private final JacksonDBCollection<LookupTableDto, ObjectId> db;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DBLookupTableService(MongoConnection mongoConnection,
-                                MongoJackObjectMapperProvider mapper) {
-
-        db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_tables"),
+                                MongoJackObjectMapperProvider mapper,
+                                ClusterEventBus clusterEventBus) {
+        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_tables"),
                 LookupTableDto.class,
                 ObjectId.class,
                 mapper.get());
+        this.clusterEventBus = clusterEventBus;
 
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
@@ -64,7 +68,11 @@ public class DBLookupTableService {
 
     public LookupTableDto save(LookupTableDto table) {
         WriteResult<LookupTableDto, ObjectId> save = db.save(table);
-        return save.getSavedObject();
+        final LookupTableDto savedLookupTable = save.getSavedObject();
+
+        clusterEventBus.post(LookupTablesUpdated.create(savedLookupTable));
+
+        return savedLookupTable;
     }
 
     public Collection<LookupTableDto> findAll() {
@@ -106,12 +114,12 @@ public class DBLookupTableService {
     }
 
     public void delete(String idOrName) {
-        try {
-            db.removeById(new ObjectId(idOrName));
-        } catch (IllegalArgumentException e) {
-            // not an ObjectId, try again with name
-            db.remove(DBQuery.is("name", idOrName));
-        }
+        final Optional<LookupTableDto> lookupTableDto = get(idOrName);
+        lookupTableDto
+                .map(LookupTableDto::id)
+                .map(ObjectId::new)
+                .ifPresent(db::removeById);
+        lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
     }
 
     public void forEach(Consumer<? super LookupTableDto> action) {
