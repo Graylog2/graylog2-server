@@ -58,7 +58,7 @@ const SidecarRow = React.createClass({
         </td>
         <td>
           <ButtonToolbar>
-            <LinkContainer to={`${Routes.pluginRoute('SYSTEM_SIDECARS_ADMINISTRATION')}?node_id=${sidecar.node_id}`}>
+            <LinkContainer to={`${Routes.SYSTEM.SIDECARS.ADMINISTRATION}?node_id=${sidecar.node_id}`}>
               <Button bsSize="xsmall" bsStyle="info">Manage sidecar</Button>
             </LinkContainer>
             <LinkContainer to={Routes.search_with_query(`gl2_source_collector:${sidecar.node_id}`, 'relative', 604800)}>
