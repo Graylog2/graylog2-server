@@ -5,10 +5,10 @@ import UserNotification from 'util/UserNotification';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
-const { AdministrationActions } = CombinedProvider.get('Administration');
+const { SidecarsAdministrationActions } = CombinedProvider.get('SidecarsAdministration');
 
-const AdministrationStore = Reflux.createStore({
-  listenables: [AdministrationActions],
+const SidecarsAdministrationStore = Reflux.createStore({
+  listenables: [SidecarsAdministrationActions],
   sourceUrl: '/plugins/org.graylog.plugins.sidecar/sidecar',
   sidecars: undefined,
   filters: undefined,
@@ -59,7 +59,7 @@ const AdministrationStore = Reflux.createStore({
           'Could not retrieve Sidecars');
       });
 
-    AdministrationActions.list.promise(promise);
+    SidecarsAdministrationActions.list.promise(promise);
   },
 
   setAction(action, collectors) {
@@ -85,8 +85,8 @@ const AdministrationStore = Reflux.createStore({
           `Could not ${action} collectors`);
       });
 
-    AdministrationActions.setAction.promise(promise);
+    SidecarsAdministrationActions.setAction.promise(promise);
   },
 });
 
-export default AdministrationStore;
+export default SidecarsAdministrationStore;

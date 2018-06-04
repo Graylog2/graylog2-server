@@ -10,7 +10,7 @@ import { Spinner } from 'components/common';
 import CollectorsAdministration from './CollectorsAdministration';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
-const { AdministrationStore, AdministrationActions } = CombinedProvider.get('Administration');
+const { SidecarsAdministrationStore, SidecarsAdministrationActions } = CombinedProvider.get('SidecarsAdministration');
 const { CollectorConfigurationsStore, CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
@@ -19,7 +19,7 @@ const CollectorsAdministrationContainer = createReactClass({
     nodeId: PropTypes.string,
   },
 
-  mixins: [Reflux.connect(CollectorsStore, 'collectors'), Reflux.connect(AdministrationStore, 'sidecars'), Reflux.connect(CollectorConfigurationsStore, 'configurations')],
+  mixins: [Reflux.connect(CollectorsStore, 'collectors'), Reflux.connect(SidecarsAdministrationStore, 'sidecars'), Reflux.connect(CollectorConfigurationsStore, 'configurations')],
 
   getDefaultProps() {
     return {
@@ -42,39 +42,39 @@ const CollectorsAdministrationContainer = createReactClass({
     const query = nodeId ? `node_id:${nodeId}` : '';
 
     CollectorsActions.all();
-    AdministrationActions.list({ query: query });
+    SidecarsAdministrationActions.list({ query: query });
     CollectorConfigurationsActions.all();
   },
 
   handlePageChange(page, pageSize) {
     const { filters, pagination, query } = this.state.sidecars;
     const effectivePage = pagination.pageSize !== pageSize ? 1 : page;
-    AdministrationActions.list({ query: query, filters: filters, page: effectivePage, pageSize: pageSize });
+    SidecarsAdministrationActions.list({ query: query, filters: filters, page: effectivePage, pageSize: pageSize });
   },
 
   handleFilter(property, value) {
     const { filters, pagination, query } = this.state.sidecars;
     const newFilters = lodash.cloneDeep(filters);
     newFilters[property] = value;
-    AdministrationActions.list({ query: query, filters: newFilters, pageSize: pagination.pageSize });
+    SidecarsAdministrationActions.list({ query: query, filters: newFilters, pageSize: pagination.pageSize });
   },
 
   handleQueryChange(query = '', callback = () => {}) {
     const { filters, pagination } = this.state.sidecars;
-    AdministrationActions.list({ query: query, filters: filters, pageSize: pagination.pageSize }).finally(callback);
+    SidecarsAdministrationActions.list({ query: query, filters: filters, pageSize: pagination.pageSize }).finally(callback);
   },
 
   handleConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback) {
     SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
       doneCallback();
       const { query, filters, pagination } = this.state.sidecars;
-      AdministrationActions.list({ query: query, filters: filters, pageSize: pagination.pageSize, page: pagination.page });
+      SidecarsAdministrationActions.list({ query: query, filters: filters, pageSize: pagination.pageSize, page: pagination.page });
       return response;
     });
   },
 
   handleProcessAction(action, selectedCollectors, doneCallback) {
-    AdministrationActions.setAction(action, selectedCollectors).then((response) => {
+    SidecarsAdministrationActions.setAction(action, selectedCollectors).then((response) => {
       doneCallback();
       return response;
     });
