@@ -36,6 +36,10 @@ class Input extends React.Component {
       PropTypes.element,
       PropTypes.string,
     ]),
+    buttonAfter: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string,
+    ]),
     children: PropTypes.oneOfType([
       PropTypes.array,
       PropTypes.element,
@@ -53,6 +57,7 @@ class Input extends React.Component {
     help: '',
     wrapperClassName: undefined,
     addonAfter: null,
+    buttonAfter: null,
     children: null,
   };
 
@@ -96,13 +101,15 @@ class Input extends React.Component {
     help,
     children,
     addon,
+    button,
   ) => {
     let input;
-    if (addon) {
+    if (addon || button) {
       input = (
         <InputGroup>
           {children}
-          <InputGroup.Addon>{addon}</InputGroup.Addon>
+          {button && <InputGroup.Button>{button}</InputGroup.Button>}
+          {addon && <InputGroup.Addon>{addon}</InputGroup.Addon>}
         </InputGroup>
       );
     } else {
@@ -143,7 +150,7 @@ class Input extends React.Component {
   };
 
   render() {
-    const { id, type, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, children, addonAfter, ...controlProps } = this.props;
+    const { id, type, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, children, addonAfter, buttonAfter, ...controlProps } = this.props;
     controlProps.type = type;
     controlProps.label = label;
 
@@ -157,7 +164,7 @@ class Input extends React.Component {
       case 'email':
       case 'number':
       case 'file':
-        return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, this._renderFormControl('input', controlProps), addonAfter);
+        return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, this._renderFormControl('input', controlProps), addonAfter, buttonAfter);
       case 'textarea':
         return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, this._renderFormControl('textarea', controlProps));
       case 'select':
@@ -167,6 +174,7 @@ class Input extends React.Component {
       case 'radio':
         return this._renderRadioGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, help, controlProps);
       default:
+        // eslint-disable-next-line no-console
         console.warn(`Unsupported input type ${type}`);
     }
 

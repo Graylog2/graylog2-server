@@ -1,0 +1,214 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
+<Input
+  addonAfter=".00"
+  bsStyle={null}
+  buttonAfter={null}
+  help=""
+  id="inputWithAddon"
+  label=""
+  placeholder=""
+  type="text"
+>
+  <FormGroup
+    bsClass="form-group"
+    controlId="inputWithAddon"
+    validationState={null}
+  >
+    <div
+      className="form-group"
+    >
+      <InputWrapper>
+        <span>
+          <InputGroup
+            bsClass="input-group"
+          >
+            <span
+              className="input-group"
+            >
+              <FormControl
+                bsClass="form-control"
+                componentClass="input"
+                inputRef={[Function]}
+                label=""
+                placeholder=""
+                type="text"
+              >
+                <input
+                  className="form-control"
+                  id="inputWithAddon"
+                  label=""
+                  placeholder=""
+                  type="text"
+                />
+              </FormControl>
+              <InputGroupAddon
+                bsClass="input-group-addon"
+              >
+                <span
+                  className="input-group-addon"
+                >
+                  .00
+                </span>
+              </InputGroupAddon>
+            </span>
+          </InputGroup>
+        </span>
+      </InputWrapper>
+    </div>
+  </FormGroup>
+</Input>
+`;
+
+exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
+<Input
+  addonAfter={null}
+  bsStyle={null}
+  buttonAfter={
+    <Button
+      active={false}
+      block={false}
+      bsClass="btn"
+      bsStyle="default"
+      disabled={false}
+    />
+  }
+  help=""
+  id="inputWithButton"
+  label=""
+  placeholder=""
+  type="text"
+>
+  <FormGroup
+    bsClass="form-group"
+    controlId="inputWithButton"
+    validationState={null}
+  >
+    <div
+      className="form-group"
+    >
+      <InputWrapper>
+        <span>
+          <InputGroup
+            bsClass="input-group"
+          >
+            <span
+              className="input-group"
+            >
+              <FormControl
+                bsClass="form-control"
+                componentClass="input"
+                inputRef={[Function]}
+                label=""
+                placeholder=""
+                type="text"
+              >
+                <input
+                  className="form-control"
+                  id="inputWithButton"
+                  label=""
+                  placeholder=""
+                  type="text"
+                />
+              </FormControl>
+              <InputGroupButton
+                bsClass="input-group-btn"
+              >
+                <span
+                  className="input-group-btn"
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    disabled={false}
+                  >
+                    <button
+                      className="btn btn-default"
+                      disabled={false}
+                      type="button"
+                    />
+                  </Button>
+                </span>
+              </InputGroupButton>
+            </span>
+          </InputGroup>
+        </span>
+      </InputWrapper>
+    </div>
+  </FormGroup>
+</Input>
+`;
+
+exports[`Input renders a checkbox addon after the input if addonAfter is passed 1`] = `
+<Input
+  addonAfter={
+    <input
+      aria-label="..."
+      id="addonCheckbox"
+      type="checkbox"
+    />
+  }
+  bsStyle={null}
+  buttonAfter={null}
+  help=""
+  id="inputWithCheckboxAddon"
+  label=""
+  placeholder=""
+  type="text"
+>
+  <FormGroup
+    bsClass="form-group"
+    controlId="inputWithCheckboxAddon"
+    validationState={null}
+  >
+    <div
+      className="form-group"
+    >
+      <InputWrapper>
+        <span>
+          <InputGroup
+            bsClass="input-group"
+          >
+            <span
+              className="input-group"
+            >
+              <FormControl
+                bsClass="form-control"
+                componentClass="input"
+                inputRef={[Function]}
+                label=""
+                placeholder=""
+                type="text"
+              >
+                <input
+                  className="form-control"
+                  id="inputWithCheckboxAddon"
+                  label=""
+                  placeholder=""
+                  type="text"
+                />
+              </FormControl>
+              <InputGroupAddon
+                bsClass="input-group-addon"
+              >
+                <span
+                  className="input-group-addon"
+                >
+                  <input
+                    aria-label="..."
+                    id="addonCheckbox"
+                    type="checkbox"
+                  />
+                </span>
+              </InputGroupAddon>
+            </span>
+          </InputGroup>
+        </span>
+      </InputWrapper>
+    </div>
+  </FormGroup>
+</Input>
+`;
