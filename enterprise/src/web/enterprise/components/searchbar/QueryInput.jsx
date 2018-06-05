@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
-import _ from 'lodash';
 
 import 'brace/mode/lucene';
 import 'enterprise/components/searchbar/queryinput/ace-queryinput';
@@ -150,7 +148,7 @@ class QueryInput extends Component {
                    style={{
                      marginTop: '9px',
                      height: '34px',
-                     width: '100%'
+                     width: '100%',
                    }} />
       </div>
     );
