@@ -33,11 +33,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
     public static final String BUFFERS_READ = "buffers:read";
-    public static final String BUNDLE_CREATE = "bundle:create";
-    public static final String BUNDLE_DELETE = "bundle:delete";
     public static final String BUNDLE_EXPORT = "bundle:export";
     public static final String BUNDLE_IMPORT = "bundle:import";
-    public static final String BUNDLE_READ = "bundle:read";
     public static final String BUNDLE_UPDATE = "bundle:update";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
@@ -45,6 +42,11 @@ public class RestPermissions implements PluginPermissions {
     public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
     public static final String CLUSTER_CONFIG_ENTRY_EDIT = "clusterconfigentry:edit";
     public static final String CLUSTER_CONFIG_ENTRY_READ = "clusterconfigentry:read";
+    public static final String CONTENT_PACK_CREATE = "contentpack:create";
+    public static final String CONTENT_PACK_DELETE = "contentpack:delete";
+    public static final String CONTENT_PACK_READ = "contentpack:read";
+    public static final String CONTENT_PACK_INSTALL = "contentpack:install";
+    public static final String CONTENT_PACK_UNINSTALL = "contentpack:uninstall";
     public static final String DASHBOARDS_CREATE = "dashboards:create";
     public static final String DASHBOARDS_EDIT = "dashboards:edit";
     public static final String DASHBOARDS_READ = "dashboards:read";
@@ -140,11 +142,11 @@ public class RestPermissions implements PluginPermissions {
         .add(create(AUTHENTICATION_EDIT, ""))
         .add(create(AUTHENTICATION_READ, ""))
         .add(create(BUFFERS_READ, ""))
-        .add(create(BUNDLE_CREATE, ""))
-        .add(create(BUNDLE_DELETE, ""))
+        .add(create(CONTENT_PACK_CREATE, ""))
+        .add(create(CONTENT_PACK_DELETE, ""))
         .add(create(BUNDLE_EXPORT, ""))
         .add(create(BUNDLE_IMPORT, ""))
-        .add(create(BUNDLE_READ, ""))
+        .add(create(CONTENT_PACK_READ, ""))
         .add(create(BUNDLE_UPDATE, ""))
         .add(create(CATALOG_LIST, ""))
         .add(create(CATALOG_RESOLVE, ""))

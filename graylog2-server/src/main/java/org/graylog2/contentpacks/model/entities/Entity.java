@@ -27,6 +27,8 @@ import org.graylog2.contentpacks.model.Versioned;
         @JsonSubTypes.Type(value = EntityV1.class, name = EntityV1.VERSION)
 })
 public interface Entity extends Identified, Typed, Versioned {
+    EntityDescriptor toEntityDescriptor();
+
     interface EntityBuilder<SELF> extends IdBuilder<SELF>, TypeBuilder<SELF>, VersionBuilder<SELF> {
     }
 }

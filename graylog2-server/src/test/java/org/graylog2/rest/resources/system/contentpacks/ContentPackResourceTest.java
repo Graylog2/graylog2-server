@@ -17,7 +17,9 @@
 package org.graylog2.rest.resources.system.contentpacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
+import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
@@ -28,7 +30,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -64,22 +65,28 @@ public class ContentPackResourceTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
+    @Mock
+    private ContentPackService contentPackService;
     @Mock
     private ContentPackPersistenceService contentPackPersistenceService;
+    @Mock
+    private ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
 
     private ContentPackResource contentPackResource;
     private ObjectMapper objectMapper;
 
-    public ContentPackResourceTest() { GuiceInjectorHolder.createInjector(Collections.emptyList()); }
+    public ContentPackResourceTest() {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+    }
 
     @Before
     public void setUp() {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.setSubtypeResolver(new AutoValueSubtypeResolver());
-        contentPackResource = new PermittedTestResource(contentPackPersistenceService);
+        contentPackResource = new PermittedTestResource(
+                contentPackService,
+                contentPackPersistenceService,
+                contentPackInstallationPersistenceService);
     }
 
     @Test
@@ -137,14 +144,16 @@ public class ContentPackResourceTest {
         contentPackResource.deleteContentPack(id);
         verify(contentPackPersistenceService, times(1)).deleteById(id);
 
-        when(contentPackPersistenceService.deleteByIdAndRevision(id,1)).thenReturn(1);
-        contentPackResource.deleteContentPack(id,1);
+        when(contentPackPersistenceService.deleteByIdAndRevision(id, 1)).thenReturn(1);
+        contentPackResource.deleteContentPack(id, 1);
         verify(contentPackPersistenceService, times(1)).deleteByIdAndRevision(id, 1);
     }
 
     static class PermittedTestResource extends ContentPackResource {
-        PermittedTestResource(ContentPackPersistenceService contentPackPersistenceService) {
-            super(contentPackPersistenceService);
+        PermittedTestResource(ContentPackService contentPackService,
+                              ContentPackPersistenceService contentPackPersistenceService,
+                              ContentPackInstallationPersistenceService contentPackInstallationPersistenceService) {
+            super(contentPackService, contentPackPersistenceService, contentPackInstallationPersistenceService);
         }
 
         @Override

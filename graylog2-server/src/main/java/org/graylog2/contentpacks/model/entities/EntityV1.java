@@ -34,6 +34,14 @@ public abstract class EntityV1 implements Entity {
     @JsonProperty(FIELD_DATA)
     public abstract JsonNode data();
 
+    @Override
+    public EntityDescriptor toEntityDescriptor() {
+        return EntityDescriptor.builder()
+                .id(id())
+                .type(type())
+                .build();
+    }
+
     public static Builder builder() {
         return new AutoValue_EntityV1.Builder();
     }
