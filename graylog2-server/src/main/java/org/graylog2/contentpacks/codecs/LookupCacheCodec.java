@@ -26,7 +26,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
@@ -68,7 +67,7 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
     }
 
     @Override
-    public CacheDto decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public CacheDto decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {
@@ -77,7 +76,7 @@ public class LookupCacheCodec implements EntityCodec<CacheDto> {
         }
     }
 
-    private CacheDto decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private CacheDto decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
         final LookupCacheConfiguration configuration = objectMapper.convertValue(toValueMap(lookupCacheEntity.configuration(), parameters), LookupCacheConfiguration.class);
         final CacheDto cacheDto = CacheDto.builder()

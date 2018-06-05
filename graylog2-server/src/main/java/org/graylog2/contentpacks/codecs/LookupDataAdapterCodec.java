@@ -26,7 +26,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
@@ -68,7 +67,7 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
     }
 
     @Override
-    public DataAdapterDto decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public DataAdapterDto decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {
@@ -77,7 +76,7 @@ public class LookupDataAdapterCodec implements EntityCodec<DataAdapterDto> {
         }
     }
 
-    private DataAdapterDto decodeEntityV1(EntityV1 entity, final Map<String, FilledParameter<?>> parameters) {
+    private DataAdapterDto decodeEntityV1(EntityV1 entity, final Map<String, ValueReference> parameters) {
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
         final LookupDataAdapterConfiguration configuration = objectMapper.convertValue(toValueMap(lookupDataAdapterEntity.configuration(), parameters), LookupDataAdapterConfiguration.class);
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()

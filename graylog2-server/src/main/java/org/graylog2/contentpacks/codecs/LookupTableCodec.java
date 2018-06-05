@@ -26,7 +26,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -68,7 +67,7 @@ public class LookupTableCodec implements EntityCodec<LookupTableDto> {
     }
 
     @Override
-    public LookupTableDto decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public LookupTableDto decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {
@@ -76,7 +75,7 @@ public class LookupTableCodec implements EntityCodec<LookupTableDto> {
         }
     }
 
-    private LookupTableDto decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private LookupTableDto decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
         final LookupTableDto lookupTableDto = LookupTableDto.builder()
                 .name(lookupTableEntity.name().asString(parameters))

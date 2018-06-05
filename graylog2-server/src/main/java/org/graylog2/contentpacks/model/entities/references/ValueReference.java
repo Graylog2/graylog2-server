@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -36,7 +35,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
     @JsonProperty(FIELD_VALUE)
     public abstract Object value();
 
-    public Boolean asBoolean(Map<String, FilledParameter<?>> parameters) {
+    public Boolean asBoolean(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case BOOLEAN:
                 return Boolean.class.cast(value());
@@ -47,7 +46,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
-    public Double asDouble(Map<String, FilledParameter<?>> parameters) {
+    public Double asDouble(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case DOUBLE:
                 return Double.class.cast(value());
@@ -58,7 +57,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
-    public Float asFloat(Map<String, FilledParameter<?>> parameters) {
+    public Float asFloat(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case FLOAT:
                 return Float.class.cast(value());
@@ -69,7 +68,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
-    public Integer asInteger(Map<String, FilledParameter<?>> parameters) {
+    public Integer asInteger(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case INTEGER:
                 return Integer.class.cast(value());
@@ -80,7 +79,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
-    public Long asLong(Map<String, FilledParameter<?>> parameters) {
+    public Long asLong(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case LONG:
                 return Long.class.cast(value());
@@ -91,7 +90,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
-    public String asString(Map<String, FilledParameter<?>> parameters) {
+    public String asString(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case STRING:
                 return String.class.cast(value());
@@ -111,12 +110,12 @@ public abstract class ValueReference implements ValueTyped, Reference {
         }
     }
 
-    private <S> S asType(Map<String, FilledParameter<?>> parameters, Class<S> type) {
+    private <S> S asType(Map<String, ValueReference> parameters, Class<S> type) {
         if (valueType() == ValueType.PARAMETER) {
             final String value = String.class.cast(value());
-            final FilledParameter<?> filledParameter = parameters.get(value);
+            final ValueReference filledParameter = parameters.get(value);
             if (filledParameter.valueType().targetClass().equals(type)) {
-                return type.cast(filledParameter.getValue());
+                return type.cast(filledParameter.value());
             } else {
                 throw new IllegalStateException("Expected parameter reference for Java type " + type + " but got " + filledParameter.valueType());
             }
@@ -124,7 +123,7 @@ public abstract class ValueReference implements ValueTyped, Reference {
         throw new IllegalStateException("Expected value reference of type PARAMETER but got " + valueType());
     }
 
-    public <S extends Enum<S>> S asEnum(Map<String, FilledParameter<?>> parameters, Class<S> type) {
+    public <S extends Enum<S>> S asEnum(Map<String, ValueReference> parameters, Class<S> type) {
         final String value;
         switch (valueType()) {
             case STRING:

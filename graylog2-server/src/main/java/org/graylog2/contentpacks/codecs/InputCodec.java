@@ -32,7 +32,6 @@ import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -144,7 +143,7 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
 
 
     @Override
-    public InputWithExtractors decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public InputWithExtractors decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
@@ -153,7 +152,7 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
     }
 
 
-    private InputWithExtractors decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
+    private InputWithExtractors decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
         final Map<String, ValueReference> staticFields = inputEntity.staticFields();
 
@@ -229,7 +228,7 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
     private List<Extractor> createExtractors(final Input input,
                                              final List<ExtractorEntity> extractorEntities,
                                              final String username,
-                                             final Map<String, FilledParameter<?>> parameters)
+                                             final Map<String, ValueReference> parameters)
             throws org.graylog2.plugin.inputs.Extractor.ReservedFieldException, org.graylog2.ConfigurationException,
             ExtractorFactory.NoSuchExtractorException, ValidationException {
         final ImmutableList.Builder<Extractor> result = ImmutableList.builder();
@@ -291,7 +290,7 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
 
 
     private List<Converter> createConverters(final List<ConverterEntity> requestedConverters,
-                                             final Map<String, FilledParameter<?>> parameters) {
+                                             final Map<String, ValueReference> parameters) {
         final ImmutableList.Builder<Converter> converters = ImmutableList.builder();
 
         for (final ConverterEntity converterEntity : requestedConverters) {
@@ -312,7 +311,7 @@ public class InputCodec implements EntityCodec<InputWithExtractors> {
 
     private void addStaticFields(final Input input, final MessageInput messageInput,
                                  final Map<String, ValueReference> staticFields,
-                                 final Map<String, FilledParameter<?>> parameters)
+                                 final Map<String, ValueReference> parameters)
             throws ValidationException {
         for (Map.Entry<String, ValueReference> staticField : staticFields.entrySet()) {
             addStaticField(input, messageInput, staticField.getKey(), staticField.getValue().asString(parameters));

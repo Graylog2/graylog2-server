@@ -28,7 +28,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
@@ -61,7 +60,7 @@ public class PipelineRuleCodec implements EntityCodec<RuleDao> {
     }
 
     @Override
-    public RuleDao decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public RuleDao decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {
@@ -69,7 +68,7 @@ public class PipelineRuleCodec implements EntityCodec<RuleDao> {
         }
     }
 
-    private RuleDao decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private RuleDao decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
         final DateTime now = Tools.nowUTC();
         final PipelineRuleEntity ruleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);
         final ValueReference description = ruleEntity.description();

@@ -26,7 +26,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
@@ -59,7 +58,7 @@ public class GrokPatternCodec implements EntityCodec<GrokPattern> {
     }
 
     @Override
-    public GrokPattern decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public GrokPattern decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters);
         } else {
@@ -67,7 +66,7 @@ public class GrokPatternCodec implements EntityCodec<GrokPattern> {
         }
     }
 
-    private GrokPattern decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters) {
+    private GrokPattern decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
         final GrokPattern grokPattern = GrokPattern.create(
                 grokPatternEntity.name().asString(parameters),
