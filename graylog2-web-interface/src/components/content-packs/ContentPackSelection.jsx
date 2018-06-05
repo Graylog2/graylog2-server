@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
-import { ExpandableList, ExpandableListItem } from 'components/common';
+import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -102,24 +102,18 @@ class ContentPackSelection extends React.Component {
     return this.props.selectedEntities[type].length === this.props.entities[type].length;
   }
 
-  _onFilterEntities = (e) => {
-    e.preventDefault();
-    this._filterEntities(this.state.filter);
-  };
-
-  _onSetFilter = (e) => {
-    this.setState({ filter: e.target.value });
+  _onSetFilter = (filter) => {
+    this._filterEntities(filter);
   };
 
   _onClearFilter = () => {
-    this.setState({ filter: '' });
-    this._filterEntities();
+    this._filterEntities('');
   };
 
-  _filterEntities = () => {
-    const filter = this.state.filter;
+  _filterEntities = (filterArg) => {
+    const filter = filterArg;
     if (filter.length <= 0) {
-      this.setState({ filteredEntities: ObjectUtils.clone(this.props.entities), isFiltered: false });
+      this.setState({ filteredEntities: ObjectUtils.clone(this.props.entities), isFiltered: false, filter: filter });
       return;
     }
     const filtered = Object.keys(this.props.entities).reduce((result, type) => {
@@ -130,7 +124,7 @@ class ContentPackSelection extends React.Component {
       });
       return filteredEntities;
     }, {});
-    this.setState({ filteredEntities: filtered, isFiltered: true });
+    this.setState({ filteredEntities: filtered, isFiltered: true, filter: filter });
   };
 
   render() {
@@ -224,23 +218,16 @@ class ContentPackSelection extends React.Component {
             <h2>Content Pack selection</h2>
           </Col>
         </Row>
-        <form id={'filter-form'} onSubmit={this._onFilterEntities} >
-          <Row>
-            <Col smOffset={1}>
-              <Input name="filter-input"
-                     id="filter-input"
-                     type="text"
-                     maxLength={250}
-                     value={this.state.filter}
-                     onChange={this._onSetFilter}
-                     labelClassName="col-sm-1"
-                     wrapperClassName="col-sm-4"
-                     label="Filter" />
-              <Button type="submit">Filter</Button>
-              <Button onClick={this._onClearFilter}>Clear</Button>
-            </Col>
-          </Row>
-        </form>
+        <Row>
+          <Col smOffset={1}>
+            <SearchForm
+              id="filter-input"
+              onSearch={this._onSetFilter}
+              onReset={this._onClearFilter}
+              searchButtonLabel="Filter"
+            />
+          </Col>
+        </Row>
         <Row>
           <Col smOffset={1} sm={8}>
             <ExpandableList>

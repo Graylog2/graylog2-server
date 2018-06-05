@@ -116,6 +116,7 @@ describe('<ContentPackSelection />', () => {
     expect(changeFn.mock.calls.length).toBe(1);
   });
 
+
   it('should filter expandableList of content selection', () => {
     const contentPack = {};
     const breq = {
@@ -132,10 +133,24 @@ describe('<ContentPackSelection />', () => {
     const wrapper = mount(
       <ContentPackSelection contentPack={contentPack}
                             entities={entities} />);
+
+    /*
+     * Search for falcon
+     *
+    /* Open menu to show all checkboxes */
+    wrapper.find('div.fa-stack').simulate('click');
+
+    expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
+    wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'falcon' } });
+    wrapper.find('form').at(1).simulate('submit');
+    expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
+
+    /*
+     * reset the search
+     */
+    wrapper.find("button[children='Reset']").simulate('click');
+    /* Open menu to show all checkboxes */
     wrapper.find('div.fa-stack').simulate('click');
     expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
-    wrapper.find('input#filter-input').simulate('change', { target: { value: 'falcon' } });
-    wrapper.find('form#filter-form').simulate('submit');
-    expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
   });
 });

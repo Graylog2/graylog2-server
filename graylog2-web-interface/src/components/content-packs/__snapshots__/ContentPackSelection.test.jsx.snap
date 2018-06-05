@@ -178,60 +178,80 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
       </h2>
     </div>
   </div>
-  <form
-    id="filter-form"
-    onSubmit={[Function]}
+  <div
+    className="row"
   >
     <div
-      className="row"
+      className="col-sm-offset-1"
     >
       <div
-        className="col-sm-offset-1"
+        className="search"
+        style={
+          Object {
+            "marginTop": 15,
+          }
+        }
       >
-        <div
-          className="form-group"
+        <form
+          className="form-inline"
+          onSubmit={[Function]}
         >
-          <label
-            className="col-sm-1 control-label"
-            htmlFor="filter-input"
-          >
-            Filter
-          </label>
           <div
-            className="col-sm-4"
+            className="form-group has-feedback"
           >
             <input
-              className="form-control"
-              id="filter-input"
-              label="Filter"
-              maxLength={250}
-              name="filter-input"
+              autoComplete="off"
+              className="query form-control"
+              id="common-search-form-query-input"
               onChange={[Function]}
-              placeholder=""
+              placeholder="Enter search query..."
+              spellCheck="false"
+              style={
+                Object {
+                  "width": "auto",
+                }
+              }
               type="text"
               value=""
             />
-            
           </div>
-        </div>
-        <button
-          className="btn btn-default"
-          disabled={false}
-          type="submit"
-        >
-          Filter
-        </button>
-        <button
-          className="btn btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Clear
-        </button>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <button
+              className="submit-button btn btn-default"
+              disabled={false}
+              type="submit"
+            >
+              Filter
+            </button>
+          </div>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <button
+              className="reset-button btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              type="reset"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  </form>
+  </div>
   <div
     className="row"
   >
@@ -424,60 +444,80 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
       </h2>
     </div>
   </div>
-  <form
-    id="filter-form"
-    onSubmit={[Function]}
+  <div
+    className="row"
   >
     <div
-      className="row"
+      className="col-sm-offset-1"
     >
       <div
-        className="col-sm-offset-1"
+        className="search"
+        style={
+          Object {
+            "marginTop": 15,
+          }
+        }
       >
-        <div
-          className="form-group"
+        <form
+          className="form-inline"
+          onSubmit={[Function]}
         >
-          <label
-            className="col-sm-1 control-label"
-            htmlFor="filter-input"
-          >
-            Filter
-          </label>
           <div
-            className="col-sm-4"
+            className="form-group has-feedback"
           >
             <input
-              className="form-control"
-              id="filter-input"
-              label="Filter"
-              maxLength={250}
-              name="filter-input"
+              autoComplete="off"
+              className="query form-control"
+              id="common-search-form-query-input"
               onChange={[Function]}
-              placeholder=""
+              placeholder="Enter search query..."
+              spellCheck="false"
+              style={
+                Object {
+                  "width": "auto",
+                }
+              }
               type="text"
               value=""
             />
-            
           </div>
-        </div>
-        <button
-          className="btn btn-default"
-          disabled={false}
-          type="submit"
-        >
-          Filter
-        </button>
-        <button
-          className="btn btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Clear
-        </button>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <button
+              className="submit-button btn btn-default"
+              disabled={false}
+              type="submit"
+            >
+              Filter
+            </button>
+          </div>
+          <div
+            className="form-group"
+            style={
+              Object {
+                "marginLeft": 5,
+              }
+            }
+          >
+            <button
+              className="reset-button btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              type="reset"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  </form>
+  </div>
   <div
     className="row"
   >
