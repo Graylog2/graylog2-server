@@ -3,8 +3,9 @@ import React from 'react';
 
 import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import DataTable from 'components/common/DataTable';
+import { DataTable, SearchForm } from 'components/common';
 
+import ObjectUtils from 'util/ObjectUtils';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';
@@ -33,6 +34,19 @@ class ContentPackParameterList extends React.Component {
       default:
         return parameter.default_value;
     }
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      filteredParameters: props.contentPack.parameters,
+      filter: undefined,
+    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    this._filterParameters(this.state.filter, newProps.contentPack.parameters);
   }
 
   _parameterRowFormatter = (parameter) => {
@@ -110,6 +124,20 @@ class ContentPackParameterList extends React.Component {
     );
   }
 
+  _filterParameters = (filter, parametersArg) => {
+    const parameters = ObjectUtils.clone(parametersArg || this.props.contentPack.parameters);
+    if (!filter || filter.length <= 0) {
+      this.setState({ filteredParameters: parameters, filter: undefined });
+      return;
+    }
+    const regexp = RegExp(filter, 'i');
+    const filteredParameters = parameters.filter((parameter) => {
+      return regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name);
+    });
+
+    this.setState({ filteredParameters: filteredParameters, filter: filter });
+  };
+
   render() {
     const headers = this.props.readOnly ?
       ['Title', 'Name', 'Description', 'Value Type', 'Default Value'] :
@@ -120,6 +148,11 @@ class ContentPackParameterList extends React.Component {
         <br />
         { !this.props.readOnly && this._parameterModal() }
         { !this.props.readOnly && (<span><br /><br /></span>) }
+        <SearchForm
+          onSearch={this._filterParameters}
+          onReset={() => { this._filterParameters(''); }}
+          searchButtonLabel='Filter'
+        />
         <DataTable
           id="parameter-list"
           headers={headers}
@@ -127,7 +160,7 @@ class ContentPackParameterList extends React.Component {
           sortByKey="title"
           noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
           filterKeys={[]}
-          rows={this.props.contentPack.parameters}
+          rows={this.state.filteredParameters}
           dataRowFormatter={this._parameterRowFormatter}
         />
       </div>

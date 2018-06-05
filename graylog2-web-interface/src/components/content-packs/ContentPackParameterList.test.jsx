@@ -65,4 +65,29 @@ describe('<ContentPackParameterList />', () => {
     wrapper.find('button[children="Delete"]').simulate('click');
     expect(deleteFn.mock.calls.length).toBe(1);
   });
+
+  it('should filter parameters', () => {
+    const contentPack = {
+      parameters: [{
+        name: 'A parameter name',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      }, {
+        name: 'A bad parameter',
+        title: 'real bad',
+        description: 'The dark ones own parameter',
+        type: 'string',
+        default_value: 'test',
+      }],
+    };
+    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
+    expect(wrapper.find("td[children='A parameter name']").exists()).toBe(true);
+    wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
+    wrapper.find('form').simulate('submit');
+    expect(wrapper.find("td[children='A parameter name']").exists()).toBe(false);
+    wrapper.find("button[children='Reset']").simulate('click');
+    expect(wrapper.find("td[children='A parameter name']").exists()).toBe(true);
+  });
 });
