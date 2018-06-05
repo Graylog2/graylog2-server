@@ -53,6 +53,72 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
           Entity list
         </h2>
         <br />
+        <div
+          className="search"
+          style={
+            Object {
+              "marginTop": 15,
+            }
+          }
+        >
+          <form
+            className="form-inline"
+            onSubmit={[Function]}
+          >
+            <div
+              className="form-group has-feedback"
+            >
+              <input
+                autoComplete="off"
+                className="query form-control"
+                id="common-search-form-query-input"
+                onChange={[Function]}
+                placeholder="Enter search query..."
+                spellCheck="false"
+                style={
+                  Object {
+                    "width": "auto",
+                  }
+                }
+                type="text"
+                value=""
+              />
+            </div>
+            <div
+              className="form-group"
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+            >
+              <button
+                className="submit-button btn btn-default"
+                disabled={false}
+                type="submit"
+              >
+                Filter
+              </button>
+            </div>
+            <div
+              className="form-group"
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+            >
+              <button
+                className="reset-button btn btn-default"
+                disabled={false}
+                onClick={[Function]}
+                type="reset"
+              >
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
         <div>
           <div
             className="row "
@@ -89,7 +155,9 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         franz
                       </td>
                       <td />
-                      <td />
+                      <td>
+                        
+                      </td>
                       <td>
                         <div
                           className="btn-toolbar"
