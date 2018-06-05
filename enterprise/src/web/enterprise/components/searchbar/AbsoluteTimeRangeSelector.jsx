@@ -1,29 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import Immutable from 'immutable';
 
 import Input from 'components/bootstrap/Input';
 import { DatePicker } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
-const _formattedDateStringInUserTZ = (field, rangeParams) => {
-  const dateString = rangeParams.get(field);
+import styles from './AbsoluteTimeRangeSelector.css';
 
-  if (dateString === null || dateString === undefined || dateString === '') {
-    return dateString;
-  }
-
-  // We only format the original dateTime, as datepicker will format the date in another way, and we
-  // don't want to annoy users trying to guess what they are typing.
-  if (rangeParams.get(field) === dateString) {
-    return DateTime.parseFromString(dateString).toString();
-  }
-
-  return dateString;
+const _formattedDateStringInUserTZ = (dateString) => {
+  return DateTime.parseFromString(dateString);
 };
 
 const _setDateTimeToNow = (field, onChange) => {
-  const value = new DateTime().toString(DateTime.Formats.DATETIME);
+  const value = new DateTime().toISOString();
   onChange(field, value);
 };
 
@@ -38,86 +29,90 @@ const _isValidDateString = (dateString) => {
   }
 };
 
-// TODO: Transfer this to AbsoluteTimeRangeSelector
-const _rangeParamsChanged = (key) => {
-  return () => {
-    let refInput;
-
-    switch (key) {
-      case 'from':
-      case 'to':
-        const ref = `${key}Formatted`;
-        refInput = this.refs[ref];
-        if (!this._isValidDateString(refInput.getValue())) {
-          refInput.getInputDOMNode().setCustomValidity('Invalid date time provided');
-        } else {
-          refInput.getInputDOMNode().setCustomValidity('');
-        }
-        break;
-      default:
-        refInput = this.refs[key];
-    }
-    SearchActions.rangeParams(key, refInput.getValue);
-  };
-};
-
-const _isValidDateField = (field, rangeParams) => {
-  return _isValidDateString(_formattedDateStringInUserTZ(field, rangeParams));
-};
-
 const _onDateSelected = (date, key, onChange) => {
   const midnightDate = date.setHours(0);
-  const newValue = DateTime.ignoreTZ(midnightDate).toString(DateTime.Formats.DATETIME);
+  const newValue = DateTime.ignoreTZ(midnightDate).toISOString();
   onChange(key, newValue);
 };
 
-export default function AbsoluteTimeRangeSelector({ value, onChange }) {
-  return (
-    <div className="timerange-selector absolute">
-      <Row className="no-bm">
-        <Col md={5} style={{ padding: 0 }}>
-          <input type="hidden" name="from" />
+const _extractStateFromProps = (props) => {
+  const { from, to } = props.value.map(value => _formattedDateStringInUserTZ(value).toString()).toObject();
+  return {
+    from,
+    to,
+  };
+};
+
+export default class AbsoluteTimeRangeSelector extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = _extractStateFromProps(props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!Immutable.is(nextProps.value, this.props.value)) {
+      this.setState(_extractStateFromProps(nextProps));
+    }
+  }
+
+  onBlur = (key, onChange) => {
+    onChange(key, _formattedDateStringInUserTZ(this.state[key]).toISOString());
+  };
+
+  onChange = (key, value) => {
+    this.setState({ [key]: value });
+  };
+
+  render() {
+    const { from, to } = this.state;
+    return (
+      <div className={`timerange-selector absolute ${styles.selectorContainer}`}>
+        <input type="hidden" name="from" />
+        <div className={styles.inputWidth}>
           <DatePicker id="searchFromDatePicker"
                       title="Search start date"
-                      date={value.get('from')}
-                      onChange={date => _onDateSelected(date, 'from', onChange)}>
-            <Input type="text"
-                   className={"absolute"}
-                   value={_formattedDateStringInUserTZ('from', value)}
-                   onChange={newValue => onChange('from', newValue)}
+                      date={from}
+                      onChange={date => _onDateSelected(date, 'from', this.props.onChange)}>
+            <Input id="fromDateInput"
+                   type="text"
+                   className="absolute"
+                   value={from}
+                   onBlur={() => this.onBlur('from', this.props.onChange)}
+                   onChange={event => this.onChange('from', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
-                   buttonAfter={<Button bsSize="small" onClick={() => _setDateTimeToNow('from', onChange)}><i className="fa fa-magic" /></Button>}
-                   bsStyle={_isValidDateField('from', value) ? null : 'error'}
+                   buttonAfter={<Button onClick={() => _setDateTimeToNow('from', this.props.onChange)}><i
+                     className="fa fa-magic" /></Button>}
+                   bsStyle={_isValidDateString(from) ? null : 'error'}
                    required />
           </DatePicker>
+        </div>
 
-        </Col>
-
-        <Col md={1}>
-          <p className="text-center" style={{ margin: 0, lineHeight: '34px', fontSize: '18px' }}>
-            <i className="fa fa-long-arrow-right" />
-          </p>
-        </Col>
-
-        <Col md={5} style={{ padding: 0 }}>
-          <input type="hidden" name="to" />
+        <p className={`text-center ${styles.separator}`}>
+          <i className="fa fa-long-arrow-right" />
+        </p>
+        <input type="hidden" name="to" />
+        <div className={styles.inputWidth}>
           <DatePicker id="searchToDatePicker"
                       title="Search end date"
-                      date={value.get('to')}
-                      onChange={date => _onDateSelected(date, 'to', onChange)}>
-            <Input type="text"
-                   className={"absolute"}
-                   value={_formattedDateStringInUserTZ('to', value)}
-                   onChange={newValue => onChange('to', newValue)}
+                      date={to}
+                      onChange={date => _onDateSelected(date, 'to', this.props.onChange)}>
+            <Input id="toDateInput"
+                   type="text"
+                   className="absolute"
+                   value={to}
+                   onBlur={() => this.onBlur('to', this.props.onChange)}
+                   onChange={event => this.onChange('to', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
-                   buttonAfter={<Button bsSize="small" onClick={() => _setDateTimeToNow('to', onChange)}><i className="fa fa-magic" /></Button>}
-                   bsStyle={_isValidDateField('to', value) ? null : 'error'}
+                   buttonAfter={<Button onClick={() => _setDateTimeToNow('to', this.props.onChange)}><i
+                     className="fa fa-magic" /></Button>}
+                   bsStyle={_isValidDateString(to) ? null : 'error'}
                    required />
           </DatePicker>
-        </Col>
-      </Row>
-    </div>
-  );
+        </div>
+      </div>
+    );
+  }
 }
 
 AbsoluteTimeRangeSelector.propTypes = {

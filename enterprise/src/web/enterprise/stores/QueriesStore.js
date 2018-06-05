@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { isEqual } from 'lodash';
+import moment from 'moment';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import Search from '../logic/search/Search';
@@ -57,7 +58,27 @@ export const QueriesStore = Reflux.createStore({
     this._propagateQueryChange(newQueries);
   },
   rangeType(queryId, type) {
-    const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { type })).build());
+    const oldQuery = this.queries.get(queryId);
+    const oldTimerange = oldQuery.timerange;
+    const oldType = oldTimerange.type;
+
+    if (type === oldType) {
+      return;
+    }
+
+    const newTimerange = { type };
+
+    // eslint-disable-next-line default-case
+    switch (type) {
+      case 'absolute':
+        newTimerange.from = moment().subtract(oldTimerange.range, 'seconds').toISOString();
+        newTimerange.to = moment().toISOString();
+        break;
+      case 'relative':
+        newTimerange.range = 300;
+        break;
+    }
+    const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(newTimerange).build());
     this._propagateQueryChange(newQueries);
   },
 

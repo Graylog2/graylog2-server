@@ -61,8 +61,9 @@ const SearchBar = createReactClass({
       return <Spinner />;
     }
     const { timerange, query, id } = this.state.currentQuery;
-    const rangeParams = Immutable.Map({ range: timerange.range });
-    const rangeType = timerange.type;
+    const { type, ...rest } = timerange;
+    const rangeParams = Immutable.Map(rest);
+    const rangeType = type;
     const streams = this.state.queryFilters.getIn([id, 'filters'], Immutable.List())
       .filter(f => f.get('type') === 'stream')
       .map(f => f.get('id'))

@@ -41,7 +41,7 @@ export default function RelativeTimeRangeSelector({ config, value, onChange }) {
       <Input id="relative-timerange-selector"
              type="select"
              value={value.get('range')}
-             className={"relative"}
+             className="relative"
              name="relative"
              onChange={event => onChange('range', event.target.value)}>
         {options}
