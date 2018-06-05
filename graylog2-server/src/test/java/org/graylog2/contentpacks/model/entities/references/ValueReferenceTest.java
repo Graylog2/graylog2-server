@@ -18,15 +18,12 @@ package org.graylog2.contentpacks.model.entities.references;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog2.contentpacks.model.parameters.FilledIntegerParameter;
-import org.graylog2.contentpacks.model.parameters.FilledStringParameter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -96,33 +93,12 @@ public class ValueReferenceTest {
     @Test
     public void resolveParameter() {
         final ValueReference parameterized = ValueReference.createParameter("parameterized");
-        final FilledStringParameter filledStringParameter = FilledStringParameter.builder()
-                .name("test")
-                .value(Optional.of("custom-value"))
-                .defaultValue(Optional.of("default-value"))
-                .build();
-        final FilledStringParameter emptyStringParameter = FilledStringParameter.builder()
-                .name("test")
-                .value(Optional.empty())
-                .defaultValue(Optional.of("default-value"))
-                .build();
-        final FilledStringParameter stringParameterWithoutDefault = FilledStringParameter.builder()
-                .name("test")
-                .value(Optional.empty())
-                .defaultValue(Optional.empty())
-                .build();
-        final FilledIntegerParameter integerParameter = FilledIntegerParameter.builder()
-                .name("test")
-                .value(Optional.empty())
-                .defaultValue(Optional.of(42))
-                .build();
+        final ValueReference filledStringParameter = ValueReference.of("custom-value");
+        final ValueReference integerParameter = ValueReference.of(42);
         assertThat(parameterized.asString(Collections.singletonMap("parameterized", filledStringParameter)))
                 .isEqualTo("custom-value");
-        assertThat(parameterized.asString(Collections.singletonMap("parameterized", emptyStringParameter)))
-                .isEqualTo("default-value");
-        assertThatThrownBy(() -> parameterized.asString(Collections.singletonMap("parameterized", stringParameterWithoutDefault)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Missing default value for parameter \"test\" of type STRING");
+        assertThat(parameterized.asInteger(Collections.singletonMap("parameterized", integerParameter)))
+                .isEqualTo(42);
         assertThatThrownBy(() -> parameterized.asString(Collections.singletonMap("parameterized", integerParameter)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Expected parameter reference for Java type class java.lang.String but got INTEGER");

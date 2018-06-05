@@ -17,7 +17,6 @@
 package org.graylog2.contentpacks.model.entities.references;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -56,7 +55,7 @@ public final class ReferenceMapUtils {
                 .collect(Collectors.toCollection(ReferenceList::new));
     }
 
-    public static Map<String, Object> toValueMap(ReferenceMap m, Map<String, FilledParameter<?>> parameters) {
+    public static Map<String, Object> toValueMap(ReferenceMap m, Map<String, ValueReference> parameters) {
         final ImmutableMap.Builder<String, Object> mapBuilder = ImmutableMap.builder();
         for (Map.Entry<String, Reference> entry : m.entrySet()) {
             final Object value = valueOf(entry.getValue(), parameters);
@@ -68,7 +67,7 @@ public final class ReferenceMapUtils {
     }
 
     @Nullable
-    private static Object valueOf(Reference value, Map<String, FilledParameter<?>> parameters) {
+    private static Object valueOf(Reference value, Map<String, ValueReference> parameters) {
         if (value instanceof ValueReference) {
             final ValueReference valueReference = (ValueReference) value;
             return valueOf(valueReference, parameters);
@@ -83,7 +82,7 @@ public final class ReferenceMapUtils {
         }
     }
 
-    private static Object valueOf(ValueReference valueReference, Map<String, FilledParameter<?>> parameters) {
+    private static Object valueOf(ValueReference valueReference, Map<String, ValueReference> parameters) {
         switch (valueReference.valueType()) {
             case BOOLEAN:
                 return valueReference.asBoolean(parameters);
@@ -104,7 +103,7 @@ public final class ReferenceMapUtils {
         }
     }
 
-    private static List<Object> toValueList(ReferenceList list, Map<String, FilledParameter<?>> parameters) {
+    private static List<Object> toValueList(ReferenceList list, Map<String, ValueReference> parameters) {
         return list.stream()
                 .map(valueReference -> valueOf(valueReference, parameters))
                 .filter(Objects::nonNull)

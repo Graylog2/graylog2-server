@@ -26,7 +26,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
@@ -66,7 +65,7 @@ public class OutputCodec implements EntityCodec<Output> {
     }
 
     @Override
-    public Output decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public Output decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
@@ -75,7 +74,7 @@ public class OutputCodec implements EntityCodec<Output> {
         }
     }
 
-    private Output decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
+    private Output decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         final CreateOutputRequest createOutputRequest = CreateOutputRequest.create(
                 outputEntity.title().asString(parameters),

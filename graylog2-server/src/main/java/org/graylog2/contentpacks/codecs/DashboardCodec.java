@@ -29,7 +29,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.TimeRangeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
@@ -114,7 +113,7 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
     }
 
     @Override
-    public Dashboard decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public Dashboard decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
@@ -122,7 +121,7 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
         }
     }
 
-    private Dashboard decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
+    private Dashboard decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
         DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final Dashboard dashboard;
         try {
@@ -145,7 +144,7 @@ public class DashboardCodec implements EntityCodec<Dashboard> {
             final String description,
             final List<DashboardWidgetEntity> widgets,
             final String username,
-            final Map<String, FilledParameter<?>> parameters)
+            final Map<String, ValueReference> parameters)
             throws ValidationException, DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         // Create dashboard.
         final Map<String, Object> dashboardData = new HashMap<>();

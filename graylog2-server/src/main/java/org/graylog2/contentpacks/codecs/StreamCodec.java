@@ -27,7 +27,6 @@ import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.contentpacks.model.parameters.FilledParameter;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -99,7 +98,7 @@ public class StreamCodec implements EntityCodec<Stream> {
     }
 
     @Override
-    public Stream decode(Entity entity, Map<String, FilledParameter<?>> parameters, String username) {
+    public Stream decode(Entity entity, Map<String, ValueReference> parameters, String username) {
         if (entity instanceof EntityV1) {
             return decodeEntityV1((EntityV1) entity, parameters, username);
         } else {
@@ -108,7 +107,7 @@ public class StreamCodec implements EntityCodec<Stream> {
         }
     }
 
-    private Stream decodeEntityV1(EntityV1 entity, Map<String, FilledParameter<?>> parameters, String username) {
+    private Stream decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
