@@ -38,8 +38,8 @@ export const QueryFiltersStore = Reflux.createStore({
   onQueriesStoreChange(newQueries) {
     const newFilters = newQueries.map(q => q.filter);
     const oldFilters = this.queries.map(q => q.filter);
+    this.queries = newQueries;
     if (!isEqual(newFilters, oldFilters)) {
-      this.queries = newQueries;
       this._trigger();
     }
   },
