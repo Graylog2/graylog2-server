@@ -6,13 +6,15 @@ import Select from 'components/common/Select';
 const StreamsFilter = ({ value, streams, onChange }) => {
   const selectedStreams = value.join(',');
   return (
-    <Select placeholder="Select streams the search should include. Searches in all streams if empty."
-            displayKey="key"
-            onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
-            options={streams}
-            multi
-            style={{ width: '100%' }}
-            value={selectedStreams} />
+    <div style={{ position: 'relative', zIndex: 10 }}>
+      <Select placeholder="Select streams the search should include. Searches in all streams if empty."
+              displayKey="key"
+              onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
+              options={streams}
+              multi
+              style={{ width: '100%' }}
+              value={selectedStreams} />
+    </div>
   );
 };
 
