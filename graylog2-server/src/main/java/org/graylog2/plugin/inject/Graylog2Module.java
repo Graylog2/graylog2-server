@@ -32,6 +32,7 @@ import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.catalogs.EntityCatalog;
+import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -439,6 +440,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<ModelType, EntityCatalog> entityCatalogBinder() {
         return MapBinder.newMapBinder(binder(), ModelType.class, EntityCatalog.class);
+    }
+
+    protected Multibinder<ConstraintChecker> constraintCheckerBinder() {
+        return Multibinder.newSetBinder(binder(), ConstraintChecker.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

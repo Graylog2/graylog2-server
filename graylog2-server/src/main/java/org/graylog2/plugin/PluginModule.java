@@ -24,6 +24,7 @@ import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.catalogs.EntityCatalog;
+import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -184,5 +185,9 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addEntityCatalog(ModelType entityType, Class<? extends EntityCatalog> entityCatalogClass) {
         entityCatalogBinder().addBinding(entityType).to(entityCatalogClass);
+    }
+
+    protected void addConstraintChecker(Class<? extends ConstraintChecker> constraintCheckerClass) {
+        constraintCheckerBinder().addBinding().to(constraintCheckerClass);
     }
 }

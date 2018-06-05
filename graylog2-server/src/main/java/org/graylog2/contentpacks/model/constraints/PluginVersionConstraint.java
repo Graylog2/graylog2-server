@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.model.constraints;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.zafarkhaja.semver.Version;
 import com.google.auto.value.AutoValue;
 import org.graylog2.contentpacks.model.ModelType;
 
@@ -34,6 +35,10 @@ public abstract class PluginVersionConstraint implements Constraint {
     // TODO: Build class for version constraint or use com.github.zafarkhaja.semver.expr.Expression?
     @JsonProperty(FIELD_PLUGIN_VERSION)
     public abstract String version();
+
+    public final Version getVersion() {
+        return Version.valueOf(version());
+    }
 
     public static Builder builder() {
         return new AutoValue_PluginVersionConstraint.Builder();

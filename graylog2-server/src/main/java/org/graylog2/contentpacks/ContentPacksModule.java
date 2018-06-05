@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.catalogs.OutputCatalog;
 import org.graylog2.contentpacks.catalogs.PipelineCatalog;
 import org.graylog2.contentpacks.catalogs.PipelineRuleCatalog;
 import org.graylog2.contentpacks.catalogs.StreamCatalog;
+import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.plugin.PluginModule;
 
@@ -49,5 +50,7 @@ public class ContentPacksModule extends PluginModule {
         addEntityCatalog(PipelineCatalog.TYPE, PipelineCatalog.class);
         addEntityCatalog(PipelineRuleCatalog.TYPE, PipelineRuleCatalog.class);
         addEntityCatalog(StreamCatalog.TYPE, StreamCatalog.class);
+
+        addConstraintChecker(GraylogVersionConstraintChecker.class);
     }
 }
