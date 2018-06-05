@@ -43,6 +43,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CONTENT_PACK_DELETE = PREFIX + "content_pack:delete";
     public static final String CONTENT_PACK_EXPORT = PREFIX + "content_pack:export";
     public static final String CONTENT_PACK_UPDATE = PREFIX + "content_pack:update";
+    public static final String CONTENT_PACK_INSTALL = PREFIX + "content_pack:install";
+    public static final String CONTENT_PACK_UNINSTALL = PREFIX + "content_pack:uninstall";
     public static final String DASHBOARD_CREATE = PREFIX + "dashboard:create";
     public static final String DASHBOARD_DELETE = PREFIX + "dashboard:delete";
     public static final String DASHBOARD_UPDATE = PREFIX + "dashboard:update";
@@ -168,6 +170,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(CONTENT_PACK_DELETE)
             .add(CONTENT_PACK_EXPORT)
             .add(CONTENT_PACK_UPDATE)
+            .add(CONTENT_PACK_INSTALL)
+            .add(CONTENT_PACK_UNINSTALL)
             .add(DASHBOARD_CREATE)
             .add(DASHBOARD_DELETE)
             .add(DASHBOARD_UPDATE)

@@ -24,13 +24,20 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
+import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackInstallationRequest;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackInstallationsResponse;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackList;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackRevisions;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -54,6 +61,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -65,11 +73,17 @@ import java.util.stream.Collectors;
 public class ContentPackResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackResource.class);
 
+    private final ContentPackService contentPackService;
     private final ContentPackPersistenceService contentPackPersistenceService;
+    private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
 
     @Inject
-    public ContentPackResource(final ContentPackPersistenceService contentPackPersistenceService) {
+    public ContentPackResource(ContentPackService contentPackService,
+                               ContentPackPersistenceService contentPackPersistenceService,
+                               ContentPackInstallationPersistenceService contentPackInstallationPersistenceService) {
+        this.contentPackService = contentPackService;
         this.contentPackPersistenceService = contentPackPersistenceService;
+        this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
     }
 
     @GET
@@ -80,7 +94,7 @@ public class ContentPackResource extends RestResource {
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackList listContentPacks() {
-        checkPermission(RestPermissions.BUNDLE_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
 
         return ContentPackList.create(contentPacks);
@@ -95,7 +109,7 @@ public class ContentPackResource extends RestResource {
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackList listLatestContentPacks() {
-        checkPermission(RestPermissions.BUNDLE_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
         return ContentPackList.create(contentPacks);
@@ -112,7 +126,7 @@ public class ContentPackResource extends RestResource {
     public ContentPackRevisions listContentPackRevisions(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id) {
-        checkPermission(RestPermissions.BUNDLE_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Map<Integer, ContentPack> contentPackMap = contentPackPersistenceService.findAllById(id).stream()
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
@@ -122,7 +136,7 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}/{revision}")
     @Timed
-    @ApiOperation(value = "Get on revision of a content pack")
+    @ApiOperation(value = "Get a revision of a content pack")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error loading content packs")
     })
@@ -131,10 +145,9 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id,
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
-            @PathParam("revision")
-                    int revision
+            @PathParam("revision") int revision
     ) {
-        checkPermission(RestPermissions.BUNDLE_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         return contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
@@ -153,7 +166,7 @@ public class ContentPackResource extends RestResource {
     public Response createContentPack(
             @ApiParam(name = "Request body", value = "Content pack", required = true)
             @NotNull @Valid final ContentPack contentPack) {
-        checkPermission(RestPermissions.BUNDLE_CREATE);
+        checkPermission(RestPermissions.CONTENT_PACK_CREATE);
         final ContentPack pack = contentPackPersistenceService.insert(contentPack)
                 .orElseThrow(() -> new BadRequestException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!"));
 
@@ -177,12 +190,11 @@ public class ContentPackResource extends RestResource {
     public void deleteContentPack(
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
             @PathParam("contentPackId") final ModelId contentPackId) {
-        checkPermission(RestPermissions.BUNDLE_DELETE);
+        checkPermission(RestPermissions.CONTENT_PACK_DELETE);
         final int deleted = contentPackPersistenceService.deleteById(contentPackId);
 
         LOG.debug("Deleted {} content packs with id {}", deleted, contentPackId);
     }
-
 
     @DELETE
     @Timed
@@ -199,9 +211,202 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") final ModelId contentPackId,
             @ApiParam(name = "revision", value = "Content Pack revision", required = true)
             @PathParam("revision") final int revision) {
-        checkPermission(RestPermissions.BUNDLE_DELETE);
+        checkPermission(RestPermissions.CONTENT_PACK_DELETE);
         final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
 
         LOG.debug("Deleted {} content packs with id {} and revision", deleted, contentPackId, revision);
+    }
+
+    @POST
+    @Path("{contentPackId}/{revision}/installations")
+    @Timed
+    @ApiOperation(value = "Install a revision of a content pack")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_INSTALL)
+    @JsonView(ContentPackView.HttpView.class)
+    public ContentPackInstallation installContentPack(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId id,
+            @ApiParam(name = "revision", value = "Content pack revision", required = true)
+            @PathParam("revision") int revision,
+            @ApiParam(name = "installation request", value = "Content pack installation request", required = true)
+            @Valid @NotNull ContentPackInstallationRequest contentPackInstallationRequest) {
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
+
+        final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
+                .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
+        final User currentUser = getCurrentUser();
+        final String userName = currentUser == null ? "unknown" : currentUser.getName();
+        final ContentPackInstallation installation = contentPackService.installContentPack(
+                contentPack,
+                contentPackInstallationRequest.parameters(),
+                contentPackInstallationRequest.comment(),
+                userName);
+
+        return installation;
+    }
+
+    @GET
+    @Path("installations/{installationId}")
+    @Timed
+    @ApiOperation(value = "Get details about an installation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content pack installation")
+    })
+    @JsonView(ContentPackView.HttpView.class)
+    public ContentPackInstallation showContentPackInstallation(
+            @ApiParam(name = "installationId", value = "Content pack installation ID", required = true)
+            @PathParam("installationId") String installationId) {
+        checkPermission(RestPermissions.CONTENT_PACK_READ, installationId);
+
+        final ObjectId id = new ObjectId(installationId);
+        final Optional<ContentPackInstallation> installation = contentPackInstallationPersistenceService.findById(id);
+        return installation.orElseThrow(() -> new NotFoundException("Couldn't find installation with id " + installationId));
+    }
+
+    @GET
+    @Path("installations")
+    @Timed
+    @ApiOperation(value = "Get details about all installation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @JsonView(ContentPackView.HttpView.class)
+    public ContentPackInstallationsResponse listContentPackInstallations() {
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
+
+        final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.loadAll();
+        return ContentPackInstallationsResponse.create(installations);
+    }
+
+    @GET
+    @Path("{contentPackId}/installations")
+    @Timed
+    @ApiOperation(value = "Get details about the installations of a content pack")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @JsonView(ContentPackView.HttpView.class)
+    public ContentPackInstallationsResponse listContentPackInstallationsById(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId id) {
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
+
+        final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackId(id);
+        return ContentPackInstallationsResponse.create(installations);
+    }
+
+    @GET
+    @Path("{contentPackId}/{revision}/installations")
+    @Timed
+    @ApiOperation(value = "Get details about the installations of a content pack revision")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @JsonView(ContentPackView.HttpView.class)
+    public ContentPackInstallationsResponse listContentPackInstallationsByIdAndRevision(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId contentPackId,
+            @ApiParam(name = "revision", value = "Content pack revision", required = true)
+            @PathParam("revision") int revision) {
+        checkPermission(RestPermissions.CONTENT_PACK_READ);
+
+        final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision);
+        return ContentPackInstallationsResponse.create(installations);
+    }
+
+    @DELETE
+    @Path("{contentPackId}/installations/{installationId}")
+    @Timed
+    @ApiOperation(value = "Uninstall a content pack installation")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_UNINSTALL)
+    @JsonView(ContentPackView.HttpView.class)
+    public Response deleteContentPackInstallationById(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId contentPackId,
+            @ApiParam(name = "installationId", value = "Installation ID", required = true)
+            @PathParam("installationId") String installationId) {
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+
+        final ObjectId id = new ObjectId(installationId);
+        final int deletedInstallations = contentPackInstallationPersistenceService.deleteById(id);
+        LOG.debug("Deleted {} installations of content pack {}", deletedInstallations, contentPackId);
+
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("{contentPackId}/installations")
+    @Timed
+    @ApiOperation(value = "Uninstall a content pack")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_UNINSTALL)
+    @JsonView(ContentPackView.HttpView.class)
+    public Response deleteContentPackInstallationsById(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId contentPackId) {
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+
+        final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackId(contentPackId);
+        deleteInstallation(installations);
+
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("{contentPackId}/{revision}/installations")
+    @Timed
+    @ApiOperation(value = "Uninstall a specific content pack revision")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_UNINSTALL)
+    @JsonView(ContentPackView.HttpView.class)
+    public Response deleteContentPackInstallationsByIdAndRevision(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId contentPackId,
+            @ApiParam(name = "revision", value = "Content pack revision", required = true)
+            @PathParam("revision") int revision) {
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+
+        final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision);
+        deleteInstallation(installations);
+
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("installations")
+    @Timed
+    @ApiOperation(value = "Uninstall all content packs")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_UNINSTALL)
+    @JsonView(ContentPackView.HttpView.class)
+    public Response deleteContentPackInstallations() {
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+
+        final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.loadAll();
+        deleteInstallation(installations);
+
+        return Response.noContent().build();
+    }
+
+    private void deleteInstallation(Set<ContentPackInstallation> installations) {
+        for (ContentPackInstallation installation : installations) {
+            contentPackInstallationPersistenceService.deleteById(installation.id());
+            LOG.debug("Removed installation {} of content pack {}, revision {}",
+                    installation.id(),
+                    installation.contentPackId(),
+                    installation.contentPackRevision());
+        }
     }
 }
