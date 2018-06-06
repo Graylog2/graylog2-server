@@ -16,27 +16,31 @@
  */
 package org.graylog2.contentpacks.constraints;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import com.vdurmont.semver4j.Requirement;
+import com.vdurmont.semver4j.Semver;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 
 import java.util.Collection;
 import java.util.Set;
 
-import static java.util.Objects.requireNonNull;
-
 public class GraylogVersionConstraintChecker implements ConstraintChecker {
-    private final Version graylogVersion;
+    private final Semver graylogVersion;
 
     public GraylogVersionConstraintChecker() {
-        this(org.graylog2.plugin.Version.CURRENT_CLASSPATH.getVersion());
+        this(org.graylog2.plugin.Version.CURRENT_CLASSPATH.toString());
     }
 
     @VisibleForTesting
-    GraylogVersionConstraintChecker(Version graylogVersion) {
-        this.graylogVersion = requireNonNull(graylogVersion, "graylogVersion");
+    GraylogVersionConstraintChecker(String graylogVersion) {
+        this(new Semver(graylogVersion));
+    }
+
+    @VisibleForTesting
+    GraylogVersionConstraintChecker(Semver graylogVersion) {
+        this.graylogVersion = graylogVersion;
     }
 
     @Override
@@ -45,10 +49,9 @@ public class GraylogVersionConstraintChecker implements ConstraintChecker {
         for (Constraint constraint : requestedConstraints) {
             if (constraint instanceof GraylogVersionConstraint) {
                 final GraylogVersionConstraint versionConstraint = (GraylogVersionConstraint) constraint;
-                final Version requiredVersion = versionConstraint.getVersion();
+                final Requirement requiredVersion = versionConstraint.version();
 
-                // TODO: Is the version requirement strict enough?
-                if (graylogVersion.greaterThanOrEqualTo(requiredVersion)) {
+                if (requiredVersion.isSatisfiedBy(graylogVersion.toString())) {
                     fulfilledConstraints.add(constraint);
                 }
             }

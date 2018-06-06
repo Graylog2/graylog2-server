@@ -16,7 +16,6 @@
  */
 package org.graylog2.contentpacks.constraints;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
@@ -28,14 +27,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GraylogVersionConstraintCheckerTest {
     @Test
     public void checkConstraints() {
-        final GraylogVersionConstraintChecker constraintChecker = new GraylogVersionConstraintChecker(Version.forIntegers(1, 0, 0));
+        final GraylogVersionConstraintChecker constraintChecker = new GraylogVersionConstraintChecker("1.0.0");
 
         final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
-                .version("1.0.0")
+                .version("^1.0.0")
                 .build();
         final PluginVersionConstraint pluginVersionConstraint = PluginVersionConstraint.builder()
                 .pluginId("unique-id")
-                .version("1.0.0")
+                .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
         assertThat(constraintChecker.checkConstraints(requiredConstraints)).containsOnly(graylogVersionConstraint);
@@ -43,14 +42,14 @@ public class GraylogVersionConstraintCheckerTest {
 
     @Test
     public void checkConstraintsFails() {
-        final GraylogVersionConstraintChecker constraintChecker = new GraylogVersionConstraintChecker(Version.forIntegers(1, 0, 0));
+        final GraylogVersionConstraintChecker constraintChecker = new GraylogVersionConstraintChecker("1.0.0");
 
         final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
-                .version("2.0.0")
+                .version("^2.0.0")
                 .build();
         final PluginVersionConstraint pluginVersionConstraint = PluginVersionConstraint.builder()
                 .pluginId("unique-id")
-                .version("1.0.0")
+                .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
         assertThat(constraintChecker.checkConstraints(requiredConstraints)).isEmpty();

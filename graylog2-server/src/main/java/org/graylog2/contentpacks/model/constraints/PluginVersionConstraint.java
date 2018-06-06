@@ -16,11 +16,14 @@
  */
 package org.graylog2.contentpacks.model.constraints;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.zafarkhaja.semver.Version;
 import com.google.auto.value.AutoValue;
+import com.vdurmont.semver4j.Requirement;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.Version;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_PluginVersionConstraint.Builder.class)
@@ -32,12 +35,18 @@ public abstract class PluginVersionConstraint implements Constraint {
     @JsonProperty(FIELD_PLUGIN_ID)
     public abstract String pluginId();
 
-    // TODO: Build class for version constraint or use com.github.zafarkhaja.semver.expr.Expression?
     @JsonProperty(FIELD_PLUGIN_VERSION)
-    public abstract String version();
+    public abstract Requirement version();
 
-    public final Version getVersion() {
-        return Version.valueOf(version());
+    public static PluginVersionConstraint of(PluginMetaData pluginMetaData) {
+        final Version version = pluginMetaData.getVersion();
+        final String versionString = version.toString().replace("-SNAPSHOT", "");
+        final Requirement requirement = Requirement.buildNPM("^" + versionString);
+
+        return builder()
+                .pluginId(pluginMetaData.getUniqueId())
+                .version(requirement)
+                .build();
     }
 
     public static Builder builder() {
@@ -50,7 +59,13 @@ public abstract class PluginVersionConstraint implements Constraint {
         public abstract Builder pluginId(String pluginId);
 
         @JsonProperty(FIELD_PLUGIN_VERSION)
-        public abstract Builder version(String version);
+        public abstract Builder version(Requirement version);
+
+        @JsonIgnore
+        public Builder version(String versionExpression) {
+            final Requirement requirement = Requirement.buildNPM(versionExpression);
+            return version(requirement);
+        }
 
         abstract PluginVersionConstraint autoBuild();
 

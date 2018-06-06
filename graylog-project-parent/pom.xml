@@ -107,6 +107,11 @@
                 <artifactId>java-semver</artifactId>
                 <version>${java-semver.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.vdurmont</groupId>
+                <artifactId>semver4j</artifactId>
+                <version>${semver4j.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mongodb</groupId>
