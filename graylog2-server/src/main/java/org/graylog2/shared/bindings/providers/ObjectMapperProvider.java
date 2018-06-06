@@ -29,9 +29,15 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zafarkhaja.semver.Version;
+import com.vdurmont.semver4j.Requirement;
+import com.vdurmont.semver4j.Semver;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
+import org.graylog2.jackson.SemverDeserializer;
+import org.graylog2.jackson.SemverRequirementDeserializer;
+import org.graylog2.jackson.SemverRequirementSerializer;
+import org.graylog2.jackson.SemverSerializer;
 import org.graylog2.jackson.VersionDeserializer;
 import org.graylog2.jackson.VersionSerializer;
 import org.graylog2.plugin.inject.JacksonSubTypes;
@@ -79,7 +85,11 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer())
                         .addSerializer(new VersionSerializer())
+                        .addSerializer(new SemverSerializer())
+                        .addSerializer(new SemverRequirementSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())
+                        .addDeserializer(Semver.class, new SemverDeserializer())
+                        .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                 );
 
         if (subtypes != null) {

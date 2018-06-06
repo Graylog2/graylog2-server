@@ -37,13 +37,31 @@ public class AbstractPluginVersionConstraintCheckerTest {
         final TestPluginMetaData pluginMetaData = new TestPluginMetaData();
         final TestPluginVersionConstraintChecker constraintChecker = new TestPluginVersionConstraintChecker(pluginMetaData);
 
-        final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.currentGraylogVersion();
+        final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
+                .version("^2.0.0")
+                .build();
         final PluginVersionConstraint pluginVersionConstraint = PluginVersionConstraint.builder()
                 .pluginId("unique-id")
-                .version("1.0.0")
+                .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
         assertThat(constraintChecker.checkConstraints(requiredConstraints)).containsOnly(pluginVersionConstraint);
+    }
+
+    @Test
+    public void checkConstraintsFails() {
+        final TestPluginMetaData pluginMetaData = new TestPluginMetaData();
+        final TestPluginVersionConstraintChecker constraintChecker = new TestPluginVersionConstraintChecker(pluginMetaData);
+
+        final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
+                .version("^2.0.0")
+                .build();
+        final PluginVersionConstraint pluginVersionConstraint = PluginVersionConstraint.builder()
+                .pluginId("unique-id")
+                .version("^2.0.0")
+                .build();
+        final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
+        assertThat(constraintChecker.checkConstraints(requiredConstraints)).isEmpty();
     }
 
     private static final class TestPluginVersionConstraintChecker extends AbstractPluginVersionConstraintChecker<TestPluginMetaData> {

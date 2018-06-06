@@ -478,6 +478,10 @@
             <artifactId>java-semver</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.vdurmont</groupId>
+            <artifactId>semver4j</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
         </dependency>

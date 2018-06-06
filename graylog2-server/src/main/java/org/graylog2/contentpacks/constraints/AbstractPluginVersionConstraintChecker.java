@@ -16,8 +16,9 @@
  */
 package org.graylog2.contentpacks.constraints;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
+import com.vdurmont.semver4j.Requirement;
+import com.vdurmont.semver4j.Semver;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.plugin.PluginMetaData;
@@ -26,13 +27,17 @@ import java.util.Collection;
 import java.util.Set;
 
 public abstract class AbstractPluginVersionConstraintChecker<T extends PluginMetaData> implements ConstraintChecker {
-    private final Version pluginVersion;
+    private final Semver pluginVersion;
 
     protected AbstractPluginVersionConstraintChecker(T pluginMetaData) {
-        this(pluginMetaData.getVersion().getVersion());
+        this(pluginMetaData.getVersion().toString());
     }
 
-    protected AbstractPluginVersionConstraintChecker(Version pluginVersion) {
+    protected AbstractPluginVersionConstraintChecker(String pluginVersion) {
+        this(new Semver(pluginVersion));
+    }
+
+    protected AbstractPluginVersionConstraintChecker(Semver pluginVersion) {
         this.pluginVersion = pluginVersion;
     }
 
@@ -42,10 +47,9 @@ public abstract class AbstractPluginVersionConstraintChecker<T extends PluginMet
         for (Constraint constraint : requestedConstraints) {
             if (constraint instanceof PluginVersionConstraint) {
                 final PluginVersionConstraint versionConstraint = (PluginVersionConstraint) constraint;
-                final Version requiredVersion = versionConstraint.getVersion();
+                final Requirement requiredVersion = versionConstraint.version();
 
-                // TODO: Is the version requirement strict enough?
-                if (pluginVersion.greaterThanOrEqualTo(requiredVersion)) {
+                if (requiredVersion.isSatisfiedBy(pluginVersion)) {
                     fulfilledConstraints.add(constraint);
                 }
             }

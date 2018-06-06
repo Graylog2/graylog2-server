@@ -16,11 +16,13 @@
  */
 package org.graylog2.contentpacks.model.constraints;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.zafarkhaja.semver.Version;
 import com.google.auto.value.AutoValue;
+import com.vdurmont.semver4j.Requirement;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.plugin.Version;
 
 @AutoValue
 @JsonDeserialize(builder = AutoValue_GraylogVersionConstraint.Builder.class)
@@ -29,28 +31,35 @@ public abstract class GraylogVersionConstraint implements Constraint {
     static final String TYPE_NAME = "server-version";
     static final String FIELD_GRAYLOG_VERSION = "version";
 
-    // TODO: Build class for version constraint or use com.github.zafarkhaja.semver.expr.Expression?
     @JsonProperty(FIELD_GRAYLOG_VERSION)
-    public abstract String version();
-
-    public final Version getVersion() {
-        return Version.valueOf(version());
-    }
+    public abstract Requirement version();
 
     public static Builder builder() {
         return new AutoValue_GraylogVersionConstraint.Builder();
     }
 
-    public static GraylogVersionConstraint currentGraylogVersion() {
+    public static GraylogVersionConstraint of(Version version) {
+        final String versionString = version.toString().replace("-SNAPSHOT", "");
+        final Requirement requirement = Requirement.buildNPM("^" + versionString);
         return builder()
-                .version(org.graylog2.plugin.Version.CURRENT_CLASSPATH.toString())
+                .version(requirement)
                 .build();
+    }
+
+    public static GraylogVersionConstraint currentGraylogVersion() {
+        return of(Version.CURRENT_CLASSPATH);
     }
 
     @AutoValue.Builder
     public abstract static class Builder implements Constraint.ConstraintBuilder<Builder> {
         @JsonProperty(FIELD_GRAYLOG_VERSION)
-        public abstract Builder version(String version);
+        public abstract Builder version(Requirement version);
+
+        @JsonIgnore
+        public Builder version(String versionExpression) {
+            final Requirement requirement = Requirement.buildNPM(versionExpression);
+            return version(requirement);
+        }
 
         abstract GraylogVersionConstraint autoBuild();
 
