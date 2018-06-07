@@ -43,19 +43,20 @@ describe('<ContentPackInstall />', () => {
     const installFn = jest.fn((id, rev, param) => {
       expect(id).toBe('1');
       expect(rev).toBe(2);
-      expect(param).toEqual({ PARAM: 'parameter' });
+      expect(param).toEqual({ comment: 'Test', parameters: { PARAM: { type: 'string', value: 'parameter' } } });
     });
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
+    wrapper.find('input#comment').simulate('change', { target: { value: 'Test' } });
     wrapper.instance().onInstall();
     expect(installFn.mock.calls.length).toBe(1);
   });
 
-  it('should not call install when parameter is missin', () => {
+  it('should not call install when parameter is missing', () => {
     const installFn = jest.fn();
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
-    wrapper.find('input').at(0).simulate('change', { target: { value: '' } });
+    wrapper.find('input').at(1).simulate('change', { target: { value: '' } });
     wrapper.instance().onInstall();
     expect(installFn.mock.calls.length).toBe(0);
   });

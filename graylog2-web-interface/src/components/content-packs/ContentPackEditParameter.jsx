@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
+import ContentPackUtils from './ContentPackUtils';
 
 class ContentPackEditParameter extends React.Component {
   static propTypes = {
@@ -28,22 +28,6 @@ class ContentPackEditParameter extends React.Component {
     default_value: '',
   };
 
-  static _convertDefaultValue(parameter) {
-    const type = parameter.type;
-    const defaultValue = parameter.default_value;
-
-    switch (type) {
-      case 'integer':
-        return parseInt(defaultValue, 10);
-      case 'double':
-        return parseFloat(defaultValue);
-      case 'boolean':
-        return defaultValue === 'true';
-      default:
-        return defaultValue;
-    }
-  }
-
   constructor(props) {
     super(props);
 
@@ -65,7 +49,8 @@ class ContentPackEditParameter extends React.Component {
       return;
     }
 
-    const realDefaultValue = ContentPackEditParameter._convertDefaultValue(this.state.newParameter);
+    const realDefaultValue = ContentPackUtils.convertValue(this.state.newParameter.type,
+      this.state.newParameter.default_value);
     const updatedParameter = ObjectUtils.clone(this.state.newParameter);
     updatedParameter.default_value = realDefaultValue;
     this.props.onUpdateParameter(updatedParameter);

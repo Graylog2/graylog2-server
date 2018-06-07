@@ -38,6 +38,7 @@ const ApiRoutes = {
     create: () => { return { url: '/system/content_packs' }; },
     delete: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
     deleteRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
+    install: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}/installations` }; },
   },
   CountsApiController: {
     total: () => { return { url: '/count/total' }; },

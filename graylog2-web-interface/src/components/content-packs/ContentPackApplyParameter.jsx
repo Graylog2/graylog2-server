@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
 
 import { Row, Col, Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';

@@ -9,6 +9,7 @@ import ObjectUtils from 'util/ObjectUtils';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';
+import ContentPackUtils from './ContentPackUtils';
 
 class ContentPackParameterList extends React.Component {
   static propTypes = {
@@ -23,18 +24,6 @@ class ContentPackParameterList extends React.Component {
     onDeleteParameter: () => {},
     onAddParameter: () => {},
   };
-
-  static _convertToString(parameter) {
-    switch (parameter.type) {
-      case 'integer':
-      case 'double':
-        return parameter.default_value.toString();
-      case 'boolean':
-        return parameter.default_value ? 'true' : 'false';
-      default:
-        return parameter.default_value;
-    }
-  }
 
   constructor(props) {
     super(props);
@@ -56,7 +45,7 @@ class ContentPackParameterList extends React.Component {
         <td>{parameter.name}</td>
         <td>{parameter.description}</td>
         <td>{parameter.type}</td>
-        <td>{ContentPackParameterList._convertToString(parameter)}</td>
+        <td>{ContentPackUtils.convertToString(parameter)}</td>
         {!this.props.readOnly &&
         <td>
           <ButtonToolbar>

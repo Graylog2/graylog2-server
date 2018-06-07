@@ -64,14 +64,9 @@ const ContentPacksStore = Reflux.createStore({
   },
 
   install(contentPackId, revision, parameters) {
-    const promise = new Promise(() => {
-      setTimeout(() => {
-        console.log(contentPackId);
-        console.log(revision);
-        console.log(parameters);
-      });
-    }, 1000);
-    return promise;
+    const promise = fetch('POST', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.install(contentPackId, revision).url), parameters);
+
+    ContentPacksActions.install.promise(promise);
   },
 });
 
