@@ -151,7 +151,7 @@
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
         <assertj-core.version>3.10.0</assertj-core.version>
-        <assertj-joda-time.version>2.0.0</assertj-joda-time.version>
+        <assertj-joda-time.version>2.1.0</assertj-joda-time.version>
         <assertj-json.version>1.2.0</assertj-json.version>
         <awaitility.version>3.1.0</awaitility.version>
         <equalsverifier.version>2.4.6</equalsverifier.version>
