@@ -140,7 +140,7 @@ class ContentPackParameterList extends React.Component {
         <SearchForm
           onSearch={this._filterParameters}
           onReset={() => { this._filterParameters(''); }}
-          searchButtonLabel='Filter'
+          searchButtonLabel="Filter"
         />
         <DataTable
           id="parameter-list"

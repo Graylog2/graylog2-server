@@ -19,7 +19,7 @@ describe('<ContentPackDetails />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = renderer.create(<ContentPackDetails contentPack={contentPack}/>);
+    const wrapper = renderer.create(<ContentPackDetails contentPack={contentPack} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 });
