@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import Immutable from 'immutable';
+import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 
-import { Alert, Button, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-
-import Routes from 'routing/Routes';
-import { PaginatedList, SearchForm, Spinner, TableList } from 'components/common';
+import { PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
+import View from './View';
 
 const ViewList = createReactClass({
   propTypes: {
@@ -39,7 +36,8 @@ const ViewList = createReactClass({
     this.execSearch();
   },
 
-  execSearch(resetLoadingState = () => {}) {
+  execSearch(resetLoadingState = () => {
+  }) {
     const { query, page, perPage } = this.state;
     this.props.handleSearch(query, page, perPage).then(resetLoadingState).catch(resetLoadingState);
   },
@@ -75,11 +73,7 @@ const ViewList = createReactClass({
   itemActionsFactory(view) {
     return (
       <ButtonToolbar>
-        {/* TODO: This needs to point to the correct route */}
-        <LinkContainer to={Routes.pluginRoute('VIEWS_VIEWID')(view.id)}>
-          <Button bsStyle="info" bsSize="xsmall">Open</Button>
-        </LinkContainer>
-        <DropdownButton title="More Actions" id={`view-actions-dropdown-${view.id}`} bsSize="xsmall">
+        <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} bsSize="small" pullRight>
           <MenuItem disabled>Edit</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this.handleViewDelete(view)}>Delete</MenuItem>
@@ -94,17 +88,16 @@ const ViewList = createReactClass({
     if (!list) {
       return <Spinner text="Loading views..." />;
     }
-    if (list.length === 0) {
-      return <Alert bsStyle="warning"><i className="fa fa-info-circle" />&nbsp;No views defined.</Alert>;
-    }
 
-    const items = list.map((view) => {
-      return {
-        id: view.id,
-        title: view.title,
-        description: view.summary,
-      };
-    });
+    const items = list.map(view => (
+      <View key={`view-${view.id}`}
+            id={view.id}
+            title={view.title}
+            summary={view.summary}
+            description={view.description}>
+        {this.itemActionsFactory(view)}
+      </View>
+    ));
 
     const { total, page, perPage } = this.props.pagination;
     return (
@@ -118,10 +111,9 @@ const ViewList = createReactClass({
                       onReset={this.handleSearchReset}
                       topMargin={0} />
         </div>
-        <TableList items={Immutable.List(items)}
-                   itemActionsFactory={this.itemActionsFactory}
-                   enableFilter={false}
-                   filterKeys={[]} />
+        <EntityList items={items}
+                    bsNoItemsStyle="success"
+                    noItemsText="There are no views present/matching the filter!" />
       </PaginatedList>
     );
   },
