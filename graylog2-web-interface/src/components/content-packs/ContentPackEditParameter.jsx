@@ -74,21 +74,21 @@ class ContentPackEditParameter extends React.Component {
     if (!param.name) {
       this.setState({ nameError: 'Name must be set.' });
       return false;
-    } else {
-      this.setState({ nameError: undefined });
     }
+    this.setState({ nameError: undefined });
+
     if (!param.title) {
       this.setState({ titleError: 'Title must be set.' });
       return false;
-    } else {
-      this.setState({ titleError: undefined });
     }
+    this.setState({ titleError: undefined });
+
     if (!param.description) {
       this.setState({ descrError: 'Description must be set.' });
       return false;
-    } else {
-      this.setState({ descrError: undefined });
     }
+    this.setState({ descrError: undefined });
+
     return this._validateDefaultValue() && this._validateName();
   }
 

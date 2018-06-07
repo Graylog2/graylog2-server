@@ -63,9 +63,8 @@ class ContentPackVersions extends React.Component {
   headerFormater(header) {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
-    } else {
-      return (<th>{header}</th>);
     }
+    return (<th>{header}</th>);
   }
 
   render() {
