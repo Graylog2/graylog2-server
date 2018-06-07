@@ -13,7 +13,15 @@ export default class extends React.Component {
     width: 0,
   };
 
+  componentDidMount() {
+    this._updateWidgetDimensionsIfChanged();
+  }
+
   componentDidUpdate() {
+    this._updateWidgetDimensionsIfChanged();
+  }
+
+  _updateWidgetDimensionsIfChanged() {
     const { height, width } = this._calculateWidgetSize();
     if (height !== this.state.height || width !== this.state.width) {
       this.setState({ height: height, width: width });

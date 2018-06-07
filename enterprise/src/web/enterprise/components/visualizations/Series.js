@@ -15,7 +15,7 @@ export const parseSeries = (s) => {
 
 const _defaultSeriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values });
 
-export const generateSeries = (results, chartType, generator = _defaultSeriesGenerator) => {
+export const extractSeries = (results) => {
   const leafs = results.filter(row => (row.source === 'leaf'));
 
   const x = leafs.map(({ key }) => key);
@@ -29,14 +29,20 @@ export const generateSeries = (results, chartType, generator = _defaultSeriesGen
     set(valuesBySeries, [joinedKey, targetIdx], value.value);
   });
 
-  const allCharts = Object.keys(valuesBySeries).map((value) => {
-    return [
-      chartType,
-      value,
-      x.map(key => key.join('-')),
-      valuesBySeries[value],
-    ];
-  });
+  return Object.keys(valuesBySeries).map((value) => [
+    value,
+    x,
+    valuesBySeries[value],
+  ]);
+};
+
+export const generateSeries = (results, chartType, generator = _defaultSeriesGenerator) => {
+  const allCharts = extractSeries(results).map(([value, x, values]) => [
+    chartType,
+    value,
+    x.map(key => key.join('-')),
+    values,
+  ]);
 
   return allCharts.map((args, idx) => generator(...args, idx, allCharts.length));
 };

@@ -23,6 +23,7 @@ import Widget from 'enterprise/logic/widgets/Widget';
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
 import DataTable from 'enterprise/components/datatable/DataTable';
+import WorldMapVisualization from './components/visualizations/worldmap/WorldMapVisualization';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -139,6 +140,11 @@ export default {
       type: 'line',
       displayName: 'Line Chart',
       component: LineVisualization,
+    },
+    {
+      type: 'map',
+      displayName: 'World Map',
+      component: WorldMapVisualization,
     },
     {
       type: 'pie',

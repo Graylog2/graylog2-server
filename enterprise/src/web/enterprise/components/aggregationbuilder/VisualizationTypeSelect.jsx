@@ -7,8 +7,8 @@ import Select from 'components/common/Select';
 
 const VisualizationTypeSelect = ({ onChange, value }) => {
   const visualizationTypes = PluginStore.exports('visualizationTypes')
-    .map(viz => ({ label: viz.displayName, value: viz.type }))
-    .sort((v1, v2) => naturalSort(v1.displayName, v2.displayName));
+    .sort((v1, v2) => naturalSort(v1.displayName, v2.displayName))
+    .map(viz => ({ label: viz.displayName, value: viz.type }));
 
   return (
     <Select placeholder="Visualization type"
