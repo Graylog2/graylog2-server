@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
+import ContentPackUtils from './ContentPackUtils';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
 
@@ -16,25 +17,13 @@ class ContentPackInstall extends React.Component {
     onInstall: () => {},
   };
 
-  static _convertToString(parameter) {
-    switch (parameter.type) {
-      case 'integer':
-      case 'double':
-        return parameter.default_value.toString();
-      case 'boolean':
-        return parameter.default_value ? 'true' : 'false';
-      default:
-        return parameter.default_value;
-    }
-  }
-
   constructor(props) {
     super(props);
 
     const parameterInput = props.contentPack.parameters.reduce((result, parameter) => {
       if (parameter.default_value) {
         const newResult = result;
-        newResult[parameter.name] = ContentPackInstall._convertToString(parameter);
+        newResult[parameter.name] = ContentPackUtils.convertToString(parameter);
         return newResult;
       }
       return result;
@@ -42,6 +31,7 @@ class ContentPackInstall extends React.Component {
 
     this.state = {
       parameterInput: parameterInput,
+      comment: '',
       errorMessages: {},
     };
   }
@@ -50,14 +40,30 @@ class ContentPackInstall extends React.Component {
     if (this._validateInput()) {
       const contentPackId = this.props.contentPack.id;
       const contentPackRev = this.props.contentPack.rev;
-      this.props.onInstall(contentPackId, contentPackRev, this.state.parameterInput);
+      const parameters = this._convertedParameters();
+      this.props.onInstall(contentPackId, contentPackRev,
+        { parameters: parameters, comment: this.state.comment });
     }
+  };
+
+  _convertedParameters = () => {
+    return Object.keys(this.state.parameterInput).reduce((result, paramName) => {
+      const newResult = result;
+      const paramType = this.props.contentPack.parameters.find(parameter => parameter.name === paramName).type;
+      const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
+      newResult[paramName] = { type: paramType, value: value };
+      return newResult;
+    }, {});
   };
 
   _getValue = (name, value) => {
     const newParameterInput = this.state.parameterInput;
     newParameterInput[name] = value;
     this.setState({ parameterInput: newParameterInput });
+  };
+
+  _getComment = (e) => {
+    this.setState({ comment: e.target.value });
   };
 
   _validateInput = () => {
@@ -98,6 +104,23 @@ class ContentPackInstall extends React.Component {
       return this.renderParameter(parameter);
     });
     return (<div>
+      <Row>
+        <Col smOffset={1}>
+          <h2>Install comment</h2>
+          <br />
+          <br />
+          <Input name="comment"
+                 id="comment"
+                 type="text"
+                 maxLength={512}
+                 value={this.state.comment}
+                 onChange={this._getComment}
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-7"
+                 label="Comment"
+          />
+        </Col>
+      </Row>
       {parameterInput.length > 0 &&
       <Row>
         <Col smOffset={1}>

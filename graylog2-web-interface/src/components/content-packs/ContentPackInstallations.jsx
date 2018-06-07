@@ -20,7 +20,7 @@ class ContentPackInstallations extends React.Component {
     this.headerFormater = this.headerFormater.bind(this);
   }
 
-  rowFormatter(item) {
+  rowFormatter = (item) => {
     return (
       <tr key={item}>
         <td>
@@ -39,15 +39,15 @@ class ContentPackInstallations extends React.Component {
         </td>
       </tr>
     );
-  }
+  };
 
-  headerFormater(header) {
+  headerFormater = (header) => {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
     } else {
       return (<th>{header}</th>);
     }
-  }
+  };
 
   render() {
     const headers = ['Comment', 'Version', 'Action'];

@@ -9,6 +9,45 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
       className="col-sm-offset-1"
     >
       <h2>
+        Install comment
+      </h2>
+      <br />
+      <br />
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-3 control-label"
+          htmlFor="comment"
+        >
+          Comment
+        </label>
+        <div
+          className="col-sm-7"
+        >
+          <input
+            className="form-control"
+            id="comment"
+            label="Comment"
+            maxLength={512}
+            name="comment"
+            onChange={[Function]}
+            placeholder=""
+            type="text"
+            value=""
+          />
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-offset-1"
+    >
+      <h2>
         Configure Parameter
       </h2>
       <br />
