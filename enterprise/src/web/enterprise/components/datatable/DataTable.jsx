@@ -6,6 +6,8 @@ import { flatten, get, isEqual, last, uniqWith } from 'lodash';
 
 import expandRows from 'enterprise/logic/ExpandRows';
 import connect from 'stores/connect';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
+
 import Field from 'enterprise/components/Field';
 import Value from 'enterprise/components/Value';
 import { ViewStore } from 'enterprise/stores/ViewStore';
@@ -47,7 +49,9 @@ class DataTable extends React.Component {
     return columnPivots.map((columnPivot, idx) => {
       const actualValues = actualColumnPivotValues.map(key => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
       const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
-        if (get(last(prev), 'key') === cur.key) {
+        const lastKey = get(last(prev), 'key');
+        const lastPath = get(last(prev), 'path');
+        if (lastKey === cur.key && isEqual(lastPath, cur.path)) {
           const lastItem = last(prev);
           const remainder = prev.slice(0, -1);
           const newLastItem = Object.assign({}, lastItem, { count: lastItem.count + 1 });
@@ -56,7 +60,7 @@ class DataTable extends React.Component {
         return [].concat(prev, [cur]);
       }, []);
       return (
-        <tr>
+        <tr key={`header-table-row-${columnPivot}`}>
           {this._spacer(1, offset)}
           {actualValuesWithoutDuplicates.map(value => this._headerFieldForValue(columnPivot, value.key, value.count * series.length, value.path))}
         </tr>
@@ -64,10 +68,31 @@ class DataTable extends React.Component {
     });
   };
 
+  _compareArray = (ary1, ary2) => {
+    if (ary1 === undefined) {
+      if (ary2 === undefined) {
+        return 0;
+      }
+      return -1;
+    }
+    if (ary1.length > ary2.length) {
+      return 1;
+    }
+    if (ary1.length < ary2.length) {
+      return -1;
+    }
+    const diffIdx = ary1.findIndex((v, idx) => (naturalSortIgnoreCase(v, ary2[idx]) !== 0));
+    if (diffIdx === -1) {
+      return 0;
+    }
+    return naturalSortIgnoreCase(ary1[diffIdx], ary2[diffIdx]);
+  };
+
   _extractColumnPivotValues = (rows) => {
-    return uniqWith(flatten(rows.map(({ values }) => values))
+    const uniqRows = uniqWith(flatten(rows.map(({ values }) => values))
       .filter(({ rollup }) => !rollup)
       .map(({ key }) => key.slice(0, -1)), isEqual);
+    return Immutable.List(uniqRows).sort(this._compareArray).toJS();
   };
 
   render() {
@@ -79,12 +104,35 @@ class DataTable extends React.Component {
     const columnFieldNames = columnPivots.map(pivot => pivot.field);
     const fields = new Immutable.OrderedSet(rowFieldNames).merge(series);
 
-    const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), series, rows);
+    const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), series, rows.filter(r => r.source === 'leaf'));
 
     const actualColumnPivotFields = this._extractColumnPivotValues(rows, columnFieldNames);
     const rowPivotFields = rowFieldNames.map(this._headerField);
 
     const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, rowFieldNames.length + series.length);
+    const duplicateKeys = {};
+    const formattedRows = expandedRows.map((item, idx) => {
+      const reducedItem = Object.assign({}, item);
+      Object.entries(reducedItem).forEach(([key, value]) => {
+        if (!rowFieldNames.includes(key)) {
+          return;
+        }
+        if (duplicateKeys[key] === value) {
+          delete reducedItem[key];
+        } else {
+          duplicateKeys[key] = value;
+        }
+      });
+      return (<DataTableEntry key={`datatableentry-${idx}`}
+                             fields={fields}
+                             item={reducedItem}
+                             columnPivots={columnFieldNames}
+                             columnPivotValues={actualColumnPivotFields}
+                             series={series} />);
+    });
+
+    const seriesFields = series.map(this._headerField);
+    const columnPivotFields = flatten(actualColumnPivotFields.map(key => series.map(s => this._headerField(s, key.join('-')))));
     return (
       <div className="messages-container" style={{ overflow: 'auto', height: '100%' }}>
         <table className="table table-condensed messages">
@@ -92,11 +140,11 @@ class DataTable extends React.Component {
             {columnPivotFieldsHeaders}
             <tr>
               {rowPivotFields}
-              {series.map(this._headerField)}
-              {actualColumnPivotFields.map(key => series.map(s => this._headerField(s, key.join('-'))))}
+              {seriesFields}
+              {columnPivotFields}
             </tr>
           </thead>
-          {expandedRows.map((item, idx) => <DataTableEntry key={`datatableentry-${idx}`} fields={fields} item={item} columnPivots={columnFieldNames} columnPivotValues={actualColumnPivotFields} series={series}/>)}
+          {formattedRows}
         </table>
       </div>
     );
