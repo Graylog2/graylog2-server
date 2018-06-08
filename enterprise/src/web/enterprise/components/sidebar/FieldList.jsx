@@ -4,23 +4,33 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
+import SearchForm from 'components/common/SearchForm';
+
 import Field from 'enterprise/components/Field';
 import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
-
+import FieldTypeIcon from 'enterprise/components/sidebar/FieldTypeIcon';
 import { SelectedFieldsActions } from 'enterprise/stores/SelectedFieldsStore';
+import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 
 import styles from './FieldList.css';
-import FieldTypeIcon from './FieldTypeIcon';
-import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
+
+const isReservedField = fieldName => fieldName.startsWith('gl2_');
 
 const FieldList = createReactClass({
   propTypes: {
     allFields: PropTypes.object.isRequired,
     fields: PropTypes.object.isRequired,
+    maximumHeight: PropTypes.number.isRequired,
     selectedFields: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
 
+  getInitialState() {
+    return {
+      filter: undefined,
+      showFieldsBy: 'current',
+    };
+  },
   componentDidMount() {
     this._updateHeight();
     window.addEventListener('scroll', this._onScroll);
@@ -76,13 +86,28 @@ const FieldList = createReactClass({
       </li>
     );
   },
-  _renderFieldList({ fields, selectedFields, allFields }) {
+  _fieldsToShow(fields, allFields, showFieldsBy = 'all') {
+    const isNotReservedField = f => !isReservedField(f.name);
+    switch (showFieldsBy) {
+      case 'all':
+        return allFields.filter(isNotReservedField);
+      case 'allreserved':
+        return allFields;
+      case 'current':
+      default:
+        return fields.filter(isNotReservedField);
+    }
+  },
+  _renderFieldList({ fields, selectedFields, allFields, showFieldsBy }) {
     if (!fields) {
       return <span>No field information available.</span>;
     }
     const selectedQuery = this.state.viewMetadata.activeQuery;
     const selectedView = this.state.viewMetadata.id;
-    const fieldList = allFields
+    const filter = this.state.filter ? (field => field.name.includes(this.state.filter)) : () => true;
+    const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
+    const fieldList = fieldsToShow
+      .filter(filter)
       .sortBy(field => field.name)
       .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, selectedFields, fields }));
     return (
@@ -93,11 +118,46 @@ const FieldList = createReactClass({
       </ul>
     );
   },
+  handleSearch(filter) {
+    this.setState({ filter });
+  },
+  handleSearchReset() {
+    this.setState({ filter: undefined });
+  },
+  changeShowFieldsBy(mode) {
+    this.setState({ showFieldsBy: mode });
+  },
+  isCurrentShowFieldsBy(mode) {
+    return this.state.showFieldsBy === mode;
+  },
+  showFieldsByLink(mode, text, title) {
+    return (
+      <a onClick={() => this.changeShowFieldsBy(mode)}
+         role="link"
+         tabIndex={0}
+         title={title}
+         style={{ fontWeight: this.isCurrentShowFieldsBy(mode) ? 'bold' : 'normal' }}>
+        {text}
+      </a>
+    );
+  },
   render() {
     const { allFields, fields, selectedFields } = this.props;
+    const { showFieldsBy } = this.state;
     return (
       <div>
-        {this._renderFieldList({ fields, selectedFields, allFields })}
+        <SearchForm onSearch={this.handleSearch}
+                    onReset={this.handleSearchReset}
+                    placeholder="Filter fields"
+                    topMargin={0} />
+        <div style={{ marginTop: '5px', marginBottom: '0px' }}>
+          List fields of{' '}
+          {this.showFieldsByLink('current', 'current streams', 'This shows fields which are (prospectively) included in the streams you have selected.')},{' '}
+          {this.showFieldsByLink('all', 'all', 'This shows all fields, but no reserved (gl2_*) fields.')} or{' '}
+          {this.showFieldsByLink('allreserved', 'all including reserved', 'This shows all fields, including reserved (gl2_*) fields.')} fields.
+        </div>
+        <hr />
+        {this._renderFieldList({ fields, selectedFields, allFields, showFieldsBy })}
       </div>
     );
   },
