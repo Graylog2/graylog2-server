@@ -10,7 +10,7 @@ const { CollectorsActions } = CombinedProvider.get('Collectors');
 
 const CollectorsStore = Reflux.createStore({
   listenables: [CollectorsActions],
-  sourceUrl: '/plugins/org.graylog.plugins.sidecar/sidecar',
+  sourceUrl: '/sidecar',
   collectors: undefined,
   query: undefined,
   pagination: {
