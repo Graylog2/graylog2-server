@@ -86,7 +86,7 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Set a collector action")
     @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)
-    public Response setAction(@ApiParam(name = "sidecarId", value = "The id this Sideacr is registering as.", required = true)
+    public Response setAction(@ApiParam(name = "sidecarId", value = "The id this Sidecar is registering as.", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId,
                               @ApiParam(name = "JSON body", required = true)
                               @Valid @NotNull List<CollectorAction> request) {
