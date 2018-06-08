@@ -10,7 +10,7 @@ export default function (queryId, field) {
     config: {
       rowPivots: [pivotForField('timestamp')],
       columnPivots: [],
-      series: [`sum(${field})`],
+      series: [`avg(${field})`],
       sort: [],
       visualization: 'line',
     },
