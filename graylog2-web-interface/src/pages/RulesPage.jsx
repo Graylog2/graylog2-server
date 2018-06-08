@@ -11,10 +11,11 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import RulesComponent from 'components/rules/RulesComponent';
-import RulesStore from 'stores/rules/RulesStore';
-import RulesActions from 'actions/rules/RulesActions';
-
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
+
 
 const RulesPage = createReactClass({
   displayName: 'RulesPage',

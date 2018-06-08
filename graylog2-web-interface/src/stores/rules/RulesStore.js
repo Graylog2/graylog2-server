@@ -1,12 +1,12 @@
 import Reflux from 'reflux';
-
-import RulesActions from 'actions/rules/RulesActions';
-
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import naturalSort from 'javascript-natural-sort';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { RulesActions } = CombinedProvider.get('Rules');
 
 const RulesStore = Reflux.createStore({
   listenables: [RulesActions],

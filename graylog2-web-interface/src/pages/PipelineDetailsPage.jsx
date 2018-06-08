@@ -11,16 +11,13 @@ import NewPipeline from 'components/pipelines/NewPipeline';
 
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
-import PipelinesActions from 'actions/pipelines/PipelinesActions';
-import PipelinesStore from 'stores/pipelines/PipelinesStore';
-import RulesStore from 'stores/rules/RulesStore';
-import PipelineConnectionsActions from 'actions/pipelines/PipelineConnectionsActions';
-import PipelineConnectionsStore from 'stores/pipelines/PipelineConnectionsStore';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
-
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
+const { RulesStore } = CombinedProvider.get('Rules');
+const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter(p => p.id === this.props.params.pipelineId)[0] : undefined;

@@ -6,13 +6,13 @@ import { Link } from 'react-router';
 
 import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
-import SimulationResults from './SimulationResults';
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import SimulatorActions from 'actions/simulator/SimulatorActions';
-// eslint-disable-next-line no-unused-vars
-import SimulatorStore from 'stores/simulator/SimulatorStore';
+import SimulationResults from './SimulationResults';
+
+const { SimulatorActions } = CombinedProvider.get('Simulator');
 
 const DEFAULT_STREAM_ID = '000000000000000000000001';
 

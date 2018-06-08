@@ -1,11 +1,11 @@
 import Reflux from 'reflux';
-
-import PipelinesActions from 'actions/pipelines/PipelinesActions';
-
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { PipelinesActions } = CombinedProvider.get('Pipelines');
 
 const PipelinesStore = Reflux.createStore({
   listenables: [PipelinesActions],

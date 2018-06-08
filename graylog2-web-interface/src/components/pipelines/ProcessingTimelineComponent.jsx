@@ -8,17 +8,15 @@ import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import PipelineConnectionsList from './PipelineConnectionsList';
-
-import PipelinesActions from 'actions/pipelines/PipelinesActions';
-import PipelinesStore from 'stores/pipelines/PipelinesStore';
-import PipelineConnectionsActions from 'actions/pipelines/PipelineConnectionsActions';
-import PipelineConnectionsStore from 'stores/pipelines/PipelineConnectionsStore';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import PipelineConnectionsList from './PipelineConnectionsList';
+
+const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
+const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 const ProcessingTimelineComponent = createReactClass({
   displayName: 'ProcessingTimelineComponent',

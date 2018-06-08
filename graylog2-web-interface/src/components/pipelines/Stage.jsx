@@ -6,11 +6,14 @@ import { Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';
-import RulesStore from 'stores/rules/RulesStore';
-import StageForm from './StageForm';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import StageForm from './StageForm';
+
+const { RulesStore } = CombinedProvider.get('Rules');
 
 const Stage = createReactClass({
   displayName: 'Stage',

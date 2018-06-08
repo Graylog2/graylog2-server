@@ -4,8 +4,9 @@ import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import PipelineConnectionsActions from 'actions/pipelines/PipelineConnectionsActions';
+const { PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 
 const PipelineConnectionsStore = Reflux.createStore({
   listenables: [PipelineConnectionsActions],

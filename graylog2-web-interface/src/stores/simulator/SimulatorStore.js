@@ -5,8 +5,9 @@ import fetch from 'logic/rest/FetchProvider';
 
 import MessageFormatter from 'logic/message/MessageFormatter';
 import ObjectUtils from 'util/ObjectUtils';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import SimulatorActions from 'actions/simulator/SimulatorActions';
+const { SimulatorActions } = CombinedProvider.get('Simulator');
 
 const SimulatorStore = Reflux.createStore({
   listenables: [SimulatorActions],

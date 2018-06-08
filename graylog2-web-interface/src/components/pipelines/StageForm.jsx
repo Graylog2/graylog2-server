@@ -10,9 +10,10 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 
-import RulesStore from 'stores/rules/RulesStore';
-
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { RulesStore } = CombinedProvider.get('Rules');
 
 const StageForm = createReactClass({
   displayName: 'StageForm',
