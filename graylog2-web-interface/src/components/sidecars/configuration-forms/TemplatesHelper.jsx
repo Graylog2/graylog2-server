@@ -33,7 +33,7 @@ class TemplatesHelper extends React.Component {
             </tr>
             <tr>
               <td><code>{'${'}ip{'}'}</code></td>
-              <td>First public IP address.</td>
+              <td>First public IP address of the machine the sidecar is running on.</td>
             </tr>
             <tr>
               <td><code>{'${'}cpuIdle{'}'}</code></td>
