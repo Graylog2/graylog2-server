@@ -3,7 +3,7 @@ import React from 'react';
 
 import { DataTable } from 'components/common';
 import { Badge } from 'react-bootstrap';
-import ContentPackConstraintsStyle from './ContentPackConstraints.css';
+import './ContentPackConstraints.css';
 
 class ContentPackConstraints extends React.Component {
   static propTypes = {
