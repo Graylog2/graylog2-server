@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { debounce } from 'lodash';
 
 import 'brace/mode/lucene';
 import 'enterprise/components/searchbar/queryinput/ace-queryinput';
@@ -96,8 +97,10 @@ class QueryInput extends Component {
     }
   }
 
+  _debouncedOnChange = debounce(this.props.onChange, 100);
+
   _onChange = (newValue) => {
-    this.setState({ value: newValue }, () => this.props.onChange(this.state.value));
+    this.setState({ value: newValue }, () => this._debouncedOnChange(this.state.value));
   };
 
   _onBlur = () => {
