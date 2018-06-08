@@ -502,6 +502,11 @@
                 <artifactId>javapoet</artifactId>
                 <version>${javapoet.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

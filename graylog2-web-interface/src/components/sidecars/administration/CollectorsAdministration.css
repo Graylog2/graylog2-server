@@ -1,0 +1,53 @@
+:local(.sidecarId) {
+    color: #aaaaaa;
+    font-size: 0.9em;
+}
+
+:local(.disabledCollector) {
+    color: #aaaaaa;
+}
+
+:local(.collectorEntry) .row {
+    margin-bottom: 5px;
+}
+
+:local(.collectorEntry) .form-group {
+    display: inline-block;
+    margin: 0 10px 0 0;
+}
+
+:local(.collectorEntry) .checkbox {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+:local(.collectorEntry) .checkbox label {
+    font-size: 1.1em;
+}
+
+:local(.alignedInformation) {
+    margin-left: 20px;
+}
+
+:local(.headerComponentsWrapper) {
+    float: right;
+    margin: 5px 0;
+}
+
+:local(.headerComponentsWrapper) .btn-link {
+    color: #666;
+}
+
+:local(.additionalContent) {
+    display: block;
+    height: 20px;
+    margin: 5px 0;
+}
+
+:local(.paginatedList) .page-size {
+    padding-top: 4px;
+}
+
+:local(.paginatedList) .search {
+    margin-bottom: 15px;
+}

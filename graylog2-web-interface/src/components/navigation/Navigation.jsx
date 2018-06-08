@@ -94,6 +94,9 @@ const Navigation = createReactClass({
     if (this._isActive('/system/enterprise')) {
       return `${prefix} / Enterprise`;
     }
+    if (this._isActive('/system/sidecars')) {
+      return `${prefix} / Sidecars`;
+    }
 
     const pluginRoute = PluginStore.exports('systemnavigation').filter(route => this._isActive(route.path))[0];
     if (pluginRoute) {
@@ -250,6 +253,9 @@ const Navigation = createReactClass({
               }
               <LinkContainer to={Routes.SYSTEM.ENTERPRISE}>
                   <MenuItem>Enterprise</MenuItem>
+              </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
+                <MenuItem>Sidecars</MenuItem>
               </LinkContainer>
               {pluginSystemNavigations}
             </NavDropdown>

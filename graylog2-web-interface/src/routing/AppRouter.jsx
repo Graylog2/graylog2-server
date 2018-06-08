@@ -68,6 +68,14 @@ import SimulatorPage from 'pages/SimulatorPage';
 import RulesPage from 'pages/RulesPage';
 import RuleDetailsPage from 'pages/RuleDetailsPage';
 import EnterprisePage from 'pages/EnterprisePage';
+import SidecarEditConfigurationPage from 'pages/SidecarEditConfigurationPage';
+import SidecarStatusPage from 'pages/SidecarStatusPage';
+import SidecarAdministrationPage from 'pages/SidecarAdministrationPage';
+import SidecarEditCollectorPage from 'pages/SidecarEditCollectorPage';
+import SidecarNewCollectorPage from 'pages/SidecarNewCollectorPage';
+import SidecarsPage from 'pages/SidecarsPage';
+import SidecarConfigurationPage from 'pages/SidecarConfigurationPage';
+import SidecarNewConfigurationPage from 'pages/SidecarNewConfigurationPage';
 
 class AppRouter extends React.Component {
   render() {
@@ -159,6 +167,15 @@ class AppRouter extends React.Component {
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
               <Route path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
+
+              <Route path={Routes.SYSTEM.SIDECARS.OVERVIEW} component={SidecarsPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.STATUS(':sidecarId')} component={SidecarStatusPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.ADMINISTRATION} component={SidecarAdministrationPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.CONFIGURATION} component={SidecarConfigurationPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION} component={SidecarNewConfigurationPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')} component={SidecarEditConfigurationPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR} component={SidecarNewCollectorPage} />
+              <Route path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')} component={SidecarEditCollectorPage} />
               {pluginRoutes}
             </Route>
           </Route>
