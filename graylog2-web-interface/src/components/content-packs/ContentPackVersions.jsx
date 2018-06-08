@@ -26,7 +26,7 @@ class ContentPackVersions extends React.Component {
 
     this.onChange = this.onChange.bind(this);
     this.rowFormatter = this.rowFormatter.bind(this);
-    this.headerFormater = this.headerFormater.bind(this);
+    this.headerFormatter = this.headerFormatter.bind(this);
   }
 
   onChange(event) {
@@ -60,12 +60,12 @@ class ContentPackVersions extends React.Component {
     );
   }
 
-  headerFormater(header) {
+  headerFormatter = (header) => {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
     }
     return (<th>{header}</th>);
-  }
+  };
 
   render() {
     const versions = Object.keys(this.props.contentPack).map((rev) => { return { version: rev }; });
@@ -74,7 +74,7 @@ class ContentPackVersions extends React.Component {
       <DataTable
         id="content-packs-versions"
         headers={headers}
-        headerCellFormatter={this.headerFormater}
+        headerCellFormatter={this.headerFormatter}
         sortByKey="version"
         dataRowFormatter={this.rowFormatter}
         rows={versions}

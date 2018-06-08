@@ -10,68 +10,66 @@ import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitie
 import ContentPackParameterList from 'components/content-packs/ContentPackParameterList';
 import 'components/content-packs/ContentPackDetails.css';
 
-class ContentPackDetails extends React.Component {
-  static propTypes = {
-    contentPack: PropTypes.object.isRequired,
-    verbose: PropTypes.bool,
-    offset: PropTypes.number,
-    showConstraints: PropTypes.bool,
-  };
+const ContentPackDetails = (props) => {
+  const markdownDescription = markdown.toHTML(props.contentPack.description || '');
+  const contentPack = props.contentPack;
 
-  static defaultProps = {
-    offset: 1,
-    verbose: false,
-    showConstraints: false,
-  };
-
-  render() {
-    const markdownDescription = markdown.toHTML(this.props.contentPack.description || '');
-    const contentPack = this.props.contentPack;
-
-    return (
-      <Row>
-        <Col smOffset={this.props.offset} sm={9}>
-          <div id="content-pack-details">
-            <h2>Details</h2>
-            <br />
-            <div>
-              <dl className="deflist">
-                <dt>Version:</dt> <dd>{contentPack.rev}</dd>
-                <dt>Name:</dt> <dd>{contentPack.name}&nbsp;</dd>
-                <dt>Summary:</dt> <dd>{contentPack.summary}&nbsp;</dd>
-                <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
-                <dt>URL:</dt> <dd><a href={contentPack.url}>{contentPack.url}</a>&nbsp;</dd>
-                { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
-                { contentPack.parameters && !this.props.verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
-                { contentPack.entities && !this.props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
-              </dl>
-            </div>
-            <h2>Description</h2>
-            <br />
-            <Well>
-              <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
-            </Well>
-            <br />
-            { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
-            <br />
-            <br />
-            { contentPack.requires && this.props.showConstraints &&
-            <div>
-              <ContentPackConstraints constraints={contentPack.requires} />
-              <br />
-            </div>
-            }
-            { contentPack.entities && contentPack.entities.length > 0 && this.props.verbose &&
-              <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
-            }
-            { contentPack.parameters && contentPack.parameters.length > 0 && this.props.verbose &&
-              <ContentPackParameterList contentPack={this.props.contentPack} readOnly />
-            }
+  return (
+    <Row>
+      <Col smOffset={props.offset} sm={9}>
+        <div id="content-pack-details">
+          <h2>Details</h2>
+          <br />
+          <div>
+            <dl className="deflist">
+              <dt>Version:</dt> <dd>{contentPack.rev}</dd>
+              <dt>Name:</dt> <dd>{contentPack.name}&nbsp;</dd>
+              <dt>Summary:</dt> <dd>{contentPack.summary}&nbsp;</dd>
+              <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
+              <dt>URL:</dt> <dd><a href={contentPack.url}>{contentPack.url}</a>&nbsp;</dd>
+              { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
+              { contentPack.parameters && !props.verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
+              { contentPack.entities && !props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
+            </dl>
           </div>
-        </Col>
-      </Row>
-    );
-  }
-}
+          <h2>Description</h2>
+          <br />
+          <Well>
+            <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
+          </Well>
+          <br />
+          { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
+          <br />
+          <br />
+          { contentPack.requires && props.showConstraints &&
+          <div>
+            <ContentPackConstraints constraints={contentPack.requires} />
+            <br />
+          </div>
+          }
+          { contentPack.entities && contentPack.entities.length > 0 && props.verbose &&
+          <ContentPackEntitiesList contentPack={props.contentPack} readOnly />
+          }
+          { contentPack.parameters && contentPack.parameters.length > 0 && props.verbose &&
+          <ContentPackParameterList contentPack={props.contentPack} readOnly />
+          }
+        </div>
+      </Col>
+    </Row>
+  );
+};
+
+ContentPackDetails.propTypes = {
+  contentPack: PropTypes.object.isRequired,
+  verbose: PropTypes.bool,
+  offset: PropTypes.number,
+  showConstraints: PropTypes.bool,
+};
+
+ContentPackDetails.defaultProps = {
+  offset: 1,
+  verbose: false,
+  showConstraints: false,
+};
 
 export default ContentPackDetails;
