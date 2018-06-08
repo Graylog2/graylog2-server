@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
@@ -7,13 +8,15 @@ import SidecarList from './SidecarList';
 
 const { SidecarsStore, SidecarsActions } = CombinedProvider.get('Sidecars');
 
-const SidecarListContainer = React.createClass({
+const SidecarListContainer = createReactClass({
+  displayName: 'SidecarListContainer',
   mixins: [Reflux.connect(SidecarsStore)],
 
   componentDidMount() {
     this._reloadSidecars({});
     this.interval = setInterval(() => this._reloadSidecars({}), this.SIDECAR_DATA_REFRESH);
   },
+
   componentWillUnmount() {
     if (this.interval) {
       clearInterval(this.interval);

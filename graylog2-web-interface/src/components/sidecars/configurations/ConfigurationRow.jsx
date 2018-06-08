@@ -11,27 +11,25 @@ import CopyConfigurationModal from './CopyConfigurationModal';
 
 import styles from './ConfigurationRow.css';
 
-const ConfigurationRow = React.createClass({
-  propTypes: {
+class ConfigurationRow extends React.Component {
+  static propTypes = {
     configuration: PropTypes.object.isRequired,
     collector: PropTypes.object,
     onCopy: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      collector: {},
-    };
-  },
+  static defaultProps = {
+    collector: {},
+  };
 
-  _handleDelete() {
+  _handleDelete = () => {
     const configuration = this.props.configuration;
     if (window.confirm(`You are about to delete configuration "${configuration.name}". Are you sure?`)) {
       this.props.onDelete(configuration);
     }
-  },
+  };
 
   render() {
     const { collector, configuration } = this.props;
@@ -63,7 +61,7 @@ const ConfigurationRow = React.createClass({
         </td>
       </tr>
     );
-  },
-});
+  }
+}
 
 export default ConfigurationRow;

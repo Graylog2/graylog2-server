@@ -11,7 +11,7 @@ import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContai
 
 import Routes from 'routing/Routes';
 
-const SidecarsPage = React.createClass({
+class SidecarsPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Sidecars">
@@ -47,7 +47,7 @@ const SidecarsPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default SidecarsPage;

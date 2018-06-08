@@ -11,33 +11,31 @@ import TemplatesHelper from './TemplatesHelper';
 import IncludesHelper from './IncludesHelper';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
-const ConfigurationHelper = React.createClass({
-  propTypes: {
+class ConfigurationHelper extends React.Component {
+  static propTypes = {
     type: PropTypes.string.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      section: undefined,
-      paragraph: undefined,
-    };
-  },
+  state = {
+    section: undefined,
+    paragraph: undefined,
+  };
 
-  _onSelect(event) {
+  _onSelect = (event) => {
     const newState = event.split('.');
     this.setState({ section: newState[0], paragraph: newState[1] });
-  },
+  };
 
-  _getId(idName, index) {
+  _getId = (idName, index) => {
     const idIndex = index !== undefined ? `. ${index}` : '';
     return idName + idIndex;
-  },
+  };
 
-  _getEventKey(a, b) {
+  _getEventKey = (a, b) => {
     return (`${a}.${b}`);
-  },
+  };
 
-  navDropDowns(content) {
+  navDropDowns = (content) => {
     const dropDowns = [];
     Object.keys(content).forEach((section) => {
       if (!Object.prototype.hasOwnProperty.call(content, section)) {
@@ -60,7 +58,7 @@ const ConfigurationHelper = React.createClass({
     });
 
     return dropDowns;
-  },
+  };
 
   render() {
     return (
@@ -104,7 +102,7 @@ const ConfigurationHelper = React.createClass({
         </Row>
       </Panel>
     );
-  },
-});
+  }
+}
 
 export default ConfigurationHelper;

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -8,7 +9,9 @@ import Routes from 'routing/Routes';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 
-const SidecarNewConfigurationPage = React.createClass({
+const SidecarNewConfigurationPage = createReactClass({
+  displayName: 'SidecarNewConfigurationPage',
+
   componentDidMount() {
     this.style.use();
   },

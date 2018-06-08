@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const TemplatesHelper = React.createClass({
+class TemplatesHelper extends React.Component {
   render() {
     return (
       <div>
@@ -47,6 +47,7 @@ const TemplatesHelper = React.createClass({
         </Table>
       </div>
     );
-  },
-});
+  }
+}
+
 export default TemplatesHelper;

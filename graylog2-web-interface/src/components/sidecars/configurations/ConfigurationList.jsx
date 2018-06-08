@@ -10,8 +10,8 @@ import ConfigurationRow from './ConfigurationRow';
 
 import style from './ConfigurationList.css';
 
-const ConfigurationList = React.createClass({
-  propTypes: {
+class ConfigurationList extends React.Component {
+  static propTypes = {
     collectors: PropTypes.array.isRequired,
     configurations: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
@@ -21,14 +21,14 @@ const ConfigurationList = React.createClass({
     onClone: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
-  },
+  };
 
-  _headerCellFormatter(header) {
+  _headerCellFormatter = (header) => {
     const className = (header === 'Actions' ? style.actionsColumn : '');
     return <th className={className}>{header}</th>;
-  },
+  };
 
-  _collectorConfigurationFormatter(configuration) {
+  _collectorConfigurationFormatter = (configuration) => {
     const { collectors, onClone, onDelete, validateConfiguration } = this.props;
     const configurationCollector = collectors.find(collector => collector.id === configuration.collector_id);
     return (
@@ -39,7 +39,7 @@ const ConfigurationList = React.createClass({
                         validateConfiguration={validateConfiguration}
                         onDelete={onDelete} />
     );
-  },
+  };
 
   render() {
     const { configurations, pagination, query, onPageChange, onQueryChange } = this.props;
@@ -99,7 +99,7 @@ const ConfigurationList = React.createClass({
         </Row>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ConfigurationList;

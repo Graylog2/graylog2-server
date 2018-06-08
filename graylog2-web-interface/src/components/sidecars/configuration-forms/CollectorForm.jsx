@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
@@ -15,8 +16,10 @@ import SourceViewModal from './SourceViewModal';
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
-const CollectorForm = React.createClass({
+const CollectorForm = createReactClass({
+  displayName: 'CollectorForm',
   mixins: [Reflux.connect(CollectorsStore)],
+
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     collector: PropTypes.object,

@@ -7,34 +7,32 @@ import SourceViewModal from './SourceViewModal';
 
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
-const IncludesHelper = React.createClass({
-  getInitialState() {
-    return {
-      configurations: [],
-    };
-  },
+class IncludesHelper extends React.Component {
+  state = {
+    configurations: [],
+  };
 
   componentDidMount() {
     this._reloadConfiguration();
-  },
+  }
 
-  _reloadConfiguration() {
+  _reloadConfiguration = () => {
     CollectorConfigurationsActions.all()
       .then((configurations) => {
         this.setState({ configurations: configurations });
       });
-  },
+  };
 
-  _getId(idName, index) {
+  _getId = (idName, index) => {
     const idIndex = index !== undefined ? `. ${index}` : '';
     return idName + idIndex;
-  },
+  };
 
-  _onShowSource(id) {
+  _onShowSource = (id) => {
     this.refs[`modal_${id}`].open();
-  },
+  };
 
-  _configurationListFormatter() {
+  _configurationListFormatter = () => {
     const configurationRows = [];
     Object.values(this.state.configurations).forEach((configuration) => {
       const escapedName = `<#include "${configuration.id}">`;
@@ -55,11 +53,11 @@ const IncludesHelper = React.createClass({
       );
     });
     return configurationRows;
-  },
+  };
 
-  _isLoading() {
+  _isLoading = () => {
     return !(this.state.configurations);
-  },
+  };
 
   render() {
     if (this._isLoading()) {
@@ -83,6 +81,7 @@ const IncludesHelper = React.createClass({
         </Table>
       </div>
     );
-  },
-});
+  }
+}
+
 export default IncludesHelper;
