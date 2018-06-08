@@ -17,19 +17,19 @@ class TemplatesHelper extends React.Component {
           <tbody>
             <tr>
               <td><code>{'${'}operatingSystem{'}'}</code></td>
-              <td>Name of the agents operating system, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
+              <td>Name of the operating system the sidecar is running on, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
             </tr>
             <tr>
               <td><code>{'${'}nodeName{'}'}</code></td>
-              <td>The name of the agent, defaults to hostname if not set.</td>
+              <td>The name of the sidecar, defaults to hostname if not set.</td>
             </tr>
             <tr>
               <td><code>{'${'}nodeId{'}'}</code></td>
-              <td>UUID of the agent.</td>
+              <td>UUID of the sidecar.</td>
             </tr>
             <tr>
               <td><code>{'${'}collectorVersion{'}'}</code></td>
-              <td>Version string of the running Sidecar.</td>
+              <td>Version string of the running sidecar.</td>
             </tr>
             <tr>
               <td><code>{'${'}ip{'}'}</code></td>
