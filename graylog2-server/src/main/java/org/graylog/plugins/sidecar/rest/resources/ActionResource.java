@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-@Api(value = "Sidecar Collector Actions", description = "Manage Collector Actions")
+@Api(value = "Sidecar/Collector/Actions", description = "Manage Collector actions")
 @Path("/sidecar/action")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

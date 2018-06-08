@@ -72,7 +72,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Api(value = "Sidecar Administration", description = "Administrate sidecars")
+@Api(value = "Sidecar/Administration", description = "Administrate sidecars")
 @Path("/sidecar/administration")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

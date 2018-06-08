@@ -63,7 +63,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(value = "Collectors", description = "Manage collectors")
+@Api(value = "Sidecar/Collectors", description = "Manage collectors")
 @Path("/sidecar/collectors")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -213,7 +213,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Delets a collector")
+    @ApiOperation(value = "Delete a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_DELETE)
     public Response deleteCollector(@ApiParam(name = "id", required = true)
                                     @PathParam("id") String id) {
