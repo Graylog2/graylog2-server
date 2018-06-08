@@ -16,10 +16,10 @@
  */
 package org.graylog2.contentpacks;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
@@ -27,8 +27,6 @@ import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
 import org.graylog2.database.MongoConnection;
-import org.mongojack.Aggregation;
-import org.mongojack.AggregationResult;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -38,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,38 +67,21 @@ public class ContentPackPersistenceService {
     }
 
     public Set<ContentPack> loadAllLatest() {
-        final DBObject groupStage = BasicDBObjectBuilder.start()
-                .push("$group")
-                .append("_id", "$id")
-                .push("max_rev")
-                .append("$max", "$rev")
-                .get();
-        final DBObject lookupStage = BasicDBObject.parse(
-                "{$lookup: " +
-                        "        {from: \"content_packs\",\n" +
-                        "         let: {id:\"$_id\", rev:\"$max_rev\"},\n" +
-                        "         pipeline: [\n" +
-                        "             {$match:\n" +
-                        "                 {$expr:\n" +
-                        "                     {$and: [\n" +
-                        "                         {$eq: [\"$id\",\"$$id\"]},\n" +
-                        "                         {$eq: [\"$rev\", \"$$rev\"]}\n" +
-                        "                     ]}\n" +
-                        "                 }\n" +
-                        "             }\n" +
-                        "         ],\n" +
-                        "         as: \"latest\"\n" +
-                        "        }\n" +
-                        "    }");
-        final DBObject unwindStage = new BasicDBObject("$unwind", "$latest");
-        final DBObject replaceRootStage = BasicDBObjectBuilder.start()
-                .push("$replaceRoot")
-                .append("newRoot", "$latest")
-                .get();
+        final Set<ContentPack> allContentPacks = loadAll();
+        final ImmutableMultimap.Builder<ModelId, ContentPack> byIdBuilder = ImmutableMultimap.builder();
+        for (ContentPack contentPack : allContentPacks) {
+            byIdBuilder.put(contentPack.id(), contentPack);
+        }
 
-        final AggregationResult<ContentPack> result = dbCollection.aggregate(new Aggregation<>(ContentPack.class,
-                groupStage, lookupStage, unwindStage, replaceRootStage));
-        return ImmutableSet.copyOf(result.results());
+        final ImmutableMultimap<ModelId, ContentPack> contentPacksById = byIdBuilder.build();
+        final ImmutableSet.Builder<ContentPack> latestContentPacks = ImmutableSet.builderWithExpectedSize(contentPacksById.keySet().size());
+        for (ModelId id : contentPacksById.keySet()) {
+            final ImmutableCollection<ContentPack> contentPacks = contentPacksById.get(id);
+            final ContentPack latestContentPackRevision = Collections.max(contentPacks, Comparator.comparingInt(Revisioned::revision));
+            latestContentPacks.add(latestContentPackRevision);
+        }
+
+        return latestContentPacks.build();
     }
 
     public Set<ContentPack> findAllById(ModelId id) {
