@@ -46,7 +46,7 @@ const AddWidgetButton = createReactClass({
   render() {
     return (
       <div>
-        <DropdownButton title="Add Widget" id="add-widget-button-dropdown" bsStyle="info">
+        <DropdownButton title="Add Widget" id="add-widget-button-dropdown" bsStyle="info" pullRight>
           <MenuItem onSelect={this.onCreateAggregation}>Aggregation</MenuItem>
           <MenuItem onSelect={this.onCreateAlertStatus}>Alert Status</MenuItem>
           <MenuItem onSelect={this.onCreateMessageTable}>Message Table</MenuItem>
