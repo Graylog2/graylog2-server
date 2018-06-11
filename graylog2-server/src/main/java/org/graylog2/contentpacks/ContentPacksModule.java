@@ -17,17 +17,17 @@
 package org.graylog2.contentpacks;
 
 import org.graylog2.contentpacks.catalogs.CatalogIndex;
-import org.graylog2.contentpacks.catalogs.DashboardCatalog;
-import org.graylog2.contentpacks.catalogs.GrokPatternCatalog;
-import org.graylog2.contentpacks.catalogs.InputCatalog;
-import org.graylog2.contentpacks.catalogs.LookupCacheCatalog;
-import org.graylog2.contentpacks.catalogs.LookupDataAdapterCatalog;
-import org.graylog2.contentpacks.catalogs.LookupTableCatalog;
-import org.graylog2.contentpacks.catalogs.OutputCatalog;
-import org.graylog2.contentpacks.catalogs.PipelineCatalog;
-import org.graylog2.contentpacks.catalogs.PipelineRuleCatalog;
-import org.graylog2.contentpacks.catalogs.StreamCatalog;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
+import org.graylog2.contentpacks.facades.DashboardFacade;
+import org.graylog2.contentpacks.facades.GrokPatternFacade;
+import org.graylog2.contentpacks.facades.InputFacade;
+import org.graylog2.contentpacks.facades.LookupCacheFacade;
+import org.graylog2.contentpacks.facades.LookupDataAdapterFacade;
+import org.graylog2.contentpacks.facades.LookupTableFacade;
+import org.graylog2.contentpacks.facades.OutputFacade;
+import org.graylog2.contentpacks.facades.PipelineFacade;
+import org.graylog2.contentpacks.facades.PipelineRuleFacade;
+import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.plugin.PluginModule;
 
@@ -36,20 +36,21 @@ public class ContentPacksModule extends PluginModule {
     @Override
     protected void configure() {
         bind(ContentPackPersistenceService.class).asEagerSingleton();
+        bind(ContentPackService.class).asEagerSingleton();
         bind(CatalogIndex.class).asEagerSingleton();
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ModelIdParamConverter.Provider.class);
 
-        addEntityCatalog(DashboardCatalog.TYPE, DashboardCatalog.class);
-        addEntityCatalog(GrokPatternCatalog.TYPE, GrokPatternCatalog.class);
-        addEntityCatalog(InputCatalog.TYPE, InputCatalog.class);
-        addEntityCatalog(LookupCacheCatalog.TYPE, LookupCacheCatalog.class);
-        addEntityCatalog(LookupDataAdapterCatalog.TYPE, LookupDataAdapterCatalog.class);
-        addEntityCatalog(LookupTableCatalog.TYPE, LookupTableCatalog.class);
-        addEntityCatalog(OutputCatalog.TYPE, OutputCatalog.class);
-        addEntityCatalog(PipelineCatalog.TYPE, PipelineCatalog.class);
-        addEntityCatalog(PipelineRuleCatalog.TYPE, PipelineRuleCatalog.class);
-        addEntityCatalog(StreamCatalog.TYPE, StreamCatalog.class);
+        addEntityFacade(DashboardFacade.TYPE, DashboardFacade.class);
+        addEntityFacade(GrokPatternFacade.TYPE, GrokPatternFacade.class);
+        addEntityFacade(InputFacade.TYPE, InputFacade.class);
+        addEntityFacade(LookupCacheFacade.TYPE, LookupCacheFacade.class);
+        addEntityFacade(LookupDataAdapterFacade.TYPE, LookupDataAdapterFacade.class);
+        addEntityFacade(LookupTableFacade.TYPE, LookupTableFacade.class);
+        addEntityFacade(OutputFacade.TYPE, OutputFacade.class);
+        addEntityFacade(PipelineFacade.TYPE, PipelineFacade.class);
+        addEntityFacade(PipelineRuleFacade.TYPE, PipelineRuleFacade.class);
+        addEntityFacade(StreamFacade.TYPE, StreamFacade.class);
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
     }
