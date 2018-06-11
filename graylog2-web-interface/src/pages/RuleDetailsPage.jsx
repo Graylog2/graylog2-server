@@ -54,7 +54,7 @@ const RuleDetailsPage = createReactClass({
       return <Spinner />;
     }
 
-    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter(pipeline => {
+    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter((pipeline) => {
       return pipeline.stages.some(stage => stage.rules.indexOf(this.state.rule.title) !== -1);
     });
 
@@ -62,8 +62,11 @@ const RuleDetailsPage = createReactClass({
 
     return (
       <DocumentTitle title={pageTitle}>
-        <Rule rule={this.state.rule} usedInPipelines={pipelinesUsingRule} create={this.props.params.ruleId === 'new'}
-              onSave={this._save} validateRule={this._validateRule} />
+        <Rule rule={this.state.rule}
+              usedInPipelines={pipelinesUsingRule}
+              create={this.props.params.ruleId === 'new'}
+              onSave={this._save}
+              validateRule={this._validateRule} />
       </DocumentTitle>
     );
   },

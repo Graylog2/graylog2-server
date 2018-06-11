@@ -41,12 +41,12 @@ class ProcessorSimulator extends React.Component {
     SimulatorActions.simulate
       .triggerPromise(this.state.stream, message.fields, options.inputId)
       .then(
-        response => {
+        (response) => {
           this.setState({ simulation: response, loading: false });
         },
-        error => {
+        (error) => {
           this.setState({ loading: false, error: error });
-        }
+        },
       );
   };
 
@@ -56,8 +56,8 @@ class ProcessorSimulator extends React.Component {
     }
 
     return streams
-      .map(s => {
-        return { value: s.id, label: s.title };
+      .map((stream) => {
+        return { value: stream.id, label: stream.title };
       })
       .sort((s1, s2) => naturalSort(s1.label, s2.label));
   };

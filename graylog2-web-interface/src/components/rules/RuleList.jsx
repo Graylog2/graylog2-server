@@ -75,7 +75,7 @@ class RuleList extends React.Component {
                    className="table-hover"
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
-                   sortByKey={"title"}
+                   sortByKey="title"
                    rows={this.props.rules}
                    filterBy="Title"
                    dataRowFormatter={this._ruleInfoFormatter}

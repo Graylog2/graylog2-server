@@ -91,7 +91,7 @@ const PipelineDetailsPage = createReactClass({
   },
 
   _isLoading() {
-    return !this._isNewPipeline(this.props.params.pipelineId) && !this.state.pipeline || !this.state.connections || !this.state.streams;
+    return !this._isNewPipeline(this.props.params.pipelineId) && (!this.state.pipeline || !this.state.connections || !this.state.streams);
   },
 
   render() {
@@ -111,9 +111,13 @@ const PipelineDetailsPage = createReactClass({
       content = <NewPipeline onChange={this._savePipeline} />;
     } else {
       content = (
-        <Pipeline pipeline={this.state.pipeline} connections={this.state.connections} streams={this.state.streams}
-                  rules={this.state.rules} onConnectionsChange={this._onConnectionsChange}
-                  onStagesChange={this._onStagesChange} onPipelineChange={this._savePipeline} />
+        <Pipeline pipeline={this.state.pipeline}
+                  connections={this.state.connections}
+                  streams={this.state.streams}
+                  rules={this.state.rules}
+                  onConnectionsChange={this._onConnectionsChange}
+                  onStagesChange={this._onStagesChange}
+                  onPipelineChange={this._savePipeline} />
       );
     }
 

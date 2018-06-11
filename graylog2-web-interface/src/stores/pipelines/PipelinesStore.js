@@ -12,7 +12,7 @@ const PipelinesStore = Reflux.createStore({
   pipelines: undefined,
 
   getInitialState() {
-    return {pipelines: this.pipelines};
+    return { pipelines: this.pipelines };
   },
 
   _updatePipelinesState(pipeline) {
@@ -21,30 +21,30 @@ const PipelinesStore = Reflux.createStore({
     } else {
       const doesPipelineExist = this.pipelines.some(p => p.id === pipeline.id);
       if (doesPipelineExist) {
-        this.pipelines = this.pipelines.map((p) => p.id === pipeline.id ? pipeline : p);
+        this.pipelines = this.pipelines.map(p => (p.id === pipeline.id ? pipeline : p));
       } else {
         this.pipelines.push(pipeline);
       }
     }
-    this.trigger({pipelines: this.pipelines});
+    this.trigger({ pipelines: this.pipelines });
   },
 
   list() {
     const failCallback = (error) => {
-      UserNotification.error('Fetching pipelines failed with status: ' + error.message,
+      UserNotification.error(`Fetching pipelines failed with status: ${error.message}`,
         'Could not retrieve processing pipelines');
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.list().url);
     return fetch('GET', url).then((response) => {
       this.pipelines = response;
-      this.trigger({pipelines: response});
+      this.trigger({ pipelines: response });
     }, failCallback);
   },
 
   get(pipelineId) {
     const failCallback = (error) => {
-      UserNotification.error('Fetching pipeline failed with status: ' + error.message,
+      UserNotification.error(`Fetching pipeline failed with status: ${error.message}`,
         `Could not retrieve processing pipeline "${pipelineId}"`);
     };
 
@@ -55,7 +55,7 @@ const PipelinesStore = Reflux.createStore({
 
   save(pipelineSource) {
     const failCallback = (error) => {
-      UserNotification.error('Saving pipeline failed with status: ' + error.message,
+      UserNotification.error(`Saving pipeline failed with status: ${error.message}`,
         'Could not save processing pipeline');
     };
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.create().url);
@@ -66,7 +66,7 @@ const PipelinesStore = Reflux.createStore({
     };
     const promise = fetch('POST', url, pipeline);
     promise.then(
-      response => {
+      (response) => {
         this._updatePipelinesState(response);
         UserNotification.success(`Pipeline "${pipeline.title}" created successfully`);
       },
@@ -77,7 +77,7 @@ const PipelinesStore = Reflux.createStore({
 
   update(pipelineSource) {
     const failCallback = (error) => {
-      UserNotification.error('Updating pipeline failed with status: ' + error.message,
+      UserNotification.error(`Updating pipeline failed with status: ${error.message}`,
         'Could not update processing pipeline');
     };
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.update(pipelineSource.id).url);
@@ -89,7 +89,7 @@ const PipelinesStore = Reflux.createStore({
     };
     const promise = fetch('PUT', url, pipeline);
     promise.then(
-      response => {
+      (response) => {
         this._updatePipelinesState(response);
         UserNotification.success(`Pipeline "${pipeline.title}" updated successfully`);
       },
@@ -99,14 +99,14 @@ const PipelinesStore = Reflux.createStore({
   },
   delete(pipelineId) {
     const failCallback = (error) => {
-      UserNotification.error('Deleting pipeline failed with status: ' + error.message,
+      UserNotification.error(`Deleting pipeline failed with status: ${error.message}`,
         `Could not delete processing pipeline "${pipelineId}"`);
     };
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
     return fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
-      this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
-      this.trigger({pipelines: this.pipelines});
+      this.pipelines = updatedPipelines.filter(el => el.id !== pipelineId);
+      this.trigger({ pipelines: this.pipelines });
       UserNotification.success(`Pipeline "${pipelineId}" deleted successfully`);
     }, failCallback);
   },
@@ -128,7 +128,7 @@ const PipelinesStore = Reflux.createStore({
         if (response.status === 400) {
           callback(response.body);
         }
-      }
+      },
     );
   },
 });

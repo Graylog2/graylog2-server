@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
+import { Button, FormGroup, ControlLabel } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import { SelectableList } from 'components/common';
@@ -22,13 +22,13 @@ const StageForm = createReactClass({
     stage: PropTypes.object,
     create: PropTypes.bool,
     save: PropTypes.func.isRequired,
-    validateStage: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(RulesStore)],
 
   getDefaultProps() {
     return {
+      create: false,
       stage: {
         stage: 0,
         match_all: false,
@@ -81,7 +81,7 @@ const StageForm = createReactClass({
   },
 
   _getFormattedOptions(rules) {
-    return rules ? rules.map(rule => {
+    return rules ? rules.map((rule) => {
       return { value: rule.title, label: rule.title };
     }) : [];
   },
@@ -121,8 +121,11 @@ const StageForm = createReactClass({
                    help="Stage priority. The lower the number, the earlier it will execute."
                    value={this.state.stage.stage} />
 
-            <Input label="Continue processing on next stage when">
-              <Input type="radio"
+            <FormGroup>
+              <ControlLabel>Continue processing on next stage when</ControlLabel>
+            </FormGroup>
+
+            <Input type="radio"
                      id="match_all"
                      name="match_all"
                      value="true"
@@ -130,20 +133,21 @@ const StageForm = createReactClass({
                      onChange={this._onChange}
                      checked={this.state.stage.match_all} />
 
-              <Input type="radio"
-                     id="match_any"
-                     name="match_all"
-                     value="false"
-                     label="At least one of the rules on this stage matches the message"
-                     onChange={this._onChange}
-                     checked={!this.state.stage.match_all} />
+            <Input type="radio"
+                   id="match_any"
+                   name="match_all"
+                   value="false"
+                   label="At least one of the rules on this stage matches the message"
+                   onChange={this._onChange}
+                   checked={!this.state.stage.match_all} />
 
-              <Input id="stage-rules-select"
-                     label="Stage rules"
-                     help={rulesHelp}>
-                <SelectableList options={this._getFormattedOptions(this.state.rules)} isLoading={!this.state.rules}
-                                onChange={this._onRulesChange} selectedOptions={this.state.stage.rules} />
-              </Input>
+            <Input id="stage-rules-select"
+                   label="Stage rules"
+                   help={rulesHelp}>
+              <SelectableList options={this._getFormattedOptions(this.state.rules)}
+                              isLoading={!this.state.rules}
+                              onChange={this._onRulesChange}
+                              selectedOptions={this.state.stage.rules} />
             </Input>
           </fieldset>
         </BootstrapModalForm>

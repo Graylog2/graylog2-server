@@ -65,14 +65,14 @@ const ProcessingTimelineComponent = createReactClass({
     const formattedStages = [];
     const stageNumbers = stages.map(stage => stage.stage);
 
-    this.usedStages.forEach(usedStage => {
+    this.usedStages.forEach((usedStage) => {
       if (stageNumbers.indexOf(usedStage) === -1) {
         formattedStages.push(
-          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage idle-stage">Idle</div>
+          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage idle-stage">Idle</div>,
         );
       } else {
         formattedStages.push(
-          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage used-stage">Stage {usedStage}</div>
+          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage used-stage">Stage {usedStage}</div>,
         );
       }
     }, this);
@@ -92,7 +92,9 @@ const ProcessingTimelineComponent = createReactClass({
           </MetricContainer>
         </td>
         <td className="stream-list">
-          <PipelineConnectionsList pipeline={pipeline} connections={this.state.connections} streams={this.state.streams}
+          <PipelineConnectionsList pipeline={pipeline}
+                                   connections={this.state.connections}
+                                   streams={this.state.streams}
                                    streamsFormatter={this._formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
         </td>

@@ -60,7 +60,7 @@ const RulesPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <RulesComponent rules={this.state.rules}/>
+              <RulesComponent rules={this.state.rules} />
             </Col>
           </Row>
         </span>
