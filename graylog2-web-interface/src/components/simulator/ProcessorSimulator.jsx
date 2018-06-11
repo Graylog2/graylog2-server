@@ -6,13 +6,13 @@ import { Link } from 'react-router';
 
 import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
-import SimulationResults from './SimulationResults';
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import SimulatorActions from 'actions/simulator/SimulatorActions';
-// eslint-disable-next-line no-unused-vars
-import SimulatorStore from 'stores/simulator/SimulatorStore';
+import SimulationResults from './SimulationResults';
+
+const { SimulatorActions } = CombinedProvider.get('Simulator');
 
 const DEFAULT_STREAM_ID = '000000000000000000000001';
 
@@ -41,12 +41,12 @@ class ProcessorSimulator extends React.Component {
     SimulatorActions.simulate
       .triggerPromise(this.state.stream, message.fields, options.inputId)
       .then(
-        response => {
+        (response) => {
           this.setState({ simulation: response, loading: false });
         },
-        error => {
+        (error) => {
           this.setState({ loading: false, error: error });
-        }
+        },
       );
   };
 
@@ -56,8 +56,8 @@ class ProcessorSimulator extends React.Component {
     }
 
     return streams
-      .map(s => {
-        return { value: s.id, label: s.title };
+      .map((stream) => {
+        return { value: stream.id, label: stream.title };
       })
       .sort((s1, s2) => naturalSort(s1.label, s2.label));
   };

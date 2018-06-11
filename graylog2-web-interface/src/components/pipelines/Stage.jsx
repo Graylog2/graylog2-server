@@ -6,11 +6,14 @@ import { Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';
-import RulesStore from 'stores/rules/RulesStore';
-import StageForm from './StageForm';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import StageForm from './StageForm';
+
+const { RulesStore } = CombinedProvider.get('Rules');
 
 const Stage = createReactClass({
   displayName: 'Stage',
@@ -18,7 +21,7 @@ const Stage = createReactClass({
   propTypes: {
     stage: PropTypes.object.isRequired,
     pipeline: PropTypes.object.isRequired,
-    isLastStage: PropTypes.bool,
+    isLastStage: PropTypes.bool.isRequired,
     onUpdate: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
   },
@@ -39,7 +42,7 @@ const Stage = createReactClass({
         id: `invalid-${ruleIdx}`,
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
-      ruleTitle = <span><i className="fa fa-warning text-danger"/> {stage.rules[ruleIdx]}</span>;
+      ruleTitle = <span><i className="fa fa-warning text-danger" /> {stage.rules[ruleIdx]}</span>;
     } else {
       ruleTitle = (
         <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
@@ -60,7 +63,7 @@ const Stage = createReactClass({
         </td>
         <td>
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${this.props.pipeline.id}.${stage.stage}.failed`}>
-            <CounterRate showTotal zeroOnMissing suffix="errors/s"/>
+            <CounterRate showTotal zeroOnMissing suffix="errors/s" />
           </MetricContainer>
         </td>
       </tr>
@@ -86,7 +89,7 @@ const Stage = createReactClass({
   render() {
     const stage = this.props.stage;
 
-    let suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
+    const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
 
     const throughput = (<MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${this.props.pipeline.id}.stage.${stage.stage}.executed`}>
       <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
@@ -109,7 +112,7 @@ const Stage = createReactClass({
       );
     }
 
-    let block = (<span>
+    const block = (<span>
       {description}
       <br />
       {throughput}

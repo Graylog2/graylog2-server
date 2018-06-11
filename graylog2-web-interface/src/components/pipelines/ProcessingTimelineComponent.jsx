@@ -8,17 +8,15 @@ import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import PipelineConnectionsList from './PipelineConnectionsList';
-
-import PipelinesActions from 'actions/pipelines/PipelinesActions';
-import PipelinesStore from 'stores/pipelines/PipelinesStore';
-import PipelineConnectionsActions from 'actions/pipelines/PipelineConnectionsActions';
-import PipelineConnectionsStore from 'stores/pipelines/PipelineConnectionsStore';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import PipelineConnectionsList from './PipelineConnectionsList';
+
+const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
+const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 const ProcessingTimelineComponent = createReactClass({
   displayName: 'ProcessingTimelineComponent',
@@ -38,6 +36,7 @@ const ProcessingTimelineComponent = createReactClass({
     this.style.unuse();
   },
 
+  // eslint-disable-next-line
   style: require('!style/useable!css!./ProcessingTimelineComponent.css'),
 
   _calculateUsedStages(pipelines) {
@@ -67,14 +66,14 @@ const ProcessingTimelineComponent = createReactClass({
     const formattedStages = [];
     const stageNumbers = stages.map(stage => stage.stage);
 
-    this.usedStages.forEach(usedStage => {
+    this.usedStages.forEach((usedStage) => {
       if (stageNumbers.indexOf(usedStage) === -1) {
         formattedStages.push(
-          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage idle-stage">Idle</div>
+          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage idle-stage">Idle</div>,
         );
       } else {
         formattedStages.push(
-          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage used-stage">Stage {usedStage}</div>
+          <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage used-stage">Stage {usedStage}</div>,
         );
       }
     }, this);
@@ -94,7 +93,9 @@ const ProcessingTimelineComponent = createReactClass({
           </MetricContainer>
         </td>
         <td className="stream-list">
-          <PipelineConnectionsList pipeline={pipeline} connections={this.state.connections} streams={this.state.streams}
+          <PipelineConnectionsList pipeline={pipeline}
+                                   connections={this.state.connections}
+                                   streams={this.state.streams}
                                    streamsFormatter={this._formatConnectedStreams}
                                    noConnectionsMessage={<em>Not connected</em>} />
         </td>

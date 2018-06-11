@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { DataTable, Timestamp } from 'components/common';
-
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import RulesActions from 'actions/rules/RulesActions';
-
+import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { RulesActions } = CombinedProvider.get('Rules');
 
 class RuleList extends React.Component {
   static propTypes = {
@@ -75,7 +75,7 @@ class RuleList extends React.Component {
                    className="table-hover"
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
-                   sortByKey={"title"}
+                   sortByKey="title"
                    rows={this.props.rules}
                    filterBy="Title"
                    dataRowFormatter={this._ruleInfoFormatter}

@@ -1,12 +1,12 @@
 import Reflux from 'reflux';
-
-import RulesActions from 'actions/rules/RulesActions';
-
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import naturalSort from 'javascript-natural-sort';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { RulesActions } = CombinedProvider.get('Rules');
 
 const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
@@ -23,7 +23,7 @@ const RulesStore = Reflux.createStore({
     } else {
       const doesRuleExist = this.rules.some(r => r.id === rule.id);
       if (doesRuleExist) {
-        this.rules = this.rules.map(r => r.id === rule.id ? rule : r);
+        this.rules = this.rules.map(r => (r.id === rule.id ? rule : r));
       } else {
         this.rules.push(rule);
       }
@@ -40,7 +40,7 @@ const RulesStore = Reflux.createStore({
 
   list() {
     const failCallback = (error) => {
-      UserNotification.error('Fetching rules failed with status: ' + error.message,
+      UserNotification.error(`Fetching rules failed with status: ${error.message}`,
         'Could not retrieve processing rules');
     };
 
@@ -113,7 +113,7 @@ const RulesStore = Reflux.createStore({
     };
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
     return fetch('DELETE', url).then(() => {
-      this.rules = this.rules.filter((el) => el.id !== rule.id);
+      this.rules = this.rules.filter(el => el.id !== rule.id);
       this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
       UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
     }, failCallback);
@@ -129,6 +129,7 @@ const RulesStore = Reflux.createStore({
       (response) => {
         // call to clear the errors, the parsing was successful
         callback([]);
+        return response;
       },
       (error) => {
         // a Bad Request indicates a parse error, set all the returned errors in the editor
@@ -136,7 +137,7 @@ const RulesStore = Reflux.createStore({
         if (response.status === 400) {
           callback(response.body);
         }
-      }
+      },
     );
   },
   multiple(ruleNames, callback) {
@@ -148,7 +149,7 @@ const RulesStore = Reflux.createStore({
   },
   loadFunctions() {
     if (this.functionDescriptors) {
-      return;
+      return undefined;
     }
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
     return fetch('GET', url)

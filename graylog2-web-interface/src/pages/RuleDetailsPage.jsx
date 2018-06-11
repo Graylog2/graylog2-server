@@ -6,11 +6,10 @@ import Reflux from 'reflux';
 import { DocumentTitle, Spinner } from 'components/common';
 
 import Rule from 'components/rules/Rule';
-import RulesStore from 'stores/rules/RulesStore';
-import RulesActions from 'actions/rules/RulesActions';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import PipelinesActions from 'actions/pipelines/PipelinesActions';
-import PipelinesStore from 'stores/pipelines/PipelinesStore';
+const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
+const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
 function filterRules(state) {
   return state.rules ? state.rules.filter(r => r.id === this.props.params.ruleId)[0] : undefined;
@@ -55,7 +54,7 @@ const RuleDetailsPage = createReactClass({
       return <Spinner />;
     }
 
-    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter(pipeline => {
+    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter((pipeline) => {
       return pipeline.stages.some(stage => stage.rules.indexOf(this.state.rule.title) !== -1);
     });
 
@@ -63,8 +62,11 @@ const RuleDetailsPage = createReactClass({
 
     return (
       <DocumentTitle title={pageTitle}>
-        <Rule rule={this.state.rule} usedInPipelines={pipelinesUsingRule} create={this.props.params.ruleId === 'new'}
-              onSave={this._save} validateRule={this._validateRule} />
+        <Rule rule={this.state.rule}
+              usedInPipelines={pipelinesUsingRule}
+              create={this.props.params.ruleId === 'new'}
+              onSave={this._save}
+              validateRule={this._validateRule} />
       </DocumentTitle>
     );
   },

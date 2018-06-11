@@ -4,16 +4,17 @@ import { Row, Col, Panel, Table, Tabs, Tab } from 'react-bootstrap';
 
 import Reflux from 'reflux';
 
-import RulesStore from 'stores/rules/RulesStore';
-import RulesActions from 'actions/rules/RulesActions';
 import ObjectUtils from 'util/ObjectUtils';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PaginatedList, Spinner, SearchForm } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import RuleHelperStyle from './RuleHelper.css';
+
+const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 
 const RuleHelper = createReactClass({
   displayName: 'RuleHelper',
