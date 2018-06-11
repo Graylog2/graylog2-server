@@ -21,6 +21,8 @@ import com.google.common.graph.ElementOrder;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
@@ -40,16 +42,16 @@ import java.util.Set;
 public class CatalogIndex {
     private static final Logger LOG = LoggerFactory.getLogger(CatalogIndex.class);
 
-    private final Map<ModelType, EntityCatalog> catalogs;
+    private final Map<ModelType, EntityFacade<?>> facades;
 
     @Inject
-    public CatalogIndex(Map<ModelType, EntityCatalog> catalogs) {
-        this.catalogs = catalogs;
+    public CatalogIndex(Map<ModelType, EntityFacade<?>> facades) {
+        this.facades = facades;
     }
 
     public Set<EntityExcerpt> entityIndex() {
         final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
-        catalogs.values().forEach(catalog -> entityIndexBuilder.addAll(catalog.listEntityExcerpts()));
+        facades.values().forEach(catalog -> entityIndexBuilder.addAll(catalog.listEntityExcerpts()));
         return entityIndexBuilder.build();
     }
 
@@ -76,8 +78,8 @@ public class CatalogIndex {
                 continue;
             }
 
-            final EntityCatalog catalog = catalogs.getOrDefault(entityDescriptor.type(), UnsupportedEntityCatalog.INSTANCE);
-            final Graph<EntityDescriptor> graph = catalog.resolve(entityDescriptor);
+            final EntityFacade<?> facade = facades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
+            final Graph<EntityDescriptor> graph = facade.resolve(entityDescriptor);
             LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
 
             mergeGraphs(dependencyGraph, graph);
@@ -98,9 +100,9 @@ public class CatalogIndex {
         final ImmutableSet.Builder<Constraint> constraints = ImmutableSet.<Constraint>builder()
                 .add(GraylogVersionConstraint.currentGraylogVersion());
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
-            final EntityCatalog catalog = catalogs.getOrDefault(entityDescriptor.type(), UnsupportedEntityCatalog.INSTANCE);
+            final EntityFacade<?> facade = facades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
 
-            catalog.collectEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
+            facade.collectEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
                 entities.add(entityWithConstraints.entity());
                 constraints.addAll(entityWithConstraints.constraints());
             });

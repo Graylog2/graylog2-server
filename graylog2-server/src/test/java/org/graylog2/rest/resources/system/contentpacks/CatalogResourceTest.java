@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.catalogs.CatalogIndex;
-import org.graylog2.contentpacks.catalogs.EntityCatalog;
+import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -56,14 +56,14 @@ public class CatalogResourceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private EntityCatalog mockEntityCatalog;
+    private EntityFacade<Void> mockEntityCatalog;
 
     private CatalogIndex catalogIndex;
     private CatalogResource catalogResource;
 
     @Before
     public void setUp() {
-        final ImmutableMap<ModelType, EntityCatalog> entityCatalogs = ImmutableMap.of(ModelType.of("test"), mockEntityCatalog);
+        final ImmutableMap<ModelType, EntityFacade<?>> entityCatalogs = ImmutableMap.of(ModelType.of("test"), mockEntityCatalog);
         catalogIndex = new CatalogIndex(entityCatalogs);
         catalogResource = new CatalogResource(catalogIndex);
     }

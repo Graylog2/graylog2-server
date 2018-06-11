@@ -19,8 +19,9 @@ package org.graylog2.contentpacks.catalogs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.contentpacks.codecs.OutputCodec;
-import org.graylog2.contentpacks.codecs.StreamCodec;
+import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.OutputFacade;
+import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -69,9 +70,9 @@ public class CatalogIndexTest {
 
     @Before
     public void setUp() throws Exception {
-        final Map<ModelType, EntityCatalog> catalogs = ImmutableMap.of(
-                ModelTypes.STREAM, new StreamCatalog(streamService, new StreamCodec(objectMapper, streamService, streamRuleService, indexSetService)),
-                ModelTypes.OUTPUT, new OutputCatalog(outputService, new OutputCodec(objectMapper, outputService))
+        final Map<ModelType, EntityFacade<?>> catalogs = ImmutableMap.of(
+                ModelTypes.STREAM, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
+                ModelTypes.OUTPUT, new OutputFacade(objectMapper, outputService)
         );
 
         catalogIndex = new CatalogIndex(catalogs);
