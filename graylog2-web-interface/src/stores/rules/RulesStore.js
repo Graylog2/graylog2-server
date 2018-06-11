@@ -129,6 +129,7 @@ const RulesStore = Reflux.createStore({
       (response) => {
         // call to clear the errors, the parsing was successful
         callback([]);
+        return response;
       },
       (error) => {
         // a Bad Request indicates a parse error, set all the returned errors in the editor
@@ -148,7 +149,7 @@ const RulesStore = Reflux.createStore({
   },
   loadFunctions() {
     if (this.functionDescriptors) {
-      return;
+      return undefined;
     }
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
     return fetch('GET', url)

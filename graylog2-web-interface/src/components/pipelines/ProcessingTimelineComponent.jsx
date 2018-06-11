@@ -36,6 +36,7 @@ const ProcessingTimelineComponent = createReactClass({
     this.style.unuse();
   },
 
+  // eslint-disable-next-line
   style: require('!style/useable!css!./ProcessingTimelineComponent.css'),
 
   _calculateUsedStages(pipelines) {
