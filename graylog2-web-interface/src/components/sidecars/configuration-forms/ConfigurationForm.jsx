@@ -72,10 +72,10 @@ const ConfigurationForm = createReactClass({
   },
 
   _formDataUpdate(key) {
-    return (nextValue) => {
+    return (nextValue, _, hideCallback) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
-      this.setState({ formData: nextFormData });
+      this.setState({ formData: nextFormData }, hideCallback);
     };
   },
 
