@@ -17,6 +17,8 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 
 import java.net.URI;
@@ -35,10 +37,10 @@ public class EmailConfiguration {
     private boolean useAuth = false;
 
     @Parameter(value = "transport_email_use_tls")
-    private boolean useTls = false;
+    private boolean useTls = true;
 
     @Parameter(value = "transport_email_use_ssl")
-    private boolean useSsl = true;
+    private boolean useSsl = false;
 
     @Parameter(value = "transport_email_auth_username")
     private String username;
@@ -90,5 +92,13 @@ public class EmailConfiguration {
 
     public URI getWebInterfaceUri() {
         return webInterfaceUri;
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateConfig() throws ValidationException {
+        if (isUseTls() && isUseSsl()) {
+            throw new ValidationException("SMTP over SSL (SMTPS) and SMTP with STARTTLS cannot be used at the same time.");
+        }
     }
 }
