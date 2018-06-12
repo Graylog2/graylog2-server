@@ -109,6 +109,7 @@ const CollectorsAdministrationContainer = createReactClass({
                                 configurations={configurations.configurations}
                                 pagination={sidecars.pagination}
                                 query={sidecars.query}
+                                filters={sidecars.filters}
                                 onPageChange={this.handlePageChange}
                                 onFilter={this.handleFilter}
                                 onQueryChange={this.handleQueryChange}

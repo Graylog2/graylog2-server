@@ -22,6 +22,7 @@ const CollectorsAdministration = createReactClass({
     configurations: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
+    filters: PropTypes.object.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onFilter: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
@@ -100,7 +101,7 @@ const CollectorsAdministration = createReactClass({
     let headerMenu;
     if (selectedItems === 0) {
       headerMenu = (
-        <CollectorsAdministrationFilters collectors={collectors} configurations={configurations} filter={this.props.onFilter} />
+        <CollectorsAdministrationFilters collectors={collectors} configurations={configurations} filters={this.props.filters} filter={this.props.onFilter} />
       );
     } else {
       headerMenu = (
