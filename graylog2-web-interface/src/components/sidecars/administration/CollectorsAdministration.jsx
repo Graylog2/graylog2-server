@@ -176,7 +176,12 @@ const CollectorsAdministration = createReactClass({
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
     const configAssignment = sidecar.assignments.find(assignment => assignment.collector_id === collector.id) || {};
     const configuration = configurations.find(config => config.id === configAssignment.configuration_id);
-    const collectorStatus = (sidecar.node_details.status.collectors[collector.name] || {}).status;
+    let collectorStatus;
+    try {
+      collectorStatus = sidecar.node_details.status.collectors[collector.name].status;
+    } catch (e) {
+      // Do nothing
+    }
 
     return (
       <Row key={sidecarCollectorId}>

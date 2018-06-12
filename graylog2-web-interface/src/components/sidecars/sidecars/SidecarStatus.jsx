@@ -25,25 +25,33 @@ const SidecarStatus = createReactClass({
     if (!details) {
       return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
     }
+    const metrics = details.metrics || {};
     return (
       <dl className="deflist top-margin">
         <dt>IP Address</dt>
-        <dd>{details.ip}</dd>
+        <dd>{lodash.defaultTo(details.ip, 'Not available')}</dd>
         <dt>Operating System</dt>
-        <dd>{details.operating_system}</dd>
+        <dd>{lodash.defaultTo(details.operating_system, 'Not available')}</dd>
         <dt>CPU Idle</dt>
-        <dd>{lodash.isNumber(details.metrics.cpu_idle) ? `${details.metrics.cpu_idle}%` : 'Not available' }</dd>
+        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available' }</dd>
         <dt>Load</dt>
-        <dd>{lodash.defaultTo(details.metrics.load_1, 'Not available')}</dd>
+        <dd>{lodash.defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>
-        <dd>{details.metrics.disks_75.length > 0 ? details.metrics.disks_75.join(', ') : 'None'}</dd>
+        {metrics.disks_75 === undefined ?
+          <dd>Not available</dd> :
+          <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>
+        }
       </dl>
     );
   },
 
   formatCollectorStatus(details) {
     if (!details) {
-      return <p>Collector statuses are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
+      return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
+    }
+
+    if (!details.status) {
+      return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the collector configuration to see this information.</p>;
     }
 
     const collectors = Object.keys(details.status.collectors);
@@ -103,7 +111,7 @@ const SidecarStatus = createReactClass({
         </Row>
         <Row className="content">
           <Col md={12}>
-            <h2>Collector statuses</h2>
+            <h2>Collectors status</h2>
             <div className="top-margin">
               {this.formatCollectorStatus(sidecar.node_details)}
             </div>
