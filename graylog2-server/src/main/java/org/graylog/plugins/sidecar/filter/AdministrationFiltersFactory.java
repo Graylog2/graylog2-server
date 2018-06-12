@@ -55,6 +55,7 @@ public class AdministrationFiltersFactory {
                     return null;
                 })
                 .filter(Objects::nonNull)
+                // We join all filters with an and condition, so results will need to match all filters
                 .reduce(Predicate::and);
     }
 }

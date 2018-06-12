@@ -122,6 +122,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
         final List<SidecarSummary> sidecarSummaries = sidecarService.toSummaryList(sidecars, activeSidecarFilter);
 
         final List<SidecarSummary> summariesWithCollectors = sidecarSummaries.stream()
+                // Enrich sidecars with a list of compatible collectors that may run on that OS
                 .map(collector -> {
                     final List<String> compatibleCollectors = collectors.stream()
                             .filter(c -> c.nodeOperatingSystem().equalsIgnoreCase(collector.nodeDetails().operatingSystem()))
@@ -165,9 +166,11 @@ public class AdministrationResource extends RestResource implements PluginRestRe
 
         final List<String> collectorIds = new ArrayList<>();
 
+        // Add ID of collector we want to filter for
         if (filters.containsKey(collectorKey)) {
             collectorIds.add(filters.get(collectorKey));
         }
+        // Load collectors using the configuration ID that we want to filter for
         if (filters.containsKey(configurationKey)) {
             final Configuration configuration = configurationService.find(filters.get(configurationKey));
             if (!collectorIds.contains(configuration.collectorId())) {
