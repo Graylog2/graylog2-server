@@ -188,12 +188,8 @@ public class FormattedEmailAlertSender implements AlertSender {
             ));
         }
 
-        if (configuration.isUseTls()) {
-            email.setStartTLSEnabled(configuration.isUseTls());
-        } else if (configuration.isUseSsl()) {
-            email.setSSLOnConnect(configuration.isUseSsl());
-        }
-
+        email.setSSLOnConnect(configuration.isUseSsl());
+        email.setStartTLSEnabled(configuration.isUseTls());
         if (pluginConfig != null && !isNullOrEmpty(pluginConfig.getString("sender"))) {
             email.setFrom(pluginConfig.getString("sender"));
         } else {
