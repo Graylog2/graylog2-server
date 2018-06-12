@@ -9,3 +9,8 @@
 .select-sm .Select-input > input {
     padding: 0;
 }
+
+:local(.increaseZIndex) .Select-menu-outer {
+    z-index: 3;
+}
+
