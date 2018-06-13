@@ -55,19 +55,3 @@ dl.message-details-fields {
 dl.message-details-fields dd {
     font-family: monospace;
 }
-
-/* the !important can go away when we removed the old search page and its stylesheet */
-table.messages thead th, table.messages thead  {
-    background-color: #eee !important;
-    color: #333;
-    border-bottom: 1px solid
-}
-
-/* the !important can go away when we removed the old search page and its stylesheet */
-table.messages {
-    margin-top: 0 !important;
-}
-
-#message-table-paginator-top {
-    margin-bottom: 12px;
-}

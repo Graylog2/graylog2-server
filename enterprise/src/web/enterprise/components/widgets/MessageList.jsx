@@ -16,6 +16,8 @@ import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 import FieldType from '../../logic/fieldtypes/FieldType';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 
+import styles from './MessageList.css';
+
 const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const { NodesStore } = CombinedProvider.get('Nodes');
 const { RefreshActions } = CombinedProvider.get('Refresh');
@@ -130,23 +132,25 @@ const MessageList = createReactClass({
     const allStreams = Immutable.List(streams);
     return (
       <span>
-        <MessageTablePaginator currentPage={Number(this.state.currentPage)}
-          onPageChange={newPage => this.setState({ currentPage: newPage })}
-          pageSize={pageSize}
-          position="top"
-          resultCount={messages.length} />
+        <div className={styles.messageListPaginator}>
+          <MessageTablePaginator currentPage={Number(this.state.currentPage)}
+            onPageChange={newPage => this.setState({ currentPage: newPage })}
+            pageSize={pageSize}
+            position="top"
+            resultCount={messages.length} />
+        </div>
 
         <div className="search-results-table" style={{ overflow: 'auto', height: '100%' }}>
           <div className="table-responsive">
-            <div className="messages-container">
-              <table className="table table-condensed messages">
+            <div className={`messages-container ${styles.messageListTableHeader}`}>
+              <table className="table table-condensed messages" style={{ marginTop: 0 }}>
                 <thead>
                   <tr>
                     <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={activeQuery} type={this._fieldTypeFor('timestamp', fields)} /></th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
-                          style={this._columnStyle(selectedFieldName)}>
+                            style={this._columnStyle(selectedFieldName)}>
                           <Field interactive
                                  type={this._fieldTypeFor(selectedFieldName, fields)}
                                  name={selectedFieldName}
