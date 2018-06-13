@@ -37,11 +37,11 @@ import org.mockito.junit.MockitoRule;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -152,14 +152,13 @@ public class GrokResourceTest {
         final GrokPatternTestRequest grokPatternTestRequest = GrokPatternTestRequest.create(grokPattern, sampleData);
         final Map<String, Object> expectedReturn = Collections.singletonMap("IP", "1.2.3.4");
 
-        // when(grokPatternService.match(grokPattern, sampleData)).thenReturn(expectedReturn);
         final Response response = grokResource.testPattern(grokPatternTestRequest);
         assertThat(response.hasEntity()).isTrue();
         assertThat(response.getEntity()).isEqualTo(expectedReturn);
     }
 
     static class GrokPatternsChangedEventSubscriber {
-        final List<Object> events = new ArrayList<>();
+        final List<Object> events = new CopyOnWriteArrayList<>();
 
         @Subscribe
         public void handleUpdatedEvent(GrokPatternsUpdatedEvent event) {
