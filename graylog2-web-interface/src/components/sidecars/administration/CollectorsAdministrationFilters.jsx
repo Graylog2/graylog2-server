@@ -8,6 +8,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { SelectPopover } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+import StatusMapper from 'components/sidecars/common/StatusMapper';
 
 const CollectorsAdministrationFilters = createReactClass({
   propTypes: {
@@ -117,16 +118,7 @@ const CollectorsAdministrationFilters = createReactClass({
   getStatusFilter() {
     // 0: running, 1: unknown, 2: failing
     const status = ['0', '1', '2'];
-    const statusFormatter = (statusCode) => {
-      switch (Number(statusCode)) {
-        case 0:
-          return 'Running';
-        case 2:
-          return 'Failing';
-        default:
-          return 'Unknown';
-      }
-    };
+    const statusFormatter = StatusMapper.toString;
 
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 

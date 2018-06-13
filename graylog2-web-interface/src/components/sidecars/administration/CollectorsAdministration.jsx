@@ -6,14 +6,17 @@ import { Col, Row } from 'react-bootstrap';
 
 import { ControlledTableList, PaginatedList } from 'components/common';
 import { Input } from 'components/bootstrap';
-import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
-import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 
-import style from './CollectorsAdministration.css';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
+
+import CollectorsAdministrationActions from './CollectorsAdministrationActions';
+import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
+import FiltersSummary from './FiltersSummary';
+
+import style from './CollectorsAdministration.css';
 
 const CollectorsAdministration = createReactClass({
   propTypes: {
@@ -238,7 +241,7 @@ const CollectorsAdministration = createReactClass({
   },
 
   render() {
-    const { configurations, onPageChange, pagination, query, sidecarCollectorPairs } = this.props;
+    const { configurations, collectors, onPageChange, pagination, query, sidecarCollectorPairs, filters } = this.props;
 
     let formattedCollectors;
     if (sidecarCollectorPairs.length === 0) {
@@ -250,11 +253,11 @@ const CollectorsAdministration = createReactClass({
     } else {
       const sidecars = lodash.uniq(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
       formattedCollectors = sidecars.map((sidecarToMap) => {
-        const collectors = sidecarCollectorPairs
+        const sidecarCollectors = sidecarCollectorPairs
           .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
           .map(({ collector }) => collector)
           .filter(collector => !lodash.isEmpty(collector));
-        return this.formatSidecar(sidecarToMap, collectors, configurations);
+        return this.formatSidecar(sidecarToMap, sidecarCollectors, configurations);
       });
     }
 
@@ -266,6 +269,9 @@ const CollectorsAdministration = createReactClass({
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <SidecarSearchForm query={query} onSearch={this.handleSearch} onReset={this.handleReset} />
+          <FiltersSummary collectors={collectors}
+                          configurations={configurations}
+                          filters={filters} />
           <Row>
             <Col md={12}>
               <ControlledTableList>
