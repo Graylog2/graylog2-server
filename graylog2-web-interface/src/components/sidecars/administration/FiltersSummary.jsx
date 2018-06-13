@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import lodash from 'lodash';
 
 import StatusMapper from 'components/sidecars/common/StatusMapper';
+
+import style from './FiltersSummary.css';
 
 class FiltersSummary extends React.Component {
   static propTypes = {
     collectors: PropTypes.array.isRequired,
     configurations: PropTypes.array.isRequired,
     filters: PropTypes.object.isRequired,
+    onResetFilters: PropTypes.func.isRequired,
   };
 
   formatFilter = (type, value) => {
@@ -37,7 +40,7 @@ class FiltersSummary extends React.Component {
   };
 
   render() {
-    const { filters } = this.props;
+    const { filters, onResetFilters } = this.props;
 
     if (lodash.isEmpty(filters)) {
       return null;
@@ -49,6 +52,10 @@ class FiltersSummary extends React.Component {
           <ul className="list-inline">
             <li><b>Filters</b></li>
             {this.formatFilters(filters)}
+            <li>
+              <Button bsStyle="link" bsSize="xsmall" className={style.deleteButton} onClick={onResetFilters}>
+                <i className="fa fa-times" /> Clear all</Button>
+            </li>
           </ul>
         </Col>
       </Row>

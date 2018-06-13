@@ -240,6 +240,10 @@ const CollectorsAdministration = createReactClass({
     this.props.onQueryChange();
   },
 
+  handleResetFilters() {
+    this.props.onFilter();
+  },
+
   render() {
     const { configurations, collectors, onPageChange, pagination, query, sidecarCollectorPairs, filters } = this.props;
 
@@ -271,7 +275,8 @@ const CollectorsAdministration = createReactClass({
           <SidecarSearchForm query={query} onSearch={this.handleSearch} onReset={this.handleReset} />
           <FiltersSummary collectors={collectors}
                           configurations={configurations}
-                          filters={filters} />
+                          filters={filters}
+                          onResetFilters={this.handleResetFilters} />
           <Row>
             <Col md={12}>
               <ControlledTableList>
