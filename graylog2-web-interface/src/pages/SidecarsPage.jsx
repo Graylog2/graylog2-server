@@ -3,10 +3,7 @@ import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import DocsHelper from 'util/DocsHelper';
-
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 
 import Routes from 'routing/Routes';
