@@ -252,11 +252,13 @@ const Navigation = createReactClass({
               </LinkContainer>
               }
               <LinkContainer to={Routes.SYSTEM.ENTERPRISE}>
-                  <MenuItem>Enterprise</MenuItem>
+                <MenuItem>Enterprise</MenuItem>
               </LinkContainer>
+              {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
               <LinkContainer to={Routes.SYSTEM.SIDECARS.OVERVIEW}>
                 <MenuItem>Sidecars</MenuItem>
               </LinkContainer>
+              }
               {pluginSystemNavigations}
             </NavDropdown>
           </Nav>
