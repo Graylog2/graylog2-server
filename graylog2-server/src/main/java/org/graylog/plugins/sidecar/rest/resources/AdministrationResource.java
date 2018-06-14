@@ -114,6 +114,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
         final String sort = Sidecar.FIELD_NODE_NAME;
         final String order = "asc";
         final SearchQuery searchQuery = searchQueryParser.parse(request.query());
+        final long total = sidecarService.count();
 
         final Optional<Predicate<Sidecar>> filters = administrationFiltersFactory.getFilters(request.filters());
 
@@ -135,7 +136,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
                 .filter(collectorSummary -> !filters.isPresent() || collectorSummary.collectors().size() > 0)
                 .collect(Collectors.toList());
 
-        return SidecarListResponse.create(request.query(), sidecars.pagination(), false, sort, order, summariesWithCollectors, request.filters());
+        return SidecarListResponse.create(request.query(), sidecars.pagination(), total, false, sort, order, summariesWithCollectors, request.filters());
     }
 
     @PUT
