@@ -54,6 +54,7 @@ const CollectorListContainer = createReactClass({
       <CollectorList collectors={collectors.paginatedCollectors}
                      pagination={collectors.pagination}
                      query={collectors.query}
+                     total={collectors.total}
                      onPageChange={this.handlePageChange}
                      onQueryChange={this.handleQueryChange}
                      onClone={this.handleClone}

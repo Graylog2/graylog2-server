@@ -15,6 +15,7 @@ const CollectorList = createReactClass({
     collectors: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
+    total: PropTypes.number.isRequired,
     onClone: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     onPageChange: PropTypes.func.isRequired,
@@ -36,7 +37,7 @@ const CollectorList = createReactClass({
   },
 
   render() {
-    const { collectors, pagination, query, onPageChange, onQueryChange } = this.props;
+    const { collectors, pagination, query, total, onPageChange, onQueryChange } = this.props;
 
     const headers = ['Name', 'Operating System', 'Actions'];
 
@@ -49,7 +50,7 @@ const CollectorList = createReactClass({
                 <Button bsStyle="success" bsSize="small">Create Log Collector</Button>
               </LinkContainer>
             </div>
-            <h2>Log Collectors <small>{collectors.length} total</small></h2>
+            <h2>Log Collectors <small>{total} total</small></h2>
           </Col>
           <Col md={12}>
             <p>Manage Log Collectors that you can configure and supervise through Graylog Sidecar and Graylog Web Interface.</p>

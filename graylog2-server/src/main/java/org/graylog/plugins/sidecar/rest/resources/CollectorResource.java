@@ -157,11 +157,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                                            @DefaultValue("asc") @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Collector> collectors = this.collectorService.findPaginated(searchQuery, page, perPage, sort, order);
+        final long total = this.collectorService.count();
         final List<CollectorSummary> summaries = collectors.stream()
                 .map(CollectorSummary::create)
                 .collect(Collectors.toList());
 
-        return CollectorSummaryResponse.create(query, collectors.pagination(), sort, order, summaries);
+        return CollectorSummaryResponse.create(query, collectors.pagination(), total, sort, order, summaries);
     }
 
     @POST

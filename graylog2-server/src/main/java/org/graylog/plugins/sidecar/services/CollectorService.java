@@ -50,6 +50,10 @@ public class CollectorService extends PaginatedDbService<Collector> {
         return db.findOne(DBQuery.is("name", name));
     }
 
+    public long count() {
+        return db.count();
+    }
+
     public List<Collector> allFilter(Predicate<Collector> filter) {
         try (final Stream<Collector> collectorsStream = streamAll()) {
             final Stream<Collector> filteredStream = filter == null ? collectorsStream : collectorsStream.filter(filter);
