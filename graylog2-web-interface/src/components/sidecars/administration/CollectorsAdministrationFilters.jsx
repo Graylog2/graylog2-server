@@ -118,8 +118,6 @@ const CollectorsAdministrationFilters = createReactClass({
   getStatusFilter() {
     // 0: running, 1: unknown, 2: failing
     const status = ['0', '1', '2'];
-    const statusFormatter = StatusMapper.toString;
-
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 
     const statusFilter = this.props.filters.status;
@@ -129,7 +127,7 @@ const CollectorsAdministrationFilters = createReactClass({
                      title="Filter by status"
                      triggerNode={<Button bsSize="small" bsStyle="link">Status <span className="caret" /></Button>}
                      items={status}
-                     itemFormatter={statusFormatter}
+                     itemFormatter={StatusMapper.toString}
                      onItemSelect={filter}
                      selectedItems={statusFilter ? [statusFilter] : []}
                      filterPlaceholder="Filter by status" />
