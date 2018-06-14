@@ -16,6 +16,7 @@ class ConfigurationList extends React.Component {
     configurations: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
+    total: PropTypes.number.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onClone: PropTypes.func.isRequired,
@@ -42,7 +43,7 @@ class ConfigurationList extends React.Component {
   };
 
   render() {
-    const { configurations, pagination, query, onPageChange, onQueryChange } = this.props;
+    const { configurations, pagination, query, total, onPageChange, onQueryChange } = this.props;
     const headers = ['Configuration', 'Color', 'Collector', 'Actions'];
 
     return (
@@ -54,7 +55,7 @@ class ConfigurationList extends React.Component {
                 <Button onClick={this.openModal} bsStyle="success" bsSize="small">Create Configuration</Button>
               </LinkContainer>
             </div>
-            <h2>Configurations <small>{pagination.total} total</small></h2>
+            <h2>Configurations <small>{total} total</small></h2>
           </Col>
           <Col md={12}>
             <p>

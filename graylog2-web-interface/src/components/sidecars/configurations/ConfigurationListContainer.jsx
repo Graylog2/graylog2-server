@@ -59,6 +59,7 @@ const ConfigurationListContainer = createReactClass({
       <ConfigurationList collectors={collectors.collectors}
                          query={configurations.query}
                          pagination={configurations.pagination}
+                         total={configurations.total}
                          configurations={configurations.paginatedConfigurations}
                          onPageChange={this.handlePageChange}
                          onQueryChange={this.handleQueryChange}

@@ -17,6 +17,7 @@ const CollectorConfigurationsStore = Reflux.createStore({
     pageSize: undefined,
     total: undefined,
   },
+  total: undefined,
   paginatedConfigurations: undefined,
   query: undefined,
 
@@ -24,6 +25,7 @@ const CollectorConfigurationsStore = Reflux.createStore({
     this.trigger({
       configurations: this.configurations,
       query: this.query,
+      total: this.total,
       pagination: this.pagination,
       paginatedConfigurations: this.paginatedConfigurations,
     });
@@ -65,10 +67,11 @@ const CollectorConfigurationsStore = Reflux.createStore({
         (response) => {
           this.query = response.query;
           this.pagination = {
-            page: response.page,
-            pageSize: response.per_page,
-            total: response.total,
+            page: response.pagination.page,
+            pageSize: response.pagination.per_page,
+            total: response.pagination.total,
           };
+          this.total = response.total;
           this.paginatedConfigurations = response.configurations;
           this.propagateChanges();
 

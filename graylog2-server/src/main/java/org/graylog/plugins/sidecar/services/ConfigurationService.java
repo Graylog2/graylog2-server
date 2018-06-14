@@ -78,6 +78,10 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return db.findOne(DBQuery.is(Configuration.FIELD_NAME, name));
     }
 
+    public long count() {
+        return db.count();
+    }
+
     public List<Configuration> all() {
         try (final Stream<Configuration> collectorConfigurationStream = streamAll()) {
             return collectorConfigurationStream.collect(Collectors.toList());
