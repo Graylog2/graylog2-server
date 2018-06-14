@@ -24,7 +24,7 @@ class SidecarsPage extends React.Component {
             <span>
               Do you need an API token for a sidecar?&ensp;
               <Link to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit('graylog-sidecar')}>
-                <a>Create or reuse a token for the <em>graylog-sidecar</em> user</a>
+                Create or reuse a token for the <em>graylog-sidecar</em> user
               </Link>.
             </span>
 
