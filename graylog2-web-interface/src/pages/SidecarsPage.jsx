@@ -1,7 +1,7 @@
 import React from 'react';
-
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import DocsHelper from 'util/DocsHelper';
 
@@ -22,8 +22,10 @@ class SidecarsPage extends React.Component {
             </span>
 
             <span>
-              Read more about sidecars and how to set them up in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_SIDECAR} text="Graylog documentation" />.
+              Do you need an API token for a sidecar?&ensp;
+              <Link to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit('graylog-sidecar')}>
+                <a>Create or reuse a token for the <em>graylog-sidecar</em> user</a>
+              </Link>.
             </span>
 
             <ButtonToolbar>
