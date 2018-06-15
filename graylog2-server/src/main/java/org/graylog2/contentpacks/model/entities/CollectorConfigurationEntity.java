@@ -1,0 +1,33 @@
+package org.graylog2.contentpacks.model.entities;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+
+@JsonAutoDetect
+@AutoValue
+@WithBeanGetter
+public abstract class CollectorConfigurationEntity {
+    @JsonProperty("collector_id")
+    public abstract ValueReference collectorId();
+
+    @JsonProperty("title")
+    public abstract ValueReference title();
+
+    @JsonProperty("color")
+    public abstract ValueReference color();
+
+    @JsonProperty("template")
+    public abstract ValueReference template();
+
+    @JsonCreator
+    public static CollectorConfigurationEntity create(@JsonProperty("collector_id") ValueReference collectorId,
+                                                      @JsonProperty("title") ValueReference title,
+                                                      @JsonProperty("color") ValueReference color,
+                                                      @JsonProperty("template") ValueReference template) {
+        return new AutoValue_CollectorConfigurationEntity(collectorId, title, color, template);
+    }
+}

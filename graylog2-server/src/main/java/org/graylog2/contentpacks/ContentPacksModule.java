@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.facades.LookupTableFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.PipelineFacade;
 import org.graylog2.contentpacks.facades.PipelineRuleFacade;
+import org.graylog2.contentpacks.facades.CollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.plugin.PluginModule;
@@ -41,6 +42,7 @@ public class ContentPacksModule extends PluginModule {
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ModelIdParamConverter.Provider.class);
 
+        addEntityFacade(CollectorConfigurationFacade.TYPE, CollectorConfigurationFacade.class);
         addEntityFacade(DashboardFacade.TYPE, DashboardFacade.class);
         addEntityFacade(GrokPatternFacade.TYPE, GrokPatternFacade.class);
         addEntityFacade(InputFacade.TYPE, InputFacade.class);
