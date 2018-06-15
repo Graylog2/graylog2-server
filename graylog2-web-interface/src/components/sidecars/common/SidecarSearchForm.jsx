@@ -52,7 +52,7 @@ class SidecarSearchForm extends React.Component {
               <td>Identifier of the sidecar</td>
             </tr>
             <tr>
-              <td>collector_version</td>
+              <td>sidecar_version</td>
               <td>Sidecar version</td>
             </tr>
           </tbody>

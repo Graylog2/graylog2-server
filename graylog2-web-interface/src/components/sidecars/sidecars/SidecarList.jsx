@@ -51,8 +51,8 @@ class SidecarList extends React.Component {
                 onClick={onSortChange('node_id')}>
               Node Id
             </th>
-            <th className={this.getTableHeaderClassName('collector_version')}
-                onClick={onSortChange('collector_version')}>
+            <th className={this.getTableHeaderClassName('sidecar_version')}
+                onClick={onSortChange('sidecar_version')}>
               Sidecar Version
             </th>
             <th className={style.actions}>&nbsp;</th>

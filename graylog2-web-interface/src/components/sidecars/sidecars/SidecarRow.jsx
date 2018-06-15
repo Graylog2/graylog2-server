@@ -53,7 +53,7 @@ class SidecarRow extends React.Component {
           {annotation}
         </td>
         <td>
-          {sidecar.collector_version}
+          {sidecar.sidecar_version}
         </td>
         <td>
           <ButtonToolbar>
