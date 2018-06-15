@@ -51,7 +51,7 @@ const SidecarStatus = createReactClass({
     }
 
     if (!details.status) {
-      return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the collector configuration to see this information.</p>;
+      return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.</p>;
     }
 
     const collectors = Object.keys(details.status.collectors);
