@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -7,7 +8,9 @@ import Routes from 'routing/Routes';
 
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 
-const SidecarNewCollectorPage = React.createClass({
+const SidecarNewCollectorPage = createReactClass({
+  displayName: 'SidecarNewCollectorPage',
+
   componentDidMount() {
     this.style.use();
   },

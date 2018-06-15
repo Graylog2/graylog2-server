@@ -87,7 +87,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             .put("id", SearchQueryField.create(Sidecar.FIELD_ID))
             .put("node_id", SearchQueryField.create(Sidecar.FIELD_NODE_ID))
             .put("name", SearchQueryField.create(Sidecar.FIELD_NODE_NAME))
-            .put("collector_version", SearchQueryField.create(Sidecar.FIELD_SIDECAR_VERSION))
+            .put("sidecar_version", SearchQueryField.create(Sidecar.FIELD_SIDECAR_VERSION))
             .put("last_seen", SearchQueryField.create(Sidecar.FIELD_LAST_SEEN, SearchQueryField.Type.DATE))
             .put("operating_system", SearchQueryField.create(Sidecar.FIELD_OPERATING_SYSTEM))
             .put("status", SearchQueryField.create(Sidecar.FIELD_STATUS, SearchQueryField.Type.INT))
@@ -127,6 +127,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                         sidecarSummaries.size(),
                         1,
                         sidecarSummaries.size()),
+                sidecarSummaries.size(),
                 false,
                 null,
                 null,
@@ -155,7 +156,8 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                 sidecarService.findPaginated(searchQuery, activeSidecarFilter, page, perPage, sort, order) :
                 sidecarService.findPaginated(searchQuery, page, perPage, sort, order);
         final List<SidecarSummary> collectorSummaries = sidecarService.toSummaryList(sidecars, activeSidecarFilter);
-        return SidecarListResponse.create(query, sidecars.pagination(), onlyActive, sort, order, collectorSummaries);
+        final long total = sidecarService.count();
+        return SidecarListResponse.create(query, sidecars.pagination(), total, onlyActive, sort, order, collectorSummaries);
     }
 
     @GET

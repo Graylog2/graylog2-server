@@ -6,14 +6,17 @@ import { Col, Row } from 'react-bootstrap';
 
 import { ControlledTableList, PaginatedList } from 'components/common';
 import { Input } from 'components/bootstrap';
-import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
-import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 
-import style from './CollectorsAdministration.css';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
+
+import CollectorsAdministrationActions from './CollectorsAdministrationActions';
+import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
+import FiltersSummary from './FiltersSummary';
+
+import style from './CollectorsAdministration.css';
 
 const CollectorsAdministration = createReactClass({
   propTypes: {
@@ -22,6 +25,7 @@ const CollectorsAdministration = createReactClass({
     configurations: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
+    filters: PropTypes.object.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onFilter: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
@@ -100,7 +104,7 @@ const CollectorsAdministration = createReactClass({
     let headerMenu;
     if (selectedItems === 0) {
       headerMenu = (
-        <CollectorsAdministrationFilters collectors={collectors} configurations={configurations} filter={this.props.onFilter} />
+        <CollectorsAdministrationFilters collectors={collectors} configurations={configurations} filters={this.props.filters} filter={this.props.onFilter} />
       );
     } else {
       headerMenu = (
@@ -176,7 +180,12 @@ const CollectorsAdministration = createReactClass({
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
     const configAssignment = sidecar.assignments.find(assignment => assignment.collector_id === collector.id) || {};
     const configuration = configurations.find(config => config.id === configAssignment.configuration_id);
-    const collectorStatus = (sidecar.node_details.status.collectors[collector.name] || {}).status;
+    let collectorStatus;
+    try {
+      collectorStatus = sidecar.node_details.status.collectors[collector.name].status;
+    } catch (e) {
+      // Do nothing
+    }
 
     return (
       <Row key={sidecarCollectorId}>
@@ -231,8 +240,12 @@ const CollectorsAdministration = createReactClass({
     this.props.onQueryChange();
   },
 
+  handleResetFilters() {
+    this.props.onFilter();
+  },
+
   render() {
-    const { configurations, onPageChange, pagination, query, sidecarCollectorPairs } = this.props;
+    const { configurations, collectors, onPageChange, pagination, query, sidecarCollectorPairs, filters } = this.props;
 
     let formattedCollectors;
     if (sidecarCollectorPairs.length === 0) {
@@ -244,11 +257,11 @@ const CollectorsAdministration = createReactClass({
     } else {
       const sidecars = lodash.uniq(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
       formattedCollectors = sidecars.map((sidecarToMap) => {
-        const collectors = sidecarCollectorPairs
+        const sidecarCollectors = sidecarCollectorPairs
           .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
           .map(({ collector }) => collector)
           .filter(collector => !lodash.isEmpty(collector));
-        return this.formatSidecar(sidecarToMap, collectors, configurations);
+        return this.formatSidecar(sidecarToMap, sidecarCollectors, configurations);
       });
     }
 
@@ -260,6 +273,10 @@ const CollectorsAdministration = createReactClass({
                        totalItems={pagination.total}
                        onChange={onPageChange}>
           <SidecarSearchForm query={query} onSearch={this.handleSearch} onReset={this.handleReset} />
+          <FiltersSummary collectors={collectors}
+                          configurations={configurations}
+                          filters={filters}
+                          onResetFilters={this.handleResetFilters} />
           <Row>
             <Col md={12}>
               <ControlledTableList>

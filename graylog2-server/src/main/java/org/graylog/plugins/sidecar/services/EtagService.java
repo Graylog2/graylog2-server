@@ -39,7 +39,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class EtagService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(EtagService.class);
 
-    private final Cache<String, String> cache;
+    private final Cache<String, Boolean> cache;
     private MetricRegistry metricRegistry;
     private EventBus eventBus;
     private ClusterEventBus clusterEventBus;
@@ -76,7 +76,7 @@ public class EtagService extends AbstractIdleService {
     }
 
     public void put(String etag) {
-        cache.put(etag, etag);
+        cache.put(etag, Boolean.TRUE);
     }
 
     public void invalidate(String etag) {

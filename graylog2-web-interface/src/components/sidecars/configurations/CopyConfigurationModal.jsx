@@ -6,61 +6,57 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 
 import style from './CopyModal.css';
 
-const CopyConfigurationModal = React.createClass({
-  propTypes: {
+class CopyConfigurationModal extends React.Component {
+  static propTypes = {
     id: PropTypes.string,
     copyConfiguration: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      id: '',
-      name: '',
-    };
-  },
+  static defaultProps = {
+    id: '',
+    name: '',
+  };
 
-  getInitialState() {
-    return {
-      id: this.props.id,
-      name: '',
-      error: false,
-      error_message: '',
-    };
-  },
+  state = {
+    id: this.props.id,
+    name: '',
+    error: false,
+    error_message: '',
+  };
 
-  openModal() {
+  openModal = () => {
     this.refs.modal.open();
-  },
+  };
 
-  _getId(prefixIdName) {
+  _getId = (prefixIdName) => {
     return `${prefixIdName}-${this.props.id}`;
-  },
+  };
 
-  _closeModal() {
+  _closeModal = () => {
     this.refs.modal.close();
-  },
+  };
 
-  _saved() {
+  _saved = () => {
     this._closeModal();
     this.setState({ name: '' });
-  },
+  };
 
-  _save() {
+  _save = () => {
     const configuration = this.state;
 
     if (!configuration.error) {
       this.props.copyConfiguration(this.props.id, this.state.name, this._saved);
     }
-  },
+  };
 
-  _changeName(event) {
+  _changeName = (event) => {
     const nextName = event.target.value;
     this.setState({ name: nextName });
     this.props.validateConfiguration(nextName).then(validation => (
       this.setState({ error: validation.error, error_message: validation.error_message })
     ));
-  },
+  };
 
   render() {
     return (
@@ -85,7 +81,7 @@ const CopyConfigurationModal = React.createClass({
         </BootstrapModalForm>
       </span>
     );
-  },
-});
+  }
+}
 
 export default CopyConfigurationModal;

@@ -67,7 +67,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(value = "Configurations", description = "Manage/Render collector configurations")
+@Api(value = "Sidecar/Configurations", description = "Manage/Render collector configurations")
 @Path("/sidecar/configurations")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -109,11 +109,12 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Configuration> configurations = this.configurationService.findPaginated(searchQuery, page, perPage, sort, order);
+        final long total = this.configurationService.count();
         final List<ConfigurationSummary> result = configurations.stream()
                 .map(ConfigurationSummary::create)
                 .collect(Collectors.toList());
 
-        return ConfigurationListResponse.create(query, configurations.pagination(), sort, order, result);
+        return ConfigurationListResponse.create(query, configurations.pagination(), total, sort, order, result);
     }
 
     @GET

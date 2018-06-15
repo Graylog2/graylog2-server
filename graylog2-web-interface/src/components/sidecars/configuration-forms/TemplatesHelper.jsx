@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 
-const TemplatesHelper = React.createClass({
+class TemplatesHelper extends React.Component {
   render() {
     return (
       <div>
@@ -17,23 +17,23 @@ const TemplatesHelper = React.createClass({
           <tbody>
             <tr>
               <td><code>{'${'}operatingSystem{'}'}</code></td>
-              <td>Name of the agents operating system, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
+              <td>Name of the operating system the sidecar is running on, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
             </tr>
             <tr>
               <td><code>{'${'}nodeName{'}'}</code></td>
-              <td>The name of the agent, defaults to hostname if not set.</td>
+              <td>The name of the sidecar, defaults to hostname if not set.</td>
             </tr>
             <tr>
               <td><code>{'${'}nodeId{'}'}</code></td>
-              <td>UUID of the agent.</td>
+              <td>UUID of the sidecar.</td>
             </tr>
             <tr>
               <td><code>{'${'}collectorVersion{'}'}</code></td>
-              <td>Version string of the running Sidecar.</td>
+              <td>Version string of the running sidecar.</td>
             </tr>
             <tr>
               <td><code>{'${'}ip{'}'}</code></td>
-              <td>First public IP address.</td>
+              <td>First public IP address of the machine the sidecar is running on.</td>
             </tr>
             <tr>
               <td><code>{'${'}cpuIdle{'}'}</code></td>
@@ -47,6 +47,7 @@ const TemplatesHelper = React.createClass({
         </Table>
       </div>
     );
-  },
-});
+  }
+}
+
 export default TemplatesHelper;

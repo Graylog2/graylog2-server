@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 
 class StatusIndicator extends React.Component {
   static propTypes = {
-    status: PropTypes.number.isRequired,
+    status: PropTypes.number,
+  };
+
+  static defaultProps = {
+    status: -1,
   };
 
   render() {

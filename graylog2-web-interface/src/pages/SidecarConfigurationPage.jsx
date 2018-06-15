@@ -10,7 +10,7 @@ import Routes from 'routing/Routes';
 import ConfigurationListContainer from 'components/sidecars/configurations/ConfigurationListContainer';
 import CollectorListContainer from 'components/sidecars/configurations/CollectorListContainer';
 
-const SidecarConfigurationPage = React.createClass({
+class SidecarConfigurationPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Collectors Configuration">
@@ -52,7 +52,7 @@ const SidecarConfigurationPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default SidecarConfigurationPage;

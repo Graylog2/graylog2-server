@@ -18,7 +18,6 @@ package org.graylog.plugins.sidecar.rest.responses;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog2.database.PaginatedList;
@@ -33,8 +32,11 @@ public abstract class SidecarListResponse {
     @JsonProperty
     public abstract String query();
 
-    @JsonUnwrapped
+    @JsonProperty("pagination")
     public abstract PaginatedList.PaginationInfo paginationInfo();
+
+    @JsonProperty
+    public abstract long total();
 
     @JsonProperty
     public abstract Boolean onlyActive();
@@ -56,21 +58,23 @@ public abstract class SidecarListResponse {
 
     @JsonCreator
     public static SidecarListResponse create(@JsonProperty("query") @Nullable String query,
-                                             @JsonProperty("pagination_info") PaginatedList.PaginationInfo paginationInfo,
+                                             @JsonProperty("pagination") PaginatedList.PaginationInfo paginationInfo,
+                                             @JsonProperty("total") long total,
                                              @JsonProperty("only_active") Boolean onlyActive,
                                              @JsonProperty("sort") @Nullable String sort,
                                              @JsonProperty("order") @Nullable String order,
                                              @JsonProperty("sidecars") Collection<SidecarSummary> sidecars,
                                              @JsonProperty("filters") @Nullable Map<String, String> filters) {
-        return new AutoValue_SidecarListResponse(query, paginationInfo, onlyActive, sort, order, sidecars, filters);
+        return new AutoValue_SidecarListResponse(query, paginationInfo, total, onlyActive, sort, order, sidecars, filters);
     }
 
     public static SidecarListResponse create(@JsonProperty("query") @Nullable String query,
-                                             @JsonProperty("pagination_info") PaginatedList.PaginationInfo paginationInfo,
+                                             @JsonProperty("pagination") PaginatedList.PaginationInfo paginationInfo,
+                                             @JsonProperty("total") long total,
                                              @JsonProperty("only_active") Boolean onlyActive,
                                              @JsonProperty("sort") @Nullable String sort,
                                              @JsonProperty("order") @Nullable String order,
                                              @JsonProperty("sidecars") Collection<SidecarSummary> sidecars) {
-        return create(query, paginationInfo, onlyActive, sort, order, sidecars, null);
+        return create(query, paginationInfo, total, onlyActive, sort, order, sidecars, null);
     }
 }

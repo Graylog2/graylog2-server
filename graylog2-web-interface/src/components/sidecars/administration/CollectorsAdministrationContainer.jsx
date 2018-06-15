@@ -54,8 +54,13 @@ const CollectorsAdministrationContainer = createReactClass({
 
   handleFilter(property, value) {
     const { filters, pagination, query } = this.state.sidecars;
-    const newFilters = lodash.cloneDeep(filters);
-    newFilters[property] = value;
+    let newFilters;
+    if (property) {
+      newFilters = lodash.cloneDeep(filters);
+      newFilters[property] = value;
+    } else {
+      newFilters = {};
+    }
     SidecarsAdministrationActions.list({ query: query, filters: newFilters, pageSize: pagination.pageSize });
   },
 
@@ -109,6 +114,7 @@ const CollectorsAdministrationContainer = createReactClass({
                                 configurations={configurations.configurations}
                                 pagination={sidecars.pagination}
                                 query={sidecars.query}
+                                filters={sidecars.filters}
                                 onPageChange={this.handlePageChange}
                                 onFilter={this.handleFilter}
                                 onQueryChange={this.handleQueryChange}

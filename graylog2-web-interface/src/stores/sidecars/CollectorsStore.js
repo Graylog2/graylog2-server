@@ -10,7 +10,7 @@ const { CollectorsActions } = CombinedProvider.get('Collectors');
 
 const CollectorsStore = Reflux.createStore({
   listenables: [CollectorsActions],
-  sourceUrl: '/plugins/org.graylog.plugins.sidecar/sidecar',
+  sourceUrl: '/sidecar',
   collectors: undefined,
   query: undefined,
   pagination: {
@@ -18,6 +18,7 @@ const CollectorsStore = Reflux.createStore({
     pageSize: undefined,
     total: undefined,
   },
+  total: undefined,
   paginatedCollectors: undefined,
 
   getInitialState() {
@@ -31,6 +32,7 @@ const CollectorsStore = Reflux.createStore({
       collectors: this.collectors,
       paginatedCollectors: this.paginatedCollectors,
       query: this.query,
+      total: this.total,
       pagination: this.pagination,
     });
   },
@@ -80,10 +82,11 @@ const CollectorsStore = Reflux.createStore({
         (response) => {
           this.query = response.query;
           this.pagination = {
-            page: response.page,
-            pageSize: response.per_page,
-            total: response.total,
+            page: response.pagination.page,
+            pageSize: response.pagination.per_page,
+            total: response.pagination.total,
           };
+          this.total = response.total;
           this.paginatedCollectors = response.collectors;
 
           this.propagateChanges();

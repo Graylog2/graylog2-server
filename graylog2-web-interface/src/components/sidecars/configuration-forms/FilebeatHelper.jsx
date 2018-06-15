@@ -4,21 +4,19 @@ import React from 'react';
 
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
-const FilebeatHelper = React.createClass({
-  propTypes: {
+class FilebeatHelper extends React.Component {
+  static propTypes = {
     section: PropTypes.string,
     paragraph: PropTypes.string,
-  },
+  };
 
-  statics: {
-    toc: {
-      prospectors: ['log'],
-      outputs: ['logstash'],
-      processors: ['fields', 'drop events'],
-    },
-  },
+  static toc = {
+    prospectors: ['log'],
+    outputs: ['logstash'],
+    processors: ['fields', 'drop events'],
+  };
 
-  prospectorsLog() {
+  prospectorsLog = () => {
     return (
       <div>
         <h3>Log Prospector</h3>
@@ -101,9 +99,9 @@ const FilebeatHelper = React.createClass({
         {this.example(`clean_inactive: 0`)}
       </div>
     );
-  },
+  };
 
-  outputsLogstash() {
+  outputsLogstash = () => {
     return (
       <div>
         <h3>Logstash Output</h3>
@@ -152,9 +150,9 @@ const FilebeatHelper = React.createClass({
         {this.example(`ssl.key_passphrase: 'secure'`)}
       </div>
     );
-  },
+  };
 
-  processorsFields() {
+  processorsFields = () => {
     return (
       <div>
         Processors are used to reduce the number of fields in the exported event or to
@@ -167,9 +165,9 @@ const FilebeatHelper = React.createClass({
     fields: ["cpu.user", "cpu.system"]`)}
       </div>
     );
-  },
+  };
 
-  processorsDropEvents() {
+  processorsDropEvents = () => {
     return (
       <div>
         The following example drops the events that have the HTTP response code 200:<br/>
@@ -181,17 +179,17 @@ const FilebeatHelper = React.createClass({
              http.code: 200`)}
       </div>
     );
-  },
+  };
 
-  example(data) {
+  example = (data) => {
     return (
       <pre className={`${ConfigurationHelperStyle.marginTab} ${ConfigurationHelperStyle.exampleFunction}`} >{data}</pre>
     );
-  },
+  };
 
-  lookupName() {
+  lookupName = () => {
     return lodash.camelCase(`${this.props.section} ${this.props.paragraph}`);
-  },
+  };
 
   render() {
     if (this.props.section && this.props.paragraph) {
@@ -203,6 +201,7 @@ const FilebeatHelper = React.createClass({
         <div>Choose a configuration topic from the drop down to get a quick help.</div>
       );
     }
-  },
-});
+  }
+}
+
 export default FilebeatHelper;

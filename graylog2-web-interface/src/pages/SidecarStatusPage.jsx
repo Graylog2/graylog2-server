@@ -14,31 +14,29 @@ import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
 
-const SidecarStatusPage = React.createClass({
-  propTypes: {
+class SidecarStatusPage extends React.Component {
+  static propTypes = {
     params: PropTypes.object.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
-      sidecar: undefined,
-    };
-  },
+  state = {
+    sidecar: undefined,
+  };
 
   componentDidMount() {
     this.reloadSidecar();
     this.interval = setInterval(this.reloadSidecar, 5000);
-  },
+  }
 
   componentWillUnmount() {
     if (this.interval) {
       clearInterval(this.interval);
     }
-  },
+  }
 
-  reloadSidecar() {
+  reloadSidecar = () => {
     SidecarsActions.getSidecar(this.props.params.sidecarId).then(sidecar => this.setState({ sidecar }));
-  },
+  };
 
   render() {
     const sidecar = this.state.sidecar;
@@ -78,7 +76,7 @@ const SidecarStatusPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default SidecarStatusPage;

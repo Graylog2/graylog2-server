@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -11,7 +12,9 @@ import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm
 
 const { CollectorsActions } = CombinedProvider.get('Collectors');
 
-const SidecarEditCollectorPage = React.createClass({
+const SidecarEditCollectorPage = createReactClass({
+  displayName: 'SidecarEditCollectorPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

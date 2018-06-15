@@ -72,7 +72,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Api(value = "Sidecar Administration", description = "Administrate sidecars")
+@Api(value = "Sidecar/Administration", description = "Administrate sidecars")
 @Path("/sidecar/administration")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -114,6 +114,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
         final String sort = Sidecar.FIELD_NODE_NAME;
         final String order = "asc";
         final SearchQuery searchQuery = searchQueryParser.parse(request.query());
+        final long total = sidecarService.count();
 
         final Optional<Predicate<Sidecar>> filters = administrationFiltersFactory.getFilters(request.filters());
 
@@ -122,6 +123,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
         final List<SidecarSummary> sidecarSummaries = sidecarService.toSummaryList(sidecars, activeSidecarFilter);
 
         final List<SidecarSummary> summariesWithCollectors = sidecarSummaries.stream()
+                // Enrich sidecars with a list of compatible collectors that may run on that OS
                 .map(collector -> {
                     final List<String> compatibleCollectors = collectors.stream()
                             .filter(c -> c.nodeOperatingSystem().equalsIgnoreCase(collector.nodeDetails().operatingSystem()))
@@ -134,7 +136,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
                 .filter(collectorSummary -> !filters.isPresent() || collectorSummary.collectors().size() > 0)
                 .collect(Collectors.toList());
 
-        return SidecarListResponse.create(request.query(), sidecars.pagination(), false, sort, order, summariesWithCollectors, request.filters());
+        return SidecarListResponse.create(request.query(), sidecars.pagination(), total, false, sort, order, summariesWithCollectors, request.filters());
     }
 
     @PUT
@@ -165,9 +167,11 @@ public class AdministrationResource extends RestResource implements PluginRestRe
 
         final List<String> collectorIds = new ArrayList<>();
 
+        // Add ID of collector we want to filter for
         if (filters.containsKey(collectorKey)) {
             collectorIds.add(filters.get(collectorKey));
         }
+        // Load collectors using the configuration ID that we want to filter for
         if (filters.containsKey(configurationKey)) {
             final Configuration configuration = configurationService.find(filters.get(configurationKey));
             if (!collectorIds.contains(configuration.collectorId())) {

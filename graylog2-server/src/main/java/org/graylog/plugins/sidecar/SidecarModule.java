@@ -33,11 +33,6 @@ import org.graylog.plugins.sidecar.migrations.V20180323150000_AddSidecarUser;
 import org.graylog.plugins.sidecar.migrations.V20180601151500_AddDefaultConfiguration;
 import org.graylog.plugins.sidecar.periodical.PurgeExpiredSidecarsThread;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
-import org.graylog.plugins.sidecar.rest.resources.ActionResource;
-import org.graylog.plugins.sidecar.rest.resources.AdministrationResource;
-import org.graylog.plugins.sidecar.rest.resources.CollectorResource;
-import org.graylog.plugins.sidecar.rest.resources.ConfigurationResource;
-import org.graylog.plugins.sidecar.rest.resources.SidecarResource;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
@@ -69,11 +64,7 @@ public class SidecarModule extends PluginModule {
                 .implement(AdministrationFilter.class, Names.named("status"), StatusAdministrationFilter.class)
                 .build(AdministrationFilter.Factory.class));
 
-        addRestResource(ConfigurationResource.class);
-        addRestResource(CollectorResource.class);
-        addRestResource(ActionResource.class);
-        addRestResource(AdministrationResource.class);
-        addRestResource(SidecarResource.class);
+        registerRestControllerPackage(getClass().getPackage().getName());
         addPermissions(SidecarRestPermissions.class);
         addPeriodical(PurgeExpiredSidecarsThread.class);
 
