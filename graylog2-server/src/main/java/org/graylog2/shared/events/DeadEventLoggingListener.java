@@ -26,7 +26,7 @@ public class DeadEventLoggingListener {
 
     @Subscribe
     public void handleDeadEvent(DeadEvent event) {
-        LOGGER.warn("Received unhandled event of type <{}> from event bus <{}>", event.getEvent().getClass().getCanonicalName(),
+        LOGGER.debug("Received unhandled event of type <{}> from event bus <{}>", event.getEvent().getClass().getCanonicalName(),
                 event.getSource().toString());
         LOGGER.debug("Dead event contents: {}", event.getEvent());
     }
