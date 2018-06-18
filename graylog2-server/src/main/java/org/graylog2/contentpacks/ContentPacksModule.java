@@ -18,6 +18,7 @@ package org.graylog2.contentpacks;
 
 import org.graylog2.contentpacks.catalogs.CatalogIndex;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
+import org.graylog2.contentpacks.facades.CollectorFacade;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
@@ -43,6 +44,7 @@ public class ContentPacksModule extends PluginModule {
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ModelIdParamConverter.Provider.class);
 
         addEntityFacade(CollectorConfigurationFacade.TYPE, CollectorConfigurationFacade.class);
+        addEntityFacade(CollectorFacade.TYPE, CollectorFacade.class);
         addEntityFacade(DashboardFacade.TYPE, DashboardFacade.class);
         addEntityFacade(GrokPatternFacade.TYPE, GrokPatternFacade.class);
         addEntityFacade(InputFacade.TYPE, InputFacade.class);
