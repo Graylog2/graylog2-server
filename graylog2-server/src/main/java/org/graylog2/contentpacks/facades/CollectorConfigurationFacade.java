@@ -62,7 +62,6 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     @Override
     public EntityWithConstraints encode(Configuration configuration) {
         final CollectorConfigurationEntity configurationEntity = CollectorConfigurationEntity.create(
-                //TODO: Check how to collectorId can be used here
                 ValueReference.of(configuration.collectorId()),
                 ValueReference.of(configuration.name()),
                 ValueReference.of(configuration.color()),
@@ -88,7 +87,6 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     private Configuration decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
         final CollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), CollectorConfigurationEntity.class);
         final Configuration configuration = Configuration.create(
-                //TODO: Check how to use the collectorId here
                 configurationEntity.collectorId().asString(parameters),
                 configurationEntity.title().asString(parameters),
                 configurationEntity.color().asString(parameters),
