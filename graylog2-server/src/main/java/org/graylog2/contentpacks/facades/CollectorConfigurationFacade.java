@@ -2,6 +2,10 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog2.contentpacks.model.ModelId;
@@ -103,5 +107,23 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
         }
 
         return Optional.of(encode(configuration));
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
+        final ModelId modelId = entityDescriptor.id();
+        final Configuration configuration = configurationService.find(modelId.id());
+        if (isNull(configuration)) {
+            LOG.debug("Could not find configuration {}", entityDescriptor);
+        } else {
+            final EntityDescriptor collectorEntityDescriptor = EntityDescriptor.create(
+                    ModelId.of(configuration.collectorId()), ModelTypes.COLLECTOR);
+            mutableGraph.putEdge(entityDescriptor, collectorEntityDescriptor);
+        }
+
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }
