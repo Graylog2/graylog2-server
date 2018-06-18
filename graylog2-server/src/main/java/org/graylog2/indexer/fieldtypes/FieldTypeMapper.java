@@ -55,8 +55,6 @@ public class FieldTypeMapper {
     private static final ImmutableMap<String, FieldTypes.Type> TYPE_MAP = ImmutableMap.<String, FieldTypes.Type>builder()
             .put("keyword", STRING_TYPE) // since ES 5.x
             .put("text", STRING_FTS_TYPE) // since ES 5.x
-            // TODO: Depending on the value of the "index" field, a "string" can be similar to "keyword" or "text".
-            .put("string", STRING_FTS_TYPE) // until ES 2.x
             .put("long", LONG_TYPE)
             .put("integer", INT_TYPE)
             .put("short", SHORT_TYPE)
