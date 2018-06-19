@@ -1,7 +1,9 @@
 package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.aggregation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import io.searchbox.core.SearchResult;
+import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
@@ -41,14 +43,16 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
         // thus we ask the spec handlers to consume as much, or as little of the tree as they need to and they will call into
         // our generation methods as needed
         // the top level aggregations we'll ask directly to generate themselves
+        List<AggregationBuilder> builders = Lists.newArrayList();
         searchType.aggregations().forEach(aggSpec -> {
             final Optional<AggregationBuilder> aggregation = handlerForType(aggSpec.type())
                     .createAggregation(namer.nextName(), aggSpec, this, queryContext);
             aggregation.ifPresent(agg -> {
                 LOG.debug("Adding top level aggregation {}: {}", agg.getName(), agg.getType());
-                searchSourceBuilder.aggregation(agg);
+                builders.add(agg);
             });
         });
+        queryContext.addFilteredAggregations(builders, searchType);
     }
 
     public ESAggregationSpecHandler<? extends AggregationSpec, ? extends io.searchbox.core.search.aggregation.Aggregation> handlerForType(String specType) {
@@ -60,17 +64,17 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Aggregation searchType, SearchResult queryResult, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, Aggregation searchType, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
         final ImmutableList.Builder<Object> metrics = ImmutableList.builder();
         final ImmutableList.Builder<Object> groups = ImmutableList.builder();
         searchType.metrics().forEach(aggSpec -> {
             final ESAggregationSpecHandler<? extends AggregationSpec, ? extends io.searchbox.core.search.aggregation.Aggregation> handler = handlerForType(aggSpec.type());
-            final Object result = handler.handleResult(aggSpec, queryResult, handler.extractAggregationFromResult(aggSpec, queryResult.getAggregations(), queryContext), this, queryContext);
+            final Object result = handler.handleResult(aggSpec, queryResult, handler.extractAggregationFromResult(aggSpec, aggregations, queryContext), this, queryContext);
             metrics.add(result);
         });
         searchType.groups().forEach(aggSpec -> {
             final ESAggregationSpecHandler<? extends AggregationSpec, ? extends io.searchbox.core.search.aggregation.Aggregation> handler = handlerForType(aggSpec.type());
-            final Object result = handler.handleResult(aggSpec, queryResult, handler.extractAggregationFromResult(aggSpec, queryResult.getAggregations(), queryContext), this, queryContext);
+            final Object result = handler.handleResult(aggSpec, queryResult, handler.extractAggregationFromResult(aggSpec, aggregations, queryContext), this, queryContext);
             groups.add(result);
         });
         return new Aggregation.Result() {

@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes;
 
 import io.searchbox.core.SearchResult;
+import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.enterprise.search.Query;
@@ -12,14 +13,21 @@ import org.graylog.plugins.enterprise.search.searchtypes.Sort;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
+    private static final Logger LOG = LoggerFactory.getLogger(ESMessageList.class);
+
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
+        if (messageList.filter() != null) {
+            LOG.warn("Search type messages currently does not support filters yet.");
+        }
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder();
         searchSourceBuilder
                 .size(messageList.limit() - messageList.offset())
@@ -35,7 +43,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, SearchResult result, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, SearchResult result, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
         //noinspection unchecked
         final List<ResultMessageSummary> messages = result.getHits(Map.class, false).stream()
                 .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))

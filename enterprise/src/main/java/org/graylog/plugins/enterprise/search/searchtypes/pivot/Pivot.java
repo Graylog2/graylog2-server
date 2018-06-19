@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.SearchType;
 
 import javax.annotation.Nullable;
@@ -39,6 +40,10 @@ public abstract class Pivot implements SearchType {
 
     @JsonProperty
     public abstract boolean rollup();
+
+    @Nullable
+    @Override
+    public abstract Filter filter();
 
     @Override
     public SearchType withId(String id) {
@@ -81,6 +86,9 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder rollup(boolean rollup);
+
+        @JsonProperty
+        public abstract Builder filter(@Nullable Filter filter);
 
         public abstract Pivot build();
     }

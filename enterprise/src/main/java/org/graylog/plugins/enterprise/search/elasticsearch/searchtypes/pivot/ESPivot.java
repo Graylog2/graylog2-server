@@ -6,7 +6,9 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import one.util.streamex.EntryStream;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
@@ -58,6 +60,16 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // holds the last complete bucket aggregation into which subsequent buckets get added
         AggregationBuilder previousAggregation = null;
 
+        // if there is a filter, we'll add it as the top level aggregation.
+        // the surrounding backend code will take care of removing it before passing the result into this handler
+        if (pivot.filter() != null) {
+            final Optional<QueryBuilder> queryBuilder = queryContext.generateFilterClause(pivot.filter());
+            if (queryBuilder.isPresent()) {
+                final QueryBuilder filterClause = queryBuilder.get();
+                previousAggregation = AggregationBuilders.filter("filtered-" + pivot.id(), filterClause);
+                searchSourceBuilder.aggregation(previousAggregation);
+            }
+        }
         final Iterator<BucketSpec> rowBuckets = pivot.rowGroups().iterator();
         while (rowBuckets.hasNext()) {
             final BucketSpec bucketSpec = rowBuckets.next();
@@ -132,7 +144,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult searchResult, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
         final PivotResult.Builder resultBuilder = PivotResult.builder().id(pivot.id());
 
         // pivot results are a table where cells can contain multiple "values" and not only scalars:
@@ -144,15 +156,16 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
 
-        processRows(resultBuilder, searchResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), searchResult.getAggregations());
+        processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), aggregations);
 
         return resultBuilder.build();
     }
 
+
     /*
-    results from elasticsearch are nested so we need to recurse into the aggregation tree, but our result is a table, thus we need
-    to keep track of the current row keys manually
-     */
+        results from elasticsearch are nested so we need to recurse into the aggregation tree, but our result is a table, thus we need
+        to keep track of the current row keys manually
+         */
     private void processRows(PivotResult.Builder resultBuilder,
                              SearchResult searchResult,
                              ESGeneratedQueryContext queryContext,

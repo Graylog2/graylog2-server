@@ -3,25 +3,35 @@ package org.graylog.plugins.enterprise.search.elasticsearch;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.Aggregation;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.plugins.enterprise.search.Filter;
+import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.searchtypes.aggregation.AggregationSpec;
 import org.graylog.plugins.enterprise.search.util.UniqueNamer;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
+    private final ElasticsearchBackend elasticsearchBackend;
     private SearchSourceBuilder ssb;
     // do _NOT_ turn this into a regular hashmap!
     private IdentityHashMap<AggregationSpec, Tuple2<String, Class<? extends Aggregation>>> aggResultTypes = Maps.newIdentityHashMap();
     private Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
 
-    public ESGeneratedQueryContext(SearchSourceBuilder ssb) {
+    public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb) {
+        this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
     }
 
@@ -53,7 +63,27 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         return uniqueNamer.nextName();
     }
 
-    public String currentName() {
-        return uniqueNamer.currentName();
+    public Optional<QueryBuilder> generateFilterClause(Filter filter) {
+        return elasticsearchBackend.generateFilterClause(filter);
+    }
+
+    public void addFilteredAggregation(AggregationBuilder builder, SearchType searchType) {
+        final Optional<QueryBuilder> filterClause = generateFilterClause(searchType.filter());
+        if (filterClause.isPresent()) {
+            builder = AggregationBuilders.filter("filtered-" + searchType.id(), filterClause.get())
+                    .subAggregation(builder);
+        }
+        ssb.aggregation(builder);
+    }
+
+    public void addFilteredAggregations(Collection<AggregationBuilder> builders, SearchType searchType) {
+        final Optional<QueryBuilder> filterClause = generateFilterClause(searchType.filter());
+        if (filterClause.isPresent()) {
+            final FilterAggregationBuilder filter = AggregationBuilders.filter("filtered-" + searchType.id(), filterClause.get());
+            builders.forEach(filter::subAggregation);
+            ssb.aggregation(filter);
+        } else {
+            builders.forEach(ssb::aggregation);
+        }
     }
 }

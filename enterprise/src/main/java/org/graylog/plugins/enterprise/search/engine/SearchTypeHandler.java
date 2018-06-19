@@ -24,8 +24,8 @@ public interface SearchTypeHandler<S extends SearchType, Q, R> {
 
     default SearchType.Result extractResult(SearchJob job, Query query, SearchType searchType, R queryResult, Q queryContext) {
         // see above for the reason for typecasting
-        return doExtractResult(job, query, (S) searchType, queryResult, queryContext);
+        return doExtractResultImpl(job, query, (S) searchType, queryResult, queryContext);
     }
 
-    SearchType.Result doExtractResult(SearchJob job, Query query, S searchType, R queryResult, Q queryContext);
+    SearchType.Result doExtractResultImpl(SearchJob job, Query query, S searchType, R queryResult, Q queryContext);
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
@@ -25,6 +26,10 @@ public abstract class MessageList implements SearchType {
     @Nullable
     @JsonProperty
     public abstract String id();
+
+    @Nullable
+    @Override
+    public abstract Filter filter();
 
     @JsonProperty
     public abstract int limit();
@@ -73,6 +78,9 @@ public abstract class MessageList implements SearchType {
 
         @JsonProperty
         public abstract Builder id(@Nullable String id);
+
+        @JsonProperty
+        public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
         public abstract Builder limit(int limit);

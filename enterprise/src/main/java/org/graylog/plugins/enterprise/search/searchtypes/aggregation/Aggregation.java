@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Iterables;
+import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.SearchType;
 
 import javax.annotation.Nullable;
@@ -34,6 +35,10 @@ public abstract class Aggregation implements SearchType {
     @Nullable
     @JsonProperty
     public abstract String id();
+
+    @Nullable
+    @Override
+    public abstract Filter filter();
 
     @JsonProperty
     public abstract List<MetricSpec> metrics();
@@ -71,6 +76,9 @@ public abstract class Aggregation implements SearchType {
 
         @JsonProperty
         public abstract Builder id(@Nullable String id);
+
+        @JsonProperty
+        public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
         public abstract Builder metrics(List<MetricSpec> metrics);
