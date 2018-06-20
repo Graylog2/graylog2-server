@@ -29,13 +29,17 @@ const WizardExample = createReactClass({
     ];
  
     return (
-      <Wizard steps={steps}>
+      <Wizard steps={steps} horizontal={this.props.horizontal}>
         <div>Preview: {this.state.input_value}</div>
       </Wizard>
     );
   },
 });
 
-<WizardExample />
+<div>
+    <WizardExample horizontal={false} />
+    <hr/>
+    <WizardExample horizontal />
+</div>
 
 ```

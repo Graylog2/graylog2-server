@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Col, Nav, NavItem, Row } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'react-bootstrap';
 
 import WizardStyle from './Wizard.css';
 
@@ -33,6 +33,8 @@ class Wizard extends React.Component {
     onStepChange: PropTypes.func,
     /** Optional component which can be rendered on the right side e.g a preview */
     children: PropTypes.element,
+    /** Indicates if wizard should be rendered in horizontal or vertical */
+    horizontal: PropTypes.bool,
     /** Customize the container CSS class used by this component */
     containerClassName: PropTypes.string,
   };
@@ -40,6 +42,7 @@ class Wizard extends React.Component {
   static defaultProps = {
     children: undefined,
     onStepChange: () => {},
+    horizontal: false,
     containerClassName: 'content',
   };
 
@@ -74,30 +77,59 @@ class Wizard extends React.Component {
     return this.props.steps.map(step => step.key).indexOf(this.state.selectedStep);
   };
 
+  _renderVerticalStepNav = () => {
+    return (
+      <Col md={2} className={WizardStyle.subnavigation}>
+        <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
+          {this.props.steps.map((navItem) => {
+            return (<NavItem key={navItem.key} eventKey={navItem.key}>{navItem.title}</NavItem>);
+          })}
+        </Nav>
+        <br />
+        <Row>
+          <Col xs={6}>
+            <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
+          </Col>
+          <Col className="text-right" xs={6}>
+            <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
+          </Col>
+        </Row>
+      </Col>
+    );
+  };
+
+  _renderHorizontalStepNav = () => {
+    return (
+      <Col sm={12} className={WizardStyle.horizontal}>
+        <div className="pull-right">
+          <ButtonToolbar className={WizardStyle.horizontalPreviousNextButtons}>
+            <Button onClick={this._onPrevious} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('previous')}>
+              <i className="fa fa-caret-left" />
+            </Button>
+            <Button onClick={this._onNext} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('next')}>
+              <i className="fa fa-caret-right" />
+            </Button>
+          </ButtonToolbar>
+        </div>
+        <Nav bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
+          {this.props.steps.map((navItem) => {
+            return (<NavItem key={navItem.key} eventKey={navItem.key}>{navItem.title}</NavItem>);
+          })}
+        </Nav>
+      </Col>
+    );
+  };
+
   render() {
+    const rightComponentCols = this.props.horizontal ? 5 : 3; // If horizontal, use more space for this component
     return (
       <Row className={this.props.containerClassName}>
-        <Col md={2} className={WizardStyle.subnavigation}>
-          <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
-            {this.props.steps.map((navItem) => {
-              return (<NavItem key={navItem.key} eventKey={navItem.key}>{navItem.title}</NavItem>);
-            })}
-          </Nav>
-          <br />
-          <Row>
-            <Col xs={6}>
-              <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
-            </Col>
-            <Col className="text-right" xs={6}>
-              <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
-            </Col>
-          </Row>
-        </Col>
+        {this.props.horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}
         <Col md={7}>
           {this.props.steps[this._getSelectedIndex()].component}
         </Col>
         {this.props.children &&
-          <Col md={3}>
+          <Col md={rightComponentCols}>
             {this.props.children}
           </Col>
         }
