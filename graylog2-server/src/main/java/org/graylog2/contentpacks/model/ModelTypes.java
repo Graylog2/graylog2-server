@@ -28,5 +28,6 @@ public interface ModelTypes {
     ModelType OUTPUT = ModelType.of("output");
     ModelType PIPELINE = ModelType.of("pipeline");
     ModelType PIPELINE_RULE = ModelType.of("pipeline_rule");
+    ModelType ROOT = ModelType.of("virtual-root");
     ModelType STREAM = ModelType.of("stream");
 }

@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public EntityWithConstraints encode(Collector collector) {
+    public EntityWithConstraints exportEntity(Collector collector) {
         final List<ValueReference> executeParameters = collector.executeParameters().stream()
                 .map(ValueReference::of)
                 .collect(Collectors.toList());
@@ -86,15 +87,18 @@ public class CollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public Collector decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<Collector> createNativeEntity(Entity entity,
+                                                      Map<String, ValueReference> parameters,
+                                                      Map<EntityDescriptor, Object> nativeEntities,
+                                                      String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Collector decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<Collector> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final CollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), CollectorEntity.class);
 
         final List<String> executeParameters = collectorEntity.executeParameters().stream()
@@ -105,7 +109,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
                 .collect(Collectors.toList());
 
         final Collector collector = Collector.builder()
-                .name(collectorEntity.title().asString(parameters))
+                .name(collectorEntity.name().asString(parameters))
                 .serviceType(collectorEntity.serviceType().asString(parameters))
                 .nodeOperatingSystem(collectorEntity.nodeOperatingSystem().asString(parameters))
                 .executablePath(collectorEntity.executablePath().asString(parameters))
@@ -115,7 +119,39 @@ public class CollectorFacade implements EntityFacade<Collector> {
                 .defaultTemplate(collectorEntity.defaultTemplate().asString(parameters))
                 .build();
 
-        return collectorService.save(collector);
+        final Collector savedCollector = collectorService.save(collector);
+        return NativeEntity.create(savedCollector.id(), TYPE, savedCollector);
+    }
+
+    @Override
+    public Optional<NativeEntity<Collector>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<Collector>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final CollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), CollectorEntity.class);
+
+        final String name = collectorEntity.name().asString(parameters);
+        final String serviceType = collectorEntity.serviceType().asString(parameters);
+        final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByName(name));
+        existingCollector.ifPresent(collector -> compareCollectors(name, serviceType, collector));
+
+        return existingCollector.map(collector -> NativeEntity.create(collector.id(), TYPE, collector));
+    }
+
+    private void compareCollectors(String name, String serviceType, Collector existingCollector) {
+        if (!name.equals(existingCollector.name()) || !serviceType.equals(existingCollector.serviceType())) {
+            throw new DivergingEntityConfiguration("Expected service type for Collector with name \"" + name + "\": <" + serviceType + ">; actual service type: <" + existingCollector.serviceType() + ">");
+        }
+    }
+
+    @Override
+    public void delete(Collector nativeEntity) {
+        collectorService.delete(nativeEntity.id());
     }
 
     @Override
@@ -135,7 +171,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         final Collector collector = collectorService.find(modelId.id());
         if (isNull(collector)) {
@@ -143,6 +179,6 @@ public class CollectorFacade implements EntityFacade<Collector> {
             return Optional.empty();
         }
 
-        return Optional.of(encode(collector));
+        return Optional.of(exportEntity(collector));
     }
 }

@@ -81,9 +81,9 @@ public class ContentPackInstallationPersistenceService {
         }
     }
 
-    public Optional<ContentPackInstallation> insert(final ContentPackInstallation installation) {
+    public ContentPackInstallation insert(final ContentPackInstallation installation) {
         final WriteResult<ContentPackInstallation, ObjectId> writeResult = dbCollection.insert(installation);
-        return Optional.of(writeResult.getSavedObject());
+        return writeResult.getSavedObject();
     }
 
     public int deleteById(ObjectId id) {

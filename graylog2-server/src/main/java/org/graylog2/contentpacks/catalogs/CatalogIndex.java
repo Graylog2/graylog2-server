@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,14 +64,17 @@ public class CatalogIndex {
         unresolvedEntities.forEach(dependencyGraph::addNode);
 
         final HashSet<EntityDescriptor> resolvedEntities = new HashSet<>();
-        resolveDependencyGraph(dependencyGraph, resolvedEntities);
+        final MutableGraph<EntityDescriptor> finalDependencyGraph = resolveDependencyGraph(dependencyGraph, resolvedEntities);
 
-        LOG.debug("Final dependency graph: {}", dependencyGraph);
+        LOG.debug("Final dependency graph: {}", finalDependencyGraph);
 
-        return dependencyGraph.nodes();
+        return finalDependencyGraph.nodes();
     }
 
-    private void resolveDependencyGraph(MutableGraph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
+    private MutableGraph<EntityDescriptor> resolveDependencyGraph(Graph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.from(dependencyGraph).build();
+        Graphs.merge(mutableGraph, dependencyGraph);
+
         for (EntityDescriptor entityDescriptor : dependencyGraph.nodes()) {
             LOG.debug("Resolving entity {}", entityDescriptor);
             if (resolvedEntities.contains(entityDescriptor)) {
@@ -82,17 +86,15 @@ public class CatalogIndex {
             final Graph<EntityDescriptor> graph = facade.resolve(entityDescriptor);
             LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
 
-            mergeGraphs(dependencyGraph, graph);
-            LOG.trace("New dependency graph: {}", dependencyGraph);
+            Graphs.merge(mutableGraph, graph);
+            LOG.trace("New dependency graph: {}", mutableGraph);
 
             resolvedEntities.add(entityDescriptor);
-            resolveDependencyGraph(dependencyGraph, resolvedEntities);
+            final Graph<EntityDescriptor> result = resolveDependencyGraph(mutableGraph, resolvedEntities);
+            Graphs.merge(mutableGraph, result);
         }
-    }
 
-    private void mergeGraphs(MutableGraph<EntityDescriptor> g1, Graph<EntityDescriptor> g2) {
-        LOG.trace("Merging {} with {}", g1, g2);
-        g2.edges().forEach(edge -> g1.putEdge(edge.nodeU(), edge.nodeV()));
+        return mutableGraph;
     }
 
     public EntitiesWithConstraints collectEntities(Collection<EntityDescriptor> resolvedEntities) {
@@ -102,7 +104,7 @@ public class CatalogIndex {
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
             final EntityFacade<?> facade = facades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
 
-            facade.collectEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
+            facade.exportEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
                 entities.add(entityWithConstraints.entity());
                 constraints.addAll(entityWithConstraints.constraints());
             });

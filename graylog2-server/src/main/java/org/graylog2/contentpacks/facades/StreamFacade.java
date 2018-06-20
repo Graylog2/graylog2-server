@@ -22,6 +22,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -30,6 +31,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -49,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,7 +78,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
-    public EntityWithConstraints encode(Stream stream) {
+    public EntityWithConstraints exportEntity(Stream stream) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
@@ -112,16 +115,21 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
-    public Stream decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<Stream> createNativeEntity(Entity entity,
+                                                   Map<String, ValueReference> parameters,
+                                                   Map<EntityDescriptor, Object> nativeEntities,
+                                                   String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters, username);
+            return decode((EntityV1) entity, parameters, nativeEntities, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-
         }
     }
 
-    private Stream decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
+    private NativeEntity<Stream> decode(EntityV1 entity,
+                                        Map<String, ValueReference> parameters,
+                                        Map<EntityDescriptor, Object> nativeEntities,
+                                        String username) {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
@@ -143,9 +151,41 @@ public class StreamFacade implements EntityFacade<Stream> {
             streamRuleService.create(stream.getId(), createStreamRuleRequest);
         }
 
-        // TODO: Assign Stream outputs
+        streamEntity.outputs().stream()
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT))
+                .forEach(output -> addOutput(stream, output, nativeEntities));
 
-        return stream;
+        return NativeEntity.create(stream.getId(), TYPE, stream);
+    }
+
+    private void addOutput(Stream stream,
+                           EntityDescriptor outputDescriptor,
+                           Map<EntityDescriptor, Object> nativeEntities) {
+        final Object output = nativeEntities.get(outputDescriptor);
+        if (output == null) {
+            final String msg = "Missing referenced output for stream \"" + stream.getTitle()
+                    + "\" (id=<" + stream.getId() + ">): "
+                    + outputDescriptor;
+            throw new ContentPackException(msg);
+        } else if (output instanceof Output) {
+            streamService.addOutput(stream, (Output) output);
+        } else {
+            final String msg = "Invalid entity type for referenced output " + outputDescriptor
+                    + " for stream \"" + stream.getTitle()
+                    + "\" (id=<" + stream.getId() + ">): "
+                    + output.getClass();
+            throw new ContentPackException(msg);
+        }
+    }
+
+    @Override
+    public void delete(Stream nativeEntity) {
+        try {
+            streamService.destroy(nativeEntity);
+        } catch (NotFoundException ignore) {
+        }
     }
 
     @Override
@@ -165,11 +205,11 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            return Optional.of(encode(stream));
+            return Optional.of(exportEntity(stream));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();
@@ -192,6 +232,36 @@ public class StreamFacade implements EntityFacade<Stream> {
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
         }
+
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolve(Entity entity,
+                                 Map<String, ValueReference> parameters,
+                                 Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolve((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolve(EntityV1 entity,
+                                  Map<String, ValueReference> parameters,
+                                  Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
+
+        streamEntity.outputs().stream()
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(outputEntity -> mutableGraph.putEdge(entity, outputEntity));
 
         return ImmutableGraph.copyOf(mutableGraph);
     }

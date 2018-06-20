@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
-    public EntityWithConstraints encode(Configuration configuration) {
+    public EntityWithConstraints exportEntity(Configuration configuration) {
         final CollectorConfigurationEntity configurationEntity = CollectorConfigurationEntity.create(
                 ValueReference.of(configuration.collectorId()),
                 ValueReference.of(configuration.name()),
@@ -76,15 +77,18 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
-    public Configuration decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<Configuration> createNativeEntity(Entity entity,
+                                                          Map<String, ValueReference> parameters,
+                                                          Map<EntityDescriptor, Object> nativeEntities,
+                                                          String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Configuration decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<Configuration> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final CollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), CollectorConfigurationEntity.class);
         final Configuration configuration = Configuration.create(
                 configurationEntity.collectorId().asString(parameters),
@@ -92,7 +96,13 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
                 configurationEntity.color().asString(parameters),
                 configurationEntity.template().asString(parameters));
 
-        return configurationService.save(configuration);
+        final Configuration savedConfiguration = configurationService.save(configuration);
+        return NativeEntity.create(savedConfiguration.id(), TYPE, savedConfiguration);
+    }
+
+    @Override
+    public void delete(Configuration nativeEntity) {
+        configurationService.delete(nativeEntity.id());
     }
 
     @Override
@@ -112,7 +122,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         final Configuration configuration = configurationService.find(modelId.id());
         if (isNull(configuration)) {
@@ -120,7 +130,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
             return Optional.empty();
         }
 
-        return Optional.of(encode(configuration));
+        return Optional.of(exportEntity(configuration));
     }
 
     @Override
@@ -136,6 +146,34 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
             final EntityDescriptor collectorEntityDescriptor = EntityDescriptor.create(
                     ModelId.of(configuration.collectorId()), ModelTypes.COLLECTOR);
             mutableGraph.putEdge(entityDescriptor, collectorEntityDescriptor);
+        }
+
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolve(Entity entity,
+                                 Map<String, ValueReference> parameters,
+                                 Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolveEntityV1((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolveEntityV1(EntityV1 entity,
+                                          Map<String, ValueReference> parameters,
+                                          Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final CollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), CollectorConfigurationEntity.class);
+        final EntityDescriptor collectorDescriptor = EntityDescriptor.create(ModelId.of(configurationEntity.collectorId().asString(parameters)), ModelTypes.COLLECTOR);
+        final Entity collectorEntity = entities.get(collectorDescriptor);
+
+        if (collectorEntity != null) {
+            mutableGraph.putEdge(entity, collectorEntity);
         }
 
         return ImmutableGraph.copyOf(mutableGraph);

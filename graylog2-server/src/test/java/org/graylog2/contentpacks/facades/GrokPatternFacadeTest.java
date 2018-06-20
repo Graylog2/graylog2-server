@@ -62,7 +62,7 @@ public class GrokPatternFacadeTest {
     @Test
     public void encode() {
         final GrokPattern grokPattern = GrokPattern.create("01234567890", "name", "pattern", null);
-        final EntityWithConstraints entityWithConstraints = facade.encode(grokPattern);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(grokPattern);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -122,7 +122,7 @@ public class GrokPatternFacadeTest {
                 .data(entityData)
                 .build();
 
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

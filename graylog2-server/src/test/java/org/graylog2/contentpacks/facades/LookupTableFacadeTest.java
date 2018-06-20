@@ -87,7 +87,7 @@ public class LookupTableFacadeTest {
                 .defaultMultiValue("default-multi")
                 .defaultMultiValueType(LookupDefaultValue.Type.STRING)
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.encode(lookupTableDto);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(lookupTableDto);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -144,7 +144,7 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("http-dsv-no-cache"), ModelTypes.LOOKUP_TABLE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("http-dsv-no-cache"), ModelTypes.LOOKUP_TABLE));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

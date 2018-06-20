@@ -112,6 +112,9 @@ public final class Graphs {
      * @param <N>    The class of the nodes
      */
     public static <N> void merge(MutableGraph<N> graph1, Graph<N> graph2) {
+        for (N node : graph2.nodes()) {
+            graph1.addNode(node);
+        }
         for (EndpointPair<N> edge : graph2.edges()) {
             graph1.putEdge(edge.nodeU(), edge.nodeV());
         }

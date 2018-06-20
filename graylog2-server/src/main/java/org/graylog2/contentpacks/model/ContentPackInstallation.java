@@ -18,13 +18,11 @@ package org.graylog2.contentpacks.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
@@ -45,7 +43,6 @@ public abstract class ContentPackInstallation {
     public static final String FIELD_CREATED_BY = "created_by";
 
     @JsonProperty(FIELD_ID)
-    @JsonView(ContentPackView.DBView.class)
     @Nullable
     public abstract ObjectId id();
 
@@ -77,7 +74,6 @@ public abstract class ContentPackInstallation {
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_ID)
-        @JsonView(ContentPackView.DBView.class)
         @Nullable
         abstract Builder id(ObjectId id);
 

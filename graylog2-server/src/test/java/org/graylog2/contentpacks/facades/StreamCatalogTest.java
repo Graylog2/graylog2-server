@@ -148,7 +148,7 @@ public class StreamCatalogTest {
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId();
         final StreamImpl stream = new StreamImpl(streamId, streamFields, streamRules, outputs, null);
-        final EntityWithConstraints entityWithConstraints = facade.encode(stream);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(stream);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -198,7 +198,7 @@ public class StreamCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/streams.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

@@ -29,8 +29,8 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class CollectorEntity {
-    @JsonProperty("title")
-    public abstract ValueReference title();
+    @JsonProperty("name")
+    public abstract ValueReference name();
 
     @JsonProperty("service_type")
     public abstract ValueReference serviceType();
@@ -54,7 +54,7 @@ public abstract class CollectorEntity {
     public abstract ValueReference defaultTemplate();
 
     @JsonCreator
-    public static CollectorEntity create(@JsonProperty("title") ValueReference title,
+    public static CollectorEntity create(@JsonProperty("name") ValueReference name,
                                          @JsonProperty("service_type") ValueReference serviceType,
                                          @JsonProperty("node_operating_system") ValueReference nodeOperatingSystem,
                                          @JsonProperty("executable_path") ValueReference executablePath,
@@ -62,7 +62,7 @@ public abstract class CollectorEntity {
                                          @JsonProperty("execute_parameters") List<ValueReference> executeParameters,
                                          @JsonProperty("validation_command") List<ValueReference> validationCommand,
                                          @JsonProperty("default_template") ValueReference defaultTemplate) {
-        return new AutoValue_CollectorEntity(title,
+        return new AutoValue_CollectorEntity(name,
                 serviceType,
                 nodeOperatingSystem,
                 executablePath,

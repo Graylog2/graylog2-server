@@ -114,7 +114,7 @@ public class InputFacadeTest {
         final InputImpl input = new InputImpl(fields);
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
-        final EntityWithConstraints entityWithConstraints = facade.encode(inputWithExtractors);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(inputWithExtractors);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -163,7 +163,7 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("5adf25294b900a0fdb4e5365"), ModelTypes.INPUT));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5adf25294b900a0fdb4e5365"), ModelTypes.INPUT));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

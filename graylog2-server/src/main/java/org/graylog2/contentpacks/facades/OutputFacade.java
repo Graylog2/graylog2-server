@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -61,7 +62,7 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public EntityWithConstraints encode(Output output) {
+    public EntityWithConstraints exportEntity(Output output) {
         final OutputEntity outputEntity = OutputEntity.create(
                 ValueReference.of(output.getTitle()),
                 ValueReference.of(output.getType()),
@@ -77,16 +78,19 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public Output decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<Output> createNativeEntity(Entity entity,
+                                                   Map<String, ValueReference> parameters,
+                                                   Map<EntityDescriptor, Object> nativeEntities,
+                                                   String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters, username);
+            return decode((EntityV1) entity, parameters, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
 
         }
     }
 
-    private Output decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
+    private NativeEntity<Output> decode(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         final CreateOutputRequest createOutputRequest = CreateOutputRequest.create(
                 outputEntity.title().asString(parameters),
@@ -95,9 +99,18 @@ public class OutputFacade implements EntityFacade<Output> {
                 null // TODO
         );
         try {
-            return outputService.create(createOutputRequest, username);
+            final Output output = outputService.create(createOutputRequest, username);
+            return NativeEntity.create(output.getId(), TYPE, output);
         } catch (ValidationException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+    @Override
+    public void delete(Output nativeEntity) {
+        try {
+            outputService.destroy(nativeEntity);
+        } catch (NotFoundException ignore) {
         }
     }
 
@@ -118,11 +131,11 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Output output = outputService.load(modelId.id());
-            return Optional.of(encode(output));
+            return Optional.of(exportEntity(output));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find output {}", entityDescriptor, e);
             return Optional.empty();

@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
@@ -56,7 +57,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     }
 
     @Override
-    public EntityWithConstraints encode(DataAdapterDto dataAdapterDto) {
+    public EntityWithConstraints exportEntity(DataAdapterDto dataAdapterDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(dataAdapterDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupDataAdapterEntity lookupDataAdapterEntity = LookupDataAdapterEntity.create(
@@ -74,16 +75,18 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     }
 
     @Override
-    public DataAdapterDto decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<DataAdapterDto> createNativeEntity(Entity entity,
+                                                           Map<String, ValueReference> parameters,
+                                                           Map<EntityDescriptor, Object> nativeEntities,
+                                                           String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-
         }
     }
 
-    private DataAdapterDto decodeEntityV1(EntityV1 entity, final Map<String, ValueReference> parameters) {
+    private NativeEntity<DataAdapterDto> decode(EntityV1 entity, final Map<String, ValueReference> parameters) {
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
         final LookupDataAdapterConfiguration configuration = objectMapper.convertValue(toValueMap(lookupDataAdapterEntity.configuration(), parameters), LookupDataAdapterConfiguration.class);
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
@@ -93,7 +96,31 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
                 .config(configuration)
                 .build();
 
-        return dataAdapterService.save(dataAdapterDto);
+        final DataAdapterDto savedDataAdapterDto = dataAdapterService.save(dataAdapterDto);
+        return NativeEntity.create(savedDataAdapterDto.name(), TYPE, savedDataAdapterDto);
+    }
+
+    @Override
+    public Optional<NativeEntity<DataAdapterDto>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<DataAdapterDto>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final LookupDataAdapterEntity dataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
+        final String name = dataAdapterEntity.name().asString(parameters);
+
+        final Optional<DataAdapterDto> existingDataAdapter = dataAdapterService.get(name);
+
+        return existingDataAdapter.map(dataAdapter -> NativeEntity.create(dataAdapter.id(), TYPE, dataAdapter));
+    }
+
+    @Override
+    public void delete(DataAdapterDto nativeEntity) {
+        dataAdapterService.delete(nativeEntity.id());
     }
 
     @Override
@@ -113,8 +140,8 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return dataAdapterService.get(modelId.id()).map(this::encode);
+        return dataAdapterService.get(modelId.id()).map(this::exportEntity);
     }
 }

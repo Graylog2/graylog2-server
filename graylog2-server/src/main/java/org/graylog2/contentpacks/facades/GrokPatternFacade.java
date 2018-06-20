@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
@@ -56,7 +57,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public EntityWithConstraints encode(GrokPattern grokPattern) {
+    public EntityWithConstraints exportEntity(GrokPattern grokPattern) {
         final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(
                 ValueReference.of(grokPattern.name()),
                 ValueReference.of(grokPattern.pattern()));
@@ -70,24 +71,59 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public GrokPattern decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<GrokPattern> createNativeEntity(Entity entity,
+                                                        Map<String, ValueReference> parameters,
+                                                        Map<EntityDescriptor, Object> nativeEntities,
+                                                        String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private GrokPattern decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<GrokPattern> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
-        final GrokPattern grokPattern = GrokPattern.create(
-                grokPatternEntity.name().asString(parameters),
-                grokPatternEntity.pattern().asString(parameters));
+        final String name = grokPatternEntity.name().asString(parameters);
+        final String pattern = grokPatternEntity.pattern().asString(parameters);
 
+        final GrokPattern grokPattern = GrokPattern.create(name, pattern);
         try {
-            return grokPatternService.save(grokPattern);
+            final GrokPattern savedGrokPattern = grokPatternService.save(grokPattern);
+            return NativeEntity.create(savedGrokPattern.id(), TYPE, savedGrokPattern);
         } catch (ValidationException e) {
             throw new RuntimeException("Couldn't create grok pattern " + grokPattern.name());
+        }
+    }
+
+    @Override
+    public void delete(GrokPattern nativeEntity) {
+        grokPatternService.delete(nativeEntity.id());
+    }
+
+    @Override
+    public Optional<NativeEntity<GrokPattern>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<GrokPattern>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
+        final String name = grokPatternEntity.name().asString(parameters);
+        final String pattern = grokPatternEntity.pattern().asString(parameters);
+
+        final Optional<GrokPattern> grokPattern = grokPatternService.loadByName(name);
+        grokPattern.ifPresent(existingPattern -> compareGrokPatterns(name, pattern, existingPattern.pattern()));
+
+        return grokPattern.map(gp -> NativeEntity.create(gp.id(), TYPE, gp));
+    }
+
+    private void compareGrokPatterns(String name, String expectedPattern, String actualPattern) {
+        if (!actualPattern.equals(expectedPattern)) {
+            throw new DivergingEntityConfiguration("Expected Grok pattern for name \"" + name + "\": <" + expectedPattern + ">; actual Grok pattern: <" + actualPattern + ">");
         }
     }
 
@@ -108,11 +144,11 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
-            return Optional.of(encode(grokPattern));
+            return Optional.of(exportEntity(grokPattern));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
             return Optional.empty();

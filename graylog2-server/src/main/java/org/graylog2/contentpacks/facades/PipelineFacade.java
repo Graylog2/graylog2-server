@@ -38,6 +38,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,7 +77,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public EntityWithConstraints encode(PipelineDao pipelineDao) {
+    public EntityWithConstraints exportEntity(PipelineDao pipelineDao) {
         final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id());
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),
@@ -100,15 +102,18 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public PipelineDao decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<PipelineDao> createNativeEntity(Entity entity,
+                                                        Map<String, ValueReference> parameters,
+                                                        Map<EntityDescriptor, Object> nativeEntities,
+                                                        String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private PipelineDao decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<PipelineDao> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final DateTime now = Tools.nowUTC();
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
         final ValueReference description = pipelineEntity.description();
@@ -122,7 +127,13 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
 
         // TODO: Create pipeline-stream connections
 
-        return pipelineService.save(pipelineDao);
+        final PipelineDao savedPipelineDao = pipelineService.save(pipelineDao);
+        return NativeEntity.create(savedPipelineDao.id(), TYPE, savedPipelineDao);
+    }
+
+    @Override
+    public void delete(PipelineDao nativeEntity) {
+        pipelineService.delete(nativeEntity.id());
     }
 
     @Override
@@ -142,11 +153,11 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());
-            return Optional.of(encode(pipelineDao));
+            return Optional.of(exportEntity(pipelineDao));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);
             return Optional.empty();
@@ -181,12 +192,49 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
+    @Override
+    public Graph<Entity> resolve(Entity entity,
+                                 Map<String, ValueReference> parameters,
+                                 Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolve((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolve(EntityV1 entity,
+                                  Map<String, ValueReference> parameters,
+                                  Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
+        final String source = pipelineEntity.source().asString(parameters);
+        final Collection<String> referencedRules = referencedRules(source);
+        referencedRules.stream()
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.PIPELINE_RULE))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(ruleEntity -> mutableGraph.putEdge(entity, ruleEntity));
+
+        pipelineEntity.connectedStreams().stream()
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(streamEntity -> mutableGraph.putEdge(entity, streamEntity));
+
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
     private Collection<String> referencedRules(String pipelineSource) {
         final Pipeline pipeline = pipelineRuleParser.parsePipeline("dummy", pipelineSource);
         return pipeline.stages().stream()
-                .map(Stage::getRules)
+                .map(Stage::ruleReferences)
                 .flatMap(Collection::stream)
-                .map(Rule::name)
                 .collect(Collectors.toSet());
     }
 }

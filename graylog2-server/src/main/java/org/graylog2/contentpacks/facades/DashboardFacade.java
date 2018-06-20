@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -33,6 +34,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.TimeRangeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.Dashboard;
@@ -47,6 +49,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.timeranges.TimeRangeFactory;
 import org.slf4j.Logger;
@@ -57,6 +60,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -89,7 +93,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public EntityWithConstraints encode(Dashboard dashboard) {
+    public EntityWithConstraints exportEntity(Dashboard dashboard) {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
@@ -128,15 +132,21 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public Dashboard decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<Dashboard> createNativeEntity(Entity entity,
+                                                      Map<String, ValueReference> parameters,
+                                                      Map<EntityDescriptor, Object> nativeEntities,
+                                                      String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters, username);
+            return decode((EntityV1) entity, parameters, nativeEntities, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Dashboard decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
+    private NativeEntity<Dashboard> decode(EntityV1 entity,
+                                           Map<String, ValueReference> parameters,
+                                           Map<EntityDescriptor, Object> nativeEntities,
+                                           String username) {
         DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final Dashboard dashboard;
         try {
@@ -145,13 +155,14 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                     dashboardEntity.description().asString(parameters),
                     dashboardEntity.widgets(),
                     username,
-                    parameters
+                    parameters,
+                    nativeEntities
             );
         } catch (Exception e) {
             throw new RuntimeException("Couldn't create dashboard", e);
         }
 
-        return dashboard;
+        return NativeEntity.create(dashboard.getId(), TYPE, dashboard);
     }
 
     private Dashboard createDashboard(
@@ -159,7 +170,8 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
             final String description,
             final List<DashboardWidgetEntity> widgets,
             final String username,
-            final Map<String, ValueReference> parameters)
+            final Map<String, ValueReference> parameters,
+            Map<EntityDescriptor, Object> nativeEntities)
             throws ValidationException, DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         // Create dashboard.
         final Map<String, Object> dashboardData = new HashMap<>();
@@ -178,7 +190,8 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                     widgetEntity.description().asString(parameters),
                     toValueMap(widgetEntity.configuration(), parameters),
                     widgetEntity.cacheTime().asInteger(parameters),
-                    username);
+                    username,
+                    nativeEntities);
             dashboardService.addWidget(dashboard, widget);
 
             widgetEntity.position().ifPresent(position -> widgetPositions.add(WidgetPositionsRequest.WidgetPosition.create(
@@ -208,30 +221,42 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
             final String description,
             final Map<String, Object> configuration,
             final int cacheTime,
-            final String username)
+            final String username,
+            Map<EntityDescriptor, Object> nativeEntities)
             throws InvalidRangeParametersException, DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
 
+        final Map<String, Object> widgetConfig = new HashMap<>(configuration);
+
         // Replace "stream_id" in configuration if it's set
-        /*
-        TODO:
-        final String streamReference = (String) configuration.get("stream_id");
+        final String streamReference = (String) widgetConfig.get("stream_id");
         if (!isNullOrEmpty(streamReference)) {
-            final org.graylog2.plugin.streams.Stream stream = streamsByReferenceId.get(streamReference);
-            if (null != stream) {
-                configuration.put("stream_id", stream.getId());
+            final EntityDescriptor streamDescriptor = EntityDescriptor.create(ModelId.of(streamReference), ModelTypes.STREAM);
+            final Object stream = nativeEntities.get(streamDescriptor);
+
+            if (stream == null) {
+                final String msg = "Missing stream for dashboard widget \"" + description + "\": " + streamDescriptor;
+                throw new ContentPackException(msg);
+            } else if (stream instanceof Stream) {
+                widgetConfig.put("stream_id", ((Stream) stream).getId());
             } else {
-                LOG.warn("Couldn't find referenced stream {}", streamReference);
+                final String msg = "Invalid entity type for referenced stream " + streamDescriptor
+                        + " for dashboard widget \"" + description + "\": " + stream.getClass();
+                throw new ContentPackException(msg);
             }
         }
-        */
 
-        final Map<String, Object> timerangeConfig = (Map<String, Object>) configuration.get("timerange");
+        final Map<String, Object> timerangeConfig = (Map<String, Object>) widgetConfig.get("timerange");
         final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
 
         final String widgetId = UUID.randomUUID().toString();
         return widgetCreator.buildDashboardWidget(type,
                 widgetId, description, cacheTime,
-                configuration, timeRange, username);
+                widgetConfig, timeRange, username);
+    }
+
+    @Override
+    public void delete(Dashboard nativeEntity) {
+        dashboardService.destroy(nativeEntity);
     }
 
     @Override
@@ -251,11 +276,11 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Dashboard dashboard = dashboardService.load(modelId.id());
-            return Optional.of(encode(dashboard));
+            return Optional.of(exportEntity(dashboard));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
             return Optional.empty();
@@ -282,6 +307,38 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
         }
+
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolve(Entity entity,
+                                 Map<String, ValueReference> parameters,
+                                 Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolveEntityV1((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolveEntityV1(EntityV1 entity,
+                                          Map<String, ValueReference> parameters,
+                                          Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
+        dashboardEntity.widgets().stream()
+                .map(widget -> widget.configuration().get("stream_id"))
+                .filter(ref -> ref instanceof ValueReference)
+                .map(ref -> (ValueReference) ref)
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(stream -> mutableGraph.putEdge(entity, stream));
 
         return ImmutableGraph.copyOf(mutableGraph);
     }

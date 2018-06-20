@@ -82,7 +82,7 @@ public class LookupCacheFacadeTest {
                 .description("Cache Description")
                 .config(new FallbackCacheConfig())
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.encode(cacheDto);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(cacheDto);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -129,7 +129,7 @@ public class LookupCacheFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("no-op-cache"), ModelTypes.LOOKUP_CACHE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("no-op-cache"), ModelTypes.LOOKUP_CACHE));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

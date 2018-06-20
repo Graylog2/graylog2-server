@@ -93,7 +93,7 @@ public class OutputFacadeTest {
                 new Date(0L),
                 null
         );
-        final EntityWithConstraints entityWithConstraints = facade.encode(output);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(output);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -142,7 +142,7 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("5adf239e4b900a0fdb4e5197"), ModelTypes.OUTPUT));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5adf239e4b900a0fdb4e5197"), ModelTypes.OUTPUT));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

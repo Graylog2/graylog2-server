@@ -22,6 +22,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -31,6 +32,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
@@ -57,7 +59,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public EntityWithConstraints encode(LookupTableDto lookupTableDto) {
+    public EntityWithConstraints exportEntity(LookupTableDto lookupTableDto) {
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
                 ValueReference.of(lookupTableDto.name()),
                 ValueReference.of(lookupTableDto.title()),
@@ -78,15 +80,18 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public LookupTableDto decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<LookupTableDto> createNativeEntity(Entity entity,
+                                                           Map<String, ValueReference> parameters,
+                                                           Map<EntityDescriptor, Object> nativeEntities,
+                                                           String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private LookupTableDto decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<LookupTableDto> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
         final LookupTableDto lookupTableDto = LookupTableDto.builder()
                 .name(lookupTableEntity.name().asString(parameters))
@@ -99,7 +104,39 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 .defaultMultiValue(lookupTableEntity.defaultMultiValue().asString(parameters))
                 .defaultMultiValueType(lookupTableEntity.defaultMultiValueType().asEnum(parameters, LookupDefaultMultiValue.Type.class))
                 .build();
-        return lookupTableService.save(lookupTableDto);
+        final LookupTableDto savedLookupTableDto = lookupTableService.save(lookupTableDto);
+        return NativeEntity.create(savedLookupTableDto.id(), TYPE, savedLookupTableDto);
+    }
+
+    @Override
+    public Optional<NativeEntity<LookupTableDto>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<LookupTableDto>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
+        final String name = lookupTableEntity.name().asString(parameters);
+        final String title = lookupTableEntity.title().asString(parameters);
+
+        final Optional<LookupTableDto> lookupTable = lookupTableService.get(name);
+        lookupTable.ifPresent(existingLookupTable -> compareLookupTable(name, title, existingLookupTable));
+
+        return lookupTable.map(lt -> NativeEntity.create(lt.id(), TYPE, lt));
+    }
+
+    private void compareLookupTable(String name, String title, LookupTableDto existingLookupTable) {
+        if (!name.equals(existingLookupTable.name()) || !title.equals(existingLookupTable.title())) {
+            throw new DivergingEntityConfiguration("Different lookup table configuration with name \"" + name + "\"");
+        }
+    }
+
+    @Override
+    public void delete(LookupTableDto nativeEntity) {
+        lookupTableService.delete(nativeEntity.id());
     }
 
     @Override
@@ -119,9 +156,9 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return lookupTableService.get(modelId.id()).map(this::encode);
+        return lookupTableService.get(modelId.id()).map(this::exportEntity);
     }
 
     @Override
@@ -138,6 +175,46 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         lookupTableDto.map(LookupTableDto::cacheId)
                 .map(cacheId -> EntityDescriptor.create(ModelId.of(cacheId), ModelTypes.LOOKUP_CACHE))
                 .ifPresent(cache -> mutableGraph.putEdge(entityDescriptor, cache));
+
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolve(Entity entity,
+                                 Map<String, ValueReference> parameters,
+                                 Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolve((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolve(EntityV1 entity,
+                                  Map<String, ValueReference> parameters,
+                                  Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
+
+        final String dataAdapterName = lookupTableEntity.dataAdapterName().asString(parameters);
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(ModelId.of(dataAdapterName), ModelTypes.LOOKUP_ADAPTER);
+        final Entity dataAdapterEntity = entities.get(dataAdapterDescriptor);
+        if (dataAdapterEntity == null) {
+            throw new ContentPackException("Missing data adapter \"" + dataAdapterName + "\" for lookup table " + entity.toEntityDescriptor());
+        } else {
+            mutableGraph.putEdge(entity, dataAdapterEntity);
+        }
+
+        final String cacheName = lookupTableEntity.cacheName().asString(parameters);
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(ModelId.of(cacheName), ModelTypes.LOOKUP_CACHE);
+        final Entity cacheEntity = entities.get(cacheDescriptor);
+        if (cacheEntity == null) {
+            throw new ContentPackException("Missing cache \"" + cacheName + "\" for lookup table " + entity.toEntityDescriptor());
+        } else {
+            mutableGraph.putEdge(entity, cacheEntity);
+        }
 
         return ImmutableGraph.copyOf(mutableGraph);
     }

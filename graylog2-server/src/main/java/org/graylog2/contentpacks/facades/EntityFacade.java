@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
@@ -31,19 +32,36 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EntityFacade<T> {
-    EntityWithConstraints encode(T nativeEntity);
+    EntityWithConstraints exportEntity(T nativeEntity);
 
-    T decode(Entity entity, Map<String, ValueReference> parameters, String username);
+    NativeEntity<T> createNativeEntity(Entity entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Object> nativeEntities,
+                                       String username);
+
+    default Optional<NativeEntity<T>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        return Optional.empty();
+    }
+
+    void delete(T nativeEntity);
 
     EntityExcerpt createExcerpt(T nativeEntity);
 
     Set<EntityExcerpt> listEntityExcerpts();
 
-    Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor);
+    Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor);
 
     default Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entityDescriptor);
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    default Graph<Entity> resolve(Entity entity,
+                                  Map<String, ValueReference> parameters,
+                                  Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 }

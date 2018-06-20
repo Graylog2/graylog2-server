@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
@@ -56,7 +57,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     @Override
-    public EntityWithConstraints encode(CacheDto cacheDto) {
+    public EntityWithConstraints exportEntity(CacheDto cacheDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(
@@ -74,16 +75,18 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     @Override
-    public CacheDto decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<CacheDto> createNativeEntity(Entity entity,
+                                                     Map<String, ValueReference> parameters,
+                                                     Map<EntityDescriptor, Object> nativeEntities,
+                                                     String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
-
         }
     }
 
-    private CacheDto decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<CacheDto> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
         final LookupCacheConfiguration configuration = objectMapper.convertValue(toValueMap(lookupCacheEntity.configuration(), parameters), LookupCacheConfiguration.class);
         final CacheDto cacheDto = CacheDto.builder()
@@ -93,7 +96,31 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 .config(configuration)
                 .build();
 
-        return cacheService.save(cacheDto);
+        final CacheDto savedCacheDto = cacheService.save(cacheDto);
+        return NativeEntity.create(savedCacheDto.name(), TYPE, savedCacheDto);
+    }
+
+    @Override
+    public Optional<NativeEntity<CacheDto>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<CacheDto>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final LookupCacheEntity cacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
+        final String name = cacheEntity.name().asString(parameters);
+
+        final Optional<CacheDto> existingCache = cacheService.get(name);
+
+        return existingCache.map(cache -> NativeEntity.create(cache.id(), TYPE, cache));
+    }
+
+    @Override
+    public void delete(CacheDto nativeEntity) {
+        cacheService.delete(nativeEntity.id());
     }
 
     @Override
@@ -113,8 +140,8 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return cacheService.get(modelId.id()).map(this::encode);
+        return cacheService.get(modelId.id()).map(this::exportEntity);
     }
 }

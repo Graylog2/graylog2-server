@@ -28,6 +28,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -57,7 +58,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @Override
-    public EntityWithConstraints encode(RuleDao ruleDao) {
+    public EntityWithConstraints exportEntity(RuleDao ruleDao) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
                 ValueReference.of(ruleDao.title()),
                 ValueReference.of(ruleDao.description()),
@@ -72,27 +73,71 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @Override
-    public RuleDao decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<RuleDao> createNativeEntity(Entity entity,
+                                                    Map<String, ValueReference> parameters,
+                                                    Map<EntityDescriptor, Object> nativeEntities,
+                                                    String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private RuleDao decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters) {
-        final DateTime now = Tools.nowUTC();
+    private NativeEntity<RuleDao> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
         final PipelineRuleEntity ruleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);
+        final String title = ruleEntity.title().asString(parameters);
+        final String source = ruleEntity.source().asString(parameters);
+
+        final DateTime now = Tools.nowUTC();
         final ValueReference description = ruleEntity.description();
         final RuleDao ruleDao = RuleDao.builder()
-                .title(ruleEntity.title().asString(parameters))
+                .title(title)
                 .description(description == null ? null : description.asString(parameters))
-                .source(ruleEntity.source().asString(parameters))
+                .source(source)
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();
 
-        return ruleService.save(ruleDao);
+        final RuleDao savedRuleDao = ruleService.save(ruleDao);
+        return NativeEntity.create(savedRuleDao.id(), TYPE, savedRuleDao);
+    }
+
+    @Override
+    public void delete(RuleDao nativeEntity) {
+        ruleService.delete(nativeEntity.id());
+    }
+
+    @Override
+    public Optional<NativeEntity<RuleDao>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<RuleDao>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final PipelineRuleEntity ruleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);
+
+        final String title = ruleEntity.title().asString(parameters);
+        final String source = ruleEntity.source().asString(parameters);
+
+        try {
+            final RuleDao ruleDao = ruleService.loadByName(title);
+            compareRuleSources(title, source, ruleDao.source());
+
+            return Optional.of(NativeEntity.create(ruleDao.id(), TYPE, ruleDao));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    private void compareRuleSources(String name, String expectedRuleSource, String actualRuleSource) {
+        if (!actualRuleSource.equals(expectedRuleSource)) {
+            LOG.debug("Expected source for rule \"{}\":\n{}\n\nActual source:\n{}", name, expectedRuleSource, actualRuleSource);
+            throw new DivergingEntityConfiguration("Different pipeline rule sources for pipeline rule with name \"" + name + "\"");
+        }
     }
 
     @Override
@@ -112,11 +157,11 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final RuleDao ruleDao = ruleService.loadByName(modelId.id());
-            return Optional.of(encode(ruleDao));
+            return Optional.of(exportEntity(ruleDao));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline rule {}", entityDescriptor, e);
             return Optional.empty();

@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -57,6 +58,13 @@ public class InMemoryGrokPatternService implements GrokPatternService {
             throw new NotFoundException("Couldn't find Grok pattern with ID " + patternId);
         }
         return pattern;
+    }
+
+    @Override
+    public Optional<GrokPattern> loadByName(String name) {
+        return store.values().stream()
+                .filter(pattern -> pattern.name().equals(name))
+                .findAny();
     }
 
     @Override

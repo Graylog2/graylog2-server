@@ -32,6 +32,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -98,7 +99,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public EntityWithConstraints encode(InputWithExtractors inputWithExtractors) {
+    public EntityWithConstraints exportEntity(InputWithExtractors inputWithExtractors) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
@@ -149,16 +150,18 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
 
 
     @Override
-    public InputWithExtractors decode(Entity entity, Map<String, ValueReference> parameters, String username) {
+    public NativeEntity<InputWithExtractors> createNativeEntity(Entity entity,
+                                                                Map<String, ValueReference> parameters,
+                                                                Map<EntityDescriptor, Object> nativeEntities,
+                                                                String username) {
         if (entity instanceof EntityV1) {
-            return decodeEntityV1((EntityV1) entity, parameters, username);
+            return decode((EntityV1) entity, parameters, username);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-
-    private InputWithExtractors decodeEntityV1(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
+    private NativeEntity<InputWithExtractors> decode(EntityV1 entity, Map<String, ValueReference> parameters, String username) {
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
         final Map<String, ValueReference> staticFields = inputEntity.staticFields();
 
@@ -193,7 +196,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
             throw new RuntimeException("Couldn't create extractors", e);
         }
 
-        return InputWithExtractors.create(input, extractors);
+        return NativeEntity.create(input.getId(), TYPE, InputWithExtractors.create(input, extractors));
     }
 
     private MessageInput createMessageInput(
@@ -377,6 +380,11 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
+    public void delete(InputWithExtractors nativeEntity) {
+        inputService.destroy(nativeEntity.input());
+    }
+
+    @Override
     public EntityExcerpt createExcerpt(InputWithExtractors inputWithExtractors) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(inputWithExtractors.input().getId()))
@@ -394,13 +402,13 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> collectEntity(EntityDescriptor entityDescriptor) {
+    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
 
         try {
             final Input input = inputService.find(modelId.id());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            return Optional.of(encode(inputWithExtractors));
+            return Optional.of(exportEntity(inputWithExtractors));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

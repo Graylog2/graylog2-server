@@ -82,11 +82,11 @@ public class LookupDataAdapterFacadeTest {
                 .description("Data Adapter Description")
                 .config(new FallbackAdapterConfig())
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.encode(dataAdapterDto);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(dataAdapterDto);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of(dataAdapterDto.id()));
+        assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));
         assertThat(entity.type()).isEqualTo(ModelType.of("lookup_adapter"));
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -129,7 +129,7 @@ public class LookupDataAdapterFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.collectEntity(EntityDescriptor.create(ModelId.of("http-dsv"), ModelTypes.LOOKUP_ADAPTER));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("http-dsv"), ModelTypes.LOOKUP_ADAPTER));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

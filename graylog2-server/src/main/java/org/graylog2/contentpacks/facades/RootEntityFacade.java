@@ -17,6 +17,8 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -24,22 +26,18 @@ import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.utilities.Graphs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class UnsupportedEntityFacade implements EntityFacade<Void> {
-    private static final Logger LOG = LoggerFactory.getLogger(UnsupportedEntityFacade.class);
-
-    public static final UnsupportedEntityFacade INSTANCE = new UnsupportedEntityFacade();
+public class RootEntityFacade implements EntityFacade<Void> {
+    public static final ModelType TYPE = ModelTypes.ROOT;
 
     @Override
     public EntityWithConstraints exportEntity(Void nativeEntity) {
-        throw new UnsupportedOperationException("Unsupported entity");
+        throw new UnsupportedOperationException("Unsupported operation for root entity");
     }
 
     @Override
@@ -47,17 +45,16 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
                                                  Map<String, ValueReference> parameters,
                                                  Map<EntityDescriptor, Object> nativeEntities,
                                                  String username) {
-        throw new UnsupportedOperationException("Unsupported entity " + entity.toEntityDescriptor());
+        throw new UnsupportedOperationException("Unsupported operation for root entity");
     }
 
     @Override
     public void delete(Void nativeEntity) {
-        throw new UnsupportedOperationException("Unsupported entity");
     }
 
     @Override
     public EntityExcerpt createExcerpt(Void nativeEntity) {
-        throw new UnsupportedOperationException("Unsupported entity");
+        throw new UnsupportedOperationException("Unsupported operation for root entity");
     }
 
     @Override
@@ -67,13 +64,11 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
 
     @Override
     public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
-        LOG.warn("Couldn't collect entity {}", entityDescriptor);
         return Optional.empty();
     }
 
     @Override
     public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
-        LOG.warn("Couldn't resolve entity {}", entityDescriptor);
         return Graphs.emptyDirectedGraph();
     }
 
@@ -81,7 +76,6 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     public Graph<Entity> resolve(Entity entity,
                                  Map<String, ValueReference> parameters,
                                  Map<EntityDescriptor, Entity> entities) {
-        LOG.warn("Couldn't resolve entity {}", entity.toEntityDescriptor());
         return Graphs.emptyDirectedGraph();
     }
 }
