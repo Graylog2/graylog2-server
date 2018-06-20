@@ -22,6 +22,16 @@ describe('<Wizard />', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
+  it('should render in horizontal mode with 3 steps', () => {
+    const wrapper = renderer.create(<Wizard steps={steps} horizontal />);
+    expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('should render in horizontal mode with 3 steps and children', () => {
+    const wrapper = renderer.create(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
+    expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
   it('should render step 1 when nothing was clicked', () => {
     const wrapper = mount(<Wizard steps={steps} />);
     expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
