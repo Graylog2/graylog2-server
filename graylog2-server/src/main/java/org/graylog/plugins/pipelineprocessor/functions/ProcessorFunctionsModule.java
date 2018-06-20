@@ -21,6 +21,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.alerts.TriggerAlert;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
@@ -156,6 +157,9 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
         // helper service for route_to_stream
         serviceBinder().addBinding().to(StreamCacheService.class).in(Scopes.SINGLETON);
+
+        // alerting related functions
+        addMessageProcessorFunction(TriggerAlert.NAME, TriggerAlert.class);
 
         // input related functions
         addMessageProcessorFunction(FromInput.NAME, FromInput.class);

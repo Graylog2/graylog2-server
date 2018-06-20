@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -27,6 +28,7 @@ import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.alerts.TriggerAlert;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
@@ -121,29 +123,40 @@ import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog2.alerts.Alert;
+import org.graylog2.alerts.AlertImpl;
+import org.graylog2.alerts.AlertNotificationsSender;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
-import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -152,20 +165,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
-
     public static final DateTime GRAYLOG_EPOCH = DateTime.parse("2010-07-30T16:03:25Z");
-    private static final EventBus eventBus = new EventBus();
-    private static StreamCacheService streamCacheService;
-    private static Stream otherStream;
+    private static Stream otherStream = new StreamMock(ImmutableMap.of(
+            "_id", "id2",
+            StreamImpl.FIELD_TITLE, "some name",
+            StreamImpl.FIELD_DISABLED, false)
+    );
 
-    @BeforeClass
+    @org.junit.Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    private final EventBus eventBus = new EventBus();
+    private final Provider<Stream> defaultStreamProvider = () -> defaultStream;
+
+    private StreamCacheService streamCacheService;
+    @Mock
+    private StreamService streamService;
+    @Mock
+    private AlertService alertService;
+    @Mock
+    private AlertNotificationsSender alertNotificationsSender;
+
+    @Before
     @SuppressForbidden("Allow using default thread factory")
-    public static void registerFunctions() {
+    public void registerFunctions() throws ValidationException, NotFoundException {
         final Map<String, Function<?>> functions = commonFunctions();
 
         functions.put(BooleanConversion.NAME, new BooleanConversion());
@@ -186,30 +219,35 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(CloneMessage.NAME, new CloneMessage());
 
         // route to stream mocks
-        final StreamService streamService = mock(StreamService.class);
-
-        otherStream = mock(Stream.class, "some stream id2");
-        when(otherStream.isPaused()).thenReturn(false);
-        when(otherStream.getTitle()).thenReturn("some name");
-        when(otherStream.getId()).thenReturn("id2");
-
         when(streamService.loadAll()).thenReturn(Lists.newArrayList(defaultStream, otherStream));
         when(streamService.loadAllEnabled()).thenReturn(Lists.newArrayList(defaultStream, otherStream));
-        try {
-            when(streamService.load(anyString())).thenThrow(new NotFoundException());
-            when(streamService.load(ArgumentMatchers.eq(Stream.DEFAULT_STREAM_ID))).thenReturn(defaultStream);
-            when(streamService.load(ArgumentMatchers.eq("id2"))).thenReturn(otherStream);
-        } catch (NotFoundException ignored) {
-            // oh well, checked exceptions <3
-        }
+        when(streamService.load(anyString())).thenThrow(new NotFoundException());
+        when(streamService.load(ArgumentMatchers.eq(Stream.DEFAULT_STREAM_ID))).thenReturn(defaultStream);
+        when(streamService.load(ArgumentMatchers.eq("id2"))).thenReturn(otherStream);
+
         streamCacheService = new StreamCacheService(eventBus, streamService, null);
         streamCacheService.startAsync().awaitRunning();
-        final Provider<Stream> defaultStreamProvider = () -> defaultStream;
+
         functions.put(RouteToStream.NAME, new RouteToStream(streamCacheService, defaultStreamProvider));
         functions.put(RemoveFromStream.NAME, new RemoveFromStream(streamCacheService, defaultStreamProvider));
         // input related functions
         // TODO needs mock
         //functions.put(FromInput.NAME, new FromInput());
+
+        // alert functions
+        final Alert alert = AlertImpl.create(
+                "id",
+                defaultStream.getId(),
+                "condition-id",
+                GRAYLOG_EPOCH,
+                GRAYLOG_EPOCH,
+                "description",
+                Collections.emptyMap(),
+                true);
+        when(alertService.factory(any())).thenReturn(alert);
+        when(alertService.save(alert)).thenReturn(alert.getId());
+        when(alertService.resolveAlert(alert)).thenReturn(alert);
+        functions.put(TriggerAlert.NAME, new TriggerAlert(alertService, alertNotificationsSender, streamCacheService, defaultStreamProvider));
 
         // generic functions
         functions.put(RegexMatch.NAME, new RegexMatch());
@@ -317,6 +355,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
 
         functionRegistry = new FunctionRegistry(functions);
+
+        DateTimeUtils.setCurrentMillisFixed(GRAYLOG_EPOCH.getMillis());
+
+        super.setup();
+    }
+
+    @After
+    public void tearDown() {
+        streamCacheService.stopAsync().awaitTerminated();
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -415,43 +463,36 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void dates() {
-        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
-        DateTimeUtils.setCurrentMillisProvider(clock);
-
+        final Rule rule;
         try {
-            final Rule rule;
-            try {
-                rule = parser.parseRule(ruleForTest(), false);
-            } catch (ParseException e) {
-                fail("Should not fail to parse", e);
-                return;
-            }
-            final Message message = evaluateRule(rule);
-
-            assertThat(actionsTriggered.get()).isTrue();
-            assertThat(message).isNotNull();
-            assertThat(message).isNotEmpty();
-            assertThat(message.hasField("year")).isTrue();
-            assertThat(message.getField("year")).isEqualTo(2010);
-            assertThat(message.getField("timezone")).isEqualTo("UTC");
-
-            // Date parsing locales
-            assertThat(message.getField("german_year")).isEqualTo(1983);
-            assertThat(message.getField("german_month")).isEqualTo(7);
-            assertThat(message.getField("german_day")).isEqualTo(24);
-            assertThat(message.getField("english_year")).isEqualTo(1983);
-            assertThat(message.getField("english_month")).isEqualTo(7);
-            assertThat(message.getField("english_day")).isEqualTo(24);
-            assertThat(message.getField("french_year")).isEqualTo(1983);
-            assertThat(message.getField("french_month")).isEqualTo(7);
-            assertThat(message.getField("french_day")).isEqualTo(24);
-
-            assertThat(message.getField("ts_hour")).isEqualTo(16);
-            assertThat(message.getField("ts_minute")).isEqualTo(3);
-            assertThat(message.getField("ts_second")).isEqualTo(25);
-        } finally {
-            DateTimeUtils.setCurrentMillisSystem();
+            rule = parser.parseRule(ruleForTest(), false);
+        } catch (ParseException e) {
+            fail("Should not fail to parse", e);
+            return;
         }
+        final Message message = evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message).isNotEmpty();
+        assertThat(message.hasField("year")).isTrue();
+        assertThat(message.getField("year")).isEqualTo(2010);
+        assertThat(message.getField("timezone")).isEqualTo("UTC");
+
+        // Date parsing locales
+        assertThat(message.getField("german_year")).isEqualTo(1983);
+        assertThat(message.getField("german_month")).isEqualTo(7);
+        assertThat(message.getField("german_day")).isEqualTo(24);
+        assertThat(message.getField("english_year")).isEqualTo(1983);
+        assertThat(message.getField("english_month")).isEqualTo(7);
+        assertThat(message.getField("english_day")).isEqualTo(24);
+        assertThat(message.getField("french_year")).isEqualTo(1983);
+        assertThat(message.getField("french_month")).isEqualTo(7);
+        assertThat(message.getField("french_day")).isEqualTo(24);
+
+        assertThat(message.getField("ts_hour")).isEqualTo(16);
+        assertThat(message.getField("ts_minute")).isEqualTo(3);
+        assertThat(message.getField("ts_second")).isEqualTo(25);
     }
 
     @Test
@@ -870,23 +911,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void timezones() {
-        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
-        DateTimeUtils.setCurrentMillisProvider(clock);
-        try {
-            final Rule rule = parser.parseRule(ruleForTest(), true);
-            evaluateRule(rule);
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        evaluateRule(rule);
 
-            assertThat(actionsTriggered.get()).isTrue();
-        } finally {
-            DateTimeUtils.setCurrentMillisSystem();
-        }
+        assertThat(actionsTriggered.get()).isTrue();
     }
 
     @Test
     public void dateArithmetic() {
-        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
-        DateTimeUtils.setCurrentMillisProvider(clock);
-        try {
             final Rule rule = parser.parseRule(ruleForTest(), true);
             final Message message = evaluateRule(rule);
 
@@ -905,13 +937,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("millis")).isEqualTo(Period.millis(2));
             assertThat(message.getField("period")).isEqualTo(Period.parse("P1YT1M"));
 
-
             assertThat(message.getFieldAs(DateTime.class, "long_time_ago")).matches(date -> date.plus(Period.years(10000)).equals(GRAYLOG_EPOCH));
 
             assertThat(message.getTimestamp()).isEqualTo(GRAYLOG_EPOCH.plusHours(1));
-        } finally {
-            DateTimeUtils.setCurrentMillisSystem();
-        }
     }
 
     @Test
@@ -962,5 +990,73 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(message).isNotNull();
         assertThat(message.getStreams()).containsOnly(defaultStream);
+    }
+
+    @Test
+    public void triggerAlert() throws ValidationException {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("alert_ids"))
+                .isInstanceOf(List.class)
+                .asList()
+                .contains("id");
+
+        verify(alertService).factory(any());
+        verify(alertService).save(any());
+        verify(alertService).resolveAlert(any());
+        verify(alertNotificationsSender).send(any(), eq(defaultStream), any(), any());
+    }
+
+    @Test
+    public void triggerAlertWithDifferentStream() throws ValidationException {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("alert_ids"))
+                .isInstanceOf(List.class)
+                .asList()
+                .contains("id");
+
+        verify(alertService).factory(any());
+        verify(alertService).save(any());
+        verify(alertService).resolveAlert(any());
+        verify(alertNotificationsSender).send(any(), eq(otherStream), any(), any());
+    }
+
+    @Test
+    public void triggerAlertWithoutNotification() throws ValidationException {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("alert_ids"))
+                .isInstanceOf(List.class)
+                .asList()
+                .contains("id");
+
+        verify(alertService).factory(any());
+        verify(alertService).save(any());
+        verify(alertService).resolveAlert(any());
+        verifyZeroInteractions(alertNotificationsSender);
+    }
+
+    @Test
+    public void triggerAlertWithoutResolving() throws ValidationException {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("alert_ids"))
+                .isInstanceOf(List.class)
+                .asList()
+                .contains("id");
+
+        verify(alertService).factory(any());
+        verify(alertService).save(any());
+        verify(alertService, never()).resolveAlert(any());
+        verify(alertNotificationsSender).send(any(), eq(defaultStream), any(), any());
     }
 }
