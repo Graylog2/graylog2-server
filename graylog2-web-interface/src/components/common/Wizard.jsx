@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Button, Col, Nav, NavItem } from 'react-bootstrap';
+import { Button, Col, Nav, NavItem, Row } from 'react-bootstrap';
 
 import WizardStyle from './Wizard.css';
 
@@ -33,11 +33,14 @@ class Wizard extends React.Component {
     onStepChange: PropTypes.func,
     /** Optional component which can be rendered on the right side e.g a preview */
     children: PropTypes.element,
+    /** Customize the container CSS class used by this component */
+    containerClassName: PropTypes.string,
   };
 
   static defaultProps = {
     children: undefined,
     onStepChange: () => {},
+    containerClassName: 'content',
   };
 
   constructor(props) {
@@ -73,7 +76,7 @@ class Wizard extends React.Component {
 
   render() {
     return (
-      <Row className="content">
+      <Row className={this.props.containerClassName}>
         <Col md={2} className={WizardStyle.subnavigation}>
           <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
             {this.props.steps.map((navItem) => {
