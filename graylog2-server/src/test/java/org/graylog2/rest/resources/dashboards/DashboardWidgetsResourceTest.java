@@ -112,6 +112,7 @@ public class DashboardWidgetsResourceTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void updateCacheTime() throws Exception {
         final int newCacheTime = 666;
 

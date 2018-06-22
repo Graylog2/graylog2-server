@@ -96,44 +96,44 @@ public class TimeBasedRotationStrategyTest {
         // should snap to 14:00:00
         period = Period.hours(1);
         final DateTime hourAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
-        assertEquals(hourAnchor.getHourOfDay(), 14);
-        assertEquals(hourAnchor.getMinuteOfHour(), 0);
-        assertEquals(hourAnchor.getSecondOfMinute(), 0);
+        assertEquals(14, hourAnchor.getHourOfDay());
+        assertEquals(0, hourAnchor.getMinuteOfHour());
+        assertEquals(0, hourAnchor.getSecondOfMinute());
 
         // should snap to 14:45:00
         period = minutes(5);
         final DateTime fiveMins = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
-        assertEquals(fiveMins.getHourOfDay(), 14);
-        assertEquals(fiveMins.getMinuteOfHour(), 45);
-        assertEquals(fiveMins.getSecondOfMinute(), 0);
+        assertEquals(14, fiveMins.getHourOfDay());
+        assertEquals(45, fiveMins.getMinuteOfHour());
+        assertEquals(0, fiveMins.getSecondOfMinute());
 
         // should snap to 2014-3-15 00:00:00
         period = Period.days(1).withHours(6);
         final DateTime dayAnd6Hours = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
-        assertEquals(dayAnd6Hours.getYear(), 2014);
-        assertEquals(dayAnd6Hours.getMonthOfYear(), 3);
-        assertEquals(dayAnd6Hours.getDayOfMonth(), 15);
-        assertEquals(dayAnd6Hours.getHourOfDay(), 0);
-        assertEquals(dayAnd6Hours.getMinuteOfHour(), 0);
-        assertEquals(dayAnd6Hours.getSecondOfMinute(), 0);
+        assertEquals(2014, dayAnd6Hours.getYear());
+        assertEquals(3, dayAnd6Hours.getMonthOfYear());
+        assertEquals(15, dayAnd6Hours.getDayOfMonth());
+        assertEquals(0, dayAnd6Hours.getHourOfDay());
+        assertEquals(0, dayAnd6Hours.getMinuteOfHour());
+        assertEquals(0, dayAnd6Hours.getSecondOfMinute());
 
         period = Period.days(30);
         final DateTime thirtyDays = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
-        assertEquals(thirtyDays.getYear(), 2014);
-        assertEquals(thirtyDays.getMonthOfYear(), 2);
-        assertEquals(thirtyDays.getDayOfMonth(), 17);
-        assertEquals(thirtyDays.getHourOfDay(), 0);
-        assertEquals(thirtyDays.getMinuteOfHour(), 0);
-        assertEquals(thirtyDays.getSecondOfMinute(), 0);
+        assertEquals(2014, thirtyDays.getYear());
+        assertEquals(2, thirtyDays.getMonthOfYear());
+        assertEquals(17, thirtyDays.getDayOfMonth());
+        assertEquals(0, thirtyDays.getHourOfDay());
+        assertEquals(0, thirtyDays.getMinuteOfHour());
+        assertEquals(0, thirtyDays.getSecondOfMinute());
 
         period = Period.hours(1);
         final DateTime diffAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(initialTime.minusMinutes(61), period);
-        assertEquals(diffAnchor.getYear(), 2014);
-        assertEquals(diffAnchor.getMonthOfYear(), 3);
-        assertEquals(diffAnchor.getDayOfMonth(), 15);
-        assertEquals(diffAnchor.getHourOfDay(), 13);
-        assertEquals(diffAnchor.getMinuteOfHour(), 0);
-        assertEquals(diffAnchor.getSecondOfMinute(), 0);
+        assertEquals(2014, diffAnchor.getYear());
+        assertEquals(3, diffAnchor.getMonthOfYear());
+        assertEquals(15, diffAnchor.getDayOfMonth());
+        assertEquals(13, diffAnchor.getHourOfDay());
+        assertEquals(0, diffAnchor.getMinuteOfHour());
+        assertEquals(0, diffAnchor.getSecondOfMinute());
 
     }
 

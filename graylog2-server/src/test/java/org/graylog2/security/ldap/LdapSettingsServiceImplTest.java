@@ -103,6 +103,7 @@ public class LdapSettingsServiceImplTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void loadReturnsNullIfDatabaseHasMoreThanOneEntry() throws Exception {
+        @SuppressWarnings("deprecation")
         final DBCollection collection = mongoRule.getMongoConnection().getDatabase().getCollection("ldap_settings");
         collection.insert(new BasicDBObject("foo", "bar"), new BasicDBObject("quux", "baz"));
         assertThat(ldapSettingsService.load()).isNull();
@@ -111,6 +112,7 @@ public class LdapSettingsServiceImplTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void deleteRemovesAllLdapSettings() throws Exception {
+        @SuppressWarnings("deprecation")
         final DBCollection collection = mongoRule.getMongoConnection().getDatabase().getCollection("ldap_settings");
         assertThat(collection.count()).isEqualTo(1L);
         ldapSettingsService.delete();

@@ -219,7 +219,7 @@ public abstract class CmdLineTool implements CliCommand {
             logLevel = Level.DEBUG;
 
             // Enable logging for Netty when running in debug mode.
-            InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+            InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE);
         } else if (onlyLogErrors()) {
             logLevel = Level.ERROR;
         } else {

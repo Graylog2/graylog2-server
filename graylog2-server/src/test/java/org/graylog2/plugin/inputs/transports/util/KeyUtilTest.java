@@ -46,7 +46,7 @@ public class KeyUtilTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
-    private static final Map<String, String> CERTIFICATES = ImmutableMap.of(
+    private static final ImmutableMap<String, String> CERTIFICATES = ImmutableMap.of(
             "RSA", "server.crt.rsa",
             "DSA", "server.crt.dsa",
             "ECDSA", "server.crt.ecdsa"

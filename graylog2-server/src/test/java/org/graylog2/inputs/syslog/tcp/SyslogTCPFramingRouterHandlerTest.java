@@ -28,6 +28,7 @@ import org.junit.Test;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class SyslogTCPFramingRouterHandlerTest {
     private EmbeddedChannel channel;
@@ -101,11 +102,9 @@ public class SyslogTCPFramingRouterHandlerTest {
         final ByteBuf buf = Unpooled.copiedBuffer("<45>012345678901234567890123456789\n", StandardCharsets.US_ASCII);
         assertThat(buf.readableBytes()).isGreaterThan(32);
 
-        try {
-            channel.writeInbound(buf);
-        } catch (TooLongFrameException e) {
-            assertThat(e).hasMessage("frame length (34) exceeds the allowed maximum (32)");
-        }
+        assertThatExceptionOfType(TooLongFrameException.class)
+                .isThrownBy(() -> channel.writeInbound(buf))
+                .withMessage("frame length (34) exceeds the allowed maximum (32)");
     }
 
     @Test

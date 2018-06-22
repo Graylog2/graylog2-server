@@ -24,19 +24,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class HttpTransportConfigTest {
-
     @Test
-    public void testGetRequestedConfiguration() throws Exception {
+    public void testGetRequestedConfiguration() {
         HttpTransport.Config config = new HttpTransport.Config();
 
         final ConfigurationRequest requestedConfiguration = config.getRequestedConfiguration();
         assertTrue(requestedConfiguration.containsField(HttpTransport.CK_ENABLE_CORS));
-        assertEquals(requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).isOptional(), ConfigurationField.Optional.OPTIONAL);
-        assertEquals(requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).getDefaultValue(), true);
+        assertEquals(ConfigurationField.Optional.OPTIONAL, requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).isOptional());
+        assertEquals(true, requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).getDefaultValue());
 
         assertTrue(requestedConfiguration.containsField(HttpTransport.CK_MAX_CHUNK_SIZE));
-        assertEquals(requestedConfiguration.getField(HttpTransport.CK_MAX_CHUNK_SIZE).isOptional(), ConfigurationField.Optional.OPTIONAL);
-        assertEquals(requestedConfiguration.getField(HttpTransport.CK_MAX_CHUNK_SIZE).getDefaultValue(), 65536);
-
+        assertEquals(ConfigurationField.Optional.OPTIONAL, requestedConfiguration.getField(HttpTransport.CK_MAX_CHUNK_SIZE).isOptional());
+        assertEquals(65536, requestedConfiguration.getField(HttpTransport.CK_MAX_CHUNK_SIZE).getDefaultValue());
     }
 }

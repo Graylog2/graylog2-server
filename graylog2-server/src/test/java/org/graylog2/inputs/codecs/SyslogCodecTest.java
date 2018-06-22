@@ -80,15 +80,15 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "BOMAn application event log entry");
-        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
-        assertEquals(message.getField("source"), "mymachine.example.com");
-        assertEquals(message.getField("level"), 5);
-        assertEquals(message.getField("facility"), "local4");
-        assertEquals(message.getField("eventSource"), "Application");
-        assertEquals(message.getField("eventID"), "1011");
-        assertEquals(message.getField("iut"), "3");
-        assertEquals(message.getField("application_name"), "evntslog");
+        assertEquals("BOMAn application event log entry", message.getMessage());
+        assertEquals(new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC), ((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals("mymachine.example.com", message.getField("source"));
+        assertEquals(5, message.getField("level"));
+        assertEquals("local4", message.getField("facility"));
+        assertEquals("Application", message.getField("eventSource"));
+        assertEquals("1011", message.getField("eventID"));
+        assertEquals("3", message.getField("iut"));
+        assertEquals("evntslog", message.getField("application_name"));
     }
 
     @Test
@@ -96,17 +96,17 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "User page 13 requested");
-        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-06T20:56:33.287Z", DateTimeZone.UTC));
-        assertEquals(message.getField("source"), "app-1");
-        assertEquals(message.getField("level"), 6);
-        assertEquals(message.getField("facility"), "local7");
-        assertEquals(message.getField("ip"), "::ffff:132.123.15.30");
-        assertEquals(message.getField("logger"), "{c.corp.Handler}");
-        assertEquals(message.getField("session"), "4ot7");
-        assertEquals(message.getField("user"), "user@example.com");
-        assertEquals(message.getField("user-agent"), "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11");
-        assertEquals(message.getField("application_name"), "app");
+        assertEquals("User page 13 requested", message.getMessage());
+        assertEquals(new DateTime("2015-01-06T20:56:33.287Z", DateTimeZone.UTC), ((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals("app-1", message.getField("source"));
+        assertEquals(6, message.getField("level"));
+        assertEquals("local7", message.getField("facility"));
+        assertEquals("::ffff:132.123.15.30", message.getField("ip"));
+        assertEquals("{c.corp.Handler}", message.getField("logger"));
+        assertEquals("4ot7", message.getField("session"));
+        assertEquals("user@example.com", message.getField("user"));
+        assertEquals("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11", message.getField("user-agent"));
+        assertEquals("app", message.getField("application_name"));
     }
 
     @Test
@@ -117,17 +117,17 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "User page 13 requested");
-        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-06T20:56:33.287Z", DateTimeZone.UTC));
-        assertEquals(message.getField("source"), "app-1");
-        assertEquals(message.getField("level"), 6);
-        assertEquals(message.getField("facility"), "local7");
-        assertEquals(message.getField("mdc@18060_ip"), "::ffff:132.123.15.30");
-        assertEquals(message.getField("mdc@18060_logger"), "{c.corp.Handler}");
-        assertEquals(message.getField("mdc@18060_session"), "4ot7");
-        assertEquals(message.getField("mdc@18060_user"), "user@example.com");
-        assertEquals(message.getField("mdc@18060_user-agent"), "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11");
-        assertEquals(message.getField("application_name"), "app");
+        assertEquals("User page 13 requested", message.getMessage());
+        assertEquals(new DateTime("2015-01-06T20:56:33.287Z", DateTimeZone.UTC), ((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals("app-1", message.getField("source"));
+        assertEquals(6, message.getField("level"));
+        assertEquals("local7", message.getField("facility"));
+        assertEquals("::ffff:132.123.15.30", message.getField("mdc@18060_ip"));
+        assertEquals("{c.corp.Handler}", message.getField("mdc@18060_logger"));
+        assertEquals("4ot7", message.getField("mdc@18060_session"));
+        assertEquals("user@example.com", message.getField("mdc@18060_user"));
+        assertEquals("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11", message.getField("mdc@18060_user-agent"));
+        assertEquals("app", message.getField("application_name"));
     }
 
     @Test
@@ -135,11 +135,11 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "tralala");
-        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-11T15:35:21.335797Z", DateTimeZone.UTC));
-        assertEquals(message.getField("source"), "s000000.example.com");
-        assertEquals(message.getField("level"), 0);
-        assertEquals(message.getField("facility"), "local0");
+        assertEquals("tralala", message.getMessage());
+        assertEquals(new DateTime("2015-01-11T15:35:21.335797Z", DateTimeZone.UTC), ((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals("s000000.example.com", message.getField("source"));
+        assertEquals(0, message.getField("level"));
+        assertEquals("local0", message.getField("facility"));
     }
 
     @Test
@@ -149,16 +149,16 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "BOMAn application event log entry");
-        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
-        assertEquals(message.getField("source"), "mymachine.example.com");
-        assertEquals(message.getField("level"), 5);
-        assertEquals(message.getField("facility"), "local4");
-        assertEquals(message.getField("full_message"), STRUCTURED);
-        assertEquals(message.getField("eventSource"), "Application");
-        assertEquals(message.getField("eventID"), "1011");
-        assertEquals(message.getField("iut"), "3");
-        assertEquals(message.getField("application_name"), "evntslog");
+        assertEquals("BOMAn application event log entry", message.getMessage());
+        assertEquals(new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC), ((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals("mymachine.example.com", message.getField("source"));
+        assertEquals(5, message.getField("level"));
+        assertEquals("local4", message.getField("facility"));
+        assertEquals(STRUCTURED, message.getField("full_message"));
+        assertEquals("Application", message.getField("eventSource"));
+        assertEquals("1011", message.getField("eventID"));
+        assertEquals("3", message.getField("iut"));
+        assertEquals("evntslog", message.getField("application_name"));
     }
 
     @Test
@@ -166,24 +166,24 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_549));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "RT_FLOW_SESSION_DENY [junos@2636.1.1.1.2.39 source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No\"]");
-        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2014-05-01T08:26:51.179Z", DateTimeZone.UTC));
-        assertEquals(message.getField("source-address"), "1.2.3.4");
-        assertEquals(message.getField("source-port"), "56639");
-        assertEquals(message.getField("destination-address"), "5.6.7.8");
-        assertEquals(message.getField("destination-port"), "2003");
-        assertEquals(message.getField("service-name"), "None");
-        assertEquals(message.getField("protocol-id"), "6");
-        assertEquals(message.getField("icmp-type"), "0");
-        assertEquals(message.getField("policy-name"), "log-all-else");
-        assertEquals(message.getField("source-zone-name"), "campus");
-        assertEquals(message.getField("destination-zone-name"), "mngmt");
-        assertEquals(message.getField("application"), "UNKNOWN");
-        assertEquals(message.getField("nested-application"), "UNKNOWN");
-        assertEquals(message.getField("username"), "N/A");
-        assertEquals(message.getField("roles"), "N/A");
-        assertEquals(message.getField("packet-incoming-interface"), "reth6.0");
-        assertEquals(message.getField("encrypted"), "No");
+        assertEquals("RT_FLOW_SESSION_DENY [junos@2636.1.1.1.2.39 source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No\"]", message.getMessage());
+        assertEquals(new DateTime("2014-05-01T08:26:51.179Z", DateTimeZone.UTC), ((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals("1.2.3.4", message.getField("source-address"));
+        assertEquals("56639", message.getField("source-port"));
+        assertEquals("5.6.7.8", message.getField("destination-address"));
+        assertEquals("2003", message.getField("destination-port"));
+        assertEquals("None", message.getField("service-name"));
+        assertEquals("6", message.getField("protocol-id"));
+        assertEquals("0", message.getField("icmp-type"));
+        assertEquals("log-all-else", message.getField("policy-name"));
+        assertEquals("campus", message.getField("source-zone-name"));
+        assertEquals("mngmt", message.getField("destination-zone-name"));
+        assertEquals("UNKNOWN", message.getField("application"));
+        assertEquals("UNKNOWN", message.getField("nested-application"));
+        assertEquals("N/A", message.getField("username"));
+        assertEquals("N/A", message.getField("roles"));
+        assertEquals("reth6.0", message.getField("packet-incoming-interface"));
+        assertEquals("No", message.getField("encrypted"));
     }
 
     @Test
@@ -191,11 +191,11 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(UNSTRUCTURED));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'");
-        assertEquals(message.getField("timestamp"), new DateTime(YEAR + "-10-21T12:09:37"));
-        assertEquals(message.getField("source"), "c4dc57ba1ebb");
-        assertEquals(message.getField("level"), 5);
-        assertEquals(message.getField("facility"), "syslogd");
+        assertEquals("c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'", message.getMessage());
+        assertEquals(new DateTime(YEAR + "-10-21T12:09:37"), message.getField("timestamp"));
+        assertEquals("c4dc57ba1ebb", message.getField("source"));
+        assertEquals(5, message.getField("level"));
+        assertEquals("syslogd", message.getField("facility"));
         assertNull(message.getField("full_message"));
     }
 
@@ -206,12 +206,12 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(UNSTRUCTURED));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'");
-        assertEquals(message.getField("timestamp"), new DateTime(YEAR + "-10-21T12:09:37"));
-        assertEquals(message.getField("source"), "c4dc57ba1ebb");
-        assertEquals(message.getField("level"), 5);
-        assertEquals(message.getField("facility"), "syslogd");
-        assertEquals(message.getField("full_message"), UNSTRUCTURED);
+        assertEquals("c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'", message.getMessage());
+        assertEquals(new DateTime(YEAR + "-10-21T12:09:37"), message.getField("timestamp"));
+        assertEquals("c4dc57ba1ebb", message.getField("source"));
+        assertEquals(5, message.getField("level"));
+        assertEquals("syslogd", message.getField("facility"));
+        assertEquals(UNSTRUCTURED, message.getField("full_message"));
     }
 
     @Test

@@ -31,12 +31,15 @@ import static java.util.Objects.requireNonNull;
 @JsonDeserialize(builder = AutoValue_LookupDefaultSingleValue.Builder.class)
 @AutoValue
 public abstract class LookupDefaultSingleValue implements LookupDefaultValue {
+    @Override
     @JsonProperty(FIELD_VALUE_STRING)
     public abstract String valueString();
 
+    @Override
     @JsonProperty(FIELD_VALUE_TYPE)
     public abstract LookupDefaultValue.Type valueType();
 
+    @Override
     @JsonProperty(FIELD_VALUE)
     @Nullable
     public abstract Object value();

@@ -81,6 +81,7 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void upgradeCreatesDefaultIndexSet() throws Exception {
         final StubRotationStrategyConfig rotationStrategyConfig = new StubRotationStrategyConfig();
         final StubRetentionStrategyConfig retentionStrategyConfig = new StubRetentionStrategyConfig();

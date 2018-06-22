@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class MessageSummaryTest {
-    public static final List<String> STREAM_IDS = ImmutableList.of("stream1", "stream2");
+    public static final ImmutableList<String> STREAM_IDS = ImmutableList.of("stream1", "stream2");
     public static final String INDEX_NAME = "graylog2_3";
 
     private Message message;
@@ -52,27 +52,27 @@ public class MessageSummaryTest {
 
     @Test
     public void testGetIndex() throws Exception {
-        assertEquals(messageSummary.getIndex(), INDEX_NAME);
+        assertEquals(INDEX_NAME, messageSummary.getIndex());
     }
 
     @Test
     public void testGetId() throws Exception {
-        assertEquals(messageSummary.getId(), message.getId());
+        assertEquals(message.getId(), messageSummary.getId());
     }
 
     @Test
     public void testGetSource() throws Exception {
-        assertEquals(messageSummary.getSource(), message.getSource());
+        assertEquals(message.getSource(), messageSummary.getSource());
     }
 
     @Test
     public void testGetMessage() throws Exception {
-        assertEquals(messageSummary.getMessage(), message.getMessage());
+        assertEquals(message.getMessage(), messageSummary.getMessage());
     }
 
     @Test
     public void testGetTimestamp() throws Exception {
-        assertEquals(messageSummary.getTimestamp(), message.getTimestamp());
+        assertEquals(message.getTimestamp(), messageSummary.getTimestamp());
     }
 
     @Test
@@ -82,11 +82,11 @@ public class MessageSummaryTest {
 
     @Test
     public void testGetFields() throws Exception {
-        assertEquals(messageSummary.getFields(), new HashMap<String, Object>());
+        assertEquals(new HashMap<String, Object>(), messageSummary.getFields());
 
         message.addField("foo", "bar");
 
-        assertEquals(messageSummary.getFields(), ImmutableMap.of("foo", "bar"));
+        assertEquals(ImmutableMap.of("foo", "bar"), messageSummary.getFields());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class MessageSummaryTest {
 
         final Map<String, Object> map = mapper.readValue(mapper.writeValueAsBytes(messageSummary), valueType);
 
-        assertEquals(map.keySet(), Sets.newHashSet("id", "timestamp", "message", "index", "source", "streamIds", "fields"));
+        assertEquals(Sets.newHashSet("id", "timestamp", "message", "index", "source", "streamIds", "fields"), map.keySet());
     }
 
     @Test
@@ -114,6 +114,6 @@ public class MessageSummaryTest {
 
         message.addField("foo", "bar");
 
-        assertEquals(messageSummary.getField("foo"), "bar");
+        assertEquals("bar", messageSummary.getField("foo"));
     }
 }

@@ -44,7 +44,7 @@ public class ConfigurationTest {
         map.put("a", 1);
 
         final String json = new Configuration(map).serializeToJson();
-        assertEquals(json, "{\"source\":{\"a\":1,\"b\":1}}");
+        assertEquals("{\"source\":{\"a\":1,\"b\":1}}", json);
 
         final Configuration config = Configuration.deserializeFromJson(json);
 

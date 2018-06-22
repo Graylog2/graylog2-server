@@ -74,6 +74,7 @@ public class GeoIpProcessor implements MessageProcessor {
         eventBus.register(this);
     }
 
+    @Override
     public Messages process(Messages messages) {
         for (Message message : messages) {
             filterEngine.get().filter(message);

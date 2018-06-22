@@ -246,7 +246,7 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
         }
     }
 
-    private class TemplateBytes {
+    private static class TemplateBytes {
         private final byte[] bytes;
         private final boolean optionTemplate;
 

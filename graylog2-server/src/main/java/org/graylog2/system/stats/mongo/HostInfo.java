@@ -49,6 +49,7 @@ public abstract class HostInfo {
     @JsonAutoDetect
     @AutoValue
     @WithBeanGetter
+    @SuppressWarnings("JavaLangClash")
     public abstract static class System {
         @JsonProperty
         public abstract DateTime currentTime();
