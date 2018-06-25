@@ -9,19 +9,13 @@ import 'brace/ext/language_tools';
 import AceEditor from 'react-ace';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
 
-const _completions = (fields) => {
-  return (editor, session, pos, prefix, callback) => {
-    const results = fields.keySeq().filter(field => field.indexOf(prefix) >= 0)
-      .map((field) => {
-        return {
-          name: field,
-          value: field,
-          score: 1,
-          meta: 'field',
-        };
-      }).toJS();
-    callback(null, results);
-  };
+const _placeholderNode = (placeholder) => {
+  const node = document.createElement('div');
+  node.textContent = placeholder;
+  node.className = 'ace_invisible ace_emptyMessage';
+  node.style.padding = '0 9px';
+  node.style.color = '#aaa';
+  return node;
 };
 
 class QueryInput extends Component {
@@ -60,18 +54,10 @@ class QueryInput extends Component {
     }
   }
 
-  _placeholderNode(placeholder) {
-    const node = document.createElement('div');
-    node.textContent = placeholder;
-    node.className = 'ace_invisible ace_emptyMessage';
-    node.style.padding = '0 9px';
-    node.style.color = '#aaa';
-    return node;
-  }
-
   _addPlaceholder = (editor) => {
     if (!editor.renderer.emptyMessageNode) {
-      const node = this._placeholderNode(this.props.placeholder);
+      const node = _placeholderNode(this.props.placeholder);
+      // eslint-disable-next-line no-param-reassign
       editor.renderer.emptyMessageNode = node;
       editor.renderer.scroller.appendChild(node);
     }
@@ -80,6 +66,7 @@ class QueryInput extends Component {
   _removePlaceholder = (editor) => {
     if (editor.renderer.emptyMessageNode) {
       editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
+      // eslint-disable-next-line no-param-reassign
       editor.renderer.emptyMessageNode = null;
     }
   };
@@ -97,7 +84,7 @@ class QueryInput extends Component {
     }
   }
 
-  _debouncedOnChange = debounce(this.props.onChange, 100);
+  _debouncedOnChange = debounce(value => this.props.onChange(value), 100);
 
   _onChange = (newValue) => {
     this.setState({ value: newValue }, () => this._debouncedOnChange(this.state.value));
@@ -162,7 +149,6 @@ QueryInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  result: PropTypes.object,
   value: PropTypes.string,
 };
 
