@@ -11,6 +11,6 @@
 }
 
 :local(.increaseZIndex) .Select-menu-outer {
-    z-index: 3;
+    z-index: 5;
 }
 
