@@ -21,7 +21,9 @@ import org.graylog2.rest.resources.search.responses.QueryParseError;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
+@Provider
 public class QueryParsingExceptionMapper implements ExceptionMapper<QueryParsingException> {
     @Override
     public Response toResponse(QueryParsingException exception) {

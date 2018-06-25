@@ -54,6 +54,6 @@ public class JsonProcessingExceptionMapperTest {
         assertTrue(response.getEntity() instanceof ApiError);
 
         final ApiError responseEntity = (ApiError) response.getEntity();
-        assertTrue(responseEntity.getMessage().startsWith("Boom!"));
+        assertTrue(responseEntity.message().startsWith("Boom!"));
     }
 }

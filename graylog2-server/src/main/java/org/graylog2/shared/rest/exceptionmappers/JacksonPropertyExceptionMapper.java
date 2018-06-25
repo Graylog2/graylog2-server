@@ -35,8 +35,11 @@ public class JacksonPropertyExceptionMapper implements ExceptionMapper<PropertyB
     @Override
     public Response toResponse(PropertyBindingException e) {
         final Collection<Object> knownPropertyIds = firstNonNull(e.getKnownPropertyIds(), Collections.emptyList());
-        final ApiError apiError = new ApiError("Unable to map property " + e.getPropertyName()
-                + ".\nKnown properties include: " + Joiner.on(", ").join(knownPropertyIds));
+        final StringBuilder message = new StringBuilder("Unable to map property ")
+                .append(e.getPropertyName())
+                .append(".\nKnown properties include: ");
+        Joiner.on(", ").appendTo(message, knownPropertyIds);
+        final ApiError apiError = ApiError.create(message.toString());
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 }

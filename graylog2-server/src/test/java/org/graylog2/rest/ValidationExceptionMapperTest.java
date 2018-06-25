@@ -61,9 +61,9 @@ public class ValidationExceptionMapperTest {
         assertThat(response.getEntity()).isInstanceOf(ValidationApiError.class);
 
         final ValidationApiError responseEntity = (ValidationApiError) response.getEntity();
-        assertThat(responseEntity.getMessage()).startsWith("Validation failed!");
-        assertThat(responseEntity.getValidationErrors()).containsKeys("foo", "bar");
-        assertThat(responseEntity.getValidationErrors().get("foo")).hasSize(1);
-        assertThat(responseEntity.getValidationErrors().get("bar")).hasSize(2);
+        assertThat(responseEntity.message()).startsWith("Validation failed!");
+        assertThat(responseEntity.validationErrors()).containsKeys("foo", "bar");
+        assertThat(responseEntity.validationErrors().get("foo")).hasSize(1);
+        assertThat(responseEntity.validationErrors().get("bar")).hasSize(2);
     }
 }

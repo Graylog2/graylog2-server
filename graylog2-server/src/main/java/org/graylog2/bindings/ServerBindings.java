@@ -36,6 +36,8 @@ import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.rest.GenericErrorCsvWriter;
+import org.graylog2.users.UserPermissionsCleanupListener;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
@@ -202,6 +204,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindAdditionalJerseyComponents() {
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ScrollChunkWriter.class);
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(GenericErrorCsvWriter.class);
     }
 
     private void bindEventBusListeners() {
