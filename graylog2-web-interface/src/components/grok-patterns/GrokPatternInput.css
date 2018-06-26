@@ -10,3 +10,16 @@
 :local(.filterFormGroup) {
     margin-bottom: 0px;
 }
+
+:local(.addButton) {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}
+
+:local(.patternDisplay) {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+}

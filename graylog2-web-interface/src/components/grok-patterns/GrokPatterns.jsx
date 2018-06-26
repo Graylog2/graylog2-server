@@ -81,6 +81,7 @@ const GrokPatterns = createReactClass({
   },
 
   _patternFormatter(pattern) {
+    const patterns = this.state.patterns.filter(p => p.name !== pattern.name);
     return (
       <tr key={pattern.id}>
         <td>{pattern.name}</td>
@@ -97,7 +98,7 @@ const GrokPatterns = createReactClass({
                               name={pattern.name}
                               pattern={pattern.pattern}
                               testPattern={this.testPattern}
-                              patterns={this.state.patterns}
+                              patterns={patterns}
                               create={false}
                               reload={this.loadData}
                               savePattern={this.savePattern}

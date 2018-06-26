@@ -26,6 +26,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
       userName="Full"
     >
       <BootstrapModalForm
+        bsSize="large"
         cancelButtonText="Cancel"
         formProps={Object {}}
         onCancel={[Function]}
@@ -37,6 +38,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
         title="Preferences for user Full"
       >
         <BootstrapModalWrapper
+          bsSize="large"
           onClose={[Function]}
           onHide={[Function]}
           onOpen={[Function]}

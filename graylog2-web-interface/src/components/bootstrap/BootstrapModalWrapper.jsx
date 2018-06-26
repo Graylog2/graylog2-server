@@ -11,7 +11,8 @@ class BootstrapModalWrapper extends React.Component {
     onOpen: () => {},
     onClose: () => {},
     onHide: () => {},
-  }
+    bsSize: 'large',
+  };
 
   static propTypes = {
     showModal: PropTypes.bool,
@@ -22,27 +23,30 @@ class BootstrapModalWrapper extends React.Component {
     onOpen: PropTypes.func,
     onClose: PropTypes.func,
     onHide: PropTypes.func,
-  }
+    bsSize: PropTypes.oneOf([
+      'large', 'lg', 'small', 'sm',
+    ]),
+  };
 
   state = {
     showModal: this.props.showModal || false,
-  }
+  };
 
   open = () => {
     this.setState({ showModal: true }, this.props.onOpen);
-  }
+  };
 
   close = () => {
     this.setState({ showModal: false }, this.props.onClose);
-  }
+  };
 
   hide = () => {
     this.setState({ showModal: false }, this.props.onHide);
-  }
+  };
 
   render() {
     return (
-      <Modal show={this.state.showModal} onHide={this.hide} bsSize="large">
+      <Modal show={this.state.showModal} onHide={this.hide} bsSize={this.props.bsSize}>
         {this.props.children}
       </Modal>
     );

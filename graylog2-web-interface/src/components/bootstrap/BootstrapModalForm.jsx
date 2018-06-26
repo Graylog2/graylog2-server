@@ -21,6 +21,7 @@ class BootstrapModalForm extends React.Component {
     onModalClose: () => {},
     onSubmitForm: undefined,
     onCancel: () => {},
+    bsSize: 'large',
   }
 
   static propTypes = {
@@ -42,6 +43,9 @@ class BootstrapModalForm extends React.Component {
     /* Text to use in the submit button. "Submit" is the default */
     submitButtonText: PropTypes.string,
     submitButtonDisabled: PropTypes.bool,
+    bsSize: PropTypes.oneOf([
+      'large', 'lg', 'small', 'sm',
+    ]),
   }
 
   onModalCancel = () => {
@@ -91,6 +95,7 @@ class BootstrapModalForm extends React.Component {
       <BootstrapModalWrapper ref={(c) => { this.modal = c; }}
                              onOpen={this.props.onModalOpen}
                              onClose={this.props.onModalClose}
+                             bsSize={this.props.bsSize}
                              onHide={this.onModalCancel}>
         <Modal.Header closeButton>
           <Modal.Title>{this.props.title}</Modal.Title>

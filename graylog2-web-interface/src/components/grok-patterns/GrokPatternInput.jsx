@@ -41,6 +41,7 @@ class GrokPatternInput extends React.Component {
     const ARROW_DOWN = 40;
     const ARROW_UP = 38;
     const ENTER = 13;
+    const listItem = this.shownListItems[this.state.activeListItem];
 
     let activeListItem = 0;
     let domElement;
@@ -66,7 +67,9 @@ class GrokPatternInput extends React.Component {
         e.preventDefault();
         break;
       case ENTER:
-        this._addToPattern(this.shownListItems[this.state.activeListItem]);
+        if (listItem) {
+          this._addToPattern(listItem);
+        }
         e.preventDefault();
         break;
       default:
@@ -83,12 +86,9 @@ class GrokPatternInput extends React.Component {
 
   render() {
     const regExp = RegExp(this.state.patternFilter, 'i');
-    const maxLength = 20;
     this.shownListItems = [];
     const patternsToDisplay = this.props.patterns.filter(pattern => regExp.test(pattern.name))
       .map((pattern, index) => {
-        const patternDisplay = pattern.pattern.length > maxLength ?
-          `${pattern.pattern.substring(0, maxLength)} ...` : pattern.pattern;
         const active = index === this.state.activeListItem;
         this.shownListItems.push(pattern.name);
         return (
@@ -97,8 +97,8 @@ class GrokPatternInput extends React.Component {
                          bsStyle={active ? 'info' : undefined}
                          onKeyDown={this._onPatternFilterKeyDown}
                          key={pattern.name}>
-            <span>{patternDisplay}</span>
-            <span className="pull-right">
+            <span className={GrokPatternInputStyle.patternDisplay}>{pattern.pattern}</span>
+            <span className={GrokPatternInputStyle.addButton}>
               <Button bsSize="xsmall" bsStyle="primary" onClick={() => { this._addToPattern(pattern.name); }}>
                 Add
               </Button>
