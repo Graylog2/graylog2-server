@@ -2,6 +2,7 @@ package org.graylog.plugins.enterprise.search.elasticsearch;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.searchbox.core.search.aggregation.Aggregation;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -11,6 +12,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.engine.GeneratedQueryContext;
+import org.graylog.plugins.enterprise.search.errors.SearchError;
 import org.graylog.plugins.enterprise.search.searchtypes.aggregation.AggregationSpec;
 import org.graylog.plugins.enterprise.search.util.UniqueNamer;
 import org.jooq.lambda.tuple.Tuple;
@@ -20,6 +22,7 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
@@ -29,6 +32,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private IdentityHashMap<AggregationSpec, Tuple2<String, Class<? extends Aggregation>>> aggResultTypes = Maps.newIdentityHashMap();
     private Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
+    private Set<SearchError> errors = Sets.newHashSet();
 
     public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb) {
         this.elasticsearchBackend = elasticsearchBackend;
@@ -85,5 +89,15 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         } else {
             builders.forEach(ssb::aggregation);
         }
+    }
+
+    @Override
+    public void addError(SearchError error) {
+        errors.add(error);
+    }
+
+    @Override
+    public Collection<SearchError> errors() {
+        return errors;
     }
 }

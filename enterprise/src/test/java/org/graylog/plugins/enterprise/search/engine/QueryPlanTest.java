@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.searchbox.client.JestClient;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.QueryResult;
@@ -13,7 +12,6 @@ import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
-import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryGenerator;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.enterprise.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESDateHistogram;
@@ -33,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.collect.ImmutableSet.of;
@@ -153,18 +150,6 @@ public class QueryPlanTest {
         bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        final ElasticsearchQueryGenerator queryGenerator = new ElasticsearchQueryGenerator() {
-            @Override
-            public Object generate(SearchJob job, Query query, Set<QueryResult> results) {
-                final Object generated = super.generate(job, query, results);
-                // for the sub query, check that the parameter was properly substituted
-                if (query.id().equals(subQuery.id())) {
-                    final SearchSourceBuilder ssb = (SearchSourceBuilder) generated;
-                    assertThat(ssb.toString()).doesNotContain("$USER_ID$");
-                }
-                return generated;
-            }
-        };
         final ElasticsearchBackend esBackend = spy(new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, mock(JestClient.class)));
 
         doReturn(QueryResult.builder()

@@ -12,6 +12,7 @@ import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
+import org.graylog.plugins.enterprise.search.errors.SearchException;
 import org.graylog.plugins.enterprise.search.params.QueryReferenceBinding;
 import org.graylog.plugins.enterprise.search.params.ValueBinding;
 import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
@@ -73,7 +74,7 @@ public class ElasticsearchBackendTest {
 
             backend.generate(job, query, Collections.emptySet());
             fail("Must throw exception");
-        } catch (IllegalStateException e) {
+        } catch (SearchException e) {
             assertThat(e).hasMessageContaining("TESTPARAM");
         }
     }

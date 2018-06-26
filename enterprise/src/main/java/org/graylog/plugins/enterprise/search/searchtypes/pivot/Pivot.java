@@ -46,17 +46,13 @@ public abstract class Pivot implements SearchType {
     public abstract Filter filter();
 
     @Override
-    public SearchType withId(String id) {
-        return builder().id(id).build();
-    }
-
-    @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
         return this;
     }
 
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
+                .type(NAME)
                 .rowGroups(of())
                 .columnGroups(of());
     }

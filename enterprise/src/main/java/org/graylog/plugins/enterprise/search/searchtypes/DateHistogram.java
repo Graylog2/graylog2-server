@@ -37,11 +37,6 @@ public abstract class DateHistogram implements SearchType {
     public abstract Searches.DateHistogramInterval interval();
 
     @Override
-    public SearchType withId(String id) {
-        return toBuilder().id(id).build();
-    }
-
-    @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
         if (state.hasNonNull("interval")) {
             final String interval = state.path("interval").asText();

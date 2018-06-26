@@ -1,16 +1,19 @@
 package org.graylog.plugins.enterprise.search.searchtypes.pivot;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Objects;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = SeriesSpec.TYPE_FIELD,
         visible = true,
         defaultImpl = SeriesSpec.Fallback.class)
@@ -30,6 +33,7 @@ public interface SeriesSpec extends PivotSpec {
 
         @JsonProperty
         private String id;
+        private Map<String, Object> props = Maps.newHashMap();
 
         @Override
         public String type() {
@@ -43,8 +47,13 @@ public interface SeriesSpec extends PivotSpec {
         }
 
         @JsonAnySetter
-        public void setType(String key, Object value) {
-            // we ignore all the other values, we only want to be able to deserialize unknown search types
+        public void setProperties(String key, Object value) {
+            props.put(key, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, Object> getProperties() {
+            return props;
         }
 
         @Override
@@ -56,12 +65,15 @@ public interface SeriesSpec extends PivotSpec {
                 return false;
             }
             Fallback fallback = (Fallback) o;
-            return Objects.equals(type, fallback.type);
+            return Objects.equals(type, fallback.type) &&
+                    Objects.equals(id, fallback.id) &&
+                    Objects.equals(props, fallback.props);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type);
+
+            return Objects.hash(type, id, props);
         }
     }
 }

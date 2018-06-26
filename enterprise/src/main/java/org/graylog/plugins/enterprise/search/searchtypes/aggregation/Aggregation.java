@@ -52,11 +52,6 @@ public abstract class Aggregation implements SearchType {
     }
 
     @Override
-    public SearchType withId(String id) {
-        return toBuilder().id(id).build();
-    }
-
-    @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
         return this;
     }

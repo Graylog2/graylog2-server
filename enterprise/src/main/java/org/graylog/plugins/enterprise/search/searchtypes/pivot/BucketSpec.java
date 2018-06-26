@@ -1,11 +1,14 @@
 package org.graylog.plugins.enterprise.search.searchtypes.pivot;
 
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Maps;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,19 +16,21 @@ import java.util.Objects;
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = BucketSpec.TYPE_FIELD,
         visible = true,
         defaultImpl = BucketSpec.Fallback.class)
 public interface BucketSpec extends PivotSpec {
     String TYPE_FIELD = "type";
 
+    @JsonProperty
     String type();
 
     @JsonAutoDetect
     class Fallback implements BucketSpec {
         @JsonProperty
         private String type;
+        private Map<String, Object> props = Maps.newHashMap();
 
         @Override
         public String type() {
@@ -33,8 +38,13 @@ public interface BucketSpec extends PivotSpec {
         }
 
         @JsonAnySetter
-        public void setType(String key, Object value) {
-            // we ignore all the other values, we only want to be able to deserialize unknown search types
+        public void setProperties(String key, Object value) {
+            props.put(key, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, Object> getProperties() {
+            return props;
         }
 
         @Override
@@ -46,12 +56,14 @@ public interface BucketSpec extends PivotSpec {
                 return false;
             }
             Fallback fallback = (Fallback) o;
-            return Objects.equals(type, fallback.type);
+            return Objects.equals(type, fallback.type) &&
+                    Objects.equals(props, fallback.props);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type);
+
+            return Objects.hash(type, props);
         }
     }
 }

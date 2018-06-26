@@ -50,11 +50,6 @@ public abstract class MessageList implements SearchType {
     public abstract Builder toBuilder();
 
     @Override
-    public SearchType withId(String id) {
-        return toBuilder().id(id).build();
-    }
-
-    @Override
     public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
         final boolean hasLimit = state.hasNonNull("limit");
         final boolean hasOffset = state.hasNonNull("offset");

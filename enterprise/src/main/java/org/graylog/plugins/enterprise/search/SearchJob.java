@@ -2,18 +2,25 @@ package org.graylog.plugins.enterprise.search;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import one.util.streamex.EntryStream;
+import org.graylog.plugins.enterprise.search.errors.SearchError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @JsonAutoDetect
-@JsonPropertyOrder({"execution", "results"}) // execution must come before results, as it signals the overall "done" state
+// execution must come before results, as it signals the overall "done" state
+@JsonPropertyOrder({"execution", "results"})
 public class SearchJob {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchJob.class);
 
     @JsonProperty
     private final String id;
@@ -21,10 +28,14 @@ public class SearchJob {
     @JsonIgnore
     private final Search search;
 
-    @JsonProperty("execution")
+    @JsonIgnore
     private CompletableFuture<Void> resultFuture;
 
     private Map<String, CompletableFuture<QueryResult>> queryResults = Maps.newHashMap();
+
+    @JsonProperty("errors")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Set<SearchError> errors = Sets.newHashSet();
 
     public SearchJob(String id, Search search) {
         this.id = id;
@@ -40,7 +51,9 @@ public class SearchJob {
     }
 
     @JsonProperty("search_id")
-    public String getQueryId() { return search.id(); }
+    public String getSearchId() {
+        return search.id();
+    }
 
     public CompletableFuture<Void> getResultFuture() {
         return resultFuture;
@@ -53,9 +66,15 @@ public class SearchJob {
     @JsonProperty("results")
     public Map<String, QueryResult> results() {
         return EntryStream.of(queryResults)
-                .mapValues(future -> future.getNow(QueryResult.emptyResult()))
-                .filterValues(queryResult -> !queryResult.query().equals(Query.emptyRoot()))
+                .mapValues(future -> future.getNow(QueryResult.incomplete()))
+                .filterKeys(queryId -> !queryId.isEmpty()) // the root query result is meaningless, so we don't include it here
+                .filterValues(r -> (r.state() == QueryResult.State.COMPLETED) || (r.state() == QueryResult.State.FAILED))
                 .toMap();
+    }
+
+    @JsonProperty("execution")
+    public ExecutionInfo execution() {
+        return new ExecutionInfo(resultFuture.isDone(), resultFuture.isCancelled(), !errors.isEmpty());
     }
 
     public CompletableFuture<QueryResult> getQueryResultFuture(String queryId) {
@@ -63,8 +82,27 @@ public class SearchJob {
     }
 
     public SearchJob seal() {
-        final Collection<CompletableFuture<QueryResult>> futures = queryResults.values();
-        this.resultFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        // for each QueryResult future, add an exception handler so we at least get a FAILED result instead of the generic exception for everything
+        this.resultFuture = CompletableFuture.allOf(queryResults.values().toArray(new CompletableFuture[0]));
         return this;
+    }
+
+    public void addError(SearchError t) {
+        errors.add(t);
+    }
+
+    private static class ExecutionInfo {
+        @JsonProperty("done")
+        private final boolean done;
+        @JsonProperty("cancelled")
+        private final boolean cancelled;
+        @JsonProperty("completed_exceptionally")
+        private final boolean hasErrors;
+
+        ExecutionInfo(boolean done, boolean cancelled, boolean hasErrors) {
+            this.done = done;
+            this.cancelled = cancelled;
+            this.hasErrors = hasErrors;
+        }
     }
 }
