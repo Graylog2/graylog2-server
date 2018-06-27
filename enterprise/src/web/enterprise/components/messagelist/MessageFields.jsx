@@ -5,6 +5,8 @@ import { ChangedMessageField } from 'components/search';
 import { MessageField } from 'enterprise/components/messagelist';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
+import styles from './MessageFields.css';
+
 class MessageFields extends React.Component {
   static propTypes = {
     customFieldActions: PropTypes.node,
@@ -68,9 +70,11 @@ class MessageFields extends React.Component {
     const fields = this._formatFields(formattedFields, this.props.showDecoration);
 
     return (
-      <dl className="message-details message-details-fields">
-        {fields}
-      </dl>
+      <span className={styles.messageFields}>
+        <dl className="message-details message-details-fields">
+          {fields}
+        </dl>
+      </span>
     );
   }
 }

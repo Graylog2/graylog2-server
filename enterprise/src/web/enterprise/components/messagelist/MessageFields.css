@@ -1,0 +1,7 @@
+:local(.messageFields) dl.message-details-fields {
+    color: #666;
+}
+
+:local(.messageFields) dl.message-details-fields dd {
+    font-family: monospace;
+}
