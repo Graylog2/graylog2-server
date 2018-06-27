@@ -165,7 +165,7 @@ const Select = createReactClass({
     }
 
     return (
-      <div className={size === 'small' ? 'select-sm' : ''}>
+      <div className={`${size === 'small' ? 'select-sm' : ''} ${this.reactSelectSmStyles.locals.increaseZIndex}`}>
         <SelectComponent ref={(c) => { this._select = c; }}
                          onChange={onReactSelectChange || this._onChange}
                          {...reactSelectProps}
