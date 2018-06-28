@@ -114,6 +114,7 @@ class EditPatternModal extends React.Component {
         </button>
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title={`${this.props.create ? 'Create' : 'Edit'} Grok Pattern ${this.state.name}`}
+                            bsSize="large"
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>

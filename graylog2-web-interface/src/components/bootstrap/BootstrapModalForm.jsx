@@ -21,8 +21,8 @@ class BootstrapModalForm extends React.Component {
     onModalClose: () => {},
     onSubmitForm: undefined,
     onCancel: () => {},
-    bsSize: 'large',
-  }
+    bsSize: undefined,
+  };
 
   static propTypes = {
     /* Modal title */
@@ -46,20 +46,20 @@ class BootstrapModalForm extends React.Component {
     bsSize: PropTypes.oneOf([
       'large', 'lg', 'small', 'sm',
     ]),
-  }
+  };
 
   onModalCancel = () => {
     this.props.onCancel();
     this.close();
-  }
+  };
 
   open = () => {
     this.modal.open();
-  }
+  };
 
   close = () => {
     this.modal.close();
-  }
+  };
 
   submit = (event) => {
     const formDOMNode = this.form;
@@ -82,7 +82,7 @@ class BootstrapModalForm extends React.Component {
       event.preventDefault();
       this.props.onSubmitForm(event);
     }
-  }
+  };
 
   render() {
     const body = (

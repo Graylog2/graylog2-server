@@ -44,7 +44,9 @@ class GrokPatternInput extends React.Component {
     const listItem = this.shownListItems[this.state.activeListItem];
 
     let activeListItem = 0;
+    const firstElement = document.getElementById(`list-item-0`);
     let domElement;
+    let list;
     switch (e.keyCode) {
       case ARROW_DOWN:
         activeListItem = this.state.activeListItem + 1;
@@ -52,7 +54,8 @@ class GrokPatternInput extends React.Component {
           return;
         }
         domElement = document.getElementById(`list-item-${activeListItem}`);
-        domElement.scrollIntoView({ behavior: 'smooth' });
+        list = domElement.parentElement;
+        list.scrollTop = domElement.offsetTop - firstElement.offsetTop;
         this.setState({ activeListItem: activeListItem });
         e.preventDefault();
         break;
@@ -62,7 +65,8 @@ class GrokPatternInput extends React.Component {
           return;
         }
         domElement = document.getElementById(`list-item-${activeListItem}`);
-        domElement.scrollIntoView();
+        list = domElement.parentElement;
+        list.scrollTop = domElement.offsetTop - firstElement.offsetTop;
         this.setState({ activeListItem: activeListItem });
         e.preventDefault();
         break;

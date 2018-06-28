@@ -11,7 +11,7 @@ class BootstrapModalWrapper extends React.Component {
     onOpen: () => {},
     onClose: () => {},
     onHide: () => {},
-    bsSize: 'large',
+    bsSize: undefined,
   };
 
   static propTypes = {
