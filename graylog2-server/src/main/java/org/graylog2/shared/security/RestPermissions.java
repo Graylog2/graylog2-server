@@ -83,6 +83,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String LOGGERS_EDITSUBSYSTEM = "loggers:editsubsystem";
     public static final String LOGGERS_READ = "loggers:read";
     public static final String LOGGERS_READSUBSYSTEM = "loggers:readsubsystem";
+    public static final String LOGGERSMESSAGES_READ = "loggersmessages:read";
     public static final String MESSAGECOUNT_READ = "messagecount:read";
     public static final String MESSAGES_ANALYZE = "messages:analyze";
     public static final String MESSAGES_READ = "messages:read";
@@ -187,6 +188,7 @@ public class RestPermissions implements PluginPermissions {
         .add(create(LOGGERS_EDITSUBSYSTEM, ""))
         .add(create(LOGGERS_READ, ""))
         .add(create(LOGGERS_READSUBSYSTEM, ""))
+        .add(create(LOGGERSMESSAGES_READ, ""))
         .add(create(MESSAGECOUNT_READ, ""))
         .add(create(MESSAGES_ANALYZE, ""))
         .add(create(MESSAGES_READ, ""))
