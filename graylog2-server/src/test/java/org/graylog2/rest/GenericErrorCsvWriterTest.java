@@ -18,6 +18,7 @@ package org.graylog2.rest;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.TestProperties;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.plugin.rest.ValidationApiError;
@@ -42,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GenericErrorCsvWriterTest extends JerseyTest {
     @Override
     protected Application configure() {
+        forceSet(TestProperties.CONTAINER_PORT, "0");
         return new ResourceConfig(Resource.class, GenericErrorCsvWriter.class);
     }
 
