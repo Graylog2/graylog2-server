@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.Capabilities;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.rest.models.system.plugins.responses.PluginList;
@@ -37,6 +38,7 @@ import java.util.Set;
 @Api(value = "System/Plugins", description = "Plugin information")
 @Path("/system/plugins")
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class SystemPluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
 
