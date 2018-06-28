@@ -44,7 +44,7 @@ class GrokPatternInput extends React.Component {
     const listItem = this.shownListItems[this.state.activeListItem];
 
     let activeListItem = 0;
-    const firstElement = document.getElementById(`list-item-0`);
+    const firstElement = document.getElementById('list-item-0');
     let domElement;
     let list;
     switch (e.keyCode) {
