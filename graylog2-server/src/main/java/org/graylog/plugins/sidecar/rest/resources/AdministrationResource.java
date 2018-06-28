@@ -76,6 +76,7 @@ import java.util.stream.Collectors;
 @Path("/sidecar/administration")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class AdministrationResource extends RestResource implements PluginRestResource {
     private final SidecarService sidecarService;
     private final ConfigurationService configurationService;
@@ -106,7 +107,6 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @POST
     @Timed
     @ApiOperation(value = "Lists existing Sidecar registrations including compatible sidecars using pagination")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     @NoAuditEvent("this is not changing any data")
     public SidecarListResponse administration(@ApiParam(name = "JSON body", required = true)
@@ -142,7 +142,6 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @PUT
     @Timed
     @Path("/action")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_UPDATE)
     @ApiOperation(value = "Set collector actions in bulk")
     @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
