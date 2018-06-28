@@ -133,7 +133,7 @@ const FieldList = createReactClass({
   showFieldsByLink(mode, text, title) {
     return (
       <a onClick={() => this.changeShowFieldsBy(mode)}
-         role="link"
+         role="button"
          tabIndex={0}
          title={title}
          style={{ fontWeight: this.isCurrentShowFieldsBy(mode) ? 'bold' : 'normal' }}>
