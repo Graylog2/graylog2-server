@@ -20,6 +20,7 @@ import java.util.Objects;
 public interface SeriesSpec extends PivotSpec {
     String TYPE_FIELD = "type";
 
+    @JsonProperty
     String type();
 
     @JsonProperty
