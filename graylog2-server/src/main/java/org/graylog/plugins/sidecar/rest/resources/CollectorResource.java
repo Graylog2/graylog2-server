@@ -67,6 +67,7 @@ import java.util.stream.Collectors;
 @Path("/sidecar/collectors")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
     private final CollectorService collectorService;
     private final EtagService etagService;
@@ -87,7 +88,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Show collector details")
@@ -97,7 +97,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     }
 
     @GET
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List all collectors")
@@ -141,7 +140,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/summary")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List a summary of all collectors")
@@ -166,7 +164,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     }
 
     @POST
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create a new collector")
@@ -180,7 +177,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @PUT
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a collector")
@@ -196,7 +192,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @POST
     @Path("/{id}/{name}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_CREATE)
     @ApiOperation(value = "Copy a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CLONE)
@@ -211,7 +206,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @DELETE
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Delete a collector")
@@ -228,7 +222,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/validate")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates collector name")

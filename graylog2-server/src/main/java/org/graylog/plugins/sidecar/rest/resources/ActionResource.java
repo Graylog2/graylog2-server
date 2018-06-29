@@ -52,6 +52,7 @@ import java.util.List;
 @Path("/sidecar/action")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class ActionResource extends RestResource implements PluginRestResource {
     private final ActionService actionService;
 
@@ -67,7 +68,6 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No actions found for specified id")
     })
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     public List<CollectorAction> getAction(@ApiParam(name = "sidecarId", required = true)
                                            @PathParam("sidecarId") @NotEmpty String sidecarId) {
@@ -81,7 +81,6 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @PUT
     @Timed
     @Path("/{sidecarId}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @ApiOperation(value = "Set a collector action")
     @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
