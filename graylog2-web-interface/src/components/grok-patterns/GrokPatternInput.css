@@ -1,0 +1,25 @@
+:local(.resultList) {
+    height: 160px;
+    max-height: 160px;
+    overflow: hidden;
+    overflow-y: scroll;
+    padding-left: 0;
+    border-bottom: 1px solid #ddd;
+}
+
+:local(.filterFormGroup) {
+    margin-bottom: 0px;
+}
+
+:local(.addButton) {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}
+
+:local(.patternDisplay) {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+}

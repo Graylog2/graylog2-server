@@ -1,0 +1,238 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`] = `
+<div
+  className="row"
+>
+  <div
+    className="col-sm-8"
+  >
+    <div
+      className="form-group"
+    >
+      <label
+        className="control-label"
+        htmlFor="pattern-input"
+      >
+        Pattern
+      </label>
+      <span>
+        <textarea
+          className="form-control"
+          id="pattern-input"
+          label="Pattern"
+          onChange={[Function]}
+          placeholder=""
+          required={true}
+          rows={9}
+          type="textarea"
+          value=""
+        />
+        <span
+          className="help-block"
+        >
+          The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
+        </span>
+      </span>
+    </div>
+  </div>
+  <div
+    className="col-sm-4"
+  >
+    <div
+      className="filterFormGroup"
+    >
+      <label
+        className="control-label"
+        htmlFor="pattern-selector"
+      >
+        Filter pattern
+      </label>
+      <span>
+        <input
+          autoComplete="off"
+          className="form-control"
+          id="pattern-selector"
+          label="Filter pattern"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          placeholder=""
+          type="text"
+          value=""
+        />
+        
+      </span>
+    </div>
+    <ul
+      className="resultList"
+    >
+      <li
+        className="list-group-item"
+        id="list-item-0"
+        onKeyDown={[Function]}
+      >
+        <h4
+          className="list-group-item-heading"
+        >
+          COMMONMAC
+        </h4>
+        <p
+          className="list-group-item-text"
+        >
+          <span
+            className="patternDisplay"
+          >
+            (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
+          </span>
+          <span
+            className="addButton"
+          >
+            <button
+              className="btn btn-xs btn-primary"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Add
+            </button>
+          </span>
+        </p>
+      </li>
+      <li
+        className="list-group-item"
+        id="list-item-1"
+        onKeyDown={[Function]}
+      >
+        <h4
+          className="list-group-item-heading"
+        >
+          DATA
+        </h4>
+        <p
+          className="list-group-item-text"
+        >
+          <span
+            className="patternDisplay"
+          >
+            .*?
+          </span>
+          <span
+            className="addButton"
+          >
+            <button
+              className="btn btn-xs btn-primary"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Add
+            </button>
+          </span>
+        </p>
+      </li>
+      <li
+        className="list-group-item"
+        id="list-item-2"
+        onKeyDown={[Function]}
+      >
+        <h4
+          className="list-group-item-heading"
+        >
+          DATE
+        </h4>
+        <p
+          className="list-group-item-text"
+        >
+          <span
+            className="patternDisplay"
+          >
+            %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
+          </span>
+          <span
+            className="addButton"
+          >
+            <button
+              className="btn btn-xs btn-primary"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Add
+            </button>
+          </span>
+        </p>
+      </li>
+    </ul>
+  </div>
+</div>
+`;
+
+exports[`<GrokPatternInput /> should render grok pattern input without patterns 1`] = `
+<div
+  className="row"
+>
+  <div
+    className="col-sm-8"
+  >
+    <div
+      className="form-group"
+    >
+      <label
+        className="control-label"
+        htmlFor="pattern-input"
+      >
+        Pattern
+      </label>
+      <span>
+        <textarea
+          className="form-control"
+          id="pattern-input"
+          label="Pattern"
+          onChange={[Function]}
+          placeholder=""
+          required={true}
+          rows={9}
+          type="textarea"
+          value=""
+        />
+        <span
+          className="help-block"
+        >
+          The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
+        </span>
+      </span>
+    </div>
+  </div>
+  <div
+    className="col-sm-4"
+  >
+    <div
+      className="filterFormGroup"
+    >
+      <label
+        className="control-label"
+        htmlFor="pattern-selector"
+      >
+        Filter pattern
+      </label>
+      <span>
+        <input
+          autoComplete="off"
+          className="form-control"
+          id="pattern-selector"
+          label="Filter pattern"
+          onChange={[Function]}
+          onKeyDown={[Function]}
+          placeholder=""
+          type="text"
+          value=""
+        />
+        
+      </span>
+    </div>
+    <ul
+      className="resultList"
+    />
+  </div>
+</div>
+`;
