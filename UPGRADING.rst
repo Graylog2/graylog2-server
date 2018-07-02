@@ -272,3 +272,16 @@ See also:
 * `to_ip() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#to-ip>`_
 * `cidr_match() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#cidr-match>`_
 * `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
+
+Changed metrics name for stream rules
+=====================================
+
+The name of the metrics for stream rules have been changed to include the stream ID which helps identifying the actual stream they are related to.
+
+Old metric name::
+
+    org.graylog2.plugin.streams.StreamRule.${stream-rule-id}.executionTime
+
+New metric name::
+
+    org.graylog2.plugin.streams.Stream.${stream-id}.StreamRule.${stream-rule-id}.executionTime
