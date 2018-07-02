@@ -85,7 +85,7 @@ class Wizard extends React.Component {
       <Col md={2} className={WizardStyle.subnavigation}>
         <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
           {this.props.steps.map((navItem) => {
-            return (<NavItem key={navItem.key} eventKey={navItem.key}>{navItem.title}</NavItem>);
+            return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
         </Nav>
         <br />
@@ -116,7 +116,7 @@ class Wizard extends React.Component {
         </div>
         <Nav bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
           {this.props.steps.map((navItem) => {
-            return (<NavItem key={navItem.key} eventKey={navItem.key}>{navItem.title}</NavItem>);
+            return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
         </Nav>
       </Col>
@@ -128,22 +128,6 @@ class Wizard extends React.Component {
     return (
       <Row className={this.props.containerClassName}>
         {this.props.horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}
-        <Col md={2} className={WizardStyle.subnavigation}>
-          <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
-            {this.props.steps.map((navItem) => {
-              return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
-            })}
-          </Nav>
-          <br />
-          <Row>
-            <Col xs={6}>
-              <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
-            </Col>
-            <Col className="text-right" xs={6}>
-              <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
-            </Col>
-          </Row>
-        </Col>
         <Col md={7}>
           {this.props.steps[this._getSelectedIndex()].component}
         </Col>
