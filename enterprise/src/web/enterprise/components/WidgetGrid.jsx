@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Row } from 'react-bootstrap';
 import _ from 'lodash';
 
 import connect from 'stores/connect';
+import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
@@ -25,11 +27,14 @@ class WidgetGrid extends React.Component {
   }
 
   static propTypes = {
+    allFields: CustomPropTypes.FieldListType.isRequired,
     data: WidgetDataMap.isRequired,
+    fields: CustomPropTypes.FieldListType.isRequired,
     locked: PropTypes.bool,
     onPositionsChange: PropTypes.func.isRequired,
     positions: PositionsMap,
     staticWidgets: PropTypes.arrayOf(PropTypes.node),
+    titles: ImmutablePropTypes.map.isRequired,
     widgets: WidgetsMap.isRequired,
   };
 

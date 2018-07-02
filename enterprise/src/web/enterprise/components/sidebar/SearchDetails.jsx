@@ -5,7 +5,6 @@ import moment from 'moment-timezone';
 import DateTime from 'logic/datetimes/DateTime';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import connect from 'stores/connect';
-import SearchResult from '../../logic/SearchResult';
 import styles from './SearchDetails.css';
 
 // eslint-disable-next-line react/prop-types
@@ -30,7 +29,12 @@ const SearchDetails = ({ results }) => {
 };
 
 SearchDetails.propTypes = {
-  results: PropTypes.instanceOf(SearchResult).isRequired,
+  results: PropTypes.shape({
+    effectiveTimerange: PropTypes.shape({
+      from: PropTypes.string.isRequired,
+      to: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default SearchDetails;

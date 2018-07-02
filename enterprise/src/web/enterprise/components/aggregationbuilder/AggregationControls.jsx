@@ -3,21 +3,22 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
+import CustomPropTypes from 'enterprise/components/CustomPropTypes';
+import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import RowPivotSelect from './RowPivotSelect';
 import ColumnPivotSelect from './ColumnPivotSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
-import { FieldList } from './AggregationBuilderPropTypes';
-import AggregationWidgetConfig from '../../logic/aggregationbuilder/AggregationWidgetConfig';
+import { PivotList } from './AggregationBuilderPropTypes';
 
 export default class AggregationControls extends React.Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
-    columnPivots: PropTypes.arrayOf(PropTypes.string),
-    fields: FieldList.isRequired,
+    columnPivots: PivotList,
+    fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,
-    rowPivots: PropTypes.arrayOf(PropTypes.string),
+    rowPivots: PivotList,
     series: PropTypes.arrayOf(PropTypes.string),
     sort: PropTypes.arrayOf(PropTypes.string),
     visualization: PropTypes.string,

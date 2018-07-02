@@ -18,11 +18,7 @@ export const WidgetsMap = PropTypes.objectOf(PropTypes.instanceOf(Widget));
 export const ImmutableWidgetsMap = ImmutablePropTypes.mapOf(PropTypes.instanceOf(Widget), PropTypes.string);
 
 export const WidgetData = PropTypes.oneOfType([
-  PropTypes.arrayOf(
-    PropTypes.shape({
-      results: PropTypes.array.isRequired,
-    }),
-  ),
+  PropTypes.arrayOf(PropTypes.object),
   PropTypes.object,
 ]);
 

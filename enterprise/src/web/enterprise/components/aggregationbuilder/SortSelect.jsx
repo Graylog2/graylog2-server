@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { FieldList } from './AggregationBuilderPropTypes';
+import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
 import SortableSelect from './SortableSelect';
 
 const SortSelect = ({ fields, onChange, sort }) => (
@@ -14,7 +14,18 @@ const SortSelect = ({ fields, onChange, sort }) => (
 );
 
 SortSelect.propTypes = {
-  fields: FieldList.isRequired,
+  fields: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.oneOfType([
+        PropTypes.string.isRequired,
+        PropTypes.instanceOf(Pivot),
+      ]),
+      value: PropTypes.oneOfType([
+        PropTypes.string.isRequired,
+        PropTypes.instanceOf(Pivot),
+      ]),
+    }),
+  ).isRequired,
   onChange: PropTypes.func.isRequired,
   sort: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

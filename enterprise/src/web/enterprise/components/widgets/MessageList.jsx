@@ -15,6 +15,7 @@ import { ViewStore } from 'enterprise/stores/ViewStore';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
+import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 
 import styles from './MessageList.css';
 import MessageFormatter from '../../logic/messages/MessageFormatter';
@@ -31,7 +32,7 @@ const MessageList = createReactClass({
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
-    fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+    fields: CustomPropTypes.FieldListType.isRequired,
     filter: PropTypes.string,
     pageSize: PropTypes.number.isRequired,
   },

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { FieldList } from './AggregationBuilderPropTypes';
 import SortableSelect from './SortableSelect';
+import { FieldList, PivotList } from './AggregationBuilderPropTypes';
 
 const ColumnPivotSelect = ({ columnPivots, fields, onChange }) => (
   <SortableSelect
@@ -14,7 +14,7 @@ const ColumnPivotSelect = ({ columnPivots, fields, onChange }) => (
 );
 
 ColumnPivotSelect.propTypes = {
-  columnPivots: PropTypes.arrayOf(PropTypes.string).isRequired,
+  columnPivots: PivotList.isRequired,
   fields: FieldList.isRequired,
   onChange: PropTypes.func.isRequired,
 };

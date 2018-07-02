@@ -18,7 +18,7 @@ const SeriesSelect = ({ fields, onChange, series }) => (
 SeriesSelect.propTypes = {
   fields: FieldList.isRequired,
   onChange: PropTypes.func.isRequired,
-  series: PropTypes.string.isRequired,
+  series: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default SeriesSelect;

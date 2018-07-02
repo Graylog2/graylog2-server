@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { FieldList } from './AggregationBuilderPropTypes';
 import SortableSelect from './SortableSelect';
+import { FieldList, PivotList } from './AggregationBuilderPropTypes';
+
 const RowPivotSelect = ({ fields, onChange, rowPivots }) => (
   <SortableSelect
     placeholder="Row pivot"
@@ -15,7 +16,7 @@ const RowPivotSelect = ({ fields, onChange, rowPivots }) => (
 RowPivotSelect.propTypes = {
   fields: FieldList.isRequired,
   onChange: PropTypes.func.isRequired,
-  rowPivots: PropTypes.arrayOf(PropTypes.string).isRequired,
+  rowPivots: PivotList.isRequired,
 };
 
 export default RowPivotSelect;
