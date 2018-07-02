@@ -26,7 +26,6 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
       userName="Full"
     >
       <BootstrapModalForm
-        bsSize="lg"
         cancelButtonText="Cancel"
         formProps={Object {}}
         onCancel={[Function]}
@@ -38,7 +37,6 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
         title="Preferences for user Full"
       >
         <BootstrapModalWrapper
-          bsSize="lg"
           onClose={[Function]}
           onHide={[Function]}
           onOpen={[Function]}
@@ -49,7 +47,6 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
             autoFocus={true}
             backdrop={true}
             bsClass="modal"
-            bsSize="lg"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}

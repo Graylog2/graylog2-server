@@ -98,7 +98,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       </div>
     </div>
     <div
-      className="col-md-6"
+      className="col-md-7"
     >
       <div>
         <div
@@ -591,7 +591,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       </div>
     </div>
     <div
-      className="col-md-6"
+      className="col-md-7"
     >
       <div>
         <div
