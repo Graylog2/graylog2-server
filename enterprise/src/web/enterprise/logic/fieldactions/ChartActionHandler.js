@@ -1,19 +1,18 @@
 import uuid from 'uuid/v4';
 
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { pivotForField } from '../searchtypes/aggregation/PivotGenerator';
+import { pivotForField } from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
+import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 
 export default function (queryId, field) {
-  const widget = {
-    id: uuid(),
-    type: 'AGGREGATION',
-    config: {
-      rowPivots: [pivotForField('timestamp')],
-      columnPivots: [],
-      series: [`avg(${field})`],
-      sort: [],
-      visualization: 'line',
-    },
-  };
+  const config = AggregationWidgetConfig.builder()
+    .rowPivots([pivotForField('timestamp')])
+    .columnPivots([])
+    .series([`avg(${field})`])
+    .sort([])
+    .visualization('line')
+    .build();
+  const widget = new AggregationWidget(uuid(), config);
   WidgetActions.create(widget);
 }

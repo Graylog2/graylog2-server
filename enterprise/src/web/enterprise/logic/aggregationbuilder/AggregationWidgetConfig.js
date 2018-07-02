@@ -37,7 +37,13 @@ export default class AggregationWidgetConfig {
     };
   }
 
+  static builder() {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
+  }
+
   toBuilder() {
+    // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
@@ -53,6 +59,7 @@ export default class AggregationWidgetConfig {
   }
 
   static fromJSON(value) {
+    // eslint-disable-next-line camelcase
     const { row_pivots, column_pivots, series, sort, visualization } = value;
 
     return new AggregationWidgetConfig(column_pivots.map(Pivot.fromJSON), row_pivots.map(Pivot.fromJSON), series, sort, visualization);
