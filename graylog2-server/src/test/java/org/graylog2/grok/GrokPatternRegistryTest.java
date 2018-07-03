@@ -18,8 +18,7 @@ package org.graylog2.grok;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.thekraken.grok.api.Grok;
-import io.thekraken.grok.api.exception.GrokException;
+import io.krakens.grok.api.Grok;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;

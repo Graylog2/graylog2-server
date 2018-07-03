@@ -18,10 +18,10 @@ package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
-import io.thekraken.grok.api.Grok;
-import io.thekraken.grok.api.GrokCompiler;
-import io.thekraken.grok.api.Match;
-import io.thekraken.grok.api.exception.GrokException;
+import io.krakens.grok.api.Grok;
+import io.krakens.grok.api.GrokCompiler;
+import io.krakens.grok.api.Match;
+import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.ConfigurationException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.plugin.inputs.Converter;

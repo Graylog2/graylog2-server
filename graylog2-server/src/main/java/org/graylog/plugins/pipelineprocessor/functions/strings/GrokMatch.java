@@ -17,8 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import com.google.common.collect.ForwardingMap;
-import io.thekraken.grok.api.Grok;
-import io.thekraken.grok.api.Match;
+import io.krakens.grok.api.Grok;
+import io.krakens.grok.api.Match;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
