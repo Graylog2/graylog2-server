@@ -18,10 +18,10 @@ package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import io.thekraken.grok.api.Grok;
-import io.thekraken.grok.api.GrokCompiler;
-import io.thekraken.grok.api.Match;
-import io.thekraken.grok.api.exception.GrokException;
+import io.krakens.grok.api.Grok;
+import io.krakens.grok.api.GrokCompiler;
+import io.krakens.grok.api.Match;
+import io.krakens.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.grok.GrokPattern;
