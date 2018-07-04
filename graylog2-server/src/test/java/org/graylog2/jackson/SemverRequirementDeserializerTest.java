@@ -40,8 +40,7 @@ public class SemverRequirementDeserializerTest {
     @Test
     public void successfullyDeserializesString() throws IOException {
         final Requirement requirement = objectMapper.readValue("\"^1.3.7-rc.2+build.2.b8f12d7\"", Requirement.class);
-        // FIXME: Requirement doesn't implement equals until https://github.com/vdurmont/semver4j/pull/34 has been merged and released
-        assertThat(requirement.toString()).isEqualTo(Requirement.buildNPM("^1.3.7-rc.2+build.2.b8f12d7").toString());
+        assertThat(requirement).isEqualTo(Requirement.buildNPM("^1.3.7-rc.2+build.2.b8f12d7"));
     }
 
     @Test

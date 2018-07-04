@@ -108,7 +108,7 @@
                 <version>${java-semver.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.vdurmont</groupId>
+                <groupId>org.graylog.repackaged</groupId>
                 <artifactId>semver4j</artifactId>
                 <version>${semver4j.version}</version>
             </dependency>
