@@ -11,10 +11,11 @@ import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 import FieldTypeIcon from 'enterprise/components/sidebar/FieldTypeIcon';
 import { SelectedFieldsActions } from 'enterprise/stores/SelectedFieldsStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import styles from './FieldList.css';
 
-const isReservedField = fieldName => fieldName.startsWith('gl2_');
+const isReservedField = fieldName => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
 const FieldList = createReactClass({
   propTypes: {

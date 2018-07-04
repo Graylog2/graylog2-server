@@ -15,10 +15,10 @@ import { ViewStore } from 'enterprise/stores/ViewStore';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
+import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 
 import styles from './MessageList.css';
-import MessageFormatter from '../../logic/messages/MessageFormatter';
 
 const { InputsActions, InputsStore } = CombinedProvider.get('Inputs');
 const { NodesStore } = CombinedProvider.get('Nodes');
@@ -117,7 +117,7 @@ const MessageList = createReactClass({
       .map((m) => {
         return {
           fields: m.message,
-          formatted_fields: MessageFormatter(m.message),
+          formatted_fields: MessageFieldsFilter.filterFields(m.message),
           id: m.message._id,
           index: m.index,
         };
