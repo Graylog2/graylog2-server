@@ -99,26 +99,27 @@ public class ConfigurationRequest {
         for (ConfigurationField field : fields.values()) {
             if (field.isOptional().equals(ConfigurationField.Optional.NOT_OPTIONAL)) {
                 final String type = field.getFieldType();
-                log.debug("Checking for non-optional field {} of type {} in configuration", field.getName(), type);
+                final String fieldName = field.getName();
+                log.debug("Checking for mandatory field \"{}\" of type {} in configuration", fieldName, type);
                 switch (type) {
                     case BooleanField.FIELD_TYPE:
-                        if (!configuration.booleanIsSet(field.getName())) {
-                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing or has the wrong data type");
+                        if (!configuration.booleanIsSet(fieldName)) {
+                            throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
                         }
                         break;
                     case NumberField.FIELD_TYPE:
-                        if (!configuration.intIsSet(field.getName())) {
-                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing or has the wrong data type");
+                        if (!configuration.intIsSet(fieldName)) {
+                            throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
                         }
                         break;
                     case TextField.FIELD_TYPE:
                     case DropdownField.FIELD_TYPE:
-                        if (!configuration.stringIsSet(field.getName())) {
-                                throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing or has the wrong data type");
+                        if (!configuration.stringIsSet(fieldName)) {
+                            throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
                         }
                         break;
                     default:
-                        throw new IllegalStateException("Unknown field type " + type + ". This is a bug.");
+                        throw new IllegalStateException("Unknown field type " + type + " for configuration field \"" + fieldName + "\". This is a bug.");
                 }
             }
         }
@@ -155,7 +156,7 @@ public class ConfigurationRequest {
                     }
                     break;
                 default:
-                    throw new IllegalStateException("Unknown field type " + type + ". This is a bug.");
+                    throw new IllegalStateException("Unknown field type " + type + " for configuration field \"" + name + "\". This is a bug.");
             }
         }
         return new Configuration(values);
