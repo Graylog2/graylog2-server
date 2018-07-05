@@ -19,9 +19,9 @@ public class ESMinHandler extends ESPivotSeriesSpecHandler<Min, MinAggregation> 
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final MinAggregationBuilder avg = AggregationBuilders.min(name).field(minSpec.field());
+        final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
         record(queryContext, pivot, minSpec, name, MinAggregation.class);
-        return Optional.of(avg);
+        return Optional.of(min);
     }
 
     @Override

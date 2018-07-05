@@ -19,9 +19,9 @@ public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedSt
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final ExtendedStatsAggregationBuilder avg = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
+        final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         record(queryContext, pivot, stddevSpec, name, ExtendedStatsAggregation.class);
-        return Optional.of(avg);
+        return Optional.of(stddev);
     }
 
     @Override

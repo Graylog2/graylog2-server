@@ -19,9 +19,9 @@ public class ESCardinalityHandler extends ESPivotSeriesSpecHandler<Cardinality, 
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final CardinalityAggregationBuilder avg = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
+        final CardinalityAggregationBuilder card = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
         record(queryContext, pivot, cardinalitySpec, name, CardinalityAggregation.class);
-        return Optional.of(avg);
+        return Optional.of(card);
     }
 
     @Override

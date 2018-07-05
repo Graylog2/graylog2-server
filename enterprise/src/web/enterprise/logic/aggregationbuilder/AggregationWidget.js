@@ -20,6 +20,11 @@ export default class AggregationWidget extends Widget {
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({ id, config, filter }));
   }
+
+  static builder() {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
+  }
 }
 
 class Builder extends Widget.Builder {

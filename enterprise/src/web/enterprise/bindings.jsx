@@ -24,6 +24,7 @@ import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWi
 import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
 import DataTable from 'enterprise/components/datatable/DataTable';
 import WorldMapVisualization from './components/visualizations/worldmap/WorldMapVisualization';
+import FieldStatisticsHandler from './logic/fieldactions/FieldStatisticsHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -66,7 +67,12 @@ export default {
       visualizationComponent: AggregationBuilder,
       searchResultTransformer: PivotTransformer,
       searchTypes: PivotConfigGenerator,
-      titleGenerator: widget => `Aggregating ${widget.config.series} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`,
+      titleGenerator: (widget) => {
+        if (widget.config.rowPivots.length > 0) {
+          return `Aggregating ${widget.config.series} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
+        }
+        return `Aggregating ${widget.config.series}`;
+      },
     },
     {
       type: 'ALERT_STATUS',
@@ -104,6 +110,11 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
+    },
+    {
+      type: 'statistics',
+      title: 'Statistics',
+      handler: FieldStatisticsHandler,
     },
     {
       type: 'add-to-table',

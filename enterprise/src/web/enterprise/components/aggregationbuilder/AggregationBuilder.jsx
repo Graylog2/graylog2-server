@@ -24,7 +24,10 @@ export default class AggregationBuilder extends React.Component {
 
   static _visualizationForType(type) {
     const visualizationTypes = PluginStore.exports('visualizationTypes');
-    const visualization = (visualizationTypes.filter(viz => viz.type === type)[0] || {});
+    const visualization = visualizationTypes.filter(viz => viz.type === type)[0];
+    if (!visualization) {
+      throw new Error(`Unable to find visualization component for type: ${type}`);
+    }
     return visualization.component;
   }
 

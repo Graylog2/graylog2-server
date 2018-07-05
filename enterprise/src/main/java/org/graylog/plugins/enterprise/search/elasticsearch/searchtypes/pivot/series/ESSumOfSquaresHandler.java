@@ -19,9 +19,9 @@ public class ESSumOfSquaresHandler extends ESPivotSeriesSpecHandler<SumOfSquares
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, SumOfSquares sumOfSquaresSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final ExtendedStatsAggregationBuilder avg = AggregationBuilders.extendedStats(name).field(sumOfSquaresSpec.field());
+        final ExtendedStatsAggregationBuilder sumOfSquares = AggregationBuilders.extendedStats(name).field(sumOfSquaresSpec.field());
         record(queryContext, pivot, sumOfSquaresSpec, name, ExtendedStatsAggregation.class);
-        return Optional.of(avg);
+        return Optional.of(sumOfSquares);
     }
 
     @Override

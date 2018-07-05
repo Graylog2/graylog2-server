@@ -60,4 +60,16 @@ describe('ExpandRows', () => {
     expect(result).toHaveLength(7);
     expect(result).toEqual(expectedResult);
   });
+  it('properly expands a result with no pivots but series', () => {
+    const pivotResult = readFixture('ExpandRows.test.noPivots.json');
+    const result = expandRows([], [], ['min(took_ms)', 'max(took_ms)', 'sum(took_ms)', 'stddev(took_ms)'], pivotResult);
+    expect(result).toHaveLength(1);
+    expect(result).toEqual([{
+      'avg(took_ms)': 80.65076335877863,
+      'min(took_ms)': 36,
+      'max(took_ms)': 5850,
+      'sum(took_ms)': 3465402,
+      'stddev(took_ms)': 331.44857900293187,
+    }]);
+  });
 });

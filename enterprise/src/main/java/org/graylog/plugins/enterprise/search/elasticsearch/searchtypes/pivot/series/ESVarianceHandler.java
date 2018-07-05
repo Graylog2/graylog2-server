@@ -19,9 +19,9 @@ public class ESVarianceHandler extends ESPivotSeriesSpecHandler<Variance, Extend
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final ExtendedStatsAggregationBuilder avg = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
+        final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
         record(queryContext, pivot, varianceSpec, name, ExtendedStatsAggregation.class);
-        return Optional.of(avg);
+        return Optional.of(variance);
     }
 
     @Override

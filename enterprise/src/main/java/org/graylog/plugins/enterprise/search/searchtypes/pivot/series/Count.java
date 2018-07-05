@@ -18,11 +18,6 @@ import java.util.Optional;
 @JsonDeserialize(builder = Count.Builder.class)
 public abstract class Count implements SeriesSpec {
     public static final String NAME = "count";
-
-    public static Count.Builder builder() {
-        return new AutoValue_Count.Builder().type(NAME);
-    }
-
     @Override
     public abstract String type();
 
@@ -30,7 +25,12 @@ public abstract class Count implements SeriesSpec {
     public abstract String id();
 
     @Nullable
+    @JsonProperty
     public abstract String field();
+
+    public static Builder builder() {
+        return new AutoValue_Count.Builder().type(NAME);
+    }
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")

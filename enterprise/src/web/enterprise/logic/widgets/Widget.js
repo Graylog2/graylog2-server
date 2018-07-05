@@ -1,5 +1,6 @@
 // @flow
 import { Map } from 'immutable';
+import uuid from 'uuid/v4';
 
 type State = {
   id: string,
@@ -73,6 +74,10 @@ class Builder {
   id(value: string) {
     this.value = this.value.set('id', value);
     return this;
+  }
+
+  newId() {
+    return this.id(uuid());
   }
 
   type(value: string) {

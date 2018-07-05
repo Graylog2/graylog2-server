@@ -4,9 +4,6 @@ const expandRows = (fieldNames, columnFieldNames, series, rows, expanded = []) =
   if (!rows) {
     return [];
   }
-  if (fieldNames.length === 0) {
-    return [];
-  }
 
   rows.forEach((row) => {
     const { values } = row;

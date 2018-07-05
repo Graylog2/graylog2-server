@@ -19,9 +19,9 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, MaxAggregation> 
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final MaxAggregationBuilder avg = AggregationBuilders.max(name).field(maxSpec.field());
+        final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
         record(queryContext, pivot, maxSpec, name, MaxAggregation.class);
-        return Optional.of(avg);
+        return Optional.of(max);
     }
 
     @Override
