@@ -45,4 +45,6 @@ PieVisualization.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
+PieVisualization.type = 'pie';
+
 export default PieVisualization;

@@ -41,10 +41,7 @@ export default function (queryId, field) {
   const fieldTypeSpecificSeries = new FieldTypeSpecificSeries();
   const series = fieldTypeSpecificSeries.seriesFor(field).map(f => `${f}(${field})`);
   const config = AggregationWidgetConfig.builder()
-    .rowPivots([])
-    .columnPivots([])
     .series(series)
-    .sort([])
     .visualization('table')
     .build();
   const widget = AggregationWidget.builder()

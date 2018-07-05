@@ -25,6 +25,7 @@ import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
 import DataTable from 'enterprise/components/datatable/DataTable';
 import WorldMapVisualization from './components/visualizations/worldmap/WorldMapVisualization';
 import FieldStatisticsHandler from './logic/fieldactions/FieldStatisticsHandler';
+import NumberVisualization from './components/visualizations/number/NumberVisualization';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -143,29 +144,34 @@ export default {
   ],
   visualizationTypes: [
     {
-      type: 'bar',
+      type: BarVisualization.type,
       displayName: 'Bar Chart',
       component: BarVisualization,
     },
     {
-      type: 'line',
+      type: LineVisualization.type,
       displayName: 'Line Chart',
       component: LineVisualization,
     },
     {
-      type: 'map',
+      type: WorldMapVisualization.type,
       displayName: 'World Map',
       component: WorldMapVisualization,
     },
     {
-      type: 'pie',
+      type: PieVisualization.type,
       displayName: 'Pie Chart',
       component: PieVisualization,
     },
     {
-      type: 'table',
+      type: DataTable.type,
       displayName: 'Data Table',
       component: DataTable,
+    },
+    {
+      type: NumberVisualization.type,
+      displayName: 'Single Number',
+      component: NumberVisualization,
     },
   ],
 };

@@ -27,4 +27,6 @@ const WorldMapVisualization = ({ config, data, width, ...rest }) => {
 
 WorldMapVisualization.propTypes = {};
 
+WorldMapVisualization.type = 'map';
+
 export default WorldMapVisualization;

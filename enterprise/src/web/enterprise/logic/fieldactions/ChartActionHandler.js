@@ -8,9 +8,7 @@ import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWi
 export default function (queryId, field) {
   const config = AggregationWidgetConfig.builder()
     .rowPivots([pivotForField('timestamp')])
-    .columnPivots([])
     .series([`avg(${field})`])
-    .sort([])
     .visualization('line')
     .build();
   const widget = new AggregationWidget(uuid(), config);

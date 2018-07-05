@@ -6,9 +6,12 @@ import uuid from 'uuid/v4';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import AggregateActionHandler from '../../logic/fieldactions/AggregateActionHandler';
-import MessagesWidget from '../../logic/widgets/MessagesWidget';
-import MessagesWidgetConfig from '../../logic/widgets/MessagesWidgetConfig';
+import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
+import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
+import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
+import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import NumberVisualization from 'enterprise/components/visualizations/number/NumberVisualization';
 
 const AddWidgetButton = createReactClass({
   propTypes: {
@@ -39,8 +42,18 @@ const AddWidgetButton = createReactClass({
     });
   },
 
+  onCreateMessageCount() {
+    WidgetActions.create(AggregationWidget.builder()
+      .newId()
+      .config(AggregationWidgetConfig.builder()
+        .series(['count()'])
+        .visualization(NumberVisualization.type)
+        .build())
+      .build());
+  },
+
   onCreateMessageTable() {
-    WidgetActions.create(new MessagesWidget(uuid(), new MessagesWidgetConfig([], true)));
+    WidgetActions.create(MessagesWidget.builder().newId().config(new MessagesWidgetConfig([], true)).build());
   },
 
   render() {
@@ -49,6 +62,7 @@ const AddWidgetButton = createReactClass({
         <DropdownButton title="Add Widget" id="add-widget-button-dropdown" bsStyle="info" pullRight>
           <MenuItem onSelect={this.onCreateAggregation}>Aggregation</MenuItem>
           <MenuItem onSelect={this.onCreateAlertStatus}>Alert Status</MenuItem>
+          <MenuItem onSelect={this.onCreateMessageCount}>Message Count</MenuItem>
           <MenuItem onSelect={this.onCreateMessageTable}>Message Table</MenuItem>
         </DropdownButton>
       </div>

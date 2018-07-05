@@ -151,4 +151,7 @@ class DataTable extends React.Component {
   }
 }
 
-export default connect(DataTable, { currentView: ViewStore });
+const ConnectedDataTable = connect(DataTable, { currentView: ViewStore });
+ConnectedDataTable.type = 'table';
+
+export default ConnectedDataTable;

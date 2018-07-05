@@ -12,5 +12,7 @@ LineVisualization.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
+LineVisualization.type = 'line';
+
 export default LineVisualization;
 

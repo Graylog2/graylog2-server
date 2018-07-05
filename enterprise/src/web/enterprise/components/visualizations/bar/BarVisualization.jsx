@@ -12,4 +12,6 @@ BarVisualization.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
+BarVisualization.type = 'bar';
+
 export default BarVisualization;

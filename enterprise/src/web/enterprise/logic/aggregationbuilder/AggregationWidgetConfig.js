@@ -39,7 +39,11 @@ export default class AggregationWidgetConfig {
 
   static builder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder();
+    return new Builder()
+      .rowPivots([])
+      .columnPivots([])
+      .series([])
+      .sort([]);
   }
 
   toBuilder() {
