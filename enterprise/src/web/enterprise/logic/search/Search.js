@@ -9,7 +9,8 @@ export default class Search {
   }
 
   static create() {
-    return new Search(ObjectID().toString(), [], []);
+    // eslint-disable-next-line no-use-before-define
+    return new Builder().newId().queries([]).parameters([]).build();
   }
 
   get id() {
@@ -54,6 +55,10 @@ class Builder {
 
   id(value) {
     return new Builder(this.value.set('id', value));
+  }
+
+  newId() {
+    return this.id(ObjectID().toString());
   }
 
   queries(value) {

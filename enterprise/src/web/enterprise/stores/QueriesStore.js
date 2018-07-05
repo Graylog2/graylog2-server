@@ -83,7 +83,10 @@ export const QueriesStore = Reflux.createStore({
   },
 
   _propagateQueryChange(newQueries) {
-    const newSearch = this.search.toBuilder().queries(newQueries.valueSeq().toList()).build();
+    const newSearch = this.search.toBuilder()
+      .newId()
+      .queries(newQueries.valueSeq().toList())
+      .build();
     return ViewActions.search(newSearch);
   },
 
