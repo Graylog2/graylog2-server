@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
@@ -83,6 +84,11 @@ public class MongoDbGrokPatternService implements GrokPatternService {
         return pattern;
     }
 
+    public Optional<GrokPattern> loadByName(String name) {
+        final GrokPattern pattern = dbCollection.findOne(DBQuery.is("name", name));
+        return Optional.ofNullable(pattern);
+    }
+
     @Override
     public Set<GrokPattern> loadAll() {
         try (DBCursor<GrokPattern> grokPatterns = dbCollection.find()) {
@@ -99,13 +105,25 @@ public class MongoDbGrokPatternService implements GrokPatternService {
         } catch (GrokException | PatternSyntaxException e) {
             throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
         }
+
+        if (loadByName(pattern.name()).isPresent()) {
+            throw new ValidationException("Grok pattern " + pattern.name() + " already exists");
+        }
+
         final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
         return result.getSavedObject();
     }
 
     @Override
     public List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException {
-        final ImmutableList.Builder<GrokPattern> savedPatterns = ImmutableList.builder();
+        if (!replace) {
+            for (GrokPattern pattern : loadAll()) {
+                final boolean patternExists = patterns.stream().anyMatch(p -> p.name().equals(pattern.name()));
+                if (patternExists) {
+                    throw new ValidationException("Grok pattern " + pattern.name() + " already exists");
+                }
+            }
+        }
 
         try {
             if (!validateAll(patterns)) {
@@ -119,6 +137,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             deleteAll();
         }
 
+        final ImmutableList.Builder<GrokPattern> savedPatterns = ImmutableList.builder();
         for (final GrokPattern pattern : patterns) {
             final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
             savedPatterns.add(result.getSavedObject());
