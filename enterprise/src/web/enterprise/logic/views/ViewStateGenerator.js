@@ -1,5 +1,6 @@
 import ViewState from './ViewState';
 import { resultHistogram } from '../Widget';
+import WidgetPosition from '../widgets/WidgetPosition';
 
 const _defaultWidgets = () => {
   const histogram = resultHistogram();
@@ -14,12 +15,7 @@ const _defaultWidgets = () => {
   };
 
   const positions = {
-    [histogram.id]: {
-      col: 1,
-      row: 1,
-      height: 2,
-      width: Infinity,
-    },
+    [histogram.id]: new WidgetPosition(1, 1, 2, Infinity),
   };
 
   return { titles, widgets, positions };

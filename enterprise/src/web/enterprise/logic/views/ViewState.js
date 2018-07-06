@@ -1,12 +1,14 @@
 // @flow
 
 import { Map, fromJS, is } from 'immutable';
+import { fromPairs } from 'lodash';
+
 import Widget from 'enterprise/logic/widgets/Widget';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 
 type FieldNameList = Array<string>;
 type TitlesMap = Map<string, Map<string, string>>;
 type WidgetMapping = Map<string, string>;
-type WidgetPosition = { col: number, row: number, width: number, height: number };
 type State = {
   fields: FieldNameList,
   titles: TitlesMap,
@@ -95,7 +97,7 @@ export default class ViewState {
       fromJS(titles),
       widgets.map(w => Widget.fromJSON(w)),
       widget_mapping,
-      positions,
+      fromPairs(Object.entries(positions).map(([k, v]) => ([k, WidgetPosition.fromJSON(v)]))),
     );
   }
 }

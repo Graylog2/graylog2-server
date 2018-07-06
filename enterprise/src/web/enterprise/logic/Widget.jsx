@@ -11,7 +11,7 @@ const widgetsKey = 'enterpriseWidgets';
 
 export function widgetDefinition(type) {
   return PluginStore.exports(widgetsKey)
-    .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase())
+    .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 }
 
 export const messageList = (id = uuid(), fields = []) => {

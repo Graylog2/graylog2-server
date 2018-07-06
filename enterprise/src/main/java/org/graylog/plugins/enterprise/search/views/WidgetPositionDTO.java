@@ -11,30 +11,30 @@ import org.graylog.autovalue.WithBeanGetter;
 @WithBeanGetter
 public abstract class WidgetPositionDTO {
     @JsonProperty("col")
-    public abstract int col();
+    public abstract Position col();
 
     @JsonProperty("row")
-    public abstract int row();
+    public abstract Position row();
 
     @JsonProperty("height")
-    public abstract int height();
+    public abstract Position height();
 
     @JsonProperty("width")
-    public abstract int width();
+    public abstract Position width();
 
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty("col")
-        public abstract Builder col(int col);
+        public abstract Builder col(Position col);
 
         @JsonProperty("row")
-        public abstract Builder row(int row);
+        public abstract Builder row(Position row);
 
         @JsonProperty("height")
-        public abstract Builder height(int height);
+        public abstract Builder height(Position height);
 
         @JsonProperty("width")
-        public abstract Builder width(int width);
+        public abstract Builder width(Position width);
 
         public abstract WidgetPositionDTO build();
 

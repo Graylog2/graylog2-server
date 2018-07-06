@@ -7,12 +7,13 @@ import { Spinner } from 'components/common';
 
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import WidgetGrid from 'enterprise/components/WidgetGrid';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore';
 import StaticMessageList from './messagelist/StaticMessageList';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 
 const _onPositionsChange = (positions) => {
-  const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, { col, height, row, width }])).toJS();
+  const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width)])).toJS();
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
@@ -84,7 +85,7 @@ Query.propTypes = {
 };
 
 Query.defaultProps = {
-  positions: {}
+  positions: {},
 };
 
 export default Query;

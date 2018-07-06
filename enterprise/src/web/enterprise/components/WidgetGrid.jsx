@@ -12,13 +12,14 @@ import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
 import { TitlesStore } from '../stores/TitlesStore';
+import WidgetPosition from '../logic/widgets/WidgetPosition';
 
 const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
     const widgetDef = widgetDefinition(type);
-    return { col: 1, row: 1, height: widgetDef.defaultHeight, width: widgetDef.defaultWidth };
+    return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
   }
 
   static _defaultTitle(widget) {
@@ -61,12 +62,21 @@ class WidgetGrid extends React.Component {
       return returnedWidgets;
     }
 
+    const onPositionsChange = (newPosition) => {
+      const newPositions = Object.keys(positions).map((id) => {
+        const { col, row, height, width } = positions[id]._value;
+        return { id: id, col: col, row: row, height: height, width: width };
+      });
+      newPositions.push(newPosition);
+      this.props.onPositionsChange(newPositions);
+    };
+
     Object.keys(widgets).forEach((widgetId) => {
       const widget = widgets[widgetId];
       const dataKey = widget.data || widgetId;
       const widgetData = data[dataKey];
 
-      returnedWidgets.positions[widgetId] = Object.assign({}, (positions[widgetId] || WidgetGrid._defaultDimensions(widget.type)));
+      returnedWidgets.positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
 
       const { height, width } = (this.state && this.state.widgetDimensions[widgetId]) || {};
 
@@ -80,9 +90,11 @@ class WidgetGrid extends React.Component {
                     widget={widget}
                     data={widgetData}
                     height={height}
+                    position={returnedWidgets.positions[widgetId]}
                     width={width}
                     allFields={this.props.allFields}
                     fields={this.props.fields}
+                    onPositionsChange={onPositionsChange}
                     onSizeChange={this._onWidgetSizeChange}
                     title={widgetTitle} />
           </div>,
@@ -114,7 +126,7 @@ class WidgetGrid extends React.Component {
         </div>
       </Row>
     );
-  };
+  }
 }
 
 export default connect(WidgetGrid, { titles: TitlesStore });

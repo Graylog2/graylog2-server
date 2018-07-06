@@ -13,6 +13,7 @@ import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
+import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 
 import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
@@ -30,7 +31,9 @@ class Widget extends React.Component {
     width: PropTypes.number,
     fields: PropTypes.any.isRequired,
     onSizeChange: PropTypes.func.isRequired,
+    onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
+    position: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -124,6 +127,11 @@ class Widget extends React.Component {
           <WidgetHeader title={title}
                         onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                         editing={editing}>
+            <WidgetHorizontalStretch widgetId={widget.id}
+                                     widgetType={widget.type}
+                                     onStretch={this.props.onPositionsChange}
+                                     position={this.props.position} />
+            {' '}
             <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
               <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
             </WidgetFilterMenu>
