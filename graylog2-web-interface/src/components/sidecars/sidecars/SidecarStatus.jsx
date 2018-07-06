@@ -54,14 +54,14 @@ const SidecarStatus = createReactClass({
       return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.</p>;
     }
 
-    const collectors = Object.keys(details.status.collectors);
+    const collectors = details.status.collectors;
     if (collectors.length === 0) {
       return <p>There are no collectors configured in this sidecar.</p>;
     }
 
     const statuses = [];
-    collectors.forEach((collector) => {
-      const status = details.status.collectors[collector];
+    collectors.forEach((status) => {
+      const collector = status.name;
 
       let statusMessage;
       let statusBadge;
