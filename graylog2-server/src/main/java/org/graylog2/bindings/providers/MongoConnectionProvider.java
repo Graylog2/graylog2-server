@@ -16,6 +16,7 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.mongodb.MongoException;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
@@ -28,23 +29,27 @@ import javax.inject.Provider;
 public class MongoConnectionProvider implements Provider<MongoConnection> {
     private static final Logger LOG = LoggerFactory.getLogger(MongoConnectionProvider.class);
     private static MongoConnection mongoConnection = null;
+    private static Exception mongoException;
 
     @Inject
     public MongoConnectionProvider(MongoDbConfiguration configuration) {
         if (mongoConnection == null) {
             try {
                 mongoConnection = new MongoConnectionImpl(configuration);
-
                 mongoConnection.connect();
             } catch (Exception e) {
                 LOG.error("Error connecting to MongoDB: {}", e.getMessage());
-                throw e;
+                mongoException = e;
             }
         }
     }
 
     @Override
     public MongoConnection get() {
-        return mongoConnection;
+        if (mongoException == null) {
+            return mongoConnection;
+        } else {
+            throw MongoException.fromThrowable(mongoException);
+        }
     }
 }
