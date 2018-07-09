@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Map, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { LatLngBounds } from 'leaflet';
 
 import {} from 'leaflet/dist/leaflet.css';
 import style from './MapVisualization.css';
@@ -35,13 +36,18 @@ const MapVisualization = createReactClass({
 
   getInitialState() {
     return {
-      zoomLevel: 1,
+      zoomLevel: 0,
     };
+  },
+
+  componentDidMount() {
+    this._fitBounds();
   },
 
   componentDidUpdate(prevProps) {
     if (this.props.height !== prevProps.height || this.props.width !== prevProps.width) {
       this._forceMapUpdate();
+      this._fitBounds();
     }
   },
 
@@ -49,6 +55,7 @@ const MapVisualization = createReactClass({
   _isMapReady: false,
   _areTilesReady: false,
   position: [0, 0],
+  bounds: new LatLngBounds([-80, -170], [80, 170]),
   MARKER_RADIUS_SIZES: 10,
   MARKER_RADIUS_INCREMENT_SIZES: 10,
 
@@ -57,6 +64,12 @@ const MapVisualization = createReactClass({
     if (this._map) {
       window.dispatchEvent(new Event('resize'));
       this._map.leafletElement.invalidateSize(this.props.interactive);
+    }
+  },
+
+  _fitBounds() {
+    if (this._map) {
+      this._map.leafletElement.fitBounds(this.bounds);
     }
   },
 
@@ -131,6 +144,7 @@ const MapVisualization = createReactClass({
         <Map ref={(c) => { this._map = c; }}
              id={`visualization-${id}`}
              center={this.position}
+             bounds={this.bounds}
              zoom={this.state.zoomLevel}
              onZoomend={this._onZoomChange}
              className={style.map}
@@ -140,6 +154,7 @@ const MapVisualization = createReactClass({
              zoomAnimation={interactive}
              fadeAnimation={interactive}
              markerZoomAnimation={interactive}
+             onResize={this._fitBounds}
              whenReady={this._handleMapReady}>
           <TileLayer url={url} maxZoom={19} attribution={attribution} onLoad={this._handleTilesReady} />
           {markers}
