@@ -38,7 +38,7 @@ public class StatusAdministrationFilter implements AdministrationFilter {
             // Sidecars with not known status are in an UNKNOWN status
             return Status.UNKNOWN.equals(status);
         }
-        return collectorStatusList.collectors().entrySet().stream()
-                .anyMatch(entry -> Status.fromStatusCode(entry.getValue().status()).equals(status));
+        return collectorStatusList.collectors().stream()
+                .anyMatch(status -> Status.fromStatusCode(status.status()).equals(this.status));
     }
 }
