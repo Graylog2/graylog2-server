@@ -44,7 +44,7 @@ class SidecarStatusFileList extends React.Component {
 
   render() {
     var filterKeys = [];
-    var headers = ["Mo2dified", "Size", "Path"];
+    var headers = ["Modified", "Size", "Path"];
 
     return (
       <div>
