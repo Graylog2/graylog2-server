@@ -19,6 +19,7 @@ import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.streams.StreamService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class ElasticsearchBackendTest {
         bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        backend = new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, null, mock(IndexRangeService.class));
+        backend = new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class));
     }
 
     @Test

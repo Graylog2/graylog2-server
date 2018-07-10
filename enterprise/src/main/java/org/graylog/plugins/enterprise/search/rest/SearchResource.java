@@ -1,6 +1,8 @@
 package org.graylog.plugins.enterprise.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
@@ -8,6 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.elasticsearch.common.util.set.Sets;
+import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.QueryMetadata;
@@ -17,13 +21,19 @@ import org.graylog.plugins.enterprise.search.SearchMetadata;
 import org.graylog.plugins.enterprise.search.db.SearchDbService;
 import org.graylog.plugins.enterprise.search.db.SearchJobService;
 import org.graylog.plugins.enterprise.search.engine.QueryEngine;
+import org.graylog.plugins.enterprise.search.filter.AndFilter;
+import org.graylog.plugins.enterprise.search.filter.OrFilter;
+import org.graylog.plugins.enterprise.search.filter.StreamFilter;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
@@ -32,19 +42,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 // TODO permission system
 @Api(value = "Enterprise/Search", description = "Searching")
@@ -60,22 +73,24 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchDbService searchDbService;
     private final SearchJobService searchJobService;
     private final ObjectMapper objectMapper;
+    private final StreamService streamService;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
                           SearchDbService searchDbService,
                           SearchJobService searchJobService,
-                          ObjectMapper objectMapper) {
+                          ObjectMapper objectMapper,
+                          StreamService streamService) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
+        this.streamService = streamService;
     }
 
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     public Response createSearch(@ApiParam Search search) {
-
         final Search saved = searchDbService.save(search);
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
@@ -102,14 +117,56 @@ public class SearchResource extends RestResource implements PluginRestResource {
         }
     }
 
+    private void checkUserIsPermittedToSeeStreams(Set<String> streamIds) {
+        final Set<String> forbiddenStreams = streamIds.stream()
+                .filter(streamId -> !isPermitted(RestPermissions.STREAMS_READ, streamId))
+                .collect(Collectors.toSet());
+
+        // We are not using `checkPermission` and throwing the exception ourselves to avoid leaking stream ids.
+        if (!forbiddenStreams.isEmpty()) {
+            LOG.warn("Not executing search, it is referencing inaccessible streams: [" + Joiner.on(',').join(forbiddenStreams) + "]");
+            throwStreamAccessForbiddenException();
+        }
+    }
+
+    private void throwStreamAccessForbiddenException() {
+        throw new ForbiddenException("The search is referencing at least one stream you are not permitted to see.");
+    }
+
     @POST
     @ApiOperation(value = "Execute the referenced search query asynchronously",
             notes = "Starts a new search, irrespective whether or not another is already running")
     @Path("{id}/execute")
-    public Response executeQuery(@Context UriInfo uriInfo,
-                                 @ApiParam(name = "id") @PathParam("id") String id,
+    public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam Map<String, Object> executionState) {
         Search search = getSearch(id);
+
+        final Optional<Set<String>> usedStreamIds = search.queries().stream().map(Query::usedStreamIds).reduce(Sets::union);
+
+        checkUserIsPermittedToSeeStreams(usedStreamIds.orElse(Collections.emptySet()));
+
+        final boolean isAnyQueryWithoutStreams = search.queries()
+                .stream()
+                .anyMatch(query -> query.usedStreamIds().isEmpty());
+
+        if (isAnyQueryWithoutStreams) {
+            final Set<String> allAvailableStreamIds = availableStreamIds();
+
+            if (allAvailableStreamIds.isEmpty()) {
+                throwStreamAccessForbiddenException();
+            }
+
+
+            final ImmutableSet<Query> newQueries = search.queries().stream().map(query -> {
+                if (query.usedStreamIds().isEmpty()) {
+                    return query.toBuilder().filter(addStreamIdsToFilter(allAvailableStreamIds, query.filter())).build();
+                }
+                return query;
+            }).collect(ImmutableSet.toImmutableSet());
+
+            search = search.toBuilder().queries(newQueries).build();
+        }
+
         search = search.applyExecutionState(objectMapper, executionState);
 
         final SearchJob searchJob = searchJobService.create(search);
@@ -121,6 +178,30 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 .build();
     }
 
+    private Filter addStreamIdsToFilter(Set<String> allAvailableStreamIds, Filter filter) {
+        final Filter orFilter = filteringForStreamIds(allAvailableStreamIds);
+        if (filter == null) {
+            return orFilter;
+        }
+        return AndFilter.and(orFilter, filter);
+    }
+
+
+    private Set<String> availableStreamIds() {
+        return streamService.loadAll().stream()
+                .map(org.graylog2.plugin.streams.Stream::getId)
+                .filter(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId))
+                .collect(toSet());
+    }
+
+    private Filter filteringForStreamIds(Set<String> streamIds) {
+        final Set<Filter> streamFilters = streamIds.stream()
+                .map(StreamFilter::ofId)
+                .collect(toSet());
+        return OrFilter.builder()
+                .filters(streamFilters)
+                .build();
+    }
 
     @GET
     @ApiOperation(value = "Retrieve the status of an executed query")

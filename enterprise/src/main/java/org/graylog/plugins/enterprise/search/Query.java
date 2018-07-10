@@ -13,17 +13,24 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.graph.Traverser;
 import org.graylog.plugins.enterprise.search.engine.BackendQuery;
 import org.graylog.plugins.enterprise.search.engine.EmptyTimeRange;
+import org.graylog.plugins.enterprise.search.filter.StreamFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 
 @AutoValue
@@ -105,6 +112,18 @@ public abstract class Query {
                 .query(new BackendQuery.Fallback())
                 .filter(null)
                 .build();
+    }
+
+    public Set<String> usedStreamIds() {
+        if (filter() != null) {
+            final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
+            return StreamSupport.stream(filterTraverser.breadthFirst(filter()).spliterator(), false)
+                    .filter(filter -> filter instanceof StreamFilter)
+                    .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
     }
 
     @AutoValue.Builder
