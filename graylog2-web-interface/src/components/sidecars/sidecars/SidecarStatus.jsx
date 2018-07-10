@@ -1,17 +1,24 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Col, Row } from 'react-bootstrap';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import SidecarStatusFileList from './SidecarStatusFileList';
 
+const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
+
 const SidecarStatus = createReactClass({
+  mixins: [Reflux.connect(CollectorsStore)],
+
   propTypes: {
     sidecar: PropTypes.object.isRequired,
   },
 
   componentDidMount() {
+    this.loadCollectors();
     this.style.use();
   },
 
@@ -20,6 +27,10 @@ const SidecarStatus = createReactClass({
   },
 
   style: require('!style/useable!css!../styles/SidecarStyles.css'),
+
+  loadCollectors() {
+    CollectorsActions.all();
+  },
 
   formatNodeDetails(details) {
     if (!details) {
@@ -46,7 +57,8 @@ const SidecarStatus = createReactClass({
   },
 
   formatCollectorStatus(details) {
-    if (!details) {
+    const { collectors } = this.state;
+    if (!details || !collectors) {
       return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
     }
 
@@ -54,14 +66,14 @@ const SidecarStatus = createReactClass({
       return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.</p>;
     }
 
-    const collectors = details.status.collectors;
-    if (collectors.length === 0) {
+    const collectorStatuses = details.status.collectors;
+    if (collectorStatuses.length === 0) {
       return <p>There are no collectors configured in this sidecar.</p>;
     }
 
     const statuses = [];
-    collectors.forEach((status) => {
-      const collector = status.name;
+    collectorStatuses.forEach((status) => {
+      const collector = collectors.find(collector => collector.id === status.collector_id);
 
       let statusMessage;
       let statusBadge;
@@ -83,10 +95,12 @@ const SidecarStatus = createReactClass({
           statusBadge = <i className="fa fa-question-circle fa-fw" />;
       }
 
-      statuses.push(
-        <dt key={`${collector}-key`} className={statusClass}>{collector}</dt>,
-        <dd key={`${collector}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
-      );
+      if (collector) {
+        statuses.push(
+          <dt key={`${collector}-key`} className={statusClass}>{collector.name}</dt>,
+          <dd key={`${collector}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
+        );
+      }
     });
 
     return (

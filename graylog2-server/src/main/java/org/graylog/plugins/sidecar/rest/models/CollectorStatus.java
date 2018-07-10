@@ -24,8 +24,8 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonAutoDetect
 public abstract class CollectorStatus {
-    @JsonProperty("name")
-    public abstract String name();
+    @JsonProperty("collector_id")
+    public abstract String collectorId();
 
     @JsonProperty("status")
     public abstract int status();
@@ -34,9 +34,9 @@ public abstract class CollectorStatus {
     public abstract String message();
 
     @JsonCreator
-    public static CollectorStatus create(@JsonProperty("name") String name,
+    public static CollectorStatus create(@JsonProperty("collector_id") String collectorId,
                                          @JsonProperty("status") int status,
                                          @JsonProperty("message") String message) {
-        return new AutoValue_CollectorStatus(name, status, message);
+        return new AutoValue_CollectorStatus(collectorId, status, message);
     }
 }
