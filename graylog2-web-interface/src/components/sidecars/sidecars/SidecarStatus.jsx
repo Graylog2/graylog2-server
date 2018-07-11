@@ -1,24 +1,18 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Col, Row } from 'react-bootstrap';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import SidecarStatusFileList from './SidecarStatusFileList';
 
-const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
-
 const SidecarStatus = createReactClass({
-  mixins: [Reflux.connect(CollectorsStore)],
-
   propTypes: {
     sidecar: PropTypes.object.isRequired,
+    collectors: PropTypes.array.isRequired,
   },
 
   componentDidMount() {
-    this.loadCollectors();
     this.style.use();
   },
 
@@ -27,10 +21,6 @@ const SidecarStatus = createReactClass({
   },
 
   style: require('!style/useable!css!../styles/SidecarStyles.css'),
-
-  loadCollectors() {
-    CollectorsActions.all();
-  },
 
   formatNodeDetails(details) {
     if (!details) {
@@ -56,8 +46,7 @@ const SidecarStatus = createReactClass({
     );
   },
 
-  formatCollectorStatus(details) {
-    const { collectors } = this.state;
+  formatCollectorStatus(details, collectors) {
     if (!details || !collectors) {
       return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
     }
@@ -127,7 +116,7 @@ const SidecarStatus = createReactClass({
           <Col md={12}>
             <h2>Collectors status</h2>
             <div className="top-margin">
-              {this.formatCollectorStatus(sidecar.node_details)}
+              {this.formatCollectorStatus(sidecar.node_details, this.props.collectors)}
             </div>
           </Col>
         </Row>

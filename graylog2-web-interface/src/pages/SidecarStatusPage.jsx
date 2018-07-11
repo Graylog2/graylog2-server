@@ -13,6 +13,7 @@ import Routes from 'routing/Routes';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
+const { CollectorsActions } = CombinedProvider.get('Collectors');
 
 class SidecarStatusPage extends React.Component {
   static propTypes = {
@@ -25,6 +26,7 @@ class SidecarStatusPage extends React.Component {
 
   componentDidMount() {
     this.reloadSidecar();
+    this.reloadCollectors();
     this.interval = setInterval(this.reloadSidecar, 5000);
   }
 
@@ -38,8 +40,13 @@ class SidecarStatusPage extends React.Component {
     SidecarsActions.getSidecar(this.props.params.sidecarId).then(sidecar => this.setState({ sidecar }));
   };
 
+  reloadCollectors() {
+    CollectorsActions.all().then(collectors => this.setState({ collectors }));
+  };
+
   render() {
     const sidecar = this.state.sidecar;
+    const collectors = this.state.collectors;
     const isLoading = !sidecar;
 
     if (isLoading) {
@@ -72,7 +79,7 @@ class SidecarStatusPage extends React.Component {
             </ButtonToolbar>
           </PageHeader>
 
-          <SidecarStatus sidecar={sidecar} />
+          <SidecarStatus sidecar={sidecar} collectors={collectors} />
         </span>
       </DocumentTitle>
     );
