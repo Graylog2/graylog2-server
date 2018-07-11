@@ -40,8 +40,7 @@ public class FieldTypeMapperTest {
     @Test
     public void mappings() {
         assertMapping("text", "string", "full-text-search");
-        assertMapping("keyword", "string", "full-text-search");
-        assertMapping("string", "string", "full-text-search");
+        assertMapping("keyword", "string", "enumerable");
 
         assertMapping("long", "long", "numeric", "enumerable");
         assertMapping("integer", "int", "numeric", "enumerable");

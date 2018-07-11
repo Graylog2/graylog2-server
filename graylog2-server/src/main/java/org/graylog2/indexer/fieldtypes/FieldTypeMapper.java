@@ -35,7 +35,8 @@ public class FieldTypeMapper {
     private static final String PROP_FULL_TEXT_SEARCH = "full-text-search";
     private static final String PROP_NUMERIC = "numeric";
 
-    private static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH));
+    private static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_ENUMERABLE));
+    private static final FieldTypes.Type STRING_FTS_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH));
     private static final FieldTypes.Type LONG_TYPE = createType("long", of(PROP_NUMERIC, PROP_ENUMERABLE));
     private static final FieldTypes.Type INT_TYPE = createType("int", of(PROP_NUMERIC, PROP_ENUMERABLE));
     private static final FieldTypes.Type SHORT_TYPE = createType("short", of(PROP_NUMERIC, PROP_ENUMERABLE));
@@ -53,8 +54,7 @@ public class FieldTypeMapper {
      */
     private static final ImmutableMap<String, FieldTypes.Type> TYPE_MAP = ImmutableMap.<String, FieldTypes.Type>builder()
             .put("keyword", STRING_TYPE) // since ES 5.x
-            .put("text", STRING_TYPE) // since ES 5.x
-            .put("string", STRING_TYPE) // until ES 2.x
+            .put("text", STRING_FTS_TYPE) // since ES 5.x
             .put("long", LONG_TYPE)
             .put("integer", INT_TYPE)
             .put("short", SHORT_TYPE)
