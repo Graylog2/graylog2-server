@@ -26,6 +26,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
+import org.graylog2.utilities.ProxyHostsPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,16 +68,19 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     protected final Duration readTimeout;
     protected final Duration writeTimeout;
     protected final URI httpProxyUri;
+    protected final ProxyHostsPattern nonProxyHostsPattern;
 
     @Inject
     public OkHttpClientProvider(@Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
-                                @Named("http_proxy_uri") @Nullable URI httpProxyUri) {
+                                @Named("http_proxy_uri") @Nullable URI httpProxyUri,
+                                @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
         this.httpProxyUri = httpProxyUri;
+        this.nonProxyHostsPattern = nonProxyHostsPattern;
     }
 
     @Override
@@ -92,9 +96,17 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
             final ProxySelector proxySelector = new ProxySelector() {
                 @Override
                 public List<Proxy> select(URI uri) {
+                    final String host = uri.getHost();
+                    if (nonProxyHostsPattern != null && nonProxyHostsPattern.matches(host)) {
+                        LOG.debug("Bypassing proxy server for {}", host);
+                        return ImmutableList.of(Proxy.NO_PROXY);
+                    }
                     try {
-                        final InetAddress targetAddress = InetAddress.getByName(uri.getHost());
+                        final InetAddress targetAddress = InetAddress.getByName(host);
                         if (targetAddress.isLoopbackAddress()) {
+                            return ImmutableList.of(Proxy.NO_PROXY);
+                        } else if (nonProxyHostsPattern != null && nonProxyHostsPattern.matches(targetAddress.getHostAddress())) {
+                            LOG.debug("Bypassing proxy server for {}", targetAddress.getHostAddress());
                             return ImmutableList.of(Proxy.NO_PROXY);
                         }
                     } catch (UnknownHostException e) {

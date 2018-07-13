@@ -14,23 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.bindings.providers;
+package org.graylog2.utilities;
 
-import com.github.joschi.jadconfig.util.Duration;
+import org.junit.Test;
 
-import javax.inject.Singleton;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Provider for a configured {@link com.squareup.okhttp.OkHttpClient} used for system-level tasks.
- */
-@Singleton
-public class SystemOkHttpClientProvider extends OkHttpClientProvider {
-    public SystemOkHttpClientProvider() {
-        super(
-                Duration.seconds(2L),
-                Duration.seconds(5L),
-                Duration.seconds(5L),
-                null,
-                null);
+public class ProxyHostsPatternConverterTest {
+    @Test
+    public void convertFromAndTo() {
+        final ProxyHostsPatternConverter converter = new ProxyHostsPatternConverter();
+        final ProxyHostsPattern pattern = converter.convertFrom("127.0.0.1,node0.graylog.example.com");
+
+        assertThat(pattern.matches("127.0.0.1")).isTrue();
+        assertThat(converter.convertTo(pattern)).isEqualTo("127.0.0.1,node0.graylog.example.com");
     }
 }
