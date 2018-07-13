@@ -40,14 +40,14 @@ class SidecarStatusPage extends React.Component {
     SidecarsActions.getSidecar(this.props.params.sidecarId).then(sidecar => this.setState({ sidecar }));
   };
 
-  reloadCollectors() {
+  reloadCollectors = () => {
     CollectorsActions.all().then(collectors => this.setState({ collectors }));
   };
 
   render() {
     const sidecar = this.state.sidecar;
     const collectors = this.state.collectors;
-    const isLoading = !sidecar;
+    const isLoading = !sidecar || !collectors;
 
     if (isLoading) {
       return <DocumentTitle title="Sidecar status"><Spinner /></DocumentTitle>;
