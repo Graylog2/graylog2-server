@@ -41,6 +41,7 @@ import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -80,7 +81,7 @@ public class SavedSearchesResource extends SearchResource {
     @ApiResponse(code = 400, message = "Validation error")
     @AuditEvent(type = AuditEventTypes.SAVED_SEARCH_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true)
-                           @Valid CreateSavedSearchRequest cr) throws ValidationException {
+                           @Valid @NotNull CreateSavedSearchRequest cr) throws ValidationException {
         if (!isTitleTaken("", cr.title())) {
             final String msg = "Cannot save search " + cr.title() + ". Title is already taken.";
             throw new BadRequestException(msg);
@@ -129,7 +130,7 @@ public class SavedSearchesResource extends SearchResource {
     public Map<String, Object> update(@ApiParam(name = "searchId", required = true)
                                       @PathParam("searchId") String searchId,
                                       @ApiParam(name = "JSON body", required = true)
-                                      @Valid CreateSavedSearchRequest cr) throws NotFoundException, ValidationException {
+                                      @Valid @NotNull CreateSavedSearchRequest cr) throws NotFoundException, ValidationException {
         final SavedSearch search = savedSearchService.load(searchId);
 
         if (!isTitleTaken(searchId, cr.title())) {
