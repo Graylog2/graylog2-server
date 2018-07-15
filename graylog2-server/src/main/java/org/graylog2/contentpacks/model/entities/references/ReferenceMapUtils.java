@@ -82,6 +82,7 @@ public final class ReferenceMapUtils {
         }
     }
 
+    @Nullable
     private static Object valueOf(ValueReference valueReference, Map<String, ValueReference> parameters) {
         switch (valueReference.valueType()) {
             case BOOLEAN:
@@ -97,9 +98,29 @@ public final class ReferenceMapUtils {
             case STRING:
                 return valueReference.asString(parameters);
             case PARAMETER:
-                // TODO: Resolve parameter
+                return resolveParameterReference(valueReference, parameters);
             default:
                 return null;
+        }
+    }
+
+    @Nullable
+    private static Object resolveParameterReference(ValueReference valueReference,
+                                                    Map<String, ValueReference> parameters) {
+        final Object parameterName = valueReference.value();
+        if (parameterName instanceof String) {
+            final ValueReference resolvedParameter = parameters.get(parameterName);
+            if (resolvedParameter == null) {
+                // TODO: Create custom exception?
+                throw new IllegalArgumentException("Missing parameter " + parameterName);
+            }
+            if (resolvedParameter.valueType() == ValueType.PARAMETER) {
+                // TODO: Create custom exception?
+                throw new IllegalArgumentException("Circular parameter " + parameterName);
+            }
+            return valueOf(resolvedParameter, parameters);
+        } else {
+            return null;
         }
     }
 

@@ -143,10 +143,14 @@ public abstract class ValueReference implements ValueTyped, Reference {
     public static ValueReference of(Object value) {
         if (value instanceof Boolean) {
             return of((Boolean) value);
+        } else if (value instanceof Double) {
+            return of((Double) value);
         } else if (value instanceof Float) {
             return of((Float) value);
         } else if (value instanceof Integer) {
             return of((Integer) value);
+        } else if (value instanceof Long) {
+            return of((Long) value);
         } else if (value instanceof String) {
             return of((String) value);
         } else if (value instanceof Enum) {
