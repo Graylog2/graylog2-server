@@ -52,17 +52,6 @@ public abstract class LegacyContentPack implements ContentPack {
     private static final String FIELD_ENTITIES = "entities";
     private static final String FIELD_DB_ID = "_id";
 
-    // Supported legacy entity types
-    // TODO: Use some sort of types registry?
-    private static final ModelType TYPE_INPUT = ModelType.of("input");
-    private static final ModelType TYPE_STREAM = ModelType.of("stream");
-    private static final ModelType TYPE_OUTPUT = ModelType.of("output");
-    private static final ModelType TYPE_DASHBOARD = ModelType.of("dashboard");
-    private static final ModelType TYPE_GROK_PATTERN = ModelType.of("grok_pattern");
-    private static final ModelType TYPE_LOOKUP_TABLE = ModelType.of("lookup_table");
-    private static final ModelType TYPE_LOOKUP_CACHE = ModelType.of("lookup_cache");
-    private static final ModelType TYPE_DATA_ADAPTER = ModelType.of("data_adapter");
-
     private static final int DEFAULT_REVISION = 0;
 
     @Nullable
@@ -260,7 +249,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertInput(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("id").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_INPUT)
+                    .type(ModelTypes.INPUT)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -279,7 +268,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertStream(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("id").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_STREAM)
+                    .type(ModelTypes.STREAM)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -298,7 +287,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertOutput(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("id").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_OUTPUT)
+                    .type(ModelTypes.OUTPUT)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -317,7 +306,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertDashboard(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(UUID.randomUUID().toString()))
-                    .type(TYPE_DASHBOARD)
+                    .type(ModelTypes.DASHBOARD)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -336,7 +325,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertGrokPattern(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_GROK_PATTERN)
+                    .type(ModelTypes.GROK_PATTERN)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -355,7 +344,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertLookupTable(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_LOOKUP_TABLE)
+                    .type(ModelTypes.LOOKUP_TABLE)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -374,7 +363,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertLookupCache(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_LOOKUP_CACHE)
+                    .type(ModelTypes.LOOKUP_CACHE)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
@@ -393,7 +382,7 @@ public abstract class LegacyContentPack implements ContentPack {
         private Entity convertLookupDataAdapter(JsonNode json) {
             return EntityV1.builder()
                     .id(ModelId.of(json.path("name").asText(UUID.randomUUID().toString())))
-                    .type(TYPE_DATA_ADAPTER)
+                    .type(ModelTypes.LOOKUP_ADAPTER)
                     .version(ModelVersion.of("1"))
                     .data(json)
                     .build();
