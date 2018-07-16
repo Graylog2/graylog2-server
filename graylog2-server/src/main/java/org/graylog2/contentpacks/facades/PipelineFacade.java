@@ -18,12 +18,12 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -43,17 +43,21 @@ import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 public class PipelineFacade implements EntityFacade<PipelineDao> {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineFacade.class);
@@ -107,13 +111,15 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                                                         Map<EntityDescriptor, Object> nativeEntities,
                                                         String username) {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private NativeEntity<PipelineDao> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<PipelineDao> decode(EntityV1 entity,
+                                             Map<String, ValueReference> parameters,
+                                             Map<EntityDescriptor, Object> nativeEntities) {
         final DateTime now = Tools.nowUTC();
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
         final ValueReference description = pipelineEntity.description();
@@ -124,15 +130,67 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();
-
-        // TODO: Create pipeline-stream connections
-
         final PipelineDao savedPipelineDao = pipelineService.save(pipelineDao);
-        return NativeEntity.create(savedPipelineDao.id(), TYPE, savedPipelineDao);
+        final String pipelineId = requireNonNull(savedPipelineDao.id(), "Saved pipeline ID must not be null");
+        final Set<EntityDescriptor> connectedStreamEntities = pipelineEntity.connectedStreams().stream()
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(streamId -> EntityDescriptor.create(ModelId.of(streamId), ModelTypes.STREAM))
+                .collect(Collectors.toSet());
+        final Set<Stream> connectedStreams = connectedStreamEntities.stream()
+                .map(nativeEntities::get)
+                .filter(nativeEntity -> nativeEntity instanceof Stream)
+                .map(Stream.class::cast)
+                .collect(Collectors.toSet());
+        createPipelineConnections(pipelineId, connectedStreams);
+
+        return NativeEntity.create(pipelineId, TYPE, savedPipelineDao);
+    }
+
+    private void createPipelineConnections(String pipelineId, Set<Stream> connectedStreams) {
+        for (Stream stream: connectedStreams) {
+            final String streamId = stream.getId();
+            try {
+                final PipelineConnections connections = connectionsService.load(streamId);
+                final Set<String> newPipelines = ImmutableSet.<String>builder()
+                        .addAll(connections.pipelineIds())
+                        .add(pipelineId)
+                        .build();
+                final PipelineConnections newConnections = connections.toBuilder()
+                        .pipelineIds(newPipelines)
+                        .build();
+                final PipelineConnections savedConnections = connectionsService.save(newConnections);
+                LOG.trace("Saved pipeline connections: {}", savedConnections);
+            } catch (NotFoundException e) {
+                final PipelineConnections connections = PipelineConnections.builder()
+                        .streamId(streamId)
+                        .pipelineIds(Collections.singleton(pipelineId))
+                        .build();
+                final PipelineConnections savedConnections = connectionsService.save(connections);
+                LOG.trace("Saved pipeline connections: {}", savedConnections);
+            }
+        }
     }
 
     @Override
     public void delete(PipelineDao nativeEntity) {
+        final Set<PipelineConnections> pipelineConnections = connectionsService.loadByPipelineId(nativeEntity.id());
+        for (PipelineConnections connections : pipelineConnections) {
+            final Set<String> pipelineIds = connections.pipelineIds().stream()
+                    .filter(pipelineId -> !pipelineId.equals(nativeEntity.id()))
+                    .collect(Collectors.toSet());
+
+            if (pipelineIds.isEmpty()) {
+                LOG.trace("Removing pipeline connections for stream {}", connections.streamId());
+                connectionsService.delete(connections.streamId());
+            } else {
+                final PipelineConnections newConnections = connections.toBuilder()
+                        .pipelineIds(pipelineIds)
+                        .build();
+                LOG.trace("Saving updated pipeline connections: {}", newConnections);
+                connectionsService.save(newConnections);
+            }
+        }
+
         pipelineService.delete(nativeEntity.id());
     }
 
