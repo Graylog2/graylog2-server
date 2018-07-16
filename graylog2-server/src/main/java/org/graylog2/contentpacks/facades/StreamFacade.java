@@ -181,6 +181,30 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
+    public Optional<NativeEntity<Stream>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        if (entity instanceof EntityV1) {
+            return findExisting((EntityV1) entity, parameters);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+        final String streamId = entity.id().id();
+        // Always use the existing default stream
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+            try {
+                final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
+                return Optional.of(NativeEntity.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM, stream));
+            } catch (NotFoundException e) {
+                throw new ContentPackException("Default stream <" + streamId + "> does not exist!", e);
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void delete(Stream nativeEntity) {
         try {
             streamService.destroy(nativeEntity);
