@@ -24,7 +24,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 
 import java.util.Map;
@@ -46,26 +45,23 @@ public abstract class RelativeRange extends TimeRange {
         return range();
     }
 
-    @Override
     @JsonIgnore
-    public DateTime getFrom() {
-        // TODO this should be computed once
-        if (range() > 0) {
-            return Tools.nowUTC().minus(Seconds.seconds(range()));
-        }
-        return new DateTime(0, DateTimeZone.UTC);
-    }
+    abstract DateTime from();
 
     @Override
     @JsonIgnore
-    public DateTime getTo() {
-        // TODO this should be fixed
-        return Tools.nowUTC();
-    }
+    public DateTime getFrom() { return from(); };
+
+    @JsonIgnore
+    abstract DateTime to();
+
+    @Override
+    @JsonIgnore
+    public DateTime getTo() { return to(); };
 
     @JsonCreator
     public static RelativeRange create(@JsonProperty("type") String type, @JsonProperty("range") int range) throws InvalidRangeParametersException {
-        return builder().type(type).checkRange(range).build();
+        return builder().type(type).range(range).build();
     }
 
     public static RelativeRange create(int range) throws InvalidRangeParametersException {
@@ -85,19 +81,24 @@ public abstract class RelativeRange extends TimeRange {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract RelativeRange build();
+        abstract RelativeRange autoBuild();
 
-        public abstract Builder type(String type);
-
-        public abstract Builder range(int range);
-
-        // TODO replace with custom build()
-        public Builder checkRange(int range) throws InvalidRangeParametersException {
+        public RelativeRange build() throws InvalidRangeParametersException {
+            final int range = this.range();
             if (range < 0) {
                 throw new InvalidRangeParametersException("Range must not be negative");
             }
-            return range(range);
-        }
+            final DateTime now = Tools.nowUTC();
+            return this.to(now).from(now.minus(Seconds.seconds(range))).autoBuild();
+        };
+
+        public abstract Builder type(String type);
+
+        abstract int range();
+        public abstract Builder range(int range);
+
+        abstract Builder from(DateTime from);
+        abstract Builder to(DateTime to);
     }
 
 }
