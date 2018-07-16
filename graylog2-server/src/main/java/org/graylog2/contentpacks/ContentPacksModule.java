@@ -16,8 +16,8 @@
  */
 package org.graylog2.contentpacks;
 
-import org.graylog2.contentpacks.catalogs.CatalogIndex;
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
+import org.graylog2.contentpacks.facades.CollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.CollectorFacade;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
@@ -28,7 +28,6 @@ import org.graylog2.contentpacks.facades.LookupTableFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.PipelineFacade;
 import org.graylog2.contentpacks.facades.PipelineRuleFacade;
-import org.graylog2.contentpacks.facades.CollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.RootEntityFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
@@ -40,7 +39,6 @@ public class ContentPacksModule extends PluginModule {
     protected void configure() {
         bind(ContentPackPersistenceService.class).asEagerSingleton();
         bind(ContentPackService.class).asEagerSingleton();
-        bind(CatalogIndex.class).asEagerSingleton();
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ModelIdParamConverter.Provider.class);
 

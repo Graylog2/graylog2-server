@@ -18,11 +18,12 @@ package org.graylog2.rest.resources.system.contentpacks;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
-import org.graylog2.contentpacks.catalogs.CatalogIndex;
+import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
+import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -42,9 +43,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CatalogResourceTest {
@@ -56,16 +60,19 @@ public class CatalogResourceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private EntityFacade<Void> mockEntityCatalog;
+    private EntityFacade<Void> mockEntityFacade;
 
-    private CatalogIndex catalogIndex;
+    private ContentPackService contentPackService;
     private CatalogResource catalogResource;
 
     @Before
     public void setUp() {
-        final ImmutableMap<ModelType, EntityFacade<?>> entityCatalogs = ImmutableMap.of(ModelType.of("test"), mockEntityCatalog);
-        catalogIndex = new CatalogIndex(entityCatalogs);
-        catalogResource = new CatalogResource(catalogIndex);
+        final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
+                mock(ContentPackInstallationPersistenceService.class);
+        final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
+        final Map<ModelType, EntityFacade<?>> entityFacades = Collections.singletonMap(ModelType.of("test"), mockEntityFacade);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+        catalogResource = new CatalogResource(contentPackService);
     }
 
     @Test
@@ -77,7 +84,7 @@ public class CatalogResourceTest {
                         .title("Test Entity")
                         .build()
         );
-        when(mockEntityCatalog.listEntityExcerpts()).thenReturn(entityExcerpts);
+        when(mockEntityFacade.listEntityExcerpts()).thenReturn(entityExcerpts);
         final CatalogIndexResponse catalogIndexResponse = catalogResource.showEntityIndex();
 
         assertThat(catalogIndexResponse.entities())
@@ -100,8 +107,8 @@ public class CatalogResourceTest {
                 .data(new ObjectNode(JsonNodeFactory.instance).put("test", "1234"))
                 .build();
         final EntityWithConstraints entityWithConstraints = EntityWithConstraints.create(entity);
-        when(mockEntityCatalog.resolve(entityDescriptor)).thenReturn(entityDescriptors);
-        when(mockEntityCatalog.exportEntity(entityDescriptor)).thenReturn(Optional.of(entityWithConstraints));
+        when(mockEntityFacade.resolve(entityDescriptor)).thenReturn(entityDescriptors);
+        when(mockEntityFacade.exportEntity(entityDescriptor)).thenReturn(Optional.of(entityWithConstraints));
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 

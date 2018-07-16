@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks.catalogs;
+package org.graylog2.contentpacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
@@ -49,9 +50,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CatalogIndexTest {
+public class ContentPackServiceTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -66,21 +68,24 @@ public class CatalogIndexTest {
     @Mock
     private OutputService outputService;
 
-    private CatalogIndex catalogIndex;
+    private ContentPackService contentPackService;
 
     @Before
     public void setUp() throws Exception {
-        final Map<ModelType, EntityFacade<?>> catalogs = ImmutableMap.of(
+        final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
+                mock(ContentPackInstallationPersistenceService.class);
+        final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
+        final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
                 ModelTypes.STREAM, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
                 ModelTypes.OUTPUT, new OutputFacade(objectMapper, outputService)
         );
 
-        catalogIndex = new CatalogIndex(catalogs);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
     }
 
     @Test
     public void resolveEntitiesWithEmptyInput() {
-        final Set<EntityDescriptor> resolvedEntities = catalogIndex.resolveEntities(Collections.emptySet());
+        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(Collections.emptySet());
         assertThat(resolvedEntities).isEmpty();
     }
 
@@ -97,7 +102,7 @@ public class CatalogIndexTest {
                 EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM)
         );
 
-        final Set<EntityDescriptor> resolvedEntities = catalogIndex.resolveEntities(unresolvedEntities);
+        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
         assertThat(resolvedEntities).containsOnly(EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM));
     }
 
@@ -128,7 +133,7 @@ public class CatalogIndexTest {
                 EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM)
         );
 
-        final Set<EntityDescriptor> resolvedEntities = catalogIndex.resolveEntities(unresolvedEntities);
+        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
         assertThat(resolvedEntities).containsOnly(
                 EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM),
                 EntityDescriptor.create(ModelId.of("output-1234"), ModelTypes.OUTPUT)

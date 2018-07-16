@@ -21,12 +21,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.graph.ElementOrder;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.exceptions.EmptyDefaultValueException;
 import org.graylog2.contentpacks.exceptions.FailedConstraintsException;
 import org.graylog2.contentpacks.exceptions.InvalidParameterTypeException;
@@ -42,8 +44,11 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
+import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -57,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -71,17 +77,14 @@ import java.util.stream.Collectors;
 public class ContentPackService {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackService.class);
 
-    private final ContentPackPersistenceService contentPackPersistenceService;
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
     private final Set<ConstraintChecker> constraintCheckers;
     private final Map<ModelType, EntityFacade<?>> entityFacades;
 
     @Inject
-    public ContentPackService(ContentPackPersistenceService contentPackPersistenceService,
-                              ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
+    public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                               Set<ConstraintChecker> constraintCheckers,
                               Map<ModelType, EntityFacade<?>> entityFacades) {
-        this.contentPackPersistenceService = contentPackPersistenceService;
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
@@ -98,7 +101,7 @@ public class ContentPackService {
         }
     }
 
-    public ContentPackInstallation installContentPack(ContentPackV1 contentPack,
+    private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
                                                       String user) {
@@ -144,8 +147,7 @@ public class ContentPackService {
         } catch (Exception e) {
             rollback(createdEntities);
 
-            // TODO: Use custom exception
-            throw new RuntimeException("Failed to install content pack <" + contentPack.id() + "/" + contentPack.revision() + ">", e);
+            throw new ContentPackException("Failed to install content pack <" + contentPack.id() + "/" + contentPack.revision() + ">", e);
         }
 
         final ContentPackInstallation installation = ContentPackInstallation.builder()
@@ -187,6 +189,69 @@ public class ContentPackService {
          */
 
         throw new UnsupportedOperationException();
+    }
+
+    public Set<EntityExcerpt> listAllEntityExcerpts() {
+        final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
+        entityFacades.values().forEach(catalog -> entityIndexBuilder.addAll(catalog.listEntityExcerpts()));
+        return entityIndexBuilder.build();
+    }
+
+    public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
+        final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
+                .allowsSelfLoops(false)
+                .nodeOrder(ElementOrder.insertion())
+                .build();
+        unresolvedEntities.forEach(dependencyGraph::addNode);
+
+        final HashSet<EntityDescriptor> resolvedEntities = new HashSet<>();
+        final MutableGraph<EntityDescriptor> finalDependencyGraph = resolveDependencyGraph(dependencyGraph, resolvedEntities);
+
+        LOG.debug("Final dependency graph: {}", finalDependencyGraph);
+
+        return finalDependencyGraph.nodes();
+    }
+
+    private MutableGraph<EntityDescriptor> resolveDependencyGraph(Graph<EntityDescriptor> dependencyGraph, Set<EntityDescriptor> resolvedEntities) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.from(dependencyGraph).build();
+        Graphs.merge(mutableGraph, dependencyGraph);
+
+        for (EntityDescriptor entityDescriptor : dependencyGraph.nodes()) {
+            LOG.debug("Resolving entity {}", entityDescriptor);
+            if (resolvedEntities.contains(entityDescriptor)) {
+                LOG.debug("Entity {} already resolved, skipping.", entityDescriptor);
+                continue;
+            }
+
+            final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
+            final Graph<EntityDescriptor> graph = facade.resolve(entityDescriptor);
+            LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
+
+            Graphs.merge(mutableGraph, graph);
+            LOG.trace("New dependency graph: {}", mutableGraph);
+
+            resolvedEntities.add(entityDescriptor);
+            final Graph<EntityDescriptor> result = resolveDependencyGraph(mutableGraph, resolvedEntities);
+            Graphs.merge(mutableGraph, result);
+        }
+
+        return mutableGraph;
+    }
+
+    public EntitiesWithConstraints collectEntities(Collection<EntityDescriptor> resolvedEntities) {
+        final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
+        final ImmutableSet.Builder<Constraint> constraints = ImmutableSet.<Constraint>builder()
+                .add(GraylogVersionConstraint.currentGraylogVersion());
+        for (EntityDescriptor entityDescriptor : resolvedEntities) {
+            final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
+
+            facade.exportEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
+                entities.add(entityWithConstraints.entity());
+                constraints.addAll(entityWithConstraints.constraints());
+            });
+        }
+
+        return EntitiesWithConstraints.create(entities.build(), constraints.build());
     }
 
     private ImmutableGraph<Entity> buildEntityGraph(Entity rootEntity,

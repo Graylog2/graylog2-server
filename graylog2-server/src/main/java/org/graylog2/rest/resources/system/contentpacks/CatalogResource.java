@@ -24,7 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.contentpacks.catalogs.CatalogIndex;
+import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -48,11 +48,11 @@ import java.util.Set;
 @Path("/system/catalog")
 @Produces(MediaType.APPLICATION_JSON)
 public class CatalogResource {
-    private final CatalogIndex catalogIndex;
+    private final ContentPackService contentPackService;
 
     @Inject
-    public CatalogResource(CatalogIndex catalogIndex) {
-        this.catalogIndex = catalogIndex;
+    public CatalogResource(ContentPackService contentPackService) {
+        this.contentPackService = contentPackService;
     }
 
     @GET
@@ -60,7 +60,7 @@ public class CatalogResource {
     @ApiOperation(value = "List available entities in this Graylog cluster")
     @RequiresPermissions(RestPermissions.CATALOG_LIST)
     public CatalogIndexResponse showEntityIndex() {
-        final Set<EntityExcerpt> entities = catalogIndex.entityIndex();
+        final Set<EntityExcerpt> entities = contentPackService.listAllEntityExcerpts();
         return CatalogIndexResponse.create(entities);
     }
 
@@ -73,8 +73,8 @@ public class CatalogResource {
             @ApiParam(name = "JSON body", required = true)
             @Valid @NotNull CatalogResolveRequest request) {
         final Set<EntityDescriptor> requestedEntities = request.entities();
-        final Set<EntityDescriptor> resolvedEntities = catalogIndex.resolveEntities(requestedEntities);
-        final EntitiesWithConstraints entitiesWithConstraints = catalogIndex.collectEntities(resolvedEntities);
+        final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(requestedEntities);
+        final EntitiesWithConstraints entitiesWithConstraints = contentPackService.collectEntities(resolvedEntities);
 
         return CatalogResolveResponse.create(entitiesWithConstraints.constraints(), entitiesWithConstraints.entities());
     }
