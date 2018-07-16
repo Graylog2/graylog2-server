@@ -22,6 +22,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -37,6 +38,7 @@ import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -58,6 +60,7 @@ import java.util.stream.Collectors;
 
 public class StreamFacade implements EntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamFacade.class);
+    private static final String DUMMY_STREAM_ID = "ffffffffffffffffffffffff";
 
     public static final ModelType TYPE = ModelTypes.STREAM;
 
@@ -140,42 +143,47 @@ public class StreamFacade implements EntityFacade<Stream> {
                 streamEntity.removeMatches().asBoolean(parameters),
                 indexSetService.getDefault().id());
         final Stream stream = streamService.create(createStreamRequest, username);
-
-        for (StreamRuleEntity streamRuleEntity : streamEntity.streamRules()) {
-            final CreateStreamRuleRequest createStreamRuleRequest = CreateStreamRuleRequest.create(
-                    streamRuleEntity.type().asEnum(parameters, StreamRuleType.class).getValue(),
-                    streamRuleEntity.value().asString(parameters),
-                    streamRuleEntity.field().asString(parameters),
-                    streamRuleEntity.inverted().asBoolean(parameters),
-                    streamRuleEntity.description().asString(parameters));
-            streamRuleService.create(stream.getId(), createStreamRuleRequest);
+        final List<StreamRule> streamRules = streamEntity.streamRules().stream()
+                .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
+                .map(request -> streamRuleService.create(DUMMY_STREAM_ID, request))
+                .collect(Collectors.toList());
+        final String savedStreamId;
+        try {
+            savedStreamId = streamService.saveWithRules(stream, streamRules);
+        } catch (ValidationException e) {
+            throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
         }
 
-        streamEntity.outputs().stream()
+        final Set<ObjectId> outputIds = streamEntity.outputs().stream()
                 .map(valueReference -> valueReference.asString(parameters))
                 .map(ModelId::of)
                 .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT))
-                .forEach(output -> addOutput(stream, output, nativeEntities));
+                .map(descriptor -> findOutput(descriptor, nativeEntities))
+                .map(Output::getId)
+                .map(ObjectId::new)
+                .collect(Collectors.toSet());
+        streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
 
-        return NativeEntity.create(stream.getId(), TYPE, stream);
+        return NativeEntity.create(savedStreamId, TYPE, stream);
     }
 
-    private void addOutput(Stream stream,
-                           EntityDescriptor outputDescriptor,
-                           Map<EntityDescriptor, Object> nativeEntities) {
+    private CreateStreamRuleRequest createStreamRuleRequest(StreamRuleEntity streamRuleEntity, Map<String, ValueReference> parameters) {
+        return CreateStreamRuleRequest.create(
+                streamRuleEntity.type().asEnum(parameters, StreamRuleType.class).getValue(),
+                streamRuleEntity.value().asString(parameters),
+                streamRuleEntity.field().asString(parameters),
+                streamRuleEntity.inverted().asBoolean(parameters),
+                streamRuleEntity.description().asString(parameters));
+    }
+
+    private Output findOutput(EntityDescriptor outputDescriptor, Map<EntityDescriptor, Object> nativeEntities) {
         final Object output = nativeEntities.get(outputDescriptor);
         if (output == null) {
-            final String msg = "Missing referenced output for stream \"" + stream.getTitle()
-                    + "\" (id=<" + stream.getId() + ">): "
-                    + outputDescriptor;
-            throw new ContentPackException(msg);
+            throw new ContentPackException("Missing referenced output: " + outputDescriptor);
         } else if (output instanceof Output) {
-            streamService.addOutput(stream, (Output) output);
+            return (Output) output;
         } else {
-            final String msg = "Invalid entity type for referenced output " + outputDescriptor
-                    + " for stream \"" + stream.getTitle()
-                    + "\" (id=<" + stream.getId() + ">): "
-                    + output.getClass();
+            final String msg = "Invalid entity type for referenced output " + outputDescriptor + ": " + output.getClass();
             throw new ContentPackException(msg);
         }
     }
