@@ -65,7 +65,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
-    private FileInfo fileInfo;
+    private FileInfo fileInfo = FileInfo.empty();
 
     @Inject
     public CSVFileDataAdapter(@Assisted("id") String id,
