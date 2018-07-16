@@ -96,7 +96,7 @@ public class OutputFacade implements EntityFacade<Output> {
                 outputEntity.title().asString(parameters),
                 outputEntity.type().asString(parameters),
                 toValueMap(outputEntity.configuration(), parameters),
-                null // TODO
+                null // Outputs are assigned to streams in StreamFacade
         );
         try {
             final Output output = outputService.create(createOutputRequest, username);
