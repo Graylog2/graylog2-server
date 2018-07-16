@@ -90,7 +90,7 @@ public abstract class RelativeRange extends TimeRange {
             }
             final DateTime now = Tools.nowUTC();
             return this.to(now).from(now.minus(Seconds.seconds(range))).autoBuild();
-        };
+        }
 
         public abstract Builder type(String type);
 
