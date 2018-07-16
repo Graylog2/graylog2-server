@@ -159,7 +159,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                     nativeEntities
             );
         } catch (Exception e) {
-            throw new RuntimeException("Couldn't create dashboard", e);
+            throw new ContentPackException("Couldn't create dashboard", e);
         }
 
         return NativeEntity.create(dashboard.getId(), TYPE, dashboard);
@@ -212,7 +212,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
             throw new RuntimeException("Failed to load dashboard with id " + dashboardId, e);
         }
 
-        return dashboard;
+        return persistedDashboard;
     }
 
     @SuppressWarnings("unchecked")

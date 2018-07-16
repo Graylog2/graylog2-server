@@ -24,6 +24,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -63,7 +64,7 @@ public abstract class DashboardWidgetEntity {
             @JsonProperty("cache_time") @PositiveOrZero ValueReference cacheTime,
             @JsonProperty("time_range") @NotNull TimeRangeEntity timeRange,
             @JsonProperty("configuration") @NotNull ReferenceMap configuration,
-            @JsonProperty("position") Position position) {
+            @JsonProperty("position") @Nullable Position position) {
         return new AutoValue_DashboardWidgetEntity(description, type, cacheTime, timeRange, configuration, Optional.ofNullable(position));
     }
 
