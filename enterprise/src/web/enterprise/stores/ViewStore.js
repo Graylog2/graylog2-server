@@ -84,7 +84,8 @@ export const ViewStore = Reflux.createStore({
        Selected query might become a property on the view later. */
     const queries = get(view, 'search.queries', Immutable.List());
     const firstQueryId = queries.first().id;
-    this.selectQuery(this.activeQuery || firstQueryId);
+    const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
+    this.selectQuery(selectedQuery);
 
     ViewActions.load.promise(Promise.resolve(this._state()));
   },
