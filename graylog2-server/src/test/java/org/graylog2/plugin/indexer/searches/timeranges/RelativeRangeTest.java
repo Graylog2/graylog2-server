@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RelativeRangeTest {
     @Test
-    public void relativeRangeCreatesExactDuration() throws Exception {
+    public void relativeRangeCreatesExactTimestamps() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(1531734983860L);
         final RelativeRange relativeRange = RelativeRange.create(300);
 
@@ -18,7 +18,7 @@ public class RelativeRangeTest {
     }
 
     @Test
-    public void relativeRangeCreatesExactDurationForZeroRange() throws Exception {
+    public void relativeRangeCreatesExactTimestampsForZeroRange() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(1531734983860L);
         final RelativeRange relativeRange = RelativeRange.create(0);
 
@@ -27,7 +27,18 @@ public class RelativeRangeTest {
     }
 
     @Test
-    public void relativeRangeCreatesExactTimestamps() throws Exception {
+    public void relativeRangeCreatesTimestampsUponCreation() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(1531734983860L);
+        final RelativeRange relativeRange = RelativeRange.create(0);
+
+        DateTimeUtils.setCurrentMillisFixed(1531735801041L);
+
+        assertThat(relativeRange.getTo()).isEqualTo(DateTime.parse("2018-07-16T09:56:23.860Z"));
+        assertThat(relativeRange.getFrom()).isEqualTo(DateTime.parse("2018-07-16T09:56:23.860Z"));
+    }
+
+    @Test
+    public void relativeRangeCreatesExactDuration() throws Exception {
         final long rangeInMillis = 300000L;
         final RelativeRange relativeRange = RelativeRange.create(new Long(rangeInMillis / 1000).intValue());
 
