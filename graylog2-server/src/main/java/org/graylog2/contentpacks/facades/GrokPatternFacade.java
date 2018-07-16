@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -123,7 +124,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
 
     private void compareGrokPatterns(String name, String expectedPattern, String actualPattern) {
         if (!actualPattern.equals(expectedPattern)) {
-            throw new DivergingEntityConfiguration("Expected Grok pattern for name \"" + name + "\": <" + expectedPattern + ">; actual Grok pattern: <" + actualPattern + ">");
+            throw new DivergingEntityConfigurationException("Expected Grok pattern for name \"" + name + "\": <" + expectedPattern + ">; actual Grok pattern: <" + actualPattern + ">");
         }
     }
 

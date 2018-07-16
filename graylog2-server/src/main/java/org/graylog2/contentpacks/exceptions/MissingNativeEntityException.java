@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks;
+package org.graylog2.contentpacks.exceptions;
 
-import java.util.Collection;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 
-public class MissingParametersException extends ContentPackException {
-    private final Collection<String> missingParameters;
+public class MissingNativeEntityException extends ContentPackException {
+    private final EntityDescriptor missingEntityDescriptor;
 
-    public MissingParametersException(Collection<String> missingParameters) {
-        super("Missing parameters: " + missingParameters);
-        this.missingParameters = missingParameters;
+    public MissingNativeEntityException(EntityDescriptor missingEntityDescriptor) {
+        super("Missing native entity: " + missingEntityDescriptor);
+        this.missingEntityDescriptor = missingEntityDescriptor;
     }
 
-    public Collection<String> getMissingParameters() {
-        return missingParameters;
+    public EntityDescriptor getMissingEntityDescriptor() {
+        return missingEntityDescriptor;
     }
 }

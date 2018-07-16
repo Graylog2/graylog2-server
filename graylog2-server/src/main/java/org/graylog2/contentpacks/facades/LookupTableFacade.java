@@ -22,8 +22,9 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
-import org.graylog2.contentpacks.ContentPackException;
-import org.graylog2.contentpacks.MissingNativeEntityException;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
+import org.graylog2.contentpacks.exceptions.MissingNativeEntityException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -156,7 +157,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     private void compareLookupTable(String name, String title, LookupTableDto existingLookupTable) {
         if (!name.equals(existingLookupTable.name()) || !title.equals(existingLookupTable.title())) {
-            throw new DivergingEntityConfiguration("Different lookup table configuration with name \"" + name + "\"");
+            throw new DivergingEntityConfigurationException("Different lookup table configuration with name \"" + name + "\"");
         }
     }
 

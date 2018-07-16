@@ -14,12 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks.facades;
+package org.graylog2.contentpacks.exceptions;
 
-import org.graylog2.contentpacks.ContentPackException;
+import java.util.Collection;
 
-public class DivergingEntityConfiguration extends ContentPackException {
-    public DivergingEntityConfiguration(String message) {
-        super(message);
+public class InvalidParametersException extends ContentPackException {
+    private final Collection<String> invalidParameters;
+
+    public InvalidParametersException(Collection<String> invalidParameters) {
+        super("Invalid parameters: " + invalidParameters);
+        this.invalidParameters = invalidParameters;
+    }
+
+    public Collection<String> getInvalidParameters() {
+        return invalidParameters;
     }
 }

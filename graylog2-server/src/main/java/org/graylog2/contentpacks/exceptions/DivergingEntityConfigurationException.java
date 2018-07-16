@@ -14,17 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks;
+package org.graylog2.contentpacks.exceptions;
 
-public class EmptyDefaultValueException extends ContentPackException {
-    private final String parameterName;
-
-    public EmptyDefaultValueException(String parameterName) {
-        super("Empty default value for missing parameter " + parameterName);
-        this.parameterName = parameterName;
-    }
-
-    public String getParameterName() {
-        return parameterName;
+public class DivergingEntityConfigurationException extends ContentPackException {
+    public DivergingEntityConfigurationException(String message) {
+        super(message);
     }
 }

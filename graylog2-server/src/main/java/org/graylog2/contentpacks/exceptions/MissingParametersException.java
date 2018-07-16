@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks;
-
-import org.graylog2.contentpacks.model.constraints.Constraint;
+package org.graylog2.contentpacks.exceptions;
 
 import java.util.Collection;
 
-public class FailedConstraintsException extends ContentPackException {
-    private final Collection<Constraint> failedConstraints;
+public class MissingParametersException extends ContentPackException {
+    private final Collection<String> missingParameters;
 
-    public FailedConstraintsException(Collection<Constraint> failedConstraints) {
-        super("Failed constraints: " + failedConstraints);
-        this.failedConstraints = failedConstraints;
+    public MissingParametersException(Collection<String> missingParameters) {
+        super("Missing parameters: " + missingParameters);
+        this.missingParameters = missingParameters;
     }
 
-    public Collection<Constraint> getFailedConstraints() {
-        return failedConstraints;
+    public Collection<String> getMissingParameters() {
+        return missingParameters;
     }
 }

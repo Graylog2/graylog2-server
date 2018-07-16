@@ -14,21 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.contentpacks;
+package org.graylog2.contentpacks.exceptions;
 
-import org.graylog2.contentpacks.model.entities.Entity;
-
-import java.util.Collection;
-
-public class UnexpectedEntitiesException extends ContentPackException {
-    private final Collection<Entity> unexpectedEntities;
-
-    public UnexpectedEntitiesException(Collection<Entity> unexpectedEntities) {
-        super("Unexpected entities in content pack: " + unexpectedEntities);
-        this.unexpectedEntities = unexpectedEntities;
+public class ContentPackException extends RuntimeException {
+    public ContentPackException() {
+        super();
     }
 
-    public Collection<Entity> getUnexpectedEntities() {
-        return unexpectedEntities;
+    public ContentPackException(String message) {
+        super(message);
+    }
+
+    public ContentPackException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

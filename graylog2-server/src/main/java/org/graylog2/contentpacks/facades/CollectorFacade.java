@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
+import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -145,7 +146,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
 
     private void compareCollectors(String name, String serviceType, Collector existingCollector) {
         if (!name.equals(existingCollector.name()) || !serviceType.equals(existingCollector.serviceType())) {
-            throw new DivergingEntityConfiguration("Expected service type for Collector with name \"" + name + "\": <" + serviceType + ">; actual service type: <" + existingCollector.serviceType() + ">");
+            throw new DivergingEntityConfigurationException("Expected service type for Collector with name \"" + name + "\": <" + serviceType + ">; actual service type: <" + existingCollector.serviceType() + ">");
         }
     }
 

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -136,7 +137,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     private void compareRuleSources(String name, String expectedRuleSource, String actualRuleSource) {
         if (!actualRuleSource.equals(expectedRuleSource)) {
             LOG.debug("Expected source for rule \"{}\":\n{}\n\nActual source:\n{}", name, expectedRuleSource, actualRuleSource);
-            throw new DivergingEntityConfiguration("Different pipeline rule sources for pipeline rule with name \"" + name + "\"");
+            throw new DivergingEntityConfigurationException("Different pipeline rule sources for pipeline rule with name \"" + name + "\"");
         }
     }
 
