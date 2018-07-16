@@ -2,13 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem, Label } from 'react-bootstrap';
 import Immutable from 'immutable';
+import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'enterprise/components/messagelist';
 import { Spinner, ClipboardButton, Timestamp } from 'components/common';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
-import Link from 'enterprise/components/Link';
 
 import Routes from 'routing/Routes';
 
@@ -185,9 +185,7 @@ class MessageDetail extends React.Component {
   _formatMessageTitle = (index, id) => {
     if (index) {
       return (
-        <LinkContainer to={Routes.message_show(index, id)}>
-          <Link href="#">{id}</Link>
-        </LinkContainer>
+        <Link to={Routes.message_show(index, id)}>{id}</Link>
       );
     }
     return <span>{id} <Label bsStyle="warning">Not stored</Label></span>;
