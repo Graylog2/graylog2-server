@@ -23,6 +23,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.ContentPackException;
+import org.graylog2.contentpacks.MissingNativeEntityException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -37,6 +38,8 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.db.DBLookupTableService;
+import org.graylog2.lookup.dto.CacheDto;
+import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 
 import javax.inject.Inject;
@@ -85,20 +88,43 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                                                            Map<EntityDescriptor, Object> nativeEntities,
                                                            String username) {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private NativeEntity<LookupTableDto> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<LookupTableDto> decode(EntityV1 entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Object> nativeEntities) {
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
+
+
+        final String referencedDataAdapterName = lookupTableEntity.dataAdapterName().asString(parameters);
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(ModelId.of(referencedDataAdapterName), ModelTypes.LOOKUP_ADAPTER);
+        final Object dataAdapter = nativeEntities.get(dataAdapterDescriptor);
+        final String dataAdapterId;
+        if (dataAdapter instanceof DataAdapterDto) {
+            dataAdapterId = ((DataAdapterDto) dataAdapter).id();
+        } else {
+            throw new MissingNativeEntityException(dataAdapterDescriptor);
+        }
+
+        final String referencedCacheName = lookupTableEntity.cacheName().asString(parameters);
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(ModelId.of(referencedCacheName), ModelTypes.LOOKUP_CACHE);
+        final Object cache = nativeEntities.get(cacheDescriptor);
+        final String cacheId;
+        if (cache instanceof CacheDto) {
+            cacheId = ((CacheDto) cache).id();
+        } else {
+            throw new MissingNativeEntityException(cacheDescriptor);
+        }
         final LookupTableDto lookupTableDto = LookupTableDto.builder()
                 .name(lookupTableEntity.name().asString(parameters))
                 .title(lookupTableEntity.title().asString(parameters))
                 .description(lookupTableEntity.description().asString(parameters))
-                .dataAdapterId(lookupTableEntity.dataAdapterName().asString(parameters))
-                .cacheId(lookupTableEntity.cacheName().asString(parameters))
+                .dataAdapterId(dataAdapterId)
+                .cacheId(cacheId)
                 .defaultSingleValue(lookupTableEntity.defaultSingleValue().asString(parameters))
                 .defaultSingleValueType(lookupTableEntity.defaultSingleValueType().asEnum(parameters, LookupDefaultSingleValue.Type.class))
                 .defaultMultiValue(lookupTableEntity.defaultMultiValue().asString(parameters))
