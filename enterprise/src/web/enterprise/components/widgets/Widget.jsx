@@ -18,6 +18,7 @@ import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
 import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
+import LoadingWidget from './LoadingWidget';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -81,7 +82,7 @@ class Widget extends React.Component {
   render() {
     const { id, widget, data, height, width, fields, onSizeChange, title } = this.props;
     const { config, computationTimeRange, filter } = widget;
-    const VisComponent = Widget._visualizationForType(widget.type);
+    const VisComponent = data ? Widget._visualizationForType(widget.type) : LoadingWidget;
     const { editing } = this.state;
     const { activeQuery } = this.props.view;
     const visualization = (
@@ -150,6 +151,6 @@ class Widget extends React.Component {
       </WidgetFrame>
     );
   }
-};
+}
 
 export default connect(Widget, { view: ViewMetadataStore });

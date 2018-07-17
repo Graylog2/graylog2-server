@@ -58,7 +58,7 @@ class WidgetGrid extends React.Component {
   _renderWidgets = (widgets, positions, data) => {
     const returnedWidgets = { positions: {}, widgets: [] };
 
-    if (!widgets || _.isEmpty(widgets) || !data || _.isEmpty(data)) {
+    if (!widgets || _.isEmpty(widgets) || !data) {
       return returnedWidgets;
     }
 
@@ -82,24 +82,22 @@ class WidgetGrid extends React.Component {
 
       const widgetTitle = this.props.titles.getIn(['widget', widget.id], WidgetGrid._defaultTitle(widget));
 
-      if (widgetData) {
-        returnedWidgets.widgets.push(
-          <div key={widget.id} className={style.widgetContainer}>
-            <Widget key={widgetId}
-                    id={widgetId}
-                    widget={widget}
-                    data={widgetData}
-                    height={height}
-                    position={returnedWidgets.positions[widgetId]}
-                    width={width}
-                    allFields={this.props.allFields}
-                    fields={this.props.fields}
-                    onPositionsChange={onPositionsChange}
-                    onSizeChange={this._onWidgetSizeChange}
-                    title={widgetTitle} />
-          </div>,
-        );
-      }
+      returnedWidgets.widgets.push(
+        <div key={widget.id} className={style.widgetContainer}>
+          <Widget key={widgetId}
+                  id={widgetId}
+                  widget={widget}
+                  data={widgetData}
+                  height={height}
+                  position={returnedWidgets.positions[widgetId]}
+                  width={width}
+                  allFields={this.props.allFields}
+                  fields={this.props.fields}
+                  onPositionsChange={onPositionsChange}
+                  onSizeChange={this._onWidgetSizeChange}
+                  title={widgetTitle} />
+        </div>,
+      );
     });
 
     return returnedWidgets;
