@@ -137,9 +137,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
+        final String idPrefix = (pivot.columnGroups().isEmpty() && pivot.rowGroups().isEmpty()) ? queryContext.nextName() + "-" : "";
         return EntryStream.of(pivot.series())
                 .mapKeyValue((integer, seriesSpec) -> {
-                    final String seriesName = "series-" + integer;
+                    final String seriesName = idPrefix + "series-" + integer;
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     return seriesHandlers.get(seriesSpec.type()).createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
                 })
