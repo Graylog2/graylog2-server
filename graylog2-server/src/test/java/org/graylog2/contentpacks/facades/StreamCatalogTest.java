@@ -27,7 +27,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -172,7 +171,7 @@ public class StreamCatalogTest {
         final EntityExcerpt excerpt = facade.createExcerpt(stream);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(stream.getId()));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("stream"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.STREAM);
         assertThat(excerpt.title()).isEqualTo(stream.getTitle());
     }
 

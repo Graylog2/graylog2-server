@@ -22,7 +22,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -87,7 +86,7 @@ public class LookupCacheFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));
-        assertThat(entity.type()).isEqualTo(ModelType.of("lookup_cache"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entityV1.data(), LookupCacheEntity.class);
@@ -109,7 +108,7 @@ public class LookupCacheFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(cacheDto);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("cache-name"));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("lookup_cache"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_CACHE);
         assertThat(excerpt.title()).isEqualTo("Cache Title");
     }
 

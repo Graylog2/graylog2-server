@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -74,7 +73,7 @@ public class GrokPatternFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("01234567890"));
-        assertThat(entity.type()).isEqualTo(ModelType.of("grok_pattern"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.GROK_PATTERN);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
@@ -88,7 +87,7 @@ public class GrokPatternFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(grokPattern);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("01234567890"));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("grok_pattern"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.GROK_PATTERN);
         assertThat(excerpt.title()).isEqualTo(grokPattern.name());
     }
 

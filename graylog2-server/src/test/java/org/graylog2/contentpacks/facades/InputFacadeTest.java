@@ -24,7 +24,6 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -119,7 +118,7 @@ public class InputFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(input.getId()));
-        assertThat(entity.type()).isEqualTo(ModelType.of("input"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
@@ -138,7 +137,7 @@ public class InputFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(inputWithExtractors);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(input.getId()));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("input"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.INPUT);
         assertThat(excerpt.title()).isEqualTo(input.getTitle());
     }
 

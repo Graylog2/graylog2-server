@@ -35,7 +35,6 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -116,7 +115,7 @@ public class PipelineFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("title"));
-        assertThat(entity.type()).isEqualTo(ModelType.of("pipeline"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
@@ -137,7 +136,7 @@ public class PipelineFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(pipeline);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("title"));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("pipeline"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.PIPELINE);
         assertThat(excerpt.title()).isEqualTo("title");
     }
 

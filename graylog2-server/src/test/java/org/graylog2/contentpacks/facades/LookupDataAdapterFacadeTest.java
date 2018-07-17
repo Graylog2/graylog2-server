@@ -22,7 +22,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -87,7 +86,7 @@ public class LookupDataAdapterFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));
-        assertThat(entity.type()).isEqualTo(ModelType.of("lookup_adapter"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entityV1.data(), LookupDataAdapterEntity.class);
@@ -109,7 +108,7 @@ public class LookupDataAdapterFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(dataAdapterDto);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("data-adapter-name"));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("lookup_adapter"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER);
         assertThat(excerpt.title()).isEqualTo("Data Adapter Title");
     }
 

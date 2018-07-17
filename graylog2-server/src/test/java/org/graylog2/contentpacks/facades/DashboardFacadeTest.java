@@ -29,7 +29,6 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.AbsoluteRangeEntity;
 import org.graylog2.contentpacks.model.entities.DashboardEntity;
@@ -142,7 +141,7 @@ public class DashboardFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(dashboard.getId()));
-        assertThat(entity.type()).isEqualTo(ModelType.of("dashboard"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entityV1.data(), DashboardEntity.class);
@@ -202,7 +201,7 @@ public class DashboardFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(dashboard);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(dashboard.getId()));
-        assertThat(excerpt.type()).isEqualTo(ModelType.of("dashboard"));
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.DASHBOARD);
         assertThat(excerpt.title()).isEqualTo(dashboard.getTitle());
     }
 
