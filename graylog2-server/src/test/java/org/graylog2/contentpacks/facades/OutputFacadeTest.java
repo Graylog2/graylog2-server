@@ -16,8 +16,10 @@
  */
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -29,13 +31,17 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.LoggingOutput;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -49,6 +55,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +65,7 @@ import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 public class OutputFacadeTest {
@@ -77,12 +85,13 @@ public class OutputFacadeTest {
     @Mock
     private OutputRegistry outputRegistry;
     private Set<PluginMetaData> pluginMetaData;
+    private OutputService outputService;
     private OutputFacade facade;
     private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
 
     @Before
     public void setUp() throws Exception {
-        final OutputService outputService = new OutputServiceImpl(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry);
+        outputService = new OutputServiceImpl(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry);
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
         outputFactories.put("org.graylog2.outputs.LoggingOutput", mock(LoggingOutput.Factory.class));
@@ -91,7 +100,7 @@ public class OutputFacadeTest {
     }
 
     @Test
-    public void encode() {
+    public void exportEntity() {
         final ImmutableMap<String, Object> configuration = ImmutableMap.of(
                 "some-setting", "foobar"
         );
@@ -116,6 +125,98 @@ public class OutputFacadeTest {
         assertThat(outputEntity.title()).isEqualTo(ValueReference.of("Output Title"));
         assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.outputs.LoggingOutput"));
         assertThat(outputEntity.configuration()).containsEntry("some-setting", ValueReference.of("foobar"));
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportNativeEntity() throws NotFoundException {
+        final Output output = outputService.load("5adf239e4b900a0fdb4e5197");
+
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(output);
+        final Entity entity = entityWithConstraints.entity();
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of("5adf239e4b900a0fdb4e5197"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final OutputEntity outputEntity = objectMapper.convertValue(entityV1.data(), OutputEntity.class);
+        assertThat(outputEntity.title()).isEqualTo(ValueReference.of("STDOUT"));
+        assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.outputs.LoggingOutput"));
+        assertThat(outputEntity.configuration()).containsEntry("prefix", ValueReference.of("Writing message: "));
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void createNativeEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.OUTPUT)
+                .data(objectMapper.convertValue(OutputEntity.create(
+                        ValueReference.of("STDOUT"),
+                        ValueReference.of("org.graylog2.outputs.LoggingOutput"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("prefix", "Writing message: "))
+                ), JsonNode.class))
+                .build();
+
+        final NativeEntity<Output> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
+
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.OUTPUT);
+        assertThat(nativeEntity.entity().getTitle()).isEqualTo("STDOUT");
+        assertThat(nativeEntity.entity().getType()).isEqualTo("org.graylog2.outputs.LoggingOutput");
+        assertThat(nativeEntity.entity().getCreatorUserId()).isEqualTo("username");
+        assertThat(nativeEntity.entity().getConfiguration()).containsEntry("prefix", "Writing message: ");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExisting() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.OUTPUT)
+                .data(objectMapper.convertValue(OutputEntity.create(
+                        ValueReference.of("STDOUT"),
+                        ValueReference.of("org.graylog2.outputs.LoggingOutput"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("prefix", "Writing message: "))
+                ), JsonNode.class))
+                .build();
+        final Optional<NativeEntity<Output>> existingOutput = facade.findExisting(entity, Collections.emptyMap());
+        assertThat(existingOutput).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("5adf239e4b900a0fdb4e5197"))
+                .type(ModelTypes.OUTPUT)
+                .data(objectMapper.convertValue(OutputEntity.create(
+                        ValueReference.of("STDOUT"),
+                        ValueReference.of("org.graylog2.outputs.LoggingOutput"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("prefix", "Writing message: "))
+                ), JsonNode.class))
+                .build();
+        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        assertThat(graph.nodes()).containsOnly(entity);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntityDescriptor() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf239e4b900a0fdb4e5197"), ModelTypes.OUTPUT);
+        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        assertThat(graph.nodes()).containsOnly(descriptor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() throws NotFoundException {
+        final Output output = outputService.load("5adf239e4b900a0fdb4e5197");
+        assertThat(outputService.count()).isEqualTo(1L);
+        facade.delete(output);
+        assertThat(outputService.count()).isEqualTo(0L);
+        assertThatThrownBy(() -> outputService.load("5adf239e4b900a0fdb4e5197"))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
