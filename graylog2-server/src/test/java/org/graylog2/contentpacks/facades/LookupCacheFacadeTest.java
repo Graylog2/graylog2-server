@@ -16,7 +16,10 @@
  */
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -29,6 +32,8 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
@@ -43,6 +48,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -61,13 +67,14 @@ public class LookupCacheFacadeTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private LookupCacheFacade facade;
+    private DBCacheService cacheService;
     private Set<PluginMetaData> pluginMetaData;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-        final DBCacheService cacheService = new DBCacheService(
+        cacheService = new DBCacheService(
                 mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
                 clusterEventBus);
@@ -77,7 +84,7 @@ public class LookupCacheFacadeTest {
     }
 
     @Test
-    public void encode() {
+    public void exportNativeEntity() {
         final CacheDto cacheDto = CacheDto.builder()
                 .id("1234567890")
                 .name("cache-name")
@@ -98,6 +105,111 @@ public class LookupCacheFacadeTest {
         assertThat(lookupCacheEntity.title()).isEqualTo(ValueReference.of("Cache Title"));
         assertThat(lookupCacheEntity.description()).isEqualTo(ValueReference.of("Cache Description"));
         assertThat(lookupCacheEntity.configuration()).containsEntry("type", ValueReference.of("FallbackCacheConfig"));
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportEntity() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24b24b900a0fdb4e52dd"), ModelTypes.LOOKUP_CACHE);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = entityWithConstraints.entity();
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of("5adf24b24b900a0fdb4e52dd"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entityV1.data(), LookupCacheEntity.class);
+        assertThat(lookupCacheEntity.name()).isEqualTo(ValueReference.of("no-op-cache"));
+        assertThat(lookupCacheEntity.title()).isEqualTo(ValueReference.of("No-op cache"));
+        assertThat(lookupCacheEntity.description()).isEqualTo(ValueReference.of("No-op cache"));
+        assertThat(lookupCacheEntity.configuration()).containsEntry("type", ValueReference.of("none"));
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExisting() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_CACHE)
+                .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of("no-op-cache"),
+                        ValueReference.of("No-op cache"),
+                        ValueReference.of("No-op cache"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
+                ), JsonNode.class))
+                .build();
+
+        final NativeEntity<CacheDto> existingCache = facade.findExisting(entity, Collections.emptyMap())
+                .orElseThrow(AssertionError::new);
+        final EntityDescriptor descriptor = existingCache.descriptor();
+        final CacheDto cacheDto = existingCache.entity();
+
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("5adf24b24b900a0fdb4e52dd"));
+        assertThat(descriptor.type()).isEqualTo(ModelTypes.LOOKUP_CACHE);
+        assertThat(cacheDto.id()).isEqualTo("5adf24b24b900a0fdb4e52dd");
+        assertThat(cacheDto.name()).isEqualTo("no-op-cache");
+        assertThat(cacheDto.title()).isEqualTo("No-op cache");
+        assertThat(cacheDto.description()).isEqualTo("No-op cache");
+        assertThat(cacheDto.config().type()).isEqualTo("none");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExistingWithNoExistingEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_CACHE)
+                .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of("some-cache"),
+                        ValueReference.of("Some cache"),
+                        ValueReference.of("Some cache"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
+                ), JsonNode.class))
+                .build();
+
+        final Optional<NativeEntity<CacheDto>> existingCache = facade.findExisting(entity, Collections.emptyMap());
+
+        assertThat(existingCache).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_CACHE)
+                .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of("no-op-cache"),
+                        ValueReference.of("No-op cache"),
+                        ValueReference.of("No-op cache"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
+                ), JsonNode.class))
+                .build();
+
+        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        assertThat(graph.nodes()).containsOnly(entity);
+    }
+
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntityDescriptor() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24b24b900a0fdb4e52dd"), ModelTypes.LOOKUP_CACHE);
+        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        assertThat(graph.nodes()).containsOnly(descriptor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() {
+        final Optional<CacheDto> cacheDto = cacheService.get("5adf24b24b900a0fdb4e52dd");
+
+        assertThat(cacheService.findAll()).hasSize(1);
+        cacheDto.ifPresent(facade::delete);
+        
+        assertThat(cacheService.get("5adf24b24b900a0fdb4e52dd")).isEmpty();
+        assertThat(cacheService.findAll()).isEmpty();
     }
 
     @Test
