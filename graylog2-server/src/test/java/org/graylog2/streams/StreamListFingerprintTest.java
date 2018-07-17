@@ -120,6 +120,6 @@ public class StreamListFingerprintTest {
     public void testWithEmptyStreamList() throws Exception {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.<Stream>newArrayList());
 
-        assertEquals(fingerprint.getFingerprint(), expectedEmptyFingerprint);
+        assertEquals(expectedEmptyFingerprint, fingerprint.getFingerprint());
     }
 }

@@ -48,12 +48,12 @@ public class JsonProcessingExceptionMapperTest {
         final JsonMappingException exception = new JsonMappingException(jsonParser, "Boom!", new RuntimeException("rootCause"));
         final Response response = mapper.toResponse(exception);
 
-        assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-        assertEquals(response.getMediaType(), MediaType.APPLICATION_JSON_TYPE);
+        assertEquals(Response.Status.BAD_REQUEST, response.getStatusInfo());
+        assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
         assertTrue(response.hasEntity());
         assertTrue(response.getEntity() instanceof ApiError);
 
         final ApiError responseEntity = (ApiError) response.getEntity();
-        assertTrue(responseEntity.getMessage().startsWith("Boom!"));
+        assertTrue(responseEntity.message().startsWith("Boom!"));
     }
 }

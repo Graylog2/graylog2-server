@@ -35,6 +35,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.log4j.MemoryAppender;
@@ -213,6 +214,7 @@ public class LoggersResource extends RestResource {
     })
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
     public LogMessagesSummary messages(@ApiParam(name = "limit", value = "How many log messages should be returned", defaultValue = "500", allowableValues = "range[0, infinity]")
                                        @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit,
                                        @ApiParam(name = "level", value = "Which log level (or higher) should the messages have", defaultValue = "ALL", allowableValues = "[OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL]")

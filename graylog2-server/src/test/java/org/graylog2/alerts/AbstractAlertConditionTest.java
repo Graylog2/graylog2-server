@@ -29,13 +29,13 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
     @Test
     public void testDifferingTypesForNumericalParameters() throws Exception {
         final AlertCondition alertConditionWithDouble = getDummyAlertCondition(ImmutableMap.of("grace", 3.0));
-        assertEquals(alertConditionWithDouble.getGrace(), 3);
+        assertEquals(3, alertConditionWithDouble.getGrace());
         final AlertCondition alertConditionWithInteger = getDummyAlertCondition(ImmutableMap.of("grace", 3));
-        assertEquals(alertConditionWithInteger.getGrace(), 3);
+        assertEquals(3, alertConditionWithInteger.getGrace());
         final AlertCondition alertConditionWithStringDouble = getDummyAlertCondition(ImmutableMap.of("grace", "3.0"));
-        assertEquals(alertConditionWithStringDouble.getGrace(), 3);
+        assertEquals(3, alertConditionWithStringDouble.getGrace());
         final AlertCondition alertConditionWithStringInteger = getDummyAlertCondition(ImmutableMap.of("grace", "3"));
-        assertEquals(alertConditionWithStringInteger.getGrace(), 3);
+        assertEquals(3, alertConditionWithStringInteger.getGrace());
     }
 
     private AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {

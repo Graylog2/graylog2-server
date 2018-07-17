@@ -6,8 +6,8 @@ PluginStore.register(new PluginManifest({}, {
     {
       type: 'org.graylog.plugins.map.widget.strategy.MapWidgetStrategy',
       displayName: 'Map',
-      defaultHeight: 2,
-      defaultWidth: 2,
+      defaultHeight: 5,
+      defaultWidth: 3,
       visualizationComponent: MapVisualization,
     },
   ],

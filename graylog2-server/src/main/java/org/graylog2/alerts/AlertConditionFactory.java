@@ -48,8 +48,10 @@ public class AlertConditionFactory {
                                                Map<String, Object> parameters,
                                                String title) throws ConfigurationException {
 
+        final String conditionTitle = isNullOrEmpty(title) ? "" : "'" + title + "' ";
         final AlertCondition.Factory factory = this.alertConditionMap.get(type);
-        checkArgument(factory != null, "Unknown alert condition type: " + type);
+        checkArgument(factory != null, "Unknown alert condition type <%s> for alert condition %s<%s> on stream \"%s\" <%s>",
+                type, conditionTitle, id, stream.getTitle(), stream.getId());
 
         /*
          * Ensure the given parameters fulfill the requested configuration preconditions.
@@ -62,8 +64,7 @@ public class AlertConditionFactory {
             final Configuration configuration = new Configuration(parameters);
             requestedConfiguration.check(configuration);
         } catch (ConfigurationException e) {
-            final String conditionTitle = isNullOrEmpty(title) ? "" : "'" + title + "' ";
-            LOG.error("Could not load alert condition " + conditionTitle + "<" + id + ">, invalid configuration detected.");
+            LOG.error("Could not load alert condition {}<{}> on stream \"{}\" <{}>, invalid configuration detected.", conditionTitle, id, stream.getTitle(), stream.getId());
             throw e;
         }
 

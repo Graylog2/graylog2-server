@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -12,7 +13,9 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
-const SidecarEditConfigurationPage = React.createClass({
+const SidecarEditConfigurationPage = createReactClass({
+  displayName: 'SidecarEditConfigurationPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },

@@ -21,7 +21,9 @@ import org.graylog2.rest.resources.search.responses.SearchError;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
+@Provider
 public class ElasticsearchExceptionMapper implements ExceptionMapper<ElasticsearchException> {
     @Override
     public Response toResponse(ElasticsearchException exception) {

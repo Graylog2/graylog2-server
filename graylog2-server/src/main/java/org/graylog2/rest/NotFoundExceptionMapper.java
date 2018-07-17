@@ -21,14 +21,13 @@ import org.graylog2.plugin.rest.ApiError;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+@Provider
 public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
     @Override
     public Response toResponse(NotFoundException exception) {
-        ApiError apiError = new ApiError(exception.getMessage());
+        final ApiError apiError = ApiError.create(exception.getMessage());
         return Response.status(Response.Status.NOT_FOUND).entity(apiError).build();
     }
 }

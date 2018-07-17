@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -96,7 +97,7 @@ public abstract class AbsoluteRange extends TimeRange {
             try {
                 return to(parseDateTime(to));
             } catch (IllegalArgumentException e) {
-                throw new InvalidRangeParametersException("Invalid end of range: " + to, e);
+                throw new InvalidRangeParametersException("Invalid end of range: <" + to + ">", e);
             }
         }
 
@@ -105,19 +106,23 @@ public abstract class AbsoluteRange extends TimeRange {
             try {
                 return from(parseDateTime(from));
             } catch (IllegalArgumentException e) {
-                throw new InvalidRangeParametersException("Invalid start of range: " + from, e);
+                throw new InvalidRangeParametersException("Invalid start of range: <" + from + ">", e);
             }
         }
 
-        private DateTime parseDateTime(String to) {
+        private DateTime parseDateTime(String s) {
+            if (Strings.isNullOrEmpty(s)) {
+                throw new IllegalArgumentException("Null or empty string");
+            }
+
             final DateTimeFormatter formatter;
-            if (to.contains("T")) {
+            if (s.contains("T")) {
                 formatter = ISODateTimeFormat.dateTime();
             } else {
                 formatter = Tools.timeFormatterWithOptionalMilliseconds();
             }
             // Use withOffsetParsed() to keep the timezone!
-            return formatter.withOffsetParsed().parseDateTime(to);
+            return formatter.withOffsetParsed().parseDateTime(s);
         }
     }
 }

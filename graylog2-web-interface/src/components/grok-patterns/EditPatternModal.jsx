@@ -1,14 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { BootstrapModalForm, Input } from 'components/bootstrap';
 
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { Button, Panel } from 'react-bootstrap';
+
+import GrokPatternInput from './GrokPatternInput';
 
 class EditPatternModal extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     pattern: PropTypes.string,
+    patterns: PropTypes.array,
     create: PropTypes.bool,
     sampleData: PropTypes.string,
     savePattern: PropTypes.func.isRequired,
@@ -20,6 +23,7 @@ class EditPatternModal extends React.Component {
     id: '',
     name: '',
     pattern: '',
+    patterns: [],
     create: false,
     sampleData: '',
     testPattern: () => {},
@@ -40,8 +44,8 @@ class EditPatternModal extends React.Component {
     this.modal.open();
   };
 
-  _onPatternChange = (event) => {
-    this.setState({ pattern: event.target.value });
+  _onPatternChange = (newPattern) => {
+    this.setState({ pattern: newPattern });
   };
 
   _onNameChange = (event) => {
@@ -110,6 +114,7 @@ class EditPatternModal extends React.Component {
         </button>
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title={`${this.props.create ? 'Create' : 'Edit'} Grok Pattern ${this.state.name}`}
+                            bsSize="large"
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>
@@ -122,18 +127,13 @@ class EditPatternModal extends React.Component {
                    help={this.state.error ? this.state.error_message : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "}
                    autoFocus
                    required />
-            <Input type="textarea"
-                   id={this._getId('pattern')}
-                   label="Pattern"
-                   help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
-                   onChange={this._onPatternChange}
-                   value={this.state.pattern}
-                   required />
+            <GrokPatternInput onPatternChange={this._onPatternChange}
+                              pattern={this.state.pattern}
+                              patterns={this.props.patterns} />
             { this.state.test_error &&
             <Panel bsStyle="danger" header="Grok Error">
               <code style={{ display: 'block', whiteSpace: 'pre-wrap' }} >{this.state.test_error}</code>
-            </Panel>
-            }
+            </Panel> }
             <Input type="textarea"
                    id={this._getId('sampleData')}
                    label="Sample Data"

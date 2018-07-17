@@ -63,10 +63,11 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(value = "Collectors", description = "Manage collectors")
+@Api(value = "Sidecar/Collectors", description = "Manage collectors")
 @Path("/sidecar/collectors")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
     private final CollectorService collectorService;
     private final EtagService etagService;
@@ -87,7 +88,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Show collector details")
@@ -97,7 +97,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     }
 
     @GET
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List all collectors")
@@ -141,7 +140,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/summary")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List a summary of all collectors")
@@ -157,15 +155,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                                            @DefaultValue("asc") @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Collector> collectors = this.collectorService.findPaginated(searchQuery, page, perPage, sort, order);
+        final long total = this.collectorService.count();
         final List<CollectorSummary> summaries = collectors.stream()
                 .map(CollectorSummary::create)
                 .collect(Collectors.toList());
 
-        return CollectorSummaryResponse.create(query, collectors.pagination(), sort, order, summaries);
+        return CollectorSummaryResponse.create(query, collectors.pagination(), total, sort, order, summaries);
     }
 
     @POST
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create a new collector")
@@ -179,7 +177,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @PUT
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a collector")
@@ -195,7 +192,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @POST
     @Path("/{id}/{name}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_CREATE)
     @ApiOperation(value = "Copy a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CLONE)
@@ -210,10 +206,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @DELETE
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Delets a collector")
+    @ApiOperation(value = "Delete a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_DELETE)
     public Response deleteCollector(@ApiParam(name = "id", required = true)
                                     @PathParam("id") String id) {
@@ -227,7 +222,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/validate")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates collector name")

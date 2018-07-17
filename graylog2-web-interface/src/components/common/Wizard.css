@@ -1,3 +1,11 @@
 :local(.subnavigation) {
     border-right: #D1D1D1 solid 1px;
 }
+
+:local(.horizontal) {
+    margin-bottom: 15px;
+}
+
+:local(.horizontalPreviousNextButtons) {
+    padding: 7px;
+}

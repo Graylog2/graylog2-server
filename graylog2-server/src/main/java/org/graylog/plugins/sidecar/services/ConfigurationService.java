@@ -23,6 +23,7 @@ import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
+import org.graylog.plugins.sidecar.rest.models.NodeMetrics;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.template.directives.IndentTemplateDirective;
 import org.graylog.plugins.sidecar.template.loader.MongoDbTemplateLoader;
@@ -77,6 +78,10 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return db.findOne(DBQuery.is(Configuration.FIELD_NAME, name));
     }
 
+    public long count() {
+        return db.count();
+    }
+
     public List<Configuration> all() {
         try (final Stream<Configuration> collectorConfigurationStream = streamAll()) {
             return collectorConfigurationStream.collect(Collectors.toList());
@@ -125,11 +130,14 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("sidecarVersion", sidecar.sidecarVersion());
         context.put("operatingSystem", sidecar.nodeDetails().operatingSystem());
         context.put("ip", sidecar.nodeDetails().ip());
-        if (sidecar.nodeDetails().metrics().cpuIdle() != null) {
-            context.put("cpuIdle", sidecar.nodeDetails().metrics().cpuIdle());
-        }
-        if (sidecar.nodeDetails().metrics().load1() != null) {
-            context.put("load1", sidecar.nodeDetails().metrics().load1());
+        final NodeMetrics metrics = sidecar.nodeDetails().metrics();
+        if (metrics != null) {
+            if (metrics.cpuIdle() != null) {
+                context.put("cpuIdle", metrics.cpuIdle());
+            }
+            if (metrics.load1() != null) {
+                context.put("load1", metrics.load1());
+            }
         }
 
         return Configuration.create(

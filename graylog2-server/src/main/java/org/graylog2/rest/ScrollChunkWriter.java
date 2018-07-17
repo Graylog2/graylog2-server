@@ -19,6 +19,7 @@ package org.graylog2.rest;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,39 +68,58 @@ public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollC
         if (LOG.isDebugEnabled()) {
             LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.getChunkNumber());
         }
-        final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
 
         final List<String> fields = scrollChunk.getFields();
         final int numberOfFields = fields.size();
 
-        if (scrollChunk.isFirstChunk()) {
-            // write field headers only on first chunk
-            csvWriter.writeNext(fields.toArray(new String[numberOfFields]));
-        }
-        // write result set in same order as the header row
-        final String[] fieldValues = new String[numberOfFields];
-        for (ResultMessage message : scrollChunk.getMessages()) {
-            int idx = 0;
-            // first collect all values from the current message
-            for (String fieldName : fields) {
-                final Object val = message.getMessage().getField(fieldName);
-                if (val == null) {
-                    fieldValues[idx] = null;
-                } else {
-                    String stringVal = val.toString();
-                    fieldValues[idx] = stringVal
-                            .replaceAll("\n", "\\\\n")
-                            .replaceAll("\r", "\\\\r");
-                }
-                idx++;
+        try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8))) {
+            if (scrollChunk.isFirstChunk()) {
+                // write field headers only on first chunk
+                csvWriter.writeNext(fields.toArray(new String[numberOfFields]));
             }
+            // write result set in same order as the header row
+            final String[] fieldValues = new String[numberOfFields];
+            for (ResultMessage resultMessage : scrollChunk.getMessages()) {
+                final Message message = resultMessage.getMessage();
 
-            // write the complete line, some fields might not be present in the message, so there might be null values
-            csvWriter.writeNext(fieldValues);
+                // first collect all values from the current message
+                int idx = 0;
+                for (String fieldName : fields) {
+                    final Object val = message.getField(fieldName);
+                    if (val == null) {
+                        fieldValues[idx] = null;
+                    } else {
+                        String stringVal = val.toString();
+                        // TODO: Maybe use StringEscapeUtils.escapeCsv(String) instead?
+                        fieldValues[idx] = escapeNewlines(stringVal);
+                    }
+                    idx++;
+                }
+
+                // write the complete line, some fields might not be present in the message, so there might be null values
+                csvWriter.writeNext(fieldValues);
+            }
+            if (csvWriter.checkError()) {
+                LOG.error("Encountered unspecified error when writing message result as CSV, result is likely malformed.");
+            }
         }
-        if (csvWriter.checkError()) {
-            LOG.error("Encountered unspecified error when writing message result as CSV, result is likely malformed.");
+    }
+
+    private String escapeNewlines(String s) {
+        final StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            final char c = s.charAt(i);
+            switch (c) {
+                case '\n':
+                    sb.append("\\\\n");
+                    break;
+                case '\r':
+                    sb.append("\\\\r");
+                    break;
+                default:
+                    sb.append(c);
+            }
         }
-        csvWriter.close();
+        return sb.toString();
     }
 }

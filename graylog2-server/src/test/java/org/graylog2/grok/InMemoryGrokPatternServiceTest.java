@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.fail;
 
 public class InMemoryGrokPatternServiceTest {
@@ -49,11 +50,9 @@ public class InMemoryGrokPatternServiceTest {
                 .isNotNull()
                 .isEqualTo(pattern);
 
-        try {
-            service.load("whatever");
-        } catch (NotFoundException e) {
-            assertThat(e).hasMessage("Couldn't find Grok pattern with ID " + "whatever");
-        }
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> service.load("whatever"))
+                .withMessage("Couldn't find Grok pattern with ID whatever");
     }
 
     @Test

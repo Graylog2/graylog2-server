@@ -67,7 +67,7 @@ public class UdpTransportTest {
     private static final String BIND_ADDRESS = "127.0.0.1";
     private static final int PORT = 0;
     private static final int RECV_BUFFER_SIZE = 1024;
-    private static final Map<String, Object> CONFIG_SOURCE = ImmutableMap.of(
+    private static final ImmutableMap<String, Object> CONFIG_SOURCE = ImmutableMap.of(
             NettyTransport.CK_BIND_ADDRESS, BIND_ADDRESS,
             NettyTransport.CK_PORT, PORT,
             NettyTransport.CK_RECV_BUFFER_SIZE, RECV_BUFFER_SIZE,

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Button } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
@@ -8,7 +9,9 @@ import ISODurationUtils from 'util/ISODurationUtils';
 import FormUtils from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
 
-const SidecarConfig = React.createClass({
+const SidecarConfig = createReactClass({
+  displayName: 'SidecarConfig',
+
   propTypes: {
     config: PropTypes.shape({
       sidecar_expiration_threshold: PropTypes.string,

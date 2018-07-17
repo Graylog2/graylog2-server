@@ -77,6 +77,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
     private DBCollection dbCollection;
 
     @Before
+    @SuppressWarnings("deprecation")
     public void setUp() throws Exception {
         final MongoConnection mongoConnection = mock(MongoConnection.class);
         final DB database = mock(DB.class);

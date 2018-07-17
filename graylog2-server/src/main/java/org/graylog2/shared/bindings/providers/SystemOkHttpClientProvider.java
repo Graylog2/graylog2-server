@@ -30,6 +30,7 @@ public class SystemOkHttpClientProvider extends OkHttpClientProvider {
                 Duration.seconds(2L),
                 Duration.seconds(5L),
                 Duration.seconds(5L),
+                null,
                 null);
     }
 }

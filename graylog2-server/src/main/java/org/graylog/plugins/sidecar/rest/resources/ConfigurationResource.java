@@ -67,10 +67,11 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(value = "Configurations", description = "Manage/Render collector configurations")
+@Api(value = "Sidecar/Configurations", description = "Manage/Render collector configurations")
 @Path("/sidecar/configurations")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class ConfigurationResource extends RestResource implements PluginRestResource {
     private final ConfigurationService configurationService;
     private final SidecarService sidecarService;
@@ -93,7 +94,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     }
 
     @GET
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List all configurations")
@@ -109,16 +109,16 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Configuration> configurations = this.configurationService.findPaginated(searchQuery, page, perPage, sort, order);
+        final long total = this.configurationService.count();
         final List<ConfigurationSummary> result = configurations.stream()
                 .map(ConfigurationSummary::create)
                 .collect(Collectors.toList());
 
-        return ConfigurationListResponse.create(query, configurations.pagination(), sort, order, result);
+        return ConfigurationListResponse.create(query, configurations.pagination(), total, sort, order, result);
     }
 
     @GET
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Show configuration details")
@@ -129,7 +129,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     @GET
     @Path("/validate")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates configuration name")
@@ -144,7 +143,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @GET
     @Path("/render/{sidecarId}/{configurationId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @ApiOperation(value = "Render configuration template")
     public Response renderConfiguration(@Context HttpHeaders httpHeaders,
@@ -201,7 +199,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @POST
     @Path("/render/preview")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @ApiOperation(value = "Render preview of a configuration template")
     @NoAuditEvent("this is not changing any data")
@@ -212,7 +209,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     }
 
     @POST
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create new configuration")
@@ -225,7 +221,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     @POST
     @Path("/{id}/{name}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
     @ApiOperation(value = "Copy a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CLONE)
@@ -239,7 +234,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     @PUT
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a configuration")
@@ -255,7 +249,6 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     @DELETE
     @Path("/{id}")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Delete a configuration")

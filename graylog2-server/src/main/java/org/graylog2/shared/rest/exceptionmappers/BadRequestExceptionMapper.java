@@ -22,7 +22,9 @@ import org.graylog2.plugin.rest.ApiError;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
+@Provider
 public class BadRequestExceptionMapper implements ExtendedExceptionMapper<BadRequestException> {
     @Override
     public boolean isMappable(BadRequestException exception) {
@@ -31,7 +33,7 @@ public class BadRequestExceptionMapper implements ExtendedExceptionMapper<BadReq
 
     @Override
     public Response toResponse(BadRequestException e) {
-        final ApiError apiError = new ApiError(e.getMessage());
+        final ApiError apiError = ApiError.create(e.getMessage());
 
         return Response.status(Response.Status.BAD_REQUEST)
                 .type(MediaType.APPLICATION_JSON_TYPE)

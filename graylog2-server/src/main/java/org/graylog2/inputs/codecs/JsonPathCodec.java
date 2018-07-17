@@ -47,17 +47,12 @@ public class JsonPathCodec extends AbstractCodec {
     public static final String CK_SOURCE = "source";
 
     private final JsonPath jsonPath;
-    private final Configuration configuration;
 
     @AssistedInject
     public JsonPathCodec(@Assisted Configuration configuration) {
         super(configuration);
-        this.configuration = configuration;
-        if (configuration.stringIsSet(CK_PATH)) {
-            jsonPath = JsonPath.compile(configuration.getString(CK_PATH));
-        } else {
-            jsonPath = null;
-        }
+        final String pathString = configuration.getString(CK_PATH);
+        jsonPath = pathString == null ? null : JsonPath.compile(pathString);
     }
 
     @Nullable

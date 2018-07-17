@@ -448,8 +448,8 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.graylog2.repackaged</groupId>
-                <artifactId>grok</artifactId>
+                <groupId>io.krakens</groupId>
+                <artifactId>java-grok</artifactId>
                 <version>${grok.version}</version>
             </dependency>
             <dependency>

@@ -39,7 +39,7 @@ public class JournalShow extends AbstractJournalCommand {
         long sizeInBytes = journal.size();
         int numSegments = journal.numberOfSegments();
         long committedReadOffset = journal.getCommittedReadOffset();
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         final long startOffset = journal.getLogStartOffset();
         final long lastOffset = journal.getLogEndOffset() - 1;
@@ -68,7 +68,7 @@ public class JournalShow extends AbstractJournalCommand {
         System.out.flush();
     }
 
-    private void appendSegmentDetails(KafkaJournal journal, StringBuffer sb) {
+    private void appendSegmentDetails(KafkaJournal journal, StringBuilder sb) {
         final Iterable<LogSegment> segments = journal.getSegments();
         int i = 1;
         for (LogSegment segment : segments) {

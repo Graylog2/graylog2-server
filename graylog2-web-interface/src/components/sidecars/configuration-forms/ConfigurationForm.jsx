@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
@@ -16,8 +17,10 @@ import ColorLabel from 'components/sidecars/common/ColorLabel';
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
-const ConfigurationForm = React.createClass({
+const ConfigurationForm = createReactClass({
+  displayName: 'ConfigurationForm',
   mixins: [Reflux.connect(CollectorsStore)],
+
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     configuration: PropTypes.object,
@@ -69,10 +72,10 @@ const ConfigurationForm = React.createClass({
   },
 
   _formDataUpdate(key) {
-    return (nextValue) => {
+    return (nextValue, _, hideCallback) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
-      this.setState({ formData: nextFormData });
+      this.setState({ formData: nextFormData }, hideCallback);
     };
   },
 

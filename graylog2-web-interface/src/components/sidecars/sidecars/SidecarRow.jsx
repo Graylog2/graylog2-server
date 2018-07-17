@@ -11,15 +11,14 @@ import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 
 import style from './SidecarRow.css';
 
-const SidecarRow = React.createClass({
-  propTypes: {
+class SidecarRow extends React.Component {
+  static propTypes = {
     sidecar: PropTypes.object.isRequired,
-  },
-  getInitialState() {
-    return {
-      showRelativeTime: true,
-    };
-  },
+  };
+
+  state = {
+    showRelativeTime: true,
+  };
 
   render() {
     const sidecar = this.props.sidecar;
@@ -54,7 +53,7 @@ const SidecarRow = React.createClass({
           {annotation}
         </td>
         <td>
-          {sidecar.collector_version}
+          {sidecar.sidecar_version}
         </td>
         <td>
           <ButtonToolbar>
@@ -68,7 +67,7 @@ const SidecarRow = React.createClass({
         </td>
       </tr>
     );
-  },
-});
+  }
+}
 
 export default SidecarRow;

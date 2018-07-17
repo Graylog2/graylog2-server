@@ -16,7 +16,7 @@
  */
 package org.graylog2.grok;
 
-import io.thekraken.grok.api.exception.GrokException;
+import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 

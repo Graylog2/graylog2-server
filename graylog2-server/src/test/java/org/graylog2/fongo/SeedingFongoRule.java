@@ -91,6 +91,9 @@ public class SeedingFongoRule extends FongoRule {
     }
 
     public void insertSeed(String seed) throws IOException {
+        final JsonWriterSettings jsonWriterSettings = JsonWriterSettings.builder()
+                .indent(true)
+                .build();
         final byte[] bytes = Resources.toByteArray(Resources.getResource(seed));
         final Map<String, Object> map = objectMapper.readValue(bytes, MAP_TYPE);
 
@@ -101,7 +104,9 @@ public class SeedingFongoRule extends FongoRule {
 
             for (Map<String, Object> document : documents) {
                 final Document parsedDocument = Document.parse(objectMapper.writeValueAsString(document));
-                LOG.debug("Inserting parsed document: \n{}", parsedDocument.toJson(new JsonWriterSettings(true)));
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Inserting parsed document: \n{}", parsedDocument.toJson(jsonWriterSettings));
+                }
                 indexSets.insertOne(parsedDocument);
             }
         }

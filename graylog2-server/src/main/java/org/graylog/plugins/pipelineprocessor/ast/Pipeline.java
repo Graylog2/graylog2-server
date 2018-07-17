@@ -52,6 +52,7 @@ public abstract class Pipeline {
         return toBuilder().id(id).build();
     }
 
+    @Override
     @Memoized
     public abstract int hashCode();
 
@@ -97,10 +98,8 @@ public abstract class Pipeline {
         public abstract Builder stages(SortedSet<Stage> stages);
     }
 
+    @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Pipeline ");
-        sb.append("'").append(name()).append("'");
-        sb.append(" (").append(id()).append(")");
-        return sb.toString();
+        return "Pipeline '" + name() + "' (" + id() + ")";
     }
 }

@@ -81,7 +81,7 @@ public class StructuredSyslogTest {
         expected.put("iut", "3");
 
         Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidStructuredMessage), false);
-        assertEquals(result, expected);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class StructuredSyslogTest {
         expected.put("sequenceId", "1");
 
         Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidStructuredMultiMessage), false);
-        assertEquals(result, expected);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -106,8 +106,8 @@ public class StructuredSyslogTest {
     @Test
     public void testExtractFieldsWithExpansion() {
         Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidStructuredMultiMessageSameKey), true);
-        assertEquals(result.get("exampleSDID@32473_iut"), "3");
-        assertEquals(result.get("meta_iut"), "10");
+        assertEquals("3", result.get("exampleSDID@32473_iut"));
+        assertEquals("10", result.get("meta_iut"));
     }
 
     @Test
@@ -119,12 +119,12 @@ public class StructuredSyslogTest {
     @Test
     public void testExtractFieldsOfNonStructuredMessage() {
         Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidNonStructuredMessage), false);
-        assertEquals(result.size(), 0);
+        assertEquals(0, result.size());
     }
 
     @Test
     public void testExtractFieldsOfAMessageThatOnlyLooksStructured() {
         Map<String, Object> result = syslogCodec.extractFields(newEvent(MessageLookingLikeStructured), false);
-        assertEquals(result.size(), 0);
+        assertEquals(0, result.size());
     }
 }

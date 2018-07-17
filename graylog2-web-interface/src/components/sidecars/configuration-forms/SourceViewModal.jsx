@@ -8,29 +8,27 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
-const SourceViewModal = React.createClass({
-  propTypes: {
+class SourceViewModal extends React.Component {
+  static propTypes = {
     configurationId: PropTypes.string,
     templateString: PropTypes.string,
-  },
+  };
 
-  getInitialState() {
-    return {
-      source: undefined,
-      name: undefined,
-    };
-  },
+  state = {
+    source: undefined,
+    name: undefined,
+  };
 
-  open() {
+  open = () => {
     this._loadConfiguration();
     this.sourceModal.open();
-  },
+  };
 
-  hide() {
+  hide = () => {
     this.sourceModal.close();
-  },
+  };
 
-  _loadConfiguration() {
+  _loadConfiguration = () => {
     if (this.props.templateString) {
       CollectorConfigurationsActions.renderPreview(this.props.templateString)
         .then((response) => {
@@ -42,7 +40,7 @@ const SourceViewModal = React.createClass({
           this.setState({ source: configuration.template, name: configuration.name });
         });
     }
-  },
+  };
 
   render() {
     return (
@@ -62,7 +60,7 @@ const SourceViewModal = React.createClass({
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
-  },
-});
+  }
+}
 
 export default SourceViewModal;

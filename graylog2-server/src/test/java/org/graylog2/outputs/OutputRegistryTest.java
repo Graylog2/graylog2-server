@@ -80,13 +80,13 @@ public class OutputRegistryTest {
         when(outputService.load(eq(outputId))).thenReturn(output);
 
         final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
-        assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
+        assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
 
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
         assertSame(result, messageOutput);
         assertNotNull(outputRegistry.getRunningMessageOutputs());
-        assertEquals(outputRegistry.getRunningMessageOutputs().size(), 1);
+        assertEquals(1, outputRegistry.getRunningMessageOutputs().size());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class OutputRegistryTest {
         MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
         assertNull(messageOutput);
-        assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
+        assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
     }
 
     @Test
@@ -111,11 +111,11 @@ public class OutputRegistryTest {
         when(outputService.load(eq(outputId))).thenReturn(output);
 
         final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
-        assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
+        assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
 
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
         assertNull(result);
-        assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
+        assertEquals(0, outputRegistry.getRunningMessageOutputs().size());
     }
 }

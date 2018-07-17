@@ -1,5 +1,200 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
+<div
+  className="content row"
+>
+  <div
+    className="horizontal col-sm-12"
+  >
+    <div
+      className="pull-right"
+    >
+      <div
+        className="horizontalPreviousNextButtons btn-toolbar"
+        role="toolbar"
+      >
+        <button
+          className="btn btn-xs btn-info"
+          disabled={true}
+          onClick={[Function]}
+          type="button"
+        >
+          <i
+            className="fa fa-caret-left"
+          />
+        </button>
+        <button
+          className="btn btn-xs btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          <i
+            className="fa fa-caret-right"
+          />
+        </button>
+      </div>
+    </div>
+    <ul
+      className="nav nav-pills"
+      role={null}
+    >
+      <li
+        className="active"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Title1
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Title2
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Title3
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div
+    className="col-md-7"
+  >
+    <div>
+      Component1
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1`] = `
+<div
+  className="content row"
+>
+  <div
+    className="horizontal col-sm-12"
+  >
+    <div
+      className="pull-right"
+    >
+      <div
+        className="horizontalPreviousNextButtons btn-toolbar"
+        role="toolbar"
+      >
+        <button
+          className="btn btn-xs btn-info"
+          disabled={true}
+          onClick={[Function]}
+          type="button"
+        >
+          <i
+            className="fa fa-caret-left"
+          />
+        </button>
+        <button
+          className="btn btn-xs btn-info"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          <i
+            className="fa fa-caret-right"
+          />
+        </button>
+      </div>
+    </div>
+    <ul
+      className="nav nav-pills"
+      role={null}
+    >
+      <li
+        className="active"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Title1
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Title2
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          href="#"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="button"
+        >
+          Title3
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div
+    className="col-md-7"
+  >
+    <div>
+      Component1
+    </div>
+  </div>
+  <div
+    className="col-md-5"
+  >
+    <span>
+      Preview
+    </span>
+  </div>
+</div>
+`;
+
 exports[`<Wizard /> should render with 3 steps 1`] = `
 <div
   className="content row"

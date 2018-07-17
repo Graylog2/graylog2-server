@@ -19,9 +19,9 @@ package org.graylog2.grok;
 import com.google.common.base.Strings;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
-import io.thekraken.grok.api.Grok;
-import io.thekraken.grok.api.GrokCompiler;
-import io.thekraken.grok.api.exception.GrokException;
+import io.krakens.grok.api.Grok;
+import io.krakens.grok.api.GrokCompiler;
+import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
@@ -115,10 +115,10 @@ public class InMemoryGrokPatternService implements GrokPatternService {
     public Map<String, Object> match(GrokPattern pattern, String sampleData) throws GrokException {
         final Set<GrokPattern> patterns = loadAll();
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-        grokCompiler.register(pattern.name(), pattern.pattern());
         for(GrokPattern storedPattern : patterns) {
             grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
+        grokCompiler.register(pattern.name(), pattern.pattern());
         Grok grok = grokCompiler.compile("%{" + pattern.name() + "}");
         return grok.capture(sampleData);
     }
@@ -128,10 +128,10 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         final Set<GrokPattern> patterns = loadAll();
         final boolean fieldsMissing = Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern());
         final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-        grokCompiler.register(pattern.name(), pattern.pattern());
         for(GrokPattern storedPattern : patterns) {
             grokCompiler.register(storedPattern.name(), storedPattern.pattern());
         }
+        grokCompiler.register(pattern.name(), pattern.pattern());
         grokCompiler.compile("%{" + pattern.name() + "}");
         return !fieldsMissing;
     }

@@ -82,12 +82,13 @@ import java.util.stream.Collectors;
 @Path("/sidecars")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class SidecarResource extends RestResource implements PluginRestResource {
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Sidecar.FIELD_ID))
             .put("node_id", SearchQueryField.create(Sidecar.FIELD_NODE_ID))
             .put("name", SearchQueryField.create(Sidecar.FIELD_NODE_NAME))
-            .put("collector_version", SearchQueryField.create(Sidecar.FIELD_SIDECAR_VERSION))
+            .put("sidecar_version", SearchQueryField.create(Sidecar.FIELD_SIDECAR_VERSION))
             .put("last_seen", SearchQueryField.create(Sidecar.FIELD_LAST_SEEN, SearchQueryField.Type.DATE))
             .put("operating_system", SearchQueryField.create(Sidecar.FIELD_OPERATING_SYSTEM))
             .put("status", SearchQueryField.create(Sidecar.FIELD_STATUS, SearchQueryField.Type.INT))
@@ -117,7 +118,6 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Timed
     @Path("/all")
     @ApiOperation(value = "Lists all existing Sidecar registrations")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     public SidecarListResponse all() {
         final List<Sidecar> sidecars = sidecarService.all();
@@ -127,6 +127,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                         sidecarSummaries.size(),
                         1,
                         sidecarSummaries.size()),
+                sidecarSummaries.size(),
                 false,
                 null,
                 null,
@@ -136,7 +137,6 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @GET
     @Timed
     @ApiOperation(value = "Lists existing Sidecar registrations using pagination")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     public SidecarListResponse sidecars(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -155,7 +155,8 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                 sidecarService.findPaginated(searchQuery, activeSidecarFilter, page, perPage, sort, order) :
                 sidecarService.findPaginated(searchQuery, page, perPage, sort, order);
         final List<SidecarSummary> collectorSummaries = sidecarService.toSummaryList(sidecars, activeSidecarFilter);
-        return SidecarListResponse.create(query, sidecars.pagination(), onlyActive, sort, order, collectorSummaries);
+        final long total = sidecarService.count();
+        return SidecarListResponse.create(query, sidecars.pagination(), total, onlyActive, sort, order, collectorSummaries);
     }
 
     @GET
@@ -165,7 +166,6 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No Sidecar with the specified id exists")
     })
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     public SidecarSummary get(@ApiParam(name = "sidecarId", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId) {
@@ -185,7 +185,6 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "The supplied request is not valid.")
     })
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @NoAuditEvent("this is only a ping from Sidecars, and would overflow the audit log")
     public Response register(@ApiParam(name = "sidecarId", value = "The id this Sidecar is registering as.", required = true)
@@ -228,7 +227,6 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Timed
     @Path("/configurations")
     @ApiOperation(value = "Assign configurations to sidecars")
-    @RequiresAuthentication
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @AuditEvent(type = SidecarAuditEventTypes.SIDECAR_UPDATE)
     public Response assignConfiguration(@ApiParam(name = "JSON body", required = true)

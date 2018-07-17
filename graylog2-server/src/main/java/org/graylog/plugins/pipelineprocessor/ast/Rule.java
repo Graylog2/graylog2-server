@@ -16,14 +16,12 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast;
 
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
-
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
@@ -34,13 +32,12 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class Rule {
@@ -208,11 +205,8 @@ public abstract class Rule {
         public abstract Rule build();
     }
 
-
+    @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Rule ");
-        sb.append("'").append(name()).append("'");
-        sb.append(" (").append(id()).append(")");
-        return sb.toString();
+        return "Rule '" + name() + "' (" + id() + ")";
     }
 }

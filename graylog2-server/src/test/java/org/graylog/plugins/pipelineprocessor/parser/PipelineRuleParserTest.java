@@ -50,11 +50,9 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
-import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidOperation;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
-import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
@@ -152,11 +150,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void declaredFunction() throws Exception {
-        try {
-            parseRuleWithOptionalCodegen();
-        } catch (ParseException e) {
-            fail("Should not fail to resolve function 'false'");
-        }
+        assertNotNull("Should not fail to resolve function 'false'", parseRuleWithOptionalCodegen());
     }
 
     @Test
@@ -172,44 +166,32 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void singleArgFunction() throws Exception {
-        try {
-            final Rule rule = parseRuleWithOptionalCodegen();
-            final Message message = evaluateRule(rule);
+        final Rule rule = parseRuleWithOptionalCodegen();
+        final Message message = evaluateRule(rule);
 
-            assertNotNull(message);
-            assertTrue("actions should have triggered", actionsTriggered.get());
-        } catch (ParseException e) {
-            fail("Should not fail to parse");
-        }
+        assertNotNull(message);
+        assertTrue("actions should have triggered", actionsTriggered.get());
     }
 
     @Test
     public void positionalArguments() throws Exception {
-        try {
-            final Rule rule = parseRuleWithOptionalCodegen();
-            evaluateRule(rule);
+        final Rule rule = parseRuleWithOptionalCodegen();
+        evaluateRule(rule);
 
-            assertTrue(actionsTriggered.get());
-        } catch (ParseException e) {
-            fail("Should not fail to parse");
-        }
+        assertTrue(actionsTriggered.get());
     }
 
     @Test
     public void inferVariableType() throws Exception {
-        try {
-            final Rule rule = parseRuleWithOptionalCodegen();
-
-            evaluateRule(rule);
-        } catch (ParseException e) {
-            fail("Should not fail to parse");
-        }
+        final Rule rule = parseRuleWithOptionalCodegen();
+        evaluateRule(rule);
     }
 
     @Test
     public void invalidArgType() throws Exception {
         try {
             parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
         } catch (ParseException e) {
             assertEquals(2, e.getErrors().size());
             assertTrue("Should only find IncompatibleArgumentType errors",
@@ -219,14 +201,10 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void booleanValuedFunctionAsCondition() throws Exception {
-        try {
-            final Rule rule = parseRuleWithOptionalCodegen();
+        final Rule rule = parseRuleWithOptionalCodegen();
 
-            evaluateRule(rule);
-            assertTrue("actions should have triggered", actionsTriggered.get());
-        } catch (ParseException e) {
-            fail("Should not fail to parse");
-        }
+        evaluateRule(rule);
+        assertTrue("actions should have triggered", actionsTriggered.get());
     }
 
     @Test
@@ -263,8 +241,9 @@ public class PipelineRuleParserTest extends BaseParserTest {
     public void optionalParamsMustBeNamed() throws Exception {
         try {
             parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
         } catch (ParseException e) {
-            assertEquals(1, e.getErrors().stream().count());
+            assertEquals(1, e.getErrors().size());
             assertTrue(e.getErrors().stream().allMatch(error -> error instanceof OptionalParametersMustBeNamed));
         }
 
@@ -280,24 +259,16 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void typedFieldAccess() throws Exception {
-        try {
-            final Rule rule = parseRuleWithOptionalCodegen();
-            evaluateRule(rule, new Message("hallo", "test", DateTime.now(DateTimeZone.UTC)));
-            assertTrue("condition should be true", actionsTriggered.get());
-        } catch (ParseException e) {
-            fail(e.getMessage());
-        }
+        final Rule rule = parseRuleWithOptionalCodegen();
+        evaluateRule(rule, new Message("hallo", "test", DateTime.now(DateTimeZone.UTC)));
+        assertTrue("condition should be true", actionsTriggered.get());
     }
 
     @Test
     public void nestedFieldAccess() throws Exception {
-        try {
-            final Rule rule = parseRuleWithOptionalCodegen();
-            evaluateRule(rule, new Message("hello", "world", DateTime.now(DateTimeZone.UTC)));
-            assertTrue("condition should be true", actionsTriggered.get());
-        } catch (ParseException e) {
-            fail(e.getMessage());
-        }
+        final Rule rule = parseRuleWithOptionalCodegen();
+        evaluateRule(rule, new Message("hello", "world", DateTime.now(DateTimeZone.UTC)));
+        assertTrue("condition should be true", actionsTriggered.get());
     }
 
     @Test
@@ -332,6 +303,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     public void indexedAccessWrongType() {
         try {
             parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(NonIndexableType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
@@ -342,21 +314,10 @@ public class PipelineRuleParserTest extends BaseParserTest {
     public void indexedAccessWrongIndexType() {
         try {
             parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(IncompatibleIndexType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
-        }
-    }
-
-    @Test
-    public void invalidArgumentValue() {
-        try {
-            parseRuleWithOptionalCodegen();
-        } catch (ParseException e) {
-            assertEquals(1, e.getErrors().size());
-            final ParseError parseError = Iterables.getOnlyElement(e.getErrors());
-            assertEquals("Unable to pre-compute value for 1st argument timezone in call to function now_in_tz: The datetime zone id '123' is not recognised", parseError.toString());
-            assertEquals(InvalidFunctionArgument.class, parseError.getClass());
         }
     }
 

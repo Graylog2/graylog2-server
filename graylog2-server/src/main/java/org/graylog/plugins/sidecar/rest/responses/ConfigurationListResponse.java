@@ -18,7 +18,6 @@ package org.graylog.plugins.sidecar.rest.responses;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
 import org.graylog2.database.PaginatedList;
@@ -32,8 +31,11 @@ public abstract class ConfigurationListResponse {
     @JsonProperty
     public abstract String query();
 
-    @JsonUnwrapped
+    @JsonProperty("pagination")
     public abstract PaginatedList.PaginationInfo paginationInfo();
+
+    @JsonProperty
+    public abstract long total();
 
     @Nullable
     @JsonProperty
@@ -48,10 +50,11 @@ public abstract class ConfigurationListResponse {
 
     @JsonCreator
     public static ConfigurationListResponse create(@JsonProperty("query") String query,
-                                                   @JsonProperty("pagination_info") PaginatedList.PaginationInfo paginationInfo,
+                                                   @JsonProperty("pagination") PaginatedList.PaginationInfo paginationInfo,
+                                                   @JsonProperty("total") long total,
                                                    @JsonProperty("sort") String sort,
                                                    @JsonProperty("order") String order,
                                                    @JsonProperty("configurations") Collection<ConfigurationSummary> configurations) {
-        return new AutoValue_ConfigurationListResponse(query, paginationInfo, sort, order, configurations);
+        return new AutoValue_ConfigurationListResponse(query, paginationInfo, total, sort, order, configurations);
     }
 }

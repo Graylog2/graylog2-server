@@ -81,7 +81,7 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_OFFSET_RESET = "offset_reset";
 
     // See https://kafka.apache.org/090/documentation.html for available values for "auto.offset.reset".
-    private static final Map<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
+    private static final ImmutableMap<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
             "largest", "Automatically reset the offset to the largest offset",
             "smallest", "Automatically reset the offset to the smallest offset"
     );

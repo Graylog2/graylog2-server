@@ -20,8 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.HashMap;
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
@@ -33,11 +34,11 @@ public abstract class CollectorStatusList {
     public abstract String message();
 
     @JsonProperty("collectors")
-    public abstract HashMap<String, CollectorStatus> collectors();
+    public abstract ImmutableSet<CollectorStatus> collectors();
 
     @JsonCreator
     public static CollectorStatusList create(@JsonProperty("status") int status,
                                              @JsonProperty("message") String message,
-                                             @JsonProperty("collectors") HashMap<String, CollectorStatus> collectors) {
-        return new AutoValue_CollectorStatusList(status, message, collectors);
+                                             @JsonProperty("collectors") Set<CollectorStatus> collectors) {
+        return new AutoValue_CollectorStatusList(status, message, ImmutableSet.copyOf(collectors));
     }}

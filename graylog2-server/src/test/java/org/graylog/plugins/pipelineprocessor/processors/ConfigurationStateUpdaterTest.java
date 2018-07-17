@@ -119,9 +119,7 @@ public class ConfigurationStateUpdaterTest {
             if (i % 10 == 0) {
                 System.gc();
                 log.info("\nClassloading metrics:\n=====================");
-                metricRegistry.getGauges((name, metric) -> name.startsWith("jvm.cl")).forEach((s, gauge) -> {
-                    log.info("{} : {}", s, gauge.getValue());
-                });
+                metricRegistry.getGauges((name, metric) -> name.startsWith("jvm.cl")).forEach((s, gauge) -> log.info("{} : {}", s, gauge.getValue()));
                 Assertions.assertThat(unloadedClasses.getValue()).isGreaterThan(initialUnloaded);
             }
         }

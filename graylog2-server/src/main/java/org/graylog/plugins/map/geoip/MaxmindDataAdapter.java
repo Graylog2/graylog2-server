@@ -40,13 +40,13 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     public static final String NAME = "maxmind_geoip";
     private final Config config;
     private final AtomicReference<DatabaseReader> databaseReader = new AtomicReference<>();
-    private FileInfo fileInfo;
+    private FileInfo fileInfo = FileInfo.empty();
 
     @Inject
     protected MaxmindDataAdapter(@Assisted("id") String id,

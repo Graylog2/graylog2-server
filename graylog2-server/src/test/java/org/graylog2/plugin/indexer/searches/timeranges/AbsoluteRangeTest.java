@@ -20,6 +20,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class AbsoluteRangeTest {
     @Test
@@ -38,5 +39,21 @@ public class AbsoluteRangeTest {
                 .isEqualTo("2016-03-24T00:00:00.000+09:00");
         assertThat(range2.to().toString(ISODateTimeFormat.dateTime()))
                 .isEqualTo("2016-03-24T23:59:59.000+09:00");
+    }
+
+    @Test
+    public void nullOrEmptyStringsThrowException() {
+        assertThatThrownBy(() -> AbsoluteRange.create(null, "2018-07-11T14:32:00.000Z"))
+                .isInstanceOf(InvalidRangeParametersException.class)
+                .hasMessage("Invalid start of range: <null>");
+        assertThatThrownBy(() -> AbsoluteRange.create("", "2018-07-11T14:32:00.000Z"))
+                .isInstanceOf(InvalidRangeParametersException.class)
+                .hasMessage("Invalid start of range: <>");
+        assertThatThrownBy(() -> AbsoluteRange.create("2018-07-11T14:32:00.000Z", null))
+                .isInstanceOf(InvalidRangeParametersException.class)
+                .hasMessage("Invalid end of range: <null>");
+        assertThatThrownBy(() -> AbsoluteRange.create("2018-07-11T14:32:00.000Z", ""))
+                .isInstanceOf(InvalidRangeParametersException.class)
+                .hasMessage("Invalid end of range: <>");
     }
 }

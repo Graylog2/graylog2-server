@@ -1,17 +1,14 @@
 import React from 'react';
-
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-
-import DocsHelper from 'util/DocsHelper';
+import { Link } from 'react-router';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 
 import Routes from 'routing/Routes';
 
-const SidecarsPage = React.createClass({
+class SidecarsPage extends React.Component {
   render() {
     return (
       <DocumentTitle title="Sidecars">
@@ -22,8 +19,10 @@ const SidecarsPage = React.createClass({
             </span>
 
             <span>
-              Read more about sidecars and how to set them up in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_SIDECAR} text="Graylog documentation" />.
+              Do you need an API token for a sidecar?&ensp;
+              <Link to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit('graylog-sidecar')}>
+                Create or reuse a token for the <em>graylog-sidecar</em> user
+              </Link>.
             </span>
 
             <ButtonToolbar>
@@ -47,7 +46,7 @@ const SidecarsPage = React.createClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
 export default SidecarsPage;

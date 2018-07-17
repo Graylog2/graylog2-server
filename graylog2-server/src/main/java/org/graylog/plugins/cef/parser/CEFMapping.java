@@ -211,8 +211,8 @@ public enum CEFMapping {
     sourceZoneURI("sourceZoneURI", "sourceZoneURI", CEFMapping::convertString);
 
     // Lookup tables for faster access
-    private static final Map<String, CEFMapping> KEY_NAMES;
-    private static final Map<String, CEFMapping> FULL_NAMES;
+    private static final ImmutableMap<String, CEFMapping> KEY_NAMES;
+    private static final ImmutableMap<String, CEFMapping> FULL_NAMES;
 
     static {
         final ImmutableMap.Builder<String, CEFMapping> keyNamesBuilder = ImmutableMap.builder();
@@ -274,7 +274,6 @@ public enum CEFMapping {
         return convertInteger(s);
     }
 
-    @Nullable
     private static Integer convertDirection(String s) {
         return convertInteger(s);
     }

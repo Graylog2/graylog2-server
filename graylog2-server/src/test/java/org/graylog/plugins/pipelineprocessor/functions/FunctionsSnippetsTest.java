@@ -117,6 +117,8 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConv
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog2.database.NotFoundException;
@@ -134,7 +136,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -283,6 +284,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SyslogLevelConversion.NAME, new SyslogLevelConversion());
 
         functions.put(UrlConversion.NAME, new UrlConversion());
+        functions.put(UrlDecode.NAME, new UrlDecode());
+        functions.put(UrlEncode.NAME, new UrlEncode());
 
         functions.put(IsBoolean.NAME, new IsBoolean());
         functions.put(IsNumber.NAME, new IsNumber());
@@ -476,16 +479,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void regexMatch() {
-        try {
-            final Rule rule = parser.parseRule(ruleForTest(), false);
-            final Message message = evaluateRule(rule);
-            assertNotNull(message);
-            assertTrue(message.hasField("matched_regex"));
-            assertTrue(message.hasField("group_1"));
-            assertThat((String) message.getField("named_group")).isEqualTo("cd.e");
-        } catch (ParseException e) {
-            Assert.fail("Should parse");
-        }
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertNotNull(message);
+        assertTrue(message.hasField("matched_regex"));
+        assertTrue(message.hasField("group_1"));
+        assertThat((String) message.getField("named_group")).isEqualTo("cd.e");
     }
 
     @Test

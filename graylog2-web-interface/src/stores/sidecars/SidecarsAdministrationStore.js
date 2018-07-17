@@ -9,7 +9,7 @@ const { SidecarsAdministrationActions } = CombinedProvider.get('SidecarsAdminist
 
 const SidecarsAdministrationStore = Reflux.createStore({
   listenables: [SidecarsAdministrationActions],
-  sourceUrl: '/plugins/org.graylog.plugins.sidecar/sidecar',
+  sourceUrl: '/sidecar',
   sidecars: undefined,
   filters: undefined,
   pagination: {
@@ -45,10 +45,10 @@ const SidecarsAdministrationStore = Reflux.createStore({
         this.query = response.query;
         this.filters = response.filters;
         this.pagination = {
-          total: response.total,
-          count: response.count,
-          page: response.page,
-          pageSize: response.per_page,
+          total: response.pagination.total,
+          count: response.pagination.count,
+          page: response.pagination.page,
+          pageSize: response.pagination.per_page,
         };
         this.propagateChanges();
 
