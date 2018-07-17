@@ -16,7 +16,9 @@
  */
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -29,6 +31,8 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
@@ -43,6 +47,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -61,13 +66,14 @@ public class LookupDataAdapterFacadeTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private LookupDataAdapterFacade facade;
+    private DBDataAdapterService dataAdapterService;
     private Set<PluginMetaData> pluginMetaData;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-        final DBDataAdapterService dataAdapterService = new DBDataAdapterService(
+        dataAdapterService = new DBDataAdapterService(
                 mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
                 clusterEventBus);
@@ -77,7 +83,7 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
-    public void encode() {
+    public void exportNativeEntity() {
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
                 .id("1234567890")
                 .name("data-adapter-name")
@@ -99,6 +105,101 @@ public class LookupDataAdapterFacadeTest {
         assertThat(lookupDataAdapterEntity.description()).isEqualTo(ValueReference.of("Data Adapter Description"));
         assertThat(lookupDataAdapterEntity.configuration()).containsEntry("type", ValueReference.of("FallbackAdapterConfig"));
     }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportEntityDescriptor() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24a04b900a0fdb4e52c8"), ModelTypes.LOOKUP_ADAPTER);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = entityWithConstraints.entity();
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of("5adf24a04b900a0fdb4e52c8"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entityV1.data(), LookupDataAdapterEntity.class);
+        assertThat(lookupDataAdapterEntity.name()).isEqualTo(ValueReference.of("http-dsv"));
+        assertThat(lookupDataAdapterEntity.title()).isEqualTo(ValueReference.of("HTTP DSV"));
+        assertThat(lookupDataAdapterEntity.description()).isEqualTo(ValueReference.of("HTTP DSV"));
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExisting() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_ADAPTER)
+                .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of("http-dsv"),
+                        ValueReference.of("HTTP DSV"),
+                        ValueReference.of("HTTP DSV"),
+                        ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
+                ), JsonNode.class))
+                .build();
+        final NativeEntity<DataAdapterDto> nativeEntity = facade.findExisting(entity, Collections.emptyMap()).orElseThrow(AssertionError::new);
+
+        assertThat(nativeEntity.descriptor().id()).isEqualTo(ModelId.of("5adf24a04b900a0fdb4e52c8"));
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER);
+        assertThat(nativeEntity.entity().name()).isEqualTo("http-dsv");
+        assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");
+        assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExistingWithNoExistingEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_ADAPTER)
+                .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of("some-name"),
+                        ValueReference.of("Some title"),
+                        ValueReference.of("Some description"),
+                        ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
+                ), JsonNode.class))
+                .build();
+        final Optional<NativeEntity<DataAdapterDto>> existingEntity = facade.findExisting(entity, Collections.emptyMap());
+        assertThat(existingEntity).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() {
+        final Optional<DataAdapterDto> dataAdapterDto = dataAdapterService.get("5adf24a04b900a0fdb4e52c8");
+
+        assertThat(dataAdapterService.findAll()).hasSize(1);
+        dataAdapterDto.ifPresent(facade::delete);
+
+        assertThat(dataAdapterService.findAll()).isEmpty();
+        assertThat(dataAdapterService.get("5adf24a04b900a0fdb4e52c8")).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntityDescriptor() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24a04b900a0fdb4e52c8"), ModelTypes.LOOKUP_ADAPTER);
+        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        assertThat(graph.nodes()).containsOnly(descriptor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
+                .type(ModelTypes.LOOKUP_ADAPTER)
+                .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of("http-dsv"),
+                        ValueReference.of("HTTP DSV"),
+                        ValueReference.of("HTTP DSV"),
+                        ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
+                ), JsonNode.class))
+                .build();
+        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        assertThat(graph.nodes()).containsOnly(entity);
+    }
+
 
     @Test
     public void createExcerpt() {
