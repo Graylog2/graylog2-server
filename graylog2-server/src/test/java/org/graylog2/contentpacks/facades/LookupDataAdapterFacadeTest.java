@@ -125,6 +125,32 @@ public class LookupDataAdapterFacadeTest {
     }
 
     @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void createNativeEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_ADAPTER)
+                .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
+                        ValueReference.of("http-dsv"),
+                        ValueReference.of("HTTP DSV"),
+                        ValueReference.of("HTTP DSV"),
+                        ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
+                ), JsonNode.class))
+                .build();
+        assertThat(dataAdapterService.findAll()).isEmpty();
+
+        final NativeEntity<DataAdapterDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
+
+        assertThat(nativeEntity.descriptor().id()).isEqualTo(ModelId.of("http-dsv"));
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER);
+        assertThat(nativeEntity.entity().name()).isEqualTo("http-dsv");
+        assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");
+        assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV");
+
+        assertThat(dataAdapterService.findAll()).hasSize(1);
+    }
+
+    @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findExisting() {
         final Entity entity = EntityV1.builder()
