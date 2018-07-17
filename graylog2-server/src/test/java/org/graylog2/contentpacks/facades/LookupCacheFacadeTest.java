@@ -127,6 +127,35 @@ public class LookupCacheFacadeTest {
     }
 
     @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void createNativeEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_CACHE)
+                .data(objectMapper.convertValue(LookupCacheEntity.create(
+                        ValueReference.of("no-op-cache"),
+                        ValueReference.of("No-op cache"),
+                        ValueReference.of("No-op cache"),
+                        ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
+                ), JsonNode.class))
+                .build();
+        assertThat(cacheService.findAll()).isEmpty();
+
+        final NativeEntity<CacheDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
+        final EntityDescriptor descriptor = nativeEntity.descriptor();
+        final CacheDto cacheDto = nativeEntity.entity();
+
+        assertThat(descriptor.id()).isEqualTo(ModelId.of("no-op-cache"));
+        assertThat(descriptor.type()).isEqualTo(ModelTypes.LOOKUP_CACHE);
+        assertThat(cacheDto.name()).isEqualTo("no-op-cache");
+        assertThat(cacheDto.title()).isEqualTo("No-op cache");
+        assertThat(cacheDto.description()).isEqualTo("No-op cache");
+        assertThat(cacheDto.config().type()).isEqualTo("none");
+
+        assertThat(cacheService.findAll()).hasSize(1);
+    }
+
+    @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findExisting() {
         final Entity entity = EntityV1.builder()
@@ -207,7 +236,7 @@ public class LookupCacheFacadeTest {
 
         assertThat(cacheService.findAll()).hasSize(1);
         cacheDto.ifPresent(facade::delete);
-        
+
         assertThat(cacheService.get("5adf24b24b900a0fdb4e52dd")).isEmpty();
         assertThat(cacheService.findAll()).isEmpty();
     }
