@@ -17,12 +17,12 @@
 package org.graylog2.plugin.utilities;
 
 import com.google.common.io.Files;
-
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
@@ -93,5 +93,15 @@ public class FileInfoTest {
         Files.write("test".getBytes(StandardCharsets.US_ASCII), tempFile);
         change = fileInfo.checkForChange();
         assertThat(change.isChanged()).isTrue();
+    }
+
+    @Test
+    public void empty() {
+        assertThat(FileInfo.empty()).isEqualTo(FileInfo.builder()
+                .path(Paths.get(""))
+                .key(null)
+                .modificationTime(null)
+                .size(-1L)
+                .build());
     }
 }

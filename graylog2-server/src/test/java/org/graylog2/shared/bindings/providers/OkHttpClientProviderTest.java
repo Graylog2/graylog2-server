@@ -301,7 +301,8 @@ public class OkHttpClientProviderTest {
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
                 Duration.milliseconds(100L),
-                proxyURI);
+                proxyURI,
+                null);
 
         return provider.get();
     }

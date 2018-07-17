@@ -69,7 +69,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     public static final String NAME = "maxmind_geoip";
     private final Config config;
     private final AtomicReference<DatabaseReader> databaseReader = new AtomicReference<>();
-    private FileInfo fileInfo;
+    private FileInfo fileInfo = FileInfo.empty();
 
     @Inject
     protected MaxmindDataAdapter(@Assisted("id") String id,

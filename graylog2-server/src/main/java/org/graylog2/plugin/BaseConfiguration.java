@@ -27,12 +27,12 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.utilities.ProxyHostsPattern;
+import org.graylog2.utilities.ProxyHostsPatternConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration extends PathConfiguration {
@@ -76,6 +76,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
+
+    @Parameter(value = "http_non_proxy_hosts", converter = ProxyHostsPatternConverter.class)
+    private ProxyHostsPattern httpNonProxyHostsPattern;
 
     @Parameter(value = "http_connect_timeout", validator = PositiveDurationValidator.class)
     private Duration httpConnectTimeout = Duration.seconds(5L);
@@ -165,6 +168,10 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public URI getHttpProxyUri() {
         return httpProxyUri;
+    }
+
+    public ProxyHostsPattern getHttpNonProxyHostsPattern() {
+        return httpNonProxyHostsPattern;
     }
 
     public Duration getHttpConnectTimeout() {

@@ -5,6 +5,15 @@ import WidgetFooter from 'components/widgets/WidgetFooter';
 
 describe('<WidgetFooter />', () => {
   const date = new Date(Date.UTC(1995, 12, 17, 3, 24, 0));
+  let dateNowMock;
+
+  beforeAll(() => {
+    dateNowMock = jest.spyOn(Date, 'now').mockImplementation(() => new Date(Date.UTC(2018, 1, 22, 17, 35, 0)));
+  });
+
+  afterAll(() => {
+    dateNowMock.mockReset();
+  });
 
   it('should render a widget footer locked and enabled replay', () => {
     const wrapper = renderer.create(<WidgetFooter
