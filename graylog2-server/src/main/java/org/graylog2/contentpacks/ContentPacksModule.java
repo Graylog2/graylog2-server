@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks;
 
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
+import org.graylog2.contentpacks.constraints.PluginVersionConstraintChecker;
 import org.graylog2.contentpacks.facades.CollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.CollectorFacade;
 import org.graylog2.contentpacks.facades.DashboardFacade;
@@ -57,5 +58,6 @@ public class ContentPacksModule extends PluginModule {
         addEntityFacade(StreamFacade.TYPE, StreamFacade.class);
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
+        addConstraintChecker(PluginVersionConstraintChecker.class);
     }
 }

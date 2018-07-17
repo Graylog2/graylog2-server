@@ -32,7 +32,10 @@ import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.outputs.LoggingOutput;
 import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
@@ -47,11 +50,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class OutputFacadeTest {
     @ClassRule
@@ -69,13 +76,18 @@ public class OutputFacadeTest {
     private StreamService streamService;
     @Mock
     private OutputRegistry outputRegistry;
+    private Set<PluginMetaData> pluginMetaData;
     private OutputFacade facade;
+    private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
 
     @Before
     public void setUp() throws Exception {
         final OutputService outputService = new OutputServiceImpl(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry);
+        pluginMetaData = new HashSet<>();
+        outputFactories = new HashMap<>();
+        outputFactories.put("org.graylog2.outputs.LoggingOutput", mock(LoggingOutput.Factory.class));
 
-        facade = new OutputFacade(objectMapper, outputService);
+        facade = new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories);
     }
 
     @Test
@@ -86,7 +98,7 @@ public class OutputFacadeTest {
         final OutputImpl output = OutputImpl.create(
                 "01234567890",
                 "Output Title",
-                "org.graylog2.output.SomeOutputClass",
+                "org.graylog2.outputs.LoggingOutput",
                 "admin",
                 configuration,
                 new Date(0L),
@@ -102,7 +114,7 @@ public class OutputFacadeTest {
         final EntityV1 entityV1 = (EntityV1) entity;
         final OutputEntity outputEntity = objectMapper.convertValue(entityV1.data(), OutputEntity.class);
         assertThat(outputEntity.title()).isEqualTo(ValueReference.of("Output Title"));
-        assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.output.SomeOutputClass"));
+        assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.outputs.LoggingOutput"));
         assertThat(outputEntity.configuration()).containsEntry("some-setting", ValueReference.of("foobar"));
     }
 

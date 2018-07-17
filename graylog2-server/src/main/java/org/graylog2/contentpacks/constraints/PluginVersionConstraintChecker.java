@@ -26,18 +26,18 @@ import org.graylog2.plugin.PluginMetaData;
 import java.util.Collection;
 import java.util.Set;
 
-public abstract class AbstractPluginVersionConstraintChecker<T extends PluginMetaData> implements ConstraintChecker {
+public class PluginVersionConstraintChecker implements ConstraintChecker {
     private final Semver pluginVersion;
 
-    protected AbstractPluginVersionConstraintChecker(T pluginMetaData) {
+    public PluginVersionConstraintChecker(PluginMetaData pluginMetaData) {
         this(pluginMetaData.getVersion().toString());
     }
 
-    protected AbstractPluginVersionConstraintChecker(String pluginVersion) {
+    public PluginVersionConstraintChecker(String pluginVersion) {
         this(new Semver(pluginVersion));
     }
 
-    protected AbstractPluginVersionConstraintChecker(Semver pluginVersion) {
+    private PluginVersionConstraintChecker(Semver pluginVersion) {
         this.pluginVersion = pluginVersion;
     }
 

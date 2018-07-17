@@ -21,9 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -41,6 +44,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -80,6 +84,8 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     private final ExtractorFactory extractorFactory;
     private final ConverterFactory converterFactory;
     private final ServerStatus serverStatus;
+    private final Set<PluginMetaData> pluginMetaData;
+    private final Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
 
     @Inject
     public InputFacade(ObjectMapper objectMapper,
@@ -88,7 +94,9 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                        MessageInputFactory messageInputFactory,
                        ExtractorFactory extractorFactory,
                        ConverterFactory converterFactory,
-                       ServerStatus serverStatus) {
+                       ServerStatus serverStatus,
+                       Set<PluginMetaData> pluginMetaData,
+                       Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories) {
         this.objectMapper = objectMapper;
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
@@ -96,6 +104,8 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         this.extractorFactory = extractorFactory;
         this.converterFactory = converterFactory;
         this.serverStatus = serverStatus;
+        this.pluginMetaData = pluginMetaData;
+        this.inputFactories = inputFactories;
     }
 
     @Override
@@ -122,7 +132,22 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .type(ModelTypes.INPUT)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
+        final Set<Constraint> constraints = versionConstraints(input);
+
+        return EntityWithConstraints.create(entity, constraints);
+    }
+
+    private Set<Constraint> versionConstraints(Input input) {
+        // TODO: Find more robust method of identifying the providing plugin
+        final MessageInput.Factory<? extends MessageInput> inputFactory = inputFactories.get(input.getType());
+        if (inputFactory == null) {
+            throw new ContentPackException("Unknown input type: " + input.getType());
+        }
+        final String packageName = inputFactory.getClass().getPackage().getName();
+        return pluginMetaData.stream()
+                .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
+                .map(PluginVersionConstraint::of)
+                .collect(Collectors.toSet());
     }
 
     private ExtractorEntity encodeExtractor(Extractor extractor) {

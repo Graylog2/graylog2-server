@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -32,6 +34,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
 import javax.inject.Inject;
@@ -48,12 +51,15 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
 
     private final ObjectMapper objectMapper;
     private final DBCacheService cacheService;
+    private final Set<PluginMetaData> pluginMetaData;
 
     @Inject
     public LookupCacheFacade(ObjectMapper objectMapper,
-                             DBCacheService cacheService) {
+                             DBCacheService cacheService,
+                             Set<PluginMetaData> pluginMetaData) {
         this.objectMapper = objectMapper;
         this.cacheService = cacheService;
+        this.pluginMetaData = pluginMetaData;
     }
 
     @Override
@@ -71,7 +77,18 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 .type(ModelTypes.LOOKUP_CACHE)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
+        final Set<Constraint> constraints = versionConstraints(cacheDto);
+
+        return EntityWithConstraints.create(entity, constraints);
+    }
+
+    private Set<Constraint> versionConstraints(CacheDto cacheDto) {
+        // TODO: Find more robust method of identifying the providing plugin
+        final String packageName = cacheDto.config().getClass().getPackage().getName();
+        return pluginMetaData.stream()
+                .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
+                .map(PluginVersionConstraint::of)
+                .collect(Collectors.toSet());
     }
 
     @Override

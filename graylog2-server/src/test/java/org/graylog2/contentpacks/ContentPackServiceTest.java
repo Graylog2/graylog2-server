@@ -29,6 +29,8 @@ import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.OutputImpl;
@@ -46,6 +48,8 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,15 +73,19 @@ public class ContentPackServiceTest {
     private OutputService outputService;
 
     private ContentPackService contentPackService;
+    private Set<PluginMetaData> pluginMetaData;
+    private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
 
     @Before
     public void setUp() throws Exception {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 mock(ContentPackInstallationPersistenceService.class);
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
+        pluginMetaData = new HashSet<>();
+        outputFactories = new HashMap<>();
         final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
                 ModelTypes.STREAM, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
-                ModelTypes.OUTPUT, new OutputFacade(objectMapper, outputService)
+                ModelTypes.OUTPUT, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories)
         );
 
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);

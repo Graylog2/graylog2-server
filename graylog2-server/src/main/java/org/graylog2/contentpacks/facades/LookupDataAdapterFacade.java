@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -32,6 +34,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.dto.DataAdapterDto;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 
 import javax.inject.Inject;
@@ -48,12 +51,15 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
 
     private final ObjectMapper objectMapper;
     private final DBDataAdapterService dataAdapterService;
+    private final Set<PluginMetaData> pluginMetaData;
 
     @Inject
     public LookupDataAdapterFacade(ObjectMapper objectMapper,
-                                   DBDataAdapterService dataAdapterService) {
+                                   DBDataAdapterService dataAdapterService,
+                                   Set<PluginMetaData> pluginMetaData) {
         this.objectMapper = objectMapper;
         this.dataAdapterService = dataAdapterService;
+        this.pluginMetaData = pluginMetaData;
     }
 
     @Override
@@ -71,7 +77,19 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
                 .type(ModelTypes.LOOKUP_ADAPTER)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
+        final Set<Constraint> constraints = versionConstraints(dataAdapterDto);
+
+        return EntityWithConstraints.create(entity, constraints);
+    }
+
+
+    private Set<Constraint> versionConstraints(DataAdapterDto dataAdapterDto) {
+        // TODO: Find more robust method of identifying the providing plugin
+        final String packageName = dataAdapterDto.config().getClass().getPackage().getName();
+        return pluginMetaData.stream()
+                .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
+                .map(PluginVersionConstraint::of)
+                .collect(Collectors.toSet());
     }
 
     @Override

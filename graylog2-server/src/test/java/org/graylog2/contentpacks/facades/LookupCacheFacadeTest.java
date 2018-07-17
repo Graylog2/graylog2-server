@@ -34,6 +34,7 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.FallbackCacheConfig;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -42,6 +43,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -59,6 +61,7 @@ public class LookupCacheFacadeTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private LookupCacheFacade facade;
+    private Set<PluginMetaData> pluginMetaData;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -68,8 +71,9 @@ public class LookupCacheFacadeTest {
                 mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
                 clusterEventBus);
+        pluginMetaData = new HashSet<>();
 
-        facade = new LookupCacheFacade(objectMapper, cacheService);
+        facade = new LookupCacheFacade(objectMapper, cacheService, pluginMetaData);
     }
 
     @Test

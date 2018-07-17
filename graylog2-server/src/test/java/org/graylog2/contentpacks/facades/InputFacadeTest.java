@@ -49,7 +49,10 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.random.FakeHttpMessageInput;
+import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.lookup.LookupTableService;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -68,6 +71,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -76,6 +80,7 @@ import java.util.concurrent.Executors;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 public class InputFacadeTest {
     @ClassRule
@@ -98,6 +103,8 @@ public class InputFacadeTest {
 
     private InputService inputService;
     private InputFacade facade;
+    private Set<PluginMetaData> pluginMetaData;
+    private Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -110,15 +117,28 @@ public class InputFacadeTest {
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
         inputService = new InputServiceImpl(mongoRule.getMongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
         final InputRegistry inputRegistry = new InputRegistry();
+        pluginMetaData = new HashSet<>();
+        inputFactories = new HashMap<>();
+        inputFactories.put("org.graylog2.inputs.random.FakeHttpMessageInput", mock(FakeHttpMessageInput.Factory.class));
+        inputFactories.put("org.graylog2.inputs.raw.udp.RawUDPInput", mock(RawUDPInput.Factory.class));
 
-        facade = new InputFacade(objectMapper, inputService, inputRegistry, messageInputFactory, extractorFactory, converterFactory, serverStatus);
+        facade = new InputFacade(
+                objectMapper,
+                inputService,
+                inputRegistry,
+                messageInputFactory,
+                extractorFactory,
+                converterFactory,
+                serverStatus,
+                pluginMetaData,
+                inputFactories);
     }
 
     @Test
     public void exportNativeEntity() {
         final ImmutableMap<String, Object> fields = ImmutableMap.of(
                 MessageInput.FIELD_TITLE, "Input Title",
-                MessageInput.FIELD_TYPE, "org.graylog2.inputs.SomeInput",
+                MessageInput.FIELD_TYPE, "org.graylog2.inputs.raw.udp.RawUDPInput",
                 MessageInput.FIELD_CONFIGURATION, Collections.emptyMap()
         );
         final InputImpl input = new InputImpl(fields);
@@ -134,7 +154,7 @@ public class InputFacadeTest {
         final EntityV1 entityV1 = (EntityV1) entity;
         final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
         assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Input Title"));
-        assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.SomeInput"));
+        assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.raw.udp.RawUDPInput"));
         assertThat(inputEntity.configuration()).isEmpty();
     }
 

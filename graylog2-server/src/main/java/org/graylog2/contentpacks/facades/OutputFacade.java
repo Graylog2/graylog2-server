@@ -18,9 +18,12 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -30,7 +33,9 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.graylog2.streams.OutputService;
@@ -53,12 +58,18 @@ public class OutputFacade implements EntityFacade<Output> {
 
     private final ObjectMapper objectMapper;
     private final OutputService outputService;
+    private final Set<PluginMetaData> pluginMetaData;
+    private final Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
 
     @Inject
     public OutputFacade(ObjectMapper objectMapper,
-                        OutputService outputService) {
+                        OutputService outputService,
+                        Set<PluginMetaData> pluginMetaData,
+                        Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories) {
         this.objectMapper = objectMapper;
         this.outputService = outputService;
+        this.pluginMetaData = pluginMetaData;
+        this.outputFactories = outputFactories;
     }
 
     @Override
@@ -74,7 +85,22 @@ public class OutputFacade implements EntityFacade<Output> {
                 .type(ModelTypes.OUTPUT)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
+        final Set<Constraint> constraints = versionConstraints(output);
+
+        return EntityWithConstraints.create(entity, constraints);
+    }
+
+    private Set<Constraint> versionConstraints(Output output) {
+        // TODO: Find more robust method of identifying the providing plugin
+        final MessageOutput.Factory<? extends MessageOutput> outputFactory = outputFactories.get(output.getType());
+        if (outputFactory == null) {
+            throw new ContentPackException("Unknown output type: " + output.getType());
+        }
+        final String packageName = outputFactory.getClass().getPackage().getName();
+        return pluginMetaData.stream()
+                .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
+                .map(PluginVersionConstraint::of)
+                .collect(Collectors.toSet());
     }
 
     @Override

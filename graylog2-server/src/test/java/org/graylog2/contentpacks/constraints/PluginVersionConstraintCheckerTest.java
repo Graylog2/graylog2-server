@@ -31,11 +31,11 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AbstractPluginVersionConstraintCheckerTest {
+public class PluginVersionConstraintCheckerTest {
     @Test
     public void checkConstraints() {
         final TestPluginMetaData pluginMetaData = new TestPluginMetaData();
-        final TestPluginVersionConstraintChecker constraintChecker = new TestPluginVersionConstraintChecker(pluginMetaData);
+        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(pluginMetaData);
 
         final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
                 .version("^2.0.0")
@@ -51,7 +51,7 @@ public class AbstractPluginVersionConstraintCheckerTest {
     @Test
     public void checkConstraintsFails() {
         final TestPluginMetaData pluginMetaData = new TestPluginMetaData();
-        final TestPluginVersionConstraintChecker constraintChecker = new TestPluginVersionConstraintChecker(pluginMetaData);
+        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(pluginMetaData);
 
         final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
                 .version("^2.0.0")
@@ -62,12 +62,6 @@ public class AbstractPluginVersionConstraintCheckerTest {
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
         assertThat(constraintChecker.checkConstraints(requiredConstraints)).isEmpty();
-    }
-
-    private static final class TestPluginVersionConstraintChecker extends AbstractPluginVersionConstraintChecker<TestPluginMetaData> {
-        TestPluginVersionConstraintChecker(TestPluginMetaData pluginMetaData) {
-            super(pluginMetaData);
-        }
     }
 
     private static final class TestPluginMetaData implements PluginMetaData {
