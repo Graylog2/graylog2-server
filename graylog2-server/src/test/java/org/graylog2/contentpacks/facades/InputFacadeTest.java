@@ -17,9 +17,11 @@
 package org.graylog2.contentpacks.facades;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -31,13 +33,17 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.InMemoryGrokPatternService;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
@@ -53,6 +59,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -60,12 +67,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class InputFacadeTest {
     @ClassRule
@@ -86,6 +96,7 @@ public class InputFacadeTest {
     @Mock
     private ServerStatus serverStatus;
 
+    private InputService inputService;
     private InputFacade facade;
 
     @Before
@@ -97,14 +108,14 @@ public class InputFacadeTest {
         grokPatternService.save(GrokPattern.create("GREEDY", ".*"));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternService, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        final InputService inputService = new InputServiceImpl(mongoRule.getMongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
+        inputService = new InputServiceImpl(mongoRule.getMongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
         final InputRegistry inputRegistry = new InputRegistry();
 
         facade = new InputFacade(objectMapper, inputService, inputRegistry, messageInputFactory, extractorFactory, converterFactory, serverStatus);
     }
 
     @Test
-    public void encode() {
+    public void exportNativeEntity() {
         final ImmutableMap<String, Object> fields = ImmutableMap.of(
                 MessageInput.FIELD_TITLE, "Input Title",
                 MessageInput.FIELD_TYPE, "org.graylog2.inputs.SomeInput",
@@ -125,6 +136,63 @@ public class InputFacadeTest {
         assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Input Title"));
         assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.SomeInput"));
         assertThat(inputEntity.configuration()).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportEntity() {
+        final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
+        final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = entityWithConstraints.entity();
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(id);
+        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
+        assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Local Raw UDP"));
+        assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.raw.udp.RawUDPInput"));
+        assertThat(inputEntity.global()).isEqualTo(ValueReference.of(false));
+        assertThat(inputEntity.configuration())
+                .containsEntry("bind_address", ValueReference.of("127.0.0.1"))
+                .containsEntry("port", ValueReference.of(5555));
+    }
+
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    @Ignore("Doesn't work without massive amount of mocks")
+    public void createNativeEntity() {
+        final Map<String, Object> configuration = new HashMap<>();
+        configuration.put("override_source", null);
+        configuration.put("recv_buffer_size", 262144);
+        configuration.put("bind_address", "127.0.0.1");
+        configuration.put("port", 5555);
+        configuration.put("number_worker_threads", 8);
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
+                .type(ModelTypes.INPUT)
+                .data(objectMapper.convertValue(InputEntity.create(
+                        ValueReference.of("Local Raw UDP"),
+                        ReferenceMapUtils.toReferenceMap(configuration),
+                        Collections.emptyMap(),
+                        ValueReference.of("org.graylog2.inputs.raw.udp.RawUDPInput"),
+                        ValueReference.of(false),
+                        Collections.emptyList()), JsonNode.class))
+                .build();
+
+        final NativeEntity<InputWithExtractors> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
+
+        final InputWithExtractors inputWithExtractors = nativeEntity.entity();
+        final Input savedInput = inputWithExtractors.input();
+        final String savedId = savedInput.getId();
+        assertThat(nativeEntity.descriptor()).isEqualTo(EntityDescriptor.create(ModelId.of(savedId), ModelTypes.INPUT));
+        assertThat(savedInput.getTitle()).isEqualTo("Local Raw UDP");
+        assertThat(savedInput.getType()).isEqualTo("org.graylog2.inputs.raw.udp.RawUDPInput");
+        assertThat(savedInput.isGlobal()).isFalse();
+        assertThat(savedInput.getContentPack()).isNull();
     }
 
     @Test
@@ -179,4 +247,76 @@ public class InputFacadeTest {
         assertThat(inputEntity.configuration()).isNotEmpty();
         assertThat(inputEntity.extractors()).hasSize(5);
     }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExisting() {
+        final Map<String, Object> configuration = new HashMap<>();
+        configuration.put("override_source", null);
+        configuration.put("recv_buffer_size", 262144);
+        configuration.put("bind_address", "127.0.0.1");
+        configuration.put("port", 5555);
+        configuration.put("number_worker_threads", 8);
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
+                .type(ModelTypes.INPUT)
+                .data(objectMapper.convertValue(InputEntity.create(
+                        ValueReference.of("Local Raw UDP"),
+                        ReferenceMapUtils.toReferenceMap(configuration),
+                        Collections.emptyMap(),
+                        ValueReference.of("org.graylog2.inputs.raw.udp.RawUDPInput"),
+                        ValueReference.of(false),
+                        Collections.emptyList()), JsonNode.class))
+                .build();
+        final Optional<NativeEntity<InputWithExtractors>> existingInput = facade.findExisting(entity, Collections.emptyMap());
+        assertThat(existingInput).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntityDescriptor() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5acc84f84b900a4ff290d9a7"), ModelTypes.INPUT);
+        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        assertThat(graph.nodes()).containsOnly(descriptor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntity() {
+        final Map<String, Object> configuration = new HashMap<>();
+        configuration.put("override_source", null);
+        configuration.put("recv_buffer_size", 262144);
+        configuration.put("bind_address", "127.0.0.1");
+        configuration.put("port", 5555);
+        configuration.put("number_worker_threads", 8);
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
+                .type(ModelTypes.INPUT)
+                .data(objectMapper.convertValue(InputEntity.create(
+                        ValueReference.of("Local Raw UDP"),
+                        ReferenceMapUtils.toReferenceMap(configuration),
+                        Collections.emptyMap(),
+                        ValueReference.of("org.graylog2.inputs.raw.udp.RawUDPInput"),
+                        ValueReference.of(false),
+                        Collections.emptyList()), JsonNode.class))
+                .build();
+        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        assertThat(graph.nodes()).containsOnly(entity);
+    }
+
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() throws NotFoundException {
+        final Input input = inputService.find("5acc84f84b900a4ff290d9a7");
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
+
+        assertThat(inputService.totalCount()).isEqualTo(2L);
+        facade.delete(inputWithExtractors);
+
+        assertThat(inputService.totalCount()).isEqualTo(1L);
+        assertThatThrownBy(() -> inputService.find("5acc84f84b900a4ff290d9a7"))
+                .isInstanceOf(NotFoundException.class);
+    }
+
 }
