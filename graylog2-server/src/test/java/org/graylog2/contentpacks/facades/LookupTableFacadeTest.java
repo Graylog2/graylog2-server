@@ -41,7 +41,11 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.db.DBLookupTableService;
+import org.graylog2.lookup.dto.CacheDto;
+import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.plugin.lookup.FallbackAdapterConfig;
+import org.graylog2.plugin.lookup.FallbackCacheConfig;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -138,6 +142,60 @@ public class LookupTableFacadeTest {
         assertThat(lookupTableEntity.defaultSingleValueType()).isEqualTo(ValueReference.of(LookupDefaultValue.Type.STRING));
         assertThat(lookupTableEntity.defaultMultiValue()).isEqualTo(ValueReference.of("Default multi value"));
         assertThat(lookupTableEntity.defaultMultiValueType()).isEqualTo(ValueReference.of(LookupDefaultValue.Type.OBJECT));
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void createNativeEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.LOOKUP_TABLE)
+                .data(objectMapper.convertValue(LookupTableEntity.create(
+                        ValueReference.of("http-dsv-no-cache"),
+                        ValueReference.of("HTTP DSV without Cache"),
+                        ValueReference.of("HTTP DSV without Cache"),
+                        ValueReference.of("no-op-cache"),
+                        ValueReference.of("http-dsv"),
+                        ValueReference.of("Default single value"),
+                        ValueReference.of(LookupDefaultValue.Type.STRING),
+                        ValueReference.of("Default multi value"),
+                        ValueReference.of(LookupDefaultValue.Type.OBJECT)), JsonNode.class))
+                .build();
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(ModelId.of("no-op-cache"), ModelTypes.LOOKUP_CACHE);
+        final CacheDto cacheDto = CacheDto.builder()
+                .id("5adf24b24b900a0fdb4e0001")
+                .name("no-op-cache")
+                .title("No-op cache")
+                .description("No-op cache")
+                .config(new FallbackCacheConfig())
+                .build();
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(ModelId.of("http-dsv"), ModelTypes.LOOKUP_ADAPTER);
+        final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
+                .id("5adf24a04b900a0fdb4e0002")
+                .name("http-dsv")
+                .title("HTTP DSV")
+                .description("HTTP DSV")
+                .config(new FallbackAdapterConfig())
+                .build();
+        final Map<EntityDescriptor, Object> nativeEntities = ImmutableMap.of(
+                cacheDescriptor, cacheDto,
+                dataAdapterDescriptor, dataAdapterDto);
+        assertThat(lookupTableService.findAll()).isEmpty();
+
+        final NativeEntity<LookupTableDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
+
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(nativeEntity.entity().name()).isEqualTo("http-dsv-no-cache");
+        assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV without Cache");
+        assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV without Cache");
+        assertThat(nativeEntity.entity().cacheId()).isEqualTo("5adf24b24b900a0fdb4e0001");
+        assertThat(nativeEntity.entity().dataAdapterId()).isEqualTo("5adf24a04b900a0fdb4e0002");
+        assertThat(nativeEntity.entity().defaultSingleValue()).isEqualTo("Default single value");
+        assertThat(nativeEntity.entity().defaultSingleValueType()).isEqualTo(LookupDefaultValue.Type.STRING);
+        assertThat(nativeEntity.entity().defaultMultiValue()).isEqualTo("Default multi value");
+        assertThat(nativeEntity.entity().defaultMultiValueType()).isEqualTo(LookupDefaultValue.Type.OBJECT);
+
+        assertThat(lookupTableService.findAll()).hasSize(1);
     }
 
     @Test
