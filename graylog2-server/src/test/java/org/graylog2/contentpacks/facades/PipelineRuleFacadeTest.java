@@ -16,7 +16,9 @@
  */
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -24,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -31,10 +34,12 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -50,6 +55,7 @@ import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PipelineRuleFacadeTest {
     @ClassRule
@@ -60,13 +66,14 @@ public class PipelineRuleFacadeTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
+    private RuleService ruleService;
     private PipelineRuleFacade facade;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-        final RuleService ruleService = new MongoDbRuleService(
+        ruleService = new MongoDbRuleService(
                 mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper),
                 clusterEventBus);
@@ -75,7 +82,7 @@ public class PipelineRuleFacadeTest {
     }
 
     @Test
-    public void encode() {
+    public void exportEntity() {
         final RuleDao pipelineRule = RuleDao.builder()
                 .id("id")
                 .title("title")
@@ -94,6 +101,94 @@ public class PipelineRuleFacadeTest {
         assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("title"));
         assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("description"));
         assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("rule \"debug\"\n");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportNativeEntity() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("debug"), ModelTypes.PIPELINE_RULE);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = entityWithConstraints.entity();
+
+        assertThat(entity.id()).isEqualTo(ModelId.of("debug"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
+        assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("debug"));
+        assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("Debug"));
+        assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("rule \"debug\"\n");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() throws NotFoundException {
+        final RuleDao ruleDao = ruleService.loadByName("debug");
+        assertThat(ruleService.loadAll()).hasSize(2);
+
+        facade.delete(ruleDao);
+        assertThatThrownBy(() -> ruleService.loadByName("debug"))
+                .isInstanceOf(NotFoundException.class);
+        assertThat(ruleService.loadAll()).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExisting() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("debug"))
+                .type(ModelTypes.PIPELINE_RULE)
+                .data(objectMapper.convertValue(PipelineRuleEntity.create(
+                        ValueReference.of("debug"),
+                        ValueReference.of("Debug"),
+                        ValueReference.of("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")), JsonNode.class))
+                .build();
+        final NativeEntity<RuleDao> existingRule = facade.findExisting(entity, Collections.emptyMap()).orElseThrow(AssertionError::new);
+
+        assertThat(existingRule.descriptor().id()).isEqualTo(ModelId.of("5adf25034b900a0fdb4e5338"));
+        assertThat(existingRule.descriptor().type()).isEqualTo(ModelTypes.PIPELINE_RULE);
+        assertThat(existingRule.entity().title()).isEqualTo("debug");
+        assertThat(existingRule.entity().description()).isEqualTo("Debug");
+        assertThat(existingRule.entity().source()).startsWith("rule \"debug\"\n");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExistingWithDifferentSource() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("debug"))
+                .type(ModelTypes.PIPELINE_RULE)
+                .data(objectMapper.convertValue(PipelineRuleEntity.create(
+                        ValueReference.of("debug"),
+                        ValueReference.of("Debug"),
+                        ValueReference.of("rule \"debug\"\nwhen\n  true\nthen\n\nend")), JsonNode.class))
+                .build();
+        assertThatThrownBy(() -> facade.findExisting(entity, Collections.emptyMap()))
+                .isInstanceOf(DivergingEntityConfigurationException.class)
+                .hasMessage("Different pipeline rule sources for pipeline rule with name \"debug\"");
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntity() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("debug"))
+                .type(ModelTypes.PIPELINE_RULE)
+                .data(objectMapper.convertValue(PipelineRuleEntity.create(
+                        ValueReference.of("debug"),
+                        ValueReference.of("Debug"),
+                        ValueReference.of("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")), JsonNode.class))
+                .build();
+        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        assertThat(graph.nodes()).containsOnly(entity);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntityDescriptor() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("debug"), ModelTypes.PIPELINE_RULE);
+        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        assertThat(graph.nodes()).containsOnly(descriptor);
     }
 
     @Test
