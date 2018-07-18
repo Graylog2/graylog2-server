@@ -34,6 +34,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -97,7 +98,7 @@ public class CollectorFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5b4c920b4b900a0024af0001"), ModelTypes.COLLECTOR);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR);
 
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         assertThat(entityWithConstraints.constraints()).isEmpty();
@@ -150,7 +151,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final EntityDescriptor expectedDescriptor = EntityDescriptor.create(ModelId.of(collector.id()), ModelTypes.COLLECTOR);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(collector.id(), ModelTypes.COLLECTOR);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(collector);
     }
@@ -182,7 +183,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final EntityDescriptor expectedDescriptor = EntityDescriptor.create(ModelId.of(collector.id()), ModelTypes.COLLECTOR);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(collector.id(), ModelTypes.COLLECTOR);
         assertThat(existingCollector.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(existingCollector.entity()).isEqualTo(collector);
     }
@@ -234,7 +235,7 @@ public class CollectorFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5b4c920b4b900a0024af0001"), ModelTypes.COLLECTOR);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }

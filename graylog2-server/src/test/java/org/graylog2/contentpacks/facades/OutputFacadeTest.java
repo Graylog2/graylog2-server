@@ -203,7 +203,7 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf239e4b900a0fdb4e5197"), ModelTypes.OUTPUT);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -254,7 +254,7 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5adf239e4b900a0fdb4e5197"), ModelTypes.OUTPUT));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

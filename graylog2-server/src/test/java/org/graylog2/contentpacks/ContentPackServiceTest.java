@@ -107,11 +107,11 @@ public class ContentPackServiceTest {
         when(streamService.load("stream-1234")).thenReturn(streamMock);
 
         final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM)
+                EntityDescriptor.create("stream-1234", ModelTypes.STREAM)
         );
 
         final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
-        assertThat(resolvedEntities).containsOnly(EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM));
+        assertThat(resolvedEntities).containsOnly(EntityDescriptor.create("stream-1234", ModelTypes.STREAM));
     }
 
     @Test
@@ -138,13 +138,13 @@ public class ContentPackServiceTest {
         when(streamService.load("stream-1234")).thenReturn(streamMock);
 
         final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM)
+                EntityDescriptor.create("stream-1234", ModelTypes.STREAM)
         );
 
         final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
         assertThat(resolvedEntities).containsOnly(
-                EntityDescriptor.create(ModelId.of("stream-1234"), ModelTypes.STREAM),
-                EntityDescriptor.create(ModelId.of("output-1234"), ModelTypes.OUTPUT)
+                EntityDescriptor.create("stream-1234", ModelTypes.STREAM),
+                EntityDescriptor.create("output-1234", ModelTypes.OUTPUT)
         );
     }
 }

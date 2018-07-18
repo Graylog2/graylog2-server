@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
@@ -110,7 +111,7 @@ public class LookupCacheFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24b24b900a0fdb4e52dd"), ModelTypes.LOOKUP_CACHE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
@@ -142,7 +143,7 @@ public class LookupCacheFacadeTest {
         assertThat(cacheService.findAll()).isEmpty();
 
         final NativeEntity<CacheDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
-        final EntityDescriptor descriptor = nativeEntity.descriptor();
+        final NativeEntityDescriptor descriptor = nativeEntity.descriptor();
         final CacheDto cacheDto = nativeEntity.entity();
 
         assertThat(descriptor.id()).isEqualTo(ModelId.of("no-op-cache"));
@@ -171,7 +172,7 @@ public class LookupCacheFacadeTest {
 
         final NativeEntity<CacheDto> existingCache = facade.findExisting(entity, Collections.emptyMap())
                 .orElseThrow(AssertionError::new);
-        final EntityDescriptor descriptor = existingCache.descriptor();
+        final NativeEntityDescriptor descriptor = existingCache.descriptor();
         final CacheDto cacheDto = existingCache.entity();
 
         assertThat(descriptor.id()).isEqualTo(ModelId.of("5adf24b24b900a0fdb4e52dd"));
@@ -224,7 +225,7 @@ public class LookupCacheFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24b24b900a0fdb4e52dd"), ModelTypes.LOOKUP_CACHE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -273,7 +274,7 @@ public class LookupCacheFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("no-op-cache"), ModelTypes.LOOKUP_CACHE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("no-op-cache", ModelTypes.LOOKUP_CACHE));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

@@ -135,7 +135,7 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("Test"), ModelTypes.PIPELINE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
@@ -164,7 +164,7 @@ public class PipelineFacadeTest {
                         Collections.singleton(ValueReference.of("5adf23894b900a0f00000001"))), JsonNode.class))
                 .build();
 
-        final EntityDescriptor streamDescriptor = EntityDescriptor.create(ModelId.of("5adf23894b900a0f00000001"), ModelTypes.STREAM);
+        final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0f00000001", ModelTypes.STREAM);
         final Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("5adf23894b900a0f00000001");
         final Map<EntityDescriptor, Object> nativeEntities = Collections.singletonMap(streamDescriptor, stream);
@@ -224,12 +224,12 @@ public class PipelineFacadeTest {
                 .build();
         when(pipelineRuleParser.parsePipeline("dummy", "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"))
                 .thenReturn(pipeline);
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("Test"), ModelTypes.PIPELINE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(
                 descriptor,
-                EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM),
-                EntityDescriptor.create(ModelId.of("no-op"), ModelTypes.PIPELINE_RULE));
+                EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM),
+                EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE));
     }
 
     @Test
@@ -263,7 +263,7 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("Test"), ModelTypes.PIPELINE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("Test", ModelTypes.PIPELINE));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -303,13 +303,13 @@ public class PipelineFacadeTest {
                 .stages(ImmutableSortedSet.of(stage))
                 .build();
         when(pipelineRuleParser.parsePipeline(eq("dummy"), anyString())).thenReturn(pipeline);
-        final EntityDescriptor pipelineEntity = EntityDescriptor.create(ModelId.of("Test"), ModelTypes.PIPELINE);
+        final EntityDescriptor pipelineEntity = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
 
         final Graph<EntityDescriptor> graph = facade.resolve(pipelineEntity);
 
-        final EntityDescriptor streamEntity = EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM);
-        final EntityDescriptor ruleEntity1 = EntityDescriptor.create(ModelId.of("debug"), ModelTypes.PIPELINE_RULE);
-        final EntityDescriptor ruleEntity2 = EntityDescriptor.create(ModelId.of("no-op"), ModelTypes.PIPELINE_RULE);
+        final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
+        final EntityDescriptor ruleEntity1 = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE);
+        final EntityDescriptor ruleEntity2 = EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE);
         assertThat(graph.nodes())
                 .containsOnly(pipelineEntity, streamEntity, ruleEntity1, ruleEntity2);
     }

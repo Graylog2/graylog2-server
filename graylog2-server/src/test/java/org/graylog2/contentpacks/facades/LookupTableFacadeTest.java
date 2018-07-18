@@ -123,7 +123,7 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24dd4b900a0fdb4e530d"), ModelTypes.LOOKUP_TABLE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
@@ -161,7 +161,7 @@ public class LookupTableFacadeTest {
                         ValueReference.of("Default multi value"),
                         ValueReference.of(LookupDefaultValue.Type.OBJECT)), JsonNode.class))
                 .build();
-        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(ModelId.of("no-op-cache"), ModelTypes.LOOKUP_CACHE);
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create("no-op-cache", ModelTypes.LOOKUP_CACHE);
         final CacheDto cacheDto = CacheDto.builder()
                 .id("5adf24b24b900a0fdb4e0001")
                 .name("no-op-cache")
@@ -169,7 +169,7 @@ public class LookupTableFacadeTest {
                 .description("No-op cache")
                 .config(new FallbackCacheConfig())
                 .build();
-        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(ModelId.of("http-dsv"), ModelTypes.LOOKUP_ADAPTER);
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create("http-dsv", ModelTypes.LOOKUP_ADAPTER);
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
                 .id("5adf24a04b900a0fdb4e0002")
                 .name("http-dsv")
@@ -280,15 +280,15 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = {"/org/graylog2/contentpacks/lut_caches.json", "/org/graylog2/contentpacks/lut_data_adapters.json", "/org/graylog2/contentpacks/lut_tables.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24dd4b900a0fdb4e530d"), ModelTypes.LOOKUP_TABLE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE);
 
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes())
                 .hasSize(3)
                 .containsOnly(
                         descriptor,
-                        EntityDescriptor.create(ModelId.of("5adf24a04b900a0fdb4e52c8"), ModelTypes.LOOKUP_ADAPTER),
-                        EntityDescriptor.create(ModelId.of("5adf24b24b900a0fdb4e52dd"), ModelTypes.LOOKUP_CACHE));
+                        EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER),
+                        EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE));
     }
 
     @Test
@@ -362,7 +362,7 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("http-dsv-no-cache"), ModelTypes.LOOKUP_TABLE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

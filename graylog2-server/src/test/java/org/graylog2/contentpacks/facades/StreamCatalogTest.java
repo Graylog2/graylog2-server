@@ -197,7 +197,7 @@ public class StreamCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/streams.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

@@ -102,7 +102,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
 
         final String referencedDataAdapterName = lookupTableEntity.dataAdapterName().asString(parameters);
-        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(ModelId.of(referencedDataAdapterName), ModelTypes.LOOKUP_ADAPTER);
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(referencedDataAdapterName, ModelTypes.LOOKUP_ADAPTER);
         final Object dataAdapter = nativeEntities.get(dataAdapterDescriptor);
         final String dataAdapterId;
         if (dataAdapter instanceof DataAdapterDto) {
@@ -112,7 +112,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         }
 
         final String referencedCacheName = lookupTableEntity.cacheName().asString(parameters);
-        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(ModelId.of(referencedCacheName), ModelTypes.LOOKUP_CACHE);
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(referencedCacheName, ModelTypes.LOOKUP_CACHE);
         final Object cache = nativeEntities.get(cacheDescriptor);
         final String cacheId;
         if (cache instanceof CacheDto) {
@@ -197,10 +197,10 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         final Optional<LookupTableDto> lookupTableDto = lookupTableService.get(modelId.id());
 
         lookupTableDto.map(LookupTableDto::dataAdapterId)
-                .map(dataAdapterId -> EntityDescriptor.create(ModelId.of(dataAdapterId), ModelTypes.LOOKUP_ADAPTER))
+                .map(dataAdapterId -> EntityDescriptor.create(dataAdapterId, ModelTypes.LOOKUP_ADAPTER))
                 .ifPresent(dataAdapter -> mutableGraph.putEdge(entityDescriptor, dataAdapter));
         lookupTableDto.map(LookupTableDto::cacheId)
-                .map(cacheId -> EntityDescriptor.create(ModelId.of(cacheId), ModelTypes.LOOKUP_CACHE))
+                .map(cacheId -> EntityDescriptor.create(cacheId, ModelTypes.LOOKUP_CACHE))
                 .ifPresent(cache -> mutableGraph.putEdge(entityDescriptor, cache));
 
         return ImmutableGraph.copyOf(mutableGraph);
@@ -226,7 +226,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
 
         final String dataAdapterName = lookupTableEntity.dataAdapterName().asString(parameters);
-        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(ModelId.of(dataAdapterName), ModelTypes.LOOKUP_ADAPTER);
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(dataAdapterName, ModelTypes.LOOKUP_ADAPTER);
         final Entity dataAdapterEntity = entities.get(dataAdapterDescriptor);
         if (dataAdapterEntity == null) {
             throw new ContentPackException("Missing data adapter \"" + dataAdapterName + "\" for lookup table " + entity.toEntityDescriptor());
@@ -235,7 +235,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         }
 
         final String cacheName = lookupTableEntity.cacheName().asString(parameters);
-        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(ModelId.of(cacheName), ModelTypes.LOOKUP_CACHE);
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(cacheName, ModelTypes.LOOKUP_CACHE);
         final Entity cacheEntity = entities.get(cacheDescriptor);
         if (cacheEntity == null) {
             throw new ContentPackException("Missing cache \"" + cacheName + "\" for lookup table " + entity.toEntityDescriptor());

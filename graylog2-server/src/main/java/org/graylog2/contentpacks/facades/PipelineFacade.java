@@ -135,7 +135,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final String pipelineId = requireNonNull(savedPipelineDao.id(), "Saved pipeline ID must not be null");
         final Set<EntityDescriptor> connectedStreamEntities = pipelineEntity.connectedStreams().stream()
                 .map(valueReference -> valueReference.asString(parameters))
-                .map(streamId -> EntityDescriptor.create(ModelId.of(streamId), ModelTypes.STREAM))
+                .map(streamId -> EntityDescriptor.create(streamId, ModelTypes.STREAM))
                 .collect(Collectors.toSet());
         final Set<Stream> connectedStreams = connectedStreams(connectedStreamEntities, nativeEntities);
         createPipelineConnections(pipelineId, connectedStreams);

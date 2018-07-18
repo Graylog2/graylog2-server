@@ -39,6 +39,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.RelativeRangeEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
@@ -171,7 +172,7 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD);
         final Optional<EntityWithConstraints> entityWithConstraints = facade.exportEntity(descriptor);
         final Entity entity = entityWithConstraints.orElseThrow(AssertionError::new).entity();
 
@@ -221,7 +222,7 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -239,8 +240,8 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolve() {
-        final EntityDescriptor dashboardEntity = EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD);
-        final EntityDescriptor streamEntity = EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM);
+        final EntityDescriptor dashboardEntity = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD);
+        final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
 
         final Graph<EntityDescriptor> graph = facade.resolve(dashboardEntity);
         assertThat(graph.nodes())
@@ -260,9 +261,9 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5a82f5974b900a7a97caa1e5"), ModelTypes.DASHBOARD);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
-        final EntityDescriptor expectedStream = EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM);
+        final EntityDescriptor expectedStream = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
 
         assertThat(graph.nodes()).containsOnly(descriptor, expectedStream);
     }
@@ -284,7 +285,7 @@ public class DashboardFacadeTest {
                         ValueReference.of("Description"),
                         Collections.singletonList(dashboardWidgetEntity)), JsonNode.class))
                 .build();
-        final EntityDescriptor streamDescriptor = EntityDescriptor.create(ModelId.of("stream-id"), ModelTypes.STREAM);
+        final EntityDescriptor streamDescriptor = EntityDescriptor.create("stream-id", ModelTypes.STREAM);
         final Entity streamEntity = EntityV1.builder()
                 .id(ModelId.of("stream-id"))
                 .type(ModelTypes.STREAM)
@@ -347,7 +348,7 @@ public class DashboardFacadeTest {
         final Dashboard dashboard = nativeEntity.entity();
         assertThat(dashboard).isEqualTo(savedDashboard);
 
-        final EntityDescriptor expectedDescriptor = EntityDescriptor.create(ModelId.of(savedDashboard.getId()), ModelTypes.DASHBOARD);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(savedDashboard.getId(), ModelTypes.DASHBOARD);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
     }
 }

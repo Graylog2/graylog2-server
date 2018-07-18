@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
@@ -56,7 +57,7 @@ public abstract class ContentPackInstallation {
     public abstract ImmutableMap<String, ValueReference> parameters();
 
     @JsonProperty(FIELD_ENTITIES)
-    public abstract ImmutableSet<EntityDescriptor> entities();
+    public abstract ImmutableSet<NativeEntityDescriptor> entities();
 
     @JsonProperty(FIELD_COMMENT)
     public abstract String comment();
@@ -87,7 +88,7 @@ public abstract class ContentPackInstallation {
         public abstract Builder parameters(ImmutableMap<String, ValueReference> parameters);
 
         @JsonProperty(FIELD_ENTITIES)
-        public abstract Builder entities(ImmutableSet<EntityDescriptor> entities);
+        public abstract Builder entities(ImmutableSet<NativeEntityDescriptor> entities);
 
         @JsonProperty(FIELD_COMMENT)
         public abstract Builder comment(String comment);

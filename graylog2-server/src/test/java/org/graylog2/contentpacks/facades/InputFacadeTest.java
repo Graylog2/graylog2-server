@@ -208,7 +208,7 @@ public class InputFacadeTest {
         final InputWithExtractors inputWithExtractors = nativeEntity.entity();
         final Input savedInput = inputWithExtractors.input();
         final String savedId = savedInput.getId();
-        assertThat(nativeEntity.descriptor()).isEqualTo(EntityDescriptor.create(ModelId.of(savedId), ModelTypes.INPUT));
+        assertThat(nativeEntity.descriptor()).isEqualTo(EntityDescriptor.create(savedId, ModelTypes.INPUT));
         assertThat(savedInput.getTitle()).isEqualTo("Local Raw UDP");
         assertThat(savedInput.getType()).isEqualTo("org.graylog2.inputs.raw.udp.RawUDPInput");
         assertThat(savedInput.isGlobal()).isFalse();
@@ -250,7 +250,7 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("5adf25294b900a0fdb4e5365"), ModelTypes.INPUT));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -295,7 +295,7 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5acc84f84b900a4ff290d9a7"), ModelTypes.INPUT);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5acc84f84b900a4ff290d9a7", ModelTypes.INPUT);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }

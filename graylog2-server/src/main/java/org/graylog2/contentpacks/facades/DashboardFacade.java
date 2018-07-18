@@ -230,7 +230,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         // Replace "stream_id" in configuration if it's set
         final String streamReference = (String) widgetConfig.get("stream_id");
         if (!isNullOrEmpty(streamReference)) {
-            final EntityDescriptor streamDescriptor = EntityDescriptor.create(ModelId.of(streamReference), ModelTypes.STREAM);
+            final EntityDescriptor streamDescriptor = EntityDescriptor.create(streamReference, ModelTypes.STREAM);
             final Object stream = nativeEntities.get(streamDescriptor);
 
             if (stream == null) {
@@ -300,7 +300,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 if (!isNullOrEmpty(streamId)) {
                     LOG.debug("Adding stream <{}> as dependency of widget <{}> on dashboard <{}>",
                             streamId, widget.getId(), dashboard.getId());
-                    final EntityDescriptor stream = EntityDescriptor.create(ModelId.of(streamId), ModelTypes.STREAM);
+                    final EntityDescriptor stream = EntityDescriptor.create(streamId, ModelTypes.STREAM);
                     mutableGraph.putEdge(entityDescriptor, stream);
                 }
             }

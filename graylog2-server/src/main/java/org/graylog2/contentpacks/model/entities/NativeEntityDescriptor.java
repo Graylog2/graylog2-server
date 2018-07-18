@@ -24,12 +24,12 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.Typed;
 
 /**
- * The unique description of a (virtual) entity by ID and type.
+ * The unique description of a native entity by ID and type.
  */
 @AutoValue
-@JsonDeserialize(builder = AutoValue_EntityDescriptor.Builder.class)
-public abstract class EntityDescriptor implements Identified, Typed {
-    public static EntityDescriptor create(ModelId id, ModelType type) {
+@JsonDeserialize(builder = AutoValue_NativeEntityDescriptor.Builder.class)
+public abstract class NativeEntityDescriptor implements Identified, Typed {
+    public static NativeEntityDescriptor create(ModelId id, ModelType type) {
         return builder()
                 .id(id)
                 .type(type)
@@ -39,16 +39,16 @@ public abstract class EntityDescriptor implements Identified, Typed {
     /**
      * Shortcut for {@link #create(ModelId, ModelType)}
      */
-    public static EntityDescriptor create(String id, ModelType type) {
+    public static NativeEntityDescriptor create(String id, ModelType type) {
         return create(ModelId.of(id), type);
     }
 
     public static Builder builder() {
-        return new AutoValue_EntityDescriptor.Builder();
+        return new AutoValue_NativeEntityDescriptor.Builder();
     }
 
     @AutoValue.Builder
     public interface Builder extends IdBuilder<Builder>, TypeBuilder<Builder> {
-        EntityDescriptor build();
+        NativeEntityDescriptor build();
     }
 }

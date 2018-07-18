@@ -106,7 +106,7 @@ public class PipelineRuleFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("debug"), ModelTypes.PIPELINE_RULE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
@@ -186,7 +186,7 @@ public class PipelineRuleFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("debug"), ModelTypes.PIPELINE_RULE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -227,7 +227,7 @@ public class PipelineRuleFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("debug"), ModelTypes.PIPELINE_RULE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

@@ -109,7 +109,7 @@ public class LookupDataAdapterFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24a04b900a0fdb4e52c8"), ModelTypes.LOOKUP_ADAPTER);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
@@ -204,7 +204,7 @@ public class LookupDataAdapterFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("5adf24a04b900a0fdb4e52c8"), ModelTypes.LOOKUP_ADAPTER);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER);
         final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -259,7 +259,7 @@ public class LookupDataAdapterFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create(ModelId.of("http-dsv"), ModelTypes.LOOKUP_ADAPTER));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv", ModelTypes.LOOKUP_ADAPTER));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)

@@ -51,6 +51,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.entities.references.ValueTyped;
@@ -121,7 +122,7 @@ public class ContentPackService {
         // Insertion order is important for created entities!
         final Map<EntityDescriptor, Object> createdEntities = new LinkedHashMap<>();
         final Map<EntityDescriptor, Object> allEntities = new HashMap<>();
-        final ImmutableSet.Builder<EntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
+        final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
 
         try {
             for (Entity entity : entitiesInOrder) {

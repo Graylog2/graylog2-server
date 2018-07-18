@@ -22,18 +22,18 @@ import org.graylog2.contentpacks.model.ModelType;
 
 @AutoValue
 public abstract class NativeEntity<T> {
-    public abstract EntityDescriptor descriptor();
+    public abstract NativeEntityDescriptor descriptor();
 
     public abstract T entity();
 
-    public static <T> NativeEntity<T> create(EntityDescriptor entityDescriptor, T entity) {
+    public static <T> NativeEntity<T> create(NativeEntityDescriptor entityDescriptor, T entity) {
         return new AutoValue_NativeEntity<>(entityDescriptor, entity);
     }
 
     /**
-     * Shortcut for {@link #create(EntityDescriptor, Object)}
+     * Shortcut for {@link #create(NativeEntityDescriptor, Object)}
      */
     public static <T> NativeEntity<T> create(String id, ModelType type, T entity) {
-        return create(EntityDescriptor.create(ModelId.of(id), type), entity);
+        return create(NativeEntityDescriptor.create(id, type), entity);
     }
 }
