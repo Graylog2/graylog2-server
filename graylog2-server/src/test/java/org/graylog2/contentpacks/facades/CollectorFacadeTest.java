@@ -236,7 +236,7 @@ public class CollectorFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
 
@@ -261,7 +261,7 @@ public class CollectorFacadeTest {
                         ValueReference.of("")), JsonNode.class))
                 .build();
 
-        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), Collections.emptyMap());
         assertThat(graph.nodes()).containsOnly(entity);
     }
 }

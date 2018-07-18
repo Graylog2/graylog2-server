@@ -51,15 +51,15 @@ public interface EntityFacade<T> {
 
     Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor);
 
-    default Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    default Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entityDescriptor);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
-    default Graph<Entity> resolve(Entity entity,
-                                  Map<String, ValueReference> parameters,
-                                  Map<EntityDescriptor, Entity> entities) {
+    default Graph<Entity> resolveForInstallation(Entity entity,
+                                                 Map<String, ValueReference> parameters,
+                                                 Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
         return ImmutableGraph.copyOf(mutableGraph);

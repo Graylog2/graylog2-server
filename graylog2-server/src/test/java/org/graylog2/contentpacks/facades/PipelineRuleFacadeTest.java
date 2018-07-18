@@ -179,7 +179,7 @@ public class PipelineRuleFacadeTest {
                         ValueReference.of("Debug"),
                         ValueReference.of("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")), JsonNode.class))
                 .build();
-        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), Collections.emptyMap());
         assertThat(graph.nodes()).containsOnly(entity);
     }
 
@@ -187,7 +187,7 @@ public class PipelineRuleFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
 

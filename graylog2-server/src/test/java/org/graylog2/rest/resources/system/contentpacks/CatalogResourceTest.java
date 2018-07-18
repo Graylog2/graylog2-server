@@ -107,7 +107,7 @@ public class CatalogResourceTest {
                 .data(new ObjectNode(JsonNodeFactory.instance).put("test", "1234"))
                 .build();
         final EntityWithConstraints entityWithConstraints = EntityWithConstraints.create(entity);
-        when(mockEntityFacade.resolve(entityDescriptor)).thenReturn(entityDescriptors);
+        when(mockEntityFacade.resolveNativeEntity(entityDescriptor)).thenReturn(entityDescriptors);
         when(mockEntityFacade.exportEntity(entityDescriptor)).thenReturn(Optional.of(entityWithConstraints));
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());

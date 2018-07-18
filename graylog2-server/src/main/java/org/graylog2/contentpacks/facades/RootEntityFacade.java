@@ -68,14 +68,14 @@ public class RootEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         return Graphs.emptyDirectedGraph();
     }
 
     @Override
-    public Graph<Entity> resolve(Entity entity,
-                                 Map<String, ValueReference> parameters,
-                                 Map<EntityDescriptor, Entity> entities) {
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
         return Graphs.emptyDirectedGraph();
     }
 }

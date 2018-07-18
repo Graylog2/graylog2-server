@@ -226,7 +226,7 @@ public class ContentPackService {
             }
 
             final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
-            final Graph<EntityDescriptor> graph = facade.resolve(entityDescriptor);
+            final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
             LOG.trace("Dependencies of entity {}: {}", entityDescriptor, graph);
 
             Graphs.merge(mutableGraph, graph);
@@ -272,7 +272,7 @@ public class ContentPackService {
             final Entity entity = entry.getValue();
 
             final EntityFacade<?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
-            final Graph<Entity> entityGraph = facade.resolve(entity, parameters, entityDescriptorMap);
+            final Graph<Entity> entityGraph = facade.resolveForInstallation(entity, parameters, entityDescriptorMap);
             LOG.trace("Dependencies of entity {}: {}", entityDescriptor, entityGraph);
 
             dependencyGraph.putEdge(rootEntity, entity);

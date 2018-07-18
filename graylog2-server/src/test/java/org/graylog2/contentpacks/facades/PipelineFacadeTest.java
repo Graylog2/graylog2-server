@@ -225,7 +225,7 @@ public class PipelineFacadeTest {
         when(pipelineRuleParser.parsePipeline("dummy", "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"))
                 .thenReturn(pipeline);
         final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(
                 descriptor,
                 EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM),
@@ -305,7 +305,7 @@ public class PipelineFacadeTest {
         when(pipelineRuleParser.parsePipeline(eq("dummy"), anyString())).thenReturn(pipeline);
         final EntityDescriptor pipelineEntity = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
 
-        final Graph<EntityDescriptor> graph = facade.resolve(pipelineEntity);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(pipelineEntity);
 
         final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
         final EntityDescriptor ruleEntity1 = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE);

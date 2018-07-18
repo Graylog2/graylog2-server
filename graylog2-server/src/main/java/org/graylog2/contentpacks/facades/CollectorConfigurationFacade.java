@@ -140,7 +140,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
-    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entityDescriptor);
 
@@ -158,9 +158,9 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
-    public Graph<Entity> resolve(Entity entity,
-                                 Map<String, ValueReference> parameters,
-                                 Map<EntityDescriptor, Entity> entities) {
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
         if (entity instanceof EntityV1) {
             return resolveEntityV1((EntityV1) entity, parameters, entities);
         } else {

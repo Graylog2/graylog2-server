@@ -243,7 +243,7 @@ public class DashboardFacadeTest {
         final EntityDescriptor dashboardEntity = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD);
         final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
 
-        final Graph<EntityDescriptor> graph = facade.resolve(dashboardEntity);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(dashboardEntity);
         assertThat(graph.nodes())
                 .containsOnly(dashboardEntity, streamEntity);
     }
@@ -262,7 +262,7 @@ public class DashboardFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         final EntityDescriptor expectedStream = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
 
         assertThat(graph.nodes()).containsOnly(descriptor, expectedStream);
@@ -300,7 +300,7 @@ public class DashboardFacadeTest {
                         ValueReference.of(false)), JsonNode.class))
                 .build();
         final Map<EntityDescriptor, Entity> entityDescriptorVMap = Collections.singletonMap(streamDescriptor, streamEntity);
-        final Graph<Entity> graph = facade.resolve(dashboardEntity, Collections.emptyMap(), entityDescriptorVMap);
+        final Graph<Entity> graph = facade.resolveForInstallation(dashboardEntity, Collections.emptyMap(), entityDescriptorVMap);
 
         assertThat(graph.nodes()).containsOnly(dashboardEntity, streamEntity);
     }

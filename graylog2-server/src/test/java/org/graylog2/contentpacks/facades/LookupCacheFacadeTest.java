@@ -217,7 +217,7 @@ public class LookupCacheFacadeTest {
                 ), JsonNode.class))
                 .build();
 
-        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), Collections.emptyMap());
         assertThat(graph.nodes()).containsOnly(entity);
     }
 
@@ -226,7 +226,7 @@ public class LookupCacheFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
 

@@ -189,7 +189,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entityDescriptor);
 
@@ -207,19 +207,19 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public Graph<Entity> resolve(Entity entity,
-                                 Map<String, ValueReference> parameters,
-                                 Map<EntityDescriptor, Entity> entities) {
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
         if (entity instanceof EntityV1) {
-            return resolve((EntityV1) entity, parameters, entities);
+            return resolveForInstallation((EntityV1) entity, parameters, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Graph<Entity> resolve(EntityV1 entity,
-                                  Map<String, ValueReference> parameters,
-                                  Map<EntityDescriptor, Entity> entities) {
+    private Graph<Entity> resolveForInstallation(EntityV1 entity,
+                                                 Map<String, ValueReference> parameters,
+                                                 Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
 

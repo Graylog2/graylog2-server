@@ -270,7 +270,7 @@ public class LookupTableFacadeTest {
         final Map<EntityDescriptor, Entity> entities = ImmutableMap.of(
                 cacheEntity.toEntityDescriptor(), cacheEntity,
                 dataAdapterEntity.toEntityDescriptor(), dataAdapterEntity);
-        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), entities);
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entities);
 
         assertThat(graph.nodes())
                 .hasSize(3)
@@ -282,7 +282,7 @@ public class LookupTableFacadeTest {
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE);
 
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes())
                 .hasSize(3)
                 .containsOnly(

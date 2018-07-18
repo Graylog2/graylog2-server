@@ -150,7 +150,7 @@ public class GrokPatternFacadeTest {
     public void resolveEntityDescriptor() throws ValidationException {
         final GrokPattern grokPattern = grokPatternService.save(GrokPattern.create("Test1", "[a-z]+"));
         final EntityDescriptor descriptor = EntityDescriptor.create(grokPattern.id(), ModelTypes.GROK_PATTERN);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
 
@@ -161,7 +161,7 @@ public class GrokPatternFacadeTest {
                 .type(ModelTypes.GROK_PATTERN)
                 .data(NullNode.getInstance())
                 .build();
-        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), Collections.emptyMap());
         assertThat(graph.nodes()).containsOnly(entity);
     }
 

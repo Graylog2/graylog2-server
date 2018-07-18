@@ -196,7 +196,7 @@ public class OutputFacadeTest {
                         ReferenceMapUtils.toReferenceMap(ImmutableMap.of("prefix", "Writing message: "))
                 ), JsonNode.class))
                 .build();
-        final Graph<Entity> graph = facade.resolve(entity, Collections.emptyMap(), Collections.emptyMap());
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), Collections.emptyMap());
         assertThat(graph.nodes()).containsOnly(entity);
     }
 
@@ -204,7 +204,7 @@ public class OutputFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT);
-        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
 

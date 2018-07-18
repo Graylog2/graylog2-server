@@ -72,15 +72,15 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Graph<EntityDescriptor> resolve(EntityDescriptor entityDescriptor) {
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         LOG.warn("Couldn't resolve entity {}", entityDescriptor);
         return Graphs.emptyDirectedGraph();
     }
 
     @Override
-    public Graph<Entity> resolve(Entity entity,
-                                 Map<String, ValueReference> parameters,
-                                 Map<EntityDescriptor, Entity> entities) {
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
         LOG.warn("Couldn't resolve entity {}", entity.toEntityDescriptor());
         return Graphs.emptyDirectedGraph();
     }
