@@ -11,6 +11,7 @@ import ColumnPivotSelect from './ColumnPivotSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import { PivotList } from './AggregationBuilderPropTypes';
+import DescriptionBox from './DescriptionBox';
 
 export default class AggregationControls extends React.Component {
   static propTypes = {
@@ -79,21 +80,31 @@ export default class AggregationControls extends React.Component {
       <span>
         <Row>
           <Col md={3} style={{ paddingRight: '2px' }}>
-            <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
+            <DescriptionBox description="Visualization Type">
+              <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
+            </DescriptionBox>
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <RowPivotSelect fields={formattedFields} rowPivots={rowPivots} onChange={this._onRowPivotChange} />
+            <DescriptionBox description="Row Pivots">
+              <RowPivotSelect fields={formattedFields} rowPivots={rowPivots} onChange={this._onRowPivotChange} />
+            </DescriptionBox>
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <ColumnPivotSelect fields={formattedFields} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
+            <DescriptionBox description="Column Pivots">
+              <ColumnPivotSelect fields={formattedFields} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
+            </DescriptionBox>
           </Col>
           <Col md={2} style={{ paddingLeft: '2px' }}>
-            <SortSelect fields={currentlyUsedFields} sort={sort} onChange={this._onSortChange} />
+            <DescriptionBox description="Sorting">
+              <SortSelect fields={currentlyUsedFields} sort={sort} onChange={this._onSortChange} />
+            </DescriptionBox>
           </Col>
         </Row>
-        <Row style={{ height: 'calc(100% - 60px)' }}>
+        <Row style={{ height: 'calc(100% - 110px)' }}>
           <Col md={2}>
-            <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series} />
+            <DescriptionBox description="Series">
+              <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series} />
+            </DescriptionBox>
           </Col>
           <Col md={10} style={{ height: '100%' }}>
             {children}

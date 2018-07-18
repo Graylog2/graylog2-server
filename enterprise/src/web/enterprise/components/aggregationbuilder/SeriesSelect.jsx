@@ -57,7 +57,7 @@ class SeriesSelect extends React.Component {
 
   render() {
     const { series } = this.props;
-    return (<Select placeholder="Click to add Series..."
+    return (<Select placeholder="None: click to add series"
                     onChange={this._onChange}
                     options={this.state.options}
                     value={series.map(_wrapOption)}

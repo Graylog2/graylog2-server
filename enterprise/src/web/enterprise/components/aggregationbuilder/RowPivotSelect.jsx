@@ -6,7 +6,7 @@ import { FieldList, PivotList } from './AggregationBuilderPropTypes';
 
 const RowPivotSelect = ({ fields, onChange, rowPivots }) => (
   <SortableSelect
-    placeholder="Row pivot"
+    placeholder="None: click to add fields"
     onChange={onChange}
     options={fields}
     value={rowPivots}

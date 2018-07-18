@@ -6,7 +6,7 @@ import SortableSelect from './SortableSelect';
 
 const SortSelect = ({ fields, onChange, sort }) => (
   <SortableSelect
-    placeholder="Sort"
+    placeholder="None: click to add fields"
     onChange={onChange}
     options={fields}
     value={sort}
