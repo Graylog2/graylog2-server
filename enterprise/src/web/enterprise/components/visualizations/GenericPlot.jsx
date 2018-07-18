@@ -20,7 +20,7 @@ const GenericPlot = ({ chartData }) => (
             pad: 0,
           },
         }}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: 'calc(100% - 10px)', width: '100%' }}
         config={{ displayModeBar: false }} />
 );
 
