@@ -43,7 +43,7 @@ import java.util.Set;
 
 @Singleton
 public class ContentPackPersistenceService {
-    private static final String COLLECTION_NAME = "content_packs";
+    public static final String COLLECTION_NAME = "content_packs";
 
     private final JacksonDBCollection<ContentPack, ObjectId> dbCollection;
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackPersistenceService.class);
