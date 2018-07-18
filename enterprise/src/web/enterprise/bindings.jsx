@@ -26,6 +26,7 @@ import DataTable from 'enterprise/components/datatable/DataTable';
 import WorldMapVisualization from './components/visualizations/worldmap/WorldMapVisualization';
 import FieldStatisticsHandler from './logic/fieldactions/FieldStatisticsHandler';
 import NumberVisualization from './components/visualizations/number/NumberVisualization';
+import ExcludeFromQueryHandler from './logic/valueactions/ExcludeFromQueryHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -131,10 +132,7 @@ export default {
     {
       type: 'exclude',
       title: 'Exclude from results',
-    },
-    {
-      type: 'search',
-      title: 'Search for values like this',
+      handler: new ExcludeFromQueryHandler().handle,
     },
     {
       type: 'add-to-query',

@@ -1,9 +1,9 @@
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
+import { QueriesActions } from '../../stores/QueriesStore';
 import QueryManipulationHandler from './QueryManipulationHandler';
 
-export default class AddToQueryHandler extends QueryManipulationHandler {
+export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
   formatNewQuery = (oldQuery, field, value) => {
-    const fieldPredicate = `${field}:${this.escape(value)}`;
+    const fieldPredicate = `NOT ${field}:${this.escape(value)}`;
 
     return this.addToQuery(oldQuery, fieldPredicate);
   };
