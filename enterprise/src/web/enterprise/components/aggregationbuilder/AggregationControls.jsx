@@ -76,6 +76,7 @@ export default class AggregationControls extends React.Component {
     const currentlyUsedFields = [].concat(rowPivots, columnPivots, series)
       .sort(naturalSort)
       .map(v => ({ label: v, value: v }));
+    const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     return (
       <span>
         <Row>
@@ -86,12 +87,12 @@ export default class AggregationControls extends React.Component {
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
             <DescriptionBox description="Row Pivots">
-              <RowPivotSelect fields={formattedFields} rowPivots={rowPivots} onChange={this._onRowPivotChange} />
+              <RowPivotSelect fields={formattedFieldsOptions} rowPivots={rowPivots} onChange={this._onRowPivotChange} />
             </DescriptionBox>
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
             <DescriptionBox description="Column Pivots">
-              <ColumnPivotSelect fields={formattedFields} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
+              <ColumnPivotSelect fields={formattedFieldsOptions} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
             </DescriptionBox>
           </Col>
           <Col md={2} style={{ paddingLeft: '2px' }}>
