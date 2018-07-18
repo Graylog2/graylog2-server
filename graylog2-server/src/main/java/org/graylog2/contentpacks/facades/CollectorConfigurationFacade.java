@@ -101,6 +101,12 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
+    public Optional<NativeEntity<Configuration>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
+        // TODO: Check if multiple configurations are allowed to exist (bernd)
+        return Optional.empty();
+    }
+
+    @Override
     public void delete(Configuration nativeEntity) {
         configurationService.delete(nativeEntity.id());
     }
