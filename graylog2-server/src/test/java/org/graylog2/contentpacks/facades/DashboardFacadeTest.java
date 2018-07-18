@@ -137,7 +137,7 @@ public class DashboardFacadeTest {
         final DashboardImpl dashboard = new DashboardImpl(fields);
         dashboard.addWidget(dashboardWidget);
 
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(dashboard);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(dashboard);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

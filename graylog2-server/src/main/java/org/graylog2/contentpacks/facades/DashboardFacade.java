@@ -93,7 +93,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(Dashboard dashboard) {
+    public EntityWithConstraints exportNativeEntity(Dashboard dashboard) {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
@@ -280,7 +280,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Dashboard dashboard = dashboardService.load(modelId.id());
-            return Optional.of(exportEntity(dashboard));
+            return Optional.of(exportNativeEntity(dashboard));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
             return Optional.empty();

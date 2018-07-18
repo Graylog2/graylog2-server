@@ -61,7 +61,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     @Override
-    public EntityWithConstraints exportEntity(Configuration configuration) {
+    public EntityWithConstraints exportNativeEntity(Configuration configuration) {
         final CollectorConfigurationEntity configurationEntity = CollectorConfigurationEntity.create(
                 ValueReference.of(configuration.collectorId()),
                 ValueReference.of(configuration.name()),
@@ -136,7 +136,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
             return Optional.empty();
         }
 
-        return Optional.of(exportEntity(configuration));
+        return Optional.of(exportNativeEntity(configuration));
     }
 
     @Override

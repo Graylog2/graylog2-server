@@ -58,7 +58,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(GrokPattern grokPattern) {
+    public EntityWithConstraints exportNativeEntity(GrokPattern grokPattern) {
         final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(
                 ValueReference.of(grokPattern.name()),
                 ValueReference.of(grokPattern.pattern()));
@@ -149,7 +149,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
-            return Optional.of(exportEntity(grokPattern));
+            return Optional.of(exportNativeEntity(grokPattern));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
             return Optional.empty();

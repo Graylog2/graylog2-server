@@ -63,7 +63,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(CacheDto cacheDto) {
+    public EntityWithConstraints exportNativeEntity(CacheDto cacheDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(
@@ -159,6 +159,6 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     @Override
     public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return cacheService.get(modelId.id()).map(this::exportEntity);
+        return cacheService.get(modelId.id()).map(this::exportNativeEntity);
     }
 }

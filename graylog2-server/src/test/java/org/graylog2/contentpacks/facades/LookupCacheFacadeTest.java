@@ -93,7 +93,7 @@ public class LookupCacheFacadeTest {
                 .description("Cache Description")
                 .config(new FallbackCacheConfig())
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(cacheDto);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(cacheDto);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

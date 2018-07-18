@@ -89,7 +89,7 @@ public class PipelineRuleFacadeTest {
                 .description("description")
                 .source("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(pipelineRule);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(pipelineRule);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

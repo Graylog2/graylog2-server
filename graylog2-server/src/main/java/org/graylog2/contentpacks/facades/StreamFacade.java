@@ -81,7 +81,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(Stream stream) {
+    public EntityWithConstraints exportNativeEntity(Stream stream) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
@@ -241,7 +241,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            return Optional.of(exportEntity(stream));
+            return Optional.of(exportNativeEntity(stream));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();

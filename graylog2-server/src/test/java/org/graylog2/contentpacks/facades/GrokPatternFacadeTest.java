@@ -69,7 +69,7 @@ public class GrokPatternFacadeTest {
     @Test
     public void exportNativeEntity() {
         final GrokPattern grokPattern = GrokPattern.create("01234567890", "name", "pattern", null);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(grokPattern);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(grokPattern);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

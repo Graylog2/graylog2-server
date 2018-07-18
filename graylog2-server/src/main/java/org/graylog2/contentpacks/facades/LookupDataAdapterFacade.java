@@ -63,7 +63,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(DataAdapterDto dataAdapterDto) {
+    public EntityWithConstraints exportNativeEntity(DataAdapterDto dataAdapterDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(dataAdapterDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupDataAdapterEntity lookupDataAdapterEntity = LookupDataAdapterEntity.create(
@@ -160,6 +160,6 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     @Override
     public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return dataAdapterService.get(modelId.id()).map(this::exportEntity);
+        return dataAdapterService.get(modelId.id()).map(this::exportNativeEntity);
     }
 }

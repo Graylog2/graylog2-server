@@ -147,7 +147,7 @@ public class StreamCatalogTest {
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId();
         final StreamImpl stream = new StreamImpl(streamId, streamFields, streamRules, outputs, null);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(stream);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(stream);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

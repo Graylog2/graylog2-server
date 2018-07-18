@@ -38,7 +38,7 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     public static final UnsupportedEntityFacade INSTANCE = new UnsupportedEntityFacade();
 
     @Override
-    public EntityWithConstraints exportEntity(Void nativeEntity) {
+    public EntityWithConstraints exportNativeEntity(Void nativeEntity) {
         throw new UnsupportedOperationException("Unsupported entity");
     }
 

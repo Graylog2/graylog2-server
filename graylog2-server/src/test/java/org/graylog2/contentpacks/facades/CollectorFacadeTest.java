@@ -72,7 +72,7 @@ public class CollectorFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(collector);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(collector);
 
         assertThat(entityWithConstraints.constraints()).isEmpty();
         final Entity expectedEntity = EntityV1.builder()

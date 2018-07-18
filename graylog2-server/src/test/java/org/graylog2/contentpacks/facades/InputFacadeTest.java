@@ -144,7 +144,7 @@ public class InputFacadeTest {
         final InputImpl input = new InputImpl(fields);
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(inputWithExtractors);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(inputWithExtractors);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

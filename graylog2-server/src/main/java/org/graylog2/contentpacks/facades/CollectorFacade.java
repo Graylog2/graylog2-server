@@ -59,7 +59,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(Collector collector) {
+    public EntityWithConstraints exportNativeEntity(Collector collector) {
         final List<ValueReference> executeParameters = collector.executeParameters().stream()
                 .map(ValueReference::of)
                 .collect(Collectors.toList());
@@ -180,6 +180,6 @@ public class CollectorFacade implements EntityFacade<Collector> {
             return Optional.empty();
         }
 
-        return Optional.of(exportEntity(collector));
+        return Optional.of(exportNativeEntity(collector));
     }
 }

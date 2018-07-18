@@ -82,7 +82,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(PipelineDao pipelineDao) {
+    public EntityWithConstraints exportNativeEntity(PipelineDao pipelineDao) {
         final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id());
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),
@@ -225,7 +225,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());
-            return Optional.of(exportEntity(pipelineDao));
+            return Optional.of(exportNativeEntity(pipelineDao));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);
             return Optional.empty();

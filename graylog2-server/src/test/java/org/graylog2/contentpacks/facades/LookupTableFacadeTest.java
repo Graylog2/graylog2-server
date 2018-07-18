@@ -100,7 +100,7 @@ public class LookupTableFacadeTest {
                 .defaultMultiValue("default-multi")
                 .defaultMultiValueType(LookupDefaultValue.Type.STRING)
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(lookupTableDto);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(lookupTableDto);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

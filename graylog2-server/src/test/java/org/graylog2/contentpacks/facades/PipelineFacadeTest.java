@@ -117,7 +117,7 @@ public class PipelineFacadeTest {
         final PipelineConnections connections = PipelineConnections.create("id", "stream-1234", Collections.singleton("pipeline-1234"));
         connectionsService.save(connections);
 
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(pipeline);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(pipeline);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

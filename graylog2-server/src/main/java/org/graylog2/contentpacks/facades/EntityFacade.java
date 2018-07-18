@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EntityFacade<T> {
-    EntityWithConstraints exportEntity(T nativeEntity);
+    EntityWithConstraints exportNativeEntity(T nativeEntity);
 
     NativeEntity<T> createNativeEntity(Entity entity,
                                        Map<String, ValueReference> parameters,

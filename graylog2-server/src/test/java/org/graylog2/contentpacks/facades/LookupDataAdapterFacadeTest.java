@@ -91,7 +91,7 @@ public class LookupDataAdapterFacadeTest {
                 .description("Data Adapter Description")
                 .config(new FallbackAdapterConfig())
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(dataAdapterDto);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(dataAdapterDto);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

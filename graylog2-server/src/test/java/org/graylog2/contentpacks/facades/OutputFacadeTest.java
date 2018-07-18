@@ -113,7 +113,7 @@ public class OutputFacadeTest {
                 new Date(0L),
                 null
         );
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(output);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(output);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -132,7 +132,7 @@ public class OutputFacadeTest {
     public void exportNativeEntity() throws NotFoundException {
         final Output output = outputService.load("5adf239e4b900a0fdb4e5197");
 
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(output);
+        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(output);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);

@@ -109,7 +109,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(InputWithExtractors inputWithExtractors) {
+    public EntityWithConstraints exportNativeEntity(InputWithExtractors inputWithExtractors) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
@@ -433,7 +433,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         try {
             final Input input = inputService.find(modelId.id());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            return Optional.of(exportEntity(inputWithExtractors));
+            return Optional.of(exportNativeEntity(inputWithExtractors));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

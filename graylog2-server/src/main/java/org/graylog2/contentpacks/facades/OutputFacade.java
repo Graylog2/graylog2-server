@@ -73,7 +73,7 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(Output output) {
+    public EntityWithConstraints exportNativeEntity(Output output) {
         final OutputEntity outputEntity = OutputEntity.create(
                 ValueReference.of(output.getTitle()),
                 ValueReference.of(output.getType()),
@@ -161,7 +161,7 @@ public class OutputFacade implements EntityFacade<Output> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Output output = outputService.load(modelId.id());
-            return Optional.of(exportEntity(output));
+            return Optional.of(exportNativeEntity(output));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find output {}", entityDescriptor, e);
             return Optional.empty();

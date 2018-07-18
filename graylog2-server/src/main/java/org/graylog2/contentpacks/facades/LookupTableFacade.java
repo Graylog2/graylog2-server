@@ -63,7 +63,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public EntityWithConstraints exportEntity(LookupTableDto lookupTableDto) {
+    public EntityWithConstraints exportNativeEntity(LookupTableDto lookupTableDto) {
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
                 ValueReference.of(lookupTableDto.name()),
                 ValueReference.of(lookupTableDto.title()),
@@ -185,7 +185,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     @Override
     public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
-        return lookupTableService.get(modelId.id()).map(this::exportEntity);
+        return lookupTableService.get(modelId.id()).map(this::exportNativeEntity);
     }
 
     @Override
