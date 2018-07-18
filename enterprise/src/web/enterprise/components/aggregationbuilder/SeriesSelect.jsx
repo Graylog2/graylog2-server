@@ -15,12 +15,19 @@ const _wrapOption = opt => ({ label: opt, value: opt });
 
 const _makeIncompleteFunction = fun => ({ label: `${fun}(...)`, value: fun, incomplete: true });
 
+const _defaultFunctions = (functions) => {
+  return [].concat(
+    [_wrapOption('count()')],
+    Object.keys(functions).map(_makeIncompleteFunction),
+  );
+};
+
 class SeriesSelect extends React.Component {
   constructor(props, context) {
     super(props, context);
     const { functions } = props;
     this.state = {
-      options: Object.keys(functions).map(_makeIncompleteFunction),
+      options: _defaultFunctions(functions),
     };
   }
   _onChange = (newSeries) => {
@@ -48,7 +55,7 @@ class SeriesSelect extends React.Component {
 
   _resetToFunctions = () => {
     const { functions } = this.props;
-    this.setState({ options: Object.keys(functions).map(_makeIncompleteFunction) });
+    this.setState({ options: _defaultFunctions(functions) });
   };
 
   _onClose = () => {
