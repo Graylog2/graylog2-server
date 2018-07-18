@@ -11,6 +11,7 @@ import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore';
 import StaticMessageList from './messagelist/StaticMessageList';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
+import EmptySearchResult from './EmptySearchResult';
 
 const _onPositionsChange = (positions) => {
   const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width)])).toJS();
@@ -48,21 +49,25 @@ const _extractMessages = (searchTypes) => {
 
 const Query = ({ children, allFields, fields, onToggleMessages, results, positions, showMessages, widgetMapping, widgets, queryId }) => {
   if (results) {
-    const messages = _extractMessages(results.searchTypes);
-    const staticWidgets = [
-      <StaticMessageList key="staticMessageList"
-                         messages={messages}
-                         onToggleMessages={onToggleMessages}
-                         showMessages={showMessages} />,
-    ];
-    const widgetGrid = _renderWidgetGrid(widgets, widgetMapping.toJS(), results.searchTypes, positions, queryId, fields, allFields, staticWidgets);
+    let content;
+    if (results.documentCount === 0) {
+      content = <EmptySearchResult />;
+    } else {
+      const staticWidgets = [
+        <StaticMessageList key="staticMessageList"
+                           messages={results.messages}
+                           onToggleMessages={onToggleMessages}
+                           showMessages={showMessages} />,
+      ];
+      content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results.searchTypes, positions, queryId, fields, allFields, staticWidgets);
+    }
     return (
       <span>
         <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
           {children}
         </Col>
         <Col md={9}>
-          {widgetGrid}
+          {content}
         </Col>
       </span>
     );
