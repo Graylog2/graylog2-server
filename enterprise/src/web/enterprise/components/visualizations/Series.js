@@ -1,6 +1,6 @@
 import { flatten, isEqual, set } from 'lodash';
 
-const seriesRegex = /^(\w+)\((\w*)\)$/;
+export const seriesRegex = /^(\w+)\((\w*)\)$/;
 
 export const parseSeries = (s) => {
   const [_, type, field] = seriesRegex.exec(s);
