@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
@@ -41,11 +42,14 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -57,12 +61,14 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -82,6 +88,7 @@ public class PipelineFacadeTest {
 
     @Mock
     private PipelineRuleParser pipelineRuleParser;
+    private PipelineService pipelineService;
     private PipelineStreamConnectionsService connectionsService;
 
     private PipelineFacade facade;
@@ -93,14 +100,14 @@ public class PipelineFacadeTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
 
-        final PipelineService pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
+        pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser);
     }
 
     @Test
-    public void encode() {
+    public void exportEntity() {
         final PipelineDao pipeline = PipelineDao.builder()
                 .id("pipeline-1234")
                 .title("title")
@@ -123,6 +130,106 @@ public class PipelineFacadeTest {
         assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("description"));
         assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("pipeline \"Test\"");
         assertThat(pipelineEntity.connectedStreams()).containsOnly(ValueReference.of("stream-1234"));
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportNativeEntity() {
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("Test"), ModelTypes.PIPELINE);
+        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = entityWithConstraints.entity();
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of("Test"));
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
+        assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("Test"));
+        assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("Description"));
+        assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("pipeline \"Test\"");
+        assertThat(pipelineEntity.connectedStreams()).containsOnly(ValueReference.of("5adf23894b900a0fdb4e517d"));
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void createNativeEntity() throws NotFoundException {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.PIPELINE)
+                .data(objectMapper.convertValue(PipelineEntity.create(
+                        ValueReference.of("Title"),
+                        ValueReference.of("Description"),
+                        ValueReference.of("pipeline \"Title\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"),
+                        Collections.singleton(ValueReference.of("5adf23894b900a0f00000001"))), JsonNode.class))
+                .build();
+
+        final EntityDescriptor streamDescriptor = EntityDescriptor.create(ModelId.of("5adf23894b900a0f00000001"), ModelTypes.STREAM);
+        final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("5adf23894b900a0f00000001");
+        final Map<EntityDescriptor, Object> nativeEntities = Collections.singletonMap(streamDescriptor, stream);
+        final NativeEntity<PipelineDao> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
+
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.PIPELINE);
+        assertThat(nativeEntity.entity().title()).isEqualTo("Title");
+        assertThat(nativeEntity.entity().description()).isEqualTo("Description");
+        assertThat(nativeEntity.entity().source()).startsWith("pipeline \"Title\"");
+
+        assertThat(connectionsService.load("5adf23894b900a0f00000001").pipelineIds())
+                .containsOnly(nativeEntity.entity().id());
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() throws NotFoundException {
+        final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be3");
+
+        assertThat(pipelineService.loadAll()).hasSize(1);
+        facade.delete(pipelineDao);
+        assertThat(pipelineService.loadAll()).isEmpty();
+
+        assertThatThrownBy(() -> pipelineService.load("5a85c4854b900afd5d662be3"))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findExisting() {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.PIPELINE)
+                .data(objectMapper.convertValue(PipelineEntity.create(
+                        ValueReference.of("Title"),
+                        ValueReference.of("Description"),
+                        ValueReference.of("pipeline \"Title\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"),
+                        Collections.singleton(ValueReference.of("5adf23894b900a0f00000001"))), JsonNode.class))
+                .build();
+
+        final Optional<NativeEntity<PipelineDao>> existingEntity = facade.findExisting(entity, Collections.emptyMap());
+        assertThat(existingEntity).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveEntityDescriptor() {
+        final Stage stage = Stage.builder()
+                .stage(0)
+                .matchAll(false)
+                .ruleReferences(Collections.singletonList("no-op"))
+                .build();
+        final Pipeline pipeline = Pipeline.builder()
+                .id("id")
+                .name("Test")
+                .stages(ImmutableSortedSet.of(stage))
+                .build();
+        when(pipelineRuleParser.parsePipeline("dummy", "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"))
+                .thenReturn(pipeline);
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of("Test"), ModelTypes.PIPELINE);
+        final Graph<EntityDescriptor> graph = facade.resolve(descriptor);
+        assertThat(graph.nodes()).containsOnly(
+                descriptor,
+                EntityDescriptor.create(ModelId.of("5adf23894b900a0fdb4e517d"), ModelTypes.STREAM),
+                EntityDescriptor.create(ModelId.of("no-op"), ModelTypes.PIPELINE_RULE));
     }
 
     @Test
@@ -172,7 +279,6 @@ public class PipelineFacadeTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolve() {
         final Stage stage = Stage.builder()
                 .stage(0)

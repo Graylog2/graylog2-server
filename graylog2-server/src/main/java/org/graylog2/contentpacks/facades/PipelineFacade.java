@@ -30,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog2.contentpacks.exceptions.MissingNativeEntityException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -136,18 +137,27 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 .map(valueReference -> valueReference.asString(parameters))
                 .map(streamId -> EntityDescriptor.create(ModelId.of(streamId), ModelTypes.STREAM))
                 .collect(Collectors.toSet());
-        final Set<Stream> connectedStreams = connectedStreamEntities.stream()
-                .map(nativeEntities::get)
-                .filter(nativeEntity -> nativeEntity instanceof Stream)
-                .map(Stream.class::cast)
-                .collect(Collectors.toSet());
+        final Set<Stream> connectedStreams = connectedStreams(connectedStreamEntities, nativeEntities);
         createPipelineConnections(pipelineId, connectedStreams);
 
         return NativeEntity.create(pipelineId, TYPE, savedPipelineDao);
     }
 
+    private Set<Stream> connectedStreams(Set<EntityDescriptor> connectedStreamEntities, Map<EntityDescriptor, Object> nativeEntities) {
+        final ImmutableSet.Builder<Stream> streams = ImmutableSet.builder();
+        for (EntityDescriptor descriptor : connectedStreamEntities) {
+            final Object stream = nativeEntities.get(descriptor);
+            if (stream instanceof Stream) {
+                streams.add((Stream) stream);
+            } else {
+                throw new MissingNativeEntityException(descriptor);
+            }
+        }
+        return streams.build();
+    }
+
     private void createPipelineConnections(String pipelineId, Set<Stream> connectedStreams) {
-        for (Stream stream: connectedStreams) {
+        for (Stream stream : connectedStreams) {
             final String streamId = stream.getId();
             try {
                 final PipelineConnections connections = connectionsService.load(streamId);
@@ -235,14 +245,14 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             referencedRules.stream()
                     .map(ModelId::of)
                     .map(id -> EntityDescriptor.create(id, ModelTypes.PIPELINE_RULE))
-                    .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));
+                    .forEach(rule -> mutableGraph.putEdge(entityDescriptor, rule));
 
             final Set<PipelineConnections> pipelineConnections = connectionsService.loadByPipelineId(pipelineDao.id());
             pipelineConnections.stream()
                     .map(PipelineConnections::streamId)
                     .map(ModelId::of)
                     .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM))
-                    .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));
+                    .forEach(stream -> mutableGraph.putEdge(entityDescriptor, stream));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);
         }
