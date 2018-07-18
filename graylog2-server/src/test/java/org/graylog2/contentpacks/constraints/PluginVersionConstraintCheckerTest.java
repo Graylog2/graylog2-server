@@ -35,7 +35,7 @@ public class PluginVersionConstraintCheckerTest {
     @Test
     public void checkConstraints() {
         final TestPluginMetaData pluginMetaData = new TestPluginMetaData();
-        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(pluginMetaData);
+        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(Collections.singleton(pluginMetaData));
 
         final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
                 .version("^2.0.0")
@@ -51,7 +51,7 @@ public class PluginVersionConstraintCheckerTest {
     @Test
     public void checkConstraintsFails() {
         final TestPluginMetaData pluginMetaData = new TestPluginMetaData();
-        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(pluginMetaData);
+        final PluginVersionConstraintChecker constraintChecker = new PluginVersionConstraintChecker(Collections.singleton(pluginMetaData));
 
         final GraylogVersionConstraint graylogVersionConstraint = GraylogVersionConstraint.builder()
                 .version("^2.0.0")

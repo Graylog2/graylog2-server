@@ -22,23 +22,23 @@ import com.vdurmont.semver4j.Semver;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.Version;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PluginVersionConstraintChecker implements ConstraintChecker {
-    private final Semver pluginVersion;
+    private final Set<Semver> pluginVersions;
 
-    public PluginVersionConstraintChecker(PluginMetaData pluginMetaData) {
-        this(pluginMetaData.getVersion().toString());
-    }
-
-    public PluginVersionConstraintChecker(String pluginVersion) {
-        this(new Semver(pluginVersion));
-    }
-
-    private PluginVersionConstraintChecker(Semver pluginVersion) {
-        this.pluginVersion = pluginVersion;
+    @Inject
+    public PluginVersionConstraintChecker(Set<PluginMetaData> pluginMetaData) {
+        pluginVersions = pluginMetaData.stream()
+                .map(PluginMetaData::getVersion)
+                .map(Version::toString)
+                .map(Semver::new)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -49,8 +49,10 @@ public class PluginVersionConstraintChecker implements ConstraintChecker {
                 final PluginVersionConstraint versionConstraint = (PluginVersionConstraint) constraint;
                 final Requirement requiredVersion = versionConstraint.version();
 
-                if (requiredVersion.isSatisfiedBy(pluginVersion)) {
-                    fulfilledConstraints.add(constraint);
+                for (Semver pluginVersion : pluginVersions) {
+                    if (requiredVersion.isSatisfiedBy(pluginVersion)) {
+                        fulfilledConstraints.add(constraint);
+                    }
                 }
             }
         }
