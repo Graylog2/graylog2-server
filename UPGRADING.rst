@@ -273,6 +273,7 @@ See also:
 * `cidr_match() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#cidr-match>`_
 * `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
 
+
 Changed metrics name for stream rules
 =====================================
 
@@ -285,3 +286,21 @@ Old metric name::
 New metric name::
 
     org.graylog2.plugin.streams.Stream.${stream-id}.StreamRule.${stream-rule-id}.executionTime
+
+
+Email alarm callback default settings
+=====================================
+
+The defaults of the configuration settings for the email alarm callback with regard to encrypted connections have been changed.
+
++-----------------------------+-------------+-------------+
+| Setting                     | Old default | New default |
++=============================+=============+=============+
+| ``transport_email_use_tls`` | ``false``   | ``true``    |
++-----------------------------+-------------+-------------+
+| ``transport_email_use_ssl`` | ``true``    | ``false``   |
++-----------------------------+-------------+-------------+
+
+Furthermore, it's not possible anymore to enable both settings (SMTP with STARTTLS and SMTP over SSL) at the same time because this led to errors at runtime when Graylog tried to upgrade the connection to TLS with STARTTLS in an already existing SMTPS connection.
+
+Most SMTP services prefer SMTP with STARTTLS to provide an encrypted connection.
