@@ -58,7 +58,11 @@ public class ContentPackPersistenceService {
     ContentPackPersistenceService(final JacksonDBCollection<ContentPack, ObjectId> dbCollection) {
         this.dbCollection = dbCollection;
 
-        dbCollection.createIndex(new BasicDBObject(Identified.FIELD_META_ID, 1).append(Revisioned.FIELD_META_REVISION, 1), new BasicDBObject("unique", true));
+        try {
+            dbCollection.createIndex(new BasicDBObject(Identified.FIELD_META_ID, 1).append(Revisioned.FIELD_META_REVISION, 1), new BasicDBObject("unique", true));
+        } catch (DuplicateKeyException e) {
+            // Ignore - this can happen if this runs before the migration of old content packs
+        }
     }
 
     public Set<ContentPack> loadAll() {
