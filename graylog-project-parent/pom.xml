@@ -396,12 +396,6 @@
                 <version>${jcip-annotations.version}</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-annotations</artifactId>
-                <version>${spotbugs-annotations.version}</version>
-                <scope>provided</scope>
-            </dependency>
 
             <dependency>
                 <groupId>org.graylog2</groupId>

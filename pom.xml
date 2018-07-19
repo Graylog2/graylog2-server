@@ -141,7 +141,6 @@
         <shiro.version>1.4.0</shiro.version>
         <sigar.version>1.6.4</sigar.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spotbugs-annotations.version>3.1.5</spotbugs-annotations.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.60</syslog4j.version>
         <uuid.version>3.2</uuid.version>
