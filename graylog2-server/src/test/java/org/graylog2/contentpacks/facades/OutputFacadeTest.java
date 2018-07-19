@@ -67,6 +67,7 @@ import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OutputFacadeTest {
     @ClassRule
@@ -94,7 +95,10 @@ public class OutputFacadeTest {
         outputService = new OutputServiceImpl(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry);
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
-        outputFactories.put("org.graylog2.outputs.LoggingOutput", mock(LoggingOutput.Factory.class));
+        final LoggingOutput.Factory factory = mock(LoggingOutput.Factory.class);
+        final LoggingOutput.Descriptor descriptor = mock(LoggingOutput.Descriptor.class);
+        when(factory.getDescriptor()).thenReturn(descriptor);
+        outputFactories.put("org.graylog2.outputs.LoggingOutput", factory);
 
         facade = new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories);
     }

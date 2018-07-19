@@ -81,6 +81,7 @@ import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InputFacadeTest {
     @ClassRule
@@ -119,8 +120,14 @@ public class InputFacadeTest {
         final InputRegistry inputRegistry = new InputRegistry();
         pluginMetaData = new HashSet<>();
         inputFactories = new HashMap<>();
-        inputFactories.put("org.graylog2.inputs.random.FakeHttpMessageInput", mock(FakeHttpMessageInput.Factory.class));
-        inputFactories.put("org.graylog2.inputs.raw.udp.RawUDPInput", mock(RawUDPInput.Factory.class));
+        final FakeHttpMessageInput.Factory fakeHttpMessageInputFactory = mock(FakeHttpMessageInput.Factory.class);
+        final FakeHttpMessageInput.Descriptor fakeHttpMessageInputDescriptor = mock(FakeHttpMessageInput.Descriptor.class);
+        when(fakeHttpMessageInputFactory.getDescriptor()).thenReturn(fakeHttpMessageInputDescriptor);
+        final RawUDPInput.Factory rawUDPInputFactory = mock(RawUDPInput.Factory.class);
+        final RawUDPInput.Descriptor rawUDPInputDescriptor = mock(RawUDPInput.Descriptor.class);
+        when(rawUDPInputFactory.getDescriptor()).thenReturn(rawUDPInputDescriptor);
+        inputFactories.put("org.graylog2.inputs.random.FakeHttpMessageInput", fakeHttpMessageInputFactory);
+        inputFactories.put("org.graylog2.inputs.raw.udp.RawUDPInput", rawUDPInputFactory);
 
         facade = new InputFacade(
                 objectMapper,

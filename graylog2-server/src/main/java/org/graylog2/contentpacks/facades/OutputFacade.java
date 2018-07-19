@@ -96,7 +96,8 @@ public class OutputFacade implements EntityFacade<Output> {
         if (outputFactory == null) {
             throw new ContentPackException("Unknown output type: " + output.getType());
         }
-        final String packageName = outputFactory.getClass().getPackage().getName();
+        // We have to use the descriptor because the factory is only a runtime-generated proxy. :(
+        final String packageName = outputFactory.getDescriptor().getClass().getPackage().getName();
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)

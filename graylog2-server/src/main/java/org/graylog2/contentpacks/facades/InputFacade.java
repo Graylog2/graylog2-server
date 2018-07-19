@@ -143,7 +143,8 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         if (inputFactory == null) {
             throw new ContentPackException("Unknown input type: " + input.getType());
         }
-        final String packageName = inputFactory.getClass().getPackage().getName();
+        // We have to use the descriptor because the factory is only a runtime-generated proxy. :(
+        final String packageName = inputFactory.getDescriptor().getClass().getPackage().getName();
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)
