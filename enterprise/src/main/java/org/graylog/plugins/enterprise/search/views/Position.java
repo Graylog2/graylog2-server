@@ -20,6 +20,9 @@ class Position {
         if (value instanceof Double && value.equals(Infinity.value)) {
             return infinity();
         }
+        if (value instanceof String && value.equals("Infinity")) {
+            return infinity();
+        }
         throw new IllegalArgumentException("Unable to deserialize " + value + " to Position.");
     }
 }
