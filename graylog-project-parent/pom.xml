@@ -665,9 +665,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!-- Use ALL the cores! -->
-                    <forkCount>1C</forkCount>
-                    <reuseForks>false</reuseForks>
+                    <forkCount>2</forkCount>
+                    <reuseForks>true</reuseForks>
                     <argLine>-Djava.library.path=${project.basedir}/../lib/sigar-${sigar.version} -Dio.netty.leakDetectionLevel=paranoid -Djava.awt.headless=true</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
