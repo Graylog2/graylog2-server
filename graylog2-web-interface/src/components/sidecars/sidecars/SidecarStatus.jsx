@@ -9,6 +9,7 @@ import SidecarStatusFileList from './SidecarStatusFileList';
 const SidecarStatus = createReactClass({
   propTypes: {
     sidecar: PropTypes.object.isRequired,
+    collectors: PropTypes.array.isRequired,
   },
 
   componentDidMount() {
@@ -45,8 +46,8 @@ const SidecarStatus = createReactClass({
     );
   },
 
-  formatCollectorStatus(details) {
-    if (!details) {
+  formatCollectorStatus(details, collectors) {
+    if (!details || !collectors) {
       return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
     }
 
@@ -54,14 +55,14 @@ const SidecarStatus = createReactClass({
       return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.</p>;
     }
 
-    const collectors = details.status.collectors;
-    if (collectors.length === 0) {
+    const collectorStatuses = details.status.collectors;
+    if (collectorStatuses.length === 0) {
       return <p>There are no collectors configured in this sidecar.</p>;
     }
 
     const statuses = [];
-    collectors.forEach((status) => {
-      const collector = status.name;
+    collectorStatuses.forEach((status) => {
+      const collector = collectors.find(collector => collector.id === status.collector_id);
 
       let statusMessage;
       let statusBadge;
@@ -83,10 +84,12 @@ const SidecarStatus = createReactClass({
           statusBadge = <i className="fa fa-question-circle fa-fw" />;
       }
 
-      statuses.push(
-        <dt key={`${collector}-key`} className={statusClass}>{collector}</dt>,
-        <dd key={`${collector}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
-      );
+      if (collector) {
+        statuses.push(
+          <dt key={`${collector}-key`} className={statusClass}>{collector.name}</dt>,
+          <dd key={`${collector}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
+        );
+      }
     });
 
     return (
@@ -113,7 +116,7 @@ const SidecarStatus = createReactClass({
           <Col md={12}>
             <h2>Collectors status</h2>
             <div className="top-margin">
-              {this.formatCollectorStatus(sidecar.node_details)}
+              {this.formatCollectorStatus(sidecar.node_details, this.props.collectors)}
             </div>
           </Col>
         </Row>

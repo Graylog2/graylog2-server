@@ -182,7 +182,7 @@ const CollectorsAdministration = createReactClass({
     const configuration = configurations.find(config => config.id === configAssignment.configuration_id);
     let collectorStatus;
     try {
-      const result = sidecar.node_details.status.collectors.find(c => c.name === collector.name);
+      const result = sidecar.node_details.status.collectors.find(c => c.collector_id === collector.id);
       if (result) {
         collectorStatus = result.status;
       }
