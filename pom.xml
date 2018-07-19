@@ -94,7 +94,7 @@
         <commons-email.version>1.5</commons-email.version>
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
-        <elasticsearch.version>5.6.9</elasticsearch.version>
+        <elasticsearch.version>5.6.10</elasticsearch.version>
         <freemarker.version>2.3.28</freemarker.version>
         <jest.version>2.4.13+jackson</jest.version>
         <gelfclient.version>1.4.1</gelfclient.version>
