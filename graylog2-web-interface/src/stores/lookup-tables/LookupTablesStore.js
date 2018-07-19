@@ -147,7 +147,7 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   lookup(tableName, key) {
-    const promise = fetch('GET', this._url(`tables/${tableName}/query?key=${key}`));
+    const promise = fetch('GET', this._url(`tables/${tableName}/query?key=${encodeURIComponent(key)}`));
 
     promise.then((response) => {
       this.trigger({
@@ -160,7 +160,7 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   purgeKey(table, key) {
-    const promise = fetch('POST', this._url(`tables/${table.id}/purge?key=${key}`));
+    const promise = fetch('POST', this._url(`tables/${table.id}/purge?key=${encodeURIComponent(key)}`));
 
     promise.then(() => {
       UserNotification.success(`Purging cache key "${key}" for lookup table "${table.name}"`, 'Success!');
