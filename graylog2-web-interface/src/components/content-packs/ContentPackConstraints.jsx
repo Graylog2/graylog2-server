@@ -8,28 +8,29 @@ import './ContentPackConstraints.css';
 class ContentPackConstraints extends React.Component {
   static propTypes = {
     constraints: PropTypes.array,
-    isFullFilled: PropTypes.bool,
+    isFulfilled: PropTypes.bool,
   };
 
   static defaultProps = {
     constraints: [],
-    isFullFilled: false,
+    isFulfilled: false,
   };
 
   _rowFormatter = (item) => {
-    const fullfilledIcon = item.fullfilled || this.props.isFullFilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
-    const fullfilledBg = item.fullfilled || this.props.isFullFilled ? 'success' : 'failure';
+    console.log('ITEM', item);
+    const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
+    const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
     return (
       <tr key={item.id}>
         <td>{item.type}</td>
         <td>{item.version}</td>
-        <td><Badge className={fullfilledBg}>{fullfilledIcon}</Badge></td>
+        <td><Badge className={fulfilledBg}>{fulfilledIcon}</Badge></td>
       </tr>
     );
   };
 
   render() {
-    const headers = ['Type', 'Version', 'Fullfilled'];
+    const headers = ['Type', 'Version', 'Fulfilled'];
     return (
       <div>
         <h2>Constraints</h2>

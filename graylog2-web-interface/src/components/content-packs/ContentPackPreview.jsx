@@ -30,7 +30,7 @@ class ContentPackPreview extends React.Component {
             <ContentPackDetails contentPack={this.props.contentPack} verbose />
           </Col>
           <Col sm={6}>
-            <ContentPackConstraints constraints={this.props.contentPack.requires} isFullFilled />
+            <ContentPackConstraints constraints={this.props.contentPack.requires} isFulfilled />
           </Col>
         </Row>
         <Row>
