@@ -26,6 +26,7 @@ import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleReques
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -42,7 +43,6 @@ public abstract class CreateStreamRequest {
     public abstract String description();
 
     @JsonProperty
-    @Nullable
     public abstract List<CreateStreamRuleRequest> rules();
 
     @JsonProperty
@@ -69,7 +69,7 @@ public abstract class CreateStreamRequest {
         return new AutoValue_CreateStreamRequest(
                 title,
                 description,
-                rules,
+                firstNonNull(rules, Collections.emptyList()),
                 contentPack,
                 Stream.MatchingType.valueOfOrDefault(matchingType),
                 firstNonNull(removeMatchesFromDefaultStream, false),

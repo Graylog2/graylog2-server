@@ -132,9 +132,13 @@ class SearchForm extends React.Component {
   _onSearch = (e) => {
     e.preventDefault();
 
-    this._setLoadingState().then(() => {
-      this.props.onSearch(this.state.query, this._resetLoadingState);
-    });
+    if (this.props.useLoadingState) {
+      this._setLoadingState().then(() => {
+        this.props.onSearch(this.state.query, this._resetLoadingState);
+      });
+    } else {
+      this.props.onSearch(this.state.query);
+    }
   };
 
   _onReset = () => {

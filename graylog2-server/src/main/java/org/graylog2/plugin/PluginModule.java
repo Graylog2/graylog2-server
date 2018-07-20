@@ -23,6 +23,9 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.contentpacks.constraints.ConstraintChecker;
+import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -178,5 +181,13 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addMigration(Class<? extends Migration> migrationClass) {
         migrationsBinder().addBinding().to(migrationClass);
+    }
+
+    protected void addEntityFacade(ModelType entityType, Class<? extends EntityFacade<?>> entityFacadeClass) {
+        entityFacadeBinder().addBinding(entityType).to(entityFacadeClass);
+    }
+
+    protected void addConstraintChecker(Class<? extends ConstraintChecker> constraintCheckerClass) {
+        constraintCheckerBinder().addBinding().to(constraintCheckerClass);
     }
 }

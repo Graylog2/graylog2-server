@@ -1,0 +1,42 @@
+{
+  "outputs": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "title": "STDOUT",
+      "type": "org.graylog2.outputs.LoggingOutput",
+      "creator_user_id": "admin",
+      "configuration": {
+        "prefix": "Writing message: "
+      },
+      "created_at": {
+        "$date": "2018-03-26T11:01:00.000Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "title": "GELF",
+      "type": "org.graylog2.outputs.GelfOutput",
+      "creator_user_id": "admin",
+      "configuration": {
+        "hostname": "127.0.0.1",
+        "protocol": "TCP",
+        "connect_timeout": 1000,
+        "reconnect_delay": 500,
+        "queue_size": 512,
+        "port": 12201,
+        "max_inflight_sends": 512,
+        "tcp_no_delay": false,
+        "tcp_keep_alive": false,
+        "tls_trust_cert_chain": "",
+        "tls_verification_enabled": false
+      },
+      "created_at": {
+        "$date": "2018-03-27T12:02:00.000Z"
+      }
+    }
+  ]
+}

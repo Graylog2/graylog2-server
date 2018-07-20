@@ -25,6 +25,7 @@ import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
@@ -42,10 +43,12 @@ public class CollectorService extends PaginatedDbService<Collector> {
         super(mongoConnection, mapper, Collector.class, COLLECTION_NAME);
     }
 
+    @Nullable
     public Collector find(String id) {
         return db.findOne(DBQuery.is("_id", id));
     }
 
+    @Nullable
     public Collector findByName(String name) {
         return db.findOne(DBQuery.is("name", name));
     }
@@ -91,9 +94,10 @@ public class CollectorService extends PaginatedDbService<Collector> {
                 .build();
     }
 
+    @Nullable
     public Collector copy(String id, String name) {
         Collector collector = find(id);
-        return collector.toBuilder()
+        return collector == null ? null : collector.toBuilder()
                 .id(null)
                 .name(name)
                 .build();

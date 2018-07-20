@@ -22,7 +22,10 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.dto.CacheDto;
+import org.graylog2.lookup.events.CachesDeleted;
+import org.graylog2.lookup.events.CachesUpdated;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -37,17 +40,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DBCacheService {
-
     private final JacksonDBCollection<CacheDto, ObjectId> db;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public DBCacheService(MongoConnection mongoConnection,
-                          MongoJackObjectMapperProvider mapper) {
+                          MongoJackObjectMapperProvider mapper,
+                          ClusterEventBus clusterEventBus) {
 
-        db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_caches"),
+        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_caches"),
                 CacheDto.class,
                 ObjectId.class,
                 mapper.get());
+        this.clusterEventBus = clusterEventBus;
+
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
@@ -63,7 +69,10 @@ public class DBCacheService {
 
     public CacheDto save(CacheDto table) {
         WriteResult<CacheDto, ObjectId> save = db.save(table);
-        return save.getSavedObject();
+        final CacheDto savedCache = save.getSavedObject();
+        clusterEventBus.post(CachesUpdated.create(savedCache.id()));
+
+        return savedCache;
     }
 
     public PaginatedList<CacheDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
@@ -81,12 +90,11 @@ public class DBCacheService {
     }
 
     public void delete(String idOrName) {
-        try {
-            db.removeById(new ObjectId(idOrName));
-        } catch (IllegalArgumentException e) {
-            // not an ObjectId, try again with name
-            db.remove(DBQuery.is("name", idOrName));
-        }
+        final Optional<CacheDto> cacheDto = get(idOrName);
+        cacheDto.map(CacheDto::id)
+                .map(ObjectId::new)
+                .ifPresent(db::removeById);
+        cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
     }
 
     public Collection<CacheDto> findByIds(Set<String> idSet) {

@@ -1,0 +1,135 @@
+{
+  "streams": [
+    {
+      "_id": {
+        "$oid": "000000000000000000000001"
+      },
+      "creator_user_id": "local:admin",
+      "is_default_stream": true,
+      "index_set_id": "5a82af654b900a1c9d8d392e",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": false,
+      "description": "Stream containing all messages",
+      "created_at": {
+        "$date": "2018-02-13T09:27:02.072Z"
+      },
+      "disabled": false,
+      "title": "All messages",
+      "outputs": []
+    },
+    {
+      "_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "creator_user_id": "admin",
+      "outputs": [
+        {
+          "$oid": "5adf239e4b900a0fdb4e5197"
+        }
+      ],
+      "index_set_id": "5adf23ce4b900a0fdb4e51cc",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": false,
+      "description": "Description",
+      "created_at": {
+        "$date": "2018-04-24T12:31:05.366Z"
+      },
+      "disabled": true,
+      "title": "Test",
+      "content_pack": null
+    }
+  ],
+  "streamrules": [
+    {
+      "_id": {
+        "$oid": "5adf23ef4b900a0fdb4e51f7"
+      },
+      "description": "exact match",
+      "field": "field",
+      "type": 1,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": "value"
+    },
+    {
+      "_id": {
+        "$oid": "5adf24004b900a0fdb4e520a"
+      },
+      "description": "regex match",
+      "field": "field",
+      "type": 2,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": "value.*"
+    },
+    {
+      "_id": {
+        "$oid": "5adf240a4b900a0fdb4e5219"
+      },
+      "description": "greater than",
+      "field": "field",
+      "type": 3,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": "5"
+    },
+    {
+      "_id": {
+        "$oid": "5adf24174b900a0fdb4e5228"
+      },
+      "description": "smaller than",
+      "field": "field",
+      "type": 4,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": "5"
+    },
+    {
+      "_id": {
+        "$oid": "5adf24214b900a0fdb4e5235"
+      },
+      "description": "field presence",
+      "field": "field",
+      "type": 5,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": ""
+    },
+    {
+      "_id": {
+        "$oid": "5adf242b4b900a0fdb4e5242"
+      },
+      "description": "contains",
+      "field": "field",
+      "type": 6,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": "value"
+    },
+    {
+      "_id": {
+        "$oid": "5adf24374b900a0fdb4e5251"
+      },
+      "description": "always match",
+      "field": "",
+      "type": 7,
+      "inverted": false,
+      "stream_id": {
+        "$oid": "5adf23894b900a0fdb4e517d"
+      },
+      "value": ""
+    }
+  ]
+}

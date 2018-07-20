@@ -23,8 +23,10 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface InputService extends PersistedService {
     List<Input> all();
@@ -38,6 +40,8 @@ public interface InputService extends PersistedService {
     String update(Input model) throws ValidationException;
 
     Input find(String id) throws NotFoundException;
+
+    Set<Input> findByIds(Collection<String> ids);
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
 

@@ -368,7 +368,7 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         for (Converter converter : converters) {
             final Map<String, Object> config = ImmutableMap.of(
-                    FIELD_CONVERTER_TYPE, converter.getType().toLowerCase(Locale.ENGLISH),
+                    FIELD_CONVERTER_TYPE, converter.getType().name().toLowerCase(Locale.ENGLISH),
                     FIELD_CONVERTER_CONFIG, converter.getConfig()
             );
             listBuilder.add(config);

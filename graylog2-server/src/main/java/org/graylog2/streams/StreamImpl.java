@@ -132,7 +132,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     @Override
     public Boolean getDisabled() {
-        return (Boolean) fields.get(FIELD_DISABLED);
+        return (Boolean) fields.getOrDefault(FIELD_DISABLED, false);
     }
 
     @Override

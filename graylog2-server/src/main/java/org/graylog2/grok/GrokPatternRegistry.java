@@ -72,7 +72,13 @@ public class GrokPatternRegistry {
     }
 
     @Subscribe
-    public void grokPatternsChanged(GrokPatternsChangedEvent event) {
+    public void grokPatternsUpdated(GrokPatternsUpdatedEvent event) {
+        // for now we simply reload everything and don't care what exactly has changed
+        reload();
+    }
+
+    @Subscribe
+    public void grokPatternsDeleted(GrokPatternsDeletedEvent event) {
         // for now we simply reload everything and don't care what exactly has changed
         reload();
     }

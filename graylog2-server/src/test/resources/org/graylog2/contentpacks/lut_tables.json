@@ -1,0 +1,22 @@
+{
+  "lut_tables": [
+    {
+      "_id": {
+        "$oid": "5adf24dd4b900a0fdb4e530d"
+      },
+      "title": "HTTP DSV without Cache",
+      "description": "HTTP DSV without Cache",
+      "name": "http-dsv-no-cache",
+      "cache": {
+        "$oid": "5adf24b24b900a0fdb4e52dd"
+      },
+      "data_adapter": {
+        "$oid": "5adf24a04b900a0fdb4e52c8"
+      },
+      "default_single_value": "Default single value",
+      "default_single_value_type": "STRING",
+      "default_multi_value": "Default multi value",
+      "default_multi_value_type": "OBJECT"
+    }
+  ]
+}

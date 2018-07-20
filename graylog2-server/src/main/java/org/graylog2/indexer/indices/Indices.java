@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -82,6 +81,7 @@ import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -157,8 +157,6 @@ public class Indices {
             throw new ElasticsearchException("Couldn't find scroll ID in search query response");
         }
 
-        final TypeReference<Map<String, Object>> type = new TypeReference<Map<String, Object>>() {
-        };
         while (true) {
             final SearchScroll scrollRequest = new SearchScroll.Builder(scrollId, "1m").build();
             final JestResult scrollResult = JestUtils.execute(jestClient, scrollRequest, () -> "Couldn't process result of scroll query");
@@ -172,7 +170,7 @@ public class Indices {
             final Bulk.Builder bulkRequestBuilder = new Bulk.Builder();
             for (JsonNode jsonElement : scrollHits) {
                 final Map<String, Object> doc = Optional.ofNullable(jsonElement.path("_source"))
-                        .map(sourceJson -> objectMapper.<Map<String, Object>>convertValue(sourceJson, type))
+                        .map(sourceJson -> objectMapper.<Map<String, Object>>convertValue(sourceJson, TypeReferences.MAP_STRING_OBJECT))
                         .orElse(Collections.emptyMap());
                 final String id = (String) doc.remove("_id");
 

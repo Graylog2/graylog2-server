@@ -16,11 +16,9 @@
  */
 package org.graylog2.rest.resources.dashboards;
 
-import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -58,10 +56,6 @@ public class DashboardsResourceTest {
     @Mock
     private ActivityWriter activityWriter;
     @Mock
-    private ClusterEventBus clusterEventBus;
-    @Mock
-    private EventBus serverEventBus;
-    @Mock
     private Subject subject;
     @Mock
     private Principal principal;
@@ -77,11 +71,9 @@ public class DashboardsResourceTest {
 
         DashboardsTestResource(DashboardService dashboardService,
                                ActivityWriter activityWriter,
-                               ClusterEventBus clusterEventBus,
-                               EventBus serverEventBus,
                                Subject subject,
                                UserService userService) {
-            super(dashboardService, activityWriter, clusterEventBus, serverEventBus);
+            super(dashboardService, activityWriter);
             this.subject = subject;
             this.userService = userService;
         }
@@ -121,7 +113,7 @@ public class DashboardsResourceTest {
         when(userService.load(eq(testuserName))).thenReturn(user);
         when(user.getName()).thenReturn(testuserName);
 
-        this.dashboardsResource = new DashboardsTestResource(dashboardService, activityWriter, clusterEventBus, serverEventBus, subject, userService);
+        this.dashboardsResource = new DashboardsTestResource(dashboardService, activityWriter, subject, userService);
     }
 
     @Test

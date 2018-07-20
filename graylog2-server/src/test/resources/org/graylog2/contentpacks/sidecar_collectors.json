@@ -1,0 +1,67 @@
+{
+  "sidecar_collectors": [
+    {
+      "_id": {
+        "$oid": "5b4c920b4b900a0024af0001"
+      },
+      "name": "filebeat",
+      "service_type": "exec",
+      "node_operating_system": "linux",
+      "executable_path": "/usr/bin/filebeat",
+      "configuration_path": "/etc/graylog/collector-sidecar/generated/filebeat.yml",
+      "execute_parameters": [
+        "-c",
+        "%s"
+      ],
+      "validation_parameters": [
+        "test",
+        "config",
+        "-c",
+        "%s"
+      ],
+      "default_template": ""
+    },
+    {
+      "_id": {
+        "$oid": "5b4c920b4b900a0024af0002"
+      },
+      "name": "winlogbeat",
+      "service_type": "svc",
+      "node_operating_system": "windows",
+      "executable_path": "C:\\Program Files\\graylog\\collector-sidecar\\winlogbeat.exe",
+      "configuration_path": "C:\\Program Files\\graylog\\collector-sidecar\\generated\\winlogbeat.yml",
+      "execute_parameters": [
+        "-c",
+        "%s"
+      ],
+      "validation_parameters": [
+        "test",
+        "config",
+        "-c",
+        "%s"
+      ],
+      "default_template": ""
+    },
+    {
+      "_id": {
+        "$oid": "5b4c920b4b900a0024af0003"
+      },
+      "name": "nxlog",
+      "service_type": "exec",
+      "node_operating_system": "linux",
+      "executable_path": "/usr/bin/nxlog",
+      "configuration_path": "/etc/graylog/collector-sidecar/generated/nxlog.conf",
+      "execute_parameters": [
+        "-f",
+        "-c",
+        "%s"
+      ],
+      "validation_parameters": [
+        "-v",
+        "-c",
+        "%s"
+      ],
+      "default_template": ""
+    }
+  ]
+}

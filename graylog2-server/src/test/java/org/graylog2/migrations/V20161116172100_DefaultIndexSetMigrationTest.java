@@ -17,13 +17,11 @@
 package org.graylog2.migrations;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -60,8 +58,6 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
     private IndexSetService indexSetService;
     @Mock
     private ClusterConfigService clusterConfigService;
-    @Mock
-    private ClusterEventBus clusterEventBus;
 
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private RotationStrategy rotationStrategy = new StubRotationStrategy();
@@ -76,8 +72,7 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
                 Collections.singletonMap("test", () -> rotationStrategy),
                 Collections.singletonMap("test", () -> retentionStrategy),
                 indexSetService,
-                clusterConfigService,
-                clusterEventBus);
+                clusterConfigService);
     }
 
     @Test
@@ -111,7 +106,6 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         verify(indexSetService).save(indexSetConfigCaptor.capture());
         verify(clusterConfigService).write(DefaultIndexSetConfig.create("id"));
         verify(clusterConfigService).write(DefaultIndexSetCreated.create());
-        verify(clusterEventBus).post(IndexSetCreatedEvent.create(savedIndexSetConfig));
 
         final IndexSetConfig capturedIndexSetConfig = indexSetConfigCaptor.getValue();
         assertThat(capturedIndexSetConfig.id()).isNull();
@@ -166,7 +160,6 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
 
         verify(clusterConfigService).get(DefaultIndexSetCreated.class);
         verifyNoMoreInteractions(clusterConfigService);
-        verifyZeroInteractions(clusterEventBus);
         verifyZeroInteractions(indexSetService);
     }
 

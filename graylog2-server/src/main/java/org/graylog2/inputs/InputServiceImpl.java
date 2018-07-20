@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -54,11 +55,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
@@ -89,7 +94,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
-            inputs.add(new InputImpl((ObjectId) o.get("_id"), o.toMap()));
+            inputs.add(new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
         }
 
         return inputs.build();
@@ -104,10 +109,26 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
-            inputs.add(new InputImpl((ObjectId) o.get("_id"), o.toMap()));
+            inputs.add(new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
         }
 
         return inputs.build();
+    }
+
+    @Override
+    public Set<Input> findByIds(Collection<String> ids) {
+        final Set<ObjectId> objectIds = ids.stream()
+                .map(ObjectId::new)
+                .collect(Collectors.toSet());
+
+        final DBObject query = BasicDBObjectBuilder.start()
+                .push(InputImpl.FIELD_ID)
+                .append("$in", objectIds)
+                .get();
+        final Stream<InputImpl> inputStream = query(InputImpl.class, query).stream()
+                .map(o -> new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+        return inputStream
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -165,7 +186,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         if (o == null) {
             throw new NotFoundException("Input <" + id + "> not found!");
         }
-        return new org.graylog2.inputs.InputImpl((ObjectId) o.get("_id"), o.toMap());
+        return new org.graylog2.inputs.InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap());
     }
 
     @Override
@@ -175,11 +196,11 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
 
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject("_id", new ObjectId(id)),
+                new BasicDBObject(InputImpl.FIELD_ID, new ObjectId(id)),
                 new BasicDBObject("$or", forThisNodeOrGlobal));
 
         final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
-        return new InputImpl((ObjectId) o.get("_id"), o.toMap());
+        return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap());
     }
 
     @Override
@@ -189,14 +210,14 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
 
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject("_id", new ObjectId(id)),
+                new BasicDBObject(InputImpl.FIELD_ID, new ObjectId(id)),
                 new BasicDBObject("$and", forThisNode));
 
         final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
         if (o == null) {
             throw new NotFoundException("Couldn't find input " + id + " on Graylog node " + nodeId);
         } else {
-            return new InputImpl((ObjectId) o.get("_id"), o.toMap());
+            return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap());
         }
     }
 

@@ -22,14 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.events.StreamsChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,17 +45,14 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
     private final StreamService streamService;
     private final IndexSetService indexSetService;
     private final ClusterConfigService clusterConfigService;
-    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public V20161122174500_AssignIndexSetsToStreamsMigration(final StreamService streamService,
                                                              final IndexSetService indexSetService,
-                                                             final ClusterConfigService clusterConfigService,
-                                                             final ClusterEventBus clusterEventBus) {
+                                                             final ClusterConfigService clusterConfigService) {
         this.streamService = streamService;
         this.indexSetService = indexSetService;
         this.clusterConfigService = clusterConfigService;
-        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
@@ -96,9 +91,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
 
         // Mark this migration as done.
         clusterConfigService.write(MigrationCompleted.create(indexSetConfig.id(), completedStreamIds.build(), failedStreamIds.build()));
-
-        // Make sure the stream router will reload the changed streams.
-        clusterEventBus.post(StreamsChangedEvent.create(completedStreamIds.build()));
     }
 
     private IndexSetConfig findDefaultIndexSet() {

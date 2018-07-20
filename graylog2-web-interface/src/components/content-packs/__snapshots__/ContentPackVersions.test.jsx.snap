@@ -1,0 +1,176 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackVersions /> should render with content pack versions 1`] = `
+<div>
+  <div
+    className="row "
+  >
+    <div
+      className="col-md-12"
+    >
+      <div
+        className="data-table table-responsive"
+        id="content-packs-versions"
+      >
+        <table
+          className="table undefined"
+        >
+          <thead>
+            <tr>
+              <th>
+                Select
+              </th>
+              <th>
+                Revision
+              </th>
+              <th
+                className="text-right"
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input
+                  checked={true}
+                  onChange={[Function]}
+                  type="radio"
+                  value={1}
+                />
+              </td>
+              <td>
+                1
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+                 
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Download
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  checked={false}
+                  onChange={[Function]}
+                  type="radio"
+                  value={2}
+                />
+              </td>
+              <td>
+                2
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+                 
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Download
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  checked={false}
+                  onChange={[Function]}
+                  type="radio"
+                  value={3}
+                />
+              </td>
+              <td>
+                3
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+                 
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Download
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input
+                  checked={false}
+                  onChange={[Function]}
+                  type="radio"
+                  value={4}
+                />
+              </td>
+              <td>
+                4
+              </td>
+              <td
+                className="text-right"
+              >
+                <button
+                  className="btn btn-sm btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+                 
+                <button
+                  className="btn btn-sm btn-info"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Download
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+`;

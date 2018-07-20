@@ -1,0 +1,33 @@
+{
+  "content_packs": [
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491344e"
+      },
+      "name": "Legacy Name",
+      "description": "Legacy Description",
+      "category": "Legacy Content Packs",
+      "inputs": [],
+      "streams": [],
+      "outputs": [],
+      "dashboards": [],
+      "grok_patterns": [],
+      "lookup_tables": [],
+      "lookup_caches": [],
+      "lookup_data_adapters": []
+    },
+    {
+      "v": "1",
+      "id": "dcd74ede-6832-4ef7-9f69-0000cafebabe",
+      "rev": 3,
+      "name": "Name",
+      "summary": "Summary",
+      "description": "Description",
+      "vendor": "Vendor",
+      "url": "http://example.com",
+      "requires": [],
+      "parameters": [],
+      "entities": []
+    }
+  ]
+}

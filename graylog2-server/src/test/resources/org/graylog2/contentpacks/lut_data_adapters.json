@@ -1,0 +1,27 @@
+{
+  "lut_data_adapters": [
+    {
+      "_id": {
+        "$oid": "5adf24a04b900a0fdb4e52c8"
+      },
+      "title": "HTTP DSV",
+      "description": "HTTP DSV",
+      "name": "http-dsv",
+      "config": {
+        "type": "dsvhttp",
+        "url": "https://example.org/table.csv",
+        "separator": ",",
+        "line_separator": "\\n",
+        "quotechar": "\"",
+        "ignorechar": "#",
+        "key_column": 1,
+        "check_presence_only": false,
+        "value_column": 2,
+        "refresh_interval": {
+          "$numberLong": "3600"
+        },
+        "case_insensitive_lookup": false
+      }
+    }
+  ]
+}

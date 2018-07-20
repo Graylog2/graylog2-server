@@ -26,7 +26,7 @@ import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.grok.GrokPatternsChangedEvent;
+import org.graylog2.grok.GrokPatternsDeletedEvent;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -98,7 +98,7 @@ public class V2018070614390000_EnforceUniqueGrokPatternsTest {
                         .containsEntry("pattern", "[0-9]+"));
 
         assertThat(subscriber.events)
-                .containsOnly(GrokPatternsChangedEvent.create(Collections.emptySet(), Collections.singleton("BAR")));
+                .containsOnly(GrokPatternsDeletedEvent.create(Collections.singleton("BAR")));
     }
 
     @Test
@@ -120,10 +120,10 @@ public class V2018070614390000_EnforceUniqueGrokPatternsTest {
     }
 
     private static class TestSubscriber {
-        public final List<GrokPatternsChangedEvent> events = new CopyOnWriteArrayList<>();
+        public final List<GrokPatternsDeletedEvent> events = new CopyOnWriteArrayList<>();
 
         @Subscribe
-        public void handleGrokPatternsChangedEvent(GrokPatternsChangedEvent event) {
+        public void handleGrokPatternsChangedEvent(GrokPatternsDeletedEvent event) {
             events.add(event);
         }
     }

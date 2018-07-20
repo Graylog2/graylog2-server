@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FallbackAdapterConfig implements LookupDataAdapterConfiguration {
 
     @JsonProperty
-    private String type;
+    private String type = "FallbackAdapterConfig";
 
     @Override
     public String type() {

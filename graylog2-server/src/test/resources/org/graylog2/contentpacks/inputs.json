@@ -1,0 +1,155 @@
+{
+  "inputs": [
+    {
+      "_id": {
+        "$oid": "5acc84f84b900a4ff290d9a7"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "override_source": null,
+        "recv_buffer_size": 262144,
+        "bind_address": "127.0.0.1",
+        "port": 5555,
+        "number_worker_threads": 8
+      },
+      "name": "Raw/Plaintext UDP",
+      "created_at": {
+        "$date": "2018-04-10T09:33:44.275Z"
+      },
+      "global": false,
+      "type": "org.graylog2.inputs.raw.udp.RawUDPInput",
+      "title": "Local Raw UDP",
+      "content_pack": null,
+      "node_id": "cd03ee44-b2a7-4824-be16-bb7456149dbd"
+    },
+    {
+      "_id": {
+        "$oid": "5adf25294b900a0fdb4e5365"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "sleep": 25,
+        "override_source": null,
+        "source": "example.org",
+        "sleep_deviation": 30,
+        "throttling_allowed": false
+      },
+      "name": "Random HTTP message generator",
+      "created_at": {
+        "$date": "2018-04-24T12:38:01.645Z"
+      },
+      "global": true,
+      "type": "org.graylog2.inputs.random.FakeHttpMessageInput",
+      "title": "Global Random HTTP",
+      "content_pack": null,
+      "extractors": [
+        {
+          "creator_user_id": "admin",
+          "source_field": "action",
+          "condition_type": "none",
+          "title": "Regex",
+          "type": "regex",
+          "cursor_strategy": "copy",
+          "target_field": "action_hash",
+          "extractor_config": {
+            "regex_value": "^(.+)$"
+          },
+          "condition_value": "",
+          "converters": [
+            {
+              "type": "hash",
+              "config": {}
+            }
+          ],
+          "id": "ad8776c0-47bc-11e8-ad9f-ac87a30082c3",
+          "order": {
+            "$numberLong": "0"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "source_field": "action",
+          "condition_type": "none",
+          "title": "Grok",
+          "type": "grok",
+          "cursor_strategy": "copy",
+          "target_field": "",
+          "extractor_config": {
+            "grok_pattern": "%{GREEDY:action_copy}"
+          },
+          "condition_value": "",
+          "converters": [],
+          "id": "877d26f0-47bc-11e8-ad9f-ac87a30082c3",
+          "order": {
+            "$numberLong": "0"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "source_field": "action",
+          "condition_type": "none",
+          "title": "Copy Input (Uppercase)",
+          "type": "copy_input",
+          "cursor_strategy": "copy",
+          "target_field": "action_uppercase",
+          "extractor_config": {},
+          "condition_value": "",
+          "converters": [
+            {
+              "type": "uppercase",
+              "config": {}
+            }
+          ],
+          "id": "7bacb520-47bc-11e8-ad9f-ac87a30082c3",
+          "order": {
+            "$numberLong": "0"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "source_field": "action",
+          "condition_type": "none",
+          "title": "Regex Replace",
+          "type": "regex_replace",
+          "cursor_strategy": "copy",
+          "target_field": "action_regex_replace",
+          "extractor_config": {
+            "replacement": "action-$1",
+            "regex": "^(.+)$"
+          },
+          "condition_value": "",
+          "converters": [],
+          "id": "cecc2830-47bc-11e8-ad9f-ac87a30082c3",
+          "order": {
+            "$numberLong": "0"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "source_field": "action",
+          "condition_type": "none",
+          "title": "Substring",
+          "type": "substring",
+          "cursor_strategy": "copy",
+          "target_field": "action_first_letter",
+          "extractor_config": {
+            "end_index": 1,
+            "begin_index": 0
+          },
+          "condition_value": "",
+          "converters": [],
+          "id": "11be10e0-47bd-11e8-ad9f-ac87a30082c3",
+          "order": {
+            "$numberLong": "0"
+          }
+        }
+      ],
+      "static_fields": [
+        {
+          "value": "foobar",
+          "key": "custom_field"
+        }
+      ]
+    }
+  ]
+}

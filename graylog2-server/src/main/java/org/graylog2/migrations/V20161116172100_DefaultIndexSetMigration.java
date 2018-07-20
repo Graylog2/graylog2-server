@@ -17,12 +17,10 @@
 package org.graylog2.migrations;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -52,21 +50,18 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
     private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
     private final IndexSetService indexSetService;
     private final ClusterConfigService clusterConfigService;
-    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public V20161116172100_DefaultIndexSetMigration(final ElasticsearchConfiguration elasticsearchConfiguration,
                                                     final Map<String, Provider<RotationStrategy>> rotationStrategies,
                                                     final Map<String, Provider<RetentionStrategy>> retentionStrategies,
                                                     final IndexSetService indexSetService,
-                                                    final ClusterConfigService clusterConfigService,
-                                                    final ClusterEventBus clusterEventBus) {
+                                                    final ClusterConfigService clusterConfigService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.rotationStrategies = requireNonNull(rotationStrategies);
         this.retentionStrategies = requireNonNull(retentionStrategies);
         this.indexSetService = indexSetService;
         this.clusterConfigService = clusterConfigService;
-        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
@@ -103,9 +98,6 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
         final IndexSetConfig savedConfig = indexSetService.save(config);
         clusterConfigService.write(DefaultIndexSetConfig.create(savedConfig.id()));
         clusterConfigService.write(DefaultIndexSetCreated.create());
-
-        // Publish event to cluster event bus so the stream router will reload.
-        clusterEventBus.post(IndexSetCreatedEvent.create(savedConfig));
 
         LOG.debug("Successfully created default index set: {}", savedConfig);
     }

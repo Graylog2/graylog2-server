@@ -18,12 +18,10 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.V20161216123500_Succeeded;
-import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -59,20 +57,17 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
     private IndexSetService indexSetService;
     @Mock
     private ClusterConfigService clusterConfigService;
-    @Mock
-    private ClusterEventBus clusterEventBus;
 
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private Migration migration;
 
 
     @Before
-    public void setUpService() throws Exception {
+    public void setUpService() {
         migration = new V20161216123500_DefaultIndexSetMigration(
                 elasticsearchConfiguration,
                 indexSetService,
-                clusterConfigService,
-                clusterEventBus);
+                clusterConfigService);
     }
 
     @Test
@@ -122,7 +117,6 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         migration.upgrade();
 
         verify(indexSetService, times(2)).save(indexSetConfigCaptor.capture());
-        verify(clusterEventBus, times(2)).post(any(IndexSetCreatedEvent.class));
         verify(clusterConfigService).write(V20161216123500_Succeeded.create());
 
         final List<IndexSetConfig> allValues = indexSetConfigCaptor.getAllValues();
@@ -158,7 +152,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
     }
 
     @Test
-    public void upgradeFailsIfDefaultIndexSetHasNotBeenCreated() throws Exception {
+    public void upgradeFailsIfDefaultIndexSetHasNotBeenCreated() {
         when(clusterConfigService.get(DefaultIndexSetCreated.class)).thenReturn(null);
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("The default index set hasn't been created yet. This is a bug!");
@@ -167,13 +161,12 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
     }
 
     @Test
-    public void migrationDoesNotRunAgainIfMigrationWasSuccessfulBefore() throws Exception {
+    public void migrationDoesNotRunAgainIfMigrationWasSuccessfulBefore() {
         when(clusterConfigService.get(V20161216123500_Succeeded.class)).thenReturn(V20161216123500_Succeeded.create());
         migration.upgrade();
 
         verify(clusterConfigService).get(V20161216123500_Succeeded.class);
         verifyNoMoreInteractions(clusterConfigService);
-        verifyZeroInteractions(clusterEventBus);
         verifyZeroInteractions(indexSetService);
     }
 }

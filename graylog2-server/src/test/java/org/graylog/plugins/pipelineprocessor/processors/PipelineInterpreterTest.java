@@ -21,7 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -45,6 +44,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
@@ -275,7 +275,8 @@ public class PipelineInterpreterTest {
     @Test
     @SuppressForbidden("Allow using default thread factory")
     public void testMetrics() {
-        final RuleService ruleService = new InMemoryRuleService();
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        final RuleService ruleService = new InMemoryRuleService(clusterEventBus);
         ruleService.save(RuleDao.create("abc",
                 "title",
                 "description",
@@ -287,7 +288,7 @@ public class PipelineInterpreterTest {
                 null)
         );
 
-        final PipelineService pipelineService = new InMemoryPipelineService();
+        final PipelineService pipelineService = new InMemoryPipelineService(new ClusterEventBus());
         pipelineService.save(PipelineDao.create("cde", "title", "description",
                 "pipeline \"pipeline\"\n" +
                         "stage 0 match all\n" +
@@ -299,7 +300,7 @@ public class PipelineInterpreterTest {
                 null)
         );
 
-        final PipelineStreamConnectionsService pipelineStreamConnectionsService = new InMemoryPipelineStreamConnectionsService();
+        final PipelineStreamConnectionsService pipelineStreamConnectionsService = new InMemoryPipelineStreamConnectionsService(clusterEventBus);
         pipelineStreamConnectionsService.save(PipelineConnections.create(null,
                 DEFAULT_STREAM_ID,
                 Collections.singleton("cde")));

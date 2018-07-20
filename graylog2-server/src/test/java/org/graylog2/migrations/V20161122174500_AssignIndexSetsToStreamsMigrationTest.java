@@ -16,17 +16,14 @@
  */
 package org.graylog2.migrations;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,14 +55,12 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
     private StreamService streamService;
     @Mock
     private ClusterConfigService clusterConfigService;
-    @Mock
-    private ClusterEventBus clusterEventBus;
 
     private Migration migration;
 
     @Before
     public void setUp() throws Exception {
-        migration = new V20161122174500_AssignIndexSetsToStreamsMigration(streamService, indexSetService, clusterConfigService, clusterEventBus);
+        migration = new V20161122174500_AssignIndexSetsToStreamsMigration(streamService, indexSetService, clusterConfigService);
     }
 
     @Test
@@ -95,7 +90,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         verify(clusterConfigService, times(1)).write(
                 V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create(
                         indexSetConfig.id(), Sets.newHashSet("stream1", "stream2"), Collections.emptySet()));
-        verify(clusterEventBus, times(1)).post(StreamsChangedEvent.create(ImmutableSet.of("stream1", "stream2")));
     }
 
     @Test
@@ -120,7 +114,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         verify(clusterConfigService, times(1)).write(
                 V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create(
                         indexSetConfig.id(), Sets.newHashSet("stream1"), Collections.emptySet()));
-        verify(clusterEventBus, times(1)).post(StreamsChangedEvent.create(ImmutableSet.of("stream1")));
     }
 
     @Test
@@ -149,7 +142,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         verify(clusterConfigService, times(1)).write(
                 V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create(
                         indexSetConfig.id(), Sets.newHashSet("stream2"), Sets.newHashSet("stream1")));
-        verify(clusterEventBus, times(1)).post(StreamsChangedEvent.create(ImmutableSet.of("stream2")));
     }
 
     @Test
@@ -183,6 +175,5 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
         verify(streamService, never()).save(any(Stream.class));
         verify(clusterConfigService, never()).write(any(V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.class));
-        verify(clusterEventBus, never()).post(any(StreamsChangedEvent.class));
     }
 }

@@ -18,9 +18,9 @@ package org.graylog2.lookup;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.jackson.TypeReferences;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -58,8 +58,7 @@ public abstract class LookupDefaultMultiValue implements LookupDefaultValue {
         try {
             switch (valueType) {
                 case OBJECT:
-                    value = OBJECT_MAPPER.readValue(valueString, new TypeReference<Map<Object, Object>>() {
-                    });
+                    value = OBJECT_MAPPER.readValue(valueString, TypeReferences.MAP_OBJECT_OBJECT);
                     break;
                 case NULL:
                     value = null;

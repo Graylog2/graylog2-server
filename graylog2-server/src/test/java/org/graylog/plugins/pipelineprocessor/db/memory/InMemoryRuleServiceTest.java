@@ -19,12 +19,14 @@ package org.graylog.plugins.pipelineprocessor.db.memory;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 public class InMemoryRuleServiceTest {
@@ -32,7 +34,7 @@ public class InMemoryRuleServiceTest {
 
     @Before
     public void setup() {
-        service = new InMemoryRuleService();
+        service = new InMemoryRuleService(new ClusterEventBus());
     }
 
     @Test
@@ -71,6 +73,21 @@ public class InMemoryRuleServiceTest {
             fail("Deleted rules should not be found anymore");
         } catch (NotFoundException ignored) {
         }
+    }
+
+    @Test
+    public void loadByName() throws NotFoundException {
+        RuleDao rule = RuleDao.create(null, "test", "description", "rule \"test\" when true then end", null, null);
+        final RuleDao savedRule = service.save(rule);
+        final RuleDao loadedRule = service.loadByName(savedRule.title());
+        assertThat(loadedRule).isEqualTo(savedRule);
+    }
+
+    @Test
+    public void loadByNameNotFound() {
+        assertThatThrownBy(() -> service.loadByName("Foobar"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("No rule with name Foobar");
     }
 
     @Test

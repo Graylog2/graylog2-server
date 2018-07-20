@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackEntityConfig /> should render with a entity 1`] = `
+<div>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="entiy-config-list"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Config Key
+                </th>
+                <th>
+                  Type
+                </th>
+                <th>
+                  Value
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  title
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  franz
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  descr
+                </td>
+                <td>
+                  <b>
+                    parameter (string)
+                  </b>
+                </td>
+                <td>
+                  <b>
+                    descrParam
+                  </b>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

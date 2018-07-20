@@ -1,0 +1,114 @@
+{
+  "content_packs_installations": [
+    {
+      "_id": {
+        "$oid": "5b4c935b4b900a0000000001"
+      },
+      "content_pack_id": "4e3d7025-881e-6870-da03-cafebabe0001",
+      "content_pack_revision": 1,
+      "parameters": {
+        "PARAM": {
+          "type": "string",
+          "value": "default string"
+        },
+        "INT_PARAM": {
+          "type": "integer",
+          "value": 42
+        }
+      },
+      "entities": [
+        {
+          "id": "5b4c920b4b900a0024af2b5d",
+          "type": "collector"
+        },
+        {
+          "id": "5b4c920b4b900a0024af2b5c",
+          "type": "collector"
+        },
+        {
+          "id": "5b4c920b4b900a0024af2b5b",
+          "type": "collector"
+        }
+      ],
+      "comment": "comment1",
+      "created_at": "2018-07-16T12:00:00.000Z",
+      "created_by": "admin"
+    },
+    {
+      "_id": {
+        "$oid": "5b4c935b4b900a0000000002"
+      },
+      "content_pack_id": "4e3d7025-881e-6870-da03-cafebabe0001",
+      "content_pack_revision": 2,
+      "parameters": {
+        "PARAM": {
+          "type": "string",
+          "value": "default string"
+        }
+      },
+      "entities": [
+        {
+          "id": "5b4c935b4b900a0062b7dc16",
+          "type": "dashboard"
+        },
+        {
+          "id": "5b4c935b4b900a0062b7dc19",
+          "type": "grok_pattern"
+        },
+        {
+          "id": "5b4c935b4b900a0062b7dc1b",
+          "type": "input"
+        },
+        {
+          "id": "5b4c935b4b900a0062b7dc1f",
+          "type": "output"
+        },
+        {
+          "id": "5b4c935b4b900a0062b7dc20",
+          "type": "stream"
+        }
+      ],
+      "comment": "comment2",
+      "created_at": "2018-07-16T13:00:00.000Z",
+      "created_by": "admin"
+    },
+    {
+      "_id": {
+        "$oid": "5b4c935b4b900a0000000003"
+      },
+      "content_pack_id": "4e3d7025-881e-6870-da03-cafebabe0002",
+      "content_pack_revision": 1,
+      "parameters": {
+        "PARAM": {
+          "type": "string",
+          "value": "default value"
+        }
+      },
+      "entities": [
+        {
+          "id": "5b4c935b4b900a0062b7dc0a",
+          "type": "pipeline_rule"
+        },
+        {
+          "id": "5b4c935b4b900a0062b7dc0b",
+          "type": "pipeline"
+        },
+        {
+          "id": "cp_lookup",
+          "type": "lookup_adapter"
+        },
+        {
+          "id": "cp_lookup",
+          "type": "lookup_cache"
+        },
+        {
+          "id": "5b4c935b4b900a0062b7dc14",
+          "type": "lookup_table"
+        }
+      ],
+      "comment": "comment3",
+      "created_at": "2018-07-16T14:00:00.000Z",
+      "created_by": "admin"
+    }
+  ]
+}

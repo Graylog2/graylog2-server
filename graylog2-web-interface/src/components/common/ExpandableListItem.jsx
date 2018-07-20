@@ -24,6 +24,8 @@ class ExpandableListItem extends React.Component {
     expandable: PropTypes.bool,
     /** Is the Item expanded */
     expanded: PropTypes.bool,
+    /** Forces to stay expanded regardless of clicking on the arrow */
+    stayExpanded: PropTypes.bool,
     /** The header of the item */
     header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
     /** The possible subheader of the item */
@@ -43,6 +45,7 @@ class ExpandableListItem extends React.Component {
     selectable: true,
     children: [],
     subheader: undefined,
+    stayExpanded: false,
   };
 
   state = {
@@ -70,11 +73,15 @@ class ExpandableListItem extends React.Component {
   _checkbox = undefined;
 
   _toggleExpand = () => {
-    this.setState({ expanded: !this.state.expanded });
+    if (this.props.stayExpanded) {
+      this.setState({ expanded: true });
+    } else {
+      this.setState({ expanded: !this.state.expanded });
+    }
   };
 
   _filterInputProps = (props) => {
-    const { expanded, indetermined, ...inputProps } = props;
+    const { expanded, indetermined, stayExpanded, ...inputProps } = props;
     return inputProps;
   };
 

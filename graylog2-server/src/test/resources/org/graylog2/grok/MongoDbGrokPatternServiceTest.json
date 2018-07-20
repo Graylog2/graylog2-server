@@ -1,0 +1,28 @@
+{
+  "grok_patterns": [
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000001"
+      },
+      "name": "Test1",
+      "pattern": "[a-z]+",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000002"
+      },
+      "name": "Test2",
+      "pattern": "[a-z]+",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000003"
+      },
+      "name": "Test3",
+      "pattern": "%{Test1}-%{Test2}",
+      "content_pack": "56250da2deadbeefcafebabe"
+    },
+  ]
+}

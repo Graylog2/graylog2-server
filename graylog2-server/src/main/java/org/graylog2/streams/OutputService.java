@@ -22,12 +22,15 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 @ImplementedBy(OutputServiceImpl.class)
 public interface OutputService {
     Output load(String streamOutputId) throws NotFoundException;
+
+    Set<Output> loadByIds(Collection<String> ids);
 
     Set<Output> loadAll();
 

@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.Lists;
-import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,13 +26,11 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -63,23 +60,19 @@ import java.util.Collection;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineResource extends RestResource implements PluginRestResource {
-
     private static final Logger log = LoggerFactory.getLogger(PipelineResource.class);
 
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
-    private final EventBus clusterBus;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
-                        PipelineRuleParser pipelineRuleParser,
-                        ClusterEventBus clusterBus) {
+                            PipelineRuleParser pipelineRuleParser) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
-        this.clusterBus = clusterBus;
     }
 
-    @ApiOperation(value = "Create a processing pipeline from source", notes = "")
+    @ApiOperation(value = "Create a processing pipeline from source")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CREATE)
@@ -99,12 +92,12 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .modifiedAt(now)
                 .build();
         final PipelineDao save = pipelineService.save(pipelineDao);
-        clusterBus.post(PipelinesChangedEvent.updatedPipelineId(save.id()));
+
         log.debug("Created new pipeline {}", save);
         return PipelineSource.fromDao(pipelineRuleParser, save);
     }
 
-    @ApiOperation(value = "Parse a processing pipeline without saving it", notes = "")
+    @ApiOperation(value = "Parse a processing pipeline without saving it")
     @POST
     @Path("/parse")
     @NoAuditEvent("only used to parse a pipeline, no changes made in the system")
@@ -153,7 +146,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
-                             @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
+                                 @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
 
         final PipelineDao dao = pipelineService.load(id);
@@ -170,7 +163,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         final PipelineDao savedPipeline = pipelineService.save(toSave);
-        clusterBus.post(PipelinesChangedEvent.updatedPipelineId(savedPipeline.id()));
 
         return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
     }
@@ -181,10 +173,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_DELETE)
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_DELETE, id);
-
         pipelineService.load(id);
         pipelineService.delete(id);
-        clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
     }
-
 }

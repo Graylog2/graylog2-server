@@ -1,0 +1,226 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackInstall /> should render a install 1`] = `
+<div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-offset-1"
+    >
+      <h2>
+        Install comment
+      </h2>
+      <br />
+      <br />
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-3 control-label"
+          htmlFor="comment"
+        >
+          Comment
+        </label>
+        <div
+          className="col-sm-7"
+        >
+          <input
+            className="form-control"
+            id="comment"
+            label="Comment"
+            maxLength={512}
+            name="comment"
+            onChange={[Function]}
+            placeholder=""
+            type="text"
+            value=""
+          />
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-offset-1"
+    >
+      <h2>
+        Configure Parameter
+      </h2>
+      <br />
+      <br />
+      <div
+        className="form-group"
+      >
+        <label
+          className="col-sm-3 control-label"
+          htmlFor="PARAM"
+        >
+          A parameter
+        </label>
+        <div
+          className="col-sm-7"
+        >
+          <input
+            className="form-control"
+            id="PARAM"
+            label="A parameter"
+            maxLength={250}
+            name="PARAM"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            type="text"
+            value="parameter"
+          />
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-10 col-sm-offset-1"
+    >
+      <div>
+        <h2>
+          Entity list
+        </h2>
+        <br />
+        <div
+          className="search"
+          style={
+            Object {
+              "marginTop": 15,
+            }
+          }
+        >
+          <form
+            className="form-inline"
+            onSubmit={[Function]}
+          >
+            <div
+              className="form-group has-feedback"
+            >
+              <input
+                autoComplete="off"
+                className="query form-control"
+                id="common-search-form-query-input"
+                onChange={[Function]}
+                placeholder="Enter search query..."
+                spellCheck="false"
+                style={
+                  Object {
+                    "width": "auto",
+                  }
+                }
+                type="text"
+                value=""
+              />
+            </div>
+            <div
+              className="form-group"
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+            >
+              <button
+                className="submit-button btn btn-default"
+                disabled={false}
+                type="submit"
+              >
+                Filter
+              </button>
+            </div>
+            <div
+              className="form-group"
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+            >
+              <button
+                className="reset-button btn btn-default"
+                disabled={false}
+                onClick={[Function]}
+                type="reset"
+              >
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
+        <div>
+          <div
+            className="row "
+          >
+            <div
+              className="col-md-12"
+            >
+              <div
+                className="data-table table-responsive"
+                id="entity-list"
+              >
+                <table
+                  className="table scrollable"
+                >
+                  <thead>
+                    <tr>
+                      <th>
+                        Title
+                      </th>
+                      <th>
+                        Type
+                      </th>
+                      <th>
+                        Description
+                      </th>
+                      <th>
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        franz
+                      </td>
+                      <td />
+                      <td>
+                        
+                      </td>
+                      <td>
+                        <div
+                          className="btn-toolbar"
+                          role="toolbar"
+                        >
+                          <button
+                            className="btn btn-xs btn-info"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            Show
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

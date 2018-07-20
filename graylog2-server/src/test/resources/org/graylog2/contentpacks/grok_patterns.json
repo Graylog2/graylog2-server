@@ -1,0 +1,18 @@
+{
+  "grok_patterns": [
+    {
+      "_id": {
+        "$oid": "5acc85444b900a4ff290d9fb"
+      },
+      "name": "GREEDY",
+      "pattern": ".*"
+    },
+    {
+      "_id": {
+        "$oid": "5ad75e254b900af7d0821db5"
+      },
+      "name": "NUMBER",
+      "pattern": "[0-9]+"
+    }
+  ]
+}

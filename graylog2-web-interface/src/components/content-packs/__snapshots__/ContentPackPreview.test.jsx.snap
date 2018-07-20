@@ -1,0 +1,304 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
+<div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-6"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-9 col-sm-offset-1"
+        >
+          <div
+            id="content-pack-details"
+          >
+            <h2>
+              Details
+            </h2>
+            <br />
+            <div>
+              <dl
+                className="deflist"
+              >
+                <dt>
+                  Version:
+                </dt>
+                 
+                <dd />
+                <dt>
+                  Name:
+                </dt>
+                 
+                <dd>
+                   
+                </dd>
+                <dt>
+                  Summary:
+                </dt>
+                 
+                <dd>
+                   
+                </dd>
+                <dt>
+                  Vendor:
+                </dt>
+                 
+                <dd>
+                   
+                </dd>
+                <dt>
+                  URL:
+                </dt>
+                 
+                <dd>
+                  <a
+                    href={undefined}
+                  />
+                   
+                </dd>
+              </dl>
+            </div>
+            <h2>
+              Description
+            </h2>
+            <br />
+            <div
+              className="well"
+            >
+              <div
+                dangerouslySetInnerHTML={
+                  Object {
+                    "__html": "",
+                  }
+                }
+              />
+            </div>
+            <br />
+            <br />
+            <br />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="col-sm-6"
+    >
+      <div>
+        <h2>
+          Constraints
+        </h2>
+        <br />
+        <br />
+        <div>
+          <div
+            className="row "
+          >
+            <div
+              className="col-md-12"
+            >
+              <div
+                className="data-table table-responsive"
+                id="content-packs-constraints"
+              >
+                <p>
+                  No data available.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-6"
+    >
+      <button
+        className="btn btn-primary"
+        disabled={false}
+        id="create"
+        onClick={[Function]}
+        type="button"
+      >
+        Create
+      </button>
+       
+      <a
+        download="content-pack-undefined-undefined.json"
+        href="data:text/plain;charset=utf-8,%7B%7D"
+      >
+        <button
+          className="btn btn-info"
+          disabled={false}
+          id="download"
+          type="button"
+        >
+          Download
+        </button>
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
+<div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-6"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-9 col-sm-offset-1"
+        >
+          <div
+            id="content-pack-details"
+          >
+            <h2>
+              Details
+            </h2>
+            <br />
+            <div>
+              <dl
+                className="deflist"
+              >
+                <dt>
+                  Version:
+                </dt>
+                 
+                <dd />
+                <dt>
+                  Name:
+                </dt>
+                 
+                <dd>
+                  name
+                   
+                </dd>
+                <dt>
+                  Summary:
+                </dt>
+                 
+                <dd>
+                  summmary
+                   
+                </dd>
+                <dt>
+                  Vendor:
+                </dt>
+                 
+                <dd>
+                  vendor
+                   
+                </dd>
+                <dt>
+                  URL:
+                </dt>
+                 
+                <dd>
+                  <a
+                    href="http://example.com"
+                  >
+                    http://example.com
+                  </a>
+                   
+                </dd>
+              </dl>
+            </div>
+            <h2>
+              Description
+            </h2>
+            <br />
+            <div
+              className="well"
+            >
+              <div
+                dangerouslySetInnerHTML={
+                  Object {
+                    "__html": "<p>descr</p>",
+                  }
+                }
+              />
+            </div>
+            <br />
+            <br />
+            <br />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="col-sm-6"
+    >
+      <div>
+        <h2>
+          Constraints
+        </h2>
+        <br />
+        <br />
+        <div>
+          <div
+            className="row "
+          >
+            <div
+              className="col-md-12"
+            >
+              <div
+                className="data-table table-responsive"
+                id="content-packs-constraints"
+              >
+                <p>
+                  No data available.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="row"
+  >
+    <div
+      className="col-sm-6"
+    >
+      <button
+        className="btn btn-primary"
+        disabled={false}
+        id="create"
+        onClick={[Function]}
+        type="button"
+      >
+        Create
+      </button>
+       
+      <a
+        download="content-pack-undefined-undefined.json"
+        href="data:text/plain;charset=utf-8,%7B%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summmary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%0A%7D"
+      >
+        <button
+          className="btn btn-info"
+          disabled={false}
+          id="download"
+          type="button"
+        >
+          Download
+        </button>
+      </a>
+    </div>
+  </div>
+</div>
+`;

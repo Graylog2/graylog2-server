@@ -1,0 +1,137 @@
+{
+  "dashboards": [
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e5"
+      },
+      "creator_user_id": "admin",
+      "description": "Description",
+      "created_at": {
+        "$date": "2018-02-13T14:26:31.078Z"
+      },
+      "positions": {
+        "8a598222-1aef-4684-bb03-c768c29c37fa": {
+          "width": 4,
+          "col": 1,
+          "row": 1,
+          "height": 4
+        }
+      },
+      "title": "Test",
+      "widgets": [
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Map",
+          "id": "8a598222-1aef-4684-bb03-c768c29c37fa",
+          "type": "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "foo_location",
+            "query": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Histogram",
+          "id": "e444b1fd-71ff-405d-a158-d6a4a6395c24",
+          "type": "SEARCH_RESULT_CHART",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "query": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Quick values",
+          "id": "560abef0-eca4-4390-9c1a-79194c12da10",
+          "type": "QUICKVALUES",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "action",
+            "query": "",
+            "show_data_table": true,
+            "limit": 5,
+            "show_pie_chart": true,
+            "sort_order": "desc",
+            "stacked_fields": "",
+            "data_table_limit": 50
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Field Statistics",
+          "id": "0a098766-737f-4216-91f5-735f7d393745",
+          "type": "STATS_COUNT",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "ingest_time",
+            "trend": true,
+            "query": "",
+            "stats_function": "cardinality",
+            "lower_is_better": false
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Field graph",
+          "id": "0cee5baa-8b81-45e1-984f-5d607bbe49a3",
+          "type": "FIELD_CHART",
+          "config": {
+            "valuetype": "mean",
+            "renderer": "line",
+            "interpolation": "linear",
+            "timerange": {
+              "type": "relative",
+              "range": 1800
+            },
+            "rangeType": "relative",
+            "field": "took_ms",
+            "query": "",
+            "interval": "minute",
+            "relative": 1800
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Quick values (Stream)",
+          "id": "7a1ac5ab-72c8-47a3-a4b3-8a6b10fcefdf",
+          "type": "QUICKVALUES",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "action",
+            "stream_id": "5adf23894b900a0fdb4e517d",
+            "query": "",
+            "show_data_table": true,
+            "limit": 5,
+            "show_pie_chart": true,
+            "sort_order": "desc",
+            "stacked_fields": "",
+            "data_table_limit": 50
+          }
+        }
+      ]
+    }
+  ]
+}

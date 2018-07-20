@@ -18,12 +18,15 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -42,17 +45,20 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
     private static final String COLLECTION = "pipeline_processor_pipelines_streams";
 
     private final JacksonDBCollection<PipelineConnections, String> dbCollection;
+    private final ClusterEventBus clusterBus;
 
     @Inject
-    public MongoDbPipelineStreamConnectionsService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        dbCollection = JacksonDBCollection.wrap(
+    public MongoDbPipelineStreamConnectionsService(MongoConnection mongoConnection,
+                                                   MongoJackObjectMapperProvider mapper,
+                                                   ClusterEventBus clusterBus) {
+        this.dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
                 PipelineConnections.class,
                 String.class,
                 mapper.get());
+        this.clusterBus = clusterBus;
         dbCollection.createIndex(DBSort.asc("stream_id"), new BasicDBObject("unique", true));
     }
-
 
     @Override
     public PipelineConnections save(PipelineConnections connections) {
@@ -64,7 +70,11 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
         final PipelineConnections toSave = existingConnections.toBuilder()
                 .pipelineIds(connections.pipelineIds()).build();
         final WriteResult<PipelineConnections, String> save = dbCollection.save(toSave);
-        return save.getSavedObject();
+
+        final PipelineConnections savedConnections = save.getSavedObject();
+        clusterBus.post(PipelineConnectionsChangedEvent.create(savedConnections.streamId(), savedConnections.pipelineIds()));
+
+        return savedConnections;
     }
 
     @Override
@@ -87,10 +97,26 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
     }
 
     @Override
+    public Set<PipelineConnections> loadByPipelineId(String pipelineId) {
+        // Thanks, MongoJack!
+        // https://github.com/mongojack/mongojack/issues/12
+        final DBObject query = new BasicDBObject("pipeline_ids", new BasicDBObject("$in", Collections.singleton(pipelineId)));
+        try (DBCursor<PipelineConnections> pipelineConnections = dbCollection.find(query)) {
+            return ImmutableSet.copyOf((Iterable<PipelineConnections>) pipelineConnections);
+        } catch (MongoException e) {
+            log.error("Unable to load pipeline connections for pipeline ID " + pipelineId, e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
     public void delete(String streamId) {
         try {
             final PipelineConnections connections = load(streamId);
+            final Set<String> pipelineIds = connections.pipelineIds();
+
             dbCollection.removeById(connections.id());
+            clusterBus.post(PipelineConnectionsChangedEvent.create(streamId, pipelineIds));
         } catch (NotFoundException e) {
             log.debug("No connections found for stream " + streamId);
         }

@@ -61,6 +61,9 @@ const Routes = {
     CONTENTPACKS: {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
+      CREATE: '/system/contentpacks/create',
+      edit: (contentPackId, contentPackRev) => { return `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`; },
+      show: contentPackId => `/system/contentpacks/${contentPackId}`,
     },
     GROKPATTERNS: '/system/grokpatterns',
     INDICES: {

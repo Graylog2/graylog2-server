@@ -25,6 +25,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.ConfigurationException;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.slf4j.Logger;
@@ -109,8 +110,7 @@ public class JsonExtractor extends Extractor {
 
         final Map<String, Object> json;
         try {
-            json = mapper.readValue(value, new TypeReference<Map<String, Object>>() {
-            });
+            json = mapper.readValue(value, TypeReferences.MAP_STRING_OBJECT);
         } catch (IOException e) {
             return Collections.emptyMap();
         }

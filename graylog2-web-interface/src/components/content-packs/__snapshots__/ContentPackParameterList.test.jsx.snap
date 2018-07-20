@@ -1,0 +1,501 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackParameterList /> should render with empty parameters with readOnly 1`] = `
+<div>
+  <h2>
+    Parameters list
+  </h2>
+  <br />
+  <div
+    className="search"
+    style={
+      Object {
+        "marginTop": 15,
+      }
+    }
+  >
+    <form
+      className="form-inline"
+      onSubmit={[Function]}
+    >
+      <div
+        className="form-group has-feedback"
+      >
+        <input
+          autoComplete="off"
+          className="query form-control"
+          id="common-search-form-query-input"
+          onChange={[Function]}
+          placeholder="Enter search query..."
+          spellCheck="false"
+          style={
+            Object {
+              "width": "auto",
+            }
+          }
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="submit-button btn btn-default"
+          disabled={false}
+          type="submit"
+        >
+          Filter
+        </button>
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="reset-button btn btn-default"
+          disabled={false}
+          onClick={[Function]}
+          type="reset"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="parameter-list"
+        >
+          <p>
+            To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackParameterList /> should render with empty parameters without readOnly 1`] = `
+<div>
+  <h2>
+    Parameters list
+  </h2>
+  <br />
+  <button
+    className="btn btn-sm btn-info"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Create parameter
+  </button>
+  <span>
+    <br />
+    <br />
+  </span>
+  <div
+    className="search"
+    style={
+      Object {
+        "marginTop": 15,
+      }
+    }
+  >
+    <form
+      className="form-inline"
+      onSubmit={[Function]}
+    >
+      <div
+        className="form-group has-feedback"
+      >
+        <input
+          autoComplete="off"
+          className="query form-control"
+          id="common-search-form-query-input"
+          onChange={[Function]}
+          placeholder="Enter search query..."
+          spellCheck="false"
+          style={
+            Object {
+              "width": "auto",
+            }
+          }
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="submit-button btn btn-default"
+          disabled={false}
+          type="submit"
+        >
+          Filter
+        </button>
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="reset-button btn btn-default"
+          disabled={false}
+          onClick={[Function]}
+          type="reset"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="parameter-list"
+        >
+          <p>
+            To use parameters for content packs, at first a parameter must be created and can then be applied to a entity.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackParameterList /> should render with parameters with readOnly 1`] = `
+<div>
+  <h2>
+    Parameters list
+  </h2>
+  <br />
+  <div
+    className="search"
+    style={
+      Object {
+        "marginTop": 15,
+      }
+    }
+  >
+    <form
+      className="form-inline"
+      onSubmit={[Function]}
+    >
+      <div
+        className="form-group has-feedback"
+      >
+        <input
+          autoComplete="off"
+          className="query form-control"
+          id="common-search-form-query-input"
+          onChange={[Function]}
+          placeholder="Enter search query..."
+          spellCheck="false"
+          style={
+            Object {
+              "width": "auto",
+            }
+          }
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="submit-button btn btn-default"
+          disabled={false}
+          type="submit"
+        >
+          Filter
+        </button>
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="reset-button btn btn-default"
+          disabled={false}
+          onClick={[Function]}
+          type="reset"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="parameter-list"
+        >
+          <table
+            className="table scrollable"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Title
+                </th>
+                <th>
+                  Name
+                </th>
+                <th>
+                  Description
+                </th>
+                <th>
+                  Value Type
+                </th>
+                <th>
+                  Default Value
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  A parameter title
+                </td>
+                <td>
+                  A parameter name
+                </td>
+                <td>
+                  A parameter descriptions
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  test
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackParameterList /> should render with parameters without readOnly 1`] = `
+<div>
+  <h2>
+    Parameters list
+  </h2>
+  <br />
+  <button
+    className="btn btn-sm btn-info"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Create parameter
+  </button>
+  <span>
+    <br />
+    <br />
+  </span>
+  <div
+    className="search"
+    style={
+      Object {
+        "marginTop": 15,
+      }
+    }
+  >
+    <form
+      className="form-inline"
+      onSubmit={[Function]}
+    >
+      <div
+        className="form-group has-feedback"
+      >
+        <input
+          autoComplete="off"
+          className="query form-control"
+          id="common-search-form-query-input"
+          onChange={[Function]}
+          placeholder="Enter search query..."
+          spellCheck="false"
+          style={
+            Object {
+              "width": "auto",
+            }
+          }
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="submit-button btn btn-default"
+          disabled={false}
+          type="submit"
+        >
+          Filter
+        </button>
+      </div>
+      <div
+        className="form-group"
+        style={
+          Object {
+            "marginLeft": 5,
+          }
+        }
+      >
+        <button
+          className="reset-button btn btn-default"
+          disabled={false}
+          onClick={[Function]}
+          type="reset"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="parameter-list"
+        >
+          <table
+            className="table scrollable"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Title
+                </th>
+                <th>
+                  Name
+                </th>
+                <th>
+                  Description
+                </th>
+                <th>
+                  Value Type
+                </th>
+                <th>
+                  Default Value
+                </th>
+                <th>
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  A parameter title
+                </td>
+                <td>
+                  A parameter name
+                </td>
+                <td>
+                  A parameter descriptions
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  test
+                </td>
+                <td>
+                  <div
+                    className="btn-toolbar"
+                    role="toolbar"
+                  >
+                    <button
+                      className="btn btn-sm btn-primary"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className="btn btn-sm btn-info"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

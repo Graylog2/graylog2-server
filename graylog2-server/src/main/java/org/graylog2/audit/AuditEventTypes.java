@@ -34,6 +34,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ALERT_RECEIVER_DELETE = PREFIX + "alert_receiver:delete";
     public static final String ALERT_RECEIVER_UPDATE = PREFIX + "alert_receiver:update";
     public static final String AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE = PREFIX + "authentication_provider_configuration:update";
+    public static final String CATALOG_RESOLVE = PREFIX + "catalog:resolve";
     public static final String CLUSTER_CONFIGURATION_CREATE = PREFIX + "cluster_configuration:create";
     public static final String CLUSTER_CONFIGURATION_DELETE = PREFIX + "cluster_configuration:delete";
     public static final String CLUSTER_CONFIGURATION_UPDATE = PREFIX + "cluster_configuration:update";
@@ -42,6 +43,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CONTENT_PACK_DELETE = PREFIX + "content_pack:delete";
     public static final String CONTENT_PACK_EXPORT = PREFIX + "content_pack:export";
     public static final String CONTENT_PACK_UPDATE = PREFIX + "content_pack:update";
+    public static final String CONTENT_PACK_INSTALL = PREFIX + "content_pack:install";
+    public static final String CONTENT_PACK_UNINSTALL = PREFIX + "content_pack:uninstall";
     public static final String DASHBOARD_CREATE = PREFIX + "dashboard:create";
     public static final String DASHBOARD_DELETE = PREFIX + "dashboard:delete";
     public static final String DASHBOARD_UPDATE = PREFIX + "dashboard:update";
@@ -158,6 +161,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ALERT_RECEIVER_DELETE)
             .add(ALERT_RECEIVER_UPDATE)
             .add(AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE)
+            .add(CATALOG_RESOLVE)
             .add(CLUSTER_CONFIGURATION_CREATE)
             .add(CLUSTER_CONFIGURATION_DELETE)
             .add(CLUSTER_CONFIGURATION_UPDATE)
@@ -166,6 +170,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(CONTENT_PACK_DELETE)
             .add(CONTENT_PACK_EXPORT)
             .add(CONTENT_PACK_UPDATE)
+            .add(CONTENT_PACK_INSTALL)
+            .add(CONTENT_PACK_UNINSTALL)
             .add(DASHBOARD_CREATE)
             .add(DASHBOARD_DELETE)
             .add(DASHBOARD_UPDATE)
