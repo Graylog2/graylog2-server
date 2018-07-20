@@ -118,7 +118,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
   },
 
   lookup(adapterName, key) {
-    const promise = fetch('GET', this._url(`adapters/${adapterName}/query?key=${key}`));
+    const promise = fetch('GET', this._url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));
 
     promise.then((response) => {
       this.trigger({
