@@ -14,6 +14,7 @@ import WidgetHeader from './WidgetHeader';
 import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
+import MeasureDimensions from './MeasureDimensions';
 
 import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
@@ -101,22 +102,24 @@ class Widget extends React.Component {
     );
     const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
     if (editing) {
-      let editWidgetFrame = null;
+      let editWidgetFrameContent = null;
       return (
         <EditWidgetFrame widgetId={id}>
-          <span ref={(elem) => { editWidgetFrame = elem; }}>
-            <WidgetHeader title={title}
-                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                          editing={editing}>
-              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-              </WidgetFilterMenu>
-              {' '}
-              <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => editWidgetFrame}>
-                <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
-              </WidgetActionDropdown>
-            </WidgetHeader>
-            {visualization}
+          <span ref={(elem) => { editWidgetFrameContent = elem; }}>
+            <MeasureDimensions>
+              <WidgetHeader title={title}
+                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            editing={editing}>
+                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                </WidgetFilterMenu>
+                {' '}
+                <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => editWidgetFrameContent}>
+                  <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
+                </WidgetActionDropdown>
+              </WidgetHeader>
+              {visualization}
+            </MeasureDimensions>
           </span>
         </EditWidgetFrame>
       );
