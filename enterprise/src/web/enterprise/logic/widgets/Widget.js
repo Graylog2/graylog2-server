@@ -12,7 +12,7 @@ type State = {
 class Widget {
   _value: State;
   constructor(id: string, type: string, config: any, filter: string) {
-    this._value = { id, type, config, filter };
+    this._value = { id, type, config, filter: filter === null ? undefined : filter };
   }
 
   static __registrations = {};

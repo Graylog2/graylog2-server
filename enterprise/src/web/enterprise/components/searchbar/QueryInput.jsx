@@ -28,15 +28,22 @@ class QueryInput extends Component {
   }
 
   componentDidMount() {
-    this.editor.editor.commands.addCommand({
-      name: 'Execute',
-      bindKey: { win: 'Enter', mac: 'Enter' },
-      exec: this._onExecute,
-    });
+    const { editor } = this.editor;
+    if (editor) {
+      editor.commands.addCommand({
+        name: 'Execute',
+        bindKey: { win: 'Enter', mac: 'Enter' },
+        exec: this._onExecute,
+      });
 
-    this.editor.editor.setFontSize(16);
+      editor.setFontSize(16);
 
-    this.editor.editor.completers.push(this.completer);
+      editor.completers.push(this.completer);
+
+      if (!this.props.value && !this._placeholderExists(editor)) {
+        this._addPlaceholder(editor);
+      }
+    }
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.state.value) {
@@ -93,16 +100,18 @@ class QueryInput extends Component {
   _onBlur = () => {
     this.isFocussed = false;
     const editor = this.editor.editor;
-    const shouldShow = !editor.session.getValue().length;
-    if (shouldShow && !this._placeholderExists(editor)) {
-      this._addPlaceholder(editor);
+    if (editor) {
+      const shouldShow = !editor.session.getValue().length;
+      if (shouldShow && !this._placeholderExists(editor)) {
+        this._addPlaceholder(editor);
+      }
     }
   };
 
   _onFocus = () => {
     this.isFocussed = true;
     const editor = this.editor.editor;
-    if (this._placeholderExists(editor)) {
+    if (editor && this._placeholderExists(editor)) {
       this._removePlaceholder(editor);
     }
   };
@@ -113,6 +122,7 @@ class QueryInput extends Component {
   };
 
   render() {
+    const { onChange, onExecute, placeholder, value, ...rest } = this.props;
     return (
       <div className="query" style={{ display: 'flex' }}>
         <AceEditor mode="lucene"
@@ -139,7 +149,9 @@ class QueryInput extends Component {
                      marginTop: '9px',
                      height: '34px',
                      width: '100%',
-                   }} />
+                   }}
+                   {...rest}
+        />
       </div>
     );
   }
