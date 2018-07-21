@@ -849,7 +849,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("e")).isEqualTo("4");
         assertThat(message.getField("f")).isEqualTo("1");
         assertThat(message.getField("g")).isEqualTo("3");
-        assertThat(message.hasField("h")).isFalse();
+        assertThat(message.getField("h")).isEqualTo("3=:3");
+        assertThat(message.hasField("i")).isFalse();
 
         assertThat(message.getField("dup_first")).isEqualTo("1");
         assertThat(message.getField("dup_last")).isEqualTo("2");
