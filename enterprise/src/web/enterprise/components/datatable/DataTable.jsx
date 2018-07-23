@@ -15,6 +15,7 @@ import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import DataTableEntry from './DataTableEntry';
 import { AggregationType } from '../aggregationbuilder/AggregationBuilderPropTypes';
+import { deduplicateValues } from './DeduplicateValues';
 
 class DataTable extends React.Component {
   static propTypes = {
@@ -110,19 +111,7 @@ class DataTable extends React.Component {
     const rowPivotFields = rowFieldNames.map(this._headerField);
 
     const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, rowFieldNames.length + series.length);
-    const duplicateKeys = {};
-    const formattedRows = expandedRows.map((item, idx) => {
-      const reducedItem = Object.assign({}, item);
-      Object.entries(reducedItem).forEach(([key, value]) => {
-        if (!rowFieldNames.includes(key)) {
-          return;
-        }
-        if (duplicateKeys[key] === value) {
-          delete reducedItem[key];
-        } else {
-          duplicateKeys[key] = value;
-        }
-      });
+    const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
       return (<DataTableEntry key={`datatableentry-${idx}`}
                              fields={fields}
                              item={reducedItem}
