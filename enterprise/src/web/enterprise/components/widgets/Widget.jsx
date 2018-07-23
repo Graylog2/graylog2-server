@@ -28,7 +28,7 @@ class Widget extends React.Component {
       computationTimeRange: PropTypes.object,
       config: PropTypes.object.isRequired,
     }).isRequired,
-    data: PropTypes.any.isRequired,
+    data: PropTypes.any,
     height: PropTypes.number,
     width: PropTypes.number,
     fields: PropTypes.any.isRequired,
@@ -41,6 +41,7 @@ class Widget extends React.Component {
   static defaultProps = {
     height: 1,
     width: 1,
+    data: undefined,
   };
 
   static _visualizationForType(type) {
