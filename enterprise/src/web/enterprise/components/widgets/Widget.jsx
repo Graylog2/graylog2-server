@@ -128,28 +128,30 @@ class Widget extends React.Component {
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
         <span ref={(elem) => { container = elem; }}>
-          <WidgetHeader title={title}
-                        onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                        editing={editing}>
-            <WidgetHorizontalStretch widgetId={widget.id}
-                                     widgetType={widget.type}
-                                     onStretch={this.props.onPositionsChange}
-                                     position={this.props.position} />
-            {' '}
-            <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-              <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-            </WidgetFilterMenu>
-            {' '}
-            <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => container}>
-              <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-              <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-              <MenuItem divider />
-              <MenuItem onSelect={() => this._onAddToOverview(activeQuery, id)}>Add to overview</MenuItem>
-              <MenuItem divider />
-              <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-            </WidgetActionDropdown>
-          </WidgetHeader>
-          {visualization}
+          <MeasureDimensions>
+            <WidgetHeader title={title}
+                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                          editing={editing}>
+              <WidgetHorizontalStretch widgetId={widget.id}
+                                       widgetType={widget.type}
+                                       onStretch={this.props.onPositionsChange}
+                                       position={this.props.position} />
+              {' '}
+              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+              </WidgetFilterMenu>
+              {' '}
+              <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => container}>
+                <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                <MenuItem divider />
+                <MenuItem onSelect={() => this._onAddToOverview(activeQuery, id)}>Add to overview</MenuItem>
+                <MenuItem divider />
+                <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+              </WidgetActionDropdown>
+            </WidgetHeader>
+            {visualization}
+          </MeasureDimensions>
         </span>
       </WidgetFrame>
     );

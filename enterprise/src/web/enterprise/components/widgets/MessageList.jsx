@@ -143,7 +143,7 @@ const MessageList = createReactClass({
   render() {
     let maxHeight = null;
     if (this.props.containerHeight) {
-      maxHeight = this.props.containerHeight - 100;
+      maxHeight = this.props.containerHeight - 60;
     }
     const pageSize = this.props.pageSize || 7;
     const messages = this.props.data.messages || [];
