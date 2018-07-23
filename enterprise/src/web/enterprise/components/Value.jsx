@@ -37,6 +37,7 @@ export default class Value extends React.Component {
   _renderTypeSpecific = (value, { type }) => {
     switch (type) {
       case 'date': return <UserTimezoneTimestamp dateTime={value} />;
+      case 'boolean': return String(value);
       default: return value;
     }
   };
