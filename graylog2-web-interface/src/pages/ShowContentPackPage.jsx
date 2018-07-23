@@ -37,6 +37,7 @@ const ShowContentPackPage = createReactClass({
 
   componentDidMount() {
     ContentPacksActions.get(this.props.params.contentPackId);
+    ContentPacksActions.installList(this.props.params.contentPackId);
   },
 
   _onVersionChanged(newVersion) {
@@ -49,7 +50,18 @@ const ShowContentPackPage = createReactClass({
         UserNotification.success('Content Pack deleted successfully.', 'Success');
         ContentPacksActions.get(contentPackId);
       }, () => {
-        UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
+        UserNotification.error('Deleting content pack failed, please check your logs for more information.', 'Error');
+      });
+    }
+  },
+
+  _uninstallContentPackRev(contentPackId, installId) {
+    if (window.confirm('You are about to uninstall this content pack installation, are you sure?')) {
+      ContentPacksActions.uninstall(contentPackId, installId).then(() => {
+        UserNotification.success('Content Pack uninstalled successfully.', 'Success');
+        ContentPacksActions.installList(contentPackId);
+      }, () => {
+        UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
       });
     }
   },
@@ -103,7 +115,9 @@ const ShowContentPackPage = createReactClass({
                 <Row className={ShowContentPackStyle.leftRow}>
                   <Col>
                     <h2>Installations</h2>
-                    <ContentPackInstallations installations={contentPack.installations} />
+                    <ContentPackInstallations installations={this.state.installations}
+                                              onUninstall={this._uninstallContentPackRev}
+                    />
                   </Col>
                 </Row>
               </div>

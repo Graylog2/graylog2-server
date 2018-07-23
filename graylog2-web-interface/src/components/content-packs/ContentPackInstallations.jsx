@@ -2,23 +2,19 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
+import Spinner from 'components/common/Spinner';
 
 class ContentPackInstallations extends React.Component {
   static propTypes = {
     installations: PropTypes.arrayOf(PropTypes.string),
+    onUninstall: PropTypes.func,
   };
 
   static defaultProps = {
     installations: [],
+    onUninstall: () => {},
   };
-
-  constructor(props) {
-    super(props);
-
-    this.rowFormatter = this.rowFormatter.bind(this);
-    this.headerFormater = this.headerFormater.bind(this);
-  }
 
   rowFormatter = (item) => {
     return (
@@ -26,16 +22,18 @@ class ContentPackInstallations extends React.Component {
         <td>
           {item.comment}
         </td>
-        <td>{item.version}</td>
-        <td className="text-right">
-          <Button bsStyle="info" bsSize="small">Install</Button>
-          &nbsp;
-          <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-            <MenuItem>Remove</MenuItem>
-            <MenuItem>Uninstall</MenuItem>
-            <MenuItem>Create New Version</MenuItem>
-            <MenuItem>Download</MenuItem>
-          </DropdownButton>
+        <td>{item.content_pack_revision}</td>
+        <td>
+          <div className="pull-right">
+            <ButtonToolbar>
+              <Button bsStyle="primary"
+                      bsSize="small"
+                      onClick={() => { this.props.onUninstall(item.content_pack_id, item._id); }}>
+                Uninstall
+              </Button>
+              <Button bsStyle="info" bsSize="small">View</Button>
+            </ButtonToolbar>
+          </div>
         </td>
       </tr>
     );
@@ -49,6 +47,10 @@ class ContentPackInstallations extends React.Component {
   };
 
   render() {
+    if (!this.props.installations) {
+      return (<Spinner />);
+    }
+
     const headers = ['Comment', 'Version', 'Action'];
     return (
       <DataTable

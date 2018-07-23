@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackInstallations /> should render with a installation 1`] = `
+<div>
+  <div
+    className="row "
+  >
+    <div
+      className="col-md-12"
+    >
+      <div
+        className="data-table table-responsive"
+        id="content-packs-versions"
+      >
+        <table
+          className="table undefined"
+        >
+          <thead>
+            <tr>
+              <th>
+                Comment
+              </th>
+              <th>
+                Version
+              </th>
+              <th
+                className="text-right"
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                The fake input
+              </td>
+              <td>
+                1
+              </td>
+              <td>
+                <div
+                  className="pull-right"
+                >
+                  <div
+                    className="btn-toolbar"
+                    role="toolbar"
+                  >
+                    <button
+                      className="btn btn-sm btn-primary"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Uninstall
+                    </button>
+                    <button
+                      className="btn btn-sm btn-info"
+                      disabled={false}
+                      type="button"
+                    >
+                      View
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackInstallations /> should render with empty installations 1`] = `
+<div>
+  <div
+    className="row "
+  >
+    <div
+      className="col-md-12"
+    >
+      <div
+        className="data-table table-responsive"
+        id="content-packs-versions"
+      >
+        <p>
+          No data available.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackInstallations /> should render without installations 1`] = `
+<div>
+  <div
+    className="row "
+  >
+    <div
+      className="col-md-12"
+    >
+      <div
+        className="data-table table-responsive"
+        id="content-packs-versions"
+      >
+        <p>
+          No data available.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
