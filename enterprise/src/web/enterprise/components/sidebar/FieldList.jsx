@@ -51,7 +51,7 @@ const FieldList = createReactClass({
   MINIMUM_FIELDS_HEIGHT: 50,
 
   _onScroll() {
-    this.eventsThrottler.throttle(this._updateHeight, 30);
+    this.eventsThrottler.throttle(this._updateHeight, 300);
   },
 
   _updateHeight() {
