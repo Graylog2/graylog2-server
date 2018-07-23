@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 
 import { Button } from 'react-bootstrap';
 import TimeHistogramPivot from './pivottypes/TimeHistogramPivot';
-import NoConfigurationPivot from './pivottypes/NoConfigurationPivot';
 import FieldType from '../../logic/fieldtypes/FieldType';
+import TermsPivotConfiguration from './pivottypes/TermsPivotConfiguration';
 
 const _configurationComponentByType = (type, value, onChange) => {
   switch (type.type) {
     case 'date': return <TimeHistogramPivot onChange={onChange} value={value} />;
-    default: return <NoConfigurationPivot />;
+    default: return <TermsPivotConfiguration onChange={onChange} value={value}/>;
   }
 };
 

@@ -5,6 +5,6 @@ export const pivotForField = (fieldName) => {
     case 'timestamp':
       return new Pivot(fieldName, 'time', { interval: { value: 1, unit: 'minutes' } });
     default:
-      return new Pivot(fieldName, 'values');
+      return new Pivot(fieldName, 'values', { limit: 15 });
   }
 };
