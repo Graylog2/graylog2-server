@@ -17,7 +17,6 @@ class ContentPackConstraints extends React.Component {
   };
 
   _rowFormatter = (item) => {
-    console.log('ITEM', item);
     const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
     const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
     return (
