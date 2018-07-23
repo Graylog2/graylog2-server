@@ -48,7 +48,6 @@ const ConfigurationsPage = createReactClass({
   SIDECAR_CONFIG: 'org.graylog.plugins.sidecar.system.SidecarConfiguration',
 
   _getConfig(configType) {
-    console.log(this.state.configuration);
     if (this.state.configuration && this.state.configuration[configType]) {
       return this.state.configuration[configType];
     }
