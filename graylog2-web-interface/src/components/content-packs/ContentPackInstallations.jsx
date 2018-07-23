@@ -2,8 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import Spinner from 'components/common/Spinner';
+
+import ContentPackInstallationView from 'components/content-packs/ContentPackInstallView';
 
 class ContentPackInstallations extends React.Component {
   static propTypes = {
@@ -17,6 +20,29 @@ class ContentPackInstallations extends React.Component {
   };
 
   rowFormatter = (item) => {
+    let showModalRef;
+    const closeShowModal = () => {
+      showModalRef.close();
+    };
+
+    const openShowModal = () => {
+      showModalRef.open();
+    };
+
+    const showModal = (
+      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
+        <Modal.Header closeButton>
+          <Modal.Title>View Installation</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ContentPackInstallationView install={item} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeShowModal}>Close</Button>
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
+
     return (
       <tr key={item}>
         <td>
@@ -31,7 +57,12 @@ class ContentPackInstallations extends React.Component {
                       onClick={() => { this.props.onUninstall(item.content_pack_id, item._id); }}>
                 Uninstall
               </Button>
-              <Button bsStyle="info" bsSize="small">View</Button>
+              <Button bsStyle="info"
+                      bsSize="small"
+                      onClick={openShowModal}>
+                View
+              </Button>
+              {showModal}
             </ButtonToolbar>
           </div>
         </td>
