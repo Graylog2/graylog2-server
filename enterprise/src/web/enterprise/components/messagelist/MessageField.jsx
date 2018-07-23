@@ -5,6 +5,7 @@ import connect from 'stores/connect';
 import Field from 'enterprise/components/Field';
 import Value from 'enterprise/components/Value';
 import { ViewStore } from '../../stores/ViewStore';
+import CustomPropTypes from '../CustomPropTypes';
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
@@ -18,14 +19,16 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }) => 
         <Field interactive queryId={activeQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
       </dt>
       <dd>
-        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType}>{innerValue}</Value>
+        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} />
       </dd>
     </span>
   );
 };
 
 MessageField.propTypes = {
+  currentView: CustomPropTypes.CurrentView.isRequired,
   fieldName: PropTypes.string.isRequired,
+  fieldType: CustomPropTypes.FieldType.isRequired,
   message: PropTypes.object.isRequired,
   value: PropTypes.any.isRequired,
 };

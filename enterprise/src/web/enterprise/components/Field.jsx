@@ -8,6 +8,7 @@ import OverlayDropdown from './OverlayDropdown';
 
 import style from './Field.css';
 import FieldType from '../logic/fieldtypes/FieldType';
+import CustomPropTypes from './CustomPropTypes';
 
 export default class Field extends React.Component {
   static propTypes = {
@@ -16,7 +17,7 @@ export default class Field extends React.Component {
     name: PropTypes.string.isRequired,
     menuContainer: PropTypes.object,
     queryId: PropTypes.string.isRequired,
-    type: PropTypes.instanceOf(FieldType).isRequired,
+    type: CustomPropTypes.FieldType.isRequired,
   };
 
   static defaultProps = {

@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { MenuItem, Well } from 'react-bootstrap';
 
+import UserTimezoneTimestamp from 'enterprise/components/common/UserTimezoneTimestamp';
 import OverlayDropdown from './OverlayDropdown';
 
 import style from './Value.css';
+import CustomPropTypes from './CustomPropTypes';
 
 export default class Value extends React.Component {
   static propTypes = {
@@ -13,6 +15,7 @@ export default class Value extends React.Component {
     field: PropTypes.string.isRequired,
     menuContainer: PropTypes.object,
     queryId: PropTypes.string.isRequired,
+    type: CustomPropTypes.FieldType.isRequired,
     value: PropTypes.node.isRequired,
   };
 
@@ -31,10 +34,16 @@ export default class Value extends React.Component {
   }
 
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
+  _renderTypeSpecific = (value, { type }) => {
+    switch (type) {
+      case 'date': return <UserTimezoneTimestamp dateTime={value} />;
+      default: return value;
+    }
+  };
 
   render() {
-    const { children, field, menuContainer, value, queryId } = this.props;
-    const element = children || value;
+    const { children, field, menuContainer, value, queryId, type } = this.props;
+    const element = children || this._renderTypeSpecific(value, type);
     const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
       const onSelect = (event) => {
         this._onMenuToggle();
@@ -64,4 +73,4 @@ export default class Value extends React.Component {
       </OverlayDropdown>
     );
   }
-};
+}

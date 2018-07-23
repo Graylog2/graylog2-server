@@ -1,25 +1,38 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { flatten, flattenDeep, get } from 'lodash';
+import { flatten, get } from 'lodash';
 
 import connect from 'stores/connect';
+import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import Value from 'enterprise/components/Value';
-import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import * as AggregationBuilderPropTypes from '../aggregationbuilder/AggregationBuilderPropTypes';
 
 const _c = (field, value) => ({ field, value });
 
 class DataTableEntry extends React.Component {
   static propTypes = {
-    item: PropTypes.object.isRequired,
+    columnPivots: AggregationBuilderPropTypes.PivotList.isRequired,
+    columnPivotValues: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
+    currentView: CustomPropTypes.CurrentView.isRequired,
     fields: PropTypes.instanceOf(Immutable.OrderedSet).isRequired,
+    item: PropTypes.object.isRequired,
+    series: AggregationBuilderPropTypes.SeriesList.isRequired,
+    types: CustomPropTypes.FieldListType.isRequired,
   };
 
-  _column = (field, value, selectedQuery, idx) => (
+  _column = (field, value, selectedQuery, idx, type) => (
     <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
-      <Value field={field} value={value} queryId={selectedQuery}>{value}</Value>
+      <Value field={field} type={type} value={value} queryId={selectedQuery} />
     </td>
   );
+
+  _fieldTypeFor = (field) => {
+    const fieldType = this.props.types.find(f => f.name === field);
+    return fieldType ? fieldType.type : FieldType.Unknown;
+  };
 
   render() {
     const classes = 'message-group';
@@ -41,7 +54,7 @@ class DataTableEntry extends React.Component {
     return (
       <tbody className={classes}>
         <tr className="fields-row">
-          {columns.map(({ field, value }, idx) => this._column(field, value, activeQuery, idx))}
+          {columns.map(({ field, value }, idx) => this._column(field, value, activeQuery, idx, this._fieldTypeFor(field)))}
         </tr>
       </tbody>
     );

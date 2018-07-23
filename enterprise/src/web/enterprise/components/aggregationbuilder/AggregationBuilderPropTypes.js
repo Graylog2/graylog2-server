@@ -10,11 +10,14 @@ export const FieldList = PropTypes.arrayOf(
 
 export const PivotType = PropTypes.instanceOf(Pivot);
 export const PivotList = PropTypes.arrayOf(PivotType);
+export const SeriesList = PropTypes.arrayOf(PropTypes.string);
+export const SortList = PropTypes.arrayOf(PropTypes.string);
+export const VisualizationType = PropTypes.string;
 
 export const AggregationType = PropTypes.shape({
   rowPivots: PivotList,
   columnPivots: PivotList,
-  series: PropTypes.arrayOf(PropTypes.string),
-  sort: PropTypes.arrayOf(PropTypes.string),
-  visualization: PropTypes.string,
+  series: SeriesList,
+  sort: SortList,
+  visualization: VisualizationType,
 });

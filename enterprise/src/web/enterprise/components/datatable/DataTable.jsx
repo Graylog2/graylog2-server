@@ -113,11 +113,12 @@ class DataTable extends React.Component {
     const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, rowFieldNames.length + series.length);
     const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
       return (<DataTableEntry key={`datatableentry-${idx}`}
-                             fields={fields}
-                             item={reducedItem}
-                             columnPivots={columnFieldNames}
-                             columnPivotValues={actualColumnPivotFields}
-                             series={series} />);
+                              fields={fields}
+                              item={reducedItem}
+                              columnPivots={columnFieldNames}
+                              columnPivotValues={actualColumnPivotFields}
+                              types={this.props.fields}
+                              series={series} />);
     });
 
     const seriesFields = series.map(this._headerField);
