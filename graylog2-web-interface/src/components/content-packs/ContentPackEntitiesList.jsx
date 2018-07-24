@@ -126,9 +126,9 @@ class ContentPackEntitiesList extends React.Component {
     const appliedParameterCount = (this.props.appliedParameter[entity.id] || []).length;
     return (
       <tr key={entity.id}>
-        <td>{this._entityTitle(entity)}</td>
+        <td className={ContentPackEntitiesListStyle.bigColumns}>{this._entityTitle(entity)}</td>
         <td>{entity.type}</td>
-        <td>{this._entityDescription(entity)}</td>
+        <td className={ContentPackEntitiesListStyle.bigColumns}>{this._entityDescription(entity)}</td>
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>

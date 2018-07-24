@@ -200,13 +200,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   A good input
                 </td>
                 <td>
                   Input
                 </td>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   Input
                 </td>
                 <td>
@@ -237,13 +241,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                 </td>
               </tr>
               <tr>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   A bad input
                 </td>
                 <td>
                   Input
                 </td>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   BadInput
                 </td>
                 <td>

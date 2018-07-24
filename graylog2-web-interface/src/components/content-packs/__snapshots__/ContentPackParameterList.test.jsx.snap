@@ -305,13 +305,17 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   A parameter title
                 </td>
                 <td>
                   A parameter name
                 </td>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   A parameter descriptions
                 </td>
                 <td>
@@ -452,13 +456,17 @@ exports[`<ContentPackParameterList /> should render with parameters without read
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   A parameter title
                 </td>
                 <td>
                   A parameter name
                 </td>
-                <td>
+                <td
+                  className="bigColumns"
+                >
                   A parameter descriptions
                 </td>
                 <td>

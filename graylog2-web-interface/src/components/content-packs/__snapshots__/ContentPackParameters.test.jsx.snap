@@ -129,13 +129,17 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   </thead>
                   <tbody>
                     <tr>
-                      <td>
+                      <td
+                        className="bigColumns"
+                      >
                         A parameter title
                       </td>
                       <td>
                         A parameter name
                       </td>
-                      <td>
+                      <td
+                        className="bigColumns"
+                      >
                         A parameter descriptions
                       </td>
                       <td>
@@ -289,11 +293,15 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   </thead>
                   <tbody>
                     <tr>
-                      <td>
+                      <td
+                        className="bigColumns"
+                      >
                         A good input
                       </td>
                       <td />
-                      <td>
+                      <td
+                        className="bigColumns"
+                      >
                         Input
                       </td>
                       <td>
