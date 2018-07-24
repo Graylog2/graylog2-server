@@ -57,6 +57,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                     <button
                       className="btn btn-sm btn-info"
                       disabled={false}
+                      onClick={[Function]}
                       type="button"
                     >
                       View
