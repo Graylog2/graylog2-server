@@ -20,7 +20,7 @@ describe('<ContentPackInstallations />', () => {
       entities: [
         {
           id: '5b55b8b73d274645e49f7eea',
-          type: 'input'
+          type: 'input',
         },
       ],
       comment: 'The fake input',

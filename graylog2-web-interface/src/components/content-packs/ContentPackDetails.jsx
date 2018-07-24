@@ -35,6 +35,7 @@ const ContentPackDetails = (props) => {
           <h2>Description</h2>
           <br />
           <Well>
+            {/* eslint-disable-next-line react/no-danger */}
             <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
           </Well>
           <br />
