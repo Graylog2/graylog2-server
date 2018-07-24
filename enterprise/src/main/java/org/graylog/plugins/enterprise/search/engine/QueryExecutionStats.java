@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 
 import static org.joda.time.DateTimeZone.UTC;
@@ -18,7 +19,7 @@ public abstract class QueryExecutionStats {
     public abstract DateTime timestamp();
 
     @JsonProperty("effective_timerange")
-    public abstract EffectiveTimeRange effectiveTimeRange();
+    public abstract AbsoluteRange effectiveTimeRange();
 
     public static QueryExecutionStats empty() {
         return builder().build();
@@ -40,7 +41,7 @@ public abstract class QueryExecutionStats {
         public static Builder create() {
             return new AutoValue_QueryExecutionStats.Builder()
                     .timestamp(DateTime.now(UTC))
-                    .effectiveTimeRange(EffectiveTimeRange.create(DateTime.now(UTC), DateTime.now(UTC)))
+                    .effectiveTimeRange(AbsoluteRange.create(DateTime.now(UTC), DateTime.now(UTC)))
                     .duration(0L);
         }
 
@@ -51,7 +52,7 @@ public abstract class QueryExecutionStats {
         public abstract Builder timestamp(DateTime timestamp);
 
         @JsonProperty("effective_timerange")
-        public abstract Builder effectiveTimeRange(EffectiveTimeRange effectiveTimeRange);
+        public abstract Builder effectiveTimeRange(AbsoluteRange effectiveTimeRange);
 
         public abstract QueryExecutionStats build();
     }

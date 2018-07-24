@@ -8,6 +8,7 @@ import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.errors.QueryError;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
             return result.toBuilder()
                     .executionStats(
                             statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS))
-                                    .effectiveTimeRange(EffectiveTimeRange.create(query.timerange().getFrom(), query.timerange().getTo()))
+                                    .effectiveTimeRange(AbsoluteRange.create(query.timerange().getFrom(), query.timerange().getTo()))
                                     .build())
                     .build();
         } catch (Exception e) {
