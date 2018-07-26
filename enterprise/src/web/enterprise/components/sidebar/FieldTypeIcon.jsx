@@ -8,6 +8,8 @@ const iconClass = (type) => {
   switch (type) {
     case 'string':
       return 'font';
+    case 'boolean':
+      return 'toggle-on';
     case 'byte':
     case 'double':
     case 'float':
