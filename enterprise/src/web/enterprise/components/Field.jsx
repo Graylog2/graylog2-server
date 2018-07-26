@@ -40,7 +40,9 @@ export default class Field extends React.Component {
   render() {
     const { children, disabled, menuContainer, name, queryId, type } = this.props;
     const element = children || name;
-    const wrappedElement = disabled ? <span className={style.disabled}>{element}</span> : element;
+    const activeClass = this.state.open ? style.active : '';
+    const disbaledClass = disabled ? style.disabled : '';
+    const wrappedElement = <span className={`${activeClass} ${disbaledClass}`}>{element}</span>;
     const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
       const onSelect = ({ field }) => {
         this._onMenuToggle();
@@ -57,6 +59,7 @@ export default class Field extends React.Component {
     return (
       <OverlayDropdown show={this.state.open}
                        toggle={wrappedElement}
+                       placement="right"
                        onToggle={this._onMenuToggle}
                        menuContainer={menuContainer} >
         <div style={{ marginBottom: '10px' }}>

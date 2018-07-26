@@ -9,3 +9,7 @@
 :local(.disabled) {
     opacity: 0.3;
 }
+
+:local(.active) {
+    color: #16ace3;
+}

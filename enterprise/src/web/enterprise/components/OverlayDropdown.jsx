@@ -9,11 +9,13 @@ export default class OverlayDropdown extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     menuContainer: PropTypes.object,
+    placement: PropTypes.string,
     toggle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   };
 
   static defaultProps = {
     menuContainer: document.body,
+    placement: 'bottom',
   };
 
   render() {
@@ -37,7 +39,7 @@ export default class OverlayDropdown extends React.Component {
         <Overlay show={show}
                  container={menuContainer}
                  containerPadding={10}
-                 placement="bottom"
+                 placement={this.props.placement}
                  shouldUpdatePosition
                  rootClose
                  onHide={onToggle}
