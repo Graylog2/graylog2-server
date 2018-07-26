@@ -112,6 +112,7 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
+      condition: ({ type }) => !type.isCompound(),
     },
     {
       type: 'statistics',

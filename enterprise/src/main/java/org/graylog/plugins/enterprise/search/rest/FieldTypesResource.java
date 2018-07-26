@@ -39,6 +39,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     private final StreamService streamService;
     private final FieldTypeMapper fieldTypeMapper;
     private static final FieldTypes.Type UNKNOWN_TYPE = createType("unknown", of());
+    private static final String PROP_COMPOUND_TYPE = "compound";
 
     @Inject
     public FieldTypesResource(IndexFieldTypesService indexFieldTypesService, StreamService streamService, FieldTypeMapper fieldTypeMapper) {
@@ -64,7 +65,9 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
                             .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().properties())
                             .reduce((s1, s2) -> Sets.intersection(s1, s2).immutableCopy())
                             .orElse(ImmutableSet.of());
-                    return MappedFieldTypeDTO.create(fieldName, createType(compoundFieldType, commonProperties));
+
+                    final ImmutableSet<String> properties = ImmutableSet.<String>builder().addAll(commonProperties).add(PROP_COMPOUND_TYPE).build();
+                    return MappedFieldTypeDTO.create(fieldName, createType(compoundFieldType, properties));
                 })
                 .collect(Collectors.toSet());
 

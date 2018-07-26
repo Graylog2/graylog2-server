@@ -1,6 +1,7 @@
 import Immutable from 'immutable';
 
 const Properties = {
+  Compound: 'compound',
   Enumerable: 'enumerable',
   FullTextSearch: 'full-text-search',
   Numeric: 'numeric',
@@ -27,6 +28,10 @@ class FieldType {
 
   isNumeric() {
     return this.properties.has(Properties.Numeric);
+  }
+
+  isCompound() {
+    return this.properties.has(Properties.Compound);
   }
 
   static fromJSON(value) {
