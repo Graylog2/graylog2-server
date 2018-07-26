@@ -190,11 +190,15 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   </thead>
                   <tbody>
                     <tr>
-                      <td>
+                      <td
+                        className="bigColumns"
+                      >
                         franz
                       </td>
                       <td />
-                      <td>
+                      <td
+                        className="bigColumns"
+                      >
                         
                       </td>
                       <td>

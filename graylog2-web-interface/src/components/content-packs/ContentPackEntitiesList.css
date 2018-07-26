@@ -10,3 +10,7 @@
     width:100%;
     table-layout:fixed;
 }
+
+:local(.bigColumns) {
+    word-wrap: break-word;
+}

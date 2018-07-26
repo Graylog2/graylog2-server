@@ -41,9 +41,9 @@ class ContentPackParameterList extends React.Component {
   _parameterRowFormatter = (parameter) => {
     return (
       <tr key={parameter.title}>
-        <td>{parameter.title}</td>
+        <td className={ContentPackParameterListStyle.bigColumns}>{parameter.title}</td>
         <td>{parameter.name}</td>
-        <td>{parameter.description}</td>
+        <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
         {!this.props.readOnly &&
