@@ -13,6 +13,7 @@ export default (name) => {
   MockComponent.defaultProps = {
     children: null,
   };
+  MockComponent.displayName = name;
 
   return MockComponent;
 };
