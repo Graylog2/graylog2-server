@@ -56,7 +56,7 @@ public abstract class AutoInterval implements Interval {
     }
 
     @JsonCreator
-    public static AutoInterval create(@JsonProperty("type") String type) {
+    public static AutoInterval create() {
         return new AutoValue_AutoInterval(type);
     }
 }
