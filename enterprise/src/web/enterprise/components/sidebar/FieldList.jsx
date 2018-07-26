@@ -2,6 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+import { is } from 'immutable';
+import { isEqual } from 'lodash';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import SearchForm from 'components/common/SearchForm';
@@ -35,6 +37,22 @@ const FieldList = createReactClass({
   componentDidMount() {
     this._updateHeight();
     window.addEventListener('scroll', this._onScroll);
+  },
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { allFields, fields, maximumHeight, selectedFields } = this.props;
+    const { maxFieldsHeight, showFieldsBy, viewMetadata } = this.state;
+    if (maximumHeight !== nextProps.maximumHeight || maxFieldsHeight !== nextState.maxFieldsHeight || showFieldsBy !== nextState.showFieldsBy) {
+      return true;
+    }
+    if (!isEqual(viewMetadata, nextState.viewMetadata)) {
+      return true;
+    }
+    if (!is(nextProps.allFields, allFields) || !is(nextProps.fields, fields) || !is(nextProps.selectedFields, selectedFields)) {
+      return true;
+    }
+
+    return false;
   },
 
   componentDidUpdate(prevProps) {
