@@ -67,7 +67,7 @@ const QueryTabActions = createReactClass({
           <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
         </DropdownButton>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
-        <ViewPropertiesModal view={view} title="Save new view" onSave={this.handleSaveView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
+        <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
         <ViewPropertiesModal view={view} title="Editing view" onSave={this.handleSaveView} show={this.state.editViewOpen} onClose={this.handleEditClose} />
       </span>
     );

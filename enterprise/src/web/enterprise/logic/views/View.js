@@ -113,6 +113,10 @@ class Builder {
     return new Builder(this.value.set('id', value));
   }
 
+  newId() {
+    return this.id(ObjectID().toString());
+  }
+
   title(value) {
     return new Builder(this.value.set('title', value));
   }
