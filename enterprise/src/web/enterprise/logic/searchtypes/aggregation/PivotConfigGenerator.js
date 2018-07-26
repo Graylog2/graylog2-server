@@ -7,8 +7,10 @@ const formatPivot = (pivot) => {
   switch (type) {
     // eslint-disable-next-line no-case-declarations
     case 'time':
-      const { unit, value } = newConfig.interval;
-      newConfig.interval = `${value}${unit[0]}`;
+      if (newConfig.interval.type === 'timeunit') {
+        const { unit, value } = newConfig.interval;
+        newConfig.interval = { type: 'timeunit', timeunit: `${value}${unit[0]}` };
+      }
       break;
     default:
   }

@@ -5,6 +5,7 @@ import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.pivot.ESPivot;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 public class ESValuesHandler extends ESPivotBucketSpecHandler<Values, TermsAggregation> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Values valuesSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
         final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
                 .minDocCount(1)
                 .field(valuesSpec.field())

@@ -80,7 +80,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             if (handler == null) {
                 throw new IllegalArgumentException("Unknown row_group type " + bucketSpec.type());
             }
-            final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext);
+            final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
             if (generatedAggregation.isPresent()) {
                 final AggregationBuilder aggregationBuilder = generatedAggregation.get();
                 if (topLevelAggregation == null) {
@@ -112,7 +112,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 if (handler == null) {
                     throw new IllegalArgumentException("Unknown column_group type " + bucketSpec.type());
                 }
-                final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext);
+                final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
                 if (generatedAggregation.isPresent()) {
                     final AggregationBuilder aggregationBuilder = generatedAggregation.get();
                     // always insert the series for the final row group, or for each one if explicit rollup was requested

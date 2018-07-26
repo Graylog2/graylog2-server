@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+  Checkbox,
   ControlLabel,
   DropdownButton,
   FormControl,
@@ -37,8 +38,20 @@ export default class TimeHistogramPivot extends React.Component {
     this.state = interval;
   }
 
-  _changeUnit = unit => this.setState({ unit }, () => this.props.onChange({ interval: this.state }));
-  _changeValue = event => this.setState({ value: FormsUtils.getValueFromInput(event.target) }, () => this.props.onChange({ interval: this.state }));
+  _toggleAuto = () => {
+    this.setState((state) => {
+      if (state.type === 'auto') {
+        return { value: 1, unit: 'minutes', type: 'timeunit' };
+      }
+      return { type: 'auto', value: undefined, unit: undefined };
+    }, this._propagateState);
+  };
+
+  _isAuto = () => this.state.type === 'auto';
+  _propagateState = () => this.props.onChange({ interval: this.state });
+
+  _changeUnit = unit => this.setState({ unit }, this._propagateState);
+  _changeValue = event => this.setState({ value: FormsUtils.getValueFromInput(event.target) }, this._propagateState);
 
   render() {
     const units = TimeHistogramPivot.units;
@@ -46,16 +59,20 @@ export default class TimeHistogramPivot extends React.Component {
       <FormGroup>
         <ControlLabel>Interval</ControlLabel>
         <InputGroup>
-          <FormControl type="text" value={this.state.value} onChange={this._changeValue} />
+          <FormControl type="number" value={this._isAuto() ? '' : this.state.value} onChange={this._changeValue} disabled={this._isAuto()} />
           <DropdownButton
             componentClass={InputGroup.Button}
             id="input-dropdown-addon"
             title={units[this.state.unit]}
+            disabled={this._isAuto()}
             onChange={this._changeUnit}
           >
             {Object.keys(units).map(unit => <MenuItem key={unit} onSelect={() => this._changeUnit(unit)}>{units[unit]}</MenuItem>)}
           </DropdownButton>
         </InputGroup>
+        <Checkbox checked={this._isAuto()} onChange={this._toggleAuto}>
+          Choose automatically
+        </Checkbox>
         <HelpBlock>The size of the buckets for this timestamp type</HelpBlock>
       </FormGroup>
     );

@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.searchtypes.pivot;
 
+import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.engine.SearchTypeHandler;
 
@@ -19,12 +20,12 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default Optional<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, PivotSpec pivotSpec, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doCreateAggregation(name, pivot, (SPEC_TYPE) pivotSpec, (SEARCHTYPE_HANDLER) searchTypeHandler, (QUERY_CONTEXT) queryContext);
+    default Optional<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, PivotSpec pivotSpec, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext, Query query) {
+        return doCreateAggregation(name, pivot, (SPEC_TYPE) pivotSpec, (SEARCHTYPE_HANDLER) searchTypeHandler, (QUERY_CONTEXT) queryContext, query);
     }
 
     @Nonnull
-    Optional<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE bucketSpec, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
+    Optional<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE bucketSpec, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext, Query query);
 
     @SuppressWarnings("unchecked")
     default Object handleResult(Pivot pivot, BucketSpec bucketSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {

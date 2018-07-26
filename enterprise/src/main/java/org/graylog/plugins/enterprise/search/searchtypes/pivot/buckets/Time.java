@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.searchtypes.pivot.buckets;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,7 +23,7 @@ public abstract class Time implements BucketSpec {
     public abstract String field();
 
     @JsonProperty
-    public abstract String interval();
+    public abstract Interval interval();
 
     public static Time.Builder builder() {
         return new AutoValue_Time.Builder()
@@ -42,7 +43,12 @@ public abstract class Time implements BucketSpec {
         public abstract Builder field(String field);
 
         @JsonProperty
-        public abstract Builder interval(String interval);
+        public abstract Builder interval(Interval interval);
+
+        @JsonIgnore
+        public Builder interval(String interval) {
+            return this.interval(TimeUnitInterval.create(interval));
+        };
 
     }
 
