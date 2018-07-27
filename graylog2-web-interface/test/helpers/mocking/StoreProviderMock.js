@@ -1,5 +1,10 @@
 export default class StoreProviderMock {
-  constructor(stores = {}) {
+  static defaultStore = {
+    get: () => jest.fn(() => ({})),
+    listen: jest.fn(),
+  };
+
+  constructor(stores = StoreProviderMock.defaultStore) {
     this.stores = stores;
   }
 
