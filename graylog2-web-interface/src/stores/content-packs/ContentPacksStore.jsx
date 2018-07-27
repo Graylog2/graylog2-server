@@ -77,7 +77,7 @@ const ContentPacksStore = Reflux.createStore({
         return result;
       });
 
-    ContentPacksActions.listInstall.promise(promise);
+    ContentPacksActions.installList.promise(promise);
   },
   uninstall(contentPackId, installId) {
     const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstall(contentPackId, installId).url));

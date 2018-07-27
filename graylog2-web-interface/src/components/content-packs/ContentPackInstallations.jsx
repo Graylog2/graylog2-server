@@ -10,7 +10,7 @@ import ContentPackInstallationView from 'components/content-packs/ContentPackIns
 
 class ContentPackInstallations extends React.Component {
   static propTypes = {
-    installations: PropTypes.arrayOf(PropTypes.string),
+    installations: PropTypes.arrayOf(PropTypes.object),
     onUninstall: PropTypes.func,
   };
 
