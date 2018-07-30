@@ -97,7 +97,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
 
-        return ContentPackList.create(contentPacks);
+        return ContentPackList.create(contentPacks.size(), contentPacks);
     }
 
     @GET
@@ -112,7 +112,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
-        return ContentPackList.create(contentPacks);
+        return ContentPackList.create(contentPacks.size(), contentPacks);
     }
 
     @GET
