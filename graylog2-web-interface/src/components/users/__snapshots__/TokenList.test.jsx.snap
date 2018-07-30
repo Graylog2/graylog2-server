@@ -92,31 +92,26 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                 
               </div>
             </div>
-            <button
-              className="btn btn-default"
-              disabled={false}
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-              type="submit"
+            <div
+              className="toolbar btn-toolbar"
+              role="toolbar"
             >
-              Filter
-            </button>
-            <button
-              className="btn btn-default"
-              disabled={true}
-              onClick={[Function]}
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-              type="button"
-            >
-              Reset
-            </button>
+              <button
+                className="btn btn-default"
+                disabled={false}
+                type="submit"
+              >
+                Filter
+              </button>
+              <button
+                className="btn btn-default"
+                disabled={true}
+                onClick={[Function]}
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
           </form>
           <ul
             className="pill-list"
@@ -257,31 +252,26 @@ exports[`<TokenList /> should render with tokens 1`] = `
                 
               </div>
             </div>
-            <button
-              className="btn btn-default"
-              disabled={false}
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-              type="submit"
+            <div
+              className="toolbar btn-toolbar"
+              role="toolbar"
             >
-              Filter
-            </button>
-            <button
-              className="btn btn-default"
-              disabled={true}
-              onClick={[Function]}
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-              type="button"
-            >
-              Reset
-            </button>
+              <button
+                className="btn btn-default"
+                disabled={false}
+                type="submit"
+              >
+                Filter
+              </button>
+              <button
+                className="btn btn-default"
+                disabled={true}
+                onClick={[Function]}
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
           </form>
           <ul
             className="pill-list"

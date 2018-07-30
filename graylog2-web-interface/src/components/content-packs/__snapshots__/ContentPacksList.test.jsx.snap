@@ -44,31 +44,47 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               
             </div>
           </div>
-          <button
-            className="btn btn-default"
-            disabled={false}
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-            type="submit"
+          <div
+            className="toolbar btn-toolbar"
+            role="toolbar"
           >
-            Filter
-          </button>
-          <button
-            className="btn btn-default"
-            disabled={true}
-            onClick={[Function]}
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-            type="button"
-          >
-            Reset
-          </button>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              type="button"
+            >
+              Reset
+            </button>
+            <span>
+              <button
+                className="button btn btn-info"
+                disabled={false}
+                id="upload-content-pack-button"
+                onClick={[Function]}
+                type="button"
+              >
+                Upload
+              </button>
+            </span>
+            <button
+              action="push"
+              className="btn btn-success"
+              disabled={false}
+              id="content-packs-create"
+              onClick={[Function]}
+              type="button"
+            >
+              Create a content pack
+            </button>
+          </div>
         </form>
         <ul
           className="pill-list"
@@ -1711,31 +1727,47 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               
             </div>
           </div>
-          <button
-            className="btn btn-default"
-            disabled={false}
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-            type="submit"
+          <div
+            className="toolbar btn-toolbar"
+            role="toolbar"
           >
-            Filter
-          </button>
-          <button
-            className="btn btn-default"
-            disabled={true}
-            onClick={[Function]}
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-            type="button"
-          >
-            Reset
-          </button>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              type="button"
+            >
+              Reset
+            </button>
+            <span>
+              <button
+                className="button btn btn-info"
+                disabled={false}
+                id="upload-content-pack-button"
+                onClick={[Function]}
+                type="button"
+              >
+                Upload
+              </button>
+            </span>
+            <button
+              action="push"
+              className="btn btn-success"
+              disabled={false}
+              id="content-packs-create"
+              onClick={[Function]}
+              type="button"
+            >
+              Create a content pack
+            </button>
+          </div>
         </form>
         <ul
           className="pill-list"

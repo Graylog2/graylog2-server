@@ -46,23 +46,36 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="btn btn-sm btn-info"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <button
+                    action="push"
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                </div>
               </td>
             </tr>
             <tr>
@@ -80,23 +93,36 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="btn btn-sm btn-info"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <button
+                    action="push"
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                </div>
               </td>
             </tr>
             <tr>
@@ -114,23 +140,36 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="btn btn-sm btn-info"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <button
+                    action="push"
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                </div>
               </td>
             </tr>
             <tr>
@@ -148,23 +187,36 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="btn btn-sm btn-info"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <button
+                    action="push"
+                    className="btn btn-sm btn-primary"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
