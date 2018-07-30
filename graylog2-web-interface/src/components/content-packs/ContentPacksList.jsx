@@ -7,6 +7,7 @@ import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonTo
 import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
+import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
@@ -182,6 +183,10 @@ class ContentPacksList extends React.Component {
         <ControlledTableList.Header />
         {this._formatItems(this.state.filteredContentPacks)}
       </ControlledTableList>);
+    const actionButtons = [<ContentPackUploadControls key="content-pack-upload-controls" />,
+      <LinkContainer key="content-packs-create" id="content-packs-create" to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
+        <Button bsStyle="success">Create a content pack</Button>
+      </LinkContainer>];
 
     return (
       <div>
@@ -195,6 +200,7 @@ class ContentPacksList extends React.Component {
               onDataFiltered={this._filterContentPacks}
               searchInKeys={['name', 'summary']}
               filterSuggestions={[]}
+              additionalButtons={actionButtons}
             />
           </Col>
           <Col md={5}>

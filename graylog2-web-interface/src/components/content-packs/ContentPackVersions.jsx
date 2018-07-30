@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import Routes from 'routing/Routes';
 import { DataTable } from 'components/common';
-import { Button } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
 import './ContentPackVersions.css';
@@ -51,9 +53,13 @@ class ContentPackVersions extends React.Component {
         </td>
         <td>{pack.rev}</td>
         <td className="text-right">
-          <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</Button>
-          &nbsp;
-          <Button bsStyle="info" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
+          <ButtonToolbar className="pull-right">
+            <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</Button>
+            <Button bsStyle="info" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
+            <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
+              <Button bsStyle="primary" bsSize="small">Edit</Button>
+            </LinkContainer>
+          </ButtonToolbar>
         </td>
         {downloadModal}
       </tr>

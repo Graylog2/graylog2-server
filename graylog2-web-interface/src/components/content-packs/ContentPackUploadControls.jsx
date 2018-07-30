@@ -5,6 +5,8 @@ import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { Button } from 'react-bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import style from './ContentPackUploadControls.css';
+
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 
 class ContentPackUploadControls extends React.Component {
@@ -58,7 +60,7 @@ class ContentPackUploadControls extends React.Component {
   render() {
     return (
       <span>
-        <Button id="upload-content-pack-button" bsStyle="info" onClick={this._openModal}>Upload</Button>
+        <Button className={style.button} id="upload-content-pack-button" bsStyle="info" onClick={this._openModal}>Upload</Button>
         <BootstrapModalForm
           ref={(node) => { this.uploadModal = node; }}
           onSubmitForm={this._save}
