@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer;
 
+import static com.google.common.collect.ImmutableMap.of;
+
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
@@ -29,7 +31,7 @@ import java.util.Map;
 public class IndexMapping5 extends IndexMapping {
     @Override
     protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
-        return ImmutableMap.of(
+        return of(
                 "message", analyzedString(analyzer, false),
                 "full_message", analyzedString(analyzer, false),
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
@@ -42,11 +44,11 @@ public class IndexMapping5 extends IndexMapping {
 
     @Override
     protected Map<String, Object> notAnalyzedString() {
-        return ImmutableMap.of("type", "keyword");
+        return of("type", "keyword");
     }
 
     private Map<String, Object> analyzedString(String analyzer, boolean fieldData) {
-        return ImmutableMap.of(
+        return of(
                 "type", "text",
                 "analyzer", analyzer,
                 "fielddata", fieldData);
