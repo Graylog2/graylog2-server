@@ -67,7 +67,8 @@ class TypeAheadDataFilter extends React.Component {
     searchInKeys: PropTypes.array,
     /**
      * Array of additional Buttons which are not related to the TypeAheadDataFilter but
-     * should be displayed next to it.
+     * should be displayed next to it. The key prop must be set on every element to
+     * prevent a warning.
      */
     additionalButtons: PropTypes.arrayOf(PropTypes.element),
   };
