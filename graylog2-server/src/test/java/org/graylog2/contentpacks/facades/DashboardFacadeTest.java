@@ -271,6 +271,7 @@ public class DashboardFacadeTest {
     @Test
     public void resolveEntity() throws InvalidRangeParametersException {
         final DashboardWidgetEntity dashboardWidgetEntity = DashboardWidgetEntity.create(
+                ValueReference.of("12345"),
                 ValueReference.of("Description"),
                 ValueReference.of("type"),
                 ValueReference.of(120),
@@ -320,6 +321,7 @@ public class DashboardFacadeTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void createNativeEntity() throws InvalidRangeParametersException {
         final DashboardWidgetEntity dashboardWidgetEntity = DashboardWidgetEntity.create(
+                ValueReference.of("12345"),
                 ValueReference.of("Description"),
                 ValueReference.of("type"),
                 ValueReference.of(120),
@@ -347,6 +349,9 @@ public class DashboardFacadeTest {
         final Dashboard savedDashboard = allDashboards.get(0);
         final Dashboard dashboard = nativeEntity.entity();
         assertThat(dashboard).isEqualTo(savedDashboard);
+
+        assertThat(dashboard.getWidgets().size()).isEqualTo(1);
+        assertThat(dashboard.getWidgets()).containsKeys("12345");
 
         final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(savedDashboard.getId(), ModelTypes.DASHBOARD);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);

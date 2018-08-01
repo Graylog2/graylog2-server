@@ -63,7 +63,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -114,6 +113,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
 
     private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position) {
         return DashboardWidgetEntity.create(
+                ValueReference.of(widget.getId()),
                 ValueReference.of(widget.getDescription()),
                 ValueReference.of(widget.getType()),
                 ValueReference.of(widget.getCacheTime()),
@@ -186,6 +186,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         final ImmutableList.Builder<WidgetPositionsRequest.WidgetPosition> widgetPositions = ImmutableList.builder();
         for (DashboardWidgetEntity widgetEntity : widgets) {
             final DashboardWidget widget = createDashboardWidget(
+                    widgetEntity.id().asString(parameters),
                     widgetEntity.type().asString(parameters),
                     widgetEntity.description().asString(parameters),
                     toValueMap(widgetEntity.configuration(), parameters),
@@ -217,6 +218,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
 
     @SuppressWarnings("unchecked")
     private DashboardWidget createDashboardWidget(
+            final String id,
             final String type,
             final String description,
             final Map<String, Object> configuration,
@@ -248,9 +250,8 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         final Map<String, Object> timerangeConfig = (Map<String, Object>) widgetConfig.get("timerange");
         final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
 
-        final String widgetId = UUID.randomUUID().toString();
         return widgetCreator.buildDashboardWidget(type,
-                widgetId, description, cacheTime,
+                id, description, cacheTime,
                 widgetConfig, timeRange, username);
     }
 

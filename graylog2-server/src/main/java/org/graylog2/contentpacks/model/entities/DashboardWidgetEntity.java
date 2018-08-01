@@ -34,6 +34,10 @@ import java.util.Optional;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class DashboardWidgetEntity {
+    @JsonProperty("id")
+    @NotNull
+    public abstract ValueReference id();
+
     @JsonProperty("description")
     @NotNull
     public abstract ValueReference description();
@@ -59,13 +63,14 @@ public abstract class DashboardWidgetEntity {
 
     @JsonCreator
     public static DashboardWidgetEntity create(
+            @JsonProperty("id") @NotNull ValueReference id,
             @JsonProperty("description") @NotNull ValueReference description,
             @JsonProperty("type") @NotBlank ValueReference type,
             @JsonProperty("cache_time") @PositiveOrZero ValueReference cacheTime,
             @JsonProperty("time_range") @NotNull TimeRangeEntity timeRange,
             @JsonProperty("configuration") @NotNull ReferenceMap configuration,
             @JsonProperty("position") @Nullable Position position) {
-        return new AutoValue_DashboardWidgetEntity(description, type, cacheTime, timeRange, configuration, Optional.ofNullable(position));
+        return new AutoValue_DashboardWidgetEntity(id, description, type, cacheTime, timeRange, configuration, Optional.ofNullable(position));
     }
 
     @AutoValue
