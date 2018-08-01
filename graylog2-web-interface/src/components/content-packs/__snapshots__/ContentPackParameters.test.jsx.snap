@@ -302,7 +302,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       <td
                         className="bigColumns"
                       >
-                        Input
+                        
                       </td>
                       <td>
                         0
