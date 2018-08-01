@@ -31,10 +31,13 @@ import java.util.Set;
 @WithBeanGetter
 public abstract class ContentPackList {
     @JsonProperty
+    public abstract long total();
+
+    @JsonProperty
     public abstract Set<ContentPack> contentPacks();
 
     @JsonCreator
-    public static ContentPackList create(@JsonProperty("content_packs") Set<ContentPack> contentPacks) {
-        return new AutoValue_ContentPackList(contentPacks);
+    public static ContentPackList create(@JsonProperty("total") long total, @JsonProperty("content_packs") Set<ContentPack> contentPacks) {
+        return new AutoValue_ContentPackList(total, contentPacks);
     }
 }

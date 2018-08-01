@@ -29,11 +29,14 @@ import java.util.Set;
 @AutoValue
 @WithBeanGetter
 public abstract class ContentPackInstallationsResponse {
+    @JsonProperty("total")
+    public abstract long total();
+
     @JsonProperty("installations")
     public abstract Set<ContentPackInstallation> contentPackInstallations();
 
     @JsonCreator
-    public static ContentPackInstallationsResponse create(@JsonProperty("installations") Set<ContentPackInstallation> contentPackInstallations) {
-        return new AutoValue_ContentPackInstallationsResponse(contentPackInstallations);
+    public static ContentPackInstallationsResponse create(@JsonProperty("total") long total, @JsonProperty("installations") Set<ContentPackInstallation> contentPackInstallations) {
+        return new AutoValue_ContentPackInstallationsResponse(total, contentPackInstallations);
     }
 }

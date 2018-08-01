@@ -97,7 +97,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
 
-        return ContentPackList.create(contentPacks);
+        return ContentPackList.create(contentPacks.size(), contentPacks);
     }
 
     @GET
@@ -112,7 +112,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
-        return ContentPackList.create(contentPacks);
+        return ContentPackList.create(contentPacks.size(), contentPacks);
     }
 
     @GET
@@ -278,7 +278,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.loadAll();
-        return ContentPackInstallationsResponse.create(installations);
+        return ContentPackInstallationsResponse.create(installations.size(), installations);
     }
 
     @GET
@@ -295,7 +295,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackId(id);
-        return ContentPackInstallationsResponse.create(installations);
+        return ContentPackInstallationsResponse.create(installations.size(), installations);
     }
 
     @GET
@@ -314,7 +314,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision);
-        return ContentPackInstallationsResponse.create(installations);
+        return ContentPackInstallationsResponse.create(installations.size(), installations);
     }
 
     @DELETE
