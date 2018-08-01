@@ -32,6 +32,7 @@ class MessageTableEntry extends React.Component {
     selectedFields: ImmutablePropTypes.orderedSet,
     showMessageRow: PropTypes.bool,
     streams: ImmutablePropTypes.map.isRequired,
+    terminalView: PropTypes.bool,
     toggleDetail: PropTypes.func.isRequired,
   };
 
@@ -42,6 +43,7 @@ class MessageTableEntry extends React.Component {
     searchConfig: undefined,
     selectedFields: Immutable.OrderedSet(),
     showMessageRow: false,
+    terminalView: false,
   };
 
   shouldComponentUpdate(newProps) {
@@ -61,6 +63,9 @@ class MessageTableEntry extends React.Component {
       return true;
     }
     if (this.props.showMessageRow !== newProps.showMessageRow) {
+      return true;
+    }
+    if (this.props.terminalView !== newProps.terminalView) {
       return true;
     }
     return false;
@@ -145,34 +150,48 @@ class MessageTableEntry extends React.Component {
   };
 
   render() {
-    const colSpanFixup = this.props.selectedFields.size + 1;
+    const { expanded, highlightMessage, message, selectedFields, showMessageRow, terminalView } = this.props;
+    const colSpanFixup = selectedFields.size + 1;
 
     let classes = 'message-group';
-    if (this.props.expanded) {
+    if (expanded) {
       classes += ' message-group-toggled';
     }
-    if (this.props.message.id === this.props.highlightMessage) {
+    if (message.id === highlightMessage) {
       classes += ' message-highlight';
+    }
+    if (terminalView) {
+      classes += ` ${style.terminalView}`;
     }
 
     return (
       <tbody className={classes}>
+        {!terminalView &&
         <tr className="fields-row" onClick={this._toggleDetail}>
           <td><strong>
-            <Timestamp dateTime={this.props.message.fields.timestamp} />
+            <Timestamp dateTime={message.fields.timestamp} />
           </strong></td>
-          { this.props.selectedFields.toSeq().map(selectedFieldName => (<td
+          {selectedFields.toSeq().map(selectedFieldName => (<td
             key={selectedFieldName}>{this.renderForDisplay(selectedFieldName, true)} </td>)) }
         </tr>
+        }
 
-        {this.props.showMessageRow &&
+        {showMessageRow &&
         <tr className="message-row" onClick={this._toggleDetail}>
-          <td colSpan={colSpanFixup}><div className="message-wrapper">{this.renderForDisplay('message', true)}</div></td>
+          <td colSpan={colSpanFixup}>
+            <div className="message-wrapper">
+              {terminalView && <Timestamp datetime={message.fields.timestamp} />}
+              {terminalView && <span className={style.terminalSource}> {this.renderForDisplay('source')} </span>}
+              {this.renderForDisplay('message', true)}
+            </div>
+          </td>
         </tr>
         }
-        {this.props.expanded &&
+
+        {expanded &&
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
+
             <MessageDetail message={this.props.message}
                            inputs={this.props.inputs}
                            streams={this.props.streams}

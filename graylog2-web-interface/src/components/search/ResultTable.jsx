@@ -11,6 +11,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
+import style from './ResultTable.css';
 
 class ResultTable extends React.Component {
   static propTypes = {
@@ -40,6 +41,8 @@ class ResultTable extends React.Component {
     allStreamsLoaded: false,
     allStreams: Immutable.List(),
     expandAllRenderAsync: false,
+    reverse: false,
+    terminalView: false,
   };
 
   componentDidMount() {
@@ -100,6 +103,14 @@ class ResultTable extends React.Component {
     this.setState({ expandedMessages: Immutable.Set() });
   };
 
+  reverseMessages = () => {
+    this.setState({ reverseMessages: !this.state.reverseMessages });
+  };
+
+  terminalView = () => {
+    this.setState({ terminalView: !this.state.terminalView });
+  };
+
   _handleSort = (e, field, order) => {
     e.preventDefault();
     SearchStore.sort(field, order);
@@ -144,6 +155,9 @@ class ResultTable extends React.Component {
 
   render() {
     const selectedColumns = this._fieldColumns();
+    let { messages } = this.props;
+    if (this.state.reverseMessages) messages = messages.reverse();
+
     return (
       <div className="content-col">
         <h1 className="pull-left">Messages</h1>
@@ -152,7 +166,16 @@ class ResultTable extends React.Component {
           <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
           <Button title="Collapse all messages"
                   onClick={this.collapseAll}
-                  disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" /></Button>
+                  disabled={this.state.expandedMessages.size === 0}>
+            <i className="fa fa-compress" />
+          </Button>
+          {this.state.terminalView ?
+            <Button title="List View" onClick={this.terminalView}><i className="fa fa-list-ul" /></Button>
+            : <Button title="Terminal View" onClick={this.terminalView}><i className="fa fa-terminal" /></Button>
+          }
+          <Button title="Reverse Messages" onClick={this.reverseMessages}>
+            <i className={`fa fa-${this.state.reverseMessages ? 'arrow-down' : 'arrow-up'}`} />
+          </Button>
         </ButtonGroup>
 
         <MessageTablePaginator currentPage={Number(this.props.page)}
@@ -161,7 +184,7 @@ class ResultTable extends React.Component {
                                position="top"
                                resultCount={this.props.resultCount} />
 
-        <div className="search-results-table">
+        <div className={`search-results-table ${this.state.terminalView ? style.terminalView : ''}`}>
           <div className="table-responsive">
             <div className="messages-container">
               <table className="table table-condensed messages">
@@ -178,7 +201,7 @@ class ResultTable extends React.Component {
                     })}
                   </tr>
                 </thead>
-                {this.props.messages.map((message) => {
+                {messages.map((message) => {
                   return (
                     <MessageTableEntry key={`${message.index}-${message.id}`}
                                        disableSurroundingSearch={this.props.disableSurroundingSearch}
@@ -195,6 +218,7 @@ class ResultTable extends React.Component {
                                        highlight={this.props.highlight}
                                        highlightMessage={SearchStore.highlightMessage}
                                        expandAllRenderAsync={this.state.expandAllRenderAsync}
+                                       terminalView={this.state.terminalView}
                                        searchConfig={this.props.searchConfig} />
                   );
                 })}
