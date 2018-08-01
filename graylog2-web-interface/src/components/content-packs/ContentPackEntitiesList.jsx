@@ -54,11 +54,11 @@ class ContentPackEntitiesList extends React.Component {
   };
 
   _entityTitle = (entity) => {
-    return (entity.data.title || {}).value || '';
+    return (entity.data.title || entity.data.name || {}).value || '';
   };
 
   _entityDescription = (entity) => {
-    return (entity.data.description || entity.data.name || {}).value || '';
+    return (entity.data.description || {}).value || '';
   };
 
   _entityRowFormatter = (entity) => {
