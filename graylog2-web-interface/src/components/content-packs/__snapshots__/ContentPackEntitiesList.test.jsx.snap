@@ -211,7 +211,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                 <td
                   className="bigColumns"
                 >
-                  Input
+                  
                 </td>
                 <td>
                   1
@@ -252,7 +252,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                 <td
                   className="bigColumns"
                 >
-                  BadInput
+                  
                 </td>
                 <td>
                   0
