@@ -41,6 +41,10 @@ public class ValueReferenceTypeIdResolverTest {
     @Test
     public void testEmbeddedDeserialization() throws IOException {
         String json = "{" +
+                "  \"id\" : {" +
+                "     \"value\" : \"12345\"," +
+                "     \"type\" : \"string\"" +
+                "  }," +
                 "  \"cache_time\" : {" +
                 "     \"value\" : 120," +
                 "     \"type\" : \"integer\"" +
