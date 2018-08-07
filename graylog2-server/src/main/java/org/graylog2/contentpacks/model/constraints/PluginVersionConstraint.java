@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.model.constraints;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -25,18 +26,27 @@ import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
 
+import java.util.Optional;
+
 @AutoValue
 @JsonDeserialize(builder = AutoValue_PluginVersionConstraint.Builder.class)
 public abstract class PluginVersionConstraint implements Constraint {
     static final String TYPE_NAME = "plugin-version";
     static final String FIELD_PLUGIN_ID = "plugin";
     static final String FIELD_PLUGIN_VERSION = "version";
+    static final String FULFILLED = "fulfilled";
 
     @JsonProperty(FIELD_PLUGIN_ID)
     public abstract String pluginId();
 
     @JsonProperty(FIELD_PLUGIN_VERSION)
     public abstract Requirement version();
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty(FULFILLED)
+    public abstract Optional<Boolean> fulfilled();
+
+    public abstract Builder toBuilder();
 
     public static PluginVersionConstraint of(PluginMetaData pluginMetaData) {
         final Version version = pluginMetaData.getVersion();
@@ -60,6 +70,9 @@ public abstract class PluginVersionConstraint implements Constraint {
 
         @JsonProperty(FIELD_PLUGIN_VERSION)
         public abstract Builder version(Requirement version);
+
+        @JsonProperty(FULFILLED)
+        public abstract Builder fulfilled(Boolean fulfilled);
 
         @JsonIgnore
         public Builder version(String versionExpression) {

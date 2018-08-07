@@ -75,7 +75,7 @@ const ShowContentPackPage = createReactClass({
       return (<Spinner />);
     }
 
-    const { contentPack, selectedVersion } = this.state;
+    const { contentPack, selectedVersion, constraints } = this.state;
     const lastVersion = this._getLastVersion();
     const lastPack = contentPack[lastVersion];
     return (
@@ -123,7 +123,7 @@ const ShowContentPackPage = createReactClass({
               </div>
             </Col>
             <Col md={8} className="content">
-              <ContentPackDetails contentPack={contentPack[selectedVersion]} showConstraints verbose />
+              <ContentPackDetails contentPack={contentPack[selectedVersion]} constraints={constraints[selectedVersion]} showConstraints verbose />
             </Col>
           </Row>
         </span>

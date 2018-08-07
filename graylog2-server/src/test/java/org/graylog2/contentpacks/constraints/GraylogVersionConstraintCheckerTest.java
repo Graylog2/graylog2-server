@@ -22,6 +22,8 @@ import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.junit.Test;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GraylogVersionConstraintCheckerTest {
@@ -37,7 +39,7 @@ public class GraylogVersionConstraintCheckerTest {
                 .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
-        assertThat(constraintChecker.checkConstraints(requiredConstraints)).containsOnly(graylogVersionConstraint);
+        assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> c.fulfilled()));
     }
 
     @Test
@@ -52,6 +54,6 @@ public class GraylogVersionConstraintCheckerTest {
                 .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
-        assertThat(constraintChecker.checkConstraints(requiredConstraints)).isEmpty();
+        assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> !c.fulfilled()));
     }
 }

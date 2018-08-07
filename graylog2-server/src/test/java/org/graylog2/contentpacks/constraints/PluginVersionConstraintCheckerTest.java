@@ -45,7 +45,7 @@ public class PluginVersionConstraintCheckerTest {
                 .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
-        assertThat(constraintChecker.checkConstraints(requiredConstraints)).containsOnly(pluginVersionConstraint);
+        assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> c.fulfilled()));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class PluginVersionConstraintCheckerTest {
                 .version("^2.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
-        assertThat(constraintChecker.checkConstraints(requiredConstraints)).isEmpty();
+        assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> !c.fulfilled()));
     }
 
     private static final class TestPluginMetaData implements PluginMetaData {
