@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.constraints;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.junit.Test;
@@ -39,7 +40,8 @@ public class GraylogVersionConstraintCheckerTest {
                 .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
-        assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> c.fulfilled()));
+        final Set<ConstraintCheckResult> result = constraintChecker.checkConstraints(requiredConstraints);
+        assertThat(result.stream().allMatch(c -> c.fulfilled()));
     }
 
     @Test
@@ -54,6 +56,7 @@ public class GraylogVersionConstraintCheckerTest {
                 .version("^1.0.0")
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
-        assertThat(constraintChecker.checkConstraints(requiredConstraints).stream().allMatch(c -> !c.fulfilled()));
+        final Set<ConstraintCheckResult> result = constraintChecker.checkConstraints(requiredConstraints);
+        assertThat(result.stream().allMatch(c -> !c.fulfilled()));
     }
 }
