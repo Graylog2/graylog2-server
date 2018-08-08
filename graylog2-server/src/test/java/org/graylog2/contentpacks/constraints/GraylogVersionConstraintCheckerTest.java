@@ -41,7 +41,7 @@ public class GraylogVersionConstraintCheckerTest {
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
         final Set<ConstraintCheckResult> result = constraintChecker.checkConstraints(requiredConstraints);
-        assertThat(result.stream().allMatch(c -> c.fulfilled()));
+        assertThat(result.stream().allMatch(c -> c.fulfilled())).isTrue();
     }
 
     @Test
@@ -57,6 +57,6 @@ public class GraylogVersionConstraintCheckerTest {
                 .build();
         final ImmutableSet<Constraint> requiredConstraints = ImmutableSet.of(graylogVersionConstraint, pluginVersionConstraint);
         final Set<ConstraintCheckResult> result = constraintChecker.checkConstraints(requiredConstraints);
-        assertThat(result.stream().allMatch(c -> !c.fulfilled()));
+        assertThat(result.stream().allMatch(c -> !c.fulfilled())).isTrue();
     }
 }
