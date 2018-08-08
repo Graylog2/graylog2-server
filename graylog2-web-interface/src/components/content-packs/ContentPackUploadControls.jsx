@@ -12,12 +12,18 @@ const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 class ContentPackUploadControls extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      isOpen: false,
+    };
+
     this._openModal = this._openModal.bind(this);
     this._closeModal = this._closeModal.bind(this);
     this._save = this._save.bind(this);
   }
 
   _openModal() {
+    this.setState({ isOpen: true });
     this.uploadModal.open();
   }
 
@@ -60,8 +66,9 @@ class ContentPackUploadControls extends React.Component {
   render() {
     return (
       <span>
-        <Button className={style.button} id="upload-content-pack-button" bsStyle="info" onClick={this._openModal}>Upload</Button>
+        <Button className={style.button} active={this.state.isOpen} id="upload-content-pack-button" bsStyle="success" onClick={this._openModal}>Upload</Button>
         <BootstrapModalForm
+          onModalClose={() => { this.setState({ isOpen: false }); }}
           ref={(node) => { this.uploadModal = node; }}
           onSubmitForm={this._save}
           title="Upload Content Pack"

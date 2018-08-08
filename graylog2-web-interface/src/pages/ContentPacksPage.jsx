@@ -1,12 +1,15 @@
 import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
+import Routes from 'routing/Routes';
 
 import Spinner from 'components/common/Spinner';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
+import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
@@ -57,6 +60,13 @@ const ContentPacksPage = createReactClass({
               <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
             </span>
 
+            <ButtonToolbar>
+              <ContentPackUploadControls />
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
+                <Button bsStyle="success">Create a content pack</Button>
+              </LinkContainer>
+              <Button bsStyle="info" active>Content Packs</Button>
+            </ButtonToolbar>
           </PageHeader>
 
           <Row className="content">

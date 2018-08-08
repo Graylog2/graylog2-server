@@ -1,11 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import { TypeAheadInput } from 'components/common';
-
-import style from './TypeAheadDataFilter.css';
 
 /**
  * Component that renders a data filter input with suggestion capabilities.
@@ -65,16 +63,6 @@ class TypeAheadDataFilter extends React.Component {
      * input field.
      */
     searchInKeys: PropTypes.array,
-    /**
-     * Array of additional Buttons which are not related to the TypeAheadDataFilter but
-     * should be displayed next to it. The key prop must be set on every element to
-     * prevent a warning.
-     */
-    additionalButtons: PropTypes.arrayOf(PropTypes.element),
-  };
-
-  static defaultProps = {
-    additionalButtons: [],
   };
 
   state = {
@@ -176,16 +164,6 @@ class TypeAheadDataFilter extends React.Component {
 
     suggestions.filter(filterSuggestion => !this.state.filters.includes(filterSuggestion));
 
-    const buttons = [
-      <Button key={1} type="submit">Filter</Button>,
-      <Button type="button"
-              key={2}
-              onClick={this._resetFilters}
-              disabled={this.state.filters.count() === 0 && this.state.filterText === ''}>
-        Reset
-      </Button>,
-    ].concat(this.props.additionalButtons);
-
     return (
       <div className="filter">
         <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline' }}>
@@ -196,10 +174,11 @@ class TypeAheadDataFilter extends React.Component {
                           suggestions={suggestions}
                           label={this.props.label}
                           displayKey={this.props.displayKey} />
-
-          <ButtonToolbar className={style.toolbar}>
-            {buttons}
-          </ButtonToolbar>
+          <Button type="submit" style={{ marginLeft: 5 }}>Filter</Button>
+          <Button type="button" style={{ marginLeft: 5 }} onClick={this._resetFilters}
+                  disabled={this.state.filters.count() === 0 && this.state.filterText === ''}>
+            Reset
+          </Button>
         </form>
         <ul className="pill-list">
           {filters}

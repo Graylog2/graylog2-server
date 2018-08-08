@@ -3,7 +3,7 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { DataTable } from 'components/common';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { Button, DropdownButton, ButtonToolbar, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
@@ -54,11 +54,13 @@ class ContentPackVersions extends React.Component {
         <td>{pack.rev}</td>
         <td className="text-right">
           <ButtonToolbar className="pull-right">
-            <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</Button>
-            <Button bsStyle="info" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
-            <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
-              <Button bsStyle="primary" bsSize="small">Edit</Button>
-            </LinkContainer>
+            <Button bsStyle="success" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
+            <DropdownButton id={`action-${pack.rev}`} bsStyle="info" title="Actions" bsSize="small">
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
+                <MenuItem >Edit clone</MenuItem>
+              </LinkContainer>
+              <MenuItem onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
+            </DropdownButton>
           </ButtonToolbar>
         </td>
         {downloadModal}
