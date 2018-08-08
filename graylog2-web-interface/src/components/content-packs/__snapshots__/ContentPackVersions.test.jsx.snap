@@ -66,7 +66,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       aria-haspopup={true}
                       className="dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
-                      id={undefined}
+                      id="action-1"
                       onClick={[Function]}
                       onKeyDown={[Function]}
                       role="button"
@@ -79,7 +79,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       />
                     </button>
                     <ul
-                      aria-labelledby={undefined}
+                      aria-labelledby="action-1"
                       className="dropdown-menu"
                       role="menu"
                     >
@@ -154,7 +154,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       aria-haspopup={true}
                       className="dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
-                      id={undefined}
+                      id="action-2"
                       onClick={[Function]}
                       onKeyDown={[Function]}
                       role="button"
@@ -167,7 +167,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       />
                     </button>
                     <ul
-                      aria-labelledby={undefined}
+                      aria-labelledby="action-2"
                       className="dropdown-menu"
                       role="menu"
                     >
@@ -242,7 +242,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       aria-haspopup={true}
                       className="dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
-                      id={undefined}
+                      id="action-3"
                       onClick={[Function]}
                       onKeyDown={[Function]}
                       role="button"
@@ -255,7 +255,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       />
                     </button>
                     <ul
-                      aria-labelledby={undefined}
+                      aria-labelledby="action-3"
                       className="dropdown-menu"
                       role="menu"
                     >
@@ -330,7 +330,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       aria-haspopup={true}
                       className="dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
-                      id={undefined}
+                      id="action-4"
                       onClick={[Function]}
                       onKeyDown={[Function]}
                       role="button"
@@ -343,7 +343,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       />
                     </button>
                     <ul
-                      aria-labelledby={undefined}
+                      aria-labelledby="action-4"
                       className="dropdown-menu"
                       role="menu"
                     >
