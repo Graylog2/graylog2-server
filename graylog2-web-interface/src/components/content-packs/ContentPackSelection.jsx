@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Panel } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
@@ -34,7 +34,12 @@ class ContentPackSelection extends React.Component {
       filteredEntities: ObjectUtils.clone(this.props.entities),
       filter: '',
       isFiltered: false,
+      errors: {},
     };
+  }
+
+  componentDidMount() {
+    this._validate();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -48,9 +53,28 @@ class ContentPackSelection extends React.Component {
     const updatedPack = ObjectUtils.clone(this.state.contentPack);
     updatedPack[name] = value;
     this.props.onStateChange({ contentPack: updatedPack });
-    this.setState({ contentPack: updatedPack });
+    this.setState({ contentPack: updatedPack }, this._validate);
   }
 
+  _validate = () => {
+    const mandatoryFields = ['name', 'summary', 'vendor'];
+    const { contentPack } = this.state;
+    const { selectedEntities } = this.props;
+
+    const errors = mandatoryFields.reduce((acc, field) => {
+      const newErrors = acc;
+      if (!contentPack[field] || contentPack[field].length <= 0) {
+        newErrors[field] = 'Must be filled out.';
+      }
+      return newErrors;
+    }, {});
+
+    if (Object.keys(selectedEntities).length <= 0) {
+      errors.selection = 'Select at least one entity.';
+    }
+
+    this.setState({ errors });
+  };
   _bindValue(event) {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
   }
@@ -65,6 +89,7 @@ class ContentPackSelection extends React.Component {
       newSelection[entity.type].splice(index, 1);
     }
     this.props.onStateChange({ selectedEntities: newSelection });
+    this._validate();
   };
 
   _updateSelectionGroup = (type) => {
@@ -76,6 +101,7 @@ class ContentPackSelection extends React.Component {
     }
 
     this.props.onStateChange({ selectedEntities: newSelection });
+    this._validate();
   };
 
   _isUndetermined(type) {
@@ -156,6 +182,8 @@ class ContentPackSelection extends React.Component {
       );
     });
 
+    const { errors } = this.state;
+
     return (
       <div>
         <Row>
@@ -167,20 +195,22 @@ class ContentPackSelection extends React.Component {
                 <Input name="name"
                        id="name"
                        type="text"
+                       bsStyle={errors.name ? 'error' : null}
                        maxLength={250}
                        value={this.state.contentPack.name}
                        onChange={this._bindValue}
                        label="Name"
-                       help="Give a descriptive name for this content pack."
+                       help={errors.name ? errors.name : 'Give a descriptive name for this content pack.'}
                        required />
                 <Input name="summary"
                        id="summary"
                        type="text"
+                       bsStyle={errors.summary ? 'error' : null}
                        maxLength={250}
                        value={this.state.contentPack.summary}
                        onChange={this._bindValue}
                        label="Summary"
-                       help="Give a short summary of the content pack."
+                       help={errors.summary ? errors.summary : 'Give a short summary of the content pack.'}
                        required />
                 <Input name="description"
                        id="description"
@@ -189,16 +219,16 @@ class ContentPackSelection extends React.Component {
                        onChange={this._bindValue}
                        rows={6}
                        label="Description"
-                       help="Give a long description of the content pack in markdown."
-                       required />
+                       help="Give a long description of the content pack in markdown." />
                 <Input name="vendor"
                        id="vendor"
                        type="text"
+                       bsStyle={errors.vendor ? 'error' : null}
                        maxLength={250}
                        value={this.state.contentPack.vendor}
                        onChange={this._bindValue}
                        label="Vendor"
-                       help="Who did this content pack and how can he be reached. e.g Name and eMail"
+                       help={errors.vendor ? errors.vendor : 'Who did this content pack and how can he be reached. e.g Name and eMail'}
                        required />
                 <Input name="url"
                        id="url"
@@ -207,8 +237,7 @@ class ContentPackSelection extends React.Component {
                        value={this.state.contentPack.url}
                        onChange={this._bindValue}
                        label="URL"
-                       help="Where can I find the content pack. e.g. github url"
-                       required />
+                       help="Where can I find the content pack. e.g. github url" />
               </fieldset>
             </form>
           </Col>
@@ -228,6 +257,11 @@ class ContentPackSelection extends React.Component {
             />
           </Col>
         </Row>
+        {errors.selection &&
+          <Row>
+            <Col smOffset={1} sm={4}><Panel bsStyle="danger">{errors.selection}</Panel></Col>
+          </Row>
+        }
         <Row>
           <Col smOffset={1} sm={8}>
             <ExpandableList>

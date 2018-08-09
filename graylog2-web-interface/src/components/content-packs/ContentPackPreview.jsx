@@ -4,6 +4,8 @@ import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
+import ContentPackEntitiesList from './ContentPackEntitiesList';
+import ContentPackParameterList from './ContentPackParameterList';
 
 class ContentPackPreview extends React.Component {
   static propTypes = {
@@ -27,10 +29,12 @@ class ContentPackPreview extends React.Component {
       <div>
         <Row>
           <Col sm={6}>
-            <ContentPackDetails contentPack={this.props.contentPack} verbose />
+            <ContentPackDetails contentPack={this.props.contentPack} />
           </Col>
           <Col sm={6}>
             <ContentPackConstraints constraints={this.props.contentPack.requires} isFulfilled />
+            <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
+            <ContentPackParameterList contentPack={this.props.contentPack} readOnly />
           </Col>
         </Row>
         <Row>

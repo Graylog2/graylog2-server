@@ -153,4 +153,18 @@ describe('<ContentPackSelection />', () => {
     wrapper.find('div.fa-stack').simulate('click');
     expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
   });
+
+  it('should validate that all fields are filled out', () => {
+    const wrapper = mount(<ContentPackSelection contentPack={{ }} />);
+    expect(wrapper.find('span[children="Must be filled out."]').length).toEqual(3);
+
+    const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} />);
+    expect(wrapper2.find('span[children="Must be filled out."]').length).toEqual(2);
+
+    const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} />);
+    expect(wrapper1.find('span[children="Must be filled out."]').length).toEqual(1);
+
+    const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }} />);
+    expect(wrapper0.find('span[children="Must be filled out."]').length).toEqual(0);
+  });
 });
