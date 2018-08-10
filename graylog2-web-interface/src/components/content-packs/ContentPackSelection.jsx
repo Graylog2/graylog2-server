@@ -56,13 +56,14 @@ class ContentPackSelection extends React.Component {
   }
 
   _updateSelectionEntity = (entity) => {
+    const typeName = entity.type.name;
     const newSelection = ObjectUtils.clone(this.props.selectedEntities);
-    newSelection[entity.type] = (newSelection[entity.type] || []);
-    const index = newSelection[entity.type].findIndex((e) => { return e.id === entity.id; });
+    newSelection[typeName] = (newSelection[typeName] || []);
+    const index = newSelection[typeName].findIndex((e) => { return e.id === entity.id; });
     if (index < 0) {
-      newSelection[entity.type].push(entity);
+      newSelection[typeName].push(entity);
     } else {
-      newSelection[entity.type].splice(index, 1);
+      newSelection[typeName].splice(index, 1);
     }
     this.props.onStateChange({ selectedEntities: newSelection });
   };
@@ -88,11 +89,12 @@ class ContentPackSelection extends React.Component {
   }
 
   _isSelected(entity) {
-    if (!this.props.selectedEntities[entity.type]) {
+    const typeName = entity.type.name;
+    if (!this.props.selectedEntities[typeName]) {
       return false;
     }
 
-    return this.props.selectedEntities[entity.type].findIndex((e) => { return e.id === entity.id; }) >= 0;
+    return this.props.selectedEntities[typeName].findIndex((e) => { return e.id === entity.id; }) >= 0;
   }
 
   _isGroupSelected(type) {

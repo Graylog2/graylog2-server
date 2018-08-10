@@ -36,7 +36,10 @@
   "entities": [
     {
       "v": "1",
-      "type": "input",
+      "type": {
+        "name": "input",
+        "version": "1"
+      },
       "id": "78547c87-af21-4292-8e57-614da5baf6c3",
       "data": {
         "title": "GELF Input",
@@ -57,7 +60,10 @@
     },
     {
       "v": "1",
-      "type": "lookup_table",
+      "type": {
+        "name": "lookup_table",
+        "version": "1"
+      },
       "id": "311d9e16-e4d9-485d-a916-337fb4ca0e8b",
       "data": {
         "title": {
@@ -80,7 +86,10 @@
     },
     {
       "v": "1",
-      "type": "lookup_cache",
+      "type": {
+        "name": "lookup_cache",
+        "version": "1"
+      },
       "id": "911da25d-74e2-4364-b88e-7930368f6e56",
       "data": {
         "title": {
@@ -105,7 +114,10 @@
     },
     {
       "v": "1",
-      "type": "lookup_adapter",
+      "type": {
+        "name": "lookup_adapter",
+        "version": "1"
+      },
       "id": "2562ac46-65f1-454c-89e1-e9be96bfd5e7",
       "data": {
         "title": {
@@ -134,7 +146,10 @@
     },
     {
       "v": "1",
-      "type": "pipeline_connection",
+      "type": {
+        "name": "pipeline_connection",
+        "version": "1"
+      },
       "id": "726b6e09-4199-4ef4-8d69-275ebfe06d31",
       "data": {
         "pipeline_id": {
@@ -149,7 +164,10 @@
     },
     {
       "v": "1",
-      "type": "pipeline",
+      "type": {
+        "name": "pipeline",
+        "version": "1"
+      },
       "id": "37f26b0a-e4ab-41ff-985c-0dd4a01ff10c",
       "data": {
         "stream_id": {
@@ -160,7 +178,10 @@
     },
     {
       "v": "1",
-      "type": "stream",
+      "type": {
+        "name": "stream",
+        "version": "1"
+      },
       "id": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3",
       "data": {
       }

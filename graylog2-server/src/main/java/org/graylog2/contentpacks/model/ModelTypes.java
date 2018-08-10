@@ -17,17 +17,17 @@
 package org.graylog2.contentpacks.model;
 
 public interface ModelTypes {
-    ModelType COLLECTOR_CONFIGURATION = ModelType.of("collector_configuration");
-    ModelType COLLECTOR = ModelType.of("collector");
-    ModelType DASHBOARD = ModelType.of("dashboard");
-    ModelType GROK_PATTERN = ModelType.of("grok_pattern");
-    ModelType LOOKUP_ADAPTER = ModelType.of("lookup_adapter");
-    ModelType LOOKUP_CACHE = ModelType.of("lookup_cache");
-    ModelType LOOKUP_TABLE = ModelType.of("lookup_table");
-    ModelType INPUT = ModelType.of("input");
-    ModelType OUTPUT = ModelType.of("output");
-    ModelType PIPELINE = ModelType.of("pipeline");
-    ModelType PIPELINE_RULE = ModelType.of("pipeline_rule");
-    ModelType ROOT = ModelType.of("virtual-root");
-    ModelType STREAM = ModelType.of("stream");
+    ModelType COLLECTOR_CONFIGURATION = ModelType.of("collector_configuration", "1");
+    ModelType COLLECTOR = ModelType.of("collector", "1");
+    ModelType DASHBOARD = ModelType.of("dashboard", "1");
+    ModelType GROK_PATTERN = ModelType.of("grok_pattern", "1");
+    ModelType LOOKUP_ADAPTER = ModelType.of("lookup_adapter", "1");
+    ModelType LOOKUP_CACHE = ModelType.of("lookup_cache", "1");
+    ModelType LOOKUP_TABLE = ModelType.of("lookup_table", "1");
+    ModelType INPUT = ModelType.of("input", "1");
+    ModelType OUTPUT = ModelType.of("output", "1");
+    ModelType PIPELINE = ModelType.of("pipeline", "1");
+    ModelType PIPELINE_RULE = ModelType.of("pipeline_rule", "1");
+    ModelType ROOT = ModelType.of("virtual-root", "1");
+    ModelType STREAM = ModelType.of("stream", "1");
 }

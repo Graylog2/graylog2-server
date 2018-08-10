@@ -62,7 +62,8 @@ public class EntityTest {
         final JsonNode jsonNode = objectMapper.convertValue(entity, JsonNode.class);
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.path("id").asText()).isEqualTo("fafd32d1-7f71-41a8-89f5-53c9b307d4d5");
-        assertThat(jsonNode.path("type").asText()).isEqualTo("input");
+        assertThat(jsonNode.path("type").path("name").asText()).isEqualTo("input");
+        assertThat(jsonNode.path("type").path("version").asText()).isEqualTo("1");
         assertThat(jsonNode.path("v").asText()).isEqualTo("1");
         final JsonNode dataNode = jsonNode.path("data");
         assertThat(dataNode.isObject()).isTrue();

@@ -104,7 +104,8 @@ public class ContentPackTest {
         final JsonNode entityNode = entitiesNode.path(0);
         assertThat(entityNode.isObject()).isTrue();
         assertThat(entityNode.path("id").asText()).isEqualTo("fafd32d1-7f71-41a8-89f5-53c9b307d4d5");
-        assertThat(entityNode.path("type").asText()).isEqualTo("input");
+        assertThat(entityNode.path("type").path("name").asText()).isEqualTo("input");
+        assertThat(entityNode.path("type").path("version").asText()).isEqualTo("1");
         assertThat(entityNode.path("v").asText()).isEqualTo("1");
         final JsonNode entityDataNode = entityNode.path("data");
         assertThat(entityDataNode.isObject()).isTrue();
@@ -214,7 +215,8 @@ public class ContentPackTest {
         final JsonNode entityNode = entitiesNode.path(0);
         assertThat(entityNode.isObject()).isTrue();
         assertThat(entityNode.path("id").asText()).isEqualTo("SOME_PATTERN");
-        assertThat(entityNode.path("type").asText()).isEqualTo("grok_pattern");
+        assertThat(entityNode.path("type").path("name").asText()).isEqualTo("grok_pattern");
+        assertThat(entityNode.path("type").path("version").asText()).isEqualTo("1");
         assertThat(entityNode.path("v").asText()).isEqualTo("1");
         final JsonNode entityDataNode = entityNode.path("data");
         assertThat(entityDataNode.isObject()).isTrue();
