@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.contentpacks.model.Identified;
@@ -29,18 +30,24 @@ import org.graylog2.contentpacks.model.Typed;
 @AutoValue
 @JsonDeserialize(builder = AutoValue_NativeEntityDescriptor.Builder.class)
 public abstract class NativeEntityDescriptor implements Identified, Typed {
-    public static NativeEntityDescriptor create(ModelId id, ModelType type) {
+    public static final String FIELD_ENTITY_ID = "entity_id";
+
+    @JsonProperty(FIELD_ENTITY_ID)
+    public abstract ModelId entityId();
+
+    public static NativeEntityDescriptor create(ModelId entityId, ModelId id, ModelType type) {
         return builder()
+                .entityId(entityId)
                 .id(id)
                 .type(type)
                 .build();
     }
 
     /**
-     * Shortcut for {@link #create(ModelId, ModelType)}
+     * Shortcut for {@link #create(String, String, ModelType)}
      */
-    public static NativeEntityDescriptor create(String id, ModelType type) {
-        return create(ModelId.of(id), type);
+    public static NativeEntityDescriptor create(String entityId, String nativeId, ModelType type) {
+        return create(ModelId.of(entityId), ModelId.of(nativeId), type);
     }
 
     public static Builder builder() {
@@ -48,7 +55,19 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
     }
 
     @AutoValue.Builder
-    public interface Builder extends IdBuilder<Builder>, TypeBuilder<Builder> {
-        NativeEntityDescriptor build();
+    public abstract static class Builder {
+
+        @JsonProperty(FIELD_ENTITY_ID)
+        abstract Builder entityId(ModelId entityId);
+
+        @JsonProperty(FIELD_META_ID)
+        abstract Builder id(ModelId id);
+
+        @JsonProperty(FIELD_META_TYPE)
+        abstract Builder type(ModelType type);
+
+        abstract NativeEntityDescriptor autoBuild();
+
+        public NativeEntityDescriptor build() { return autoBuild(); }
     }
 }

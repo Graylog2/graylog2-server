@@ -162,7 +162,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
             throw new ContentPackException("Couldn't create dashboard", e);
         }
 
-        return NativeEntity.create(dashboard.getId(), TYPE, dashboard);
+        return NativeEntity.create(entity.id().toString(), dashboard.getId(), TYPE, dashboard);
     }
 
     private Dashboard createDashboard(

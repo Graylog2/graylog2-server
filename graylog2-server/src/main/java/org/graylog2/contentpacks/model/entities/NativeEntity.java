@@ -33,7 +33,7 @@ public abstract class NativeEntity<T> {
     /**
      * Shortcut for {@link #create(NativeEntityDescriptor, Object)}
      */
-    public static <T> NativeEntity<T> create(String id, ModelType type, T entity) {
-        return create(NativeEntityDescriptor.create(id, type), entity);
+    public static <T> NativeEntity<T> create(String entity_id, String native_id, ModelType type, T entity) {
+        return create(NativeEntityDescriptor.create(entity_id, native_id, type), entity);
     }
 }

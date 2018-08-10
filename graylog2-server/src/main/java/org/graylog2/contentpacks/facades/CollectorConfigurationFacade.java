@@ -97,7 +97,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
                 configurationEntity.template().asString(parameters));
 
         final Configuration savedConfiguration = configurationService.save(configuration);
-        return NativeEntity.create(savedConfiguration.id(), TYPE, savedConfiguration);
+        return NativeEntity.create(entity.id().toString(), savedConfiguration.id(), TYPE, savedConfiguration);
     }
 
     @Override

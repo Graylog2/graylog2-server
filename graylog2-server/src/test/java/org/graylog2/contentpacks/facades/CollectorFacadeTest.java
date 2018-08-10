@@ -151,7 +151,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(collector.id(), ModelTypes.COLLECTOR);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id().toString(), collector.id(), ModelTypes.COLLECTOR);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(collector);
     }
@@ -183,7 +183,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(collector.id(), ModelTypes.COLLECTOR);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id().toString(), collector.id(), ModelTypes.COLLECTOR);
         assertThat(existingCollector.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(existingCollector.entity()).isEqualTo(collector);
     }
