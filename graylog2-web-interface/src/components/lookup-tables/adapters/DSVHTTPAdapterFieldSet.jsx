@@ -72,7 +72,7 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
            label="Key column"
            required
            onChange={handleFormEvent}
-           help="The column name that should be used for the key lookup."
+           help="The column number that should be used for the key lookup."
            value={config.key_column}
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9" />
@@ -82,7 +82,7 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
            label="Value column"
            required
            onChange={handleFormEvent}
-           help="The column name that should be used as the value for a key."
+           help="The column number that should be used as the value for a key."
            value={config.value_column}
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9" />
