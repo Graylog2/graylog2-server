@@ -2,7 +2,7 @@ rule "kv"
 when true
 then
     set_fields(key_value(
-            value: "a='1' <b>=2  \n 'c'=3 [d]=44 a=4 \"e\"=4 [f=1][[g]:3] h=",
+            value: "a='1' <b>=2  \n 'c'=3 [d]=44 a=4 \"e\"=4 [f=1][[g]:3] 'h'=3=:3 i=",
             delimiters: " \t\n\r[",
             kv_delimiters: "=:",
             ignore_empty_values: true,
