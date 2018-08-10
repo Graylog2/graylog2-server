@@ -56,6 +56,10 @@
     };
     $('#input_apiUser').change(updateApiAuth);
     $('#input_apiPassword').change(updateApiAuth);
+
+    // Add CSRF header
+    window.authorizations.add("csrf", new ApiKeyAuthorization("X-Requested-By", "Graylog API Browser", "header"));
+
     window.swaggerUi.load();
   });
 
