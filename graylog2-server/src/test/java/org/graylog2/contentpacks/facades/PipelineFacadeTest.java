@@ -122,7 +122,7 @@ public class PipelineFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("title"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
@@ -135,13 +135,13 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("Test"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
@@ -156,7 +156,7 @@ public class PipelineFacadeTest {
     public void createNativeEntity() throws NotFoundException {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.PIPELINE)
+                .type(ModelTypes.PIPELINE_V1)
                 .data(objectMapper.convertValue(PipelineEntity.create(
                         ValueReference.of("Title"),
                         ValueReference.of("Description"),
@@ -164,13 +164,13 @@ public class PipelineFacadeTest {
                         Collections.singleton(ValueReference.of("5adf23894b900a0f00000001"))), JsonNode.class))
                 .build();
 
-        final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0f00000001", ModelTypes.STREAM);
+        final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0f00000001", ModelTypes.STREAM_V1);
         final Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("5adf23894b900a0f00000001");
         final Map<EntityDescriptor, Object> nativeEntities = Collections.singletonMap(streamDescriptor, stream);
         final NativeEntity<PipelineDao> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
 
-        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.PIPELINE);
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.PIPELINE_V1);
         assertThat(nativeEntity.entity().title()).isEqualTo("Title");
         assertThat(nativeEntity.entity().description()).isEqualTo("Description");
         assertThat(nativeEntity.entity().source()).startsWith("pipeline \"Title\"");
@@ -197,7 +197,7 @@ public class PipelineFacadeTest {
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.PIPELINE)
+                .type(ModelTypes.PIPELINE_V1)
                 .data(objectMapper.convertValue(PipelineEntity.create(
                         ValueReference.of("Title"),
                         ValueReference.of("Description"),
@@ -224,12 +224,12 @@ public class PipelineFacadeTest {
                 .build();
         when(pipelineRuleParser.parsePipeline("dummy", "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"))
                 .thenReturn(pipeline);
-        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(
                 descriptor,
-                EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM),
-                EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE));
+                EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1),
+                EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE_V1));
     }
 
     @Test
@@ -243,7 +243,7 @@ public class PipelineFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(pipeline);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("title"));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.PIPELINE);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.PIPELINE_V1);
         assertThat(excerpt.title()).isEqualTo("title");
     }
 
@@ -252,7 +252,7 @@ public class PipelineFacadeTest {
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
                 .id(ModelId.of("Test"))
-                .type(ModelTypes.PIPELINE)
+                .type(ModelTypes.PIPELINE_V1)
                 .title("Test")
                 .build();
 
@@ -263,7 +263,7 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("Test", ModelTypes.PIPELINE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -271,7 +271,7 @@ public class PipelineFacadeTest {
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("Test"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
         assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("Test"));
         assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("Description"));
@@ -303,13 +303,13 @@ public class PipelineFacadeTest {
                 .stages(ImmutableSortedSet.of(stage))
                 .build();
         when(pipelineRuleParser.parsePipeline(eq("dummy"), anyString())).thenReturn(pipeline);
-        final EntityDescriptor pipelineEntity = EntityDescriptor.create("Test", ModelTypes.PIPELINE);
+        final EntityDescriptor pipelineEntity = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
 
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(pipelineEntity);
 
-        final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM);
-        final EntityDescriptor ruleEntity1 = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE);
-        final EntityDescriptor ruleEntity2 = EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE);
+        final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
+        final EntityDescriptor ruleEntity1 = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
+        final EntityDescriptor ruleEntity2 = EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE_V1);
         assertThat(graph.nodes())
                 .containsOnly(pipelineEntity, streamEntity, ruleEntity1, ruleEntity2);
     }

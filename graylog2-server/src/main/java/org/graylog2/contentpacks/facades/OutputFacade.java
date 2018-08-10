@@ -54,7 +54,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 public class OutputFacade implements EntityFacade<Output> {
     private static final Logger LOG = LoggerFactory.getLogger(OutputFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.OUTPUT;
+    public static final ModelType TYPE = ModelTypes.OUTPUT_V1;
 
     private final ObjectMapper objectMapper;
     private final OutputService outputService;
@@ -82,7 +82,7 @@ public class OutputFacade implements EntityFacade<Output> {
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(output.getId()))
-                .type(ModelTypes.OUTPUT)
+                .type(ModelTypes.OUTPUT_V1)
                 .data(data)
                 .build();
         final Set<Constraint> constraints = versionConstraints(output);
@@ -145,7 +145,7 @@ public class OutputFacade implements EntityFacade<Output> {
     public EntityExcerpt createExcerpt(Output output) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(output.getId()))
-                .type(ModelTypes.OUTPUT)
+                .type(ModelTypes.OUTPUT_V1)
                 .title(output.getTitle())
                 .build();
     }

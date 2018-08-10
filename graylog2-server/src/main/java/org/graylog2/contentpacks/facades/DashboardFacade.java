@@ -72,7 +72,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 public class DashboardFacade implements EntityFacade<Dashboard> {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.DASHBOARD;
+    public static final ModelType TYPE = ModelTypes.DASHBOARD_V1;
 
     private final ObjectMapper objectMapper;
     private final DashboardService dashboardService;
@@ -105,7 +105,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(dashboard.getId()))
-                .type(ModelTypes.DASHBOARD)
+                .type(ModelTypes.DASHBOARD_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -232,7 +232,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         // Replace "stream_id" in configuration if it's set
         final String streamReference = (String) widgetConfig.get("stream_id");
         if (!isNullOrEmpty(streamReference)) {
-            final EntityDescriptor streamDescriptor = EntityDescriptor.create(streamReference, ModelTypes.STREAM);
+            final EntityDescriptor streamDescriptor = EntityDescriptor.create(streamReference, ModelTypes.STREAM_V1);
             final Object stream = nativeEntities.get(streamDescriptor);
 
             if (stream == null) {
@@ -264,7 +264,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     public EntityExcerpt createExcerpt(Dashboard dashboard) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(dashboard.getId()))
-                .type(ModelTypes.DASHBOARD)
+                .type(ModelTypes.DASHBOARD_V1)
                 .title(dashboard.getTitle())
                 .build();
     }
@@ -301,7 +301,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 if (!isNullOrEmpty(streamId)) {
                     LOG.debug("Adding stream <{}> as dependency of widget <{}> on dashboard <{}>",
                             streamId, widget.getId(), dashboard.getId());
-                    final EntityDescriptor stream = EntityDescriptor.create(streamId, ModelTypes.STREAM);
+                    final EntityDescriptor stream = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
                     mutableGraph.putEdge(entityDescriptor, stream);
                 }
             }
@@ -336,7 +336,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 .map(ref -> (ValueReference) ref)
                 .map(valueReference -> valueReference.asString(parameters))
                 .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM))
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
                 .map(entities::get)
                 .filter(Objects::nonNull)
                 .forEach(stream -> mutableGraph.putEdge(entity, stream));

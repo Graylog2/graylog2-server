@@ -23,7 +23,6 @@ import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
-import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -84,8 +83,8 @@ public class ContentPackServiceTest {
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
         final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
-                ModelTypes.STREAM, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
-                ModelTypes.OUTPUT, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories)
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
+                ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories)
         );
 
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
@@ -107,11 +106,11 @@ public class ContentPackServiceTest {
         when(streamService.load("stream-1234")).thenReturn(streamMock);
 
         final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM)
+                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1)
         );
 
         final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
-        assertThat(resolvedEntities).containsOnly(EntityDescriptor.create("stream-1234", ModelTypes.STREAM));
+        assertThat(resolvedEntities).containsOnly(EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1));
     }
 
     @Test
@@ -138,13 +137,13 @@ public class ContentPackServiceTest {
         when(streamService.load("stream-1234")).thenReturn(streamMock);
 
         final ImmutableSet<EntityDescriptor> unresolvedEntities = ImmutableSet.of(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM)
+                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1)
         );
 
         final Set<EntityDescriptor> resolvedEntities = contentPackService.resolveEntities(unresolvedEntities);
         assertThat(resolvedEntities).containsOnly(
-                EntityDescriptor.create("stream-1234", ModelTypes.STREAM),
-                EntityDescriptor.create("output-1234", ModelTypes.OUTPUT)
+                EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1),
+                EntityDescriptor.create("output-1234", ModelTypes.OUTPUT_V1)
         );
     }
 }

@@ -62,7 +62,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamFacade.class);
     private static final String DUMMY_STREAM_ID = "ffffffffffffffffffffffff";
 
-    public static final ModelType TYPE = ModelTypes.STREAM;
+    public static final ModelType TYPE = ModelTypes.STREAM_V1;
 
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
@@ -102,7 +102,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(stream.getId()))
-                .type(ModelTypes.STREAM)
+                .type(ModelTypes.STREAM_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -157,7 +157,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final Set<ObjectId> outputIds = streamEntity.outputs().stream()
                 .map(valueReference -> valueReference.asString(parameters))
                 .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT))
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT_V1))
                 .map(descriptor -> findOutput(descriptor, nativeEntities))
                 .map(Output::getId)
                 .map(ObjectId::new)
@@ -203,7 +203,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
             try {
                 final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
-                return Optional.of(NativeEntity.create(entity.id(), Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM, stream));
+                return Optional.of(NativeEntity.create(entity.id(), Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1, stream));
             } catch (NotFoundException e) {
                 throw new ContentPackException("Default stream <" + streamId + "> does not exist!", e);
             }
@@ -224,7 +224,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     public EntityExcerpt createExcerpt(Stream stream) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(stream.getId()))
-                .type(ModelTypes.STREAM)
+                .type(ModelTypes.STREAM_V1)
                 .title(stream.getTitle())
                 .build();
     }
@@ -259,7 +259,7 @@ public class StreamFacade implements EntityFacade<Stream> {
             stream.getOutputs().stream()
                     .map(Output::getId)
                     .map(ModelId::of)
-                    .map(id -> EntityDescriptor.create(id, ModelTypes.OUTPUT))
+                    .map(id -> EntityDescriptor.create(id, ModelTypes.OUTPUT_V1))
                     .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
@@ -290,7 +290,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         streamEntity.outputs().stream()
                 .map(valueReference -> valueReference.asString(parameters))
                 .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT))
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.OUTPUT_V1))
                 .map(entities::get)
                 .filter(Objects::nonNull)
                 .forEach(outputEntity -> mutableGraph.putEdge(entity, outputEntity));

@@ -77,7 +77,7 @@ public class CollectorFacadeTest {
         assertThat(entityWithConstraints.constraints()).isEmpty();
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.COLLECTOR)
+                .type(ModelTypes.COLLECTOR_V1)
                 .data(objectMapper.convertValue(CollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
@@ -98,13 +98,13 @@ public class CollectorFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR_V1);
 
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         assertThat(entityWithConstraints.constraints()).isEmpty();
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.COLLECTOR)
+                .type(ModelTypes.COLLECTOR_V1)
                 .data(objectMapper.convertValue(CollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
@@ -127,7 +127,7 @@ public class CollectorFacadeTest {
     public void createNativeEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
-                .type(ModelTypes.COLLECTOR)
+                .type(ModelTypes.COLLECTOR_V1)
                 .data(objectMapper.convertValue(CollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
@@ -151,7 +151,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.COLLECTOR);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.COLLECTOR_V1);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(collector);
     }
@@ -161,7 +161,7 @@ public class CollectorFacadeTest {
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
-                .type(ModelTypes.COLLECTOR)
+                .type(ModelTypes.COLLECTOR_V1)
                 .data(objectMapper.convertValue(CollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
@@ -183,7 +183,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.COLLECTOR);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.COLLECTOR_V1);
         assertThat(existingCollector.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(existingCollector.entity()).isEqualTo(collector);
     }
@@ -205,7 +205,7 @@ public class CollectorFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(collector);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("5b4c920b4b900a0024af0001"));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.COLLECTOR);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.COLLECTOR_V1);
         assertThat(excerpt.title()).isEqualTo("filebeat");
     }
 
@@ -216,17 +216,17 @@ public class CollectorFacadeTest {
         assertThat(entityExcerpts).containsOnly(
                 EntityExcerpt.builder()
                         .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                        .type(ModelTypes.COLLECTOR)
+                        .type(ModelTypes.COLLECTOR_V1)
                         .title("filebeat")
                         .build(),
                 EntityExcerpt.builder()
                         .id(ModelId.of("5b4c920b4b900a0024af0002"))
-                        .type(ModelTypes.COLLECTOR)
+                        .type(ModelTypes.COLLECTOR_V1)
                         .title("winlogbeat")
                         .build(),
                 EntityExcerpt.builder()
                         .id(ModelId.of("5b4c920b4b900a0024af0003"))
-                        .type(ModelTypes.COLLECTOR)
+                        .type(ModelTypes.COLLECTOR_V1)
                         .title("nxlog")
                         .build()
         );
@@ -235,7 +235,7 @@ public class CollectorFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -245,7 +245,7 @@ public class CollectorFacadeTest {
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
-                .type(ModelTypes.COLLECTOR)
+                .type(ModelTypes.COLLECTOR_V1)
                 .data(objectMapper.convertValue(CollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),

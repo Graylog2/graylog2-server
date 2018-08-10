@@ -63,7 +63,7 @@ import static java.util.Objects.requireNonNull;
 public class PipelineFacade implements EntityFacade<PipelineDao> {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.PIPELINE;
+    public static final ModelType TYPE = ModelTypes.PIPELINE_V1;
 
     private final ObjectMapper objectMapper;
     private final PipelineService pipelineService;
@@ -92,7 +92,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(pipelineDao.title()))
-                .type(ModelTypes.PIPELINE)
+                .type(ModelTypes.PIPELINE_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -135,7 +135,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final String pipelineId = requireNonNull(savedPipelineDao.id(), "Saved pipeline ID must not be null");
         final Set<EntityDescriptor> connectedStreamEntities = pipelineEntity.connectedStreams().stream()
                 .map(valueReference -> valueReference.asString(parameters))
-                .map(streamId -> EntityDescriptor.create(streamId, ModelTypes.STREAM))
+                .map(streamId -> EntityDescriptor.create(streamId, ModelTypes.STREAM_V1))
                 .collect(Collectors.toSet());
         final Set<Stream> connectedStreams = connectedStreams(connectedStreamEntities, nativeEntities);
         createPipelineConnections(pipelineId, connectedStreams);
@@ -208,7 +208,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     public EntityExcerpt createExcerpt(PipelineDao pipeline) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(pipeline.title()))
-                .type(ModelTypes.PIPELINE)
+                .type(ModelTypes.PIPELINE_V1)
                 .title(pipeline.title())
                 .build();
     }
@@ -244,14 +244,14 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             final Collection<String> referencedRules = referencedRules(pipelineSource);
             referencedRules.stream()
                     .map(ModelId::of)
-                    .map(id -> EntityDescriptor.create(id, ModelTypes.PIPELINE_RULE))
+                    .map(id -> EntityDescriptor.create(id, ModelTypes.PIPELINE_RULE_V1))
                     .forEach(rule -> mutableGraph.putEdge(entityDescriptor, rule));
 
             final Set<PipelineConnections> pipelineConnections = connectionsService.loadByPipelineId(pipelineDao.id());
             pipelineConnections.stream()
                     .map(PipelineConnections::streamId)
                     .map(ModelId::of)
-                    .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM))
+                    .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
                     .forEach(stream -> mutableGraph.putEdge(entityDescriptor, stream));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);
@@ -282,7 +282,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final Collection<String> referencedRules = referencedRules(source);
         referencedRules.stream()
                 .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.PIPELINE_RULE))
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.PIPELINE_RULE_V1))
                 .map(entities::get)
                 .filter(Objects::nonNull)
                 .forEach(ruleEntity -> mutableGraph.putEdge(entity, ruleEntity));
@@ -290,7 +290,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         pipelineEntity.connectedStreams().stream()
                 .map(valueReference -> valueReference.asString(parameters))
                 .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM))
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
                 .map(entities::get)
                 .filter(Objects::nonNull)
                 .forEach(streamEntity -> mutableGraph.putEdge(entity, streamEntity));

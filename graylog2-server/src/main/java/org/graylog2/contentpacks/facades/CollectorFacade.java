@@ -47,7 +47,7 @@ import static java.util.Objects.isNull;
 public class CollectorFacade implements EntityFacade<Collector> {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.COLLECTOR;
+    public static final ModelType TYPE = ModelTypes.COLLECTOR_V1;
 
     private final ObjectMapper objectMapper;
     private final CollectorService collectorService;

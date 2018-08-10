@@ -152,7 +152,7 @@ public class StreamCatalogTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(streamId.toHexString()));
-        assertThat(entity.type()).isEqualTo(ModelTypes.STREAM);
+        assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final StreamEntity streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntity.class);
@@ -171,7 +171,7 @@ public class StreamCatalogTest {
         final EntityExcerpt excerpt = facade.createExcerpt(stream);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(stream.getId()));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.STREAM);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.STREAM_V1);
         assertThat(excerpt.title()).isEqualTo(stream.getTitle());
     }
 
@@ -181,12 +181,12 @@ public class StreamCatalogTest {
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("000000000000000000000001"))
-                .type(ModelTypes.STREAM)
+                .type(ModelTypes.STREAM_V1)
                 .title("All messages")
                 .build();
         final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
                 .id(ModelId.of("5adf23894b900a0fdb4e517d"))
-                .type(ModelTypes.STREAM)
+                .type(ModelTypes.STREAM_V1)
                 .title("Test")
                 .build();
 
@@ -197,7 +197,7 @@ public class StreamCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/streams.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -205,7 +205,7 @@ public class StreamCatalogTest {
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf23894b900a0fdb4e517d"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.STREAM);
+        assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Test"));
         assertThat(streamEntity.description()).isEqualTo(ValueReference.of("Description"));

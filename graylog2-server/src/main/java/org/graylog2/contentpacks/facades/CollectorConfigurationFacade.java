@@ -49,7 +49,7 @@ import static java.util.Objects.isNull;
 public class CollectorConfigurationFacade implements EntityFacade<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorConfigurationFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.COLLECTOR_CONFIGURATION;
+    public static final ModelType TYPE = ModelTypes.COLLECTOR_CONFIGURATION_V1;
 
     private final ObjectMapper objectMapper;
     private final ConfigurationService configurationService;
@@ -150,7 +150,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
             LOG.debug("Could not find configuration {}", entityDescriptor);
         } else {
             final EntityDescriptor collectorEntityDescriptor = EntityDescriptor.create(
-                    configuration.collectorId(), ModelTypes.COLLECTOR);
+                    configuration.collectorId(), ModelTypes.COLLECTOR_V1);
             mutableGraph.putEdge(entityDescriptor, collectorEntityDescriptor);
         }
 
@@ -175,7 +175,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
         mutableGraph.addNode(entity);
 
         final CollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), CollectorConfigurationEntity.class);
-        final EntityDescriptor collectorDescriptor = EntityDescriptor.create(configurationEntity.collectorId().asString(parameters), ModelTypes.COLLECTOR);
+        final EntityDescriptor collectorDescriptor = EntityDescriptor.create(configurationEntity.collectorId().asString(parameters), ModelTypes.COLLECTOR_V1);
         final Entity collectorEntity = entities.get(collectorDescriptor);
 
         if (collectorEntity != null) {

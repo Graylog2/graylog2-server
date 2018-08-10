@@ -53,7 +53,7 @@ public class EntityTest {
 
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5"))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .version(ModelVersion.of("1"))
                 .data(entityData)
                 .build();
@@ -93,7 +93,7 @@ public class EntityTest {
         final EntityV1 entityV1 = (EntityV1) entity;
         assertThat(entityV1).isNotNull();
         assertThat(entityV1.version()).isEqualTo(ModelVersion.of("1"));
-        assertThat(entityV1.type()).isEqualTo(ModelTypes.INPUT);
+        assertThat(entityV1.type()).isEqualTo(ModelTypes.INPUT_V1);
         assertThat(entityV1.id()).isEqualTo(ModelId.of("78547c87-af21-4292-8e57-614da5baf6c3"));
         assertThat(entityV1.data()).isEqualTo(expectedData);
     }

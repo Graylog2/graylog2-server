@@ -156,7 +156,7 @@ public class InputFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of(input.getId()));
-        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT);
+        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
@@ -169,13 +169,13 @@ public class InputFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
-        final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT);
+        final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT_V1);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(id);
-        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT);
+        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
@@ -200,7 +200,7 @@ public class InputFacadeTest {
         configuration.put("number_worker_threads", 8);
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .data(objectMapper.convertValue(InputEntity.create(
                         ValueReference.of("Local Raw UDP"),
                         ReferenceMapUtils.toReferenceMap(configuration),
@@ -215,7 +215,7 @@ public class InputFacadeTest {
         final InputWithExtractors inputWithExtractors = nativeEntity.entity();
         final Input savedInput = inputWithExtractors.input();
         final String savedId = savedInput.getId();
-        assertThat(nativeEntity.descriptor()).isEqualTo(EntityDescriptor.create(savedId, ModelTypes.INPUT));
+        assertThat(nativeEntity.descriptor()).isEqualTo(EntityDescriptor.create(savedId, ModelTypes.INPUT_V1));
         assertThat(savedInput.getTitle()).isEqualTo("Local Raw UDP");
         assertThat(savedInput.getType()).isEqualTo("org.graylog2.inputs.raw.udp.RawUDPInput");
         assertThat(savedInput.isGlobal()).isFalse();
@@ -232,7 +232,7 @@ public class InputFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(inputWithExtractors);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(input.getId()));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.INPUT);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.INPUT_V1);
         assertThat(excerpt.title()).isEqualTo(input.getTitle());
     }
 
@@ -241,12 +241,12 @@ public class InputFacadeTest {
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5adf25294b900a0fdb4e5365"))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .title("Global Random HTTP")
                 .build();
         final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
                 .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .title("Local Raw UDP")
                 .build();
 
@@ -257,7 +257,7 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -265,7 +265,7 @@ public class InputFacadeTest {
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf25294b900a0fdb4e5365"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT);
+        assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
         assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Global Random HTTP"));
         assertThat(inputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.inputs.random.FakeHttpMessageInput"));
@@ -286,7 +286,7 @@ public class InputFacadeTest {
         configuration.put("number_worker_threads", 8);
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .data(objectMapper.convertValue(InputEntity.create(
                         ValueReference.of("Local Raw UDP"),
                         ReferenceMapUtils.toReferenceMap(configuration),
@@ -302,7 +302,7 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5acc84f84b900a4ff290d9a7", ModelTypes.INPUT);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5acc84f84b900a4ff290d9a7", ModelTypes.INPUT_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -318,7 +318,7 @@ public class InputFacadeTest {
         configuration.put("number_worker_threads", 8);
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5acc84f84b900a4ff290d9a7"))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .data(objectMapper.convertValue(InputEntity.create(
                         ValueReference.of("Local Raw UDP"),
                         ReferenceMapUtils.toReferenceMap(configuration),

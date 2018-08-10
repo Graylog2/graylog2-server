@@ -75,7 +75,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 public class InputFacade implements EntityFacade<InputWithExtractors> {
     private static final Logger LOG = LoggerFactory.getLogger(InputFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.INPUT;
+    public static final ModelType TYPE = ModelTypes.INPUT_V1;
 
     private final ObjectMapper objectMapper;
     private final InputService inputService;
@@ -129,7 +129,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(input.getId()))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .data(data)
                 .build();
         final Set<Constraint> constraints = versionConstraints(input);
@@ -414,7 +414,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     public EntityExcerpt createExcerpt(InputWithExtractors inputWithExtractors) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(inputWithExtractors.input().getId()))
-                .type(ModelTypes.INPUT)
+                .type(ModelTypes.INPUT_V1)
                 .title(inputWithExtractors.input().getTitle())
                 .build();
     }

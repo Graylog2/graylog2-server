@@ -47,7 +47,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
-    public static final ModelType TYPE = ModelTypes.LOOKUP_ADAPTER;
+    public static final ModelType TYPE = ModelTypes.LOOKUP_ADAPTER_V1;
 
     private final ObjectMapper objectMapper;
     private final DBDataAdapterService dataAdapterService;
@@ -74,7 +74,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
         final JsonNode data = objectMapper.convertValue(lookupDataAdapterEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(dataAdapterDto.id()))
-                .type(ModelTypes.LOOKUP_ADAPTER)
+                .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(data)
                 .build();
         final Set<Constraint> constraints = versionConstraints(dataAdapterDto);
@@ -145,7 +145,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     public EntityExcerpt createExcerpt(DataAdapterDto dataAdapterDto) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(dataAdapterDto.name()))
-                .type(ModelTypes.LOOKUP_ADAPTER)
+                .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .title(dataAdapterDto.title())
                 .build();
     }

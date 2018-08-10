@@ -47,7 +47,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class LookupCacheFacade implements EntityFacade<CacheDto> {
-    public static final ModelType TYPE = ModelTypes.LOOKUP_CACHE;
+    public static final ModelType TYPE = ModelTypes.LOOKUP_CACHE_V1;
 
     private final ObjectMapper objectMapper;
     private final DBCacheService cacheService;
@@ -74,7 +74,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         final JsonNode data = objectMapper.convertValue(lookupCacheEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(cacheDto.id()))
-                .type(ModelTypes.LOOKUP_CACHE)
+                .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(data)
                 .build();
         final Set<Constraint> constraints = versionConstraints(cacheDto);
@@ -144,7 +144,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     public EntityExcerpt createExcerpt(CacheDto cacheDto) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(cacheDto.name()))
-                .type(ModelTypes.LOOKUP_CACHE)
+                .type(ModelTypes.LOOKUP_CACHE_V1)
                 .title(cacheDto.title())
                 .build();
     }

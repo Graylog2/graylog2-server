@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineRuleFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.PIPELINE_RULE;
+    public static final ModelType TYPE = ModelTypes.PIPELINE_RULE_V1;
 
     private final ObjectMapper objectMapper;
     private final RuleService ruleService;
@@ -67,7 +67,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(ruleDao.title()))
-                .type(ModelTypes.PIPELINE_RULE)
+                .type(ModelTypes.PIPELINE_RULE_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -145,7 +145,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     public EntityExcerpt createExcerpt(RuleDao ruleDao) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(ruleDao.title()))
-                .type(ModelTypes.PIPELINE_RULE)
+                .type(ModelTypes.PIPELINE_RULE_V1)
                 .title(ruleDao.title())
                 .build();
     }

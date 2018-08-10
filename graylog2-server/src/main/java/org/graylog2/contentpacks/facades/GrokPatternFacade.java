@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     private static final Logger LOG = LoggerFactory.getLogger(GrokPatternFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.GROK_PATTERN;
+    public static final ModelType TYPE = ModelTypes.GROK_PATTERN_V1;
 
     private final ObjectMapper objectMapper;
     private final GrokPatternService grokPatternService;
@@ -65,7 +65,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(grokPattern.id()))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -132,7 +132,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     public EntityExcerpt createExcerpt(GrokPattern grokPattern) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(grokPattern.id()))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .title(grokPattern.name())
                 .build();
     }
