@@ -63,7 +63,7 @@ import static java.util.Objects.requireNonNull;
 public class PipelineFacade implements EntityFacade<PipelineDao> {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.PIPELINE_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.PIPELINE_V1;
 
     private final ObjectMapper objectMapper;
     private final PipelineService pipelineService;
@@ -140,7 +140,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final Set<Stream> connectedStreams = connectedStreams(connectedStreamEntities, nativeEntities);
         createPipelineConnections(pipelineId, connectedStreams);
 
-        return NativeEntity.create(entity.id(), pipelineId, TYPE, savedPipelineDao);
+        return NativeEntity.create(entity.id(), pipelineId, TYPE_V1, savedPipelineDao);
     }
 
     private Set<Stream> connectedStreams(Set<EntityDescriptor> connectedStreamEntities, Map<EntityDescriptor, Object> nativeEntities) {

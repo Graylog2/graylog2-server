@@ -47,7 +47,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
 
 public class LookupCacheFacade implements EntityFacade<CacheDto> {
-    public static final ModelType TYPE = ModelTypes.LOOKUP_CACHE_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.LOOKUP_CACHE_V1;
 
     private final ObjectMapper objectMapper;
     private final DBCacheService cacheService;
@@ -114,7 +114,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 .build();
 
         final CacheDto savedCacheDto = cacheService.save(cacheDto);
-        return NativeEntity.create(entity.id(), savedCacheDto.name(), TYPE, savedCacheDto);
+        return NativeEntity.create(entity.id(), savedCacheDto.name(), TYPE_V1, savedCacheDto);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
 
         final Optional<CacheDto> existingCache = cacheService.get(name);
 
-        return existingCache.map(cache -> NativeEntity.create(entity.id(), cache.id(), TYPE, cache));
+        return existingCache.map(cache -> NativeEntity.create(entity.id(), cache.id(), TYPE_V1, cache));
     }
 
     @Override

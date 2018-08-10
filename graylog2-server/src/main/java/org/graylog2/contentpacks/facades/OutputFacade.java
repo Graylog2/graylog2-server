@@ -54,7 +54,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 public class OutputFacade implements EntityFacade<Output> {
     private static final Logger LOG = LoggerFactory.getLogger(OutputFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.OUTPUT_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.OUTPUT_V1;
 
     private final ObjectMapper objectMapper;
     private final OutputService outputService;
@@ -127,7 +127,7 @@ public class OutputFacade implements EntityFacade<Output> {
         );
         try {
             final Output output = outputService.create(createOutputRequest, username);
-            return NativeEntity.create(entity.id(), output.getId(), TYPE, output);
+            return NativeEntity.create(entity.id(), output.getId(), TYPE_V1, output);
         } catch (ValidationException e) {
             throw new IllegalArgumentException(e);
         }

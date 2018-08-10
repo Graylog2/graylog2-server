@@ -62,7 +62,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamFacade.class);
     private static final String DUMMY_STREAM_ID = "ffffffffffffffffffffffff";
 
-    public static final ModelType TYPE = ModelTypes.STREAM_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.STREAM_V1;
 
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
@@ -164,7 +164,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
 
-        return NativeEntity.create(entity.id(), savedStreamId, TYPE, stream);
+        return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream);
     }
 
     private CreateStreamRuleRequest createStreamRuleRequest(StreamRuleEntity streamRuleEntity, Map<String, ValueReference> parameters) {

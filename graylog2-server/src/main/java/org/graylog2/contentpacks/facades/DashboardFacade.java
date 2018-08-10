@@ -72,7 +72,7 @@ import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUt
 public class DashboardFacade implements EntityFacade<Dashboard> {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.DASHBOARD_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.DASHBOARD_V1;
 
     private final ObjectMapper objectMapper;
     private final DashboardService dashboardService;
@@ -162,7 +162,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
             throw new ContentPackException("Couldn't create dashboard", e);
         }
 
-        return NativeEntity.create(entity.id(), dashboard.getId(), TYPE, dashboard);
+        return NativeEntity.create(entity.id(), dashboard.getId(), TYPE_V1, dashboard);
     }
 
     private Dashboard createDashboard(

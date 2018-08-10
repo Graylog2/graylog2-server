@@ -50,7 +50,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LookupTableFacade implements EntityFacade<LookupTableDto> {
-    public static final ModelType TYPE = ModelTypes.LOOKUP_TABLE_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.LOOKUP_TABLE_V1;
 
     private final ObjectMapper objectMapper;
     private final DBLookupTableService lookupTableService;
@@ -132,7 +132,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 .defaultMultiValueType(lookupTableEntity.defaultMultiValueType().asEnum(parameters, LookupDefaultMultiValue.Type.class))
                 .build();
         final LookupTableDto savedLookupTableDto = lookupTableService.save(lookupTableDto);
-        return NativeEntity.create(entity.id(), savedLookupTableDto.id(), TYPE, savedLookupTableDto);
+        return NativeEntity.create(entity.id(), savedLookupTableDto.id(), TYPE_V1, savedLookupTableDto);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         final Optional<LookupTableDto> lookupTable = lookupTableService.get(name);
         lookupTable.ifPresent(existingLookupTable -> compareLookupTable(name, title, existingLookupTable));
 
-        return lookupTable.map(lt -> NativeEntity.create(entity.id(), lt.id(), TYPE, lt));
+        return lookupTable.map(lt -> NativeEntity.create(entity.id(), lt.id(), TYPE_V1, lt));
     }
 
     private void compareLookupTable(String name, String title, LookupTableDto existingLookupTable) {

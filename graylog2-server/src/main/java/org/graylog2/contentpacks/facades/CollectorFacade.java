@@ -47,7 +47,7 @@ import static java.util.Objects.isNull;
 public class CollectorFacade implements EntityFacade<Collector> {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.COLLECTOR_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.COLLECTOR_V1;
 
     private final ObjectMapper objectMapper;
     private final CollectorService collectorService;
@@ -81,7 +81,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(collector.id()))
-                .type(TYPE)
+                .type(TYPE_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -121,7 +121,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
                 .build();
 
         final Collector savedCollector = collectorService.save(collector);
-        return NativeEntity.create(entity.id(), savedCollector.id(), TYPE, savedCollector);
+        return NativeEntity.create(entity.id(), savedCollector.id(), TYPE_V1, savedCollector);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
         final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByName(name));
         existingCollector.ifPresent(collector -> compareCollectors(name, serviceType, collector));
 
-        return existingCollector.map(collector -> NativeEntity.create(entity.id(), collector.id(), TYPE, collector));
+        return existingCollector.map(collector -> NativeEntity.create(entity.id(), collector.id(), TYPE_V1, collector));
     }
 
     private void compareCollectors(String name, String serviceType, Collector existingCollector) {
@@ -159,7 +159,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
     public EntityExcerpt createExcerpt(Collector collector) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(collector.id()))
-                .type(TYPE)
+                .type(TYPE_V1)
                 .title(collector.name())
                 .build();
     }
