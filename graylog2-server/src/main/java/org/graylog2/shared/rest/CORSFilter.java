@@ -40,7 +40,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
         if (origin != null && !origin.isEmpty()) {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", origin);
             responseContext.getHeaders().add("Access-Control-Allow-Credentials", true);
-            responseContext.getHeaders().add("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Graylog-No-Session-Extension, X-Requested-With");
+            responseContext.getHeaders().add("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Graylog-No-Session-Extension, X-Requested-With, X-Requested-By");
             responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             // In order to avoid redoing the preflight thingy for every request, see http://stackoverflow.com/a/12021982/1088469
             responseContext.getHeaders().add("Access-Control-Max-Age", "600"); // 10 minutes seems to be the maximum allowable value
@@ -57,7 +57,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
                 options.header("Access-Control-Allow-Origin", origin);
                 options.header("Access-Control-Allow-Credentials", true);
                 options.header("Access-Control-Allow-Headers",
-                               "Authorization, Content-Type, X-Graylog-No-Session-Extension, X-Requested-With");
+                               "Authorization, Content-Type, X-Graylog-No-Session-Extension, X-Requested-With, X-Requested-By");
                 options.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 // In order to avoid redoing the preflight thingy for every request, see http://stackoverflow.com/a/12021982/1088469
                 options.header("Access-Control-Max-Age", "600"); // 10 minutes seems to be the maximum allowable value
