@@ -162,6 +162,11 @@ public class ContentPackResourceTest {
         }
 
         @Override
+        protected boolean isPermitted(String permission, String id) {
+            return true;
+        }
+
+        @Override
         protected UriBuilder getUriBuilderToSelf() {
             return UriBuilder.fromUri("http://testserver/api");
         }

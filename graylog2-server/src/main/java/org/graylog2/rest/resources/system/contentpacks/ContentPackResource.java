@@ -126,7 +126,7 @@ public class ContentPackResource extends RestResource {
     public ContentPackRevisions listContentPackRevisions(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id) {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
         Map<Integer, ContentPack> contentPackMap = contentPackPersistenceService.findAllById(id).stream()
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
@@ -147,7 +147,7 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision") int revision
     ) {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
         return contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
@@ -190,7 +190,7 @@ public class ContentPackResource extends RestResource {
     public void deleteContentPack(
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
             @PathParam("contentPackId") final ModelId contentPackId) {
-        checkPermission(RestPermissions.CONTENT_PACK_DELETE);
+        checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
         final int deleted = contentPackPersistenceService.deleteById(contentPackId);
 
         LOG.debug("Deleted {} content packs with id {}", deleted, contentPackId);
@@ -211,7 +211,7 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") final ModelId contentPackId,
             @ApiParam(name = "revision", value = "Content Pack revision", required = true)
             @PathParam("revision") final int revision) {
-        checkPermission(RestPermissions.CONTENT_PACK_DELETE);
+        checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
         final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
 
         LOG.debug("Deleted {} content packs with id {} and revision", deleted, contentPackId, revision);
@@ -233,7 +233,7 @@ public class ContentPackResource extends RestResource {
             @PathParam("revision") int revision,
             @ApiParam(name = "installation request", value = "Content pack installation request", required = true)
             @Valid @NotNull ContentPackInstallationRequest contentPackInstallationRequest) {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_INSTALL, id.toString());
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
@@ -259,10 +259,9 @@ public class ContentPackResource extends RestResource {
     public ContentPackInstallation showContentPackInstallation(
             @ApiParam(name = "installationId", value = "Content pack installation ID", required = true)
             @PathParam("installationId") String installationId) {
-        checkPermission(RestPermissions.CONTENT_PACK_READ, installationId);
-
         final ObjectId id = new ObjectId(installationId);
         final Optional<ContentPackInstallation> installation = contentPackInstallationPersistenceService.findById(id);
+        installation.ifPresent(i -> checkPermission(RestPermissions.CONTENT_PACK_READ, i.contentPackId().toString()));
         return installation.orElseThrow(() -> new NotFoundException("Couldn't find installation with id " + installationId));
     }
 
@@ -292,7 +291,7 @@ public class ContentPackResource extends RestResource {
     public ContentPackInstallationsResponse listContentPackInstallationsById(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id) {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackId(id);
         return ContentPackInstallationsResponse.create(installations.size(), installations);
@@ -311,7 +310,7 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") ModelId contentPackId,
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision") int revision) {
-        checkPermission(RestPermissions.CONTENT_PACK_READ);
+        checkPermission(RestPermissions.CONTENT_PACK_READ, contentPackId.toString());
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision);
         return ContentPackInstallationsResponse.create(installations.size(), installations);
@@ -331,7 +330,7 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") ModelId contentPackId,
             @ApiParam(name = "installationId", value = "Installation ID", required = true)
             @PathParam("installationId") String installationId) {
-        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL, contentPackId.toString());
 
         final ObjectId id = new ObjectId(installationId);
         final int deletedInstallations = contentPackInstallationPersistenceService.deleteById(id);
@@ -352,7 +351,7 @@ public class ContentPackResource extends RestResource {
     public Response deleteContentPackInstallationsById(
             @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId contentPackId) {
-        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL, contentPackId.toString());
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackId(contentPackId);
         deleteInstallation(installations);
@@ -374,7 +373,7 @@ public class ContentPackResource extends RestResource {
             @PathParam("contentPackId") ModelId contentPackId,
             @ApiParam(name = "revision", value = "Content pack revision", required = true)
             @PathParam("revision") int revision) {
-        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL);
+        checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL, contentPackId.toString());
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision);
         deleteInstallation(installations);
