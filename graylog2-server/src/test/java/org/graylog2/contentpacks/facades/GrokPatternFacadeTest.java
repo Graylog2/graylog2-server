@@ -176,7 +176,7 @@ public class GrokPatternFacadeTest {
                         ValueReference.of("[a-z]+")), JsonNode.class))
                 .build();
         final Optional<NativeEntity<GrokPattern>> existingGrokPattern = facade.findExisting(grokPatternEntity, Collections.emptyMap());
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(grokPatternEntity.id().toString(), "1", ModelTypes.GROK_PATTERN);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(grokPatternEntity.id(), "1", ModelTypes.GROK_PATTERN);
         assertThat(existingGrokPattern)
                 .isPresent()
                 .get()

@@ -50,21 +50,19 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
         return create(ModelId.of(entityId), ModelId.of(nativeId), type);
     }
 
+    public static NativeEntityDescriptor create(ModelId entityId, String nativeId, ModelType type) {
+        return create(entityId, ModelId.of(nativeId), type);
+    }
+
     public static Builder builder() {
         return new AutoValue_NativeEntityDescriptor.Builder();
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements IdBuilder<Builder>, TypeBuilder<Builder> {
 
         @JsonProperty(FIELD_ENTITY_ID)
         abstract Builder entityId(ModelId entityId);
-
-        @JsonProperty(FIELD_META_ID)
-        abstract Builder id(ModelId id);
-
-        @JsonProperty(FIELD_META_TYPE)
-        abstract Builder type(ModelType type);
 
         abstract NativeEntityDescriptor autoBuild();
 
