@@ -64,8 +64,6 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
         @JsonProperty(FIELD_ENTITY_ID)
         abstract Builder entityId(ModelId entityId);
 
-        abstract NativeEntityDescriptor autoBuild();
-
-        public NativeEntityDescriptor build() { return autoBuild(); }
+        public abstract NativeEntityDescriptor build();
     }
 }

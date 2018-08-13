@@ -19,17 +19,17 @@
       "entities": [
         {
           "id": "5b4c920b4b900a0024af2b5d",
-          "type": "collector"
+          "type": "collector",
           "entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
           "id": "5b4c920b4b900a0024af2b5c",
-          "type": "collector"
+          "type": "collector",
           "entity_id": "5b1a49eb3d274631fe07beff"
         },
         {
           "id": "5b4c920b4b900a0024af2b5b",
-          "type": "collector"
+          "type": "collector",
           "entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
