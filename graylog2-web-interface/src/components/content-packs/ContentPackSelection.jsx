@@ -38,10 +38,6 @@ class ContentPackSelection extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this._validate();
-  }
-
   componentWillReceiveProps(nextProps) {
     this.setState({ filteredEntities: nextProps.entities, contentPack: nextProps.contentPack });
     if (this.state.isFiltered) {
@@ -56,10 +52,10 @@ class ContentPackSelection extends React.Component {
     this.setState({ contentPack: updatedPack }, this._validate);
   }
 
-  _validate = () => {
+  _validate = (newSelection) => {
     const mandatoryFields = ['name', 'summary', 'vendor'];
     const { contentPack } = this.state;
-    const { selectedEntities } = this.props;
+    const selectedEntities = newSelection || this.props.selectedEntities;
 
     const errors = mandatoryFields.reduce((acc, field) => {
       const newErrors = acc;
@@ -69,12 +65,16 @@ class ContentPackSelection extends React.Component {
       return newErrors;
     }, {});
 
-    if (Object.keys(selectedEntities).length <= 0) {
+    const selectionEmpty = Object.keys(selectedEntities)
+      .reduce((acc, entityGroup) => { return acc + selectedEntities[entityGroup].length; }, 0) <= 0;
+
+    if (selectionEmpty) {
       errors.selection = 'Select at least one entity.';
     }
 
     this.setState({ errors });
   };
+
   _bindValue(event) {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
   }
@@ -88,8 +88,8 @@ class ContentPackSelection extends React.Component {
     } else {
       newSelection[entity.type].splice(index, 1);
     }
+    this._validate(newSelection);
     this.props.onStateChange({ selectedEntities: newSelection });
-    this._validate();
   };
 
   _updateSelectionGroup = (type) => {
@@ -100,8 +100,8 @@ class ContentPackSelection extends React.Component {
       newSelection[type] = this.props.entities[type];
     }
 
+    this._validate(newSelection);
     this.props.onStateChange({ selectedEntities: newSelection });
-    this._validate();
   };
 
   _isUndetermined(type) {
@@ -200,7 +200,7 @@ class ContentPackSelection extends React.Component {
                        value={this.state.contentPack.name}
                        onChange={this._bindValue}
                        label="Name"
-                       help={errors.name ? errors.name : 'Give a descriptive name for this content pack.'}
+                       help={errors.name ? errors.name : 'Required. Give a descriptive name for this content pack.'}
                        required />
                 <Input name="summary"
                        id="summary"
@@ -210,7 +210,7 @@ class ContentPackSelection extends React.Component {
                        value={this.state.contentPack.summary}
                        onChange={this._bindValue}
                        label="Summary"
-                       help={errors.summary ? errors.summary : 'Give a short summary of the content pack.'}
+                       help={errors.summary ? errors.summary : 'Required. Give a short summary of the content pack.'}
                        required />
                 <Input name="description"
                        id="description"
@@ -228,7 +228,7 @@ class ContentPackSelection extends React.Component {
                        value={this.state.contentPack.vendor}
                        onChange={this._bindValue}
                        label="Vendor"
-                       help={errors.vendor ? errors.vendor : 'Who did this content pack and how can he be reached. e.g Name and eMail'}
+                       help={errors.vendor ? errors.vendor : 'Required. Who did this content pack and how can he be reached. e.g Name and eMail'}
                        required />
                 <Input name="url"
                        id="url"
@@ -257,13 +257,9 @@ class ContentPackSelection extends React.Component {
             />
           </Col>
         </Row>
-        {errors.selection &&
-          <Row>
-            <Col smOffset={1} sm={4}><Panel bsStyle="danger">{errors.selection}</Panel></Col>
-          </Row>
-        }
         <Row>
           <Col smOffset={1} sm={8}>
+            {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel> }
             <ExpandableList>
               {entitiesComponent}
             </ExpandableList>

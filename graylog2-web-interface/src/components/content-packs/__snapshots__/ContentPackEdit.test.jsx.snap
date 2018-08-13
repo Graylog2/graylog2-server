@@ -118,7 +118,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
             >
               <fieldset>
                 <div
-                  className="form-group has-error"
+                  className="form-group"
                 >
                   <label
                     className="control-label"
@@ -142,12 +142,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <span
                       className="help-block"
                     >
-                      Must be filled out.
+                      Required. Give a descriptive name for this content pack.
                     </span>
                   </span>
                 </div>
                 <div
-                  className="form-group has-error"
+                  className="form-group"
                 >
                   <label
                     className="control-label"
@@ -171,7 +171,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <span
                       className="help-block"
                     >
-                      Must be filled out.
+                      Required. Give a short summary of the content pack.
                     </span>
                   </span>
                 </div>
@@ -204,7 +204,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </span>
                 </div>
                 <div
-                  className="form-group has-error"
+                  className="form-group"
                 >
                   <label
                     className="control-label"
@@ -228,7 +228,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <span
                       className="help-block"
                     >
-                      Must be filled out.
+                      Required. Who did this content pack and how can he be reached. e.g Name and eMail
                     </span>
                   </span>
                 </div>
@@ -346,24 +346,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-        <div
-          className="row"
-        >
-          <div
-            className="col-sm-4 col-sm-offset-1"
-          >
-            <div
-              className="panel panel-danger"
-              id={undefined}
-            >
-              <div
-                className="panel-body"
-              >
-                Select at least one entity.
-              </div>
             </div>
           </div>
         </div>
@@ -651,7 +633,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <span
                       className="help-block"
                     >
-                      Give a descriptive name for this content pack.
+                      Required. Give a descriptive name for this content pack.
                     </span>
                   </span>
                 </div>
@@ -680,7 +662,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <span
                       className="help-block"
                     >
-                      Give a short summary of the content pack.
+                      Required. Give a short summary of the content pack.
                     </span>
                   </span>
                 </div>
@@ -737,7 +719,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <span
                       className="help-block"
                     >
-                      Who did this content pack and how can he be reached. e.g Name and eMail
+                      Required. Who did this content pack and how can he be reached. e.g Name and eMail
                     </span>
                   </span>
                 </div>

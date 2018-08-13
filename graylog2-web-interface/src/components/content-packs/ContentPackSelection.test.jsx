@@ -155,16 +155,36 @@ describe('<ContentPackSelection />', () => {
   });
 
   it('should validate that all fields are filled out', () => {
-    const wrapper = mount(<ContentPackSelection contentPack={{ }} />);
+    const breq = {
+      title: 'breq',
+      type: 'spaceship',
+      id: 'beef123',
+    };
+    const falcon = {
+      title: 'falcon',
+      type: 'spaceship',
+      id: 'beef124',
+    };
+    const entities = { spaceship: [breq, falcon] };
+
+    const wrapper = mount(<ContentPackSelection contentPack={{ }} entities={entities} />);
+    wrapper.instance()._validate();
+    wrapper.update();
     expect(wrapper.find('span[children="Must be filled out."]').length).toEqual(3);
 
-    const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} />);
+    const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
+    wrapper2.instance()._validate();
+    wrapper2.update();
     expect(wrapper2.find('span[children="Must be filled out."]').length).toEqual(2);
 
-    const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} />);
+    const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} entities={entities} />);
+    wrapper1.instance()._validate();
+    wrapper1.update();
     expect(wrapper1.find('span[children="Must be filled out."]').length).toEqual(1);
 
-    const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }} />);
+    const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }} entities={entities} />);
+    wrapper0.instance()._validate();
+    wrapper0.update();
     expect(wrapper0.find('span[children="Must be filled out."]').length).toEqual(0);
   });
 });
