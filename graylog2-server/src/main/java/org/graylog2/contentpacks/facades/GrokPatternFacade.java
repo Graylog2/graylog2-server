@@ -91,7 +91,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final GrokPattern grokPattern = GrokPattern.create(name, pattern);
         try {
             final GrokPattern savedGrokPattern = grokPatternService.save(grokPattern);
-            return NativeEntity.create(savedGrokPattern.id(), TYPE, savedGrokPattern);
+            return NativeEntity.create(entity.id(), savedGrokPattern.id(), TYPE, savedGrokPattern);
         } catch (ValidationException e) {
             throw new RuntimeException("Couldn't create grok pattern " + grokPattern.name());
         }
@@ -119,7 +119,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final Optional<GrokPattern> grokPattern = grokPatternService.loadByName(name);
         grokPattern.ifPresent(existingPattern -> compareGrokPatterns(name, pattern, existingPattern.pattern()));
 
-        return grokPattern.map(gp -> NativeEntity.create(gp.id(), TYPE, gp));
+        return grokPattern.map(gp -> NativeEntity.create(entity.id(), gp.id(), TYPE, gp));
     }
 
     private void compareGrokPatterns(String name, String expectedPattern, String actualPattern) {

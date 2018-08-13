@@ -164,7 +164,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
 
-        return NativeEntity.create(savedStreamId, TYPE, stream);
+        return NativeEntity.create(entity.id(), savedStreamId, TYPE, stream);
     }
 
     private CreateStreamRuleRequest createStreamRuleRequest(StreamRuleEntity streamRuleEntity, Map<String, ValueReference> parameters) {
@@ -203,7 +203,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
             try {
                 final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
-                return Optional.of(NativeEntity.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM, stream));
+                return Optional.of(NativeEntity.create(entity.id(), Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM, stream));
             } catch (NotFoundException e) {
                 throw new ContentPackException("Default stream <" + streamId + "> does not exist!", e);
             }

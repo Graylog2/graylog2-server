@@ -19,15 +19,18 @@
       "entities": [
         {
           "id": "5b4c920b4b900a0024af2b5d",
-          "type": "collector"
+          "type": "collector",
+          "entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
           "id": "5b4c920b4b900a0024af2b5c",
-          "type": "collector"
+          "type": "collector",
+          "entity_id": "5b1a49eb3d274631fe07beff"
         },
         {
           "id": "5b4c920b4b900a0024af2b5b",
-          "type": "collector"
+          "type": "collector",
+          "entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
       "comment": "comment1",
@@ -49,23 +52,28 @@
       "entities": [
         {
           "id": "5b4c935b4b900a0062b7dc16",
-          "type": "dashboard"
+          "type": "dashboard",
+          "entity_id": "beef49eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc19",
-          "type": "grok_pattern"
+          "type": "grok_pattern",
+          "entity_id": "bee149eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc1b",
-          "type": "input"
+          "type": "input",
+          "entity_id": "bee249eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc1f",
-          "type": "output"
+          "type": "output",
+          "entity_id": "bee349eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc20",
-          "type": "stream"
+          "type": "stream",
+          "entity_id": "bee449eb3d274631fe07abfe"
         }
       ],
       "comment": "comment2",
@@ -87,23 +95,28 @@
       "entities": [
         {
           "id": "5b4c935b4b900a0062b7dc0a",
-          "type": "pipeline_rule"
+          "type": "pipeline_rule",
+          "entity_id": "bee549eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc0b",
-          "type": "pipeline"
+          "type": "pipeline",
+          "entity_id": "bee649eb3d274631fe07abfe"
         },
         {
           "id": "cp_lookup",
-          "type": "lookup_adapter"
+          "type": "lookup_adapter",
+          "entity_id": "bee749eb3d274631fe07abfe"
         },
         {
           "id": "cp_lookup",
-          "type": "lookup_cache"
+          "type": "lookup_cache",
+          "entity_id": "bee849eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc14",
-          "type": "lookup_table"
+          "type": "lookup_table",
+          "entity_id": "bee949eb3d274631fe07abfe"
         }
       ],
       "comment": "comment3",

@@ -115,7 +115,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
                 .build();
 
         final DataAdapterDto savedDataAdapterDto = dataAdapterService.save(dataAdapterDto);
-        return NativeEntity.create(savedDataAdapterDto.name(), TYPE, savedDataAdapterDto);
+        return NativeEntity.create(entity.id(), savedDataAdapterDto.name(), TYPE, savedDataAdapterDto);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
 
         final Optional<DataAdapterDto> existingDataAdapter = dataAdapterService.get(name);
 
-        return existingDataAdapter.map(dataAdapter -> NativeEntity.create(dataAdapter.id(), TYPE, dataAdapter));
+        return existingDataAdapter.map(dataAdapter -> NativeEntity.create(entity.id(), dataAdapter.id(), TYPE, dataAdapter));
     }
 
     @Override
