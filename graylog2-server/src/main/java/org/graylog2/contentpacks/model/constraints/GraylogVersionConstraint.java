@@ -34,14 +34,9 @@ public abstract class GraylogVersionConstraint implements Constraint {
     // TODO: Rename to graylog-version
     static final String TYPE_NAME = "server-version";
     static final String FIELD_GRAYLOG_VERSION = "version";
-    static final String FULFILLED = "fulfilled";
 
     @JsonProperty(FIELD_GRAYLOG_VERSION)
     public abstract Requirement version();
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonProperty(FULFILLED)
-    public abstract Optional<Boolean> fulfilled();
 
     public abstract Builder toBuilder();
 
@@ -71,9 +66,6 @@ public abstract class GraylogVersionConstraint implements Constraint {
             final Requirement requirement = Requirement.buildNPM(versionExpression);
             return version(requirement);
         }
-
-        @JsonProperty(FULFILLED)
-        public abstract Builder fulfilled(Boolean fulfilled);
 
         abstract GraylogVersionConstraint autoBuild();
 

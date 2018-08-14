@@ -30,6 +30,4 @@ import java.util.Optional;
 public interface Constraint extends Typed {
     interface ConstraintBuilder<SELF> extends Typed.TypeBuilder<SELF> {
     }
-
-    Optional<Boolean> fulfilled();
 }

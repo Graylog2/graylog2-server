@@ -34,17 +34,12 @@ public abstract class PluginVersionConstraint implements Constraint {
     static final String TYPE_NAME = "plugin-version";
     static final String FIELD_PLUGIN_ID = "plugin";
     static final String FIELD_PLUGIN_VERSION = "version";
-    static final String FULFILLED = "fulfilled";
 
     @JsonProperty(FIELD_PLUGIN_ID)
     public abstract String pluginId();
 
     @JsonProperty(FIELD_PLUGIN_VERSION)
     public abstract Requirement version();
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonProperty(FULFILLED)
-    public abstract Optional<Boolean> fulfilled();
 
     public abstract Builder toBuilder();
 
@@ -70,9 +65,6 @@ public abstract class PluginVersionConstraint implements Constraint {
 
         @JsonProperty(FIELD_PLUGIN_VERSION)
         public abstract Builder version(Requirement version);
-
-        @JsonProperty(FULFILLED)
-        public abstract Builder fulfilled(Boolean fulfilled);
 
         @JsonIgnore
         public Builder version(String versionExpression) {
