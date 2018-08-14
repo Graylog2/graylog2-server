@@ -114,6 +114,21 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           Delete
                         </a>
                       </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -200,6 +215,21 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Delete
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
                         </a>
                       </li>
                     </ul>
@@ -290,6 +320,21 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           Delete
                         </a>
                       </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -376,6 +421,21 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Delete
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
                         </a>
                       </li>
                     </ul>

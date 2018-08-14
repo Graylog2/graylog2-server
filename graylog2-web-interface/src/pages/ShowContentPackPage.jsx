@@ -65,6 +65,16 @@ const ShowContentPackPage = createReactClass({
     }
   },
 
+  _installContentPack(contentPackId, contentPackRev, parameters) {
+    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
+      UserNotification.success('Content Pack installed successfully.', 'Success');
+      ContentPacksActions.installList(contentPackId);
+    }, (error) => {
+      UserNotification.error(`Installing content pack failed with status: ${error}.
+         Could not install content pack with ID: ${contentPackId}`);
+    });
+  },
+
   render() {
     if (!this.state.contentPack) {
       return (<Spinner />);
@@ -100,6 +110,7 @@ const ShowContentPackPage = createReactClass({
                   <Col>
                     <h2>Versions</h2>
                     <ContentPackVersions contentPack={contentPack}
+                                         onInstall={this._installContentPack}
                                          onChange={this._onVersionChanged}
                                          onDeletePack={this._deleteContentPackRev} />
                   </Col>
