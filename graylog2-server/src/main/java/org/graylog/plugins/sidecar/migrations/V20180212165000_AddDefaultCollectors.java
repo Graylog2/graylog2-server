@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class V20180212165000_AddDefaultCollectors extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20180212165000_AddDefaultCollectors.class);
@@ -52,8 +49,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "linux",
                 "/usr/bin/filebeat",
                 "/etc/graylog/collector-sidecar/generated/filebeat.yml",
-                new ArrayList<String>(Arrays.asList("-c",  "%s")),
-                new ArrayList<String>(Arrays.asList("test", "config", "-c", "%s")),
+                "-c  %s",
+                "test config -c %s",
                 ""
         );
         ensureCollector(
@@ -62,8 +59,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "windows",
                 "C:\\Program Files\\graylog\\collector-sidecar\\winlogbeat.exe",
                 "C:\\Program Files\\graylog\\collector-sidecar\\generated\\winlogbeat.yml",
-                new ArrayList<String>(Arrays.asList("-c", "%s")),
-                new ArrayList<String>(Arrays.asList("test", "config", "-c", "%s")),
+                "-c %s",
+                "test config -c %s",
                 ""
         );
         ensureCollector(
@@ -72,8 +69,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "linux",
                 "/usr/bin/nxlog",
                 "/etc/graylog/collector-sidecar/generated/nxlog.conf",
-                new ArrayList<String>(Arrays.asList("-f", "-c", "%s")),
-                new ArrayList<String>(Arrays.asList("-v", "-c", "%s")),
+                "-f -c %s",
+                "-v -c %s",
                 ""
         );
     }
@@ -84,8 +81,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                    String nodeOperatingSystem,
                                    String executablePath,
                                    String configurationPath,
-                                   List<String> executeParameters,
-                                   List<String> validationCommand,
+                                   String executeParameters,
+                                   String validationCommand,
                                    String defaultTemplate) {
         Collector collector = null;
         try {

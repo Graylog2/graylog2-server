@@ -24,10 +24,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 @AutoValue
 @JsonAutoDetect
@@ -65,10 +61,10 @@ public abstract class Collector {
     public abstract String configurationPath();
 
     @JsonProperty(FIELD_EXECUTE_PARAMETERS)
-    public abstract List<String> executeParameters();
+    public abstract String executeParameters();
 
     @JsonProperty(FIELD_VALIDATION_PARAMETERS)
-    public abstract List<String> validationParameters();
+    public abstract String validationParameters();
 
     @JsonProperty(FIELD_DEFAULT_TEMPLATE)
     public abstract String defaultTemplate();
@@ -87,8 +83,8 @@ public abstract class Collector {
         public abstract Builder nodeOperatingSystem(String nodeOperatingSystem);
         public abstract Builder executablePath(String executablePath);
         public abstract Builder configurationPath(String configurationPath);
-        public abstract Builder executeParameters(List<String> executeParameters);
-        public abstract Builder validationParameters(List<String> validationParameters);
+        public abstract Builder executeParameters(String executeParameters);
+        public abstract Builder validationParameters(String validationParameters);
         public abstract Builder defaultTemplate(String defaultTemplate);
         public abstract Collector build();
     }
@@ -100,8 +96,8 @@ public abstract class Collector {
                                    @JsonProperty(FIELD_NODE_OPERATING_SYSTEM) String nodeOperatingSystem,
                                    @JsonProperty(FIELD_EXECUTABLE_PATH) String executablePath,
                                    @JsonProperty(FIELD_CONFIGURATION_PATH) String configurationPath,
-                                   @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable List<String> executeParameters,
-                                   @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable List<String> validationParameters,
+                                   @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable String executeParameters,
+                                   @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable String validationParameters,
                                    @JsonProperty(FIELD_DEFAULT_TEMPLATE) String defaultTemplate) {
         return builder()
                 .id(id)
@@ -110,8 +106,8 @@ public abstract class Collector {
                 .nodeOperatingSystem(nodeOperatingSystem)
                 .executablePath(executablePath)
                 .configurationPath(configurationPath)
-                .executeParameters(firstNonNull(executeParameters, new ArrayList<>()))
-                .validationParameters(firstNonNull(validationParameters, new ArrayList<>()))
+                .executeParameters(executeParameters)
+                .validationParameters(validationParameters)
                 .defaultTemplate(defaultTemplate)
                 .build();
     }
