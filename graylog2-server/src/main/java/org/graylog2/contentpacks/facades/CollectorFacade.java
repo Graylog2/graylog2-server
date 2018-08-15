@@ -63,7 +63,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
         final List<ValueReference> executeParameters = collector.executeParameters().stream()
                 .map(ValueReference::of)
                 .collect(Collectors.toList());
-        final List<ValueReference> validationCommand = collector.validationCommand().stream()
+        final List<ValueReference> validationCommand = collector.validationParameters().stream()
                 .map(ValueReference::of)
                 .collect(Collectors.toList());
 
@@ -105,7 +105,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
         final List<String> executeParameters = collectorEntity.executeParameters().stream()
                 .map(parameter -> parameter.asString(parameters))
                 .collect(Collectors.toList());
-        final List<String> validationCommand = collectorEntity.validationCommand().stream()
+        final List<String> validationParameters = collectorEntity.validationParameters().stream()
                 .map(parameter -> parameter.asString(parameters))
                 .collect(Collectors.toList());
 
@@ -116,7 +116,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
                 .executablePath(collectorEntity.executablePath().asString(parameters))
                 .configurationPath(collectorEntity.configurationPath().asString(parameters))
                 .executeParameters(executeParameters)
-                .validationCommand(validationCommand)
+                .validationParameters(validationParameters)
                 .defaultTemplate(collectorEntity.defaultTemplate().asString(parameters))
                 .build();
 

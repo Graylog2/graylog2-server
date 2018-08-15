@@ -68,7 +68,7 @@ public abstract class Collector {
     public abstract List<String> executeParameters();
 
     @JsonProperty(FIELD_VALIDATION_PARAMETERS)
-    public abstract List<String> validationCommand();
+    public abstract List<String> validationParameters();
 
     @JsonProperty(FIELD_DEFAULT_TEMPLATE)
     public abstract String defaultTemplate();
@@ -88,7 +88,7 @@ public abstract class Collector {
         public abstract Builder executablePath(String executablePath);
         public abstract Builder configurationPath(String configurationPath);
         public abstract Builder executeParameters(List<String> executeParameters);
-        public abstract Builder validationCommand(List<String> validationCommand);
+        public abstract Builder validationParameters(List<String> validationParameters);
         public abstract Builder defaultTemplate(String defaultTemplate);
         public abstract Collector build();
     }
@@ -101,7 +101,7 @@ public abstract class Collector {
                                    @JsonProperty(FIELD_EXECUTABLE_PATH) String executablePath,
                                    @JsonProperty(FIELD_CONFIGURATION_PATH) String configurationPath,
                                    @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable List<String> executeParameters,
-                                   @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable List<String> validationCommand,
+                                   @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable List<String> validationParameters,
                                    @JsonProperty(FIELD_DEFAULT_TEMPLATE) String defaultTemplate) {
         return builder()
                 .id(id)
@@ -111,7 +111,7 @@ public abstract class Collector {
                 .executablePath(executablePath)
                 .configurationPath(configurationPath)
                 .executeParameters(firstNonNull(executeParameters, new ArrayList<>()))
-                .validationCommand(firstNonNull(validationCommand, new ArrayList<>()))
+                .validationParameters(firstNonNull(validationParameters, new ArrayList<>()))
                 .defaultTemplate(defaultTemplate)
                 .build();
     }

@@ -47,8 +47,8 @@ public abstract class CollectorEntity {
     @JsonProperty("execute_parameters")
     public abstract List<ValueReference> executeParameters();
 
-    @JsonProperty("validation_command")
-    public abstract List<ValueReference> validationCommand();
+    @JsonProperty("validation_parameters")
+    public abstract List<ValueReference> validationParameters();
 
     @JsonProperty("default_template")
     public abstract ValueReference defaultTemplate();
@@ -60,7 +60,7 @@ public abstract class CollectorEntity {
                                          @JsonProperty("executable_path") ValueReference executablePath,
                                          @JsonProperty("configuration_path") ValueReference configurationPath,
                                          @JsonProperty("execute_parameters") List<ValueReference> executeParameters,
-                                         @JsonProperty("validation_command") List<ValueReference> validationCommand,
+                                         @JsonProperty("validation_parameters") List<ValueReference> validationParameters,
                                          @JsonProperty("default_template") ValueReference defaultTemplate) {
         return new AutoValue_CollectorEntity(name,
                 serviceType,
@@ -68,7 +68,7 @@ public abstract class CollectorEntity {
                 executablePath,
                 configurationPath,
                 executeParameters,
-                validationCommand,
+                validationParameters,
                 defaultTemplate);
     }
 }
