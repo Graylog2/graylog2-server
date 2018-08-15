@@ -35,6 +35,7 @@ const ApiRoutes = {
     list: () => { return { url: '/system/content_packs/latest' }; },
     get: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
     getRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },
+    downloadRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}/download` }; },
     create: () => { return { url: '/system/content_packs' }; },
     delete: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}` }; },
     deleteRev: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}` }; },

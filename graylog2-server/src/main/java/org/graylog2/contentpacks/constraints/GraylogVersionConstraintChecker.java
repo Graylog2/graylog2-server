@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.vdurmont.semver4j.Requirement;
 import com.vdurmont.semver4j.Semver;
 import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 
 import java.util.Collection;
@@ -43,17 +44,32 @@ public class GraylogVersionConstraintChecker implements ConstraintChecker {
         this.graylogVersion = graylogVersion;
     }
 
+
     @Override
-    public Set<Constraint> checkConstraints(Collection<Constraint> requestedConstraints) {
+    public Set<Constraint> ensureConstraints(Collection<Constraint> requestedConstraints) {
         final ImmutableSet.Builder<Constraint> fulfilledConstraints = ImmutableSet.builder();
         for (Constraint constraint : requestedConstraints) {
             if (constraint instanceof GraylogVersionConstraint) {
                 final GraylogVersionConstraint versionConstraint = (GraylogVersionConstraint) constraint;
                 final Requirement requiredVersion = versionConstraint.version();
-
                 if (requiredVersion.isSatisfiedBy(graylogVersion.toString())) {
                     fulfilledConstraints.add(constraint);
                 }
+            }
+        }
+        return fulfilledConstraints.build();
+    }
+
+    @Override
+    public Set<ConstraintCheckResult> checkConstraints(Collection<Constraint> requestedConstraints) {
+        final ImmutableSet.Builder<ConstraintCheckResult> fulfilledConstraints = ImmutableSet.builder();
+        for (Constraint constraint : requestedConstraints) {
+            if (constraint instanceof GraylogVersionConstraint) {
+                final GraylogVersionConstraint versionConstraint = (GraylogVersionConstraint) constraint;
+                final Requirement requiredVersion = versionConstraint.version();
+                final ConstraintCheckResult constraintCheckResult = ConstraintCheckResult.create(versionConstraint,
+                        requiredVersion.isSatisfiedBy(graylogVersion.toString()));
+                fulfilledConstraints.add(constraintCheckResult);
             }
         }
         return fulfilledConstraints.build();

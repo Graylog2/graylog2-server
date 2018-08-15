@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.vdurmont.semver4j.Requirement;
 import com.vdurmont.semver4j.Semver;
 import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
@@ -42,7 +43,7 @@ public class PluginVersionConstraintChecker implements ConstraintChecker {
     }
 
     @Override
-    public Set<Constraint> checkConstraints(Collection<Constraint> requestedConstraints) {
+    public Set<Constraint> ensureConstraints(Collection<Constraint> requestedConstraints) {
         final ImmutableSet.Builder<Constraint> fulfilledConstraints = ImmutableSet.builder();
         for (Constraint constraint : requestedConstraints) {
             if (constraint instanceof PluginVersionConstraint) {
@@ -54,6 +55,27 @@ public class PluginVersionConstraintChecker implements ConstraintChecker {
                         fulfilledConstraints.add(constraint);
                     }
                 }
+            }
+        }
+        return fulfilledConstraints.build();
+    }
+
+    @Override
+    public Set<ConstraintCheckResult> checkConstraints(Collection<Constraint> requestedConstraints) {
+        final ImmutableSet.Builder<ConstraintCheckResult> fulfilledConstraints = ImmutableSet.builder();
+        for (Constraint constraint : requestedConstraints) {
+            if (constraint instanceof PluginVersionConstraint) {
+                final PluginVersionConstraint versionConstraint = (PluginVersionConstraint) constraint;
+                final Requirement requiredVersion = versionConstraint.version();
+
+                boolean result = false;
+                for (Semver pluginVersion : pluginVersions) {
+                    if (requiredVersion.isSatisfiedBy(pluginVersion)) {
+                        result = true;
+                    }
+                }
+                ConstraintCheckResult constraintCheckResult = ConstraintCheckResult.create(versionConstraint, result);
+                fulfilledConstraints.add(constraintCheckResult);
             }
         }
         return fulfilledConstraints.build();

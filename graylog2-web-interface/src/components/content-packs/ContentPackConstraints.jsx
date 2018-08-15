@@ -17,12 +17,13 @@ class ContentPackConstraints extends React.Component {
   };
 
   _rowFormatter = (item) => {
+    const constraint = item.constraint || item;
     const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
     const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
     return (
-      <tr key={item.id}>
-        <td>{item.type}</td>
-        <td>{item.version}</td>
+      <tr key={constraint.id}>
+        <td>{constraint.type}</td>
+        <td>{constraint.version}</td>
         <td><Badge className={fulfilledBg}>{fulfilledIcon}</Badge></td>
       </tr>
     );

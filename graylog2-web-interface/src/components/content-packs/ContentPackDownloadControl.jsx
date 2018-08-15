@@ -24,7 +24,7 @@ class ContentPackDownloadControl extends React.Component {
 
   _getDownloadUrl() {
     const url = new URI(URLUtils.qualifyUrl(
-      ApiRoutes.ContentPacksController.getRev(this.props.contentPackId, this.props.revision).url,
+      ApiRoutes.ContentPacksController.downloadRev(this.props.contentPackId, this.props.revision).url,
     ));
 
     if (URLUtils.areCredentialsInURLSupported()) {
