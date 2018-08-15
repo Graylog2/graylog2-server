@@ -29,7 +29,7 @@ class ContentPackParameterList extends React.Component {
     super(props);
 
     this.state = {
-      filteredParameters: props.contentPack.parameters,
+      filteredParameters: props.contentPack.parameters || [],
       filter: undefined,
     };
   }

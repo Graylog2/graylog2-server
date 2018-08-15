@@ -43,9 +43,10 @@ class ContentPackEdit extends React.Component {
 
   _disableParameters() {
     const content = this.props.contentPack;
-    const selection = Object.keys(this.props.selectedEntities).length !== 0;
-    return !(content.name && content.summary && content.description && content.vendor &&
-      selection);
+    const { selectedEntities } = this.props;
+    const selection = Object.keys(selectedEntities)
+      .reduce((acc, key) => { return acc + selectedEntities[key].length; }, 0) > 0;
+    return !(content.name && content.summary && content.vendor && selection);
   }
 
   _disablePreview() {

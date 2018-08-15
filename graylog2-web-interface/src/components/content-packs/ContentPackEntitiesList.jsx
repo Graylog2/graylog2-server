@@ -30,7 +30,7 @@ class ContentPackEntitiesList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      filteredEntities: props.contentPack.entities,
+      filteredEntities: props.contentPack.entities || [],
       filter: undefined,
     };
   }
