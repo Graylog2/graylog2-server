@@ -298,7 +298,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       >
                         A good input
                       </td>
-                      <td />
+                      <td>
+                        input
+                      </td>
                       <td
                         className="bigColumns"
                       >

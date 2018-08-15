@@ -18,6 +18,10 @@ describe('<ContentPackParameters />', () => {
     const entity = {
       id: '111-beef',
       v: '1.0',
+      type: {
+        name: 'input',
+        version: '1',
+      },
       data: {
         name: { type: 'string', value: 'Input' },
         title: { type: 'string', value: 'A good input' },
