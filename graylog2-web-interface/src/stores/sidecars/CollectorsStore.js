@@ -147,8 +147,8 @@ const CollectorsStore = Reflux.createStore({
         this.refreshList();
         return response;
       }, (error) => {
-        UserNotification.error(`Deleting Collector "${collector.name}" failed with status: ${error.message}`,
-          'Could not delete Collector');
+        UserNotification.error(`Deleting Collector failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+          `Could not delete Collector "${collector.name}"`);
       });
 
     CollectorsActions.delete.promise(promise);
