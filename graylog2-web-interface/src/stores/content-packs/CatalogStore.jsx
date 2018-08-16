@@ -16,7 +16,7 @@ const CatalogStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
     const promise = fetch('GET', url)
       .then((result) => {
-        const entityIndex = lodash.groupBy(result.entities, 'type');
+        const entityIndex = lodash.groupBy(result.entities, 'type.name');
         this.trigger({ entityIndex: entityIndex });
 
         return result;

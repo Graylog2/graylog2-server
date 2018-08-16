@@ -105,7 +105,7 @@ public class LookupTableFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entityV1.data(), LookupTableEntity.class);
@@ -123,13 +123,13 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf24dd4b900a0fdb4e530d"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entityV1.data(), LookupTableEntity.class);
@@ -149,7 +149,7 @@ public class LookupTableFacadeTest {
     public void createNativeEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.LOOKUP_TABLE)
+                .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
                         ValueReference.of("http-dsv-no-cache"),
                         ValueReference.of("HTTP DSV without Cache"),
@@ -161,7 +161,7 @@ public class LookupTableFacadeTest {
                         ValueReference.of("Default multi value"),
                         ValueReference.of(LookupDefaultValue.Type.OBJECT)), JsonNode.class))
                 .build();
-        final EntityDescriptor cacheDescriptor = EntityDescriptor.create("no-op-cache", ModelTypes.LOOKUP_CACHE);
+        final EntityDescriptor cacheDescriptor = EntityDescriptor.create("no-op-cache", ModelTypes.LOOKUP_CACHE_V1);
         final CacheDto cacheDto = CacheDto.builder()
                 .id("5adf24b24b900a0fdb4e0001")
                 .name("no-op-cache")
@@ -169,7 +169,7 @@ public class LookupTableFacadeTest {
                 .description("No-op cache")
                 .config(new FallbackCacheConfig())
                 .build();
-        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create("http-dsv", ModelTypes.LOOKUP_ADAPTER);
+        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create("http-dsv", ModelTypes.LOOKUP_ADAPTER_V1);
         final DataAdapterDto dataAdapterDto = DataAdapterDto.builder()
                 .id("5adf24a04b900a0fdb4e0002")
                 .name("http-dsv")
@@ -184,7 +184,7 @@ public class LookupTableFacadeTest {
 
         final NativeEntity<LookupTableDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
 
-        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
         assertThat(nativeEntity.entity().name()).isEqualTo("http-dsv-no-cache");
         assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV without Cache");
         assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV without Cache");
@@ -203,7 +203,7 @@ public class LookupTableFacadeTest {
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.LOOKUP_TABLE)
+                .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
                         ValueReference.of("http-dsv-no-cache"),
                         ValueReference.of("HTTP DSV without Cache"),
@@ -218,7 +218,7 @@ public class LookupTableFacadeTest {
         final NativeEntity<LookupTableDto> existingEntity = facade.findExisting(entity, Collections.emptyMap()).orElseThrow(AssertionError::new);
 
         assertThat(existingEntity.descriptor().id()).isEqualTo(ModelId.of("5adf24dd4b900a0fdb4e530d"));
-        assertThat(existingEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(existingEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
         assertThat(existingEntity.entity().name()).isEqualTo("http-dsv-no-cache");
         assertThat(existingEntity.entity().title()).isEqualTo("HTTP DSV without Cache");
         assertThat(existingEntity.entity().description()).isEqualTo("HTTP DSV without Cache");
@@ -235,7 +235,7 @@ public class LookupTableFacadeTest {
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5adf24dd4b900a0fdb4e530d"))
-                .type(ModelTypes.LOOKUP_TABLE)
+                .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
                         ValueReference.of("http-dsv-no-cache"),
                         ValueReference.of("HTTP DSV without Cache"),
@@ -249,7 +249,7 @@ public class LookupTableFacadeTest {
                 .build();
         final Entity cacheEntity = EntityV1.builder()
                 .id(ModelId.of("5adf24b24b900a0fdb4e52dd"))
-                .type(ModelTypes.LOOKUP_CACHE)
+                .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(objectMapper.convertValue(LookupCacheEntity.create(
                         ValueReference.of("no-op-cache"),
                         ValueReference.of("No-op cache"),
@@ -259,7 +259,7 @@ public class LookupTableFacadeTest {
                 .build();
         final Entity dataAdapterEntity = EntityV1.builder()
                 .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
-                .type(ModelTypes.LOOKUP_ADAPTER)
+                .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(objectMapper.convertValue(LookupDataAdapterEntity.create(
                         ValueReference.of("http-dsv"),
                         ValueReference.of("HTTP DSV"),
@@ -280,15 +280,15 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = {"/org/graylog2/contentpacks/lut_caches.json", "/org/graylog2/contentpacks/lut_data_adapters.json", "/org/graylog2/contentpacks/lut_tables.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
 
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes())
                 .hasSize(3)
                 .containsOnly(
                         descriptor,
-                        EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER),
-                        EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE));
+                        EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1),
+                        EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1));
     }
 
     @Test
@@ -296,7 +296,7 @@ public class LookupTableFacadeTest {
     public void findExistingWithNoExistingEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.LOOKUP_TABLE)
+                .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(objectMapper.convertValue(LookupTableEntity.create(
                         ValueReference.of("some-name"),
                         ValueReference.of("Title"),
@@ -342,7 +342,7 @@ public class LookupTableFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(lookupTableDto);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("lookup-table-name"));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
         assertThat(excerpt.title()).isEqualTo("Lookup Table Title");
     }
 
@@ -351,7 +351,7 @@ public class LookupTableFacadeTest {
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
                 .id(ModelId.of("http-dsv-no-cache"))
-                .type(ModelTypes.LOOKUP_TABLE)
+                .type(ModelTypes.LOOKUP_TABLE_V1)
                 .title("HTTP DSV without Cache")
                 .build();
 
@@ -362,7 +362,7 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE_V1));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -370,7 +370,7 @@ public class LookupTableFacadeTest {
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf24dd4b900a0fdb4e530d"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE);
+        assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
         assertThat(lookupTableEntity.name()).isEqualTo(ValueReference.of("http-dsv-no-cache"));
         assertThat(lookupTableEntity.title()).isEqualTo(ValueReference.of("HTTP DSV without Cache"));

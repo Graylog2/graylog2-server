@@ -30,29 +30,40 @@ public class ModelTypeTest {
 
     @Test
     public void deserialize() {
-        final ModelType modelType = ModelType.of("foobar");
+        final ModelType modelType = ModelType.of("foobar", "1");
         final JsonNode jsonNode = objectMapper.convertValue(modelType, JsonNode.class);
 
-        assertThat(jsonNode.isTextual()).isTrue();
-        assertThat(jsonNode.asText()).isEqualTo("foobar");
+        assertThat(jsonNode.isObject()).isTrue();
+        assertThat(jsonNode.path("name").asText()).isEqualTo("foobar");
+        assertThat(jsonNode.path("version").asText()).isEqualTo("1");
     }
 
     @Test
     public void serialize() throws IOException {
-        final ModelType modelType = objectMapper.readValue("\"foobar\"", ModelType.class);
-        assertThat(modelType).isEqualTo(ModelType.of("foobar"));
+        final ModelType modelType = objectMapper.readValue("{\"name\":\"foobar\",\"version\":\"1\"}", ModelType.class);
+        assertThat(modelType).isEqualTo(ModelType.of("foobar", "1"));
     }
 
     @Test
     public void ensureTypeIsNotBlank() {
-        assertThatThrownBy(() -> ModelType.of(null))
+        assertThatThrownBy(() -> ModelType.of(null, "1"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Type must not be blank");
-        assertThatThrownBy(() -> ModelType.of(""))
+                .hasMessage("Type name must not be blank");
+        assertThatThrownBy(() -> ModelType.of("", "1"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Type must not be blank");
-        assertThatThrownBy(() -> ModelType.of("    \n\r\t"))
+                .hasMessage("Type name must not be blank");
+        assertThatThrownBy(() -> ModelType.of("    \n\r\t", "1"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Type must not be blank");
+                .hasMessage("Type name must not be blank");
+
+        assertThatThrownBy(() -> ModelType.of("foo", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Type version must not be blank");
+        assertThatThrownBy(() -> ModelType.of("foo", ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Type version must not be blank");
+        assertThatThrownBy(() -> ModelType.of("foo", "    \n\r\t"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Type version must not be blank");
     }
 }

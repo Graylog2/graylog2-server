@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineRuleFacade.class);
 
-    public static final ModelType TYPE = ModelTypes.PIPELINE_RULE;
+    public static final ModelType TYPE_V1 = ModelTypes.PIPELINE_RULE_V1;
 
     private final ObjectMapper objectMapper;
     private final RuleService ruleService;
@@ -67,7 +67,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of(ruleDao.title()))
-                .type(ModelTypes.PIPELINE_RULE)
+                .type(ModelTypes.PIPELINE_RULE_V1)
                 .data(data)
                 .build();
         return EntityWithConstraints.create(entity);
@@ -101,7 +101,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
                 .build();
 
         final RuleDao savedRuleDao = ruleService.save(ruleDao);
-        return NativeEntity.create(entity.id(), savedRuleDao.id(), TYPE, savedRuleDao);
+        return NativeEntity.create(entity.id(), savedRuleDao.id(), TYPE_V1, savedRuleDao);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
             final RuleDao ruleDao = ruleService.loadByName(title);
             compareRuleSources(title, source, ruleDao.source());
 
-            return Optional.of(NativeEntity.create(entity.id(), ruleDao.id(), TYPE, ruleDao));
+            return Optional.of(NativeEntity.create(entity.id(), ruleDao.id(), TYPE_V1, ruleDao));
         } catch (NotFoundException e) {
             return Optional.empty();
         }
@@ -145,7 +145,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     public EntityExcerpt createExcerpt(RuleDao ruleDao) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(ruleDao.title()))
-                .type(ModelTypes.PIPELINE_RULE)
+                .type(ModelTypes.PIPELINE_RULE_V1)
                 .title(ruleDao.title())
                 .build();
     }

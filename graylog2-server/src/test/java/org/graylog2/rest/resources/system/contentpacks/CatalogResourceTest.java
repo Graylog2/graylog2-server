@@ -70,7 +70,7 @@ public class CatalogResourceTest {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 mock(ContentPackInstallationPersistenceService.class);
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
-        final Map<ModelType, EntityFacade<?>> entityFacades = Collections.singletonMap(ModelType.of("test"), mockEntityFacade);
+        final Map<ModelType, EntityFacade<?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
         catalogResource = new CatalogResource(contentPackService);
     }
@@ -80,7 +80,7 @@ public class CatalogResourceTest {
         final ImmutableSet<EntityExcerpt> entityExcerpts = ImmutableSet.of(
                 EntityExcerpt.builder()
                         .id(ModelId.of("1234567890"))
-                        .type(ModelType.of("test"))
+                        .type(ModelType.of("test", "1"))
                         .title("Test Entity")
                         .build()
         );
@@ -96,14 +96,14 @@ public class CatalogResourceTest {
     public void resolveEntities() {
         final EntityDescriptor entityDescriptor = EntityDescriptor.builder()
                 .id(ModelId.of("1234567890"))
-                .type(ModelType.of("test"))
+                .type(ModelType.of("test", "1"))
                 .build();
         final MutableGraph<EntityDescriptor> entityDescriptors = GraphBuilder.directed().build();
         entityDescriptors.addNode(entityDescriptor);
 
         final EntityV1 entity = EntityV1.builder()
                 .id(ModelId.of("1234567890"))
-                .type(ModelType.of("test"))
+                .type(ModelType.of("test", "1"))
                 .data(new ObjectNode(JsonNodeFactory.instance).put("test", "1234"))
                 .build();
         final EntityWithConstraints entityWithConstraints = EntityWithConstraints.create(entity);

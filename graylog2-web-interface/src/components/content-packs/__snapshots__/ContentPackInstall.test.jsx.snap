@@ -195,7 +195,9 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                       >
                         franz
                       </td>
-                      <td />
+                      <td>
+                        grok_pattern
+                      </td>
                       <td
                         className="bigColumns"
                       >

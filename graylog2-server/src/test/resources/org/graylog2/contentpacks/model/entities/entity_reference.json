@@ -1,6 +1,9 @@
 {
   "v": "1",
-  "type": "input",
+  "type": {
+    "name": "input",
+    "version": "1"
+  },
   "id": "78547c87-af21-4292-8e57-614da5baf6c3",
   "data": {
     "title": "GELF Input",

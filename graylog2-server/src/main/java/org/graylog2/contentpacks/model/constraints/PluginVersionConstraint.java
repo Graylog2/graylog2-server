@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.vdurmont.semver4j.Requirement;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
 
@@ -75,7 +74,7 @@ public abstract class PluginVersionConstraint implements Constraint {
         abstract PluginVersionConstraint autoBuild();
 
         public PluginVersionConstraint build() {
-            type(ModelType.of(TYPE_NAME));
+            type(TYPE_NAME);
             return autoBuild();
         }
     }

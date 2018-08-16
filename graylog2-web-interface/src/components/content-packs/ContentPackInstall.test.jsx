@@ -14,6 +14,10 @@ describe('<ContentPackInstall />', () => {
   };
 
   const entity = {
+    type: {
+      name: 'grok_pattern',
+      version: '1',
+    },
     data: {
       title: { type: 'string', value: 'franz' },
       descr: { type: 'string', value: 'hans' },

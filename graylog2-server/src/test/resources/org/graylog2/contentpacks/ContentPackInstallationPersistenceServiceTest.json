@@ -19,17 +19,26 @@
       "entities": [
         {
           "id": "5b4c920b4b900a0024af2b5d",
-          "type": "collector",
+          "type": {
+            "name": "collector",
+            "version": "1"
+          },
           "entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
           "id": "5b4c920b4b900a0024af2b5c",
-          "type": "collector",
+          "type": {
+            "name": "collector",
+            "version": "1"
+          },
           "entity_id": "5b1a49eb3d274631fe07beff"
         },
         {
           "id": "5b4c920b4b900a0024af2b5b",
-          "type": "collector",
+          "type": {
+            "name": "collector",
+            "version": "1"
+          },
           "entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
@@ -52,27 +61,42 @@
       "entities": [
         {
           "id": "5b4c935b4b900a0062b7dc16",
-          "type": "dashboard",
+          "type": {
+            "name": "dashboard",
+            "version": "1"
+          },
           "entity_id": "beef49eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc19",
-          "type": "grok_pattern",
+          "type": {
+            "name": "grok_pattern",
+            "version": "1"
+          },
           "entity_id": "bee149eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc1b",
-          "type": "input",
+          "type": {
+            "name": "input",
+            "version": "1"
+          },
           "entity_id": "bee249eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc1f",
-          "type": "output",
+          "type": {
+            "name": "output",
+            "version": "1"
+          },
           "entity_id": "bee349eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc20",
-          "type": "stream",
+          "type": {
+            "name": "stream",
+            "version": "1"
+          },
           "entity_id": "bee449eb3d274631fe07abfe"
         }
       ],
@@ -95,27 +119,42 @@
       "entities": [
         {
           "id": "5b4c935b4b900a0062b7dc0a",
-          "type": "pipeline_rule",
+          "type": {
+            "name": "pipeline_rule",
+            "version": "1"
+          },
           "entity_id": "bee549eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc0b",
-          "type": "pipeline",
+          "type": {
+            "name": "pipeline",
+            "version": "1"
+          },
           "entity_id": "bee649eb3d274631fe07abfe"
         },
         {
           "id": "cp_lookup",
-          "type": "lookup_adapter",
+          "type": {
+            "name": "lookup_adapter",
+            "version": "1"
+          },
           "entity_id": "bee749eb3d274631fe07abfe"
         },
         {
           "id": "cp_lookup",
-          "type": "lookup_cache",
+          "type": {
+            "name": "lookup_cache",
+            "version": "1"
+          },
           "entity_id": "bee849eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc14",
-          "type": "lookup_table",
+          "type": {
+            "name": "lookup_table",
+            "version": "1"
+          },
           "entity_id": "bee949eb3d274631fe07abfe"
         }
       ],

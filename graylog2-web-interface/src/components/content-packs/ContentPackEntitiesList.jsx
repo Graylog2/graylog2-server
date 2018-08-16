@@ -127,7 +127,7 @@ class ContentPackEntitiesList extends React.Component {
     return (
       <tr key={entity.id}>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{this._entityTitle(entity)}</td>
-        <td>{entity.type}</td>
+        <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{this._entityDescription(entity)}</td>
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
@@ -173,7 +173,7 @@ class ContentPackEntitiesList extends React.Component {
           id="entity-list"
           headers={headers}
           className={ContentPackEntitiesListStyle.scrollable}
-          sortByKey="type"
+          sortBy={entity => entity.type.name}
           filterKeys={[]}
           rows={this.state.filteredEntities}
           dataRowFormatter={this._entityRowFormatter}

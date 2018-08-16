@@ -74,7 +74,7 @@ public class GrokPatternFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("01234567890"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.GROK_PATTERN);
+        assertThat(entity.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
@@ -88,7 +88,7 @@ public class GrokPatternFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(grokPattern);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("01234567890"));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.GROK_PATTERN);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
         assertThat(excerpt.title()).isEqualTo(grokPattern.name());
     }
 
@@ -99,12 +99,12 @@ public class GrokPatternFacadeTest {
 
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .title("Test1")
                 .build();
         final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
                 .id(ModelId.of("2"))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .title("Test2")
                 .build();
 
@@ -124,12 +124,12 @@ public class GrokPatternFacadeTest {
                 "pattern", ValueReference.of("[a-z]+"));
         final JsonNode entityData = objectMapper.convertValue(entity, JsonNode.class);
         final Entity expectedEntity = EntityV1.builder()
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .id(ModelId.of("1"))
                 .data(entityData)
                 .build();
 
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -149,7 +149,7 @@ public class GrokPatternFacadeTest {
     @Test
     public void resolveEntityDescriptor() throws ValidationException {
         final GrokPattern grokPattern = grokPatternService.save(GrokPattern.create("Test1", "[a-z]+"));
-        final EntityDescriptor descriptor = EntityDescriptor.create(grokPattern.id(), ModelTypes.GROK_PATTERN);
+        final EntityDescriptor descriptor = EntityDescriptor.create(grokPattern.id(), ModelTypes.GROK_PATTERN_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -158,7 +158,7 @@ public class GrokPatternFacadeTest {
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("grok-id"))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .data(NullNode.getInstance())
                 .build();
         final Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), Collections.emptyMap());
@@ -170,13 +170,13 @@ public class GrokPatternFacadeTest {
         final GrokPattern grokPattern = grokPatternService.save(GrokPattern.create("Test", "[a-z]+"));
         final Entity grokPatternEntity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .data(objectMapper.convertValue(GrokPatternEntity.create(
                         ValueReference.of("Test"),
                         ValueReference.of("[a-z]+")), JsonNode.class))
                 .build();
         final Optional<NativeEntity<GrokPattern>> existingGrokPattern = facade.findExisting(grokPatternEntity, Collections.emptyMap());
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(grokPatternEntity.id(), "1", ModelTypes.GROK_PATTERN);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(grokPatternEntity.id(), "1", ModelTypes.GROK_PATTERN_V1);
         assertThat(existingGrokPattern)
                 .isPresent()
                 .get()
@@ -190,7 +190,7 @@ public class GrokPatternFacadeTest {
     public void createNativeEntity() throws NotFoundException {
         final Entity grokPatternEntity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .data(objectMapper.convertValue(GrokPatternEntity.create(
                         ValueReference.of("Test"),
                         ValueReference.of("[a-z]+")), JsonNode.class))
@@ -198,7 +198,7 @@ public class GrokPatternFacadeTest {
         final NativeEntity<GrokPattern> nativeEntity = facade.createNativeEntity(grokPatternEntity, Collections.emptyMap(), Collections.emptyMap(), "admin");
 
         final GrokPattern expectedGrokPattern = GrokPattern.create("1", "Test", "[a-z]+", null);
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create("1", "1", ModelTypes.GROK_PATTERN);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create("1", "1", ModelTypes.GROK_PATTERN_V1);
 
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(expectedGrokPattern);
@@ -210,7 +210,7 @@ public class GrokPatternFacadeTest {
         grokPatternService.save(GrokPattern.create("Test", "[a-z]+"));
         final Entity grokPatternEntity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.GROK_PATTERN)
+                .type(ModelTypes.GROK_PATTERN_V1)
                 .data(objectMapper.convertValue(GrokPatternEntity.create(
                         ValueReference.of("Test"),
                         ValueReference.of("BOOM")), JsonNode.class))

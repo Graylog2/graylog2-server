@@ -122,7 +122,7 @@ public class OutputFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("01234567890"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT);
+        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final OutputEntity outputEntity = objectMapper.convertValue(entityV1.data(), OutputEntity.class);
@@ -141,7 +141,7 @@ public class OutputFacadeTest {
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf239e4b900a0fdb4e5197"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT);
+        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
         final OutputEntity outputEntity = objectMapper.convertValue(entityV1.data(), OutputEntity.class);
@@ -155,7 +155,7 @@ public class OutputFacadeTest {
     public void createNativeEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.OUTPUT)
+                .type(ModelTypes.OUTPUT_V1)
                 .data(objectMapper.convertValue(OutputEntity.create(
                         ValueReference.of("STDOUT"),
                         ValueReference.of("org.graylog2.outputs.LoggingOutput"),
@@ -165,7 +165,7 @@ public class OutputFacadeTest {
 
         final NativeEntity<Output> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
 
-        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.OUTPUT);
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.OUTPUT_V1);
         assertThat(nativeEntity.entity().getTitle()).isEqualTo("STDOUT");
         assertThat(nativeEntity.entity().getType()).isEqualTo("org.graylog2.outputs.LoggingOutput");
         assertThat(nativeEntity.entity().getCreatorUserId()).isEqualTo("username");
@@ -177,7 +177,7 @@ public class OutputFacadeTest {
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("1"))
-                .type(ModelTypes.OUTPUT)
+                .type(ModelTypes.OUTPUT_V1)
                 .data(objectMapper.convertValue(OutputEntity.create(
                         ValueReference.of("STDOUT"),
                         ValueReference.of("org.graylog2.outputs.LoggingOutput"),
@@ -193,7 +193,7 @@ public class OutputFacadeTest {
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("5adf239e4b900a0fdb4e5197"))
-                .type(ModelTypes.OUTPUT)
+                .type(ModelTypes.OUTPUT_V1)
                 .data(objectMapper.convertValue(OutputEntity.create(
                         ValueReference.of("STDOUT"),
                         ValueReference.of("org.graylog2.outputs.LoggingOutput"),
@@ -207,7 +207,7 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -238,7 +238,7 @@ public class OutputFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(output);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of(output.getId()));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.OUTPUT);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.OUTPUT_V1);
         assertThat(excerpt.title()).isEqualTo(output.getTitle());
     }
 
@@ -247,7 +247,7 @@ public class OutputFacadeTest {
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
                 .id(ModelId.of("5adf239e4b900a0fdb4e5197"))
-                .type(ModelTypes.OUTPUT)
+                .type(ModelTypes.OUTPUT_V1)
                 .title("STDOUT")
                 .build();
 
@@ -258,7 +258,7 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT));
+        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1));
         assertThat(collectedEntity)
                 .isPresent()
                 .map(EntityWithConstraints::entity)
@@ -266,7 +266,7 @@ public class OutputFacadeTest {
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
         assertThat(entity.id()).isEqualTo(ModelId.of("5adf239e4b900a0fdb4e5197"));
-        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT);
+        assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         assertThat(outputEntity.title()).isEqualTo(ValueReference.of("STDOUT"));
         assertThat(outputEntity.type()).isEqualTo(ValueReference.of("org.graylog2.outputs.LoggingOutput"));

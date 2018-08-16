@@ -16,9 +16,9 @@
  */
 package org.graylog2.contentpacks.model.constraints;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog2.contentpacks.model.Typed;
 
 import java.util.Optional;
 
@@ -27,7 +27,14 @@ import java.util.Optional;
         @JsonSubTypes.Type(value = GraylogVersionConstraint.class, name = GraylogVersionConstraint.TYPE_NAME),
         @JsonSubTypes.Type(value = PluginVersionConstraint.class, name = PluginVersionConstraint.TYPE_NAME)
 })
-public interface Constraint extends Typed {
-    interface ConstraintBuilder<SELF> extends Typed.TypeBuilder<SELF> {
+public interface Constraint {
+    String FIELD_META_TYPE = "type";
+
+    @JsonProperty(FIELD_META_TYPE)
+    String type();
+
+    interface ConstraintBuilder<SELF> {
+        @JsonProperty(FIELD_META_TYPE)
+        SELF type(String type);
     }
 }
