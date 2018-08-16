@@ -96,22 +96,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           role="menuitem"
                           tabIndex="-1"
                         >
-                          Edit clone
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                        style={undefined}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Delete
+                          Create New From Revision
                         </a>
                       </li>
                       <li
@@ -127,6 +112,27 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
                         </a>
                       </li>
                     </ul>
@@ -199,22 +205,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           role="menuitem"
                           tabIndex="-1"
                         >
-                          Edit clone
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                        style={undefined}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Delete
+                          Create New From Revision
                         </a>
                       </li>
                       <li
@@ -230,6 +221,27 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
                         </a>
                       </li>
                     </ul>
@@ -302,22 +314,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           role="menuitem"
                           tabIndex="-1"
                         >
-                          Edit clone
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                        style={undefined}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Delete
+                          Create New From Revision
                         </a>
                       </li>
                       <li
@@ -333,6 +330,27 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
                         </a>
                       </li>
                     </ul>
@@ -405,22 +423,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           role="menuitem"
                           tabIndex="-1"
                         >
-                          Edit clone
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                        style={undefined}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Delete
+                          Create New From Revision
                         </a>
                       </li>
                       <li
@@ -436,6 +439,27 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
                         </a>
                       </li>
                     </ul>
