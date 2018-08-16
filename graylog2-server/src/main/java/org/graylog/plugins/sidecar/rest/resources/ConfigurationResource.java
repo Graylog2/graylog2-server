@@ -28,6 +28,7 @@ import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
+import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationPreviewRequest;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
@@ -47,6 +48,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -64,8 +66,11 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Api(value = "Sidecar/Configurations", description = "Manage/Render collector configurations")
 @Path("/sidecar/configurations")
@@ -255,6 +260,16 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_DELETE)
     public Response deleteConfiguration(@ApiParam(name = "id", required = true)
                                         @PathParam("id") String id) {
+        final long sidecarsUsingConfiguration = sidecarService.all().stream()
+                .filter(sidecar -> {
+                    final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
+                    return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(id));
+                })
+                .count();
+        if (sidecarsUsingConfiguration > 0) {
+            throw new BadRequestException("Configuration still in use, cannot delete.");
+        }
+
         int deleted = configurationService.delete(id);
         if (deleted == 0) {
             return Response.notModified().build();

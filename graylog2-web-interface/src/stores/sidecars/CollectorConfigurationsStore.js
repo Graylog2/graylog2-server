@@ -179,8 +179,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         this.refreshList();
         return response;
       }, (error) => {
-        UserNotification.error(`Deleting Output "${configuration.name}" failed with status: ${error.message}`,
-          'Could not delete Configuration');
+        UserNotification.error(`Deleting Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+          `Could not delete Configuration ${configuration.name}`);
       });
 
     CollectorConfigurationsActions.delete.promise(promise);
