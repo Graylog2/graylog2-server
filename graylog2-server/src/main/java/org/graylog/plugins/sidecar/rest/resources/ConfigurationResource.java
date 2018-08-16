@@ -79,7 +79,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Configuration.FIELD_ID))
-            .put("backend_id", SearchQueryField.create(Configuration.FIELD_COLLECTOR_ID))
+            .put("collector_id", SearchQueryField.create(Configuration.FIELD_COLLECTOR_ID))
             .put("name", SearchQueryField.create(Configuration.FIELD_NAME))
             .build();
 
@@ -103,7 +103,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                         @ApiParam(name = "sort",
                                                                          value = "The field to sort the result on",
                                                                          required = true,
-                                                                         allowableValues = "name,id,backend_id")
+                                                                         allowableValues = "name,id,collector_id")
                                                                      @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
