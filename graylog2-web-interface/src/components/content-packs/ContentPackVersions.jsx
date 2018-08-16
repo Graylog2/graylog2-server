@@ -104,10 +104,11 @@ class ContentPackVersions extends React.Component {
             <Button bsStyle="success" bsSize="small" onClick={() => { downloadRef.open(); }}>Download</Button>
             <DropdownButton id={`action-${pack.rev}`} bsStyle="info" title="Actions" bsSize="small">
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
-                <MenuItem >Edit clone</MenuItem>
+                <MenuItem >Create New From Revision</MenuItem>
               </LinkContainer>
-              <MenuItem onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
               <MenuItem onClick={openFunc}>Install</MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
               {installModal}
             </DropdownButton>
           </ButtonToolbar>
