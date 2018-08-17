@@ -148,7 +148,7 @@ const ConfigurationForm = createReactClass({
           <FormControl.Static>{this._formatCollector(collector)}</FormControl.Static>
           <HelpBlock bsClass="warning">
             <b>Note:</b> Log Collector cannot change while the Configuration is in use. Clone the Configuration
-            for testing it with a new Collector.
+            to test it using another Collector.
           </HelpBlock>
         </span>
       );
