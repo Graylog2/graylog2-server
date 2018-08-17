@@ -2,7 +2,6 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
 import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -66,8 +65,14 @@ const ShowContentPackPage = createReactClass({
     }
   },
 
-  _getLastVersion() {
-    return lodash.last(Object.keys(this.state.contentPack).filter(key => !isNaN(key)).sort());
+  _installContentPack(contentPackId, contentPackRev, parameters) {
+    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
+      UserNotification.success('Content Pack installed successfully.', 'Success');
+      ContentPacksActions.installList(contentPackId);
+    }, (error) => {
+      UserNotification.error(`Installing content pack failed with status: ${error}.
+         Could not install content pack with ID: ${contentPackId}`);
+    });
   },
 
   render() {
@@ -76,8 +81,6 @@ const ShowContentPackPage = createReactClass({
     }
 
     const { contentPack, selectedVersion, constraints } = this.state;
-    const lastVersion = this._getLastVersion();
-    const lastPack = contentPack[lastVersion];
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -95,9 +98,6 @@ const ShowContentPackPage = createReactClass({
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
                 <Button bsStyle="info">Content Packs</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(lastPack.id), encodeURIComponent(lastPack.rev))}>
-                <Button bsStyle="primary">Edit</Button>
-              </LinkContainer>
             </ButtonToolbar>
           </PageHeader>
 
@@ -108,6 +108,7 @@ const ShowContentPackPage = createReactClass({
                   <Col>
                     <h2>Versions</h2>
                     <ContentPackVersions contentPack={contentPack}
+                                         onInstall={this._installContentPack}
                                          onChange={this._onVersionChanged}
                                          onDeletePack={this._deleteContentPackRev} />
                   </Col>

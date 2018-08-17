@@ -46,23 +46,98 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <div
+                    className="dropdown btn-group btn-group-sm btn-group-info"
+                  >
+                    <button
+                      aria-expanded={false}
+                      aria-haspopup={true}
+                      className="dropdown-toggle btn btn-sm btn-info"
+                      disabled={false}
+                      id="action-1"
+                      onClick={[Function]}
+                      onKeyDown={[Function]}
+                      role="button"
+                      type="button"
+                    >
+                      Actions
+                       
+                      <span
+                        className="caret"
+                      />
+                    </button>
+                    <ul
+                      aria-labelledby="action-1"
+                      className="dropdown-menu"
+                      role="menu"
+                    >
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          action="push"
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Create New From Revision
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr>
@@ -80,23 +155,98 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <div
+                    className="dropdown btn-group btn-group-sm btn-group-info"
+                  >
+                    <button
+                      aria-expanded={false}
+                      aria-haspopup={true}
+                      className="dropdown-toggle btn btn-sm btn-info"
+                      disabled={false}
+                      id="action-2"
+                      onClick={[Function]}
+                      onKeyDown={[Function]}
+                      role="button"
+                      type="button"
+                    >
+                      Actions
+                       
+                      <span
+                        className="caret"
+                      />
+                    </button>
+                    <ul
+                      aria-labelledby="action-2"
+                      className="dropdown-menu"
+                      role="menu"
+                    >
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          action="push"
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Create New From Revision
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr>
@@ -114,23 +264,98 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <div
+                    className="dropdown btn-group btn-group-sm btn-group-info"
+                  >
+                    <button
+                      aria-expanded={false}
+                      aria-haspopup={true}
+                      className="dropdown-toggle btn btn-sm btn-info"
+                      disabled={false}
+                      id="action-3"
+                      onClick={[Function]}
+                      onKeyDown={[Function]}
+                      role="button"
+                      type="button"
+                    >
+                      Actions
+                       
+                      <span
+                        className="caret"
+                      />
+                    </button>
+                    <ul
+                      aria-labelledby="action-3"
+                      className="dropdown-menu"
+                      role="menu"
+                    >
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          action="push"
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Create New From Revision
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </td>
             </tr>
             <tr>
@@ -148,23 +373,98 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
               <td
                 className="text-right"
               >
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
+                <div
+                  className="pull-right btn-toolbar"
+                  role="toolbar"
                 >
-                  Delete
-                </button>
-                 
-                <button
-                  className="btn btn-sm btn-info"
-                  disabled={false}
-                  onClick={[Function]}
-                  type="button"
-                >
-                  Download
-                </button>
+                  <button
+                    className="btn btn-sm btn-success"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Download
+                  </button>
+                  <div
+                    className="dropdown btn-group btn-group-sm btn-group-info"
+                  >
+                    <button
+                      aria-expanded={false}
+                      aria-haspopup={true}
+                      className="dropdown-toggle btn btn-sm btn-info"
+                      disabled={false}
+                      id="action-4"
+                      onClick={[Function]}
+                      onKeyDown={[Function]}
+                      role="button"
+                      type="button"
+                    >
+                      Actions
+                       
+                      <span
+                        className="caret"
+                      />
+                    </button>
+                    <ul
+                      aria-labelledby="action-4"
+                      className="dropdown-menu"
+                      role="menu"
+                    >
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          action="push"
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Create New From Revision
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className="divider"
+                        onKeyDown={[Function]}
+                        role="separator"
+                        style={undefined}
+                      />
+                      <li
+                        className=""
+                        role="presentation"
+                        style={undefined}
+                      >
+                        <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>

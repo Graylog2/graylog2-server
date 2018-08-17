@@ -65,6 +65,7 @@ const ContentPacksPage = createReactClass({
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
                 <Button bsStyle="success">Create a content pack</Button>
               </LinkContainer>
+              <Button bsStyle="info" active>Content Packs</Button>
             </ButtonToolbar>
           </PageHeader>
 
