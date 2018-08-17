@@ -13,6 +13,8 @@ export const parseSeries = (s) => {
   return definition;
 };
 
+export const isFunction = s => seriesRegex.test(s);
+
 const _defaultSeriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values });
 
 export const extractSeries = (results) => {

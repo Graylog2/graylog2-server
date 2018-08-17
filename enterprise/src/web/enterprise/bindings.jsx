@@ -27,6 +27,7 @@ import WorldMapVisualization from './components/visualizations/worldmap/WorldMap
 import FieldStatisticsHandler from './logic/fieldactions/FieldStatisticsHandler';
 import NumberVisualization from './components/visualizations/number/NumberVisualization';
 import ExcludeFromQueryHandler from './logic/valueactions/ExcludeFromQueryHandler';
+import { isFunction } from './components/visualizations/Series';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -134,11 +135,13 @@ export default {
       type: 'exclude',
       title: 'Exclude from results',
       handler: new ExcludeFromQueryHandler().handle,
+      condition: ({ field }) => !isFunction(field),
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
+      condition: ({ field }) => !isFunction(field),
     },
   ],
   visualizationTypes: [
