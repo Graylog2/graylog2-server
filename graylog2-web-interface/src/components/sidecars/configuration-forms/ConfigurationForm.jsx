@@ -9,22 +9,23 @@ import { ColorPickerPopover, Select, SourceCodeEditor } from 'components/common'
 import { Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
-import CombinedProvider from 'injection/CombinedProvider';
-import SourceViewModal from './SourceViewModal';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import SourceViewModal from './SourceViewModal';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 const ConfigurationForm = createReactClass({
   displayName: 'ConfigurationForm',
-  mixins: [Reflux.connect(CollectorsStore)],
 
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     configuration: PropTypes.object,
   },
+
+  mixins: [Reflux.connect(CollectorsStore)],
 
   getDefaultProps() {
     return {

@@ -18,12 +18,13 @@ const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfig
 
 const CollectorForm = createReactClass({
   displayName: 'CollectorForm',
-  mixins: [Reflux.connect(CollectorsStore)],
 
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     collector: PropTypes.object,
   },
+
+  mixins: [Reflux.connect(CollectorsStore)],
 
   getDefaultProps() {
     return {
