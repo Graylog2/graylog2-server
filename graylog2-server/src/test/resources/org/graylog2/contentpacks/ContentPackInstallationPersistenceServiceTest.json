@@ -23,7 +23,7 @@
             "name": "collector",
             "version": "1"
           },
-          "entity_id": "5b1a49eb3d274631fe07c86a"
+          "content_pack_entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
           "id": "5b4c920b4b900a0024af2b5c",
@@ -31,7 +31,7 @@
             "name": "collector",
             "version": "1"
           },
-          "entity_id": "5b1a49eb3d274631fe07beff"
+          "content_pack_entity_id": "5b1a49eb3d274631fe07beff"
         },
         {
           "id": "5b4c920b4b900a0024af2b5b",
@@ -39,7 +39,7 @@
             "name": "collector",
             "version": "1"
           },
-          "entity_id": "5b1a49eb3d274631fe07abfe"
+          "content_pack_entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
       "comment": "comment1",
@@ -65,7 +65,7 @@
             "name": "dashboard",
             "version": "1"
           },
-          "entity_id": "beef49eb3d274631fe07abfe"
+          "content_pack_entity_id": "beef49eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc19",
@@ -73,7 +73,7 @@
             "name": "grok_pattern",
             "version": "1"
           },
-          "entity_id": "bee149eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee149eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc1b",
@@ -81,7 +81,7 @@
             "name": "input",
             "version": "1"
           },
-          "entity_id": "bee249eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee249eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc1f",
@@ -89,7 +89,7 @@
             "name": "output",
             "version": "1"
           },
-          "entity_id": "bee349eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee349eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc20",
@@ -97,7 +97,7 @@
             "name": "stream",
             "version": "1"
           },
-          "entity_id": "bee449eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee449eb3d274631fe07abfe"
         }
       ],
       "comment": "comment2",
@@ -123,7 +123,7 @@
             "name": "pipeline_rule",
             "version": "1"
           },
-          "entity_id": "bee549eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee549eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc0b",
@@ -131,7 +131,7 @@
             "name": "pipeline",
             "version": "1"
           },
-          "entity_id": "bee649eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee649eb3d274631fe07abfe"
         },
         {
           "id": "cp_lookup",
@@ -139,7 +139,7 @@
             "name": "lookup_adapter",
             "version": "1"
           },
-          "entity_id": "bee749eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee749eb3d274631fe07abfe"
         },
         {
           "id": "cp_lookup",
@@ -147,7 +147,7 @@
             "name": "lookup_cache",
             "version": "1"
           },
-          "entity_id": "bee849eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee849eb3d274631fe07abfe"
         },
         {
           "id": "5b4c935b4b900a0062b7dc14",
@@ -155,7 +155,7 @@
             "name": "lookup_table",
             "version": "1"
           },
-          "entity_id": "bee949eb3d274631fe07abfe"
+          "content_pack_entity_id": "bee949eb3d274631fe07abfe"
         }
       ],
       "comment": "comment3",
