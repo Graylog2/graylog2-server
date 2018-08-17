@@ -9,9 +9,7 @@ import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import SearchForm from 'components/common/SearchForm';
 
 import Field from 'enterprise/components/Field';
-import FieldSelected from 'enterprise/components/sidebar/FieldSelected';
 import FieldTypeIcon from 'enterprise/components/sidebar/FieldTypeIcon';
-import { SelectedFieldsActions } from 'enterprise/stores/SelectedFieldsStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
@@ -24,7 +22,6 @@ const FieldList = createReactClass({
     allFields: PropTypes.object.isRequired,
     fields: PropTypes.object.isRequired,
     maximumHeight: PropTypes.number.isRequired,
-    selectedFields: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
 
@@ -81,16 +78,12 @@ const FieldList = createReactClass({
     this.setState({ maxFieldsHeight: Math.max(isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   },
 
-  _renderField({ fields, fieldType, selectedQuery, selectedView, selectedFields }) {
+  _renderField({ fields, fieldType, selectedQuery, selectedView }) {
     const { name, type } = fieldType;
     const disabled = !fields.find(f => f.name === name);
 
     return (
       <li key={`field-${name}`} className={styles.fieldListItem} >
-        <FieldSelected name={name}
-                       selected={selectedFields.contains(name)}
-                       onToggleSelected={SelectedFieldsActions.toggle} />
-        {' '}
         <FieldTypeIcon type={type} />
         {' '}
         <Field queryId={selectedQuery}
@@ -117,7 +110,7 @@ const FieldList = createReactClass({
         return fields.filter(isNotReservedField);
     }
   },
-  _renderFieldList({ fields, selectedFields, allFields, showFieldsBy }) {
+  _renderFieldList({ fields, allFields, showFieldsBy }) {
     if (!fields) {
       return <span>No field information available.</span>;
     }
@@ -128,7 +121,7 @@ const FieldList = createReactClass({
     const fieldList = fieldsToShow
       .filter(filter)
       .sortBy(field => field.name)
-      .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, selectedFields, fields }));
+      .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, fields }));
     return (
       <ul ref={(elem) => { this.fieldList = elem; }}
           style={{ maxHeight: this.state.maxFieldsHeight }}
@@ -161,7 +154,7 @@ const FieldList = createReactClass({
     );
   },
   render() {
-    const { allFields, fields, selectedFields } = this.props;
+    const { allFields, fields } = this.props;
     const { showFieldsBy } = this.state;
     return (
       <div>
@@ -176,7 +169,7 @@ const FieldList = createReactClass({
           {this.showFieldsByLink('allreserved', 'all including reserved', 'This shows all fields, including reserved (gl2_*) fields.')} fields.
         </div>
         <hr />
-        {this._renderFieldList({ fields, selectedFields, allFields, showFieldsBy })}
+        {this._renderFieldList({ fields, allFields, showFieldsBy })}
       </div>
     );
   },

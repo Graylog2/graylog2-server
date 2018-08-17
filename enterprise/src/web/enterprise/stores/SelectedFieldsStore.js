@@ -15,7 +15,7 @@ type StateUpdate = {
 export const SelectedFieldsActions = Reflux.createActions([
   'add',
   'remove',
-  'toggle',
+  'set',
 ]);
 
 export const SelectedFieldsStore = Reflux.createStore({
@@ -44,14 +44,9 @@ export const SelectedFieldsStore = Reflux.createStore({
   remove(field: string) {
     CurrentViewStateActions.fields(this.selectedFields.remove(field));
   },
-  toggle(field: string) {
-    if (this.selectedFields.contains(field)) {
-      this.remove(field);
-    } else {
-      this.add(field);
-    }
+  set(fields: Array<string>) {
+    CurrentViewStateActions.fields(fields);
   },
-
   _state() {
     return this.selectedFields;
   },

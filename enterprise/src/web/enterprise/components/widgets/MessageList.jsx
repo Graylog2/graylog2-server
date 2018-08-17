@@ -9,8 +9,8 @@ import { MessageTableEntry } from 'enterprise/components/messagelist';
 import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
 import { Row, Col } from 'react-bootstrap';
-import DescriptionBox from '../aggregationbuilder/DescriptionBox';
 
+import { SelectedFieldsActions } from 'enterprise/stores/SelectedFieldsStore';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import CombinedProvider from 'injection/CombinedProvider';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
@@ -22,6 +22,7 @@ import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 
+import DescriptionBox from '../aggregationbuilder/DescriptionBox';
 import styles from './MessageList.css';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
@@ -131,13 +132,14 @@ const MessageList = createReactClass({
   },
 
   _onFieldSelectionChanged(fields) {
-    if (!this.props.config) {
-      return;
-    }
     const newFields = fields.split(',');
-    const newConfigBuilder = this.props.config.toBuilder();
-    const newConfig = newConfigBuilder.fields(newFields).build();
-    WidgetActions.updateConfig(this.props.id, newConfig);
+    if (this.props.config) {
+      const newConfigBuilder = this.props.config.toBuilder();
+      const newConfig = newConfigBuilder.fields(newFields).build();
+      WidgetActions.updateConfig(this.props.id, newConfig);
+    } else {
+      SelectedFieldsActions.set(newFields);
+    }
   },
 
   render() {
