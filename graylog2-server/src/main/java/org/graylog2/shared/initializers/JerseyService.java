@@ -32,6 +32,7 @@ import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -281,6 +282,7 @@ public class JerseyService extends AbstractIdleService {
                 .register(new PrefixAddingModelProcessor(packagePrefixes))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
+                        CsrfProtectionFilter.class,
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class,

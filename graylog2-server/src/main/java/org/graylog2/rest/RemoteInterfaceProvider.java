@@ -21,6 +21,7 @@ import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.glassfish.jersey.client.filter.CsrfProtectionFilter;
 import org.graylog2.cluster.Node;
 import org.graylog2.security.realm.SessionAuthenticator;
 import retrofit2.Retrofit;
@@ -46,6 +47,7 @@ public class RemoteInterfaceProvider {
 
                     Request.Builder builder = original.newBuilder()
                             .header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString())
+                            .header(CsrfProtectionFilter.HEADER_NAME, "Graylog Server")
                             .method(original.method(), original.body());
 
                     if (authorizationToken != null) {
