@@ -30,14 +30,14 @@ import org.graylog2.contentpacks.model.Typed;
 @AutoValue
 @JsonDeserialize(builder = AutoValue_NativeEntityDescriptor.Builder.class)
 public abstract class NativeEntityDescriptor implements Identified, Typed {
-    public static final String FIELD_ENTITY_ID = "entity_id";
+    public static final String FIELD_ENTITY_ID = "content_pack_entity_id";
 
     @JsonProperty(FIELD_ENTITY_ID)
-    public abstract ModelId entityId();
+    public abstract ModelId contentPackEntityId();
 
-    public static NativeEntityDescriptor create(ModelId entityId, ModelId id, ModelType type) {
+    public static NativeEntityDescriptor create(ModelId contentPackEntityId, ModelId id, ModelType type) {
         return builder()
-                .entityId(entityId)
+                .contentPackEntityId(contentPackEntityId)
                 .id(id)
                 .type(type)
                 .build();
@@ -46,12 +46,12 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
     /**
      * Shortcut for {@link #create(String, String, ModelType)}
      */
-    public static NativeEntityDescriptor create(String entityId, String nativeId, ModelType type) {
-        return create(ModelId.of(entityId), ModelId.of(nativeId), type);
+    public static NativeEntityDescriptor create(String contentPackEntityId, String nativeId, ModelType type) {
+        return create(ModelId.of(contentPackEntityId), ModelId.of(nativeId), type);
     }
 
-    public static NativeEntityDescriptor create(ModelId entityId, String nativeId, ModelType type) {
-        return create(entityId, ModelId.of(nativeId), type);
+    public static NativeEntityDescriptor create(ModelId contentPackEntityId, String nativeId, ModelType type) {
+        return create(contentPackEntityId, ModelId.of(nativeId), type);
     }
 
     public static Builder builder() {
@@ -62,7 +62,7 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
     public abstract static class Builder implements IdBuilder<Builder>, TypeBuilder<Builder> {
 
         @JsonProperty(FIELD_ENTITY_ID)
-        abstract Builder entityId(ModelId entityId);
+        abstract Builder contentPackEntityId(ModelId contentPackEntityId);
 
         public abstract NativeEntityDescriptor build();
     }
