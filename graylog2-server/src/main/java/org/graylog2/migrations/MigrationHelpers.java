@@ -55,12 +55,12 @@ public class MigrationHelpers {
                 final Role savedRole = roleService.save(fixedRole);
                 return savedRole.getId();
             } catch (DuplicateKeyException | ValidationException e) {
-                LOG.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
+                LOG.error("Unable to save fixed '" + roleName + "' role, please restart Graylog to fix this.", e);
             }
         }
 
         if (previousRole == null) {
-            LOG.error("Unable to access fixed " + roleName + " role, please restart Graylog to fix this.");
+            LOG.error("Unable to access fixed '" + roleName + "' role, please restart Graylog to fix this.");
             return null;
         }
 
@@ -73,7 +73,7 @@ public class MigrationHelpers {
         try {
             previousUser = userService.load(userName);
             if (previousUser == null || !expectedRoles.equals(previousUser.getRoleIds())) {
-                final String msg = "Invalid user '" + userName + "' fixing it.";
+                final String msg = "Invalid user '" + userName + "', fixing it.";
                 LOG.error(msg);
                 throw new IllegalArgumentException(msg);
             }
@@ -96,12 +96,12 @@ public class MigrationHelpers {
             try {
                 return userService.save(fixedUser);
             } catch (ValidationException e) {
-                LOG.error("Unabale to save fixed " + userName + " user, please restart Graylog to fix this.", e);
+                LOG.error("Unable to save fixed '" + userName + "' user, please restart Graylog to fix this.", e);
             }
         }
 
         if (previousUser == null) {
-            LOG.error("Unable to access fixed " + userName + " user, please restart Graylog to fix this.");
+            LOG.error("Unable to access fixed '" + userName + "' user, please restart Graylog to fix this.");
             return null;
         }
 
