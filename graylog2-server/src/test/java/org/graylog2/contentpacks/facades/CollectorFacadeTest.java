@@ -43,7 +43,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -84,12 +83,8 @@ public class CollectorFacadeTest {
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/bin/filebeat"),
                         ValueReference.of("/etc/graylog/collector-sidecar/generated/filebeat.yml"),
-                        Arrays.asList(ValueReference.of("-c"), ValueReference.of("%s")),
-                        Arrays.asList(
-                                ValueReference.of("test"),
-                                ValueReference.of("config"),
-                                ValueReference.of("-c"),
-                                ValueReference.of("%s")),
+                        ValueReference.of("-c %s"),
+                        ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
         assertThat(entityWithConstraints.entity()).isEqualTo(expectedEntity);
@@ -111,12 +106,8 @@ public class CollectorFacadeTest {
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/bin/filebeat"),
                         ValueReference.of("/etc/graylog/collector-sidecar/generated/filebeat.yml"),
-                        Arrays.asList(ValueReference.of("-c"), ValueReference.of("%s")),
-                        Arrays.asList(
-                                ValueReference.of("test"),
-                                ValueReference.of("config"),
-                                ValueReference.of("-c"),
-                                ValueReference.of("%s")),
+                        ValueReference.of("-c %s"),
+                        ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
         assertThat(entityWithConstraints.entity()).isEqualTo(expectedEntity);
@@ -134,12 +125,8 @@ public class CollectorFacadeTest {
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/bin/filebeat"),
                         ValueReference.of("/etc/graylog/collector-sidecar/generated/filebeat.yml"),
-                        Arrays.asList(ValueReference.of("-c"), ValueReference.of("%s")),
-                        Arrays.asList(
-                                ValueReference.of("test"),
-                                ValueReference.of("config"),
-                                ValueReference.of("-c"),
-                                ValueReference.of("%s")),
+                        ValueReference.of("-c %s"),
+                        ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
 
@@ -168,12 +155,8 @@ public class CollectorFacadeTest {
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/bin/filebeat"),
                         ValueReference.of("/etc/graylog/collector-sidecar/generated/filebeat.yml"),
-                        Arrays.asList(ValueReference.of("-c"), ValueReference.of("%s")),
-                        Arrays.asList(
-                                ValueReference.of("test"),
-                                ValueReference.of("config"),
-                                ValueReference.of("-c"),
-                                ValueReference.of("%s")),
+                        ValueReference.of("-c %s"),
+                        ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
 
@@ -252,12 +235,8 @@ public class CollectorFacadeTest {
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/bin/filebeat"),
                         ValueReference.of("/etc/graylog/collector-sidecar/generated/filebeat.yml"),
-                        Arrays.asList(ValueReference.of("-c"), ValueReference.of("%s")),
-                        Arrays.asList(
-                                ValueReference.of("test"),
-                                ValueReference.of("config"),
-                                ValueReference.of("-c"),
-                                ValueReference.of("%s")),
+                        ValueReference.of("-c %s"),
+                        ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
 
