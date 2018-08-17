@@ -32,6 +32,7 @@ import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationPreviewRequest;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
+import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
 import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
@@ -128,8 +129,23 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Show configuration details")
     public Configuration getConfigurations(@ApiParam(name = "id", required = true)
-                                                    @PathParam("id") String id) {
+                                           @PathParam("id") String id) {
         return this.configurationService.find(id);
+    }
+
+    @GET
+    @Path("/{id}/sidecars")
+    @RequiresPermissions({SidecarRestPermissions.CONFIGURATIONS_READ, SidecarRestPermissions.SIDECARS_READ})
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Show sidecars using the given configuration")
+    public ConfigurationSidecarsResponse getConfigurationSidecars(@ApiParam(name = "id", required = true)
+                                                                      @PathParam("id") String id) {
+        final Configuration configuration = configurationService.find(id);
+        final List<String> sidecarsWithConfiguration = sidecarService.all().stream()
+                .filter(sidecar -> isConfigurationAssignedToSidecar(configuration.id(), sidecar))
+                .map(Sidecar::id)
+                .collect(Collectors.toList());
+        return ConfigurationSidecarsResponse.create(configuration.id(), sidecarsWithConfiguration);
     }
 
     @GET
@@ -247,6 +263,14 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                              @PathParam("id") String id,
                                              @ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
+        final Configuration previousConfiguration = configurationService.find(id);
+        // Only allow changing the associated collector ID if the configuration is not in use
+        if (!previousConfiguration.collectorId().equals(request.collectorId())) {
+            if (isConfigurationInUse(id)) {
+                throw new BadRequestException("Configuration still in use, cannot change collector type.");
+            }
+        }
+
         etagService.invalidateAll();
         Configuration configuration = configurationService.fromRequest(id, request);
         return configurationService.save(configuration);
@@ -260,13 +284,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_DELETE)
     public Response deleteConfiguration(@ApiParam(name = "id", required = true)
                                         @PathParam("id") String id) {
-        final long sidecarsUsingConfiguration = sidecarService.all().stream()
-                .filter(sidecar -> {
-                    final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
-                    return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(id));
-                })
-                .count();
-        if (sidecarsUsingConfiguration > 0) {
+        if (isConfigurationInUse(id)) {
             throw new BadRequestException("Configuration still in use, cannot delete.");
         }
 
@@ -276,6 +294,15 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         }
         etagService.invalidateAll();
         return Response.accepted().build();
+    }
+
+    private boolean isConfigurationInUse(String configurationId) {
+        return sidecarService.all().stream().anyMatch(sidecar -> isConfigurationAssignedToSidecar(configurationId, sidecar));
+    }
+
+    private boolean isConfigurationAssignedToSidecar(String configurationId, Sidecar sidecar) {
+        final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
+        return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(configurationId));
     }
 
     private String configurationToEtag(Configuration configuration) {

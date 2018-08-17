@@ -38,11 +38,17 @@ const SidecarEditConfigurationPage = createReactClass({
   style: require('!style/useable!css!components/sidecars/styles/SidecarStyles.css'),
 
   _reloadConfiguration() {
-    CollectorConfigurationsActions.getConfiguration(this.props.params.configurationId).then(this._setConfiguration);
+    const configurationId = this.props.params.configurationId;
+    CollectorConfigurationsActions.getConfiguration(configurationId).then(this._setConfiguration);
+    CollectorConfigurationsActions.getConfigurationSidecars(configurationId).then(this._setConfigurationSidecars);
   },
 
   _setConfiguration(configuration) {
     this.setState({ configuration });
+  },
+
+  _setConfigurationSidecars(configurationSidecars) {
+    this.setState({ configurationSidecars });
   },
 
   _isLoading() {
@@ -81,7 +87,8 @@ const SidecarEditConfigurationPage = createReactClass({
 
           <Row className="content">
             <Col md={6}>
-              <ConfigurationForm configuration={this.state.configuration} />
+              <ConfigurationForm configuration={this.state.configuration}
+                                 configurationSidecars={this.state.configurationSidecars} />
             </Col>
             <Col md={6}>
               <ConfigurationHelper type="filebeat" />

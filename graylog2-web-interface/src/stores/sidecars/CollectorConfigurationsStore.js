@@ -100,6 +100,17 @@ const CollectorConfigurationsStore = Reflux.createStore({
     CollectorConfigurationsActions.getConfiguration.promise(promise);
   },
 
+  getConfigurationSidecars(configurationId) {
+    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}/sidecars`));
+    promise
+      .catch(
+        (error) => {
+          UserNotification.error(`Fetching Sidecars for Configuration failed with status: ${error}`,
+            'Could not retrieve Sidecars for Configuration');
+        });
+    CollectorConfigurationsActions.getConfigurationSidecars.promise(promise);
+  },
+
   renderPreview(template) {
     const requestTemplate = {
       template: template,
@@ -145,8 +156,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         this.refreshList();
         return response;
       }, (error) => {
-        UserNotification.error(`Updating configuration failed with status: ${error.message}`,
-          'Could not update configuration');
+        UserNotification.error(`Updating Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+          `Could not update Configuration ${configuration.name}`);
       });
 
     CollectorConfigurationsActions.updateConfiguration.promise(promise);
