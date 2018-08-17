@@ -81,8 +81,6 @@ const ShowContentPackPage = createReactClass({
     }
 
     const { contentPack, selectedVersion, constraints } = this.state;
-    const lastVersion = this._getLastVersion();
-    const lastPack = contentPack[lastVersion];
     return (
       <DocumentTitle title="Content packs">
         <span>
