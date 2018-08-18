@@ -20,7 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.google.auto.value.AutoValue;
+import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.ModelVersion;
 
 @AutoValue
@@ -44,6 +48,14 @@ public abstract class EntityV1 implements Entity {
 
     public static Builder builder() {
         return new AutoValue_EntityV1.Builder();
+    }
+
+    public static Entity createRoot(ContentPack contentPack) {
+        return EntityV1.builder()
+                .type(ModelTypes.ROOT)
+                .id(ModelId.of("virtual-root-" + contentPack.id() + "-" + contentPack.revision()))
+                .data(NullNode.getInstance())
+                .build();
     }
 
     @AutoValue.Builder

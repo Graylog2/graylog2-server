@@ -16,7 +16,6 @@
  */
 package org.graylog2.contentpacks;
 
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -40,9 +39,7 @@ import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackV1;
-import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
@@ -109,11 +106,7 @@ public class ContentPackService {
                                                       String user) {
         ensureConstraints(contentPack.requires());
 
-        final Entity rootEntity = EntityV1.builder()
-                .type(ModelTypes.ROOT)
-                .id(ModelId.of("virtual-root-" + contentPack.id() + "-" + contentPack.revision()))
-                .data(NullNode.getInstance())
-                .build();
+        final Entity rootEntity = EntityV1.createRoot(contentPack);
         final ImmutableMap<String, ValueReference> validatedParameters = validateParameters(parameters, contentPack.parameters());
         final ImmutableGraph<Entity> dependencyGraph = buildEntityGraph(rootEntity, contentPack.entities(), validatedParameters);
 
