@@ -254,5 +254,13 @@ public class ThrottleStateUpdaterThread extends Periodical {
                     .addSeverity(Notification.Severity.URGENT);
             notificationService.publishIfFirst(notification);
         }
+
+        if (!journal.journalFileFitsInPartition()) {
+            Notification notification = notificationService.buildNow()
+                    .addNode(serverStatus.getNodeId().toString())
+                    .addType(Notification.Type.JOURNAL_WONT_FIT_IN_PARTITION)
+                    .addSeverity(Notification.Severity.URGENT);
+            notificationService.publishIfFirst(notification);
+        }
     }
 }

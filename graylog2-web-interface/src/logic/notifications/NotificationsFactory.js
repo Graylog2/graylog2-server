@@ -150,6 +150,17 @@ class NotificationsFactory {
             </span>
           ),
         };
+      case 'journal_wont_fit_in_partition':
+        return {
+          title: 'Journal file won\'t fit in partition',
+          description: (
+            <span>
+              Journal file max size value is higher than free space in the partition. Root causes may be other files
+              in the same partition growing up (logs...) or the partition being too small.
+              (Node: <em>{notification.node_id}</em>)
+            </span>
+          ),
+        };
       case 'multi_master':
         return {
           title: 'Multiple Graylog server masters in the cluster',

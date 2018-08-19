@@ -369,6 +369,14 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
 
+        if (!journalFileFitsInPartition()) {
+            LOG.warn("Journal file won't fit in partition");
+        }
+    }
+
+    public boolean journalFileFitsInPartition()
+    {
+        return kafkaLog.dir().getUsableSpace() - (kafkaLog.config().retentionSize() - kafkaLog.size()) > 0;
     }
 
     /**

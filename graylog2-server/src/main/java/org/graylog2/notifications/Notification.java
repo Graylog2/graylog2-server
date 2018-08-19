@@ -62,7 +62,8 @@ public interface Notification extends Persisted {
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
         OUTPUT_DISABLED,
         INDEX_RANGES_RECALCULATION,
-        GENERIC
+        GENERIC,
+        JOURNAL_WONT_FIT_IN_PARTITION
     }
 
     enum Severity {
