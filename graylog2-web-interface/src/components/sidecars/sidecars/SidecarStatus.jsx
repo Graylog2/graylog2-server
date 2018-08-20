@@ -62,7 +62,7 @@ const SidecarStatus = createReactClass({
 
     const statuses = [];
     collectorStatuses.forEach((status) => {
-      const collector = collectors.find(collector => collector.id === status.collector_id);
+      const collector = collectors.find(c => c.id === status.collector_id);
 
       let statusMessage;
       let statusBadge;
@@ -86,8 +86,8 @@ const SidecarStatus = createReactClass({
 
       if (collector) {
         statuses.push(
-          <dt key={`${collector}-key`} className={statusClass}>{collector.name}</dt>,
-          <dd key={`${collector}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
+          <dt key={`${collector.id}-key`} className={statusClass}>{collector.name}</dt>,
+          <dd key={`${collector.id}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
         );
       }
     });
