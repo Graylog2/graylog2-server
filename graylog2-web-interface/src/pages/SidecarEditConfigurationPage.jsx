@@ -27,15 +27,8 @@ const SidecarEditConfigurationPage = createReactClass({
   },
 
   componentDidMount() {
-    this.style.use();
     this._reloadConfiguration();
   },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!components/sidecars/styles/SidecarStyles.css'),
 
   _reloadConfiguration() {
     const configurationId = this.props.params.configurationId;
