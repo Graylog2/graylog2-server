@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { ColorPickerPopover, Select, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
