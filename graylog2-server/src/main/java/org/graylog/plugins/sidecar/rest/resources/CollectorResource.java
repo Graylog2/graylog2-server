@@ -31,6 +31,7 @@ import org.graylog.plugins.sidecar.rest.responses.CollectorListResponse;
 import org.graylog.plugins.sidecar.rest.responses.CollectorSummaryResponse;
 import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.CollectorService;
+import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -43,6 +44,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -70,6 +72,7 @@ import java.util.stream.Collectors;
 @RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
     private final CollectorService collectorService;
+    private final ConfigurationService configurationService;
     private final EtagService etagService;
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -80,8 +83,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @Inject
     public CollectorResource(CollectorService collectorService,
+                             ConfigurationService configurationService,
                              EtagService etagService) {
         this.collectorService = collectorService;
+        this.configurationService = configurationService;
         this.etagService = etagService;
         this.searchQueryParser = new SearchQueryParser(Collector.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
@@ -212,6 +217,13 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_DELETE)
     public Response deleteCollector(@ApiParam(name = "id", required = true)
                                     @PathParam("id") String id) {
+        final long configurationsForCollector = configurationService.all().stream()
+                .filter(configuration -> configuration.collectorId().equals(id))
+                .count();
+        if (configurationsForCollector > 0) {
+            throw new BadRequestException("Collector still in use, cannot delete.");
+        }
+
         int deleted = collectorService.delete(id);
         if (deleted == 0) {
             return Response.notModified().build();

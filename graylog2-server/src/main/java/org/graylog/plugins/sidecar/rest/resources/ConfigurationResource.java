@@ -28,9 +28,11 @@ import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
+import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationPreviewRequest;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
+import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
 import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
@@ -47,6 +49,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -64,8 +67,11 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Api(value = "Sidecar/Configurations", description = "Manage/Render collector configurations")
 @Path("/sidecar/configurations")
@@ -79,7 +85,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Configuration.FIELD_ID))
-            .put("backend_id", SearchQueryField.create(Configuration.FIELD_COLLECTOR_ID))
+            .put("collector_id", SearchQueryField.create(Configuration.FIELD_COLLECTOR_ID))
             .put("name", SearchQueryField.create(Configuration.FIELD_NAME))
             .build();
 
@@ -103,7 +109,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                         @ApiParam(name = "sort",
                                                                          value = "The field to sort the result on",
                                                                          required = true,
-                                                                         allowableValues = "name,id,backend_id")
+                                                                         allowableValues = "name,id,collector_id")
                                                                      @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
@@ -123,8 +129,23 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Show configuration details")
     public Configuration getConfigurations(@ApiParam(name = "id", required = true)
-                                                    @PathParam("id") String id) {
+                                           @PathParam("id") String id) {
         return this.configurationService.find(id);
+    }
+
+    @GET
+    @Path("/{id}/sidecars")
+    @RequiresPermissions({SidecarRestPermissions.CONFIGURATIONS_READ, SidecarRestPermissions.SIDECARS_READ})
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Show sidecars using the given configuration")
+    public ConfigurationSidecarsResponse getConfigurationSidecars(@ApiParam(name = "id", required = true)
+                                                                      @PathParam("id") String id) {
+        final Configuration configuration = configurationService.find(id);
+        final List<String> sidecarsWithConfiguration = sidecarService.all().stream()
+                .filter(sidecar -> isConfigurationAssignedToSidecar(configuration.id(), sidecar))
+                .map(Sidecar::id)
+                .collect(Collectors.toList());
+        return ConfigurationSidecarsResponse.create(configuration.id(), sidecarsWithConfiguration);
     }
 
     @GET
@@ -242,6 +263,14 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                              @PathParam("id") String id,
                                              @ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
+        final Configuration previousConfiguration = configurationService.find(id);
+        // Only allow changing the associated collector ID if the configuration is not in use
+        if (!previousConfiguration.collectorId().equals(request.collectorId())) {
+            if (isConfigurationInUse(id)) {
+                throw new BadRequestException("Configuration still in use, cannot change collector type.");
+            }
+        }
+
         etagService.invalidateAll();
         Configuration configuration = configurationService.fromRequest(id, request);
         return configurationService.save(configuration);
@@ -255,12 +284,25 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_DELETE)
     public Response deleteConfiguration(@ApiParam(name = "id", required = true)
                                         @PathParam("id") String id) {
+        if (isConfigurationInUse(id)) {
+            throw new BadRequestException("Configuration still in use, cannot delete.");
+        }
+
         int deleted = configurationService.delete(id);
         if (deleted == 0) {
             return Response.notModified().build();
         }
         etagService.invalidateAll();
         return Response.accepted().build();
+    }
+
+    private boolean isConfigurationInUse(String configurationId) {
+        return sidecarService.all().stream().anyMatch(sidecar -> isConfigurationAssignedToSidecar(configurationId, sidecar));
+    }
+
+    private boolean isConfigurationAssignedToSidecar(String configurationId, Sidecar sidecar) {
+        final List<ConfigurationAssignment> assignments = firstNonNull(sidecar.assignments(), new ArrayList<>());
+        return assignments.stream().anyMatch(assignment -> assignment.configurationId().equals(configurationId));
     }
 
     private String configurationToEtag(Configuration configuration) {

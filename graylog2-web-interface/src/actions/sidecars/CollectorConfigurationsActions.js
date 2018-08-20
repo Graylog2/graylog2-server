@@ -4,6 +4,7 @@ const CollectorConfigurationsActions = Reflux.createActions({
   all: { asyncResult: true },
   list: { asyncResult: true },
   getConfiguration: { asyncResult: true },
+  getConfigurationSidecars: { asyncResult: true },
   createConfiguration: { asyncResult: true },
   updateConfiguration: { asyncResult: true },
   renderPreview: { asyncResult: true },
