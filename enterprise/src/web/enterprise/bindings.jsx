@@ -28,6 +28,7 @@ import FieldStatisticsHandler from './logic/fieldactions/FieldStatisticsHandler'
 import NumberVisualization from './components/visualizations/number/NumberVisualization';
 import ExcludeFromQueryHandler from './logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from './components/visualizations/Series';
+import * as Permissions from './Permissions';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -42,15 +43,15 @@ export default {
 
   },
   routes: [
-    { path: extendedSearchPath, component: NewSearchPage },
-    { path: viewsPath, component: ViewManagementPage },
+    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
+    { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage },
   ],
   navigation: [
     // Disabling navigation for extended search for now to avoid confusing alpha testers.
     // TODO: Disable Views and ExtendedSearch menu items again for the next alpha release!
-    { path: extendedSearchPath, description: 'Extended Search' },
-    { path: viewsPath, description: 'Views' },
+    { path: extendedSearchPath, description: 'Extended Search', permissions: Permissions.ExtendedSearch.Use },
+    { path: viewsPath, description: 'Views', permissions: Permissions.View.Use },
   ],
   enterpriseWidgets: [
     {

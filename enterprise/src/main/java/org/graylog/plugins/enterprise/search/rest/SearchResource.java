@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.common.util.set.Sets;
 import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.Parameter;
@@ -64,6 +65,7 @@ import static java.util.stream.Collectors.toSet;
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_USE)
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
@@ -90,6 +92,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
+    @RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
         final Search saved = searchDbService.save(search);
         if (saved == null || saved.id() == null) {

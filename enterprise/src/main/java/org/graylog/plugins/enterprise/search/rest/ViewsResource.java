@@ -48,6 +48,7 @@ import static java.util.Locale.ENGLISH;
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@RequiresPermissions(EnterpriseSearchRestPermissions.VIEW_USE)
 public class ViewsResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ViewsResource.class);
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
