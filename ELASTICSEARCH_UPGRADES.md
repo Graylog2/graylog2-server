@@ -1,4 +1,11 @@
 
+## Tools
+
+We'll use:
+
+ * https://httpie.org/
+ * https://stedolan.github.io/jq/
+ 
 ## Preparations
 
 * Deploy Graylog 2.5.0-SNAPSHOT
@@ -27,15 +34,42 @@
     [2018-08-21T15:11:31,062][WARN ][o.e.d.i.m.TypeParsers    ] Expected a boolean [true/false] for property [index] but got [not_analyzed]
     ```
 * Wait for index rotation, new index should have new index mapping and settings:
-  * Retrieve settings: `TODO`
-  * Check mapping: `TODO`
+  * Retrieve names of indices created prior to 5.x: 
+    * `http 127.0.0.1:9200/graylog25_*/_settings | jq '[ path(.[] | select(.settings.index.version.created < "5000000"))[] ]'`:
+       ```json
+       [
+        "graylog25_1",
+        "graylog25_0"
+        ]
+       ```
+    * These indices need to be reindexed in order to be able to start a 6.x cluster.
+  * Check mapping: After an index rotation (manually or due to retention) the newly installed index mapping template should be used.
+    * Verify by running:
+    `http 127.0.0.1:9200/graylog25_*/_mapping | jq '[ path(.[] | select(.mappings.message.properties.gl2_source_input.type == "keyword"))[] ]'`
+    ```json
+    [
+      "graylog25_9",
+      "graylog25_6",
+      "graylog25_4",
+      "graylog25_2",
+      "graylog25_7",
+      "graylog25_3",
+      "graylog25_10",
+      "graylog25_8",
+      "graylog25_5"
+    ]
+    ```
+    * Cross check that the old indices still have the deprecated index mapping:
+    `http 127.0.0.1:9200/graylog25_*/_mapping | jq '[ path(.[] | select(.mappings.message.properties.gl2_source_input.index == "not_analyzed"))[] ]'`
+* Reindex old indices
+  * TODO: this also requires a decision on how to integrate the new names into the relevant index sets and preventing premature retention cleaning 
 * Stop 5.6: `Ctrl-C`
 * Copy `56` data to `63`: `cp -R 56 63`
 * Remove cluster name in data directory (or symlink)
   * `pushd 63; ln -s graylog_upgrade/nodes; popd`
   * OR `mv graylog_upgrade/nodes . ; rmdir graylog_upgrade`
 * Start 6.3: `./6/bin/elasticsearch`
-  * This will fail due to incompatible 2.x indices:
+  * If we hadn't reindexed the the old indices, this would have failed due to incompatible 2.x indices:
   ```
   [2018-08-21T15:21:27,109][ERROR][o.e.g.GatewayMetaState   ] [ZdInArk] failed to read local state, exiting...
   java.lang.IllegalStateException: The index [[graylog25_1/8ILwepokQNSYmXp2c9K24A]] was created with version [2.4.6] but the minimum compatible version is [5.0.0]. It should be re-indexed in Elasticsearch 5.x before upgrading to 6.3.2.
@@ -88,21 +122,17 @@ cluster.name: graylog_upgrade
 
 path.data: /tmp/graylog-upgrade/24/data
 path.logs: /tmp/graylog-upgrade/24/logs
-
-network.host: _wlp2s0_
 ```
 
 ### 5.6
 
-Both 5.6 and 6.3 require changing the `discovery.type` to avoid bootstrap checks refusing to start, when binding to a non-local address.
+Note: Both 5.6 and 6.3 require changing the `discovery.type` to avoid bootstrap checks refusing to start, when binding to a non-local address.
 
 ```yaml
 cluster.name: graylog_upgrade
 
 path.data: /tmp/graylog-upgrade/56/data
 path.logs: /tmp/graylog-upgrade/56/logs
-
-network.host: _wlp2s0_
 discovery.type: single-node
 ```
 
@@ -112,8 +142,6 @@ cluster.name: graylog_upgrade
 
 path.data: /tmp/graylog-upgrade/63/data
 path.logs: /tmp/graylog-upgrade/63/logs
-
-network.host: _wlp2s0_
 discovery.type: single-node
 ```
 
