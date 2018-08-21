@@ -157,7 +157,6 @@ const LdapComponent = createReactClass({
 
   _formatAdditionalRoles(roles) {
     return roles
-      .filter(r => !(r.name.toLowerCase() === 'reader' || r.name.toLowerCase() === 'admin'))
       .sort((r1, r2) => naturalSort(r1.name.toLowerCase(), r2.name.toLowerCase()))
       .map((r) => {
         return { label: r.name, value: r.name };
@@ -418,17 +417,14 @@ const LdapComponent = createReactClass({
               <Input id="default_group" labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" label="Default User Role"
                      help={help.defaultGroup(this._onShowGroups)}>
-                <Row>
-                  <Col sm={4}>
-                    <select id="default_group" name="default_group" className="form-control" required
-                            value={this.state.ldapSettings.default_group.toLowerCase()} disabled={disabled}
-                            onChange={ev => this._setSetting('default_group', ev.target.value)}>
-
-                      <option value="reader">Reader - basic access</option>
-                      <option value="admin">Administrator - complete access</option>
-                    </select>
-                  </Col>
-                </Row>
+                <MultiSelect
+                  options={rolesOptions}
+                  disabled={disabled}
+                  multi={false}
+                  value={this.state.ldapSettings.default_group}
+                  onChange={role => this._setSetting('default_group', role)}
+                  placeholder="Choose a default role"
+                />
               </Input>
 
               <Row>
