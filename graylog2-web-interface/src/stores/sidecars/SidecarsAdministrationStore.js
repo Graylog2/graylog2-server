@@ -62,6 +62,10 @@ const SidecarsAdministrationStore = Reflux.createStore({
     SidecarsAdministrationActions.list.promise(promise);
   },
 
+  refreshList() {
+    this.list({ query: this.query, page: this.pagination.page, pageSize: this.pagination.pageSize, filter: this.filters });
+  },
+
   setAction(action, collectors) {
     const sidecarIds = Object.keys(collectors);
     const formattedCollectors = sidecarIds.map(sidecarId => ({

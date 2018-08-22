@@ -55,13 +55,7 @@ const CollectorsAdministrationContainer = createReactClass({
 
   reloadSidecars() {
     if (this.state.sidecars) {
-      const { query, filters, pagination } = this.state.sidecars;
-      SidecarsAdministrationActions.list({
-        query: query,
-        filters: filters,
-        pageSize: pagination.pageSize,
-        page: pagination.page,
-      });
+      SidecarsAdministrationActions.refreshList();
     }
   },
 
