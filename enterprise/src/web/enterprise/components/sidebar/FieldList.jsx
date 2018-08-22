@@ -38,11 +38,10 @@ const FieldList = createReactClass({
 
   shouldComponentUpdate(nextProps, nextState) {
     const { allFields, fields, maximumHeight, selectedFields } = this.props;
-    const { maxFieldsHeight, showFieldsBy, viewMetadata } = this.state;
-    if (maximumHeight !== nextProps.maximumHeight || maxFieldsHeight !== nextState.maxFieldsHeight || showFieldsBy !== nextState.showFieldsBy) {
+    if (maximumHeight !== nextProps.maximumHeight) {
       return true;
     }
-    if (!isEqual(viewMetadata, nextState.viewMetadata)) {
+    if (!isEqual(this.state, nextState)) {
       return true;
     }
     if (!is(nextProps.allFields, allFields) || !is(nextProps.fields, fields) || !is(nextProps.selectedFields, selectedFields)) {
