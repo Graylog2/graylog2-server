@@ -41,16 +41,14 @@ const ConfigurationForm = createReactClass({
 
   getInitialState() {
     return {
-      editor: undefined,
       parseErrors: [],
-      error: false,
-      error_message: '',
+      errors: {},
       formData: {
         id: this.props.configuration.id,
         name: this.props.configuration.name,
         color: this.props.configuration.color,
         collector_id: this.props.configuration.collector_id,
-        template: String(this.props.configuration.template),
+        template: this.props.configuration.template || '',
       },
     };
   },
@@ -59,18 +57,37 @@ const ConfigurationForm = createReactClass({
     CollectorsActions.all();
   },
 
-  hasErrors() {
-    return this.state.error || this.state.parseErrors.length !== 0;
+  _isTemplateSet(template) {
+    return template !== undefined && template !== '';
+  },
+
+  _hasErrors() {
+    return Object.keys(this.state.errors).length !== 0 ||
+      this.state.parseErrors.length !== 0 ||
+      !this._isTemplateSet(this.state.formData.template);
+  },
+
+  _validateTemplate(template) {
+    const validation = { key: 'template' };
+    if (!this._isTemplateSet(template)) {
+      validation.hasError = true;
+      validation.message = 'Please fill out the configuration field.';
+    }
+    this._updateValidationError(validation);
   },
 
   _save() {
-    if (!this.hasErrors()) {
-      if (this.props.action === 'create') {
-        CollectorConfigurationsActions.createConfiguration(this.state.formData)
-          .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
-      } else {
-        CollectorConfigurationsActions.updateConfiguration(this.state.formData);
-      }
+    if (this._hasErrors()) {
+      // Ensure we display an error on the template field, as this is not validated by the browser
+      this._validateTemplate(this.state.formData.template);
+      return;
+    }
+
+    if (this.props.action === 'create') {
+      CollectorConfigurationsActions.createConfiguration(this.state.formData)
+        .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
+    } else {
+      CollectorConfigurationsActions.updateConfiguration(this.state.formData);
     }
   },
 
@@ -82,11 +99,19 @@ const ConfigurationForm = createReactClass({
     };
   },
 
+  _updateValidationError({ key, hasError, message }) {
+    const nextErrors = lodash.omit(this.state.errors, key);
+    if (hasError) {
+      nextErrors[key] = message;
+    }
+    this.setState({ errors: nextErrors });
+  },
+
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);
     CollectorConfigurationsActions.validate(nextName).then(validation => (
-      this.setState({ error: validation.error, error_message: validation.error_message })
+      this._updateValidationError({ key: 'name', hasError: validation.error, message: validation.error_message })
     ));
   },
 
@@ -95,6 +120,11 @@ const ConfigurationForm = createReactClass({
     nextFormData.collector_id = nextId;
     nextFormData.template = this._collectorDefaultTemplate(nextId);
     this.setState({ formData: nextFormData });
+  },
+
+  _onTemplateChange(nextTemplate) {
+    this._formDataUpdate('template')(nextTemplate);
+    this._validateTemplate(nextTemplate);
   },
 
   _onSubmit(event) {
@@ -176,8 +206,8 @@ const ConfigurationForm = createReactClass({
                    id="name"
                    label="Name"
                    onChange={this._onNameChange}
-                   bsStyle={this.state.error ? 'error' : null}
-                   help={this.state.error ? this.state.error_message : 'Name for this configuration'}
+                   bsStyle={this.state.errors.name ? 'error' : null}
+                   help={this.state.errors.name ? this.state.errors.name : 'Required. Name for this configuration'}
                    value={this.state.formData.name}
                    autoFocus
                    required />
@@ -202,18 +232,22 @@ const ConfigurationForm = createReactClass({
               {this._renderCollectorTypeField(this.state.formData.collector_id, this.state.collectors, this.props.configurationSidecars)}
             </FormGroup>
 
-            <FormGroup controlId="template">
+            <FormGroup controlId="template" validationState={this.state.errors.template ? 'error' : null}>
               <ControlLabel>Configuration</ControlLabel>
               <SourceCodeEditor id="template"
                                 value={this.state.formData.template}
-                                onChange={this._formDataUpdate('template')} />
+                                onChange={this._onTemplateChange} />
               <Button className="pull-right"
                       bsStyle="link"
                       bsSize="sm"
                       onClick={this._onShowSource}>
                 Preview
               </Button>
-              <HelpBlock>Collector configuration, see quick reference for more information.</HelpBlock>
+              <HelpBlock>
+                {this.state.errors.template ?
+                  this.state.errors.template :
+                  'Required. Collector configuration, see quick reference for more information.'}
+              </HelpBlock>
             </FormGroup>
           </fieldset>
 
@@ -221,7 +255,7 @@ const ConfigurationForm = createReactClass({
             <Col md={12}>
               <FormGroup>
                 <ButtonToolbar>
-                  <Button type="submit" bsStyle="primary" disabled={this.hasErrors()}>
+                  <Button type="submit" bsStyle="primary">
                     {this.props.action === 'create' ? 'Create' : 'Update'}
                   </Button>
                   <Button type="button" onClick={this._onCancel}>
