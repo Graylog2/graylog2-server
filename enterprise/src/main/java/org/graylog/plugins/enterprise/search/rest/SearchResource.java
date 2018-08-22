@@ -98,7 +98,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
         }
-        LOG.info("Created new search object {}", saved.id());
+        LOG.debug("Created new search object {}", saved.id());
         return Response.created(URI.create(Objects.requireNonNull(saved.id()))).entity(saved).build();
     }
 

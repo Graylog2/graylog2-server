@@ -99,7 +99,7 @@ public class QueryEngine {
             }
         });
 
-        LOG.info("Search job {} executing with plan {}", searchJob.getId(), plan);
+        LOG.debug("Search job {} executing with plan {}", searchJob.getId(), plan);
         return searchJob.seal();
     }
 
