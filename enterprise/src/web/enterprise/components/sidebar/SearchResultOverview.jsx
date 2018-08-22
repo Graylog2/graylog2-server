@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import numeral from 'numeral';
+import { get } from 'lodash';
 
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import connect from 'stores/connect';
 
-const UserTimestamp = connect(Timestamp, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ tz: currentUser.currentUser.timezone }));
+const UserTimestamp = connect(Timestamp, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ tz: get(currentUser, 'currentUser.timezone', 'UTC') }));
 
 const SearchResultOverview = ({ results }) => {
   const { timestamp } = results;
