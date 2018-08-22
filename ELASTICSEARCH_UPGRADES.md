@@ -19,6 +19,7 @@ We'll use:
   * `ln -s elasticsearch-5.6.10 5`
   * `ln -s elasticsearch-6.3.2 6`
 * Configure elasticsearch versions (see sections below)
+* Set the base URL in your shell `export URL=127.0.0.1:9200` (or whereever elasticsearch is listening for you)
 
 ## Upgrade tests
 
@@ -35,7 +36,7 @@ We'll use:
     ```
 * Wait for index rotation, new index should have new index mapping and settings:
   * Retrieve names of indices created prior to 5.x: 
-    * `http 127.0.0.1:9200/graylog25_*/_settings | jq '[ path(.[] | select(.settings.index.version.created < "5000000"))[] ]'`:
+    * `http $URL/graylog25_*/_settings | jq '[ path(.[] | select(.settings.index.version.created < "5000000"))[] ]'`:
        ```json
        [
         "graylog25_1",
@@ -45,7 +46,7 @@ We'll use:
     * These indices need to be reindexed in order to be able to start a 6.x cluster.
   * Check mapping: After an index rotation (manually or due to retention) the newly installed index mapping template should be used.
     * Verify by running:
-    `http 127.0.0.1:9200/graylog25_*/_mapping | jq '[ path(.[] | select(.mappings.message.properties.gl2_source_input.type == "keyword"))[] ]'`
+    `http $URL/graylog25_*/_mapping | jq '[ path(.[] | select(.mappings.message.properties.gl2_source_input.type == "keyword"))[] ]'`
     ```json
     [
       "graylog25_9",
@@ -60,9 +61,48 @@ We'll use:
     ]
     ```
     * Cross check that the old indices still have the deprecated index mapping:
-    `http 127.0.0.1:9200/graylog25_*/_mapping | jq '[ path(.[] | select(.mappings.message.properties.gl2_source_input.index == "not_analyzed"))[] ]'`
+    `http $URL/graylog25_*/_mapping | jq '[ path(.[] | select(.mappings.message.properties.gl2_source_input.index == "not_analyzed"))[] ]'`
 * Reindex old indices
-  * TODO: this also requires a decision on how to integrate the new names into the relevant index sets and preventing premature retention cleaning 
+  * TODO: this also requires a decision on how to integrate the new names into the relevant index sets and preventing premature retention cleaning
+    * One option is to remove the original index and create an alias in the old name, but we still need to adapt code to chase that alias in when rotation comes
+  * From above, for each index that requires reindexing (we are doing this async):
+    * `http post $URL/_reindex wait_for_completion==false source:='{"index":"graylog25_0"}' dest:='{"index":"graylog25_0-upgrade"}' | jq -r '"http $URL/_tasks/\(.task)"'`:
+    ```
+    http $URL/_tasks/ZdInArkUQXOm4UZSUQGCbw:299408
+    ```
+    * Running that command will give the update on the operation:
+    `http $URL/_tasks/ZdInArkUQXOm4UZSUQGCbw:299408 | jq '{ completed, response }'`
+    ```json
+    {
+      "completed": true,
+      "response": {
+        "took": 5860,
+        "timed_out": false,
+        "total": 102975,
+        "updated": 102975,
+        "created": 0,
+        "deleted": 0,
+        "batches": 103,
+        "version_conflicts": 0,
+        "noops": 0,
+        "retries": {
+          "bulk": 0,
+          "search": 0
+        },
+        "throttled_millis": 0,
+        "requests_per_second": -1,
+        "throttled_until_millis": 0,
+        "failures": []
+      }
+    }
+    ```
+    * Check that the document counts match:
+      * `http $URL/graylog25_0/_count | jq .count`
+      * `http $URL/graylog25_0-upgrade/_count | jq .count`
+    * Remove the original index
+      * `http delete $URL/graylog25_0`
+    * Alias the new index to the old name to make it accessible for searches
+      * `http put $URL/graylog25_0-upgrade/_alias/graylog25_0`
 * Stop 5.6: `Ctrl-C`
 * Copy `56` data to `63`: `cp -R 56 63`
 * Remove cluster name in data directory (or symlink)
