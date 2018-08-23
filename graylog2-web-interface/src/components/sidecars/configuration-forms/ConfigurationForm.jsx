@@ -118,7 +118,10 @@ const ConfigurationForm = createReactClass({
   _onCollectorChange(nextId) {
     const nextFormData = lodash.cloneDeep(this.state.formData);
     nextFormData.collector_id = nextId;
-    nextFormData.template = this._collectorDefaultTemplate(nextId);
+    if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
+      nextFormData.template = this._collectorDefaultTemplate(nextId);
+    }
+
     this.setState({ formData: nextFormData });
   },
 
