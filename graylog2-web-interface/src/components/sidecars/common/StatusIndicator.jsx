@@ -25,6 +25,12 @@ class StatusIndicator extends React.Component {
         className = 'text-danger';
         icon = 'fa-exclamation-triangle';
         break;
+      case 3:
+        text = 'Stopped';
+        className = 'text-danger';
+        icon = 'fa-stop';
+        break;
+
       default:
         text = 'Unknown';
         className = 'text-info';

@@ -78,6 +78,11 @@ const SidecarStatus = createReactClass({
           statusClass = 'text-danger';
           statusBadge = <i className="fa fa-warning fa-fw" />;
           break;
+        case 3:
+          statusMessage = status.message;
+          statusClass = 'text-danger';
+          statusBadge = <i className="fa fa-stop fa-fw" />;
+          break;
         default:
           statusMessage = 'Collector status is currently unknown.';
           statusClass = 'text-info';
