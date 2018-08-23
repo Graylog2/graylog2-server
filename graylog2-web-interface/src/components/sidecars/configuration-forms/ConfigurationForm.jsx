@@ -57,6 +57,8 @@ const ConfigurationForm = createReactClass({
     CollectorsActions.all();
   },
 
+  defaultTemplates: {},
+
   _isTemplateSet(template) {
     return template !== undefined && template !== '';
   },
@@ -115,11 +117,31 @@ const ConfigurationForm = createReactClass({
     ));
   },
 
+  _getCollectorDefaultTemplate(collectorId) {
+    const storedTemplate = this.defaultTemplates[collectorId];
+    if (storedTemplate !== undefined) {
+      return new Promise(resolve => resolve(storedTemplate));
+    }
+
+    return CollectorsActions.getCollector(collectorId).then((collector) => {
+      this.defaultTemplates[collectorId] = collector.default_template;
+      return collector.default_template;
+    });
+  },
+
   _onCollectorChange(nextId) {
+    // Start loading the request to get the default template, so it is available asap.
+    const defaultTemplatePromise = this._getCollectorDefaultTemplate(nextId);
+
     const nextFormData = lodash.cloneDeep(this.state.formData);
     nextFormData.collector_id = nextId;
     if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
-      nextFormData.template = this._collectorDefaultTemplate(nextId);
+      // Wait for the promise to resolve and then update the whole formData state
+      defaultTemplatePromise.then((defaultTemplate) => {
+        nextFormData.template = defaultTemplate;
+        this.setState({ formData: nextFormData });
+      });
+      return;
     }
 
     this.setState({ formData: nextFormData });
@@ -159,16 +181,6 @@ const ConfigurationForm = createReactClass({
     }
 
     return options;
-  },
-
-  _collectorDefaultTemplate(collectorId) {
-    let defaultTemplate = '';
-    this.state.collectors.forEach((collector) => {
-      if (collector.id === collectorId) {
-        defaultTemplate = collector.default_template;
-      }
-    });
-    return defaultTemplate;
   },
 
   _renderCollectorTypeField(collectorId, collectors, configurationSidecars) {
