@@ -23,20 +23,6 @@ import com.google.common.base.Strings;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.client.http.HttpRetryHandler;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.graylog2.indexer.cluster.jest.GraylogJestRetryHandler;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,6 +30,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.graylog2.indexer.cluster.jest.GraylogJestRetryHandler;
+import org.graylog2.indexer.cluster.jest.RequestResponseLogger;
 
 @Singleton
 public class JestClientProvider implements Provider<JestClient> {
@@ -67,6 +66,7 @@ public class JestClientProvider implements Provider<JestClient> {
             @Override
             protected HttpClientBuilder configureHttpClient(HttpClientBuilder builder) {
                 return super.configureHttpClient(builder)
+                    .addInterceptorLast(new RequestResponseLogger())
                     .disableAutomaticRetries();
             }
         };
