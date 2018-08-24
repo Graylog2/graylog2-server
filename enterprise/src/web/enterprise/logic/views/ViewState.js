@@ -33,7 +33,7 @@ export default class ViewState {
   }
 
   static create(): ViewState {
-    return new ViewState([], {}, [], {}, []);
+    return new ViewState([], {}, [], {}, {});
   }
 
   get fields(): FieldNameList {

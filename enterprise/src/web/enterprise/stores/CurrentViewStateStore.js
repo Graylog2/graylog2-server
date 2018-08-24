@@ -1,9 +1,12 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { isEqual } from 'lodash';
+import { isEqual, maxBy } from 'lodash';
+
+import { widgetDefinition } from 'enterprise/logic/Widget';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
+import WidgetPosition from '../logic/widgets/WidgetPosition';
 
 export const CurrentViewStateActions = Reflux.createActions([
   'fields',
@@ -59,7 +62,24 @@ export const CurrentViewStateStore = Reflux.createStore({
   },
 
   widgets(newWidgets) {
-    const newActiveState = this._activeState().toBuilder().widgets(newWidgets).build();
+    const positionsMap = this._activeState().widgetPositions;
+    const widgetsWithoutPositions = newWidgets.filter((widget) => {
+      return !positionsMap[widget.id];
+    });
+
+    widgetsWithoutPositions.forEach((widget) => {
+      const widgetDef = widgetDefinition(widget.type);
+      const positions = Object.keys(positionsMap).map(id => positionsMap[id]);
+      const lastPosition = maxBy(positions, (p) => { return p.row; });
+      const newWidgetRow = lastPosition ? lastPosition.row + lastPosition.height : 1;
+
+      positionsMap[widget.id] = new WidgetPosition(1, newWidgetRow, widgetDef.defaultHeight, widgetDef.defaultWidth);
+    });
+
+    const newActiveState = this._activeState().toBuilder()
+      .widgets(newWidgets)
+      .widgetPositions(positionsMap)
+      .build();
     ViewStatesActions.update(this.activeQuery, newActiveState);
   },
 
