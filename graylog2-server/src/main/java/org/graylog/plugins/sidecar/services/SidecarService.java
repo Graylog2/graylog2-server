@@ -43,7 +43,6 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -144,11 +143,16 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
         try (final Stream<Sidecar> collectorStream = streamAll()) {
             count = collectorStream
                     .mapToInt(collector -> {
-                        if (collector.lastSeen().isBefore(threshold) && Objects.requireNonNull(collector.nodeDetails().statusList()).status() == 0) {
+                        if (collector.nodeDetails().statusList() == null) {
+                            return 0;
+                        }
+                        final CollectorStatusList sidecarStatus = collector.nodeDetails().statusList();
+
+                        if (collector.lastSeen().isBefore(threshold) && sidecarStatus.status() == 0) {
                             NodeDetails nodeDetails = collector.nodeDetails();
 
                             ImmutableSet.Builder<CollectorStatus> collectorStatuses = ImmutableSet.builder();
-                            for (CollectorStatus collectorStatus : Objects.requireNonNull(nodeDetails.statusList()).collectors()) {
+                            for (CollectorStatus collectorStatus : sidecarStatus.collectors()) {
                                 collectorStatuses.add(CollectorStatus.create(
                                         collectorStatus.collectorId(),
                                         3,
