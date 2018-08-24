@@ -36,7 +36,7 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
 
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, Aggregation searchType, ESGeneratedQueryContext queryContext) {
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder();
+        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(searchType.id());
         // aggregation specs do not necessarily map 1 to 1 onto elasticsearch aggregations, for example field stacking required multiple
         // nested aggregations to produce the necessary data. our result also does not follow the elasticsearch query result directly
         // for the same reason.

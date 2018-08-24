@@ -77,7 +77,7 @@ public class ESGroupBy implements ESSearchTypeHandler<GroupBy> {
         final String mainField = groupBy.fields().get(0);
         final List<String> stackedFields = groupBy.fields().subList(1, groupBy.fields().size());
 
-        queryContext.searchSourceBuilder().aggregation(createTermsBuilder(mainField, stackedFields, groupBy));
+        queryContext.searchSourceBuilder(groupBy.id()).aggregation(createTermsBuilder(mainField, stackedFields, groupBy));
     }
 
     @Override

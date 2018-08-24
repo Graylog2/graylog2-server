@@ -49,7 +49,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder();
+        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot.id());
 
         final Map<Object, Object> contextMap = queryContext.contextMap();
         final AggTypes aggTypes = new AggTypes();

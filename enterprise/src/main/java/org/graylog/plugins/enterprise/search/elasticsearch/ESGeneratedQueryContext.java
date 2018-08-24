@@ -27,20 +27,27 @@ import java.util.Set;
 public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     private final ElasticsearchBackend elasticsearchBackend;
-    private SearchSourceBuilder ssb;
+    private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
     // do _NOT_ turn this into a regular hashmap!
     private IdentityHashMap<AggregationSpec, Tuple2<String, Class<? extends Aggregation>>> aggResultTypes = Maps.newIdentityHashMap();
     private Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private Set<SearchError> errors = Sets.newHashSet();
+    private final SearchSourceBuilder ssb;
 
     public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
     }
 
-    public SearchSourceBuilder searchSourceBuilder() {
-        return ssb;
+    public SearchSourceBuilder searchSourceBuilder(String searchTypeId) {
+        final SearchSourceBuilder newSearchSourceBuilder = ssb.copyWithNewSlice(ssb.slice());
+        this.searchTypeQueries.put(searchTypeId, newSearchSourceBuilder);
+        return newSearchSourceBuilder;
+    }
+
+    Map<String, SearchSourceBuilder> searchTypeQueries() {
+        return this.searchTypeQueries;
     }
 
     @Override
