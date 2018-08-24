@@ -45,7 +45,7 @@ public abstract class PluginVersionConstraint implements Constraint {
     public static PluginVersionConstraint of(PluginMetaData pluginMetaData) {
         final Version version = pluginMetaData.getVersion();
         final String versionString = version.toString().replace("-SNAPSHOT", "");
-        final Requirement requirement = Requirement.buildNPM("^" + versionString);
+        final Requirement requirement = Requirement.buildNPM(">=" + versionString);
 
         return builder()
                 .pluginId(pluginMetaData.getUniqueId())
