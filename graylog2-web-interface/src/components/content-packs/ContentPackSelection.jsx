@@ -158,7 +158,11 @@ class ContentPackSelection extends React.Component {
   render() {
     const entitiesComponent = Object.keys(this.state.filteredEntities || {}).map((entityType) => {
       const group = this.state.filteredEntities[entityType];
-      const entities = group.map((entity) => {
+      const entities = group.sort((a, b) => {
+        if (a.title < b.title) return -1;
+        if (a.title > b.title) return 1;
+        return 0;
+      }).map((entity) => {
         const checked = this._isSelected(entity);
         return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
                                     key={entity.id}
