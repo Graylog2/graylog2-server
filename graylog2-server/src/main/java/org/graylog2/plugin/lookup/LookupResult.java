@@ -56,6 +56,12 @@ public abstract class LookupResult {
     @Nullable
     public abstract Map<Object, Object> multiValue();
 
+    /**
+     * The time to live (in milliseconds) for a LookupResult instance. Prevents repeated lookups for the same key
+     * during the time to live period. Data Tables processing does not currently use this functionality, but we
+     * expect to add support for it at some point. Some Data Adaptors may fill this ttl value in anticipation of
+     * future implementation.
+     */
     @JsonProperty("ttl")
     public abstract long cacheTTL();
 
