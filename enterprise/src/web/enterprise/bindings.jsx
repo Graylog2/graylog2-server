@@ -29,6 +29,8 @@ import NumberVisualization from './components/visualizations/number/NumberVisual
 import ExcludeFromQueryHandler from './logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from './components/visualizations/Series';
 import * as Permissions from './Permissions';
+import AggregationControls from './components/aggregationbuilder/AggregationControls';
+import EditMessageList from './components/widgets/EditMessageList';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -60,6 +62,7 @@ export default {
       defaultHeight: 5,
       defaultWidth: 6,
       visualizationComponent: MessageList,
+      editComponent: EditMessageList,
       searchResultTransformer: data => data[0],
       searchTypes: () => [{ type: 'messages' }],
     },
@@ -69,6 +72,7 @@ export default {
       defaultHeight: 4,
       defaultWidth: 4,
       visualizationComponent: AggregationBuilder,
+      editComponent: AggregationControls,
       searchResultTransformer: PivotTransformer,
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget) => {

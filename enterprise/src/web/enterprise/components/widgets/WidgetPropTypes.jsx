@@ -23,3 +23,10 @@ export const WidgetData = PropTypes.oneOfType([
 ]);
 
 export const WidgetDataMap = PropTypes.objectOf(WidgetData);
+
+export const WidgetError = PropTypes.shape({
+  description: PropTypes.string,
+});
+export const WidgetErrorsList = PropTypes.arrayOf(WidgetError);
+export const WidgetErrorsMap = PropTypes.objectOf(WidgetErrorsList);
+

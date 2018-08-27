@@ -17,6 +17,7 @@ import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
 import widgetStyles from '../widgets/Widget.css';
 
 import staticMessageListStyle from './StaticMessageList.css';
+import EditMessageList from '../widgets/EditMessageList';
 
 const StaticMessageList = createReactClass({
   propTypes: {
@@ -53,10 +54,11 @@ const StaticMessageList = createReactClass({
           </span>
           <MeasureDimensions>
             <WidgetHeader hideDragHandle title="All Messages" />
-            <MessageList editing={this.state.editing}
-                         data={this.props.messages}
-                         fields={this.props.fieldTypes.all}
-                         pageSize={100} />
+            <EditMessageList fields={this.props.fieldTypes.all}>
+              <MessageList data={this.props.messages}
+                           fields={this.props.fieldTypes.all}
+                           pageSize={100} />
+            </EditMessageList>
           </MeasureDimensions>
         </span>
       </EditWidgetFrame>
@@ -77,8 +79,7 @@ const StaticMessageList = createReactClass({
             </WidgetActionDropdown>
           </span>
           {this.props.showMessages ? <WidgetHeader hideDragHandle title="All Messages" /> : <span style={{ fontSize: 12 }}>Messages</span>}
-          {this.props.showMessages && <MessageList editing={this.state.editing}
-                                                   data={this.props.messages}
+          {this.props.showMessages && <MessageList data={this.props.messages}
                                                    fields={this.props.fieldTypes.all}
                                                    pageSize={100} />}
         </div>

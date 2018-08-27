@@ -18,22 +18,30 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, positions, queryId, fields, allFields, staticWidgets) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, staticWidgets) => {
   const widgets = {};
   const data = {};
+  const errors = {};
+  const { searchTypes } = results;
 
   widgetDefs.forEach((widget) => {
     const widgetType = widgetDefinition(widget.type);
     const dataTransformer = widgetType.searchResultTransformer || (x => x);
-    const widgetData = (widgetMapping[widget.id] || []).map(searchTypeId => searchTypes[searchTypeId]);
-    if (widgetData) {
-      widgets[widget.id] = widget;
-      data[widget.id] = dataTransformer(widgetData, widget);
+    const searchTypeIds = (widgetMapping[widget.id] || []);
+    const widgetData = searchTypeIds.map(searchTypeId => searchTypes[searchTypeId]).filter(result => result);
+    const widgetErrors = results.errors.filter(e => searchTypeIds.includes(e.searchTypeId));
+
+    widgets[widget.id] = widget;
+    data[widget.id] = dataTransformer(widgetData, widget);
+
+    if (widgetErrors && widgetErrors.length > 0) {
+      errors[widget.id] = widgetErrors;
     }
   });
   return (
     <WidgetGrid allFields={allFields}
                 data={data}
+                errors={errors}
                 fields={fields}
                 locked={false}
                 onPositionsChange={p => _onPositionsChange(p)}
@@ -41,10 +49,6 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, searchTypes, positions, qu
                 staticWidgets={staticWidgets}
                 widgets={widgets} />
   );
-};
-
-const _extractMessages = (searchTypes) => {
-  return new Immutable.Map(searchTypes).find(searchType => searchType.type.toLocaleUpperCase() === 'MESSAGES');
 };
 
 const Query = ({ children, allFields, fields, onToggleMessages, results, positions, showMessages, widgetMapping, widgets, queryId }) => {
@@ -59,7 +63,7 @@ const Query = ({ children, allFields, fields, onToggleMessages, results, positio
                            onToggleMessages={onToggleMessages}
                            showMessages={showMessages} />,
       ];
-      content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results.searchTypes, positions, queryId, fields, allFields, staticWidgets);
+      content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields, staticWidgets);
     }
     return (
       <span>

@@ -10,7 +10,7 @@ import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import Widget from './widgets/Widget';
-import { PositionsMap, WidgetsMap, WidgetDataMap } from './widgets/WidgetPropTypes';
+import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import { TitlesStore } from '../stores/TitlesStore';
 import WidgetPosition from '../logic/widgets/WidgetPosition';
 
@@ -30,6 +30,7 @@ class WidgetGrid extends React.Component {
   static propTypes = {
     allFields: CustomPropTypes.FieldListType.isRequired,
     data: WidgetDataMap.isRequired,
+    errors: WidgetErrorsMap.isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     locked: PropTypes.bool,
     onPositionsChange: PropTypes.func.isRequired,
@@ -55,7 +56,7 @@ class WidgetGrid extends React.Component {
     this.setState({ widgetDimensions: widgetDimensions });
   };
 
-  _renderWidgets = (widgets, positions, data) => {
+  _renderWidgets = (widgets, positions, data, errors) => {
     const returnedWidgets = { positions: {}, widgets: [] };
 
     if (!widgets || _.isEmpty(widgets) || !data) {
@@ -75,6 +76,7 @@ class WidgetGrid extends React.Component {
       const widget = widgets[widgetId];
       const dataKey = widget.data || widgetId;
       const widgetData = data[dataKey];
+      const widgetErrors = errors[widgetId] || [];
 
       returnedWidgets.positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
 
@@ -88,6 +90,7 @@ class WidgetGrid extends React.Component {
                   id={widgetId}
                   widget={widget}
                   data={widgetData}
+                  errors={widgetErrors}
                   height={height}
                   position={returnedWidgets.positions[widgetId]}
                   width={width}
@@ -105,7 +108,7 @@ class WidgetGrid extends React.Component {
 
   render() {
     const { staticWidgets } = this.props;
-    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data);
+    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data, this.props.errors);
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer animate={false}
                           locked={this.props.locked}

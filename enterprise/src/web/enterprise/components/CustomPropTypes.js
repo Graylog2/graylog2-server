@@ -12,4 +12,9 @@ const CurrentView = PropTypes.shape({
   activeQuery: PropTypes.string.isRequired,
 });
 
-export default Object.assign({ CurrentView, FieldListType, FieldType, TimeRangeType }, PropTypes);
+const OneOrMoreChildren = PropTypes.oneOfType([
+  PropTypes.element,
+  PropTypes.arrayOf(PropTypes.element),
+]);
+
+export default Object.assign({ CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType }, PropTypes);

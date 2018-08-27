@@ -3,26 +3,21 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import connect from 'stores/connect';
 import Immutable from 'immutable';
-import naturalSort from 'javascript-natural-sort';
 
 import { MessageTableEntry } from 'enterprise/components/messagelist';
 import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
-import { Row, Col } from 'react-bootstrap';
 
-import { SelectedFieldsActions } from 'enterprise/stores/SelectedFieldsStore';
+import { SelectedFieldsActions, SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import CombinedProvider from 'injection/CombinedProvider';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
-import Select from 'components/common/Select';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
-import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 
-import DescriptionBox from '../aggregationbuilder/DescriptionBox';
 import styles from './MessageList.css';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
@@ -44,7 +39,6 @@ const MessageList = createReactClass({
     }).isRequired,
     filter: PropTypes.string,
     config: PropTypes.object,
-    editing: PropTypes.bool,
     containerHeight: PropTypes.number,
     inputs: PropTypes.object,
     nodes: PropTypes.object,
@@ -131,17 +125,6 @@ const MessageList = createReactClass({
     return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
   },
 
-  _onFieldSelectionChanged(fields) {
-    const newFields = fields.split(',');
-    if (this.props.config) {
-      const newConfigBuilder = this.props.config.toBuilder();
-      const newConfig = newConfigBuilder.fields(newFields).build();
-      WidgetActions.updateConfig(this.props.id, newConfig);
-    } else {
-      SelectedFieldsActions.set(newFields);
-    }
-  },
-
   render() {
     let maxHeight = null;
     if (this.props.containerHeight) {
@@ -171,85 +154,66 @@ const MessageList = createReactClass({
     const { streams } = this.props.availableStreams;
     const streamsMap = Immutable.Map(streams.map(stream => [stream.id, stream]));
     const allStreams = Immutable.List(streams);
-    const fieldsForSelect = this.props.fields
-      .map(fieldType => fieldType.name)
-      .map(fieldName => ({ label: fieldName, value: fieldName }))
-      .valueSeq()
-      .toJS()
-      .sort((v1, v2) => naturalSort(v1.label, v2.label));
-    const selectedFieldsForSelect = selectedFields.join(',');
 
     return (
       <span>
-        <Row>
-          {this.props.editing &&
-            <Col md={3}>
-              <DescriptionBox description="Fields">
-                <Select options={fieldsForSelect}
-                        onChange={this._onFieldSelectionChanged}
-                        value={selectedFieldsForSelect}
-                        multi
-                />
-              </DescriptionBox>
-            </Col>
-          }
-          <Col md={this.props.editing ? 9 : 12}>
-            <div className={styles.messageListPaginator}>
-              <MessageTablePaginator currentPage={Number(this.state.currentPage)}
-                                     onPageChange={newPage => this.setState({ currentPage: newPage })}
-                                     pageSize={pageSize}
-                                     position="top"
-                                     resultCount={messages.length} />
-            </div>
+        <div className={styles.messageListPaginator}>
+          <MessageTablePaginator currentPage={Number(this.state.currentPage)}
+                                 onPageChange={newPage => this.setState({ currentPage: newPage })}
+                                 pageSize={pageSize}
+                                 position="top"
+                                 resultCount={messages.length} />
+        </div>
 
-            <div className="search-results-table" style={{ overflow: 'auto', height: '100%', maxHeight: maxHeight }}>
-              <div className="table-responsive">
-                <div className={`messages-container ${styles.messageListTableHeader}`}>
-                  <table className="table table-condensed messages" style={{ marginTop: 0 }}>
-                    <thead>
-                      <tr>
-                        <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId={activeQuery} type={this._fieldTypeFor('timestamp', fields)} /></th>
-                        {selectedColumns.toSeq().map((selectedFieldName) => {
-                          return (
-                            <th key={selectedFieldName}
-                                style={this._columnStyle(selectedFieldName)}>
-                              <Field interactive
-                                     type={this._fieldTypeFor(selectedFieldName, fields)}
-                                     name={selectedFieldName}
-                                     queryId={activeQuery}
-                                     viewId={view.id} />
-                            </th>
-                          );
-                        })}
-                      </tr>
-                    </thead>
-                    {messageSlice.map((message) => {
-                      const messageKey = `${message.index}-${message.id}`;
+        <div className="search-results-table" style={{ overflow: 'auto', height: '100%', maxHeight: maxHeight }}>
+          <div className="table-responsive">
+            <div className={`messages-container ${styles.messageListTableHeader}`}>
+              <table className="table table-condensed messages" style={{ marginTop: 0 }}>
+                <thead>
+                  <tr>
+                    <th style={{ width: 180 }}><Field interactive
+                                                      name="Timestamp"
+                                                      queryId={activeQuery}
+                                                      type={this._fieldTypeFor('timestamp', fields)} /></th>
+                    {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
-                        <MessageTableEntry key={messageKey}
-                                           fields={fields}
-                                           disableSurroundingSearch
-                                           message={message}
-                                           showMessageRow={selectedFields.contains('message')}
-                                           selectedFields={selectedColumns}
-                                           expanded={this.state.expandedMessages.contains(messageKey)}
-                                           toggleDetail={this._toggleMessageDetail}
-                                           inputs={inputsMap}
-                                           streams={streamsMap}
-                                           allStreams={allStreams}
-                                           allStreamsLoaded
-                                           nodes={nodesMap}
-                                           highlight={false}
-                                           expandAllRenderAsync={false}
-                                           searchConfig={this.props.configurations.searchesClusterConfig} />
+                        <th key={selectedFieldName}
+                            style={this._columnStyle(selectedFieldName)}>
+                          <Field interactive
+                                 type={this._fieldTypeFor(selectedFieldName, fields)}
+                                 name={selectedFieldName}
+                                 queryId={activeQuery}
+                                 viewId={view.id} />
+                        </th>
                       );
                     })}
-                  </table>
-                </div>
-              </div>
+                  </tr>
+                </thead>
+                {messageSlice.map((message) => {
+                  const messageKey = `${message.index}-${message.id}`;
+                  return (
+                    <MessageTableEntry key={messageKey}
+                                       fields={fields}
+                                       disableSurroundingSearch
+                                       message={message}
+                                       showMessageRow={selectedFields.contains('message')}
+                                       selectedFields={selectedColumns}
+                                       expanded={this.state.expandedMessages.contains(messageKey)}
+                                       toggleDetail={this._toggleMessageDetail}
+                                       inputs={inputsMap}
+                                       streams={streamsMap}
+                                       allStreams={allStreams}
+                                       allStreamsLoaded
+                                       nodes={nodesMap}
+                                       highlight={false}
+                                       expandAllRenderAsync={false}
+                                       searchConfig={this.props.configurations.searchesClusterConfig} />
+                  );
+                })}
+              </table>
             </div>
-          </Col>
-        </Row>
+          </div>
+        </div>
       </span>
     );
   },

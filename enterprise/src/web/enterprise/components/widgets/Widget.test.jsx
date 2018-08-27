@@ -6,6 +6,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import Widget from './Widget';
 import WidgetPosition from '../../logic/widgets/WidgetPosition';
 import LoadingWidget from './LoadingWidget';
+import ErrorWidget from './ErrorWidget';
 
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => mockComponent('WidgetHeader'));
@@ -48,6 +49,32 @@ describe('<Widget />', () => {
               position={new WidgetPosition(1, 1, 1, 1)} />
     ));
     expect(wrapper.find(LoadingWidget)).toHaveLength(1);
+  });
+  it('should render error widget for widget with one error', () => {
+    const wrapper = mount((
+      <Widget widget={{}}
+              errors={[{ description: 'The widget has failed: the dungeon collapsed, you die!' }]}
+              onSizeChange={() => {}}
+              position={new WidgetPosition(1, 1, 1, 1)} />
+    ));
+    const errorWidgets = wrapper.find(ErrorWidget);
+    expect(errorWidgets).toHaveLength(1);
+    expect(errorWidgets).toIncludeText('The widget has failed: the dungeon collapsed, you die!');
+  });
+  it('should render error widget including all error messages for widget with multiple errors', () => {
+    const wrapper = mount((
+      <Widget widget={{}}
+              errors={[
+                { description: 'Something is wrong' },
+                { description: 'Very wrong' },
+              ]}
+              onSizeChange={() => {}}
+              position={new WidgetPosition(1, 1, 1, 1)} />
+    ));
+    const errorWidgets = wrapper.find(ErrorWidget);
+    expect(errorWidgets).toHaveLength(1);
+    expect(errorWidgets).toIncludeText('Something is wrong');
+    expect(errorWidgets).toIncludeText('Very wrong');
   });
   it('should render correct widget visualization for widget with data', () => {
     const wrapper = mount((

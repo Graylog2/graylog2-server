@@ -20,6 +20,8 @@ import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
 import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 import LoadingWidget from './LoadingWidget';
+import ErrorWidget from './ErrorWidget';
+import { WidgetErrorsMap } from './WidgetPropTypes';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -29,6 +31,7 @@ class Widget extends React.Component {
       config: PropTypes.object.isRequired,
     }).isRequired,
     data: PropTypes.any,
+    errors: WidgetErrorsMap,
     height: PropTypes.number,
     width: PropTypes.number,
     fields: PropTypes.any.isRequired,
@@ -36,16 +39,24 @@ class Widget extends React.Component {
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     position: PropTypes.object.isRequired,
+    view: PropTypes.shape({
+      activeQuery: PropTypes.string,
+    }).isRequired,
   };
 
   static defaultProps = {
     height: 1,
     width: 1,
     data: undefined,
+    errors: undefined,
   };
 
   static _visualizationForType(type) {
     return widgetDefinition(type).visualizationComponent;
+  }
+
+  static _editComponentForType(type) {
+    return widgetDefinition(type).editComponent;
   }
 
   constructor(props) {
@@ -81,14 +92,17 @@ class Widget extends React.Component {
     WidgetActions.updateConfig(widgetId, config);
   };
 
-  render() {
-    const { id, widget, data, height, width, fields, onSizeChange, title } = this.props;
-    const { config, computationTimeRange, filter } = widget;
-    const VisComponent = data ? Widget._visualizationForType(widget.type) : LoadingWidget;
-    const { editing } = this.state;
-    const { activeQuery } = this.props.view;
-    const visualization = (
-      <VisComponent id={id}
+  visualize = () => {
+    const { data, errors } = this.props;
+    if (errors && errors.length > 0) {
+      return <ErrorWidget errors={errors} />;
+    }
+    if (data) {
+      const { editing } = this.state;
+      const { id, widget, height, width, fields } = this.props;
+      const { config, computationTimeRange, filter } = widget;
+      const VisComponent = Widget._visualizationForType(widget.type);
+      return (<VisComponent id={id}
                     editing={editing}
                     title={widget.title}
                     config={config}
@@ -97,13 +111,21 @@ class Widget extends React.Component {
                     height={height}
                     width={width}
                     filter={filter}
-                    onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}
                     onFinishEditing={this._onToggleEdit}
-                    computationTimeRange={computationTimeRange} />
-    );
+                    computationTimeRange={computationTimeRange} />);
+    }
+    return <LoadingWidget />;
+  };
+  render() {
+    const { id, widget, fields, onSizeChange, title } = this.props;
+    const { editing } = this.state;
+    const { config, filter } = widget;
+    const { activeQuery } = this.props.view;
+    const visualization = this.visualize();
     const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
     if (editing) {
       let editWidgetFrameContent = null;
+      const EditComponent = Widget._editComponentForType(widget.type);
       return (
         <EditWidgetFrame widgetId={id}>
           <span ref={(elem) => { editWidgetFrameContent = elem; }}>
@@ -119,7 +141,12 @@ class Widget extends React.Component {
                   <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
                 </WidgetActionDropdown>
               </WidgetHeader>
-              {visualization}
+              <EditComponent config={config}
+                             fields={fields}
+                             id={id}
+                             onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
+                {visualization}
+              </EditComponent>
             </MeasureDimensions>
           </span>
         </EditWidgetFrame>

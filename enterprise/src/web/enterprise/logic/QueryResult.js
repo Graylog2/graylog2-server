@@ -1,6 +1,7 @@
 import { mapValues } from 'lodash';
 
 import { searchTypeDefinition } from 'enterprise/logic/SearchType';
+import SearchError from './SearchError';
 
 const _findMessages = (results) => {
   return Object.keys(results.searchTypes)
@@ -25,6 +26,7 @@ export default class QueryResult {
     const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
     this._state = {
       query: queryResult.query,
+      errors: queryResult.error.map(error => new SearchError(error)),
       duration,
       timestamp,
       effectiveTimerange: effective_timerange,
@@ -35,17 +37,18 @@ export default class QueryResult {
     };
   }
 
-  get query() { return this._state.query; }
-  get duration() { return this._state.duration; }
-  get timestamp() { return this._state.timestamp; }
-  get effectiveTimerange() { return this._state.effectiveTimerange; }
-  get searchTypes() { return this._state.searchTypes; }
   get documentCount() {
     const messages = _findMessages(this);
     return messages.total;
   }
+  get duration() { return this._state.duration; }
+  get effectiveTimerange() { return this._state.effectiveTimerange; }
+  get errors() { return this._state.errors; }
   get messages() {
     return _findMessages(this);
   }
+  get query() { return this._state.query; }
+  get searchTypes() { return this._state.searchTypes; }
+  get timestamp() { return this._state.timestamp; }
 }
 

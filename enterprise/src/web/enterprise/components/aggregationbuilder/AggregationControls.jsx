@@ -16,13 +16,15 @@ import DescriptionBox from './DescriptionBox';
 export default class AggregationControls extends React.Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
-    columnPivots: PivotList,
+    config: PropTypes.shape({
+      columnPivots: PivotList,
+      rowPivots: PivotList,
+      series: PropTypes.arrayOf(PropTypes.string),
+      sort: PropTypes.arrayOf(PropTypes.string),
+      visualization: PropTypes.string,
+    }).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,
-    rowPivots: PivotList,
-    series: PropTypes.arrayOf(PropTypes.string),
-    sort: PropTypes.arrayOf(PropTypes.string),
-    visualization: PropTypes.string,
   };
 
   static defaultProps = {
@@ -36,9 +38,9 @@ export default class AggregationControls extends React.Component {
   constructor(props) {
     super(props);
 
-    const { columnPivots, rowPivots, sort, series, visualization } = props;
-    const config = new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization);
-    this.state = { config };
+    const { config } = props;
+    const { columnPivots, rowPivots, sort, series, visualization } = config;
+    this.state = { config: new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization) };
   }
 
   _onColumnPivotChange = (columnPivots) => {

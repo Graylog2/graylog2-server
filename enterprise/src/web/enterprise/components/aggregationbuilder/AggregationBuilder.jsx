@@ -32,23 +32,13 @@ export default class AggregationBuilder extends React.Component {
   }
 
   render() {
-    const { config, data, fields, onChange } = this.props;
+    const { config, data } = this.props;
     const VisComponent = AggregationBuilder._visualizationForType(config.visualization || defaultVisualizationType);
     const chartData = data && data[0] ? data : [];
-    const children = (
+    return (
       <FullSizeContainer>
         <VisComponent {...this.props} data={chartData} />
       </FullSizeContainer>
-    );
-    const content = this.props.editing ? (
-      <AggregationControls fields={fields} onChange={onChange} {...config.toObject()}>
-        {children}
-      </AggregationControls>
-    ) : children;
-    return (
-      <span>
-        {content}
-      </span>
     );
   }
 }
