@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import naturalSort from 'javascript-natural-sort';
 
 import { Row, Col, Panel } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -156,37 +157,35 @@ class ContentPackSelection extends React.Component {
   };
 
   render() {
-    const entitiesComponent = Object.keys(this.state.filteredEntities || {}).map((entityType) => {
-      const group = this.state.filteredEntities[entityType];
-      const entities = group.sort((a, b) => {
-        if (a.title < b.title) return -1;
-        if (a.title > b.title) return 1;
-        return 0;
-      }).map((entity) => {
-        const checked = this._isSelected(entity);
-        return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
-                                    key={entity.id}
-                                    checked={checked}
-                                    expandable={false}
-                                    header={entity.title} />);
+    const entitiesComponent = Object.keys(this.state.filteredEntities || {})
+      .sort((a, b) => naturalSort(a, b))
+      .map((entityType) => {
+        const group = this.state.filteredEntities[entityType];
+        const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
+          const checked = this._isSelected(entity);
+          return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
+                                      key={entity.id}
+                                      checked={checked}
+                                      expandable={false}
+                                      header={entity.title} />);
+        });
+        if (group.length <= 0) {
+          return null;
+        }
+        return (
+          <ExpandableListItem key={entityType}
+                              onChange={() => this._updateSelectionGroup(entityType)}
+                              indetermined={this._isUndetermined(entityType)}
+                              checked={this._isGroupSelected(entityType)}
+                              stayExpanded={this.state.isFiltered}
+                              expanded={this.state.isFiltered}
+                              header={ContentPackSelection._toDisplayTitle(entityType)}>
+            <ExpandableList>
+              {entities}
+            </ExpandableList>
+          </ExpandableListItem>
+        );
       });
-      if (group.length <= 0) {
-        return null;
-      }
-      return (
-        <ExpandableListItem key={entityType}
-                            onChange={() => this._updateSelectionGroup(entityType)}
-                            indetermined={this._isUndetermined(entityType)}
-                            checked={this._isGroupSelected(entityType)}
-                            stayExpanded={this.state.isFiltered}
-                            expanded={this.state.isFiltered}
-                            header={ContentPackSelection._toDisplayTitle(entityType)}>
-          <ExpandableList>
-            {entities}
-          </ExpandableList>
-        </ExpandableListItem>
-      );
-    });
 
     const { errors } = this.state;
 
