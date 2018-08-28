@@ -34,8 +34,6 @@ public class IndexMapping6 extends IndexMapping {
                 "filter", "lowercase"));
         final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
         final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
-        // mapping types are deprecated, 7.0 and later will only allow `_doc` here, so we start using that
-        // see https://www.elastic.co/guide/en/elasticsearch/reference/6.3/removal-of-types.html#_schedule_for_removal_of_mapping_types
         final Map<String, Object> mappings = ImmutableMap.of(IndexMapping.TYPE_MESSAGE, messageMapping(analyzer));
 
         return ImmutableMap.of(
