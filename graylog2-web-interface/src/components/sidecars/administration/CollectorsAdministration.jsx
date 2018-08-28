@@ -186,11 +186,15 @@ const CollectorsAdministration = createReactClass({
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
     const configAssignment = sidecar.assignments.find(assignment => assignment.collector_id === collector.id) || {};
     const configuration = configurations.find(config => config.id === configAssignment.configuration_id);
-    let collectorStatus;
+    let collectorStatus = { status: null, message: null, id: null };
     try {
       const result = sidecar.node_details.status.collectors.find(c => c.collector_id === collector.id);
       if (result) {
-        collectorStatus = result.status;
+        collectorStatus = {
+          status: result.status,
+          message: result.message,
+          id: result.collector_id,
+        };
       }
     } catch (e) {
       // Do nothing
@@ -207,7 +211,9 @@ const CollectorsAdministration = createReactClass({
         </Col>
         <Col lg={1} md={2} xs={3}>
           <span className={style.additionalContent}>
-            {configuration && <StatusIndicator status={collectorStatus} />}
+            {configuration && <StatusIndicator status={collectorStatus.status}
+                                               message={collectorStatus.message}
+                                               id={collectorStatus.id} />}
           </span>
         </Col>
         <Col lg={1} md={2} xs={3}>

@@ -1,19 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 
 class StatusIndicator extends React.Component {
   static propTypes = {
     status: PropTypes.number,
+    message: PropTypes.string,
+    id: PropTypes.string,
   };
 
   static defaultProps = {
     status: -1,
+    message: '',
+    id: '',
   };
 
   render() {
     let text;
     let icon;
     let className;
+
     switch (this.props.status) {
       case 0:
         text = 'Running';
@@ -37,10 +43,18 @@ class StatusIndicator extends React.Component {
         icon = 'fa-question-circle';
     }
 
-    return (
-      <span className={`${className}`}><i className={`fa ${icon}`} /> {text}</span>
-    );
-
+    if (this.props.message && this.props.id) {
+      const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{this.props.message}</Tooltip>;
+      return (
+        <OverlayTrigger placement="top" overlay={tooltip} rootClose>
+          <span className={`${className}`}><i className={`fa ${icon}`} /> {text}</span>
+        </OverlayTrigger>
+      );
+    } else {
+      return (
+        <span className={`${className}`}><i className={`fa ${icon}`} /> {text}</span>
+      );
+    }
   }
 }
 

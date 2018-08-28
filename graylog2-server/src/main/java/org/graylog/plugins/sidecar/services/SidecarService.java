@@ -155,11 +155,11 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                             for (CollectorStatus collectorStatus : sidecarStatus.collectors()) {
                                 collectorStatuses.add(CollectorStatus.create(
                                         collectorStatus.collectorId(),
-                                        3,
+                                        1, // state unknown, cause lost connection
                                         message));
                             }
                             CollectorStatusList statusListToSave = CollectorStatusList.create(
-                                    3,
+                                    1, // unknown
                                     message,
                                     collectorStatuses.build()
                             );

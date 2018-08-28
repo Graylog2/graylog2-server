@@ -24,9 +24,13 @@ class SidecarRow extends React.Component {
     const sidecar = this.props.sidecar;
     const sidecarClass = sidecar.active ? '' : style.greyedOut;
     const annotation = sidecar.active ? '' : ' (inactive)';
-    let sidecarStatus = null;
-    if (sidecar.node_details.status) {
-      sidecarStatus = sidecar.node_details.status.status;
+    let sidecarStatus = { status: null, message: null, id: null };
+    if (sidecar.node_details.status && sidecar.node_details.status.status >= 0) {
+      sidecarStatus = {
+        status: sidecar.node_details.status.status,
+        message: sidecar.node_details.status.message,
+        id: sidecar.node_id,
+      };
     }
     return (
       <tr className={sidecarClass}>
@@ -39,7 +43,9 @@ class SidecarRow extends React.Component {
           }
         </td>
         <td>
-          <StatusIndicator status={sidecarStatus} />
+          <StatusIndicator status={sidecarStatus.status}
+                           message={sidecarStatus.message}
+                           id={sidecarStatus.id} />
         </td>
         <td>
           <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />&ensp;
