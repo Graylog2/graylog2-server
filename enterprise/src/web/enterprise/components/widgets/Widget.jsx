@@ -22,6 +22,7 @@ import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsMap } from './WidgetPropTypes';
+import EmptyResultWidget from './EmptyResultWidget';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -67,6 +68,7 @@ class Widget extends React.Component {
   }
 
   _onDelete = (widget) => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to remove the widget "${this.props.title}"?`)) {
       WidgetActions.remove(widget.id);
     }

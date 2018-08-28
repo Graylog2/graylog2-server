@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-import styles from './LoadingWidget.css';
+import styles from './MessageWidgets.css';
 
 const LoadingWidget = () => (
   <div className={styles.spinnerContainer}>

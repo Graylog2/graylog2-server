@@ -44,6 +44,7 @@ class WidgetGrid extends React.Component {
     locked: true,
     staticWidgets: [],
     positions: {},
+    errors: {},
   };
 
   state = {

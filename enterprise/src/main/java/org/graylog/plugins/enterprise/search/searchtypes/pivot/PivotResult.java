@@ -24,6 +24,9 @@ public abstract class PivotResult implements SearchType.Result {
     @JsonProperty
     public abstract ImmutableList<Row> rows();
 
+    @JsonProperty
+    public abstract long total();
+
     public static Builder builder() {
         return new AutoValue_PivotResult.Builder();
     }
@@ -46,6 +49,8 @@ public abstract class PivotResult implements SearchType.Result {
             rowsBuilder().addAll(rows);
             return this;
         }
+
+        public abstract Builder total(long total);
 
         public abstract PivotResult build();
     }

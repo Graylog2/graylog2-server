@@ -22,7 +22,7 @@ public interface ESSearchTypeHandler<S extends SearchType> extends SearchTypeHan
         // this way we don't have to duplicate this step everywhere
         MetricAggregation aggregations = queryResult.getAggregations();
         if (searchType.filter() != null) {
-            aggregations = queryResult.getAggregations().getAggregation("filtered-" + searchType.id(), FilterAggregation.class);
+            aggregations = queryResult.getAggregations().getAggregation(queryContext.filterName(searchType), FilterAggregation.class);
         }
         return doExtractResult(job, query, searchType, queryResult, aggregations, queryContext);
     }

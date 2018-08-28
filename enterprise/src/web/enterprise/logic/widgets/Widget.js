@@ -63,6 +63,11 @@ class Widget {
   static registerSubtype(type: string, implementingClass: typeof Widget) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
+
+  static builder() {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
+  }
 }
 
 class Builder {

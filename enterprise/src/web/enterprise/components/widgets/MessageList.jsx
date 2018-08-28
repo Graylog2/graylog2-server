@@ -126,14 +126,14 @@ const MessageList = createReactClass({
   },
 
   render() {
+    const { containerHeight, data, fields, filter } = this.props;
     let maxHeight = null;
-    if (this.props.containerHeight) {
-      maxHeight = this.props.containerHeight - 60;
+    if (containerHeight) {
+      maxHeight = containerHeight - 60;
     }
     const pageSize = this.props.pageSize || 7;
-    const messages = this.props.data.messages || [];
-    const { fields, filter } = this.props;
-    const filteredMessages = filter && filter !== '' ? this._filterMessages(this.props.filter, messages) : messages;
+    const messages = (data && data.messages) || [];
+    const filteredMessages = filter && filter !== '' ? this._filterMessages(filter, messages) : messages;
     const messageSlice = filteredMessages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
       .map((m) => {

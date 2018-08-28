@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { AggregationType } from './AggregationBuilderPropTypes';
-import AggregationControls from './AggregationControls';
 import FullSizeContainer from './FullSizeContainer';
+import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
 const defaultVisualizationType = 'table';
 
@@ -33,11 +33,13 @@ export default class AggregationBuilder extends React.Component {
 
   render() {
     const { config, data } = this.props;
+    if (!data || data.total === 0) {
+      return <EmptyResultWidget />;
+    }
     const VisComponent = AggregationBuilder._visualizationForType(config.visualization || defaultVisualizationType);
-    const chartData = data && data[0] ? data : [];
     return (
       <FullSizeContainer>
-        <VisComponent {...this.props} data={chartData} />
+        <VisComponent {...this.props} data={data.rows} />
       </FullSizeContainer>
     );
   }

@@ -14,6 +14,7 @@ const _searchTypePlugin = (type) => {
   return typeDefinition && typeDefinition.handler ? searchTypeDefinition(type).handler :
     {
       convert: (result) => {
+        // eslint-disable-next-line no-console
         console.log(`No search type handler for type '${type}' result:`, result);
         return result;
       },
@@ -39,7 +40,7 @@ export default class QueryResult {
 
   get documentCount() {
     const messages = _findMessages(this);
-    return messages.total;
+    return messages ? messages.total : 0;
   }
   get duration() { return this._state.duration; }
   get effectiveTimerange() { return this._state.effectiveTimerange; }

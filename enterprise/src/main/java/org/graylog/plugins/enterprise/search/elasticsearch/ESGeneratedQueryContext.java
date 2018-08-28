@@ -78,10 +78,14 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         return elasticsearchBackend.generateFilterClause(filter);
     }
 
+    public String filterName(SearchType searchType) {
+        return "filtered-" + searchType.id();
+    }
+
     public void addFilteredAggregation(AggregationBuilder builder, SearchType searchType) {
         final Optional<QueryBuilder> filterClause = generateFilterClause(searchType.filter());
         if (filterClause.isPresent()) {
-            builder = AggregationBuilders.filter("filtered-" + searchType.id(), filterClause.get())
+            builder = AggregationBuilders.filter(filterName(searchType), filterClause.get())
                     .subAggregation(builder);
         }
         ssb.aggregation(builder);
@@ -90,7 +94,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     public void addFilteredAggregations(Collection<AggregationBuilder> builders, SearchType searchType) {
         final Optional<QueryBuilder> filterClause = generateFilterClause(searchType.filter());
         if (filterClause.isPresent()) {
-            final FilterAggregationBuilder filter = AggregationBuilders.filter("filtered-" + searchType.id(), filterClause.get());
+            final FilterAggregationBuilder filter = AggregationBuilders.filter(filterName(searchType), filterClause.get());
             builders.forEach(filter::subAggregation);
             ssb.aggregation(filter);
         } else {

@@ -5,8 +5,9 @@ import { mount } from 'enzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import Widget from 'enterprise/components/widgets/Widget';
+import _Widget from 'enterprise/logic/widgets/Widget';
 import WidgetGrid from './WidgetGrid';
-import Widget from './widgets/Widget';
 
 jest.mock('./widgets/Widget', () => mockComponent('Widget'));
 jest.mock('components/common/ReactGridContainer', () => mockComponent('ReactGridContainer'));
@@ -31,7 +32,7 @@ describe('<WidgetGrid />', () => {
 
   it('should render with widgets passed', () => {
     const widgets = {
-      widget1: { type: 'dummy', id: 'widget1' },
+      widget1: _Widget.builder().type('dummy').id('widget1').build(),
     };
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
@@ -49,7 +50,7 @@ describe('<WidgetGrid />', () => {
 
   it('should render widget even if widget has no data', () => {
     const widgets = {
-      widget1: { type: 'dummy', id: 'widget1' },
+      widget1: _Widget.builder().type('dummy').id('widget1').build(),
     };
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),

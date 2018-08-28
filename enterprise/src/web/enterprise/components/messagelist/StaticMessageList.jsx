@@ -18,6 +18,7 @@ import widgetStyles from '../widgets/Widget.css';
 
 import staticMessageListStyle from './StaticMessageList.css';
 import EditMessageList from '../widgets/EditMessageList';
+import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
 const StaticMessageList = createReactClass({
   propTypes: {
@@ -25,6 +26,7 @@ const StaticMessageList = createReactClass({
       all: ImmutablePropTypes.listOf(PropTypes.instanceOf(FieldTypeMapping)),
     }).isRequired,
     messages: PropTypes.shape({
+      total: PropTypes.number.isRequired,
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
     onToggleMessages: PropTypes.func.isRequired,
@@ -67,6 +69,11 @@ const StaticMessageList = createReactClass({
 
   renderWidget() {
     const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${widgetStyles.widgetActionDropdownCaret} ${widgetStyles.tonedDown}`} />;
+    const messageList = this.props.messages.total > 0 ? (
+      <MessageList data={this.props.messages}
+                   fields={this.props.fieldTypes.all}
+                   pageSize={100} />
+    ) : <EmptyResultWidget />;
     return (
       <div className={style.widgetContainer}>
         <div className="widget">
@@ -79,9 +86,7 @@ const StaticMessageList = createReactClass({
             </WidgetActionDropdown>
           </span>
           {this.props.showMessages ? <WidgetHeader hideDragHandle title="All Messages" /> : <span style={{ fontSize: 12 }}>Messages</span>}
-          {this.props.showMessages && <MessageList data={this.props.messages}
-                                                   fields={this.props.fieldTypes.all}
-                                                   pageSize={100} />}
+          {this.props.showMessages && messageList}
         </div>
       </div>
     );

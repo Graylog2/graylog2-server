@@ -4,3 +4,7 @@
     justify-content: center;
     align-items: center;
 }
+
+:local(.iconMargin) {
+    margin-right: 1rem;
+}

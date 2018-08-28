@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
+import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import one.util.streamex.EntryStream;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -66,7 +67,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             final Optional<QueryBuilder> queryBuilder = queryContext.generateFilterClause(pivot.filter());
             if (queryBuilder.isPresent()) {
                 final QueryBuilder filterClause = queryBuilder.get();
-                previousAggregation = AggregationBuilders.filter("filtered-" + pivot.id(), filterClause);
+                previousAggregation = AggregationBuilders.filter(queryContext.filterName(pivot), filterClause);
                 searchSourceBuilder.aggregation(previousAggregation);
             }
         }
@@ -151,7 +152,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
-        final PivotResult.Builder resultBuilder = PivotResult.builder().id(pivot.id());
+        final PivotResult.Builder resultBuilder = PivotResult.builder()
+                .id(pivot.id())
+                .total(extractDocumentCount(queryResult, pivot, queryContext));
 
         // pivot results are a table where cells can contain multiple "values" and not only scalars:
         // each combination of row and column groups can contain all series (if rollup is true)
@@ -165,6 +168,19 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), aggregations);
 
         return resultBuilder.build();
+    }
+
+    private long extractDocumentCount(SearchResult queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
+        if (pivot.filter() != null) {
+            final MetricAggregation aggregations = queryResult.getAggregations();
+            if (aggregations == null) {
+                return 0;
+            }
+            final FilterAggregation filterAggregation = aggregations.getFilterAggregation(queryContext.filterName(pivot));
+            return filterAggregation == null ? 0 : filterAggregation.getCount();
+        }
+
+        return queryResult.getTotal();
     }
 
 

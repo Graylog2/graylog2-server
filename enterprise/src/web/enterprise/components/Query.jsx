@@ -11,7 +11,6 @@ import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore';
 import StaticMessageList from './messagelist/StaticMessageList';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
-import EmptySearchResult from './EmptySearchResult';
 
 const _onPositionsChange = (positions) => {
   const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width)])).toJS();
@@ -37,6 +36,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
     if (widgetErrors && widgetErrors.length > 0) {
       errors[widget.id] = widgetErrors;
     }
+
+    if (!widgetData || widgetData.length === 0) {
+      const queryErrors = results.errors.filter(e => e.type === 'query');
+      if (queryErrors.length > 0) {
+        errors[widget.id] = errors[widget.id] ? [].concat(errors[widget.id], queryErrors) : queryErrors;
+      }
+    }
   });
   return (
     <WidgetGrid allFields={allFields}
@@ -53,18 +59,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 
 const Query = ({ children, allFields, fields, onToggleMessages, results, positions, showMessages, widgetMapping, widgets, queryId }) => {
   if (results) {
-    let content;
-    if (results.documentCount === 0) {
-      content = <EmptySearchResult />;
-    } else {
-      const staticWidgets = [
-        <StaticMessageList key="staticMessageList"
-                           messages={results.messages}
-                           onToggleMessages={onToggleMessages}
-                           showMessages={showMessages} />,
-      ];
-      content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields, staticWidgets);
-    }
+    const staticWidgets = [
+      <StaticMessageList key="staticMessageList"
+                         messages={results.messages}
+                         onToggleMessages={onToggleMessages}
+                         showMessages={showMessages} />,
+    ];
+    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields, staticWidgets);
     return (
       <span>
         <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
