@@ -56,9 +56,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 </dt>
                  
                 <dd>
-                  <a
-                    href={undefined}
-                  />
+                  <a />
                    
                 </dd>
               </dl>

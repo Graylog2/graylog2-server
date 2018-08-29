@@ -3,9 +3,7 @@
 exports[`<PermissionSelector /> should render with empty permissions 1`] = `
 <div>
   <div
-    className={undefined}
     id="permissionSelectorTabs"
-    style={undefined}
   >
     <ul
       className="nav nav-tabs"
@@ -14,7 +12,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
       <li
         className="active"
         role="presentation"
-        style={undefined}
       >
         <a
           aria-controls="permissionSelectorTabs-pane-1"
@@ -24,7 +21,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
           onClick={[Function]}
           onKeyDown={[Function]}
           role="tab"
-          tabIndex={undefined}
         >
           Streams
         </a>
@@ -32,7 +28,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
       <li
         className=""
         role="presentation"
-        style={undefined}
       >
         <a
           aria-controls="permissionSelectorTabs-pane-2"
@@ -100,10 +95,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           className="form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
-                          onKeyPress={undefined}
                           placeholder=""
                           type="text"
-                          value={undefined}
                         />
                         
                       </div>
@@ -155,7 +148,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                     >
                       <div
                         className="checkbox"
-                        style={undefined}
                       >
                         <label
                           title=""
@@ -167,7 +159,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
-                            value={undefined}
                           />
                           Select all
                         </label>
@@ -214,7 +205,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -226,7 +216,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -279,7 +268,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -291,7 +279,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -360,10 +347,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           className="form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
-                          onKeyPress={undefined}
                           placeholder=""
                           type="text"
-                          value={undefined}
                         />
                         
                       </div>
@@ -415,7 +400,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                     >
                       <div
                         className="checkbox"
-                        style={undefined}
                       >
                         <label
                           title=""
@@ -427,7 +411,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
-                            value={undefined}
                           />
                           Select all
                         </label>
@@ -474,7 +457,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -486,7 +468,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -539,7 +520,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -551,7 +531,6 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -579,9 +558,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
 exports[`<PermissionSelector /> should render with set permissions 1`] = `
 <div>
   <div
-    className={undefined}
     id="permissionSelectorTabs"
-    style={undefined}
   >
     <ul
       className="nav nav-tabs"
@@ -590,7 +567,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
       <li
         className="active"
         role="presentation"
-        style={undefined}
       >
         <a
           aria-controls="permissionSelectorTabs-pane-1"
@@ -600,7 +576,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
           onClick={[Function]}
           onKeyDown={[Function]}
           role="tab"
-          tabIndex={undefined}
         >
           Streams
         </a>
@@ -608,7 +583,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
       <li
         className=""
         role="presentation"
-        style={undefined}
       >
         <a
           aria-controls="permissionSelectorTabs-pane-2"
@@ -676,10 +650,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           className="form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
-                          onKeyPress={undefined}
                           placeholder=""
                           type="text"
-                          value={undefined}
                         />
                         
                       </div>
@@ -731,7 +703,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                     >
                       <div
                         className="checkbox"
-                        style={undefined}
                       >
                         <label
                           title=""
@@ -743,7 +714,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
-                            value={undefined}
                           />
                           Select all
                         </label>
@@ -790,7 +760,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -802,7 +771,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -855,7 +823,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -867,7 +834,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -936,10 +902,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           className="form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
-                          onKeyPress={undefined}
                           placeholder=""
                           type="text"
-                          value={undefined}
                         />
                         
                       </div>
@@ -991,7 +955,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                     >
                       <div
                         className="checkbox"
-                        style={undefined}
                       >
                         <label
                           title=""
@@ -1003,7 +966,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
-                            value={undefined}
                           />
                           Select all
                         </label>
@@ -1050,7 +1012,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -1062,7 +1023,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>
@@ -1115,7 +1075,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       >
                         <div
                           className="checkbox"
-                          style={undefined}
                         >
                           <label
                             title=""
@@ -1127,7 +1086,6 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
-                              value={undefined}
                             />
                             
                           </label>

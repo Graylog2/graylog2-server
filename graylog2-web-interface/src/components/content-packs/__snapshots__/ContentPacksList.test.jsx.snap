@@ -36,10 +36,8 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 className="form-control"
                 id="content-packs-filter"
                 label="Filter"
-                onKeyPress={undefined}
                 placeholder=""
                 type="text"
-                value={undefined}
               />
               
             </div>
@@ -83,7 +81,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       >
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -106,7 +103,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -129,7 +125,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className="active"
-          style={undefined}
         >
           <a
             href="#"
@@ -142,7 +137,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className=""
-          style={undefined}
         >
           <a
             href="#"
@@ -155,7 +149,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className=""
-          style={undefined}
         >
           <a
             href="#"
@@ -172,7 +165,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className=""
-          style={undefined}
         >
           <a
             href="#"
@@ -301,7 +293,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -316,7 +307,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -332,7 +322,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -422,7 +411,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -437,7 +425,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -453,7 +440,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -549,7 +535,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -564,7 +549,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -580,7 +564,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -676,7 +659,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -691,7 +673,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -707,7 +688,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -814,7 +794,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -829,7 +808,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -845,7 +823,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -946,7 +923,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -961,7 +937,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -977,7 +952,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1067,7 +1041,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1082,7 +1055,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -1098,7 +1070,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1194,7 +1165,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1209,7 +1179,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -1225,7 +1194,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1321,7 +1289,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1336,7 +1303,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -1352,7 +1318,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1459,7 +1424,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1474,7 +1438,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     action="push"
@@ -1490,7 +1453,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 <li
                   className=""
                   role="presentation"
-                  style={undefined}
                 >
                   <a
                     href="#"
@@ -1533,7 +1495,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       >
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1556,7 +1517,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1579,7 +1539,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className="active"
-          style={undefined}
         >
           <a
             href="#"
@@ -1592,7 +1551,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className=""
-          style={undefined}
         >
           <a
             href="#"
@@ -1605,7 +1563,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className=""
-          style={undefined}
         >
           <a
             href="#"
@@ -1622,7 +1579,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </li>
         <li
           className=""
-          style={undefined}
         >
           <a
             href="#"
@@ -1703,10 +1659,8 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                 className="form-control"
                 id="content-packs-filter"
                 label="Filter"
-                onKeyPress={undefined}
                 placeholder=""
                 type="text"
-                value={undefined}
               />
               
             </div>
@@ -1750,7 +1704,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
       >
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1773,7 +1726,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1796,7 +1748,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1819,7 +1770,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1884,7 +1834,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
       >
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1907,7 +1856,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1930,7 +1878,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"
@@ -1953,7 +1900,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
         </li>
         <li
           className="disabled"
-          style={undefined}
         >
           <a
             href="#"

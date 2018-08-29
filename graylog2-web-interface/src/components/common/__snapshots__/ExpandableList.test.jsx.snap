@@ -12,7 +12,6 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
     >
       <label
         className="checkbox-inline"
-        style={undefined}
         title=""
       >
         <input
@@ -63,7 +62,6 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
     >
       <label
         className="checkbox-inline"
-        style={undefined}
         title=""
       >
         <input
@@ -109,7 +107,6 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
           >
             <label
               className="checkbox-inline"
-              style={undefined}
               title=""
             >
               <input

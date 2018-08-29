@@ -15,7 +15,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
         <li
           className="active"
           role="presentation"
-          style={undefined}
         >
           <a
             href="#"
@@ -29,7 +28,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
         <li
           className="disabled"
           role="presentation"
-          style={undefined}
         >
           <a
             href="#"
@@ -49,7 +47,6 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
         <li
           className="disabled"
           role="presentation"
-          style={undefined}
         >
           <a
             href="#"
@@ -512,7 +509,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
         <li
           className="active"
           role="presentation"
-          style={undefined}
         >
           <a
             href="#"
@@ -526,7 +522,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
         <li
           className=""
           role="presentation"
-          style={undefined}
         >
           <a
             href="#"
@@ -540,7 +535,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
         <li
           className="disabled"
           role="presentation"
-          style={undefined}
         >
           <a
             href="#"
@@ -857,7 +851,6 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                 >
                   <label
                     className="checkbox-inline"
-                    style={undefined}
                     title=""
                   >
                     <input

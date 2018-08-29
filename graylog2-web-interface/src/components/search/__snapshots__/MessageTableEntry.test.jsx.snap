@@ -55,8 +55,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                 data-clipboard-text="01"
                 disabled={false}
                 onClick={[Function]}
-                style={undefined}
-                title={undefined}
                 type="button"
               >
                 Copy ID
@@ -89,7 +87,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                   <li
                     className=""
                     role="presentation"
-                    style={undefined}
                   >
                     <a
                       action="push"
@@ -103,7 +100,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                   <li
                     className=""
                     role="presentation"
-                    style={undefined}
                   >
                     <a
                       action="push"
@@ -223,7 +219,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=message&example_index=01&example_id=01"
@@ -238,7 +233,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=message&example_index=01&example_id=01"
@@ -253,7 +247,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=message&example_index=01&example_id=01"
@@ -268,7 +261,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=message&example_index=01&example_id=01"
@@ -283,7 +275,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=message&example_index=01&example_id=01"
@@ -298,7 +289,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=message&example_index=01&example_id=01"
@@ -313,7 +303,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=message&example_index=01&example_id=01"
@@ -328,7 +317,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=message&example_index=01&example_id=01"
@@ -345,7 +333,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           <li
                             className=""
                             role="presentation"
-                            style={undefined}
                           >
                             <a
                               href="#"
@@ -436,7 +423,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=timestamp&example_index=01&example_id=01"
@@ -451,7 +437,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=timestamp&example_index=01&example_id=01"
@@ -466,7 +451,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=timestamp&example_index=01&example_id=01"
@@ -481,7 +465,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=timestamp&example_index=01&example_id=01"
@@ -496,7 +479,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=timestamp&example_index=01&example_id=01"
@@ -511,7 +493,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=timestamp&example_index=01&example_id=01"
@@ -526,7 +507,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=timestamp&example_index=01&example_id=01"
@@ -541,7 +521,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                               <li
                                 className=""
                                 role="presentation"
-                                style={undefined}
                               >
                                 <a
                                   href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=timestamp&example_index=01&example_id=01"
@@ -558,7 +537,6 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           <li
                             className=""
                             role="presentation"
-                            style={undefined}
                           >
                             <a
                               href="#"
