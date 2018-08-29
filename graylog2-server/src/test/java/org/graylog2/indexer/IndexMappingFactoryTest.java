@@ -16,24 +16,23 @@
  */
 package org.graylog2.indexer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
 import com.github.zafarkhaja.semver.Version;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 import org.graylog2.indexer.cluster.Node;
-import org.junit.Rule;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 public class IndexMappingFactoryTest {
     @Rule
@@ -71,11 +70,11 @@ public class IndexMappingFactoryTest {
 
     @Test
     public void createIndexMappingFailsIfElasticsearchVersionIsTooHigh() throws Exception {
-        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("6.0.0")));
+        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("7.0.0")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
                 .isInstanceOf(ElasticsearchException.class)
-                .hasMessageStartingWith("Unsupported Elasticsearch version: 6.0.0")
+                .hasMessageStartingWith("Unsupported Elasticsearch version: 7.0.0")
                 .hasNoCause();
     }
 
@@ -94,6 +93,7 @@ public class IndexMappingFactoryTest {
                     {"5.2.0", IndexMapping5.class},
                     {"5.3.0", IndexMapping5.class},
                     {"5.4.0", IndexMapping5.class},
+                    {"6.3.1", IndexMapping6.class},
             });
         }
 
