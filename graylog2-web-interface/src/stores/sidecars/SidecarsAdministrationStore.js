@@ -63,7 +63,7 @@ const SidecarsAdministrationStore = Reflux.createStore({
   },
 
   refreshList() {
-    this.list({ query: this.query, page: this.pagination.page, pageSize: this.pagination.pageSize, filter: this.filters });
+    this.list({ query: this.query, page: this.pagination.page, pageSize: this.pagination.pageSize, filters: this.filters });
   },
 
   setAction(action, collectors) {

@@ -45,6 +45,7 @@ const CollectorsAdministration = createReactClass({
     if (!lodash.isEqual(this.props.sidecarCollectorPairs, nextProps.sidecarCollectorPairs)) {
       this.setState({
         enabledCollectors: this.getEnabledCollectors(nextProps.sidecarCollectorPairs),
+        selected: this.filterSelectedCollectors(nextProps.sidecarCollectorPairs),
       });
     }
   },
@@ -63,12 +64,17 @@ const CollectorsAdministration = createReactClass({
     if (!selectAllCheckbox) {
       return;
     }
-    // Set the select all checkbox as indeterminate if some but not items are selected.
+    // Set the select all checkbox as indeterminate if some but not all items are selected.
     selectAllCheckbox.indeterminate = selected.length > 0 && !this.isAllSelected(collectors, selected);
   },
 
   sidecarCollectorId(sidecar, collector) {
     return `${sidecar.node_id}-${collector.name}`;
+  },
+
+  filterSelectedCollectors(collectors) {
+    const filteredSidecarCollectorIds = collectors.map(({ collector, sidecar }) => this.sidecarCollectorId(sidecar, collector));
+    return this.state.selected.filter(sidecarCollectorId => filteredSidecarCollectorIds.includes(sidecarCollectorId));
   },
 
   handleConfigurationChange(selectedConfigurations, doneCallback) {
