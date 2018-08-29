@@ -50,7 +50,7 @@ public abstract class Sidecar {
     public static final String FIELD_STATUS = FIELD_NODE_DETAILS + ".status.status";
 
     public enum Status {
-        RUNNING(0), UNKNOWN(1), FAILING(2);
+        RUNNING(0), UNKNOWN(1), FAILING(2), STOPPED(3);
 
         private final int statusCode;
 
@@ -66,6 +66,7 @@ public abstract class Sidecar {
             switch (statusCode) {
                 case 0: return RUNNING;
                 case 2: return FAILING;
+                case 3: return STOPPED;
                 default: return UNKNOWN;
             }
         }
