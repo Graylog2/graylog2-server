@@ -2,7 +2,7 @@
 
 exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`] = `
 <div
-  className="row"
+  className=""
 >
   <div
     className="col-sm-8"
@@ -169,7 +169,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
 
 exports[`<GrokPatternInput /> should render grok pattern input without patterns 1`] = `
 <div
-  className="row"
+  className=""
 >
   <div
     className="col-sm-8"

@@ -1,15 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { Link } from 'react-router';
 
 import { Input } from 'components/bootstrap';
-import Routes from 'routing/Routes';
+import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-
 import StoreProvider from 'injection/StoreProvider';
+
+import Style from './GrokExtractorConfiguration.css';
+
 const ToolsStore = StoreProvider.getStore('Tools');
+const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 class GrokExtractorConfiguration extends React.Component {
   static propTypes = {
@@ -19,8 +21,34 @@ class GrokExtractorConfiguration extends React.Component {
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   };
 
+  static defaultProps = {
+    exampleMessage: undefined,
+  };
+
   state = {
     trying: false,
+    patterns: [],
+  };
+
+  componentDidMount() {
+    this.loadData();
+  }
+
+  componentWillUnmount() {
+    if (this.loadPromise) {
+      this.loadPromise.cancel();
+    }
+  }
+
+  loadData = () => {
+    this.loadPromise = GrokPatternsStore.loadPatterns((patterns) => {
+      if (!this.loadPromise.isCancelled()) {
+        this.loadPromise = undefined;
+        this.setState({
+          patterns: patterns,
+        });
+      }
+    });
   };
 
   _onChange = (key) => {
@@ -32,13 +60,20 @@ class GrokExtractorConfiguration extends React.Component {
     };
   };
 
+  _onPatternChange = (newPattern) => {
+    this.props.onExtractorPreviewLoad(undefined);
+    const newConfig = this.props.configuration;
+    newConfig.grok_pattern = newPattern;
+    this.props.onChange(newConfig);
+  };
+
   _onTryClick = () => {
     this.setState({ trying: true });
 
     const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.configuration.named_captures_only, this.props.exampleMessage);
     promise.then((result) => {
       if (result.error_message != null) {
-        UserNotification.error('We were not able to run the grok extraction because of the following error: ' + result.error_message);
+        UserNotification.error(`We were not able to run the grok extraction because of the following error: ${result.error_message}`);
         return;
       }
 
@@ -48,7 +83,7 @@ class GrokExtractorConfiguration extends React.Component {
       }
 
       const matches = [];
-      result.matches.map((match) => {
+      result.matches.forEach((match) => {
         matches.push(<dt key={`${match.name}-name`}>{match.name}</dt>);
         matches.push(<dd key={`${match.name}-value`}><samp>{match.match}</samp></dd>);
       });
@@ -65,13 +100,6 @@ class GrokExtractorConfiguration extends React.Component {
   };
 
   render() {
-    const helpMessage = (
-      <span>
-          Matches the field against the current Grok pattern list, use <b>{'%{PATTERN-NAME}'}</b> to refer to a{' '}
-        <Link to={Routes.SYSTEM.GROKPATTERNS}>stored pattern</Link>.
-      </span>
-    );
-
     return (
       <div>
         <Input type="checkbox"
@@ -85,18 +113,21 @@ class GrokExtractorConfiguration extends React.Component {
         <Input id="grok_pattern"
                label="Grok pattern"
                labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               help={helpMessage}>
+               wrapperClassName="col-md-10">
           <Row className="row-sm">
             <Col md={11}>
-              <input type="text" id="grok_pattern" className="form-control"
-                     defaultValue={this.props.configuration.grok_pattern}
-                     onChange={this._onChange('grok_pattern')}
-                     required />
+              <GrokPatternInput
+                onPatternChange={this._onPatternChange}
+                pattern={this.props.configuration.grok_pattern || ''}
+                patterns={this.state.patterns}
+                className={Style.grokInput}
+              />
             </Col>
-            <Col md={1} className="text-right">
+          </Row>
+          <Row>
+            <Col md={1}>
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
+                {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try against example'}
               </Button>
             </Col>
           </Row>

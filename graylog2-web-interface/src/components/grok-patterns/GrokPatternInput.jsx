@@ -11,12 +11,14 @@ class GrokPatternInput extends React.Component {
     pattern: PropTypes.string,
     patterns: PropTypes.array,
     onPatternChange: PropTypes.func,
+    className: PropTypes.string,
   };
 
   static defaultProps = {
     pattern: '',
     patterns: [],
     onPatternChange: () => {},
+    className: '',
   };
 
   constructor(props) {
@@ -110,7 +112,7 @@ class GrokPatternInput extends React.Component {
           </ListGroupItem>);
       });
     return (
-      <Row>
+      <Row bsClass={this.props.className}>
         <Col sm={8}>
           <Input ref={(node) => { this.patternInput = node; }}
                  type="textarea"
