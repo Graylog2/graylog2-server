@@ -1,6 +1,6 @@
 import { mapValues } from 'lodash';
 
-import { searchTypeDefinition } from 'enterprise/logic/SearchType';
+import searchTypeDefinition from 'enterprise/logic/SearchType';
 import SearchError from './SearchError';
 
 const _findMessages = (results) => {

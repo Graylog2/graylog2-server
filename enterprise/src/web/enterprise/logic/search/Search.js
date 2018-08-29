@@ -10,7 +10,8 @@ export default class Search {
 
   static create() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder().newId().queries([]).parameters([]).build();
+    return new Builder().newId().queries([]).parameters([])
+      .build();
   }
 
   get id() {

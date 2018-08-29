@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
 import GenericPlot from '../GenericPlot';
 import { generateSeries } from '../Series';
-import { transformKeys } from '../TransformKeys';
+import transformKeys from '../TransformKeys';
 
 const maxItemsPerRow = 4;
 

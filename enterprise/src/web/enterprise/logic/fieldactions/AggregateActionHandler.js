@@ -1,7 +1,7 @@
 import uuid from 'uuid/v4';
 
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { pivotForField } from '../searchtypes/aggregation/PivotGenerator';
+import pivotForField from '../searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
 

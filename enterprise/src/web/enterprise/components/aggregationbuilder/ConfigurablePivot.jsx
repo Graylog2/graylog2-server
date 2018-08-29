@@ -10,9 +10,18 @@ import connect from 'stores/connect';
 import PivotConfiguration from './PivotConfiguration';
 import { FieldTypesStore } from '../../stores/FieldTypesStore';
 import FieldType from '../../logic/fieldtypes/FieldType';
+import CustomPropTypes from '../CustomPropTypes';
 
 class ConfigurablePivot extends React.Component {
-  static propTypes = {};
+  static propTypes = {
+    children: CustomPropTypes.OneOrMoreChildren.isRequired,
+    config: PropTypes.object.isRequired,
+    fields: CustomPropTypes.FieldListType.isRequired,
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.shape({
+      label: PropTypes.string,
+    }).isRequired,
+  };
 
   constructor(props, context) {
     super(props, context);

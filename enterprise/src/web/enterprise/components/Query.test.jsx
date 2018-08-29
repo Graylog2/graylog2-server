@@ -2,7 +2,6 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import Immutable from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import Query from './Query';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';

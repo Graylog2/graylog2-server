@@ -3,6 +3,7 @@ import { flatten, isEqual, set } from 'lodash';
 export const seriesRegex = /^(\w+)\((\w*)\)$/;
 
 export const parseSeries = (s) => {
+  // eslint-disable-next-line no-unused-vars
   const [_, type, field] = seriesRegex.exec(s);
   const definition = {
     type,
@@ -31,7 +32,7 @@ export const extractSeries = (results) => {
     set(valuesBySeries, [joinedKey, targetIdx], value.value);
   });
 
-  return Object.keys(valuesBySeries).map((value) => [
+  return Object.keys(valuesBySeries).map(value => [
     value,
     x,
     valuesBySeries[value],

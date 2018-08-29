@@ -9,7 +9,7 @@ import Input from 'components/bootstrap/Input';
 export default class ViewPropertiesModal extends React.Component {
   static propTypes = {
     view: PropTypes.object.isRequired,
-    show: PropTypes.bool,
+    show: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func,
@@ -32,7 +32,7 @@ export default class ViewPropertiesModal extends React.Component {
     if (this.props.show !== nextProps.show || this.props.title !== nextProps.title || !isEqual(this.state.view, nextProps.view)) {
       this.setState({ view: nextProps.view, title: nextProps.title, show: nextProps.show });
     }
-  };
+  }
 
   // eslint-disable-next-line consistent-return
   _onChange = (event) => {
@@ -90,4 +90,4 @@ export default class ViewPropertiesModal extends React.Component {
       </Modal>
     );
   }
-};
+}

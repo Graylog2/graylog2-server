@@ -12,6 +12,7 @@ export default class EditableTitle extends React.Component {
 
   static defaultProps = {
     disabled: false,
+    onChange: () => {},
   };
 
   state = {

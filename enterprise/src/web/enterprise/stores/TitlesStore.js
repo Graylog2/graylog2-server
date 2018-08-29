@@ -14,7 +14,7 @@ export const TitlesStore = Reflux.createStore({
   titles: new Immutable.Map(),
 
   init() {
-    this.listenTo(CurrentViewStateStore, this.onViewStateStoreChange, this.onViewStateStoreChange)
+    this.listenTo(CurrentViewStateStore, this.onViewStateStoreChange, this.onViewStateStoreChange);
   },
   getInitialState() {
     return this.titles;

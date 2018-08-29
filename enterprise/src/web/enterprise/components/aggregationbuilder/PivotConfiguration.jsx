@@ -9,7 +9,7 @@ import TermsPivotConfiguration from './pivottypes/TermsPivotConfiguration';
 const _configurationComponentByType = (type, value, onChange) => {
   switch (type.type) {
     case 'date': return <TimeHistogramPivot onChange={onChange} value={value} />;
-    default: return <TermsPivotConfiguration onChange={onChange} value={value}/>;
+    default: return <TermsPivotConfiguration onChange={onChange} value={value} />;
   }
 };
 
@@ -46,4 +46,4 @@ export default class PivotConfiguration extends React.Component {
       </span>
     );
   }
-};
+}

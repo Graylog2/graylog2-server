@@ -3,6 +3,7 @@ import { isEqual } from 'lodash';
 
 import { ViewStore } from './ViewStore';
 
+// eslint-disable-next-line import/prefer-default-export
 export const ViewMetadataStore = Reflux.createStore({
   state: {},
   init() {

@@ -9,7 +9,9 @@ export default class OverlayDropdown extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     menuContainer: PropTypes.object,
+    onToggle: PropTypes.func.isRequired,
     placement: PropTypes.string,
+    show: PropTypes.bool.isRequired,
     toggle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   };
 
@@ -51,4 +53,4 @@ export default class OverlayDropdown extends React.Component {
       </span>
     );
   }
-};
+}

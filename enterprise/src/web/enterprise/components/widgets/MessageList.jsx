@@ -8,8 +8,7 @@ import { MessageTableEntry } from 'enterprise/components/messagelist';
 import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
 
-import { SelectedFieldsActions, SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
+import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import CombinedProvider from 'injection/CombinedProvider';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -31,7 +30,6 @@ const MessageList = createReactClass({
   displayName: 'MessageList',
 
   propTypes: {
-    id: PropTypes.string,
     fields: CustomPropTypes.FieldListType.isRequired,
     pageSize: PropTypes.number,
     data: PropTypes.shape({
@@ -50,7 +48,6 @@ const MessageList = createReactClass({
 
   getDefaultProps() {
     return {
-      id: undefined,
       filter: '',
       config: undefined,
       pageSize: UniversalSearchStore.DEFAULT_LIMIT,

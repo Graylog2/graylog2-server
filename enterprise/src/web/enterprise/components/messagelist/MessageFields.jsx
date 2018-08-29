@@ -9,8 +9,9 @@ import styles from './MessageFields.css';
 
 class MessageFields extends React.Component {
   static propTypes = {
-    customFieldActions: PropTypes.node,
-    disableFieldActions: PropTypes.bool,
+    customFieldActions: PropTypes.node.isRequired,
+    disableFieldActions: PropTypes.bool.isRequired,
+    fields: PropTypes.object.isRequired,
     message: PropTypes.object.isRequired,
     possiblyHighlight: PropTypes.func.isRequired,
     showDecoration: PropTypes.bool,

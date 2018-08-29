@@ -1,8 +1,6 @@
-export default {
-  View: {
-    Use: 'view:use',
-  },
-  ExtendedSearch: {
-    Use: 'extendedsearch:use',
-  },
+export const View = {
+  Use: 'view:use',
+};
+export const ExtendedSearch = {
+  Use: 'extendedsearch:use',
 };

@@ -12,6 +12,9 @@ import ViewPropertiesModal from './views/ViewPropertiesModal';
 const QueryTabActions = createReactClass({
   propTypes: {
     onSaveView: PropTypes.func.isRequired,
+    view: PropTypes.shape({
+      view: PropTypes.object.isRequired,
+    }).isRequired,
   },
 
   getInitialState() {

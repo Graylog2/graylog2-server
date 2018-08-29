@@ -4,6 +4,7 @@ import { get, isEqual } from 'lodash';
 
 import { ViewStore } from './ViewStore';
 
+// eslint-disable-next-line import/prefer-default-export
 export const QueryTitlesStore = Reflux.createStore({
   init() {
     this.listenTo(ViewStore, this.onViewStoreUpdate, this.onViewStoreUpdate);

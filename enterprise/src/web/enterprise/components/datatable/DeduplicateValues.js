@@ -1,4 +1,4 @@
-export const deduplicateValues = (rows, rowFieldNames) => {
+export default (rows, rowFieldNames) => {
   const duplicateKeys = {};
   return rows.map((item) => {
     const reducedItem = Object.assign({}, item);

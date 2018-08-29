@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Select from 'react-select';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 
-import { pivotForField } from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
+import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
 import ConfigurablePivot from './ConfigurablePivot';
 
 import styles from './SortableSelect.css';
@@ -27,7 +27,7 @@ const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
   onChange(newItems.join(','));
 };
 
-const configFor = ({ value }, values) => value === '' ? {} : values.find(({ field }) => field === value).config;
+const configFor = ({ value }, values) => (value === '' ? {} : values.find(({ field }) => field === value).config);
 const newPivotConfigChange = (values, value, newPivotConfig, onChange) => {
   const newValues = values.map((pivot) => {
     if (pivot.field === value.value) {

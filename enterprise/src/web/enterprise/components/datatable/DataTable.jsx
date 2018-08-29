@@ -13,9 +13,9 @@ import Value from 'enterprise/components/Value';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
 import DataTableEntry from './DataTableEntry';
-import { AggregationType } from '../aggregationbuilder/AggregationBuilderPropTypes';
-import { deduplicateValues } from './DeduplicateValues';
+import deduplicateValues from './DeduplicateValues';
 
 class DataTable extends React.Component {
   static propTypes = {
@@ -112,6 +112,7 @@ class DataTable extends React.Component {
 
     const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, rowFieldNames.length + series.length);
     const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
+      // eslint-disable-next-line react/no-array-index-key
       return (<DataTableEntry key={`datatableentry-${idx}`}
                               fields={fields}
                               item={reducedItem}

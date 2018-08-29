@@ -95,7 +95,7 @@ class SearchResult extends React.Component {
         <SearchLoadingIndicator />
       </span>
     );
-  };
+  }
 }
 
 export default connect(SearchResult, {

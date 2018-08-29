@@ -8,7 +8,7 @@ const defaultExecutionState = Immutable.fromJS({
   parameter_bindings: {},
 });
 
-const newParameterBindingValue = (value) => Immutable.fromJS({
+const newParameterBindingValue = value => Immutable.fromJS({
   type: 'value',
   value: value,
 });

@@ -7,7 +7,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import OverlayDropdown from './OverlayDropdown';
 
 import style from './Field.css';
-import FieldType from '../logic/fieldtypes/FieldType';
 import CustomPropTypes from './CustomPropTypes';
 
 export default class Field extends React.Component {

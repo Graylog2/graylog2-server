@@ -52,5 +52,5 @@ export const ViewStatesStore = Reflux.createStore({
   },
   _trigger() {
     this.trigger(this._state());
-  }
+  },
 });

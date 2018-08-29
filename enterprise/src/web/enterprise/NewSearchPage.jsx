@@ -24,4 +24,4 @@ export default class NewSearchPage extends React.Component {
     }
     return <Spinner />;
   }
-};
+}

@@ -30,4 +30,4 @@ export default () => {
     .widgets(widgets)
     .widgetPositions(positions)
     .build();
-}
+};

@@ -1,4 +1,4 @@
-import { deduplicateValues } from './DeduplicateValues';
+import deduplicateValues from './DeduplicateValues';
 
 describe('DeduplicateValues', () => {
   it('should not fail for empty rows', () => {

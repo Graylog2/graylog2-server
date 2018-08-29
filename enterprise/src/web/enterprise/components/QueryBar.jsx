@@ -14,6 +14,7 @@ import { QueryIdsStore } from '../stores/QueryIdsStore';
 import { QueryTitlesStore } from '../stores/QueryTitlesStore';
 import { ViewMetadataStore } from '../stores/ViewMetadataStore';
 import QueryTabs from './QueryTabs';
+import CustomPropTypes from './CustomPropTypes';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
@@ -62,5 +63,15 @@ const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetad
   );
 };
 
+QueryBar.propTypes = {
+  children: CustomPropTypes.OneOrMoreChildren.isRequired,
+  onExecute: PropTypes.func.isRequired,
+  queries: PropTypes.object.isRequired,
+  queryTitles: PropTypes.object.isRequired,
+  router: PropTypes.any.isRequired,
+  viewMetadata: PropTypes.shape({
+    activeQuery: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default withRouter(connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore }));

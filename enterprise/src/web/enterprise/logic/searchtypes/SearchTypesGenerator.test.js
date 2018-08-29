@@ -5,9 +5,7 @@ jest.mock('../Widget', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{}] }),
 }));
 
-jest.mock('../SearchType', () => ({
-  searchTypeDefinition: () => ({ defaults: {} }),
-}));
+jest.mock('../SearchType', () => () => ({ defaults: {} }));
 
 describe('SearchTypesGenerator', () => {
   it('should include filters of widgets', () => {

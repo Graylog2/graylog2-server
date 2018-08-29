@@ -41,9 +41,13 @@ export default class PortaledPopover extends React.Component {
     );
     return (
       <span>
-        <a role="link" tabIndex={0} ref={(elem) => {
-          this.target = elem;
-        }} {...rest} onClick={this._onClick}>
+        <a role="link"
+           tabIndex={0}
+           ref={(elem) => {
+             this.target = elem;
+           }}
+           {...rest}
+           onClick={this._onClick}>
           {this.props.children}
         </a>
         {popoverElem}

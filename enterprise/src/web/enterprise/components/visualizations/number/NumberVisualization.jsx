@@ -6,6 +6,8 @@ import style from 'components/visualizations/NumericVisualization.css';
 
 const DEFAULT_VALUE_FONT_SIZE = '60px';
 
+const _formatData = data => String(NumberUtils.formatNumber(data));
+
 const _calculateFontSize = (data) => {
   if (typeof data === 'undefined') {
     return DEFAULT_VALUE_FONT_SIZE;
@@ -40,7 +42,6 @@ const _calculateFontSize = (data) => {
   return fontSize;
 };
 
-const _formatData = data => String(NumberUtils.formatNumber(data));
 const _extractValue = (data) => {
   if (!data || !data[0]) {
     return undefined;

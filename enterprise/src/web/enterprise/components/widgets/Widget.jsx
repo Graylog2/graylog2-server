@@ -22,7 +22,6 @@ import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsMap } from './WidgetPropTypes';
-import EmptyResultWidget from './EmptyResultWidget';
 
 class Widget extends React.Component {
   static propTypes = {

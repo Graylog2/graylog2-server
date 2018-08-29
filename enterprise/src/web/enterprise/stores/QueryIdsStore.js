@@ -3,6 +3,7 @@ import { isEqual } from 'lodash';
 
 import { QueriesStore } from './QueriesStore';
 
+// eslint-disable-next-line import/prefer-default-export
 export const QueryIdsStore = Reflux.createStore({
   state: {},
   init() {

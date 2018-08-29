@@ -32,7 +32,7 @@ describe('ExpandRows', () => {
             'sum(took_ms)': 6580 },
           index: {
             'count()': 2696,
-            'sum(took_ms)': 239622
+            'sum(took_ms)': 239622,
           },
         },
         controller: 'PostsController',

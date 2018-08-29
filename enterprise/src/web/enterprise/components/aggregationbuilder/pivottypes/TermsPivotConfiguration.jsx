@@ -52,4 +52,4 @@ export default class TermsPivotConfiguration extends React.Component {
              value={this.state.limit} />
     );
   }
-};
+}

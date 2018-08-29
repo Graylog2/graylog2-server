@@ -13,9 +13,9 @@ import PieVisualization from 'enterprise/components/visualizations/pie/PieVisual
 
 import ShowViewPage from 'enterprise/ShowViewPage';
 import NewSearchPage from 'enterprise/NewSearchPage';
-import PivotConfigGenerator from './logic/searchtypes/aggregation/PivotConfigGenerator';
-import PivotHandler from './logic/searchtypes/pivot/PivotHandler';
-import PivotTransformer from './logic/searchresulttransformers/PivotTransformer';
+import PivotConfigGenerator from 'enterprise/logic/searchtypes/aggregation/PivotConfigGenerator';
+import PivotHandler from 'enterprise/logic/searchtypes/pivot/PivotHandler';
+import PivotTransformer from 'enterprise/logic/searchresulttransformers/PivotTransformer';
 import ViewManagementPage from 'enterprise/ViewManagementPage';
 
 import { AlertStatus, MessageList } from 'enterprise/components/widgets';
@@ -23,14 +23,14 @@ import Widget from 'enterprise/logic/widgets/Widget';
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
 import DataTable from 'enterprise/components/datatable/DataTable';
-import WorldMapVisualization from './components/visualizations/worldmap/WorldMapVisualization';
-import FieldStatisticsHandler from './logic/fieldactions/FieldStatisticsHandler';
-import NumberVisualization from './components/visualizations/number/NumberVisualization';
-import ExcludeFromQueryHandler from './logic/valueactions/ExcludeFromQueryHandler';
-import { isFunction } from './components/visualizations/Series';
+import WorldMapVisualization from 'enterprise/components/visualizations/worldmap/WorldMapVisualization';
+import FieldStatisticsHandler from 'enterprise/logic/fieldactions/FieldStatisticsHandler';
+import NumberVisualization from 'enterprise/components/visualizations/number/NumberVisualization';
+import ExcludeFromQueryHandler from 'enterprise/logic/valueactions/ExcludeFromQueryHandler';
+import { isFunction } from 'enterprise/components/visualizations/Series';
+import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
+import EditMessageList from 'enterprise/components/widgets/EditMessageList';
 import * as Permissions from './Permissions';
-import AggregationControls from './components/aggregationbuilder/AggregationControls';
-import EditMessageList from './components/widgets/EditMessageList';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -41,7 +41,7 @@ Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 
 export default {
   pages: {
-    //search: { component: ExtendedSearchPage },
+    // search: { component: ExtendedSearchPage },
 
   },
   routes: [

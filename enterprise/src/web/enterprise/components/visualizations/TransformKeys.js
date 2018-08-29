@@ -21,7 +21,7 @@ const transformKey = (key, indices, tz) => {
 };
 
 const findIndices = (ary, predicate) => ary.map((value, idx) => ({ value, idx })).filter(({ value }) => predicate(value)).map(({ idx }) => idx);
-export const transformKeys = (rowPivots, columnPivots, result) => {
+export default (rowPivots, columnPivots, result) => {
   const rowIndices = findIndices(rowPivots, pivot => (pivot.type === 'time'));
   const columnIndices = findIndices(columnPivots, pivot => (pivot.type === 'time'));
 

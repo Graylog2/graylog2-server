@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
+import MessageDetail from './MessageDetail';
 
 class MessageTableEntry extends React.Component {
   static propTypes = {
@@ -144,7 +144,7 @@ class MessageTableEntry extends React.Component {
                            possiblyHighlight={this.possiblyHighlight}
                            disableSurroundingSearch={this.props.disableSurroundingSearch}
                            expandAllRenderAsync={this.props.expandAllRenderAsync}
-                           searchConfig={this.props.searchConfig}/>
+                           searchConfig={this.props.searchConfig} />
           </td>
         </tr>
         }

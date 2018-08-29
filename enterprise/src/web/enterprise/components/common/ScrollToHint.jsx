@@ -26,4 +26,4 @@ export default class ScrollToHint extends React.Component {
       </span>
     );
   }
-};
+}

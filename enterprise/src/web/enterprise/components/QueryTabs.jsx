@@ -60,12 +60,10 @@ QueryTabs.propTypes = {
   queries: PropTypes.object.isRequired,
   selectedQuery: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
-  renderDashboardTab: PropTypes.func,
 };
 
 QueryTabs.defaultProps = {
   results: {},
-  renderDashboardTab: () => null,
 };
 
 export default QueryTabs;

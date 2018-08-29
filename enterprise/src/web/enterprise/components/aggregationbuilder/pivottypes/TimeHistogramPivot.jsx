@@ -77,4 +77,4 @@ export default class TimeHistogramPivot extends React.Component {
       </FormGroup>
     );
   }
-};
+}

@@ -4,7 +4,8 @@ import Immutable from 'immutable';
 import moment from 'moment';
 
 import Plotly from 'enterprise/custom-plotly';
-import createPlotlyComponent from 'react-plotly.js/factory'
+import createPlotlyComponent from 'react-plotly.js/factory';
+
 const Plot = createPlotlyComponent(Plotly);
 
 const _formatTimestamp = (epoch) => {
@@ -32,7 +33,7 @@ export default function Histogram(props) {
                   },
                 }}
                 config={{ displayModeBar: false }} />);
-};
+}
 
 Histogram.propTypes = {
   data: PropTypes.shape({

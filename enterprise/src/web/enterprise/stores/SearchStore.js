@@ -13,7 +13,8 @@ import { SearchExecutionStateStore } from './SearchExecutionStateStore';
 import SearchActions from '../actions/SearchActions';
 
 const displayError = (error) => {
-  console.log(error);
+  // eslint-disable-next-line no-console
+  console.error(error);
 };
 
 Bluebird.config({ cancellation: true });

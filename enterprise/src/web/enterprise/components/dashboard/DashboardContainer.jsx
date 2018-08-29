@@ -10,13 +10,16 @@ import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidget
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { DashboardWidgetsActions } from 'enterprise/stores/DashboardWidgetsStore';
 import EmptyDashboardHelpMessage from './EmptyDashboardHelpMessage';
+import * as WidgetPropTypes from '../widgets/WidgetPropTypes';
 
 const DashboardContainer = createReactClass({
   propTypes: {
     dashboardWidgets: PropTypes.shape({
       dashboardWidgets: PropTypes.instanceOf(Immutable.Map).isRequired,
     }).isRequired,
+    widgetDefs: WidgetPropTypes.WidgetsMap.isRequired,
     widgetMapping: PropTypes.object,
+    positions: WidgetPropTypes.PositionsMap.isRequired,
     results: PropTypes.object,
   },
 

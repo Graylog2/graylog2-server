@@ -7,7 +7,7 @@ import Input from 'components/bootstrap/Input';
 import ColorPickerPopover from 'components/common/ColorPickerPopover';
 import FormsUtils from 'util/FormsUtils';
 
-import { WidgetConfigModal, WidgetHeader } from 'enterprise/components/widgets';
+import { WidgetConfigModal } from 'enterprise/components/widgets';
 
 const AlertStatus = createReactClass({
   propTypes: {

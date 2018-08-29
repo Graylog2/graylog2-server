@@ -4,7 +4,8 @@ import { fromPairs, zip } from 'lodash';
 
 import MapVisualization from './MapVisualization';
 import { extractSeries } from '../Series';
-import { transformKeys } from '../TransformKeys';
+import transformKeys from '../TransformKeys';
+import { AggregationType } from '../../aggregationbuilder/AggregationBuilderPropTypes';
 
 const WorldMapVisualization = ({ config, data, width, ...rest }) => {
   const { rowPivots } = config;
@@ -19,6 +20,7 @@ const WorldMapVisualization = ({ config, data, width, ...rest }) => {
       return { name, y, x: newX, keys };
     })
     .map(({ keys, name, x, y }) => {
+      // eslint-disable-next-line no-unused-vars
       const values = fromPairs(zip(x, y).filter(([_, v]) => (v !== undefined)));
       return { keys, name, values };
     });
@@ -26,7 +28,11 @@ const WorldMapVisualization = ({ config, data, width, ...rest }) => {
   return <MapVisualization {...rest} data={series} id={`worldmap-${config.id}`} />;
 };
 
-WorldMapVisualization.propTypes = {};
+WorldMapVisualization.propTypes = {
+  config: AggregationType.isRequired,
+  data: PropTypes.any.isRequired,
+  width: PropTypes.number.isRequired,
+};
 
 WorldMapVisualization.type = 'map';
 

@@ -1,6 +1,7 @@
 /* eslint-disable react/no-find-dom-node,react/no-string-refs */
 /* global window */
 import React from 'react';
+import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import { AutoAffix } from 'react-overlays';
@@ -11,12 +12,23 @@ import { AddWidgetButton, SearchResultOverview } from 'enterprise/components/sid
 
 import styles from './SideBar.css';
 import SearchDetails from './SearchDetails';
+import CustomPropTypes from '../CustomPropTypes';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
 
 const SideBar = createReactClass({
   displayName: 'SideBar',
+
+  propTypes: {
+    children: CustomPropTypes.OneOrMoreChildren.isRequired,
+    queryId: PropTypes.string.isRequired,
+    results: PropTypes.object.isRequired,
+    viewMetadata: PropTypes.shape({
+      summary: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+    }).isRequired,
+  },
 
   getInitialState() {
     return {

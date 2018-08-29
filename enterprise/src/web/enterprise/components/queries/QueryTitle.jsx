@@ -34,7 +34,7 @@ class QueryTitle extends React.Component {
     onClose();
   };
 
-  _onSubmit = (e) => {
+  _onSubmit = () => {
     if (this.state.value !== '') {
       this.props.onChange(this.state.value);
     } else {
@@ -72,4 +72,3 @@ class QueryTitle extends React.Component {
 }
 
 export default QueryTitle;
-    
