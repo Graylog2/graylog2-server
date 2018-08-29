@@ -15,8 +15,10 @@ const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
 const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
-const ExportContentPackPage = loadAsync(() => import('./ExportContentPackPage'));
-const ExportExtractorsPage = loadAsync(() => import('./ExportExtractorsPage'));
+const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
+const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
+const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
+const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
 const GettingStartedPage = loadAsync(() => import('./GettingStartedPage'));
 const GrokPatternsPage = loadAsync(() => import('./GrokPatternsPage'));
@@ -60,6 +62,14 @@ const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
 const UsersPage = loadAsync(() => import('./UsersPage'));
+const SidecarEditConfigurationPage = loadAsync(() => import('pages/SidecarEditConfigurationPage'));
+const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
+const SidecarAdministrationPage = loadAsync(() => import('pages/SidecarAdministrationPage'));
+const SidecarEditCollectorPage = loadAsync(() => import('pages/SidecarEditCollectorPage'));
+const SidecarNewCollectorPage = loadAsync(() => import('pages/SidecarNewCollectorPage'));
+const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
+const SidecarConfigurationPage = loadAsync(() => import('pages/SidecarConfigurationPage'));
+const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConfigurationPage'));
 
 export {
   AlertConditionsPage,
@@ -77,8 +87,10 @@ export {
   EditTokensPage,
   EditUsersPage,
   EnterprisePage,
-  ExportContentPackPage,
   ExportExtractorsPage,
+  ShowContentPackPage,
+  CreateContentPackPage,
+  EditContentPackPage,
   ExtractorsPage,
   GettingStartedPage,
   GrokPatternsPage,
@@ -122,4 +134,12 @@ export {
   SystemOverviewPage,
   ThreadDumpPage,
   UsersPage,
+  SidecarEditConfigurationPage,
+  SidecarStatusPage,
+  SidecarAdministrationPage,
+  SidecarEditCollectorPage,
+  SidecarNewCollectorPage,
+  SidecarsPage,
+  SidecarConfigurationPage,
+  SidecarNewConfigurationPage,
 };
