@@ -29,6 +29,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -47,6 +48,32 @@ public abstract class Sidecar {
 
     public static final String FIELD_OPERATING_SYSTEM = FIELD_NODE_DETAILS + ".operating_system";
     public static final String FIELD_STATUS = FIELD_NODE_DETAILS + ".status.status";
+
+    public enum Status {
+        RUNNING(0), UNKNOWN(1), FAILING(2);
+
+        private final int statusCode;
+
+        Status(int statusCode) {
+            this.statusCode = statusCode;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        public static Status fromStatusCode(int statusCode) {
+            switch (statusCode) {
+                case 0: return RUNNING;
+                case 2: return FAILING;
+                default: return UNKNOWN;
+            }
+        }
+
+        public static Status fromString(String statusString) {
+            return valueOf(statusString.toUpperCase(Locale.ENGLISH));
+        }
+    }
 
     @JsonProperty
     @Id
