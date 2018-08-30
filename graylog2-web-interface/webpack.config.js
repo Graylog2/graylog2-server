@@ -5,7 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const Visualizer = require('webpack-visualizer-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -68,9 +67,6 @@ const webpackConfig = {
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
   plugins: [
-    new Visualizer({
-      filename: 'statistics.html',
-    }),
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
