@@ -144,7 +144,6 @@
     "webpack-dev-server": "^3.1.1",
     "webpack-hot-middleware": "^2.21.2",
     "webpack-merge": "^4.1.2",
-    "webpack-visualizer-plugin": "^0.1.11",
     "yargs": "^10.0.3"
   },
   "resolutions": {
