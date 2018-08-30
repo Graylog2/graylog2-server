@@ -1,5 +1,3 @@
-import loadable, { setConfig } from 'loadable-components';
-
-setConfig({ hotReload: false });
+import loadable from 'loadable-components';
 
 export default f => loadable(() => f().then(c => c.default));
