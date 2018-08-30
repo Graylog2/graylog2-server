@@ -1,7 +1,7 @@
 {
   "modules": {
     "byIdentifier": {
-      "node_modules/react/react.js": 0,
+      "node_modules/react/index.js": 0,
       "node_modules/moment/moment.js": 1,
       "node_modules/babel-runtime/helpers/classCallCheck.js": 2,
       "node_modules/babel-runtime/helpers/possibleConstructorReturn.js": 3,
