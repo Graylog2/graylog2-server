@@ -1,4 +1,10 @@
 {
   "presets": ["env", "react", "stage-0", "flow"],
-  "plugins": ["add-module-exports"]
+  "plugins": ["add-module-exports"],
+  "env": {
+    "test": {
+      "plugins": ["babel-plugin-dynamic-import-node"]
+    }
+  }
 }
+
