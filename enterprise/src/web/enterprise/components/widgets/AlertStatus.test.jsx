@@ -2,7 +2,6 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
 
-
 describe('AlertStatus', () => {
 
   const SearchStore = StoreMock('searchSurroundingMessages');
