@@ -125,13 +125,13 @@ const CollectorsAdministrationFilters = createReactClass({
 
     return (
       <SelectPopover id="status-filter"
-                     title="Filter by status"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Status <span className="caret" /></Button>}
+                     title="Filter by collector status"
+                     triggerNode={<Button bsSize="small" bsStyle="link">Collector Status <span className="caret" /></Button>}
                      items={status}
                      itemFormatter={statusFormatter}
                      onItemSelect={filter}
                      selectedItems={statusFilter ? [statusFilter] : []}
-                     filterPlaceholder="Filter by status" />
+                     filterPlaceholder="Filter by collector status" />
     );
   },
 
