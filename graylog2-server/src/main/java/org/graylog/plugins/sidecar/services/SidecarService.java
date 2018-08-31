@@ -148,18 +148,18 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                         }
                         final CollectorStatusList sidecarStatus = collector.nodeDetails().statusList();
 
-                        if (collector.lastSeen().isBefore(threshold) && sidecarStatus.status() == 0) {
+                        if (collector.lastSeen().isBefore(threshold) && Sidecar.Status.RUNNING.equals(Sidecar.Status.fromStatusCode(sidecarStatus.status()))) {
                             NodeDetails nodeDetails = collector.nodeDetails();
 
                             ImmutableSet.Builder<CollectorStatus> collectorStatuses = ImmutableSet.builder();
                             for (CollectorStatus collectorStatus : sidecarStatus.collectors()) {
                                 collectorStatuses.add(CollectorStatus.create(
                                         collectorStatus.collectorId(),
-                                        1, // state unknown, cause lost connection
+                                        Sidecar.Status.UNKNOWN.getStatusCode(),
                                         message));
                             }
                             CollectorStatusList statusListToSave = CollectorStatusList.create(
-                                    1, // unknown
+                                    Sidecar.Status.UNKNOWN.getStatusCode(),
                                     message,
                                     collectorStatuses.build()
                             );
