@@ -58,6 +58,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -117,7 +118,12 @@ public class AdministrationResource extends RestResource implements PluginRestRe
         final String sort = Sidecar.FIELD_NODE_NAME;
         final String order = "asc";
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(request.query());
-        final SearchQuery searchQuery = searchQueryParser.parse(mappedQuery);
+        SearchQuery searchQuery;
+        try {
+             searchQuery = searchQueryParser.parse(mappedQuery);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
         final long total = sidecarService.count();
 
         final Optional<Predicate<Sidecar>> filters = administrationFiltersFactory.getFilters(request.filters());

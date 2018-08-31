@@ -71,7 +71,7 @@ const SidecarsStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        UserNotification.error(`Fetching Sidecars failed with status: ${error}`,
+        UserNotification.error(error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
           'Could not retrieve Sidecars');
       });
 
