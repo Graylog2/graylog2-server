@@ -8,7 +8,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { SelectPopover } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
-import StatusMapper from 'components/sidecars/common/StatusMapper';
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 const CollectorsAdministrationFilters = createReactClass({
   propTypes: {
@@ -121,13 +121,14 @@ const CollectorsAdministrationFilters = createReactClass({
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 
     const statusFilter = this.props.filters.status;
+    const statusFormatter = statusCode => lodash.upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
       <SelectPopover id="status-filter"
                      title="Filter by status"
                      triggerNode={<Button bsSize="small" bsStyle="link">Status <span className="caret" /></Button>}
                      items={status}
-                     itemFormatter={StatusMapper.toString}
+                     itemFormatter={statusFormatter}
                      onItemSelect={filter}
                      selectedItems={statusFilter ? [statusFilter] : []}
                      filterPlaceholder="Filter by status" />

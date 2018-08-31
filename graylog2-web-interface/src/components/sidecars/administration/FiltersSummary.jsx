@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Col, Row } from 'react-bootstrap';
 import lodash from 'lodash';
 
-import StatusMapper from 'components/sidecars/common/StatusMapper';
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 import style from './FiltersSummary.css';
 
@@ -27,7 +27,7 @@ class FiltersSummary extends React.Component {
       return configurations.find(c => c.id === value).name;
     } else if (type === 'status') {
       // Convert status code to string
-      return StatusMapper.toString(value);
+      return SidecarStatusEnum.toString(value);
     } else {
       return value;
     }

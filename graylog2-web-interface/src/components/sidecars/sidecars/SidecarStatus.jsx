@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Col, Row } from 'react-bootstrap';
 
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import SidecarStatusFileList from './SidecarStatusFileList';
 
 const SidecarStatus = createReactClass({
@@ -68,17 +69,17 @@ const SidecarStatus = createReactClass({
       let statusBadge;
       let statusClass;
       switch (status.status) {
-        case 0:
+        case SidecarStatusEnum.RUNNING:
           statusMessage = 'Collector is running.';
           statusClass = 'text-success';
           statusBadge = <i className="fa fa-play fa-fw" />;
           break;
-        case 2:
+        case SidecarStatusEnum.FAILING:
           statusMessage = status.message;
           statusClass = 'text-danger';
           statusBadge = <i className="fa fa-warning fa-fw" />;
           break;
-        case 3:
+        case SidecarStatusEnum.STOPPED:
           statusMessage = status.message;
           statusClass = 'text-danger';
           statusBadge = <i className="fa fa-stop fa-fw" />;

@@ -8,6 +8,7 @@ import Routes from 'routing/Routes';
 import { Timestamp } from 'components/common';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 import style from './SidecarRow.css';
 
@@ -25,7 +26,8 @@ class SidecarRow extends React.Component {
     const sidecarClass = sidecar.active ? '' : style.greyedOut;
     const annotation = sidecar.active ? '' : ' (inactive)';
     let sidecarStatus = { status: null, message: null, id: null };
-    if (sidecar.node_details.status && sidecar.node_details.status.status >= 0) {
+
+    if (sidecar.node_details.status && SidecarStatusEnum.isValidStatusCode(sidecar.node_details.status.status)) {
       sidecarStatus = {
         status: sidecar.node_details.status.status,
         message: sidecar.node_details.status.message,

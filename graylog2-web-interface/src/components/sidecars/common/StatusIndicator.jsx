@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import lodash from 'lodash';
+
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 class StatusIndicator extends React.Component {
   static propTypes = {
@@ -16,29 +19,24 @@ class StatusIndicator extends React.Component {
   };
 
   render() {
-    let text;
+    const text = lodash.upperFirst(SidecarStatusEnum.toString(this.props.status));
     let icon;
     let className;
 
     switch (this.props.status) {
-      case 0:
-        text = 'Running';
+      case SidecarStatusEnum.RUNNING:
         className = 'text-success';
         icon = 'fa-play';
         break;
-      case 2:
-        text = 'Failing';
+      case SidecarStatusEnum.FAILING:
         className = 'text-danger';
         icon = 'fa-exclamation-triangle';
         break;
-      case 3:
-        text = 'Stopped';
+      case SidecarStatusEnum.STOPPED:
         className = 'text-danger';
         icon = 'fa-stop';
         break;
-
       default:
-        text = 'Unknown';
         className = 'text-info';
         icon = 'fa-question-circle';
     }
@@ -47,12 +45,12 @@ class StatusIndicator extends React.Component {
       const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{this.props.message}</Tooltip>;
       return (
         <OverlayTrigger placement="top" overlay={tooltip} rootClose>
-          <span className={`${className}`}><i className={`fa ${icon}`} /> {text}</span>
+          <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
         </OverlayTrigger>
       );
     } else {
       return (
-        <span className={`${className}`}><i className={`fa ${icon}`} /> {text}</span>
+        <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
       );
     }
   }
