@@ -86,7 +86,6 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     private final SearchQueryParser searchQueryParser;
     private final AdministrationFiltersFactory administrationFiltersFactory;
     private final ActiveSidecarFilter activeSidecarFilter;
-    private final SidecarConfiguration sidecarConfiguration;
     private final SidecarStatusMapper sidecarStatusMapper;
 
     @Inject
@@ -97,8 +96,8 @@ public class AdministrationResource extends RestResource implements PluginRestRe
                                   AdministrationFiltersFactory administrationFiltersFactory,
                                   ClusterConfigService clusterConfigService,
                                   SidecarStatusMapper sidecarStatusMapper) {
+        final SidecarConfiguration sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
         this.sidecarService = sidecarService;
-        this.sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
         this.configurationService = configurationService;
         this.collectorService = collectorService;
         this.actionService = actionService;
