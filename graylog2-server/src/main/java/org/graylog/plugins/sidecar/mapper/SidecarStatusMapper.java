@@ -18,13 +18,16 @@ package org.graylog.plugins.sidecar.mapper;
 
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public class SidecarStatusMapper {
-    private static final Pattern searchQueryStatusRegex = Pattern.compile("\\bstatus:(running|failing|unknown)\\b", CASE_INSENSITIVE);
+    private static final String statusPattern = Arrays.stream(Sidecar.Status.values()).map(Enum::toString).collect(Collectors.joining("|"));
+    private static final Pattern searchQueryStatusRegex = Pattern.compile("\\bstatus:(" + statusPattern + ")\\b", CASE_INSENSITIVE);
 
     /**
      * Replaces status strings in search query with their number representations,
