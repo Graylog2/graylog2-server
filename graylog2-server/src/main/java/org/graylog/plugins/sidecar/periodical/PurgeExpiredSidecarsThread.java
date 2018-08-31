@@ -82,7 +82,7 @@ public class PurgeExpiredSidecarsThread extends Periodical {
     @Override
     public void doRun() {
         final Period inactiveThreshold = this.sidecarConfiguration.sidecarInactiveThreshold();
-        final int expiredSidecars = sidecarService.markExpired(inactiveThreshold, "Received no ping signal since " + inactiveThreshold.getMinutes() + " minutes");
+        final int expiredSidecars = sidecarService.markExpired(inactiveThreshold, "Received no ping signal from sidecar");
         LOG.debug("Marked {} sidecars as inactive.", expiredSidecars);
         final int purgedSidecars = sidecarService.destroyExpired(this.sidecarConfiguration.sidecarExpirationThreshold());
         LOG.debug("Purged {} inactive sidecars.", purgedSidecars);
