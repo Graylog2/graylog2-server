@@ -29,6 +29,7 @@ import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.filter.ActiveSidecarFilter;
 import org.graylog.plugins.sidecar.filter.AdministrationFilter;
 import org.graylog.plugins.sidecar.filter.AdministrationFiltersFactory;
+import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.CollectorAction;
@@ -86,6 +87,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     private final AdministrationFiltersFactory administrationFiltersFactory;
     private final ActiveSidecarFilter activeSidecarFilter;
     private final SidecarConfiguration sidecarConfiguration;
+    private final SidecarStatusMapper sidecarStatusMapper;
 
     @Inject
     public AdministrationResource(SidecarService sidecarService,
@@ -93,13 +95,15 @@ public class AdministrationResource extends RestResource implements PluginRestRe
                                   CollectorService collectorService,
                                   ActionService actionService,
                                   AdministrationFiltersFactory administrationFiltersFactory,
-                                  ClusterConfigService clusterConfigService) {
+                                  ClusterConfigService clusterConfigService,
+                                  SidecarStatusMapper sidecarStatusMapper) {
         this.sidecarService = sidecarService;
         this.sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
         this.configurationService = configurationService;
         this.collectorService = collectorService;
         this.actionService = actionService;
         this.administrationFiltersFactory = administrationFiltersFactory;
+        this.sidecarStatusMapper = sidecarStatusMapper;
         this.activeSidecarFilter = new ActiveSidecarFilter(sidecarConfiguration.sidecarInactiveThreshold());
         this.searchQueryParser = new SearchQueryParser(Sidecar.FIELD_NODE_NAME, SidecarResource.SEARCH_FIELD_MAPPING);
     }
@@ -113,7 +117,8 @@ public class AdministrationResource extends RestResource implements PluginRestRe
                                                 @Valid @NotNull AdministrationRequest request) {
         final String sort = Sidecar.FIELD_NODE_NAME;
         final String order = "asc";
-        final SearchQuery searchQuery = searchQueryParser.parse(request.query());
+        final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(request.query());
+        final SearchQuery searchQuery = searchQueryParser.parse(mappedQuery);
         final long total = sidecarService.count();
 
         final Optional<Predicate<Sidecar>> filters = administrationFiltersFactory.getFilters(request.filters());
