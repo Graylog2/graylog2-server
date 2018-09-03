@@ -40,6 +40,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CLUSTER_CONFIGURATION_UPDATE = PREFIX + "cluster_configuration:update";
     public static final String CONTENT_PACK_CREATE = PREFIX + "content_pack:create";
     public static final String CONTENT_PACK_DELETE = PREFIX + "content_pack:delete";
+    public static final String CONTENT_PACK_DELETE_REV = PREFIX + "content_pack:delete_rev";
     public static final String CONTENT_PACK_INSTALL = PREFIX + "content_pack:install";
     public static final String CONTENT_PACK_UNINSTALL = PREFIX + "content_pack:uninstall";
     public static final String DASHBOARD_CREATE = PREFIX + "dashboard:create";

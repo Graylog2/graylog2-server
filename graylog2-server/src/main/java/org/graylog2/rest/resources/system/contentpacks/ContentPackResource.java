@@ -232,7 +232,7 @@ public class ContentPackResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid content pack"),
             @ApiResponse(code = 500, message = "Error while saving content pack")
     })
-    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_DELETE)
+    @AuditEvent(type = AuditEventTypes.CONTENT_PACK_DELETE_REV)
     @Path("{contentPackId}/{revision}")
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
