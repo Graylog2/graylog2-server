@@ -165,6 +165,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(CLUSTER_CONFIGURATION_UPDATE)
             .add(CONTENT_PACK_CREATE)
             .add(CONTENT_PACK_DELETE)
+            .add(CONTENT_PACK_DELETE_REV)
             .add(CONTENT_PACK_INSTALL)
             .add(CONTENT_PACK_UNINSTALL)
             .add(DASHBOARD_CREATE)
