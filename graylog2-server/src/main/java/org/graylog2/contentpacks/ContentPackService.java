@@ -113,7 +113,7 @@ public class ContentPackService {
         final Traverser<Entity> entityTraverser = Traverser.forGraph(dependencyGraph);
         final Iterable<Entity> entitiesInOrder = entityTraverser.depthFirstPostOrder(rootEntity);
 
-        // Insertion order is important for created entities!
+        // Insertion order is important for created entities so we can roll back in order!
         final Map<EntityDescriptor, Object> createdEntities = new LinkedHashMap<>();
         final Map<EntityDescriptor, Object> allEntities = new HashMap<>();
         final ImmutableSet.Builder<NativeEntityDescriptor> allEntityDescriptors = ImmutableSet.builder();
