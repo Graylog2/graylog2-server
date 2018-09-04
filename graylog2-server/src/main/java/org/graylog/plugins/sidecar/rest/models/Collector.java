@@ -61,9 +61,11 @@ public abstract class Collector {
     public abstract String configurationPath();
 
     @JsonProperty(FIELD_EXECUTE_PARAMETERS)
+    @Nullable
     public abstract String executeParameters();
 
     @JsonProperty(FIELD_VALIDATION_PARAMETERS)
+    @Nullable
     public abstract String validationParameters();
 
     @JsonProperty(FIELD_DEFAULT_TEMPLATE)
