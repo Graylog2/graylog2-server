@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer;
 
+import static com.google.common.collect.ImmutableMap.of;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
@@ -35,14 +37,14 @@ public abstract class IndexMapping {
     }
 
     public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
+        final Map<String, Object> analyzerKeyword = of("analyzer_keyword", of(
                 "tokenizer", "keyword",
                 "filter", "lowercase"));
-        final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
-        final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
-        final Map<String, Object> mappings = ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
+        final Map<String, Object> analysis = of("analyzer", analyzerKeyword);
+        final Map<String, Object> settings = of("analysis", analysis);
+        final Map<String, Object> mappings = of(TYPE_MESSAGE, messageMapping(analyzer));
 
-        return ImmutableMap.of(
+        return of(
                 "template", template,
                 "order", order,
                 "settings", settings,
@@ -51,24 +53,24 @@ public abstract class IndexMapping {
     }
 
     protected Map<String, Object> messageMapping(final String analyzer) {
-        return ImmutableMap.of(
+        return of(
                 "properties", fieldProperties(analyzer),
                 "dynamic_templates", dynamicTemplate(),
                 "_source", enabled());
     }
 
     protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
-        final Map<String, Object> defaultInternal = ImmutableMap.of(
+        final Map<String, Object> defaultInternal = of(
                 "match", "gl2_*",
                 "mapping", notAnalyzedString());
-        final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
+        final Map<String, Map<String, Object>> templateInternal = of("internal_fields", defaultInternal);
 
-        final Map<String, Object> defaultAll = ImmutableMap.of(
+        final Map<String, Object> defaultAll = of(
                 // Match all
                 "match", "*",
                 // Analyze nothing by default
-                "mapping", ImmutableMap.of("index", "not_analyzed"));
-        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
+                "mapping", of("index", "not_analyzed"));
+        final Map<String, Map<String, Object>> templateAll = of("store_generic", defaultAll);
 
         return ImmutableList.of(templateInternal, templateAll);
     }
@@ -78,12 +80,12 @@ public abstract class IndexMapping {
     protected abstract Map<String, Object> notAnalyzedString();
 
     protected Map<String, Object> typeTimeWithMillis() {
-        return ImmutableMap.of(
+        return of(
                 "type", "date",
                 "format", Tools.ES_DATE_FORMAT);
     }
 
     protected Map<String, Boolean> enabled() {
-        return ImmutableMap.of("enabled", true);
+        return of("enabled", true);
     }
 }
