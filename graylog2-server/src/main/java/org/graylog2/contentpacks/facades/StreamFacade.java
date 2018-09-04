@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -208,6 +209,16 @@ public class StreamFacade implements EntityFacade<Stream> {
                 throw new ContentPackException("Default stream <" + streamId + "> does not exist!", e);
             }
         } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<NativeEntity<Stream>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final Stream stream = streamService.load(nativeEntityDescriptor.id().id());
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, stream));
+        } catch (NotFoundException e) {
             return Optional.empty();
         }
     }

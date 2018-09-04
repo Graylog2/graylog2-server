@@ -34,6 +34,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +105,12 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     public Optional<NativeEntity<Configuration>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
         // TODO: Check if multiple configurations are allowed to exist (bernd)
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<NativeEntity<Configuration>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        return configurationService.get(nativeEntityDescriptor.id().id())
+                .map(entity -> NativeEntity.create(nativeEntityDescriptor, entity));
     }
 
     @Override

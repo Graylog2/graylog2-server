@@ -31,6 +31,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +134,12 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         if (!name.equals(existingCollector.name()) || !serviceType.equals(existingCollector.serviceType())) {
             throw new DivergingEntityConfigurationException("Expected service type for Collector with name \"" + name + "\": <" + serviceType + ">; actual service type: <" + existingCollector.serviceType() + ">");
         }
+    }
+
+    @Override
+    public Optional<NativeEntity<Collector>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        return collectorService.get(nativeEntityDescriptor.id().id())
+                .map(entity -> NativeEntity.create(nativeEntityDescriptor, entity));
     }
 
     @Override

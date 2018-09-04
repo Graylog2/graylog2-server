@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBDataAdapterService;
@@ -134,6 +135,12 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
         final Optional<DataAdapterDto> existingDataAdapter = dataAdapterService.get(name);
 
         return existingDataAdapter.map(dataAdapter -> NativeEntity.create(entity.id(), dataAdapter.id(), TYPE_V1, dataAdapter));
+    }
+
+    @Override
+    public Optional<NativeEntity<DataAdapterDto>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        return dataAdapterService.get(nativeEntityDescriptor.id().id())
+                .map(entity -> NativeEntity.create(nativeEntityDescriptor, entity));
     }
 
     @Override

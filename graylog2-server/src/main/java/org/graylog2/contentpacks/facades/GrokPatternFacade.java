@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
@@ -94,6 +95,16 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
             return NativeEntity.create(entity.id(), savedGrokPattern.id(), TYPE_V1, savedGrokPattern);
         } catch (ValidationException e) {
             throw new RuntimeException("Couldn't create grok pattern " + grokPattern.name());
+        }
+    }
+
+    @Override
+    public Optional<NativeEntity<GrokPattern>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final GrokPattern grokPattern = grokPatternService.load(nativeEntityDescriptor.id().id());
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, grokPattern));
+        } catch (NotFoundException e) {
+            return Optional.empty();
         }
     }
 

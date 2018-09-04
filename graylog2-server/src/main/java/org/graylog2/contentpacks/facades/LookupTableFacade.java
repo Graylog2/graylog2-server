@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
@@ -159,6 +160,12 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         if (!name.equals(existingLookupTable.name()) || !title.equals(existingLookupTable.title())) {
             throw new DivergingEntityConfigurationException("Different lookup table configuration with name \"" + name + "\"");
         }
+    }
+
+    @Override
+    public Optional<NativeEntity<LookupTableDto>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        return lookupTableService.get(nativeEntityDescriptor.id().id())
+                .map(entity -> NativeEntity.create(nativeEntityDescriptor, entity));
     }
 
     @Override

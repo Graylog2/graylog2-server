@@ -36,6 +36,7 @@ import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -403,6 +404,16 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         }
 
         return inputData.build();
+    }
+
+    @Override
+    public Optional<NativeEntity<InputWithExtractors>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final InputWithExtractors input = InputWithExtractors.create(inputService.find(nativeEntityDescriptor.id().id()));
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, input));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

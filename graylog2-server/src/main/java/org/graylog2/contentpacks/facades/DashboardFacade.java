@@ -35,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.TimeRangeEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.Dashboard;
@@ -253,6 +254,16 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         return widgetCreator.buildDashboardWidget(type,
                 id, description, cacheTime,
                 widgetConfig, timeRange, username);
+    }
+
+    @Override
+    public Optional<NativeEntity<Dashboard>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final Dashboard dashboard = dashboardService.load(nativeEntityDescriptor.id().id());
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, dashboard));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

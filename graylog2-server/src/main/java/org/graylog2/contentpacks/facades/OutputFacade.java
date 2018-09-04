@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -130,6 +131,16 @@ public class OutputFacade implements EntityFacade<Output> {
             return NativeEntity.create(entity.id(), output.getId(), TYPE_V1, output);
         } catch (ValidationException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+    @Override
+    public Optional<NativeEntity<Output>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final Output output = outputService.load(nativeEntityDescriptor.id().id());
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, output));
+        } catch (NotFoundException e) {
+            return Optional.empty();
         }
     }
 

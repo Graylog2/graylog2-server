@@ -25,6 +25,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
@@ -80,6 +81,15 @@ public interface EntityFacade<T> {
     default Optional<NativeEntity<T>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
         return Optional.empty();
     }
+
+    /**
+     * Loads the native entity instance for the given native entity descriptor.
+     *
+     * @param nativeEntityDescriptor the native entity descriptor
+     * @return the existing native entity in the database wrapped in {@link NativeEntity<T>},
+     * or {@link Optional#empty()} if the native entity doesn't exist.
+     */
+    Optional<NativeEntity<T>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor);
 
     /**
      * Delete the given native entity.
