@@ -136,7 +136,8 @@ const SidecarsStore = Reflux.createStore({
       return { node_id: sidecar.node_id, assignments: assignments };
     });
 
-    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`), { nodes: nodes })
+    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`), { nodes: nodes });
+    promise
       .then(
         (response) => {
           UserNotification.success('', `Configuration change for ${sidecars.length} collectors requested`);
