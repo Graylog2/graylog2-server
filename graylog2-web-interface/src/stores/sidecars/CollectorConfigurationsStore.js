@@ -45,7 +45,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
   },
 
   all() {
-    const promise = this._fetchConfigurations({ pageSize: 0 })
+    const promise = this._fetchConfigurations({ pageSize: 0 });
+    promise
       .then(
         (response) => {
           this.configurations = response.configurations;
@@ -62,7 +63,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
   },
 
   list({ query = '', page = 1, pageSize = 10 }) {
-    const promise = this._fetchConfigurations({ query: query, page: page, pageSize: pageSize })
+    const promise = this._fetchConfigurations({ query: query, page: page, pageSize: pageSize });
+    promise
       .then(
         (response) => {
           this.query = response.query;

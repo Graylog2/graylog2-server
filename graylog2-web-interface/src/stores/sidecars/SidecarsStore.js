@@ -82,7 +82,7 @@ const SidecarsStore = Reflux.createStore({
     const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}`));
     promise
       .catch(
-        error => {
+        (error) => {
           UserNotification.error(`Fetching Sidecar failed with status: ${error}`,
             'Could not retrieve Sidecar');
         });
@@ -97,7 +97,7 @@ const SidecarsStore = Reflux.createStore({
     const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`), [action]);
     promise
       .catch(
-        error => {
+        (error) => {
           UserNotification.error(`Restarting Sidecar failed with status: ${error}`,
             'Could not restart Sidecar');
         });
@@ -108,7 +108,7 @@ const SidecarsStore = Reflux.createStore({
     const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`));
     promise
       .catch(
-        error => {
+        (error) => {
           UserNotification.error(`Fetching Sidecar actions failed with status: ${error}`,
             'Could not retrieve Sidecar actions');
         });
@@ -136,7 +136,8 @@ const SidecarsStore = Reflux.createStore({
       return { node_id: sidecar.node_id, assignments: assignments };
     });
 
-    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`), { nodes: nodes })
+    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`), { nodes: nodes });
+    promise
       .then(
         (response) => {
           UserNotification.success('', `Configuration change for ${sidecars.length} collectors requested`);

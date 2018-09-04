@@ -61,7 +61,8 @@ const CollectorsStore = Reflux.createStore({
   },
 
   all() {
-    const promise = this._fetchCollectors({ pageSize: 0 })
+    const promise = this._fetchCollectors({ pageSize: 0 });
+    promise
       .then(
         (response) => {
           this.collectors = response.collectors;
@@ -77,7 +78,8 @@ const CollectorsStore = Reflux.createStore({
   },
 
   list({ query = '', page = 1, pageSize = 10 }) {
-    const promise = this._fetchCollectors({ query: query, page: page, pageSize: pageSize })
+    const promise = this._fetchCollectors({ query: query, page: page, pageSize: pageSize });
+    promise
       .then(
         (response) => {
           this.query = response.query;
@@ -105,7 +107,8 @@ const CollectorsStore = Reflux.createStore({
   },
 
   create(collector) {
-    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors`), collector)
+    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors`), collector);
+    promise
       .then(
         (response) => {
           UserNotification.success('', 'Collector successfully created');
@@ -122,7 +125,8 @@ const CollectorsStore = Reflux.createStore({
   },
 
   update(collector) {
-    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collector.id}`), collector)
+    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collector.id}`), collector);
+    promise
       .then(
         (response) => {
           UserNotification.success('', 'Collector successfully updated');
