@@ -41,7 +41,7 @@ class SidecarStatusPage extends React.Component {
   };
 
   reloadCollectors = () => {
-    CollectorsActions.all().then(collectors => this.setState({ collectors }));
+    CollectorsActions.all().then(response => this.setState({ collectors: response.collectors }));
   };
 
   render() {
