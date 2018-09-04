@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, FormGroup, ControlLabel } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
@@ -110,28 +110,26 @@ class GrokExtractorConfiguration extends React.Component {
                onChange={this._onChange('named_captures_only')}
                help="Only put the explicitly named captures into the message." />
 
-        <Input id="grok_pattern"
-               label="Grok pattern"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10">
-          <Row className="row-sm">
-            <Col md={11}>
-              <GrokPatternInput
-                onPatternChange={this._onPatternChange}
-                pattern={this.props.configuration.grok_pattern || ''}
-                patterns={this.state.patterns}
-                className={Style.grokInput}
-              />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={1}>
-              <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try against example'}
-              </Button>
-            </Col>
-          </Row>
-        </Input>
+        <Row>
+          <Col mdOffset={1} md={1}>
+            <ControlLabel className="col-md-offset-2">Grok pattern</ControlLabel>
+          </Col>
+          <Col md={10}>
+            <GrokPatternInput
+              onPatternChange={this._onPatternChange}
+              pattern={this.props.configuration.grok_pattern || ''}
+              patterns={this.state.patterns}
+              className={Style.grokInput}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col mdOffset={2} md={1}>
+            <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
+              {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try against example'}
+            </Button>
+          </Col>
+        </Row>
       </div>
     );
   }

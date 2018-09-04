@@ -112,7 +112,7 @@ class GrokPatternInput extends React.Component {
           </ListGroupItem>);
       });
     return (
-      <Row bsClass={this.props.className}>
+      <Row className={this.props.className}>
         <Col sm={8}>
           <Input ref={(node) => { this.patternInput = node; }}
                  type="textarea"
