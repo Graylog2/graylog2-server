@@ -16,10 +16,11 @@
  */
 package org.graylog2;
 
+import static com.google.common.base.Strings.nullToEmpty;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchRule;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
@@ -38,12 +39,6 @@ import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
-import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexMapping2;
-import org.graylog2.indexer.IndexMapping5;
-import org.junit.Rule;
-
-import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -54,9 +49,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-
-import static com.google.common.base.Strings.nullToEmpty;
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.inject.Inject;
+import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMapping2;
+import org.graylog2.indexer.IndexMapping5;
+import org.junit.Rule;
 
 public abstract class ElasticsearchBase {
     private static final String PROPERTIES_RESOURCE_NAME = "elasticsearch.properties";

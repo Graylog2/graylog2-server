@@ -16,16 +16,23 @@
  */
 package org.graylog2.indexer.results;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.params.Parameters;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.Map;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.ElasticsearchBase;
+import org.graylog2.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -40,14 +47,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 public class ScrollResultIT extends ElasticsearchBase {
     @Rule

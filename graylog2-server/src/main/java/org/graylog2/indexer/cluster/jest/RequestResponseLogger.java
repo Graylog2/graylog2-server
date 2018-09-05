@@ -17,8 +17,6 @@
 package org.graylog2.indexer.cluster.jest;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -26,7 +24,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.RequestLine;
 import org.apache.http.StatusLine;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.slf4j.Logger;
@@ -54,17 +51,12 @@ public class RequestResponseLogger implements HttpResponseInterceptor {
     final HttpRequest httpRequest = (HttpRequest) context
         .getAttribute(HttpCoreContext.HTTP_REQUEST);
     final RequestLine request = httpRequest.getRequestLine();
-    URI uri = null;
-    try {
-      uri = new URIBuilder(targetHost.toURI()).setPath(request.getUri()).build();
-    } catch (URISyntaxException ignore) {
-      // we only update the path of a valid URI, that should never fail
-    }
-    logger.trace("[{} {}]: {} {}",
+    logger.trace("[{} {}]: {} {}{}",
         statusLine.getStatusCode(),
         statusLine.getReasonPhrase(),
         request.getMethod(),
-        uri
+        targetHost.toURI(),
+        request.getUri()
     );
   }
 }
