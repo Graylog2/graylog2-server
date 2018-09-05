@@ -4,9 +4,9 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual } from 'lodash';
+import { Button } from 'react-bootstrap';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
-import SearchForm from 'components/common/SearchForm';
 
 import Field from 'enterprise/components/Field';
 import FieldTypeIcon from 'enterprise/components/sidebar/FieldTypeIcon';
@@ -115,12 +115,16 @@ const FieldList = createReactClass({
     }
     const selectedQuery = this.state.viewMetadata.activeQuery;
     const selectedView = this.state.viewMetadata.id;
-    const filter = this.state.filter ? (field => field.name.includes(this.state.filter)) : () => true;
+    const filter = this.state.filter ? (field => field.name.toLocaleUpperCase().includes(this.state.filter.toLocaleUpperCase())) : () => true;
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
       .filter(filter)
-      .sortBy(field => field.name)
+      .sortBy(field => field.name.toLocaleUpperCase())
       .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, fields }));
+
+    if (fieldList.isEmpty()) {
+      return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
+    }
     return (
       <ul ref={(elem) => { this.fieldList = elem; }}
           style={{ maxHeight: this.state.maxFieldsHeight }}
@@ -129,7 +133,8 @@ const FieldList = createReactClass({
       </ul>
     );
   },
-  handleSearch(filter) {
+  handleSearch(e) {
+    const filter = e.target.value;
     this.setState({ filter });
   },
   handleSearchReset() {
@@ -157,10 +162,24 @@ const FieldList = createReactClass({
     const { showFieldsBy } = this.state;
     return (
       <div>
-        <SearchForm onSearch={this.handleSearch}
-                    onReset={this.handleSearchReset}
-                    placeholder="Filter fields"
-                    topMargin={0} />
+        <form className={`form-inline ${styles.filterContainer}`}>
+          <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
+            <input id="common-search-form-query-input"
+                   className="query form-control"
+                   style={{ width: '100%' }}
+                   onChange={this.handleSearch}
+                   value={this.state.filter}
+                   placeholder="Filter fields"
+                   type="text"
+                   autoComplete="off"
+                   spellCheck="false" />
+          </div>
+          <div className="form-group">
+            <Button type="reset" className="reset-button" onClick={this.handleSearchReset}>
+              Reset
+            </Button>
+          </div>
+        </form>
         <div style={{ marginTop: '5px', marginBottom: '0px' }}>
           List fields of{' '}
           {this.showFieldsByLink('current', 'current streams', 'This shows fields which are (prospectively) included in the streams you have selected.')},{' '}

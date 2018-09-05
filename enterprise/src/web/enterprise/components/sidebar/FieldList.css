@@ -6,3 +6,12 @@
 :local(.fieldListItem) {
     font-size: 12px;
 }
+
+:local(.filterContainer) {
+    display: flex;
+}
+
+:local(.filterInputContainer) {
+    flex-grow: 1;
+    margin-right: 5px;
+}
