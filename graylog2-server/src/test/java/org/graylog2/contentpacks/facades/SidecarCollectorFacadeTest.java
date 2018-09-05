@@ -27,7 +27,7 @@ import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.CollectorEntity;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -49,7 +49,7 @@ import java.util.Set;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CollectorFacadeTest {
+public class SidecarCollectorFacadeTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
 
@@ -58,13 +58,13 @@ public class CollectorFacadeTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private CollectorService collectorService;
-    private CollectorFacade facade;
+    private SidecarCollectorFacade facade;
 
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         collectorService = new CollectorService(mongoRule.getMongoConnection(), mapperProvider);
-        facade = new CollectorFacade(objectMapper, collectorService);
+        facade = new SidecarCollectorFacade(objectMapper, collectorService);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class CollectorFacadeTest {
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -100,7 +100,7 @@ public class CollectorFacadeTest {
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -119,7 +119,7 @@ public class CollectorFacadeTest {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
                 .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -149,7 +149,7 @@ public class CollectorFacadeTest {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
                 .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -229,7 +229,7 @@ public class CollectorFacadeTest {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
                 .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),

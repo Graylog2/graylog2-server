@@ -27,7 +27,7 @@ import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.CollectorConfigurationEntity;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -46,8 +46,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
-public class CollectorConfigurationFacade implements EntityFacade<Configuration> {
-    private static final Logger LOG = LoggerFactory.getLogger(CollectorConfigurationFacade.class);
+public class SidecarCollectorConfigurationFacade implements EntityFacade<Configuration> {
+    private static final Logger LOG = LoggerFactory.getLogger(SidecarCollectorConfigurationFacade.class);
 
     public static final ModelType TYPE_V1 = ModelTypes.COLLECTOR_CONFIGURATION_V1;
 
@@ -55,14 +55,14 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     private final ConfigurationService configurationService;
 
     @Inject
-    public CollectorConfigurationFacade(ObjectMapper objectMapper, ConfigurationService configurationService) {
+    public SidecarCollectorConfigurationFacade(ObjectMapper objectMapper, ConfigurationService configurationService) {
         this.objectMapper = objectMapper;
         this.configurationService = configurationService;
     }
 
     @Override
     public EntityWithConstraints exportNativeEntity(Configuration configuration) {
-        final CollectorConfigurationEntity configurationEntity = CollectorConfigurationEntity.create(
+        final SidecarCollectorConfigurationEntity configurationEntity = SidecarCollectorConfigurationEntity.create(
                 ValueReference.of(configuration.collectorId()),
                 ValueReference.of(configuration.name()),
                 ValueReference.of(configuration.color()),
@@ -89,7 +89,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
     }
 
     private NativeEntity<Configuration> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
-        final CollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), CollectorConfigurationEntity.class);
+        final SidecarCollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), SidecarCollectorConfigurationEntity.class);
         final Configuration configuration = Configuration.create(
                 configurationEntity.collectorId().asString(parameters),
                 configurationEntity.title().asString(parameters),
@@ -174,7 +174,7 @@ public class CollectorConfigurationFacade implements EntityFacade<Configuration>
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
 
-        final CollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), CollectorConfigurationEntity.class);
+        final SidecarCollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), SidecarCollectorConfigurationEntity.class);
         final EntityDescriptor collectorDescriptor = EntityDescriptor.create(configurationEntity.collectorId().asString(parameters), ModelTypes.COLLECTOR_V1);
         final Entity collectorEntity = entities.get(collectorDescriptor);
 
