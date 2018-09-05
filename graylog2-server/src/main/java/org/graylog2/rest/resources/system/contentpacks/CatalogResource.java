@@ -22,8 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -68,7 +67,7 @@ public class CatalogResource {
     @Timed
     @ApiOperation(value = "Resolve dependencies of entities and return their configuration")
     @RequiresPermissions(RestPermissions.CATALOG_RESOLVE)
-    @AuditEvent(type = AuditEventTypes.CATALOG_RESOLVE)
+    @NoAuditEvent("this is not changing any data")
     public CatalogResolveResponse resolveEntities(
             @ApiParam(name = "JSON body", required = true)
             @Valid @NotNull CatalogResolveRequest request) {
