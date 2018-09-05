@@ -25,8 +25,11 @@ const SideBar = createReactClass({
     queryId: PropTypes.string.isRequired,
     results: PropTypes.object.isRequired,
     viewMetadata: PropTypes.shape({
-      summary: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
+      activeQuery: PropTypes.string,
+      description: PropTypes.string,
+      id: PropTypes.string,
+      summary: PropTypes.string,
+      title: PropTypes.string,
     }).isRequired,
   },
 

@@ -6,7 +6,7 @@ import { mount } from 'enzyme';
 import MeasureDimensions from './MeasureDimensions';
 
 describe('<MeasureDimensions />', () => {
-  it('should pass a function to getHeight of Container', () => {
+  it('should pass the height of the container to its children', () => {
     const ChildComp = createReactClass({
       propTypes: {
         containerHeight: PropTypes.number,
@@ -28,6 +28,8 @@ describe('<MeasureDimensions />', () => {
     });
     let childRef = null;
     mount(<MeasureDimensions><ChildComp ref={(node) => { childRef = node; }} /></MeasureDimensions>);
-    expect(childRef.getContainerHeight()).not.toBe(undefined);
+
+    // JSDOM does not have a height, therefore we can only check that containerHeight was set to 0.
+    expect(childRef.getContainerHeight()).toBe(0);
   });
 });
