@@ -4,24 +4,30 @@ import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import lodash from 'lodash';
 
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
+import DateTime from 'logic/datetimes/DateTime';
 
 class StatusIndicator extends React.Component {
   static propTypes = {
-    status: PropTypes.number,
-    message: PropTypes.string,
     id: PropTypes.string,
+    lastSeen: PropTypes.string,
+    message: PropTypes.string,
+    status: PropTypes.number,
   };
 
   static defaultProps = {
-    status: -1,
-    message: '',
     id: '',
+    lastSeen: undefined,
+    message: '',
+    status: -1,
   };
 
   render() {
     const text = lodash.upperFirst(SidecarStatusEnum.toString(this.props.status));
+    const lastSeenDateTime = new DateTime(this.props.lastSeen);
+
     let icon;
     let className;
+    let message = this.props.message;
 
     switch (this.props.status) {
       case SidecarStatusEnum.RUNNING:
@@ -39,10 +45,11 @@ class StatusIndicator extends React.Component {
       default:
         className = 'text-info';
         icon = 'fa-question-circle';
+        message += ` (${lastSeenDateTime.toRelativeString()})`;
     }
 
     if (this.props.message && this.props.id) {
-      const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{this.props.message}</Tooltip>;
+      const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{message}</Tooltip>;
       return (
         <OverlayTrigger placement="top" overlay={tooltip} rootClose>
           <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>

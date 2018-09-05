@@ -211,9 +211,12 @@ const CollectorsAdministration = createReactClass({
         </Col>
         <Col lg={1} md={2} xs={3}>
           <span className={style.additionalContent}>
-            {configuration && <StatusIndicator status={collectorStatus.status}
-                                               message={collectorStatus.message}
-                                               id={collectorStatus.id} />}
+            {configuration && (
+              <StatusIndicator status={collectorStatus.status}
+                               message={collectorStatus.message}
+                               id={collectorStatus.id}
+                               lastSeen={sidecar.last_seen} />
+            )}
           </span>
         </Col>
         <Col lg={1} md={2} xs={3}>

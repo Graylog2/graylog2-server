@@ -47,7 +47,8 @@ class SidecarRow extends React.Component {
         <td>
           <StatusIndicator status={sidecarStatus.status}
                            message={sidecarStatus.message}
-                           id={sidecarStatus.id} />
+                           id={sidecarStatus.id}
+                           lastSeen={sidecar.last_seen} />
         </td>
         <td>
           <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />&ensp;
