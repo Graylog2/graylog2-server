@@ -35,11 +35,16 @@ const EditContentPackPage = createReactClass({
   },
 
   componentDidMount() {
-    ContentPacksActions.getRev(this.props.params.contentPackId, this.props.params.contentPackRev).then(() => {
+    ContentPacksActions.get(this.props.params.contentPackId).then(() => {
+      const originContentPackRev =  this.props.params.contentPackRev;
+      const newContentPack = this.state.contentPack[originContentPackRev];
+      const nextContentPackRev = Math.max(...Object.keys(this.state.contentPack).map(x => parseInt(x, 10))) + 1;
+      newContentPack.rev = nextContentPackRev;
+      this.setState({ contentPack: newContentPack });
+
       CatalogActions.showEntityIndex().then(() => {
         this._getSelectedEntities();
         this._getAppliedParameter();
-        this._bumpVersion();
       });
     });
   },
@@ -49,12 +54,12 @@ const EditContentPackPage = createReactClass({
       return;
     }
     const selectedEntities = this.state.contentPack.entities.reduce((result, entity) => {
-      if (this.state.entityIndex[entity.type] &&
-        this.state.entityIndex[entity.type].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
+      if (this.state.entityIndex[entity.type.name] &&
+        this.state.entityIndex[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
         const newResult = result;
         const selectedEntity = { type: entity.type, id: entity.id };
-        newResult[entity.type] = result[entity.type] || [];
-        newResult[entity.type].push(selectedEntity);
+        newResult[entity.type.name] = result[entity.type.name] || [];
+        newResult[entity.type.name].push(selectedEntity);
         return newResult;
       }
       return result;
@@ -80,13 +85,6 @@ const EditContentPackPage = createReactClass({
       return newResult;
     }, {});
     this.setState({ appliedParameter: appliedParameter });
-  },
-
-  _bumpVersion() {
-    const newContentPack = ObjectUtils.clone(this.state.contentPack);
-    const rev = parseInt(newContentPack.rev, 10);
-    newContentPack.rev = rev + 1;
-    this.setState({ contentPack: newContentPack });
   },
 
   _onStateChanged(newState) {
