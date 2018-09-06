@@ -36,6 +36,8 @@ const TimeUnitInput = createReactClass({
     enabled: PropTypes.bool,
     /** Specifies the value of the input. */
     value: PropTypes.number,
+    /** Indicates the default value to use, in case value is not provided or set. */
+    defaultValue: PropTypes.number,
     /** Indicates which unit is used for the value. */
     unit: PropTypes.oneOf(['NANOSECONDS', 'MICROSECONDS', 'MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']),
     /** Add an additional class to the label. */
@@ -46,7 +48,8 @@ const TimeUnitInput = createReactClass({
 
   getDefaultProps() {
     return {
-      value: 1,
+      defaultValue: 1,
+      value: undefined,
       unit: 'SECONDS',
       label: '',
       help: '',
@@ -67,13 +70,17 @@ const TimeUnitInput = createReactClass({
     { value: 'DAYS', label: 'days' },
   ],
 
+  _getEffectiveValue() {
+    return lodash.defaultTo(this.props.value, this.props.defaultValue);
+  },
+
   _isChecked() {
     return this.props.required || this.props.enabled;
   },
 
   _propagateInput(update) {
     const previousInput = {
-      value: this.props.value,
+      value: this._getEffectiveValue(),
       unit: this.props.unit,
       checked: this._isChecked(),
     };
@@ -86,7 +93,7 @@ const TimeUnitInput = createReactClass({
   },
 
   _onUpdate(e) {
-    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), this.constructor.getDefaultProps().value);
+    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), this.props.defaultValue);
     this._propagateInput({ value: value });
   },
 

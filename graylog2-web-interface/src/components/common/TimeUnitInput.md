@@ -4,7 +4,7 @@ const createReactClass = require('create-react-class');
 const TimeUnitInputExample = createReactClass({
   getInitialState() {
     return {
-      value: 0,
+      value: undefined,
       unit: 'MINUTES',
       enabled: false,
     };
@@ -22,7 +22,8 @@ const TimeUnitInputExample = createReactClass({
         <TimeUnitInput value={value}
                        unit={unit}
                        enabled={enabled}
-                       update={this.onChange}/>
+                       update={this.onChange}
+                       defaultValue={7} />
       </div>
     );
   },
