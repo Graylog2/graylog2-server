@@ -55,11 +55,10 @@ class StatusIndicator extends React.Component {
           <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
         </OverlayTrigger>
       );
-    } else {
-      return (
-        <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
-      );
     }
+    return (
+      <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
+    );
   }
 }
 

@@ -28,9 +28,9 @@ class FiltersSummary extends React.Component {
     } else if (type === 'status') {
       // Convert status code to string
       return SidecarStatusEnum.toString(value);
-    } else {
-      return value;
     }
+
+    return value;
   };
 
   formatFilters = (filters) => {

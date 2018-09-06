@@ -1,0 +1,25 @@
+:local(.sidecarOs) {
+    margin-right: 5px;
+    margin-left: 2px;
+}
+
+:local(.name) {
+    width: 300px;
+}
+
+:local(.deflist) {
+    margin-top: 10px;
+}
+
+:local(.deflist) dt {
+    float: left;
+    clear: left;
+}
+
+:local(.deflist) dd {
+    margin-left: 160px;
+}
+
+:local(.topMargin) {
+    margin-top: 10px;
+}
