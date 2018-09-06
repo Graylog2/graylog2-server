@@ -12,16 +12,6 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 const SidecarNewConfigurationPage = createReactClass({
   displayName: 'SidecarNewConfigurationPage',
 
-  componentDidMount() {
-    this.style.use();
-  },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!components/sidecars/styles/SidecarStyles.css'),
-
   render() {
     return (
       <DocumentTitle title="New Collector Configuration">

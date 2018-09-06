@@ -41,7 +41,7 @@ class SidecarStatusPage extends React.Component {
   };
 
   reloadCollectors = () => {
-    CollectorsActions.all().then(collectors => this.setState({ collectors }));
+    CollectorsActions.all().then(response => this.setState({ collectors: response.collectors }));
   };
 
   render() {
@@ -63,7 +63,7 @@ class SidecarStatusPage extends React.Component {
 
             <span>
               Read more about sidecars and how to set them up in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_STATUS} text="Graylog documentation"/>.
+              {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR_STATUS} text="Graylog documentation" />.
             </span>
 
             <ButtonToolbar>

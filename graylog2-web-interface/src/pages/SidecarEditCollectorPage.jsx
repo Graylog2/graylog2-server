@@ -25,17 +25,6 @@ const SidecarEditCollectorPage = createReactClass({
     };
   },
 
-  componentDidMount() {
-    this.style.use();
-    this._reloadCollector();
-  },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!components/sidecars/styles/SidecarStyles.css'),
-
   _reloadCollector() {
     CollectorsActions.getCollector(this.props.params.collectorId).then(this._setCollector);
   },
