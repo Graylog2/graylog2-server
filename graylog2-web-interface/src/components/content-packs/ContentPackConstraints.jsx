@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import ObjectUtils from 'util/ObjectUtils';
 import { DataTable } from 'components/common';
 import { Badge } from 'react-bootstrap';
 import './ContentPackConstraints.css';
