@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Col, Row } from 'react-bootstrap';
 
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
+import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
+
 import SidecarStatusFileList from './SidecarStatusFileList';
 
 const SidecarStatus = createReactClass({
@@ -12,23 +15,13 @@ const SidecarStatus = createReactClass({
     collectors: PropTypes.array.isRequired,
   },
 
-  componentDidMount() {
-    this.style.use();
-  },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!../styles/SidecarStyles.css'),
-
   formatNodeDetails(details) {
     if (!details) {
       return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
     }
     const metrics = details.metrics || {};
     return (
-      <dl className="deflist top-margin">
+      <dl className={`${commonStyles.deflist} ${commonStyles.topMargin}`}>
         <dt>IP Address</dt>
         <dd>{lodash.defaultTo(details.ip, 'Not available')}</dd>
         <dt>Operating System</dt>
@@ -68,17 +61,17 @@ const SidecarStatus = createReactClass({
       let statusBadge;
       let statusClass;
       switch (status.status) {
-        case 0:
+        case SidecarStatusEnum.RUNNING:
           statusMessage = 'Collector is running.';
           statusClass = 'text-success';
           statusBadge = <i className="fa fa-play fa-fw" />;
           break;
-        case 2:
+        case SidecarStatusEnum.FAILING:
           statusMessage = status.message;
           statusClass = 'text-danger';
           statusBadge = <i className="fa fa-warning fa-fw" />;
           break;
-        case 3:
+        case SidecarStatusEnum.STOPPED:
           statusMessage = status.message;
           statusClass = 'text-danger';
           statusBadge = <i className="fa fa-stop fa-fw" />;
@@ -98,7 +91,7 @@ const SidecarStatus = createReactClass({
     });
 
     return (
-      <dl className="deflist">
+      <dl className={commonStyles.deflist}>
         {statuses}
       </dl>
     );
@@ -120,7 +113,7 @@ const SidecarStatus = createReactClass({
         <Row className="content">
           <Col md={12}>
             <h2>Collectors status</h2>
-            <div className="top-margin">
+            <div className={commonStyles.topMargin}>
               {this.formatCollectorStatus(sidecar.node_details, this.props.collectors)}
             </div>
           </Col>
@@ -128,8 +121,8 @@ const SidecarStatus = createReactClass({
         <Row className="content" hidden={logFileList.length === 0}>
           <Col md={12}>
             <h2>Log Files</h2>
-            <p>Recently modified files will be highlighted in blue.</p>
-            <div className="top-margin">
+            <p className={commonStyles.topMargin}>Recently modified files will be highlighted in blue.</p>
+            <div>
               <SidecarStatusFileList files={logFileList} />
             </div>
           </Col>

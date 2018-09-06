@@ -16,8 +16,11 @@
  */
 package org.graylog.plugins.sidecar.services;
 
+import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import org.graylog.plugins.sidecar.rest.models.Collector;
+import org.graylog.plugins.sidecar.rest.models.CollectorStatus;
+import org.graylog.plugins.sidecar.rest.models.CollectorStatusList;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
@@ -124,6 +127,55 @@ public class SidecarService extends PaginatedDbService<Sidecar> {
                     .mapToInt(collector -> {
                         if (collector.lastSeen().isBefore(threshold)) {
                             return delete(collector.id());
+                        }
+                        return 0;
+                    })
+                    .sum();
+        }
+
+        return count;
+    }
+
+    public int markExpired(Period period, String message) {
+        final DateTime threshold = DateTime.now(DateTimeZone.UTC).minus(period);
+        int count;
+
+        try (final Stream<Sidecar> collectorStream = streamAll()) {
+            count = collectorStream
+                    .mapToInt(collector -> {
+                        if (collector.nodeDetails().statusList() == null) {
+                            return 0;
+                        }
+                        final CollectorStatusList sidecarStatus = collector.nodeDetails().statusList();
+
+                        if (collector.lastSeen().isBefore(threshold) && Sidecar.Status.RUNNING.equals(Sidecar.Status.fromStatusCode(sidecarStatus.status()))) {
+                            NodeDetails nodeDetails = collector.nodeDetails();
+
+                            ImmutableSet.Builder<CollectorStatus> collectorStatuses = ImmutableSet.builder();
+                            for (CollectorStatus collectorStatus : sidecarStatus.collectors()) {
+                                collectorStatuses.add(CollectorStatus.create(
+                                        collectorStatus.collectorId(),
+                                        Sidecar.Status.UNKNOWN.getStatusCode(),
+                                        message));
+                            }
+                            CollectorStatusList statusListToSave = CollectorStatusList.create(
+                                    Sidecar.Status.UNKNOWN.getStatusCode(),
+                                    message,
+                                    collectorStatuses.build()
+                            );
+                            NodeDetails nodeDetailsToSave = NodeDetails.create(
+                                    nodeDetails.operatingSystem(),
+                                    nodeDetails.ip(),
+                                    nodeDetails.metrics(),
+                                    nodeDetails.logFileList(),
+                                    statusListToSave);
+
+                            Sidecar toSave = collector.toBuilder()
+                                    .nodeDetails(nodeDetailsToSave)
+                                    .build();
+                            save(toSave);
+                            return 1;
+
                         }
                         return 0;
                     })

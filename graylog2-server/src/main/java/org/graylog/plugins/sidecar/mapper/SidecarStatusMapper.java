@@ -16,39 +16,18 @@
  */
 package org.graylog.plugins.sidecar.mapper;
 
-import java.util.Locale;
+import org.graylog.plugins.sidecar.rest.models.Sidecar;
+
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public class SidecarStatusMapper {
-    private static final Pattern searchQueryStatusRegex = Pattern.compile("\\bstatus:(running|failing|unknown)\\b", CASE_INSENSITIVE);
-    public enum Status {
-        RUNNING(0), UNKNOWN(1), FAILING(2);
-
-        private final int statusCode;
-
-        Status(int statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
-
-        public static Status fromStatusCode(int statusCode) {
-            switch (statusCode) {
-                case 0: return RUNNING;
-                case 2: return FAILING;
-                default: return UNKNOWN;
-            }
-        }
-
-        public static Status fromString(String statusString) {
-            return valueOf(statusString.toUpperCase(Locale.ENGLISH));
-        }
-    }
+    private static final String statusPattern = Arrays.stream(Sidecar.Status.values()).map(Enum::toString).collect(Collectors.joining("|"));
+    private static final Pattern searchQueryStatusRegex = Pattern.compile("\\bstatus:(" + statusPattern + ")\\b", CASE_INSENSITIVE);
 
     /**
      * Replaces status strings in search query with their number representations,
@@ -62,7 +41,7 @@ public class SidecarStatusMapper {
         final StringBuffer stringBuffer = new StringBuffer();
         while(matcher.find()) {
             final String status = matcher.group(1);
-            matcher.appendReplacement(stringBuffer, "status:" + Status.fromString(status).getStatusCode());
+            matcher.appendReplacement(stringBuffer, "status:" + Sidecar.Status.fromString(status).getStatusCode());
         }
         matcher.appendTail(stringBuffer);
         return stringBuffer.toString();

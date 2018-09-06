@@ -1,46 +1,64 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import lodash from 'lodash';
+
+import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
+import DateTime from 'logic/datetimes/DateTime';
 
 class StatusIndicator extends React.Component {
   static propTypes = {
+    id: PropTypes.string,
+    lastSeen: PropTypes.string,
+    message: PropTypes.string,
     status: PropTypes.number,
   };
 
   static defaultProps = {
+    id: '',
+    lastSeen: undefined,
+    message: '',
     status: -1,
   };
 
   render() {
-    let text;
+    const text = lodash.upperFirst(SidecarStatusEnum.toString(this.props.status));
+    const lastSeenDateTime = new DateTime(this.props.lastSeen);
+
     let icon;
     let className;
+    let message = this.props.message;
+
     switch (this.props.status) {
-      case 0:
-        text = 'Running';
+      case SidecarStatusEnum.RUNNING:
         className = 'text-success';
         icon = 'fa-play';
         break;
-      case 2:
-        text = 'Failing';
+      case SidecarStatusEnum.FAILING:
         className = 'text-danger';
         icon = 'fa-exclamation-triangle';
         break;
-      case 3:
-        text = 'Stopped';
+      case SidecarStatusEnum.STOPPED:
         className = 'text-danger';
         icon = 'fa-stop';
         break;
-
       default:
-        text = 'Unknown';
         className = 'text-info';
         icon = 'fa-question-circle';
+        message += ` (${lastSeenDateTime.toRelativeString()})`;
     }
 
+    if (this.props.message && this.props.id) {
+      const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{message}</Tooltip>;
+      return (
+        <OverlayTrigger placement="top" overlay={tooltip} rootClose>
+          <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
+        </OverlayTrigger>
+      );
+    }
     return (
-      <span className={`${className}`}><i className={`fa ${icon}`} /> {text}</span>
+      <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
     );
-
   }
 }
 
