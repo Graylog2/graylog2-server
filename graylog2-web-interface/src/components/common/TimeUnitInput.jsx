@@ -5,6 +5,7 @@ import {
   InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem
 } from 'react-bootstrap';
 import { InputWrapper } from 'components/bootstrap';
+import FormsUtils from 'util/FormsUtils';
 
 /**
  * Component that renders a form field for a time unit value. The field has
@@ -81,7 +82,7 @@ const TimeUnitInput = createReactClass({
   },
 
   _onUpdate(e) {
-    const value = e.target.value;
+    const value = FormsUtils.getValueFromInput(e.target);
     this.setState({ value: value }, this._propagateState);
   },
 
@@ -104,7 +105,7 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
             {!this.props.required && checkbox}
-            <FormControl type="text" disabled={!this.state.checked} onChange={this._onUpdate} value={this.state.value} />
+            <FormControl type="number" disabled={!this.state.checked} onChange={this._onUpdate} value={this.state.value} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             title={this.OPTIONS.filter(o => o.value === this.state.unit)[0].label}>
