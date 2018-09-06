@@ -83,7 +83,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -126,13 +125,18 @@ public class UsersResource extends RestResource {
     })
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                            @PathParam("username") String username) {
+        final String requestingUser = getSubject().getPrincipal().toString();
+        final boolean isSelf = requestingUser.equals(username);
+        final boolean isAdmin = userService.getAdminUser().getName().equals(requestingUser);
+        if (!(isSelf || isAdmin)) {
+            throw new ForbiddenException("Not allowed to view user " + username);
+        }
+
         final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
-        // if the requested username does not match the authenticated user, then we don't return permission information
-        final boolean allowedToSeePermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
-        final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
+        final boolean permissionsAllowed = isSelf || isAdmin;
 
         return toUserResponse(user, permissionsAllowed, Optional.empty());
     }
