@@ -57,10 +57,6 @@ const TimeUnitInput = createReactClass({
     };
   },
 
-  isChecked() {
-    return this.props.required || this.props.enabled;
-  },
-
   OPTIONS: [
     { value: 'NANOSECONDS', label: 'nanoseconds' },
     { value: 'MICROSECONDS', label: 'microseconds' },
@@ -71,11 +67,15 @@ const TimeUnitInput = createReactClass({
     { value: 'DAYS', label: 'days' },
   ],
 
+  _isChecked() {
+    return this.props.required || this.props.enabled;
+  },
+
   _propagateInput(update) {
     const previousInput = {
       value: this.props.value,
       unit: this.props.unit,
-      checked: this.isChecked(),
+      checked: this._isChecked(),
     };
     const nextInput = Object.assign({}, previousInput, update);
     this.props.update(nextInput.value, nextInput.unit, nextInput.checked);
@@ -100,7 +100,7 @@ const TimeUnitInput = createReactClass({
     });
 
     const checkbox = (<InputGroup.Addon>
-      <input type="checkbox" checked={this.isChecked()} onChange={this._onToggleEnable} />
+      <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} />
     </InputGroup.Addon>);
 
     return (
@@ -109,7 +109,7 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
             {!this.props.required && checkbox}
-            <FormControl type="number" disabled={!this.isChecked()} onChange={this._onUpdate} value={this.props.value} />
+            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             title={this.OPTIONS.filter(o => o.value === this.props.unit)[0].label}>
