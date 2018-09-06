@@ -55,12 +55,8 @@ const TimeUnitInput = createReactClass({
     };
   },
 
-  getInitialState() {
-    return {
-      checked: this.props.required || this.props.enabled,
-      value: this.props.value,
-      unit: this.props.unit,
-    };
+  isChecked() {
+    return this.props.required || this.props.enabled;
   },
 
   OPTIONS: [
@@ -73,21 +69,27 @@ const TimeUnitInput = createReactClass({
     { value: 'DAYS', label: 'days' },
   ],
 
-  _propagateState() {
-    this.props.update(this.state.value, this.state.unit, this.state.checked);
+  _propagateInput(update) {
+    const previousInput = {
+      value: this.props.value,
+      unit: this.props.unit,
+      checked: this.isChecked(),
+    };
+    const nextInput = Object.assign({}, previousInput, update);
+    this.props.update(nextInput.value, nextInput.unit, nextInput.checked);
   },
 
   _onToggleEnable(e) {
-    this.setState({ checked: e.target.checked }, this._propagateState);
+    this._propagateInput({ checked: e.target.checked });
   },
 
   _onUpdate(e) {
     const value = FormsUtils.getValueFromInput(e.target);
-    this.setState({ value: value }, this._propagateState);
+    this._propagateInput({ value: value });
   },
 
   _onUnitSelect(unit) {
-    this.setState({ unit: unit }, this._propagateState);
+    this._propagateInput({ unit: unit });
   },
 
   render() {
@@ -96,7 +98,7 @@ const TimeUnitInput = createReactClass({
     });
 
     const checkbox = (<InputGroup.Addon>
-      <input type="checkbox" checked={this.state.checked} onChange={this._onToggleEnable} />
+      <input type="checkbox" checked={this.isChecked()} onChange={this._onToggleEnable} />
     </InputGroup.Addon>);
 
     return (
@@ -105,10 +107,10 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
             {!this.props.required && checkbox}
-            <FormControl type="number" disabled={!this.state.checked} onChange={this._onUpdate} value={this.state.value} />
+            <FormControl type="number" disabled={!this.isChecked()} onChange={this._onUpdate} value={this.props.value} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
-                            title={this.OPTIONS.filter(o => o.value === this.state.unit)[0].label}>
+                            title={this.OPTIONS.filter(o => o.value === this.props.unit)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>
