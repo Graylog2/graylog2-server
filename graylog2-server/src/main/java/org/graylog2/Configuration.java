@@ -133,15 +133,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "user_password_bcrypt_salt_size", validator = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
-    @Parameter(value = "content_packs_loader_enabled")
-    private boolean contentPacksLoaderEnabled = true;
-
-    @Parameter(value = "content_packs_dir", validators = DirectoryPathReadableValidator.class)
-    private Path contentPacksDir = Paths.get("data", "contentpacks");
-
-    @Parameter(value = "content_packs_auto_load", converter = TrimmedStringSetConverter.class)
-    private Set<String> contentPacksAutoLoad = Collections.emptySet();
-
     @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
 
@@ -267,18 +258,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getUserPasswordBCryptSaltSize() {
         return userPasswordBCryptSaltSize;
-    }
-
-    public boolean isContentPacksLoaderEnabled() {
-        return contentPacksLoaderEnabled;
-    }
-
-    public Path getContentPacksDir() {
-        return contentPacksDir;
-    }
-
-    public Set<String> getContentPacksAutoLoad() {
-        return contentPacksAutoLoad;
     }
 
     public Duration getIndexRangesCleanupInterval() {

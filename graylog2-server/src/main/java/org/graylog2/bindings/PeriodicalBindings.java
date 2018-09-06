@@ -27,7 +27,6 @@ import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ClusterIdGeneratorPeriodical;
 import org.graylog2.periodical.ConfigurationManagementPeriodical;
-import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.GarbageCollectionWarningThread;
 import org.graylog2.periodical.IndexFailuresPeriodical;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
@@ -50,7 +49,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(AlertScannerThread.class);
         periodicalBinder.addBinding().to(BatchedElasticSearchOutputFlushThread.class);
         periodicalBinder.addBinding().to(ClusterHealthCheckThread.class);
-        periodicalBinder.addBinding().to(ContentPackLoaderPeriodical.class);
         periodicalBinder.addBinding().to(GarbageCollectionWarningThread.class);
         periodicalBinder.addBinding().to(IndexerClusterCheckerThread.class);
         periodicalBinder.addBinding().to(IndexRetentionThread.class);
