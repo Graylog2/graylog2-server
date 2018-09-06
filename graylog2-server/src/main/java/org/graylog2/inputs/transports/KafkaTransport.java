@@ -88,7 +88,7 @@ public class KafkaTransport extends ThrottleableTransport {
     );
 
     private static final String DEFAULT_OFFSET_RESET = "largest";
-    public static final String DEFAULT_GROUP_ID = "graylog2";
+    private static final String DEFAULT_GROUP_ID = "graylog2";
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
 
