@@ -4,6 +4,8 @@ import createReactClass from 'create-react-class';
 import {
   InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem
 } from 'react-bootstrap';
+import lodash from 'lodash';
+
 import { InputWrapper } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
 
@@ -84,7 +86,7 @@ const TimeUnitInput = createReactClass({
   },
 
   _onUpdate(e) {
-    const value = FormsUtils.getValueFromInput(e.target);
+    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), this.constructor.getDefaultProps().value);
     this._propagateInput({ value: value });
   },
 
