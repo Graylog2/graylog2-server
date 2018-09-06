@@ -1,0 +1,341 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackConstraints /> should render with created constraints 1`] = `
+<div>
+  <h2>
+    Constraints
+  </h2>
+  <br />
+  <br />
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="content-packs-constraints"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Type
+                </th>
+                <th>
+                  Plugin
+                </th>
+                <th>
+                  Version
+                </th>
+                <th>
+                  Fulfilled
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  plugin-version
+                </td>
+                <td>
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                </td>
+                <td>
+                  &gt;=3.0.0-alpha.2
+                </td>
+                <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  server-version
+                </td>
+                <td />
+                <td>
+                  &gt;=3.0.0-alpha.2+af8d8e0
+                </td>
+                <td>
+                  <span
+                    className="success badge"
+                  >
+                    <i
+                      className="fa fa-check"
+                    />
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackConstraints /> should render with new constraints 1`] = `
+<div>
+  <h2>
+    Constraints
+  </h2>
+  <br />
+  <br />
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="content-packs-constraints"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Type
+                </th>
+                <th>
+                  Plugin
+                </th>
+                <th>
+                  Version
+                </th>
+                <th>
+                  Fulfilled
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  plugin-version
+                </td>
+                <td>
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                </td>
+                <td>
+                  &gt;=3.0.0-alpha.2
+                </td>
+                <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  server-version
+                </td>
+                <td />
+                <td>
+                  &gt;=3.0.0-alpha.2+af8d8e0
+                </td>
+                <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackConstraints /> should render with new constraints with forced fulfillment 1`] = `
+<div>
+  <h2>
+    Constraints
+  </h2>
+  <br />
+  <br />
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="content-packs-constraints"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Type
+                </th>
+                <th>
+                  Plugin
+                </th>
+                <th>
+                  Version
+                </th>
+                <th>
+                  Fulfilled
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  plugin-version
+                </td>
+                <td>
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                </td>
+                <td>
+                  &gt;=3.0.0-alpha.2
+                </td>
+                <td>
+                  <span
+                    className="success badge"
+                  >
+                    <i
+                      className="fa fa-check"
+                    />
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  server-version
+                </td>
+                <td />
+                <td>
+                  &gt;=3.0.0-alpha.2+af8d8e0
+                </td>
+                <td>
+                  <span
+                    className="success badge"
+                  >
+                    <i
+                      className="fa fa-check"
+                    />
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackConstraints /> should render with new constraints without forced fulfillment 1`] = `
+<div>
+  <h2>
+    Constraints
+  </h2>
+  <br />
+  <br />
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="content-packs-constraints"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Type
+                </th>
+                <th>
+                  Plugin
+                </th>
+                <th>
+                  Version
+                </th>
+                <th>
+                  Fulfilled
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  plugin-version
+                </td>
+                <td>
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                </td>
+                <td>
+                  &gt;=3.0.0-alpha.2
+                </td>
+                <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  server-version
+                </td>
+                <td />
+                <td>
+                  &gt;=3.0.0-alpha.2+af8d8e0
+                </td>
+                <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
