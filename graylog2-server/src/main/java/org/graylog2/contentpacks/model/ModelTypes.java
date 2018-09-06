@@ -17,8 +17,8 @@
 package org.graylog2.contentpacks.model;
 
 public interface ModelTypes {
-    ModelType COLLECTOR_CONFIGURATION_V1 = ModelType.of("collector_configuration", "1");
-    ModelType COLLECTOR_V1 = ModelType.of("collector", "1");
+    ModelType SIDECAR_COLLECTOR_CONFIGURATION_V1 = ModelType.of("sidecar_collector_configuration", "1");
+    ModelType SIDECAR_COLLECTOR_V1 = ModelType.of("sidecar_collector", "1");
     ModelType DASHBOARD_V1 = ModelType.of("dashboard", "1");
     ModelType GROK_PATTERN_V1 = ModelType.of("grok_pattern", "1");
     ModelType LOOKUP_ADAPTER_V1 = ModelType.of("lookup_adapter", "1");

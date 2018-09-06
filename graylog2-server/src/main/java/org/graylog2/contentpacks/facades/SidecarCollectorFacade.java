@@ -46,7 +46,7 @@ import static java.util.Objects.isNull;
 public class SidecarCollectorFacade implements EntityFacade<Collector> {
     private static final Logger LOG = LoggerFactory.getLogger(SidecarCollectorFacade.class);
 
-    public static final ModelType TYPE_V1 = ModelTypes.COLLECTOR_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.SIDECAR_COLLECTOR_V1;
 
     private final ObjectMapper objectMapper;
     private final CollectorService collectorService;

@@ -49,7 +49,7 @@ import static java.util.Objects.isNull;
 public class SidecarCollectorConfigurationFacade implements EntityFacade<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(SidecarCollectorConfigurationFacade.class);
 
-    public static final ModelType TYPE_V1 = ModelTypes.COLLECTOR_CONFIGURATION_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.SIDECAR_COLLECTOR_CONFIGURATION_V1;
 
     private final ObjectMapper objectMapper;
     private final ConfigurationService configurationService;
@@ -150,7 +150,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
             LOG.debug("Could not find configuration {}", entityDescriptor);
         } else {
             final EntityDescriptor collectorEntityDescriptor = EntityDescriptor.create(
-                    configuration.collectorId(), ModelTypes.COLLECTOR_V1);
+                    configuration.collectorId(), ModelTypes.SIDECAR_COLLECTOR_V1);
             mutableGraph.putEdge(entityDescriptor, collectorEntityDescriptor);
         }
 
@@ -175,7 +175,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
         mutableGraph.addNode(entity);
 
         final SidecarCollectorConfigurationEntity configurationEntity = objectMapper.convertValue(entity.data(), SidecarCollectorConfigurationEntity.class);
-        final EntityDescriptor collectorDescriptor = EntityDescriptor.create(configurationEntity.collectorId().asString(parameters), ModelTypes.COLLECTOR_V1);
+        final EntityDescriptor collectorDescriptor = EntityDescriptor.create(configurationEntity.collectorId().asString(parameters), ModelTypes.SIDECAR_COLLECTOR_V1);
         final Entity collectorEntity = entities.get(collectorDescriptor);
 
         if (collectorEntity != null) {
