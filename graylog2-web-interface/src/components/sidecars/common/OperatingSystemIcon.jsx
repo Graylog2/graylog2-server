@@ -2,6 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
+import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
+
 const OperatingSystemIcon = createReactClass({
   propTypes: {
     operatingSystem: PropTypes.string,
@@ -12,7 +14,6 @@ const OperatingSystemIcon = createReactClass({
       operatingSystem: undefined,
     };
   },
-
 
   operatingSystemIcon(operatingSystem) {
     let glyphClass = 'fa-question-circle';
@@ -27,7 +28,7 @@ const OperatingSystemIcon = createReactClass({
       }
     }
 
-    glyphClass += ' fa-fw sidecar-os';
+    glyphClass += ` fa-fw ${commonStyles.sidecarOs}`;
 
     return (<i className={`fa ${glyphClass}`} />);
   },

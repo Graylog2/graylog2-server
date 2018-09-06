@@ -3,10 +3,6 @@
     margin-left: 2px;
 }
 
-:local(.name) {
-    width: 300px;
-}
-
 :local(.deflist) {
     margin-top: 10px;
 }
