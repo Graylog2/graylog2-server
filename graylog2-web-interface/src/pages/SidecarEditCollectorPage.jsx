@@ -25,6 +25,10 @@ const SidecarEditCollectorPage = createReactClass({
     };
   },
 
+  componentDidMount() {
+    this._reloadCollector();
+  },
+
   _reloadCollector() {
     CollectorsActions.getCollector(this.props.params.collectorId).then(this._setCollector);
   },
