@@ -58,6 +58,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -79,6 +82,7 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_TOPIC_FILTER = "topic_filter";
     public static final String CK_THREADS = "threads";
     public static final String CK_OFFSET_RESET = "offset_reset";
+    public static final String CK_CONSUMER_PROPERTIES = "consumer_properties";
 
     // See https://kafka.apache.org/090/documentation.html for available values for "auto.offset.reset".
     private static final Map<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
@@ -185,18 +189,28 @@ public class KafkaTransport extends ThrottleableTransport {
 
         final Properties props = new Properties();
 
+        // Add default values to properties so they can be overrided later
         props.put("group.id", GROUP_ID);
-        props.put("client.id", "gl2-" + nodeId + "-" + input.getId());
-
-        props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
-        props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
-        props.put("zookeeper.connect", configuration.getString(CK_ZOOKEEPER));
-        props.put("auto.offset.reset", configuration.getString(CK_OFFSET_RESET, DEFAULT_OFFSET_RESET));
         // Default auto commit interval is 60 seconds. Reduce to 1 second to minimize message duplication
         // if something breaks.
         props.put("auto.commit.interval.ms", "1000");
         // Set a consumer timeout to avoid blocking on the consumer iterator.
         props.put("consumer.timeout.ms", "1000");
+
+        try {
+            // Overwrite defaults with consumer properties config file (if exists)
+            props.putAll(getConsumerPropertiesFromFile(configuration, CK_CONSUMER_PROPERTIES));
+        } catch (IOException e) {
+            doStop();
+            throw new MisfireException("Unable to read consumer properties file.", e);
+        }
+
+        // Overwrite everything with Input configuration
+        props.put("client.id", "gl2-" + nodeId + "-" + input.getId());
+        props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
+        props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
+        props.put("zookeeper.connect", configuration.getString(CK_ZOOKEEPER));
+        props.put("auto.offset.reset", configuration.getString(CK_OFFSET_RESET, DEFAULT_OFFSET_RESET));
 
         final int numThreads = configuration.getInt(CK_THREADS);
         final ConsumerConfig consumerConfig = new ConsumerConfig(props);
@@ -279,6 +293,18 @@ public class KafkaTransport extends ThrottleableTransport {
                 lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0));
             }
         }, 1, 1, TimeUnit.SECONDS);
+    }
+
+    private Properties getConsumerPropertiesFromFile(Configuration configuration, String configKey) throws IOException {
+        Properties props = new Properties();
+        String consumerPropertiesPath = configuration.getString(configKey);
+
+        if (consumerPropertiesPath != null && !"".equals(consumerPropertiesPath)) {
+            File propertiesFile = new File(consumerPropertiesPath);
+            props.load(new FileInputStream(propertiesFile));
+        }
+
+        return props;
     }
 
     private ExecutorService executorService(int numThreads) {
@@ -380,6 +406,13 @@ public class KafkaTransport extends ThrottleableTransport {
                     DEFAULT_OFFSET_RESET,
                     OFFSET_RESET_VALUES,
                     "What to do when there is no initial offset in ZooKeeper or if an offset is out of range",
+                    ConfigurationField.Optional.OPTIONAL));
+
+            cr.addField(new TextField(
+                    CK_CONSUMER_PROPERTIES,
+                    "Consumer properties file",
+                    "",
+                    "Path to consumer properties file.",
                     ConfigurationField.Optional.OPTIONAL));
 
             return cr;
