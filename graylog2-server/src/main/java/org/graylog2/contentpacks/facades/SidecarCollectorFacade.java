@@ -24,7 +24,7 @@ import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationExceptio
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.CollectorEntity;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -43,23 +43,23 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
-public class CollectorFacade implements EntityFacade<Collector> {
-    private static final Logger LOG = LoggerFactory.getLogger(CollectorFacade.class);
+public class SidecarCollectorFacade implements EntityFacade<Collector> {
+    private static final Logger LOG = LoggerFactory.getLogger(SidecarCollectorFacade.class);
 
-    public static final ModelType TYPE_V1 = ModelTypes.COLLECTOR_V1;
+    public static final ModelType TYPE_V1 = ModelTypes.SIDECAR_COLLECTOR_V1;
 
     private final ObjectMapper objectMapper;
     private final CollectorService collectorService;
 
     @Inject
-    public CollectorFacade(ObjectMapper objectMapper, CollectorService collectorService) {
+    public SidecarCollectorFacade(ObjectMapper objectMapper, CollectorService collectorService) {
         this.objectMapper = objectMapper;
         this.collectorService = collectorService;
     }
 
     @Override
     public EntityWithConstraints exportNativeEntity(Collector collector) {
-        final CollectorEntity collectorEntity = CollectorEntity.create(
+        final SidecarCollectorEntity collectorEntity = SidecarCollectorEntity.create(
                 ValueReference.of(collector.name()),
                 ValueReference.of(collector.serviceType()),
                 ValueReference.of(collector.nodeOperatingSystem()),
@@ -92,7 +92,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
     }
 
     private NativeEntity<Collector> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
-        final CollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), CollectorEntity.class);
+        final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), SidecarCollectorEntity.class);
 
         final Collector collector = Collector.builder()
                 .name(collectorEntity.name().asString(parameters))
@@ -119,7 +119,7 @@ public class CollectorFacade implements EntityFacade<Collector> {
     }
 
     private Optional<NativeEntity<Collector>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
-        final CollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), CollectorEntity.class);
+        final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), SidecarCollectorEntity.class);
 
         final String name = collectorEntity.name().asString(parameters);
         final String serviceType = collectorEntity.serviceType().asString(parameters);

@@ -18,8 +18,8 @@ package org.graylog2.contentpacks;
 
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.constraints.PluginVersionConstraintChecker;
-import org.graylog2.contentpacks.facades.CollectorConfigurationFacade;
-import org.graylog2.contentpacks.facades.CollectorFacade;
+import org.graylog2.contentpacks.facades.SidecarCollectorConfigurationFacade;
+import org.graylog2.contentpacks.facades.SidecarCollectorFacade;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
@@ -43,8 +43,8 @@ public class ContentPacksModule extends PluginModule {
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(ModelIdParamConverter.Provider.class);
 
-        addEntityFacade(CollectorConfigurationFacade.TYPE_V1, CollectorConfigurationFacade.class);
-        addEntityFacade(CollectorFacade.TYPE_V1, CollectorFacade.class);
+        addEntityFacade(SidecarCollectorConfigurationFacade.TYPE_V1, SidecarCollectorConfigurationFacade.class);
+        addEntityFacade(SidecarCollectorFacade.TYPE_V1, SidecarCollectorFacade.class);
         addEntityFacade(DashboardFacade.TYPE_V1, DashboardFacade.class);
         addEntityFacade(GrokPatternFacade.TYPE_V1, GrokPatternFacade.class);
         addEntityFacade(InputFacade.TYPE_V1, InputFacade.class);

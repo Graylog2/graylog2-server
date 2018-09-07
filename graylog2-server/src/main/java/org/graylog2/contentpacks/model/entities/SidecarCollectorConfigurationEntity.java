@@ -26,7 +26,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class CollectorConfigurationEntity {
+public abstract class SidecarCollectorConfigurationEntity {
     @JsonProperty("collector_id")
     public abstract ValueReference collectorId();
 
@@ -40,10 +40,10 @@ public abstract class CollectorConfigurationEntity {
     public abstract ValueReference template();
 
     @JsonCreator
-    public static CollectorConfigurationEntity create(@JsonProperty("collector_id") ValueReference collectorId,
+    public static SidecarCollectorConfigurationEntity create(@JsonProperty("collector_id") ValueReference collectorId,
                                                       @JsonProperty("title") ValueReference title,
                                                       @JsonProperty("color") ValueReference color,
                                                       @JsonProperty("template") ValueReference template) {
-        return new AutoValue_CollectorConfigurationEntity(collectorId, title, color, template);
+        return new AutoValue_SidecarCollectorConfigurationEntity(collectorId, title, color, template);
     }
 }

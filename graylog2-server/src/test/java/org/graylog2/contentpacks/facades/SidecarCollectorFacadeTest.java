@@ -27,7 +27,7 @@ import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.CollectorEntity;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -49,7 +49,7 @@ import java.util.Set;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CollectorFacadeTest {
+public class SidecarCollectorFacadeTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
 
@@ -58,13 +58,13 @@ public class CollectorFacadeTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private CollectorService collectorService;
-    private CollectorFacade facade;
+    private SidecarCollectorFacade facade;
 
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         collectorService = new CollectorService(mongoRule.getMongoConnection(), mapperProvider);
-        facade = new CollectorFacade(objectMapper, collectorService);
+        facade = new SidecarCollectorFacade(objectMapper, collectorService);
     }
 
     @Test
@@ -76,8 +76,8 @@ public class CollectorFacadeTest {
         assertThat(entityWithConstraints.constraints()).isEmpty();
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -93,14 +93,14 @@ public class CollectorFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
 
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         assertThat(entityWithConstraints.constraints()).isEmpty();
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -118,8 +118,8 @@ public class CollectorFacadeTest {
     public void createNativeEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
-                .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -138,7 +138,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.COLLECTOR_V1);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(collector);
     }
@@ -148,8 +148,8 @@ public class CollectorFacadeTest {
     public void findExisting() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
-                .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
@@ -166,7 +166,7 @@ public class CollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.COLLECTOR_V1);
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1);
         assertThat(existingCollector.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(existingCollector.entity()).isEqualTo(collector);
     }
@@ -188,7 +188,7 @@ public class CollectorFacadeTest {
         final EntityExcerpt excerpt = facade.createExcerpt(collector);
 
         assertThat(excerpt.id()).isEqualTo(ModelId.of("5b4c920b4b900a0024af0001"));
-        assertThat(excerpt.type()).isEqualTo(ModelTypes.COLLECTOR_V1);
+        assertThat(excerpt.type()).isEqualTo(ModelTypes.SIDECAR_COLLECTOR_V1);
         assertThat(excerpt.title()).isEqualTo("filebeat");
     }
 
@@ -199,17 +199,17 @@ public class CollectorFacadeTest {
         assertThat(entityExcerpts).containsOnly(
                 EntityExcerpt.builder()
                         .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                        .type(ModelTypes.COLLECTOR_V1)
+                        .type(ModelTypes.SIDECAR_COLLECTOR_V1)
                         .title("filebeat")
                         .build(),
                 EntityExcerpt.builder()
                         .id(ModelId.of("5b4c920b4b900a0024af0002"))
-                        .type(ModelTypes.COLLECTOR_V1)
+                        .type(ModelTypes.SIDECAR_COLLECTOR_V1)
                         .title("winlogbeat")
                         .build(),
                 EntityExcerpt.builder()
                         .id(ModelId.of("5b4c920b4b900a0024af0003"))
-                        .type(ModelTypes.COLLECTOR_V1)
+                        .type(ModelTypes.SIDECAR_COLLECTOR_V1)
                         .title("nxlog")
                         .build()
         );
@@ -218,7 +218,7 @@ public class CollectorFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveEntityDescriptor() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.COLLECTOR_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(descriptor);
     }
@@ -228,8 +228,8 @@ public class CollectorFacadeTest {
     public void resolveEntity() {
         final Entity entity = EntityV1.builder()
                 .id(ModelId.of("0"))
-                .type(ModelTypes.COLLECTOR_V1)
-                .data(objectMapper.convertValue(CollectorEntity.create(
+                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
+                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
                         ValueReference.of("filebeat"),
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
