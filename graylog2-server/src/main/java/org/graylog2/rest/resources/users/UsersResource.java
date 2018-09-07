@@ -27,6 +27,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -329,6 +331,17 @@ public class UsersResource extends RestResource {
         if (roles != null) {
             try {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+                List<String> unknownRoles = new ArrayList<>();
+                roles.forEach(roleName -> {
+                    if (!nameMap.containsKey(roleName)) {
+                        unknownRoles.add(roleName);
+                    }
+                });
+                if (!unknownRoles.isEmpty()) {
+                    throw new BadRequestException(
+                        String.format("Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
+                    );
+                }
                 final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
                 user.setRoleIds(Sets.newHashSet(roleIds));
             } catch (org.graylog2.database.NotFoundException e) {
