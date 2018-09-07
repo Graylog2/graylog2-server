@@ -31,6 +31,7 @@ import { isFunction } from 'enterprise/components/visualizations/Series';
 import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'enterprise/components/widgets/EditMessageList';
 import * as Permissions from './Permissions';
+import ScatterVisualization from './components/visualizations/scatter/ScatterVisualization';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -179,6 +180,11 @@ export default {
       type: NumberVisualization.type,
       displayName: 'Single Number',
       component: NumberVisualization,
+    },
+    {
+      type: ScatterVisualization.type,
+      displayName: 'Scatter Plot',
+      component: ScatterVisualization,
     },
   ],
 };
