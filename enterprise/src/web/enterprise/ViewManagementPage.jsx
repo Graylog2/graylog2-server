@@ -11,7 +11,9 @@ import { ViewManagementStore, ViewManagementActions } from 'enterprise/stores/Vi
 import ViewList from 'enterprise/components/views/ViewList';
 
 const ViewManagementPage = createReactClass({
-  mixins: [Reflux.connect(ViewManagementStore, 'views')],
+  mixins: [
+    Reflux.connect(ViewManagementStore, 'views'),
+  ],
 
   handleSearch(query, page, perPage) {
     return ViewManagementActions.search(query, page, perPage);
@@ -22,6 +24,8 @@ const ViewManagementPage = createReactClass({
   },
 
   render() {
+    const { views } = this.state;
+
     return (
       <DocumentTitle title="Views">
         <span>
@@ -41,8 +45,8 @@ const ViewManagementPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <ViewList views={this.state.views.list}
-                        pagination={this.state.views.pagination}
+              <ViewList views={views.list}
+                        pagination={views.pagination}
                         handleSearch={this.handleSearch}
                         handleViewDelete={this.handleViewDelete} />
             </Col>

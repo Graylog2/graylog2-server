@@ -32,6 +32,7 @@ import AggregationControls from 'enterprise/components/aggregationbuilder/Aggreg
 import EditMessageList from 'enterprise/components/widgets/EditMessageList';
 import * as Permissions from './Permissions';
 import ScatterVisualization from './components/visualizations/scatter/ScatterVisualization';
+import ViewsLicenseCheck from './components/common/ViewsLicenseCheck';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -46,9 +47,9 @@ export default {
 
   },
   routes: [
-    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
-    { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
-    { path: showViewsPath, component: ShowViewPage },
+    { path: extendedSearchPath, component: ViewsLicenseCheck(NewSearchPage), permissions: Permissions.ExtendedSearch.Use },
+    { path: viewsPath, component: ViewsLicenseCheck(ViewManagementPage), permissions: Permissions.View.Use },
+    { path: showViewsPath, component: ViewsLicenseCheck(ShowViewPage) },
   ],
   navigation: [
     // Disabling navigation for extended search for now to avoid confusing alpha testers.
