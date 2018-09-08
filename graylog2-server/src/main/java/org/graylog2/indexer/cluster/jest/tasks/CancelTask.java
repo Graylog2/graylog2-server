@@ -57,6 +57,10 @@ public class CancelTask extends GenericResultAbstractAction {
       this.taskId = taskId;
     }
 
+    public Builder(long id) {
+      this(String.valueOf(id));
+    }
+
     public Builder actions(String actionFilter) {
       return setParameter("actions", actionFilter);
     }

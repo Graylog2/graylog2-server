@@ -16,10 +16,14 @@
  */
 package org.graylog2.bindings;
 
+import static com.google.inject.name.Names.named;
+
 import com.floreysoft.jmte.Engine;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ExceptionMapper;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog2.Configuration;
@@ -37,7 +41,6 @@ import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.users.UserPermissionsCleanupListener;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
@@ -49,6 +52,7 @@ import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
+import org.graylog2.indexer.indices.ElasticsearchTaskView;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
@@ -95,11 +99,7 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
-
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ExceptionMapper;
-
-import static com.google.inject.name.Names.named;
+import org.graylog2.users.UserPermissionsCleanupListener;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
@@ -148,6 +148,8 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
         bind(Stream.class).annotatedWith(DefaultStream.class).toProvider(DefaultStreamProvider.class);
         bind(DefaultStreamChangeHandler.class).asEagerSingleton();
+
+        install(new FactoryModuleBuilder().build(ElasticsearchTaskView.Factory.class));
     }
 
     private void bindSingletons() {

@@ -112,12 +112,14 @@ public class IndicesIT extends ElasticsearchBase {
         final Node node = new Node(client());
         indexMappingFactory = new IndexMappingFactory(node);
         indices = new Indices(client(),
-                new ObjectMapperProvider().get(),
-                indexMappingFactory,
-                new Messages(new MetricRegistry(), client()),
-                mock(NodeId.class),
-                new NullAuditEventSender(),
-                eventBus);
+            new ObjectMapperProvider().get(),
+            indexMappingFactory,
+            new Messages(new MetricRegistry(), client()),
+            mock(NodeId.class),
+            new NullAuditEventSender(),
+            eventBus,
+            (responseJsonNode) -> null
+        );
     }
 
     @Test

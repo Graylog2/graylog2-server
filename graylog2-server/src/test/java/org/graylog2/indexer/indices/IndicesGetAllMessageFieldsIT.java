@@ -16,11 +16,17 @@
  */
 package org.graylog2.indexer.indices;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 import org.graylog2.ElasticsearchBase;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -33,13 +39,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 public class IndicesGetAllMessageFieldsIT extends ElasticsearchBase {
     @Rule
@@ -56,7 +55,8 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBase {
                 new Messages(new MetricRegistry(), client()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
-                new EventBus());
+                new EventBus(),
+            (responseJsonNode) -> null);
     }
 
     @After

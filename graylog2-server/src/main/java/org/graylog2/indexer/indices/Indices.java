@@ -16,11 +16,16 @@
  */
 package org.graylog2.indexer.indices;
 
+import static java.util.stream.Collectors.toList;
+import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -54,12 +59,30 @@ import io.searchbox.indices.aliases.AliasMapping;
 import io.searchbox.indices.aliases.GetAliases;
 import io.searchbox.indices.aliases.ModifyAliases;
 import io.searchbox.indices.aliases.RemoveAliasMapping;
+import io.searchbox.indices.reindex.Reindex;
+import io.searchbox.indices.reindex.Reindex.Builder;
 import io.searchbox.indices.settings.GetSettings;
 import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -75,6 +98,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.cluster.jest.tasks.GetTasks;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -84,36 +108,17 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
-import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
-import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
-
 @Singleton
 public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
     private static final String REOPENED_ALIAS_SUFFIX = "_reopened";
+    private static final int DEFAULT_REINDEX_BATCH_SIZE = 1000;
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -122,11 +127,12 @@ public class Indices {
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
     private final EventBus eventBus;
+    private final ElasticsearchTaskView.Factory taskFactory;
 
     @Inject
     public Indices(JestClient jestClient, ObjectMapper objectMapper, IndexMappingFactory indexMappingFactory,
                    Messages messages, NodeId nodeId, AuditEventSender auditEventSender,
-                   EventBus eventBus) {
+                   EventBus eventBus, ElasticsearchTaskView.Factory taskFactory) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.indexMappingFactory = indexMappingFactory;
@@ -134,6 +140,7 @@ public class Indices {
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
         this.eventBus = eventBus;
+        this.taskFactory = taskFactory;
     }
 
     public void move(String source, String target) {
@@ -715,5 +722,54 @@ public class Indices {
 
 
         return IndexRangeStats.create(min, max, streamIds);
+    }
+
+    public ElasticsearchTaskView reindex(String oldIndex, String newIndex) {
+        return reindex(oldIndex, newIndex, DEFAULT_REINDEX_BATCH_SIZE);
+    }
+
+    public ElasticsearchTaskView reindex(String oldIndex, String newIndex, int batchSize) {
+        final ImmutableMap<Object, Object> src = ImmutableMap.of(
+            "index", oldIndex,
+            "size", batchSize
+        );
+        final ImmutableMap<Object, Object> dst = ImmutableMap.of(
+            "index", newIndex
+        );
+
+        // Reindexing happens asynchronously, we will get back the task id (and it is someone else's
+        // responsibility to track its progress/cancel it/make sure not to start more than one of them.
+        final Reindex reindex = new Builder(src, dst)
+            .waitForCompletion(false)
+            .build();
+
+        final JestResult reindexResult = JestUtils.execute(jestClient, reindex,
+            () -> "Reindexing " + oldIndex + " into " + newIndex + " failed.");
+        if (!reindexResult.isSucceeded()) {
+            LOG.error("Unable to start reindex task from index {} to index {}: {}", oldIndex, newIndex, reindexResult.getErrorMessage());
+            throw new ReindexingFailedException(oldIndex, newIndex, reindexResult.getErrorMessage());
+        }
+        final String taskId = reindexResult.getJsonObject().path("task").asText();
+        if (Strings.isNullOrEmpty(taskId)) {
+            LOG.error("Invalid task response for async reindex request, cannot find taskId");
+            throw new ReindexingFailedException(oldIndex, newIndex, "Invalid task response for async reindex request, cannot find taskId");
+        }
+
+        return getTask(taskId);
+    }
+
+    public ElasticsearchTaskView getTask(String taskId) {
+        final GetTasks getTask = new GetTasks.Builder(taskId).waitForCompletion(false).detailed(true).build();
+        try {
+            final JestResult result = JestUtils
+                .execute(jestClient, getTask, () -> "Unable to load details of task " + taskId);
+            if (result.isSucceeded()) {
+                return taskFactory.create(result.getJsonObject());
+            }
+        } catch (Exception e) {
+            LOG.error("Unable to load details of task {}", taskId, e);
+            throw new TaskException(taskId, ExceptionUtils.getRootCause(e));
+        }
+        throw new TaskException(taskId);
     }
 }
