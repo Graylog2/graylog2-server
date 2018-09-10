@@ -1,8 +1,3 @@
 :local(.sidecarName) {
     word-break: break-all;
 }
-
-:local(.greyedOut) {
-    opacity: 0.5;
-    z-index: 20;
-}

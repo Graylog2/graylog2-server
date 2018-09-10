@@ -12,6 +12,8 @@ import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon'
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 
+import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
+
 import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
 import FiltersSummary from './FiltersSummary';
@@ -238,9 +240,9 @@ const CollectorsAdministration = createReactClass({
         <div className={style.collectorEntry}>
           <Row>
             <Col md={12}>
-              <h4 className={`list-group-item-heading ${style.alignedInformation}`}>
+              <h4 className={`list-group-item-heading ${style.alignedInformation} ${!sidecar.active && commonStyle.greyedOut}`}>
                 {sidecar.node_name} <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
-                &emsp;<small>{sidecar.node_id}</small>
+                &emsp;<small>{sidecar.node_id} {!sidecar.active && <b>&mdash; inactive</b>}</small>
               </h4>
             </Col>
           </Row>

@@ -10,6 +10,7 @@ import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon'
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
+import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
 import style from './SidecarRow.css';
 
 class SidecarRow extends React.Component {
@@ -23,7 +24,7 @@ class SidecarRow extends React.Component {
 
   render() {
     const sidecar = this.props.sidecar;
-    const sidecarClass = sidecar.active ? '' : style.greyedOut;
+    const sidecarClass = sidecar.active ? '' : commonStyle.greyedOut;
     const annotation = sidecar.active ? '' : ' (inactive)';
     let sidecarStatus = { status: null, message: null, id: null };
 
