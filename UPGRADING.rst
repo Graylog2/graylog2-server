@@ -159,8 +159,6 @@ For a long time, Graylog allowed to use `Drools <https://www.drools.org/>`_ to f
 
 Starting with Graylog 3.0.0, the support for Drools-based message filters has been removed from Graylog. The ``rules_file`` configuration setting has been removed accordingly.
 
-If you still want to be able to use Drools for filtering messages in your Graylog cluster, you can install the [Drools plugin](https://github.com/fbalicchia/graylog-plugin-drools) and keep using your ``rules.drl`` file.
-
 We recommend migrating the Drools-based logic to `Processing Pipelines <http://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
 
 
