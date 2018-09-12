@@ -22,6 +22,7 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.NodeMetrics;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
@@ -49,6 +50,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang.CharEncoding.UTF_8;
+
 @Singleton
 public class ConfigurationService extends PaginatedDbService<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationService.class);
@@ -68,6 +71,8 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                 stringTemplateLoader });
         templateConfiguration.setTemplateLoader(multiTemplateLoader);
         templateConfiguration.setSharedVariable("indent", new IndentTemplateDirective());
+        templateConfiguration.setDefaultEncoding(UTF_8);
+        templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfiguration.setLogTemplateExceptions(false);
     }
 
