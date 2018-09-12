@@ -37,6 +37,7 @@ import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
+import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -170,7 +171,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                         @ApiParam(name = "sidecarId", required = true)
                                         @PathParam("sidecarId") String sidecarId,
                                         @ApiParam(name = "configurationId", required = true)
-                                        @PathParam("configurationId") String configurationId) {
+                                        @PathParam("configurationId") String configurationId) throws RenderTemplateException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
         Boolean etagCached = false;
         Response.ResponseBuilder builder = Response.noContent();
@@ -225,8 +226,12 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @NoAuditEvent("this is not changing any data")
     public ConfigurationPreviewRenderResponse renderConfiguration(@ApiParam(name = "JSON body", required = true)
                                                                   @Valid @NotNull ConfigurationPreviewRequest request) {
-        String preview = this.configurationService.renderPreview(request.template());
-        return ConfigurationPreviewRenderResponse.create(preview);
+        try {
+            String preview = this.configurationService.renderPreview(request.template());
+            return ConfigurationPreviewRenderResponse.create(preview);
+        } catch (RenderTemplateException e) {
+            throw new BadRequestException("Could not render template preview: " + e.getMessage());
+        }
     }
 
     @POST
@@ -236,8 +241,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
     public Configuration createConfiguration(@ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
-        Configuration configuration = configurationService.fromRequest(request);
-        return configurationService.save(configuration);
+        return persistConfiguration(null, request);
     }
 
     @POST
@@ -271,9 +275,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             }
         }
 
+        final Configuration updatedConfiguration = persistConfiguration(id, request);
         etagService.invalidateAll();
-        Configuration configuration = configurationService.fromRequest(id, request);
-        return configurationService.save(configuration);
+
+        return updatedConfiguration;
     }
 
     @DELETE
@@ -309,5 +314,21 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         return Hashing.md5()
                 .hashInt(configuration.hashCode())  // avoid negative values
                 .toString();
+    }
+
+    private Configuration persistConfiguration(String id, Configuration request) {
+        try {
+            this.configurationService.renderPreview(request.template());
+        } catch (RenderTemplateException e) {
+            throw new BadRequestException("Configuration template validation failed: " + e.getMessage());
+        }
+
+        Configuration configuration;
+        if (id == null) {
+            configuration = configurationService.fromRequest(request);
+        } else {
+            configuration = configurationService.fromRequest(id, request);
+        }
+        return configurationService.save(configuration);
     }
 }
