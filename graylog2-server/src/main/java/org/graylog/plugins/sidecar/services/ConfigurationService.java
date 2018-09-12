@@ -68,6 +68,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                 stringTemplateLoader });
         templateConfiguration.setTemplateLoader(multiTemplateLoader);
         templateConfiguration.setSharedVariable("indent", new IndentTemplateDirective());
+        templateConfiguration.setLogTemplateExceptions(false);
     }
 
     public Configuration find(String id) {
