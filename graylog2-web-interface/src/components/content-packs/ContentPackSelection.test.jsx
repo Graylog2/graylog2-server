@@ -175,12 +175,18 @@ describe('<ContentPackSelection />', () => {
   it('should validate that all fields are filled out', () => {
     const breq = {
       title: 'breq',
-      type: 'spaceship',
+      type: {
+        name: 'spaceship',
+        version: '1',
+      },
       id: 'beef123',
     };
     const falcon = {
       title: 'falcon',
-      type: 'spaceship',
+      type: {
+        name: 'spaceship',
+        version: '1',
+      },
       id: 'beef124',
     };
     const entities = { spaceship: [breq, falcon] };
