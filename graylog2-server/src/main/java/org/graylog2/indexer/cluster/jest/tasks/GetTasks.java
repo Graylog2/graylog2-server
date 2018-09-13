@@ -78,7 +78,7 @@ public class GetTasks extends GenericResultAbstractAction {
     }
 
     public Builder detailed(boolean detailed) {
-      return setParameter("detailed", detailed);
+      return addCleanApiParameter("detailed");
     }
 
     public Builder ofParentTaskId(String parentTaskId) {
@@ -92,6 +92,10 @@ public class GetTasks extends GenericResultAbstractAction {
       if (!"_all".equals(joinedNodes)) {
         // this api uses nodes as a parameter, not in the url
         setParameter("nodes", joinedNodes);
+      }
+      if (taskId != null) {
+        // cannot request "detailed" for individual tasks, sigh :(
+        removeCleanApiParameter("detailed");
       }
       return new GetTasks(this, taskId);
     }

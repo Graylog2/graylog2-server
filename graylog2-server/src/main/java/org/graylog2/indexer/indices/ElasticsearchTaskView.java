@@ -32,6 +32,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.cluster.jest.tasks.CancelTask.Builder;
+import org.graylog2.indexer.cluster.jest.tasks.GetTasks;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -66,7 +67,7 @@ public class ElasticsearchTaskView {
   private final JsonNode response;
 
   @AssistedInject
-  private ElasticsearchTaskView(JestClient jestClient, ObjectMapper objectMapper,
+  ElasticsearchTaskView(JestClient jestClient, ObjectMapper objectMapper,
       @Assisted JsonNode rawJson) {
     this.jestClient = jestClient;
     this.objectMapper = objectMapper;
@@ -89,6 +90,14 @@ public class ElasticsearchTaskView {
 
   public long id() {
     return staticData.id();
+  }
+
+  /**
+   * Elasticsearch uses this id for uniquely identifying tasks across the cluster.
+   * @return the clusterwide unique task id
+   */
+  public String taskId() {
+    return nodeId() + ":" + id();
   }
 
   public String action() {
@@ -138,13 +147,28 @@ public class ElasticsearchTaskView {
 
   public boolean cancel() {
     if (!cancellable()) {
-      LOG.error("The task " + id() + "/" + action() + " is not cancellable.");
+      LOG.error("The task " + taskId() + "/" + action() + " is not cancellable.");
       return false;
     }
     final JestResult cancelResponse = JestUtils.execute(jestClient,
-        new Builder(id()).build(),
+        new Builder(taskId()).build(),
         () -> "Unable to cancel task " + id());
     return cancelResponse.isSucceeded();
+  }
+
+  /**
+   * Blocks until this task has been completed.
+   *
+   * @return true if the task completed, false otherwise (which likely throw an exception)
+   */
+  public boolean waitForCompletion() {
+    if (isCompleted()) {
+      return true;
+    }
+    final JestResult completion = JestUtils
+        .execute(jestClient, new GetTasks.Builder(taskId()).waitForCompletion(true).build(),
+            () -> "Unable to wait for task " + taskId() + " to complete.");
+    return completion.isSucceeded();
   }
 
   public interface Factory {
@@ -170,7 +194,7 @@ public class ElasticsearchTaskView {
         @JsonProperty("action") String action,
         @JsonProperty("cancellable") boolean cancellable,
         @JsonProperty("description") String description,
-        @JsonProperty("node_id") String nodeId,
+        @JsonProperty("node") String nodeId,
         @JsonProperty("parent_task_id") @Nullable String parentTaskId,
         @JsonProperty("type") String type,
         @JsonProperty("start_time_in_millis") long startTime) {

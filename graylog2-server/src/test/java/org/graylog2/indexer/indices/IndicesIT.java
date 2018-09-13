@@ -111,14 +111,15 @@ public class IndicesIT extends ElasticsearchBase {
         eventBus = new EventBus("indices-test");
         final Node node = new Node(client());
         indexMappingFactory = new IndexMappingFactory(node);
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         indices = new Indices(client(),
-            new ObjectMapperProvider().get(),
+            objectMapper,
             indexMappingFactory,
             new Messages(new MetricRegistry(), client()),
             mock(NodeId.class),
             new NullAuditEventSender(),
             eventBus,
-            (responseJsonNode) -> null
+            responseJsonNode -> new ElasticsearchTaskView(client(), objectMapper, responseJsonNode)
         );
     }
 
@@ -471,6 +472,27 @@ public class IndicesIT extends ElasticsearchBase {
         assertThat(listener.indicesReopenedEvents).containsOnly(IndicesReopenedEvent.create(index));
         assertThat(listener.indicesClosedEvents).isEmpty();
         assertThat(listener.indicesDeletedEvents).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void reindex() throws IOException {
+        final String targetIndex = "graylog_reindexed";
+        try {
+            createIndex(targetIndex);
+            final ElasticsearchTaskView reindexTask = indices
+                .reindex("graylog_0", targetIndex, 1);
+            if (!reindexTask.isCompleted()) {
+                final boolean completed = reindexTask.waitForCompletion();
+                assertThat(completed).describedAs("Task should have completed.").isTrue();
+            }
+            indices.flush(targetIndex);
+            final long originalCount = indices.numberOfMessages("graylog_0");
+            final long reindexedCount = indices.numberOfMessages(targetIndex);
+            assertThat(reindexedCount).describedAs("The number of messages should be equal").isEqualTo(originalCount);
+        } finally {
+            indices.delete(targetIndex);
+        }
     }
 
     public static final class IndicesEventListener {

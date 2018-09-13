@@ -759,7 +759,7 @@ public class Indices {
     }
 
     public ElasticsearchTaskView getTask(String taskId) {
-        final GetTasks getTask = new GetTasks.Builder(taskId).waitForCompletion(false).detailed(true).build();
+        final GetTasks getTask = new GetTasks.Builder(taskId).waitForCompletion(false).build();
         try {
             final JestResult result = JestUtils
                 .execute(jestClient, getTask, () -> "Unable to load details of task " + taskId);
