@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import { Button, Modal } from 'react-bootstrap';
+import lodash from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -14,9 +14,29 @@ class SourceViewModal extends React.Component {
     templateString: PropTypes.string,
   };
 
-  state = {
+  static defaultProps = {
+    configurationId: undefined,
+    templateString: undefined,
+  };
+
+  static initialState = {
     source: undefined,
     name: undefined,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = SourceViewModal.initialState;
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!lodash.isEqual(this.state, SourceViewModal.initialState) && !lodash.isEqual(prevProps, this.props)) {
+      this.resetState();
+    }
+  }
+
+  resetState = () => {
+    this.setState(SourceViewModal.initialState);
   };
 
   open = () => {
