@@ -225,6 +225,10 @@ public class StreamFacade implements EntityFacade<Stream> {
 
     @Override
     public void delete(Stream nativeEntity) {
+        if (nativeEntity.isDefaultStream()) {
+            LOG.debug("The default stream should not be deleted");
+            return;
+        }
         try {
             streamService.destroy(nativeEntity);
         } catch (NotFoundException ignore) {
