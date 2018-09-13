@@ -49,16 +49,31 @@ class SourceViewModal extends React.Component {
   };
 
   _loadConfiguration = () => {
+    // Don't load anything if neither template nor configuration ID are set
+    if (!this.props.templateString && !this.props.configurationId) {
+      return;
+    }
+
     if (this.props.templateString) {
       CollectorConfigurationsActions.renderPreview(this.props.templateString)
-        .then((response) => {
-          this.setState({ source: response.preview, name: 'preview' });
-        });
+        .then(
+          (response) => {
+            this.setState({ source: response.preview, name: 'preview' });
+          },
+          (error) => {
+            this.setState({ source: `Error rendering preview: ${error.responseMessage ? error.responseMessage : error}` });
+          },
+        );
     } else {
       CollectorConfigurationsActions.getConfiguration(this.props.configurationId)
-        .then((configuration) => {
-          this.setState({ source: configuration.template, name: configuration.name });
-        });
+        .then(
+          (configuration) => {
+            this.setState({ source: configuration.template, name: configuration.name });
+          },
+          (error) => {
+            this.setState({ source: `Error fetching configuration: ${error}` });
+          },
+        );
     }
   };
 
@@ -71,7 +86,7 @@ class SourceViewModal extends React.Component {
         <Modal.Body>
           <div className="configuration">
             <pre>
-              {this.state.source}
+              {this.state.source || '<empty template>'}
             </pre>
           </div>
         </Modal.Body>
