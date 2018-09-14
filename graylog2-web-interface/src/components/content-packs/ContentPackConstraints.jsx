@@ -40,7 +40,7 @@ class ContentPackConstraints extends React.Component {
           id="content-packs-constraints"
           headers={headers}
           headerCellFormatter={header => <th>{header}</th>}
-          sortByKey="type"
+          sortBy={row => row.constraint.type}
           dataRowFormatter={this._rowFormatter}
           rows={this.props.constraints}
           filterKeys={[]}

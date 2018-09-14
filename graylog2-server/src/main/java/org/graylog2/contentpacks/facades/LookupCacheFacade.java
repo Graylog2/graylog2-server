@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.db.DBCacheService;
@@ -133,6 +134,12 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         final Optional<CacheDto> existingCache = cacheService.get(name);
 
         return existingCache.map(cache -> NativeEntity.create(entity.id(), cache.id(), TYPE_V1, cache));
+    }
+
+    @Override
+    public Optional<NativeEntity<CacheDto>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        return cacheService.get(nativeEntityDescriptor.id().id())
+                .map(entity -> NativeEntity.create(nativeEntityDescriptor, entity));
     }
 
     @Override

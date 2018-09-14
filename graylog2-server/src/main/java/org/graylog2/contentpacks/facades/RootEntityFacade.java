@@ -24,6 +24,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.utilities.Graphs;
 
@@ -46,6 +47,11 @@ public class RootEntityFacade implements EntityFacade<Void> {
                                                  Map<EntityDescriptor, Object> nativeEntities,
                                                  String username) {
         throw new UnsupportedOperationException("Unsupported operation for root entity");
+    }
+
+    @Override
+    public Optional<NativeEntity<Void>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        return Optional.empty();
     }
 
     @Override

@@ -40,6 +40,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -178,6 +179,16 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 final PipelineConnections savedConnections = connectionsService.save(connections);
                 LOG.trace("Saved pipeline connections: {}", savedConnections);
             }
+        }
+    }
+
+    @Override
+    public Optional<NativeEntity<PipelineDao>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final PipelineDao pipeline = pipelineService.load(nativeEntityDescriptor.id().id());
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, pipeline));
+        } catch (NotFoundException e) {
+            return Optional.empty();
         }
     }
 

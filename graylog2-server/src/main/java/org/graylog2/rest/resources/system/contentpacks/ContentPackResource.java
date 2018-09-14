@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.contentpacks;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,6 +33,7 @@ import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
+import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.Revisioned;
@@ -361,11 +363,18 @@ public class ContentPackResource extends RestResource {
             @PathParam("installationId") String installationId) {
         checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL, contentPackId.toString());
 
-        final ObjectId id = new ObjectId(installationId);
-        final int deletedInstallations = contentPackInstallationPersistenceService.deleteById(id);
-        LOG.debug("Deleted {} installations of content pack {}", deletedInstallations, contentPackId);
+        final ContentPackInstallation installation = contentPackInstallationPersistenceService.findById(new ObjectId(installationId))
+                .orElseThrow(() -> new NotFoundException("Couldn't find installation " + installationId));
 
-        return Response.noContent().build();
+        final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(installation.contentPackId(), installation.contentPackRevision())
+                .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));
+
+        final ContentPackUninstallation removedInstallation = contentPackService.uninstallContentPack(contentPack, installation);
+
+        return Response.ok(ImmutableMap.of(
+                "content_pack", contentPack,
+                "uninstalled", removedInstallation
+        )).build();
     }
 
     @DELETE

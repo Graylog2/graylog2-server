@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
@@ -102,6 +103,16 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
 
         final RuleDao savedRuleDao = ruleService.save(ruleDao);
         return NativeEntity.create(entity.id(), savedRuleDao.id(), TYPE_V1, savedRuleDao);
+    }
+
+    @Override
+    public Optional<NativeEntity<RuleDao>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
+        try {
+            final RuleDao ruleDao = ruleService.load(nativeEntityDescriptor.id().id());
+            return Optional.of(NativeEntity.create(nativeEntityDescriptor, ruleDao));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
