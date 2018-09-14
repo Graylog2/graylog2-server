@@ -146,6 +146,6 @@ const stores = {
 /* eslint-enable import/no-require, global-require */
 
 export default () => {
-  Object.entries(actions).forEach(entry => CombinedProvider.registerAction(entry[0], entry[1]));
-  Object.entries(stores).forEach(entry => CombinedProvider.registerStore(entry[0], entry[1]));
+  Object.keys(actions).forEach(key => CombinedProvider.registerAction(key, actions[key]));
+  Object.keys(stores).forEach(key => CombinedProvider.registerStore(key, stores[key]));
 };
