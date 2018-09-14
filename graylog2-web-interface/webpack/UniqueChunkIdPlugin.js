@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 const pluginName = 'UniqueChunkIdPlugin';
 
-export default class UniqueChunkIdPlugin {
+class UniqueChunkIdPlugin {
   // eslint-disable-next-line class-methods-use-this
   apply(compiler) {
     const randomId = crypto.randomBytes(4).toString('hex');
@@ -17,3 +17,5 @@ export default class UniqueChunkIdPlugin {
     });
   }
 }
+
+module.exports = UniqueChunkIdPlugin;
