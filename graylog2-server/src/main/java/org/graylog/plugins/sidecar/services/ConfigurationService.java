@@ -22,9 +22,11 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.NodeMetrics;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
+import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog.plugins.sidecar.template.directives.IndentTemplateDirective;
 import org.graylog.plugins.sidecar.template.loader.MongoDbTemplateLoader;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -49,6 +51,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang.CharEncoding.UTF_8;
+
 @Singleton
 public class ConfigurationService extends PaginatedDbService<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationService.class);
@@ -68,6 +72,9 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                 stringTemplateLoader });
         templateConfiguration.setTemplateLoader(multiTemplateLoader);
         templateConfiguration.setSharedVariable("indent", new IndentTemplateDirective());
+        templateConfiguration.setDefaultEncoding(UTF_8);
+        templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        templateConfiguration.setLogTemplateExceptions(false);
     }
 
     public Configuration find(String id) {
@@ -122,7 +129,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                 request.template());
     }
 
-    public Configuration renderConfigurationForCollector(Sidecar sidecar, Configuration configuration) {
+    public Configuration renderConfigurationForCollector(Sidecar sidecar, Configuration configuration) throws RenderTemplateException {
         Map<String, Object> context = new HashMap<>();
 
         context.put("nodeId", sidecar.nodeId());
@@ -149,7 +156,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         );
     }
 
-    public String renderPreview(String template) {
+    public String renderPreview(String template) throws RenderTemplateException {
         Map<String, Object> context = new HashMap<>();
         context.put("nodeId", "<node id>");
         context.put("nodeName", "<node name>");
@@ -172,14 +179,17 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return result;
     }
 
-    private String renderTemplate(String configurationId, Map<String, Object> context) {
+    private String renderTemplate(String configurationId, Map<String, Object> context) throws RenderTemplateException {
         Writer writer = new StringWriter();
         try {
             Template compiledTemplate = templateConfiguration.getTemplate(configurationId);
             compiledTemplate.process(context, writer);
-        } catch (TemplateException | IOException e) {
+        } catch (TemplateException e) {
+            LOG.error("Failed to render template: " + e.getMessageWithoutStackTop());
+            throw new RenderTemplateException(e.getFTLInstructionStack(), e);
+        } catch (IOException e) {
             LOG.error("Failed to render template: ", e);
-            return null;
+            throw new RenderTemplateException(e.getMessage(), e);
         }
 
         return writer.toString();

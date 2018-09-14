@@ -141,7 +141,7 @@ const CollectorConfigurationsStore = Reflux.createStore({
         UserNotification.success('', 'Configuration successfully created');
         return response;
       }, (error) => {
-        UserNotification.error(`Creating configuration failed with status: ${error.message}`,
+        UserNotification.error(error.status === 400 ? error.responseMessage : `Creating configuration failed with status: ${error.message}`,
           'Could not save configuration');
       });
 
