@@ -3,6 +3,9 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import CSVFileAdapterFieldSet from './CSVFileAdapterFieldSet';
 import CSVFileAdapterSummary from './CSVFileAdapterSummary';
 import CSVFileAdapterDocumentation from './CSVFileAdapterDocumentation';
+import DnsAdapterFieldSet from './DnsAdapterFieldSet';
+import DnsAdapterSummary from './DnsAdapterSummary';
+import DnsAdapterDocumentation from './DnsAdapterDocumentation';
 import DSVHTTPAdapterFieldSet from './DSVHTTPAdapterFieldSet';
 import DSVHTTPAdapterSummary from './DSVHTTPAdapterSummary';
 import DSVHTTPAdapterDocumentation from './DSVHTTPAdapterDocumentation';
@@ -21,11 +24,11 @@ PluginStore.register(new PluginManifest({}, {
       documentationComponent: CSVFileAdapterDocumentation,
     },
     {
-      type: 'httpjsonpath',
-      displayName: 'HTTP JSONPath',
-      formComponent: HTTPJSONPathAdapterFieldSet,
-      summaryComponent: HTTPJSONPathAdapterSummary,
-      documentationComponent: HTTPJSONPathAdapterDocumentation,
+      type: 'dnslookup',
+      displayName: 'DNS Lookup',
+      formComponent: DnsAdapterFieldSet,
+      summaryComponent: DnsAdapterSummary,
+      documentationComponent: DnsAdapterDocumentation,
     },
     {
       type: 'dsvhttp',
@@ -33,6 +36,13 @@ PluginStore.register(new PluginManifest({}, {
       formComponent: DSVHTTPAdapterFieldSet,
       summaryComponent: DSVHTTPAdapterSummary,
       documentationComponent: DSVHTTPAdapterDocumentation,
+    },
+    {
+      type: 'httpjsonpath',
+      displayName: 'HTTP JSONPath',
+      formComponent: HTTPJSONPathAdapterFieldSet,
+      summaryComponent: HTTPJSONPathAdapterSummary,
+      documentationComponent: HTTPJSONPathAdapterDocumentation,
     },
   ],
 }));
