@@ -30,6 +30,7 @@ const webpackConfig = {
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
+    builtins: [path.resolve(APP_PATH, 'injection', 'builtins.js')],
     polyfill: ['babel-polyfill'],
   },
   output: {
@@ -81,6 +82,12 @@ const webpackConfig = {
           return -1;
         }
         if (c2.names[0] === 'polyfill') {
+          return 1;
+        }
+        if (c1.names[0] === 'builtins') {
+          return -1;
+        }
+        if (c2.names[0] === 'builtins') {
           return 1;
         }
         if (c1.names[0] === 'app') {

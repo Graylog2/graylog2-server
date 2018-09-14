@@ -43,6 +43,7 @@ public class PluginAssets {
     private final List<String> jsFiles;
     private final List<String> cssFiles;
     private final String polyfillJsFile;
+    private final String builtinsJsFile;
     private final List<String> vendorJsFiles;
 
     @Inject
@@ -87,6 +88,7 @@ public class PluginAssets {
             jsFiles.addAll(manifest.files().jsFiles());
             cssFiles.addAll(manifest.files().cssFiles());
             polyfillJsFile = manifest.files().chunks().get("polyfill").entry();
+            builtinsJsFile = manifest.files().chunks().get("builtins").entry();
         } else {
             throw new IllegalStateException("Unable to find web interface assets. Maybe the web interface was not built into server?");
         }
@@ -113,6 +115,14 @@ public class PluginAssets {
                     }
 
                     if (file2.equals(polyfillJsFile)) {
+                        return 1;
+                    }
+                    // Builtins JS script goes second
+                    if (file1.equals(builtinsJsFile)) {
+                        return -1;
+                    }
+
+                    if (file2.equals(builtinsJsFile)) {
                         return 1;
                     }
 
