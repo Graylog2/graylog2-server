@@ -1,4 +1,5 @@
 import loadAsync from 'routing/loadAsync';
+
 const SourceCodeEditor = loadAsync(() => import('./SourceCodeEditor'));
 
 export { default as ClipboardButton } from './ClipboardButton';
