@@ -1,5 +1,7 @@
 module.exports = [
   'jquery',
+  'create-react-class',
+  'deep-equal',
   'react',
   'react-dom',
   'react-addons-pure-render-mixin',
