@@ -117,7 +117,7 @@ public class PluginAssets {
                     if (file2.equals(polyfillJsFile)) {
                         return 1;
                     }
-                    // Builtins JS script goes second
+                    // Builtins JS script goes third
                     if (file1.equals(builtinsJsFile)) {
                         return -1;
                     }
