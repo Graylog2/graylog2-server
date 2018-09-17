@@ -65,7 +65,7 @@ public abstract class TimeUnitIntervalDTO implements IntervalDTO {
         @JsonProperty(FIELD_UNIT)
         public Builder unit(String unit) {
             return unit(IntervalUnit.valueOf(unit.toUpperCase(Locale.ENGLISH)));
-        };
+        }
 
         public abstract TimeUnitIntervalDTO build();
 
