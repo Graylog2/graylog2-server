@@ -53,6 +53,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -384,7 +385,7 @@ public class DnsClient {
             byte[] addressBytes = InetAddresses.forString(ipAddress).getAddress();
 
             if (addressBytes.length > 16) {
-                throw new IllegalArgumentException(String.format("[%s] is an invalid IPv6 address", ipAddress));
+                throw new IllegalArgumentException(String.format(Locale.ENGLISH, "[%s] is an invalid IPv6 address", ipAddress));
             }
 
             // Convert the raw address bytes to hex.
@@ -395,7 +396,7 @@ public class DnsClient {
                 resolvedHex[i * 2 + 1] = HEX_CHARS_ARRAY[v & 0x0F];
             }
 
-            String fullHexAddress = new String(resolvedHex).toLowerCase();
+            String fullHexAddress = new String(resolvedHex).toLowerCase(Locale.ENGLISH);
             String[] reversedAndSplit = new StringBuilder(fullHexAddress).reverse().toString().split("");
 
             String invertedAddress = Joiner.on(".").join(reversedAndSplit);
@@ -413,17 +414,11 @@ public class DnsClient {
              * For example, the reverse format for the address 10.20.30.40 is
              * 40.30.20.10.in-addr.arpa */
             final String[] octets = ipAddress.split("\\.");
-            if (octets.length == 4) {
-                String invertedAddress = octets[3] + "." + octets[2] + "." + octets[1] + "." + octets[0] + IP_4_REVERSE_SUFFIX;
+            String invertedAddress = octets[3] + "." + octets[2] + "." + octets[1] + "." + octets[0] + IP_4_REVERSE_SUFFIX;
 
-                LOG.debug("Inverted address [{}] built for [{}]", invertedAddress, ipAddress);
+            LOG.debug("Inverted address [{}] built for [{}]", invertedAddress, ipAddress);
 
-                return invertedAddress;
-            } else {
-                throw new IllegalArgumentException(
-                        String.format("[%s] is an invalid IPv4 address. " +
-                                      "Please provide an address in the format 10.20.30.40", ipAddress));
-            }
+            return invertedAddress;
         }
     }
 
@@ -431,7 +426,7 @@ public class DnsClient {
 
         if (!isHostName(hostName)) {
             throw new IllegalArgumentException(
-                    String.format("[%s] is an invalid hostname. Please supply a pure hostname (eg. api.graylog.com)",
+                    String.format(Locale.ENGLISH, "[%s] is an invalid hostname. Please supply a pure hostname (eg. api.graylog.com)",
                                   hostName));
         }
     }
@@ -445,7 +440,7 @@ public class DnsClient {
 
         if (!isValidIpAddress(ipAddress)) {
             throw new IllegalArgumentException(
-                    String.format("[%s] is an invalid IPv4 addresses.", ipAddress));
+                    String.format(Locale.ENGLISH, "[%s] is an invalid IP address.", ipAddress));
         }
     }
 
