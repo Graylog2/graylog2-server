@@ -2,9 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import {
-  InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem
+  InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
 } from 'react-bootstrap';
+import lodash from 'lodash';
+
 import { InputWrapper } from 'components/bootstrap';
+import FormsUtils from 'util/FormsUtils';
 
 /**
  * Component that renders a form field for a time unit value. The field has
@@ -33,6 +36,8 @@ const TimeUnitInput = createReactClass({
     enabled: PropTypes.bool,
     /** Specifies the value of the input. */
     value: PropTypes.number,
+    /** Indicates the default value to use, in case value is not provided or set. */
+    defaultValue: PropTypes.number,
     /** Indicates which unit is used for the value. */
     unit: PropTypes.oneOf(['NANOSECONDS', 'MICROSECONDS', 'MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']),
     /** Add an additional class to the label. */
@@ -43,7 +48,8 @@ const TimeUnitInput = createReactClass({
 
   getDefaultProps() {
     return {
-      value: 1,
+      defaultValue: 1,
+      value: undefined,
       unit: 'SECONDS',
       label: '',
       help: '',
@@ -51,14 +57,6 @@ const TimeUnitInput = createReactClass({
       enabled: false,
       labelClassName: undefined,
       wrapperClassName: undefined,
-    };
-  },
-
-  getInitialState() {
-    return {
-      checked: this.props.required || this.props.enabled,
-      value: this.props.value,
-      unit: this.props.unit,
     };
   },
 
@@ -72,21 +70,35 @@ const TimeUnitInput = createReactClass({
     { value: 'DAYS', label: 'days' },
   ],
 
-  _propagateState() {
-    this.props.update(this.state.value, this.state.unit, this.state.checked);
+  _getEffectiveValue() {
+    return lodash.defaultTo(this.props.value, this.props.defaultValue);
+  },
+
+  _isChecked() {
+    return this.props.required || this.props.enabled;
+  },
+
+  _propagateInput(update) {
+    const previousInput = {
+      value: this._getEffectiveValue(),
+      unit: this.props.unit,
+      checked: this._isChecked(),
+    };
+    const nextInput = Object.assign({}, previousInput, update);
+    this.props.update(nextInput.value, nextInput.unit, nextInput.checked);
   },
 
   _onToggleEnable(e) {
-    this.setState({ checked: e.target.checked }, this._propagateState);
+    this._propagateInput({ checked: e.target.checked });
   },
 
   _onUpdate(e) {
-    const value = e.target.value;
-    this.setState({ value: value }, this._propagateState);
+    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), this.props.defaultValue);
+    this._propagateInput({ value: value });
   },
 
   _onUnitSelect(unit) {
-    this.setState({ unit: unit }, this._propagateState);
+    this._propagateInput({ unit: unit });
   },
 
   render() {
@@ -95,7 +107,7 @@ const TimeUnitInput = createReactClass({
     });
 
     const checkbox = (<InputGroup.Addon>
-      <input type="checkbox" checked={this.state.checked} onChange={this._onToggleEnable} />
+      <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} />
     </InputGroup.Addon>);
 
     return (
@@ -104,10 +116,10 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
             {!this.props.required && checkbox}
-            <FormControl type="text" disabled={!this.state.checked} onChange={this._onUpdate} value={this.state.value} />
+            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
-                            title={this.OPTIONS.filter(o => o.value === this.state.unit)[0].label}>
+                            title={this.OPTIONS.filter(o => o.value === this.props.unit)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>
