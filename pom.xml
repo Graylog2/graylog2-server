@@ -168,6 +168,9 @@
         <!-- Nodejs dependencies -->
         <nodejs.version>v8.11.2</nodejs.version>
         <yarn.version>v1.7.0</yarn.version>
+
+        <!-- Plugin versions -->
+        <license-maven.version>2.11</license-maven.version>
     </properties>
 
     <repositories>
@@ -308,6 +311,11 @@
                     <artifactId>antlr4-maven-plugin</artifactId>
                     <version>${antlr.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license-maven.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -361,6 +369,10 @@
                     <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
                     <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
