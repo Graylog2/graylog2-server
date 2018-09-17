@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -30,6 +31,7 @@ const webpackConfig = {
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
+    builtins: [path.resolve(APP_PATH, 'injection', 'builtins.js')],
     polyfill: ['babel-polyfill'],
   },
   output: {
@@ -38,7 +40,6 @@ const webpackConfig = {
   },
   module: {
     rules: [
-      { test: /pages\/.+\.jsx$/, use: 'react-proxy-loader', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
       { test: /\.js(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
       { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
       { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, use: 'file-loader' },
@@ -68,6 +69,11 @@ const webpackConfig = {
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
   plugins: [
+    new UniqueChunkIdPlugin(),
+    new webpack.HashedModuleIdsPlugin({
+      hashFunction: 'sha256',
+      hashDigestLength: 8,
+    }),
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
@@ -82,6 +88,12 @@ const webpackConfig = {
           return -1;
         }
         if (c2.names[0] === 'polyfill') {
+          return 1;
+        }
+        if (c1.names[0] === 'builtins') {
+          return -1;
+        }
+        if (c2.names[0] === 'builtins') {
           return 1;
         }
         if (c1.names[0] === 'app') {

@@ -1,16 +1,22 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Modal, Well } from 'react-bootstrap';
-import { DocumentTitle } from 'components/common';
+import DocumentTitle from 'components/common/DocumentTitle';
 
 import URLUtils from 'util/URLUtils';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 
 class ServerUnavailablePage extends React.Component {
   static propTypes = {
     server: PropTypes.object,
   };
+
+  static defaultProps = {
+    server: undefined,
+  };
+
 
   state = {
     showDetails: false,
@@ -102,10 +108,10 @@ class ServerUnavailablePage extends React.Component {
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
               <p>
                 Do you need a hand?{' '}
-                <a href="https://www.graylog.org/community-support" target="_blank">We can help you</a>.
+                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
               </p>
               <div>
-                <a href="#" onClick={this._toggleDetails}>
+                <a role="button" tabIndex={0} onClick={this._toggleDetails}>
                   {this.state.showDetails ? 'Less details' : 'More details'}
                 </a>
                 {this._formatErrorMessage()}
