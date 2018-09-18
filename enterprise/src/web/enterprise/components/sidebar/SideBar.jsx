@@ -59,7 +59,7 @@ const SideBar = createReactClass({
   _updateHeight() {
     const viewPortHeight = window.innerHeight;
 
-    const sidebar = ReactDOM.findDOMNode(this.refs.sidebar);
+    const sidebar = ReactDOM.findDOMNode(this.sidebar);
     const sidebarCss = window.getComputedStyle(ReactDOM.findDOMNode(sidebar));
     const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 
@@ -83,7 +83,7 @@ const SideBar = createReactClass({
       <div className={styles.sidebarContainer}>
         <AutoAffix viewportOffsetTop={46}>
           <div id="sidebar">
-            <div className={`content-col ${styles.sidebarContent}`} ref="sidebar">
+            <div className={`content-col ${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
               <span className="pull-right">
                 <AddWidgetButton queryId={queryId} />
               </span>
