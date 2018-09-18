@@ -1,5 +1,6 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import {} from 'components/maps/adapter';
 import CSVFileAdapterFieldSet from './CSVFileAdapterFieldSet';
 import CSVFileAdapterSummary from './CSVFileAdapterSummary';
 import CSVFileAdapterDocumentation from './CSVFileAdapterDocumentation';
@@ -12,7 +13,6 @@ import DSVHTTPAdapterDocumentation from './DSVHTTPAdapterDocumentation';
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 import HTTPJSONPathAdapterSummary from './HTTPJSONPathAdapterSummary';
 import HTTPJSONPathAdapterDocumentation from './HTTPJSONPathAdapterDocumentation';
-import {} from 'components/maps/adapter';
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableAdapters: [
