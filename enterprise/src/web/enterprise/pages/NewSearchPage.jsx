@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { Spinner } from 'components/common';
+import { ViewActions } from 'enterprise/stores/ViewStore';
 import ExtendedSearchPage from './ExtendedSearchPage';
-import { ViewActions } from './stores/ViewStore';
 
 export default class NewSearchPage extends React.Component {
   static propTypes = {};

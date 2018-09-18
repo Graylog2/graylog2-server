@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { debounce } from 'lodash';
 
+import 'brace';
 import 'brace/mode/lucene';
 import 'enterprise/components/searchbar/queryinput/ace-queryinput';
 import 'brace/ext/language_tools';

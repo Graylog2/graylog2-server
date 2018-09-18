@@ -11,12 +11,9 @@ import BarVisualization from 'enterprise/components/visualizations/bar/BarVisual
 import LineVisualization from 'enterprise/components/visualizations/line/LineVisualization';
 import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
 
-import ShowViewPage from 'enterprise/ShowViewPage';
-import NewSearchPage from 'enterprise/NewSearchPage';
 import PivotConfigGenerator from 'enterprise/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'enterprise/logic/searchtypes/pivot/PivotHandler';
 import PivotTransformer from 'enterprise/logic/searchresulttransformers/PivotTransformer';
-import ViewManagementPage from 'enterprise/ViewManagementPage';
 
 import { AlertStatus, MessageList } from 'enterprise/components/widgets';
 import Widget from 'enterprise/logic/widgets/Widget';
@@ -30,6 +27,12 @@ import ExcludeFromQueryHandler from 'enterprise/logic/valueactions/ExcludeFromQu
 import { isFunction } from 'enterprise/components/visualizations/Series';
 import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'enterprise/components/widgets/EditMessageList';
+import {
+  ShowViewPage,
+  NewSearchPage,
+  ViewManagementPage,
+} from 'enterprise/pages';
+
 import * as Permissions from './Permissions';
 import ScatterVisualization from './components/visualizations/scatter/ScatterVisualization';
 import ViewsLicenseCheck from './components/common/ViewsLicenseCheck';
