@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert, Col, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
-import { Spinner } from 'components/common/Spinner';
+import { Spinner } from 'components/common';
 import Output from 'components/outputs/Output';
 
 class OutputList extends React.Component {
