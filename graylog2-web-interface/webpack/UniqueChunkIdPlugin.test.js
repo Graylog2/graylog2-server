@@ -6,7 +6,7 @@ jest.mock('crypto', () => ({
   }),
 }));
 
-const mockCompiler = (chunks) => {
+const mockCompiler = () => {
   const compilation = {
     hooks: {
       optimizeChunkIds: {
