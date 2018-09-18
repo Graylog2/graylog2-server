@@ -27,7 +27,7 @@ const DnsAdapterSummary = ({ dataAdapter }) => {
     <dt>Cache TTL Override</dt>
     <dd>
       { !config.cache_ttl_override_enabled ? 'n/a' :
-      <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit }/> }
+        <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} /> }
     </dd>
   </dl>);
 };
