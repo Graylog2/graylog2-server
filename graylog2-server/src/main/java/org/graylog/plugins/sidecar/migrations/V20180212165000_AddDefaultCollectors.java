@@ -47,8 +47,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "filebeat",
                 "exec",
                 "linux",
-                "/usr/bin/filebeat",
-                "/etc/graylog/collector-sidecar/generated/filebeat.yml",
+                "/usr/lib/graylog-sidecar/filebeat",
+                "/var/lib/graylog-sidecar/generated/filebeat.yml",
                 "-c  %s",
                 "test config -c %s",
                 ""
@@ -57,8 +57,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "winlogbeat",
                 "svc",
                 "windows",
-                "C:\\Program Files\\graylog\\collector-sidecar\\winlogbeat.exe",
-                "C:\\Program Files\\graylog\\collector-sidecar\\generated\\winlogbeat.yml",
+                "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
+                "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
                 "-c %s",
                 "test config -c %s",
                 ""
@@ -67,8 +67,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "nxlog",
                 "exec",
                 "linux",
-                "/usr/bin/nxlog",
-                "/etc/graylog/collector-sidecar/generated/nxlog.conf",
+                "/usr/lib/graylog-sidecar/nxlog",
+                "/var/lib/graylog-sidecar/generated/nxlog.conf",
                 "-f -c %s",
                 "-v -c %s",
                 ""
