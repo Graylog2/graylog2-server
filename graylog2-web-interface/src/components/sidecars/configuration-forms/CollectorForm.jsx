@@ -11,7 +11,6 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
-import SourceViewModal from './SourceViewModal';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
@@ -219,11 +218,6 @@ const CollectorForm = createReactClass({
             </Col>
           </Row>
         </form>
-        {this.props.action === 'edit' &&
-          <SourceViewModal ref={(c) => { this.modal = c; }}
-                         templateString={this.state.formData.template}
-          />
-        }
       </div>
     );
   },

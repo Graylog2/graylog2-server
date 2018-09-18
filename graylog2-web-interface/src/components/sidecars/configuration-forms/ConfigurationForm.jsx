@@ -281,11 +281,8 @@ const ConfigurationForm = createReactClass({
             </Col>
           </Row>
         </form>
-        {this.props.action === 'edit' &&
-          <SourceViewModal ref={(c) => { this.modal = c; }}
-                         templateString={this.state.formData.template}
-          />
-        }
+        <SourceViewModal ref={(c) => { this.modal = c; }}
+                         templateString={this.state.formData.template} />
       </div>
     );
   },
