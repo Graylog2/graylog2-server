@@ -22,7 +22,7 @@ import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.Typed;
 import org.graylog2.contentpacks.model.Versioned;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = Versioned.FIELD_META_VERSION)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = Versioned.FIELD_META_VERSION)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = EntityV1.class, name = EntityV1.VERSION)
 })

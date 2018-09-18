@@ -22,7 +22,7 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 
 import java.util.Set;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = Versioned.FIELD_META_VERSION, defaultImpl = LegacyContentPack.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = Versioned.FIELD_META_VERSION, defaultImpl = LegacyContentPack.class)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = LegacyContentPack.class),
         @JsonSubTypes.Type(value = ContentPackV1.class, name = ContentPackV1.VERSION)
