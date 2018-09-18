@@ -88,7 +88,7 @@
     "toastr": "^2.1.2",
     "typeahead.js": "^0.11.1",
     "ua-parser-js": "^0.7.12",
-    "uglifyjs-webpack-plugin": "^1.2.5",
+    "uglifyjs-webpack-plugin": "2.0.0",
     "urijs": "^1.17.0"
   },
   "devDependencies": {
@@ -139,11 +139,11 @@
     "ts-loader": "^4.0.1",
     "typescript": "^2.7.2",
     "url-loader": "^1.0.1",
-    "webpack": "^4.1.1",
-    "webpack-dev-middleware": "^3.0.1",
-    "webpack-dev-server": "^3.1.1",
-    "webpack-hot-middleware": "^2.21.2",
-    "webpack-merge": "^4.1.2",
+    "webpack": "^4.19.1",
+    "webpack-dev-middleware": "^3.3.0",
+    "webpack-dev-server": "^3.1.8",
+    "webpack-hot-middleware": "^2.24.0",
+    "webpack-merge": "^4.1.4",
     "yargs": "^10.0.3"
   },
   "resolutions": {
