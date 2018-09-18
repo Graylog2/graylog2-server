@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 
 import { Badge, Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -12,19 +11,17 @@ import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
 
-import StoreProvider from 'injection/StoreProvider';
-const NotificationsStore = StoreProvider.getStore('Notifications');
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
+import badgeStyles from 'components/bootstrap/Badge.css';
+
 import NavigationBrand from './NavigationBrand';
 import InactiveNavItem from './InactiveNavItem';
-
-import badgeStyles from 'components/bootstrap/Badge.css';
+import NotificationBadge from './NotificationBadge';
 
 const Navigation = createReactClass({
   displayName: 'Navigation',
@@ -36,17 +33,7 @@ const Navigation = createReactClass({
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
 
-  mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
-
-  componentDidMount() {
-    this.interval = setInterval(NotificationsStore.list, this.POLL_INTERVAL);
-  },
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  },
-
-  POLL_INTERVAL: 3000,
+  mixins: [PermissionsMixin],
 
   _isActive(prefix) {
     return this.props.requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
@@ -111,20 +98,6 @@ const Navigation = createReactClass({
   },
 
   render() {
-    let notificationBadge;
-
-    if (this.state.total > 0) {
-      notificationBadge = (
-        <Nav navbar>
-          <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-            <InactiveNavItem className="notification-badge-link">
-              <Badge className={badgeStyles.badgeDanger} id="notification-badge">{this.state.total}</Badge>
-            </InactiveNavItem>
-          </LinkContainer>
-        </Nav>
-      );
-    }
-
     const pluginNavigations = PluginStore.exports('navigation')
       .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
@@ -263,7 +236,7 @@ const Navigation = createReactClass({
             </NavDropdown>
           </Nav>
 
-          {notificationBadge}
+          <NotificationBadge />
 
           <Nav navbar pullRight>
             <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
