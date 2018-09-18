@@ -159,6 +159,9 @@
         <!-- Nodejs dependencies -->
         <nodejs.version>v6.9.2</nodejs.version>
         <npm.version>4.0.3</npm.version>
+
+        <!-- Plugin versions -->
+        <license-maven.version>2.11</license-maven.version>
     </properties>
 
     <repositories>
@@ -298,6 +301,11 @@
                         <skip>true</skip>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license-maven.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -351,6 +359,10 @@
                     <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
                     <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
