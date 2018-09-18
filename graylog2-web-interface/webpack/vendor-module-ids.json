@@ -879,7 +879,14 @@
       "node_modules/react-router/node_modules/prop-types/factoryWithTypeCheckers.js": "./node_modules/react-router/node_modules/prop-types/factoryWithTypeCheckers.js",
       "node_modules/react-router/node_modules/prop-types/index.js": "./node_modules/react-router/node_modules/prop-types/index.js",
       "node_modules/react-router/node_modules/prop-types/lib/ReactPropTypesSecret.js": "./node_modules/react-router/node_modules/prop-types/lib/ReactPropTypesSecret.js",
-      "node_modules/react/cjs/react.development.js": "./node_modules/react/cjs/react.development.js"
+      "node_modules/react/cjs/react.development.js": "./node_modules/react/cjs/react.development.js",
+      "node_modules/react-router/node_modules/prop-types/factoryWithThrowingShims.js": 11,
+      "node_modules/prop-types/node_modules/fbjs/lib/invariant.js": 12,
+      "node_modules/prop-types/node_modules/fbjs/lib/emptyFunction.js": 15,
+      "node_modules/schedule/cjs/schedule.production.min.js": 18,
+      "node_modules/schedule/index.js": 20,
+      "node_modules/react-dom/cjs/react-dom.production.min.js": 23,
+      "node_modules/react/cjs/react.production.min.js": 24
     },
     "usedIds": {
       "0": 0,
