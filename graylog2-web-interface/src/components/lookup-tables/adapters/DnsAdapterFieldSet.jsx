@@ -29,15 +29,13 @@ class DnsAdapterFieldSet extends React.Component {
   };
 
   _updateCacheTTLOverride = (value, unit, enabled, fieldPrefix) => {
-
     const config = ObjectUtils.clone(this.props.config);
 
     // If Cache TTL Override box is checked, then save the value. If not, then do not save it.
     if (enabled && value) {
       config[fieldPrefix] = enabled && value ? parseInt(value) : null;
       config[fieldPrefix + '_enabled'] = enabled;
-    }
-    else {
+    } else {
       config[fieldPrefix] = null;
       config[fieldPrefix + '_enabled'] = false;
     }
@@ -62,15 +60,15 @@ class DnsAdapterFieldSet extends React.Component {
                id="lookup-type"
                required
                autoFocus
-               help={ 'Select the type of DNS lookup to perform.' }
+               help={'Select the type of DNS lookup to perform.'}
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9">
           <Select placeholder="Select the type of DNS lookup"
-                  clearable={ false }
-                  options={ lookupTypes }
+                  clearable={false}
+                  options={lookupTypes}
                   matchProp="value"
-                  onChange={ this._onLookupTypeSelect }
-                  value={ config.lookup_type }/>
+                  onChange={this._onLookupTypeSelect}
+                  value={config.lookup_type}/>
         </Input>
         <Input type="text"
                id="server_ips"
@@ -87,18 +85,18 @@ class DnsAdapterFieldSet extends React.Component {
                name="request_timeout"
                label="DNS Request Timeout"
                required
-               onChange={ this.props.handleFormEvent }
-               help={ this.props.validationMessage('request_timeout', 'DNS request timeout in milliseconds.') }
-               bsStyle={ this.props.validationState('request_timeout') }
-               value={ config.request_timeout }
+               onChange={this.props.handleFormEvent}
+               help={this.props.validationMessage('request_timeout', 'DNS request timeout in milliseconds.')}
+               bsStyle={this.props.validationState('request_timeout')}
+               value={config.request_timeout}
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9"/>
         <TimeUnitInput label="Cache TTL Override"
-                       help={ 'If enabled, the TTL for this adapter\'s cache will be overridden with the specified value.' }
-                       update={ this.updateCacheTTLOverride }
-                       value={ config.cache_ttl_override }
-                       unit={ config.cache_ttl_override_unit || 'MINUTES' }
-                       enabled={ config.cache_ttl_override_enabled }
+                       help={'If enabled, the TTL for this adapter\'s cache will be overridden with the specified value.' }
+                       update={this.updateCacheTTLOverride}
+                       value={config.cache_ttl_override}
+                       unit={config.cache_ttl_override_unit || 'MINUTES'}
+                       enabled={config.cache_ttl_override_enabled}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9"/>
       </fieldset>
