@@ -16,7 +16,6 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
         >
           <label
             className="tokenNewNameLabel control-label"
-            htmlFor={undefined}
           >
             Token Name
           </label>
@@ -84,10 +83,8 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   className="form-control"
                   id="filter-data-filter"
                   label="Filter"
-                  onKeyPress={undefined}
                   placeholder=""
                   type="text"
-                  value={undefined}
                 />
                 
               </div>
@@ -147,7 +144,6 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
   </div>
   <div
     className="checkbox"
-    style={undefined}
   >
     <label
       title=""
@@ -181,7 +177,6 @@ exports[`<TokenList /> should render with tokens 1`] = `
         >
           <label
             className="tokenNewNameLabel control-label"
-            htmlFor={undefined}
           >
             Token Name
           </label>
@@ -249,10 +244,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   className="form-control"
                   id="filter-data-filter"
                   label="Filter"
-                  onKeyPress={undefined}
                   placeholder=""
                   type="text"
-                  value={undefined}
                 />
                 
               </div>
@@ -377,7 +370,6 @@ exports[`<TokenList /> should render with tokens 1`] = `
   </div>
   <div
     className="checkbox"
-    style={undefined}
   >
     <label
       title=""

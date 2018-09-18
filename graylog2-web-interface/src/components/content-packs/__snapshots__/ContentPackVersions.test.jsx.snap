@@ -86,7 +86,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           action="push"
@@ -102,7 +101,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -118,12 +116,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         className="divider"
                         onKeyDown={[Function]}
                         role="separator"
-                        style={undefined}
                       />
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -195,7 +191,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           action="push"
@@ -211,7 +206,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -227,12 +221,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         className="divider"
                         onKeyDown={[Function]}
                         role="separator"
-                        style={undefined}
                       />
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -304,7 +296,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           action="push"
@@ -320,7 +311,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -336,12 +326,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         className="divider"
                         onKeyDown={[Function]}
                         role="separator"
-                        style={undefined}
                       />
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -413,7 +401,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           action="push"
@@ -429,7 +416,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"
@@ -445,12 +431,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         className="divider"
                         onKeyDown={[Function]}
                         role="separator"
-                        style={undefined}
                       />
                       <li
                         className=""
                         role="presentation"
-                        style={undefined}
                       >
                         <a
                           href="#"

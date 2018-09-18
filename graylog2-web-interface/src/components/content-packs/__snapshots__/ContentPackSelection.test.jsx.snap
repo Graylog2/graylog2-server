@@ -38,7 +38,6 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
-                value={undefined}
               />
               <span
                 className="help-block"
@@ -67,7 +66,6 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
-                value={undefined}
               />
               <span
                 className="help-block"
@@ -95,7 +93,6 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 rows={6}
                 type="textarea"
-                value={undefined}
               />
               <span
                 className="help-block"
@@ -124,7 +121,6 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
-                value={undefined}
               />
               <span
                 className="help-block"
@@ -152,7 +148,6 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 onChange={[Function]}
                 placeholder=""
                 type="text"
-                value={undefined}
               />
               <span
                 className="help-block"
@@ -531,7 +526,6 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
           >
             <label
               className="checkbox-inline"
-              style={undefined}
               title=""
             >
               <input
