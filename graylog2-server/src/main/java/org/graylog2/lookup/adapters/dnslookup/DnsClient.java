@@ -208,8 +208,8 @@ public class DnsClient {
         LOG.trace("The resulting IP address is [{}]", ipAddress.getHostAddress());
 
         final ADnsAnswer.Builder builder = ADnsAnswer.builder()
-                                               .ipAddress(ipAddress.getHostAddress())
-                                               .dnsTTL(dnsRecord.timeToLive());
+                                                     .ipAddress(ipAddress.getHostAddress())
+                                                     .dnsTTL(dnsRecord.timeToLive());
 
         if (includeIpVersion) {
             builder.ipVersion(ipAddress instanceof Inet4Address ? IP_4_VERSION : IP_6_VERSION);
@@ -317,8 +317,9 @@ public class DnsClient {
         DnsResponse content = null;
         try {
             content = resolver.query(new DefaultDnsQuestion(hostName, DnsRecordType.TXT)).sync().get().content();
-            final ArrayList<TxtDnsAnswer> txtRecords = new ArrayList<>();
-            for (int i = 0; i < content.count(DnsSection.ANSWER); i++) {
+            int count = content.count(DnsSection.ANSWER);
+            final ArrayList<TxtDnsAnswer> txtRecords = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
 
                 final DnsRecord dnsRecord = content.recordAt(DnsSection.ANSWER, i);
                 LOG.trace("TXT record [{}] retrieved with content [{}].", i, dnsRecord);

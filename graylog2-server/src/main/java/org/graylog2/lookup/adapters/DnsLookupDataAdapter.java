@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,8 +52,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -236,14 +236,12 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     private LookupResult buildLookupResult(List<ADnsAnswer> aDnsAnswers) {
 
         // Provide both a single and multiValue addresses.
-        final Map<Object, Object> multiValueResults = new HashMap<>();
-        multiValueResults.put(RESULTS_FIELD, aDnsAnswers);
 
         // Always read the first entry and place in singleValue
         final String singleValue = aDnsAnswers.get(0).ipAddress();
         LookupResult.Builder builder = LookupResult.builder()
                                                    .single(singleValue)
-                                                   .multiValue(multiValueResults);
+                                                   .multiValue(Collections.singletonMap(RESULTS_FIELD, aDnsAnswers));
 
         assignMinimumTTL(aDnsAnswers, builder);
 
@@ -290,15 +288,12 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
                 builder.single(singleValue);
             }
 
-            final Map<Object, Object> multiValueResults = new HashMap<>();
-
             final List<ADnsAnswer> allAnswers = new ArrayList<>();
             allAnswers.addAll(ip4Answers);
             allAnswers.addAll(ip6Answers);
 
             if (CollectionUtils.isNotEmpty(allAnswers)) {
-                multiValueResults.put(RESULTS_FIELD, allAnswers);
-                builder.multiValue(multiValueResults);
+                builder.multiValue(Collections.singletonMap(RESULTS_FIELD, allAnswers));
             }
 
             assignMinimumTTL(allAnswers, builder);
@@ -364,11 +359,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {
-            final Map<Object, Object> results = new HashMap<>();
-            results.put(RAW_RESULTS_FIELD, txtDnsAnswers);
-
             final LookupResult.Builder builder = LookupResult.builder();
-            builder.multiValue(results);
+            builder.multiValue(Collections.singletonMap(RAW_RESULTS_FIELD, txtDnsAnswers));
             assignMinimumTTL(txtDnsAnswers, builder);
 
             return builder.build();
@@ -477,8 +469,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
         @Override
         public Optional<Multimap<String, String>> validate() {
-            final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
+            final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
             if (StringUtils.isNotBlank(serverIps()) && !DnsClient.allIpAddressesValid(serverIps())) {
                 errors.put(FIELD_SERVER_IPS, "Invalid server IP address and/or port. " +
                                              "Please enter one or more comma-separated IPv4 addresses with optional ports (eg. 192.168.1.1:5353, 192.168.1.244).");
