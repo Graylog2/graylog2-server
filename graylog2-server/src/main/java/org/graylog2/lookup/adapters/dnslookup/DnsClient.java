@@ -41,7 +41,6 @@ import io.netty.resolver.dns.SequentialDnsServerAddressStreamProvider;
 import io.netty.util.concurrent.Future;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -485,7 +484,7 @@ public class DnsClient {
      * "8.8.4.4 8.8.8.8" returns false
      * "8.8.4.4, google.com" returns false
      */
-    public static boolean allIpAddressesValid(@Nullable String ipAddresses) {
+    public static boolean allIpAddressesValid(String ipAddresses) {
 
         if (!Strings.isNullOrEmpty(ipAddresses)) {
             return Lists.newArrayList(Splitter.on(",")
