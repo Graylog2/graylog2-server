@@ -12,7 +12,7 @@ import SupportLink from 'components/support/SupportLink';
 class PageHeader extends React.Component {
   static propTypes = {
     /** Page header heading. */
-    title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+    title: PropTypes.node.isRequired,
     /**
      * One or more children, they will be used in the header in this order:
      *  1. Page description
@@ -21,7 +21,7 @@ class PageHeader extends React.Component {
      *
      * Please see the examples to see how to use this in practice.
      */
-    children: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
+    children: PropTypes.node,
     /** Flag that specifies if the page is experimental or not. */
     experimental: PropTypes.bool,
     /** Specifies if the page header is children of a content `Row` or not. */
@@ -31,6 +31,7 @@ class PageHeader extends React.Component {
   static defaultProps = {
     experimental: false,
     subpage: false,
+    children: [],
   };
 
   render() {
