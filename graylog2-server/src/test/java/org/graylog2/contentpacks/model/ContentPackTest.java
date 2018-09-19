@@ -57,7 +57,7 @@ public class ContentPackTest {
     }
 
     @Test
-    public void serializeContentPackV1() {
+    public void serializeContentPackV1() throws Exception {
         final ObjectNode entityData = objectMapper.createObjectNode()
                 .put("bool", true)
                 .put("double", 1234.5678D)
@@ -113,6 +113,14 @@ public class ContentPackTest {
         assertThat(entityDataNode.path("double").asDouble()).isEqualTo(1234.5678D);
         assertThat(entityDataNode.path("long").asLong()).isEqualTo(1234L);
         assertThat(entityDataNode.path("string").asText()).isEqualTo("foobar");
+
+        final String jsonTxt = objectMapper.writeValueAsString(contentPack);
+        assertThat(jsonTxt).doesNotContain("AutoValue_");
+
+        final ContentPack readContentPack = objectMapper.readValue(jsonTxt, ContentPack.class);
+        assertThat(readContentPack.id()).isEqualTo(contentPack.id());
+        assertThat(readContentPack.version()).isEqualTo(contentPack.version());
+        assertThat(readContentPack.revision()).isEqualTo(contentPack.revision());
     }
 
     @Test
