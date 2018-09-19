@@ -10,7 +10,7 @@ that there is no border around the header, as the `subpage` prop is set:
 ```js
 const Button = require('react-bootstrap').Button;
 
-<PageHeader title="Here goes the page title" experimental subpage>
+<PageHeader title="Here goes the page title" lifecycle="experimental" subpage>
   <span>This is a page description</span>
   <span>This is a support message</span>
   <span><Button bsStyle="info">Action</Button></span>
