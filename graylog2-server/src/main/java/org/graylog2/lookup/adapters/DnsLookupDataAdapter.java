@@ -148,7 +148,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
                 break;
             case AAAA: {
                 try (final Timer.Context ignored = resolveDomainNameTimer.time()) {
-                    lookupResult = resolveIPv4AddressForHostname(trimmedKey);
+                    lookupResult = resolveIPv6AddressForHostname(trimmedKey);
                 }
                 break;
             }
@@ -186,23 +186,24 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
      */
     private LookupResult resolveIPv4AddressForHostname(Object key) {
 
+        final List<ADnsAnswer> aDnsAnswers;
         try {
-            final List<ADnsAnswer> aDnsAnswers = dnsClient.resolveIPv4AddressForHostname(key.toString(), false);
-            if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
-                return buildLookupResult(aDnsAnswers);
-            }
-
-            LOG.debug("Could not resolve [{}] records for hostname [{}].", A_RECORD_LABEL, key);
-            return LookupResult.empty();
+            aDnsAnswers = dnsClient.resolveIPv4AddressForHostname(key.toString(), false);
         } catch (UnknownHostException e) {
             // UnknownHostException is a valid case when the DNS record does not exist. Silently ignore and do not log an error.
             return LookupResult.empty();
         } catch (Exception e) {
-            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key,
-                      ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
             return LookupResult.empty();
         }
+
+        if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
+            return buildLookupResult(aDnsAnswers);
+        }
+
+        LOG.debug("Could not resolve [{}] records for hostname [{}].", A_RECORD_LABEL, key);
+        return LookupResult.empty();
     }
 
     /**
@@ -212,23 +213,24 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
      */
     private LookupResult resolveIPv6AddressForHostname(Object key) {
 
+        final List<ADnsAnswer> aDnsAnswers;
         try {
-            final List<ADnsAnswer> aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
-            if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
-                return buildLookupResult(aDnsAnswers);
-            }
-
-            LOG.debug("Could not resolve [{}] records for hostname [{}].", AAAA_RECORD_LABEL, key);
-            return LookupResult.empty();
+            aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
         } catch (UnknownHostException e) {
             // UnknownHostException is a valid case when the DNS record does not exist. Silently ignore and do not log an error.
             return LookupResult.empty();
         } catch (Exception e) {
-            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key,
-                      ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
             return LookupResult.empty();
         }
+
+        if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
+            return buildLookupResult(aDnsAnswers);
+        }
+
+        LOG.debug("Could not resolve [{}] records for hostname [{}].", AAAA_RECORD_LABEL, key);
+        return LookupResult.empty();
     }
 
     private LookupResult buildLookupResult(List<ADnsAnswer> aDnsAnswers) {
@@ -312,67 +314,68 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     private LookupResult performReverseLookup(Object key) {
 
         // Only one PTR reverse record will be returned.
+        final PtrDnsAnswer dnsResponse;
         try {
-            final PtrDnsAnswer dnsResponse = dnsClient.reverseLookup(key.toString());
-            if (dnsResponse != null) {
-
-                if (!Strings.isNullOrEmpty(dnsResponse.fullDomain())) {
-
-                    // Include answer in both single and multiValue fields.
-                    final Map<Object, Object> multiValueResults = new LinkedHashMap<>();
-                    multiValueResults.put(PtrDnsAnswer.FIELD_DOMAIN, dnsResponse.domain());
-                    multiValueResults.put(PtrDnsAnswer.FIELD_FULL_DOMAIN, dnsResponse.fullDomain());
-                    multiValueResults.put(PtrDnsAnswer.FIELD_DNS_TTL, dnsResponse.dnsTTL());
-
-                    final LookupResult.Builder builder = LookupResult.builder()
-                                                                     .single(dnsResponse.fullDomain())
-                                                                     .multiValue(multiValueResults);
-
-                    if (config.hasOverrideTTL()) {
-                        builder.cacheTTL(config.getCacheTTLOverrideMillis());
-                    } else {
-                        builder.cacheTTL(dnsResponse.dnsTTL() * 1000);
-                    }
-
-                    return builder.build();
-                }
-            }
-
-            LOG.debug("Could not perform reverse lookup on IP address [{}]. No PTR record was found.", key);
-            return LookupResult.empty();
+            dnsResponse = dnsClient.reverseLookup(key.toString());
         } catch (Exception e) {
             LOG.error("Could not perform reverse DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
             return LookupResult.empty();
         }
+
+        if (dnsResponse != null) {
+            if (!Strings.isNullOrEmpty(dnsResponse.fullDomain())) {
+
+                // Include answer in both single and multiValue fields.
+                final Map<Object, Object> multiValueResults = new LinkedHashMap<>();
+                multiValueResults.put(PtrDnsAnswer.FIELD_DOMAIN, dnsResponse.domain());
+                multiValueResults.put(PtrDnsAnswer.FIELD_FULL_DOMAIN, dnsResponse.fullDomain());
+                multiValueResults.put(PtrDnsAnswer.FIELD_DNS_TTL, dnsResponse.dnsTTL());
+
+                final LookupResult.Builder builder = LookupResult.builder()
+                                                                 .single(dnsResponse.fullDomain())
+                                                                 .multiValue(multiValueResults);
+
+                if (config.hasOverrideTTL()) {
+                    builder.cacheTTL(config.getCacheTTLOverrideMillis());
+                } else {
+                    builder.cacheTTL(dnsResponse.dnsTTL() * 1000);
+                }
+
+                return builder.build();
+            }
+        }
+
+        LOG.debug("Could not perform reverse lookup on IP address [{}]. No PTR record was found.", key);
+        return LookupResult.empty();
     }
 
     private LookupResult performTextLookup(Object key) {
 
         /* Query all TXT records for hostname, and provide them in the multiValue field as an array.
          * Do not attempt to attempt to choose a single value for the user (all are valid). */
+        final List<TxtDnsAnswer> txtDnsAnswers;
         try {
-            final List<TxtDnsAnswer> txtDnsAnswers = dnsClient.txtLookup(key.toString());
-
-            if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {
-
-                final Map<Object, Object> results = new HashMap<>();
-                results.put(RAW_RESULTS_FIELD, txtDnsAnswers);
-
-                final LookupResult.Builder builder = LookupResult.builder();
-                builder.multiValue(results);
-                assignMinimumTTL(txtDnsAnswers, builder);
-
-                return builder.build();
-            }
-
-            LOG.debug("Could not perform Text lookup on IP address [{}]. No TXT records were found.", key);
-            return LookupResult.empty();
+            txtDnsAnswers = dnsClient.txtLookup(key.toString());
         } catch (Exception e) {
             LOG.error("Could not perform TXT DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
             return LookupResult.empty();
         }
+
+        if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {
+            final Map<Object, Object> results = new HashMap<>();
+            results.put(RAW_RESULTS_FIELD, txtDnsAnswers);
+
+            final LookupResult.Builder builder = LookupResult.builder();
+            builder.multiValue(results);
+            assignMinimumTTL(txtDnsAnswers, builder);
+
+            return builder.build();
+        }
+
+        LOG.debug("Could not perform Text lookup on IP address [{}]. No TXT records were found.", key);
+        return LookupResult.empty();
     }
 
     /**
