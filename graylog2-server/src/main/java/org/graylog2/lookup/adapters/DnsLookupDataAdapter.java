@@ -190,8 +190,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         try {
             aDnsAnswers = dnsClient.resolveIPv4AddressForHostname(key.toString(), false);
         } catch (UnknownHostException e) {
-            // UnknownHostException is a valid case when the DNS record does not exist. Silently ignore and do not log an error.
-            return LookupResult.empty();
+            return LookupResult.empty(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
@@ -217,8 +216,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         try {
             aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
         } catch (UnknownHostException e) {
-            // UnknownHostException is a valid case when the DNS record does not exist. Silently ignore and do not log an error.
-            return LookupResult.empty();
+            return LookupResult.empty(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
@@ -235,9 +233,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     private LookupResult buildLookupResult(List<ADnsAnswer> aDnsAnswers) {
 
-        // Provide both a single and multiValue addresses.
-
-        // Always read the first entry and place in singleValue
+        /* Provide both a single and multiValue addresses.
+         * Always read the first entry and place in singleValue */
         final String singleValue = aDnsAnswers.get(0).ipAddress();
         LookupResult.Builder builder = LookupResult.builder()
                                                    .single(singleValue)
@@ -273,7 +270,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
             }
 
             // Select answer for single value. Prefer use of IPv4 address. Only return IPv6 address if no IPv6 address found.
-            String singleValue;
+            final String singleValue;
             if (CollectionUtils.isNotEmpty(ip4Answers)) {
                 singleValue = ip4Answers.get(0).ipAddress();
             } else if (CollectionUtils.isNotEmpty(ip6Answers)) {
@@ -308,7 +305,6 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     private LookupResult performReverseLookup(Object key) {
 
-        // Only one PTR reverse record will be returned.
         final PtrDnsAnswer dnsResponse;
         try {
             dnsResponse = dnsClient.reverseLookup(key.toString());
@@ -347,7 +343,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     private LookupResult performTextLookup(Object key) {
 
-        /* Query all TXT records for hostname, and provide them in the multiValue field as an array.
+        /* Query all TXT records for hostname and provide them in the multiValue field as an array.
          * Do not attempt to attempt to choose a single value for the user (all are valid). */
         final List<TxtDnsAnswer> txtDnsAnswers;
         try {

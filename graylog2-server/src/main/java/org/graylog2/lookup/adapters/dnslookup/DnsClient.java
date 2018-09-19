@@ -89,7 +89,7 @@ public class DnsClient {
         final DnsNameResolverBuilder dnsNameResolverBuilder = new DnsNameResolverBuilder(nettyEventLoop.next());
         dnsNameResolverBuilder.channelType(NioDatagramChannel.class).queryTimeoutMillis(requestTimeout);
 
-        // Specify custom DNS server if provided. If not, use local network adapter address.
+        // Specify custom DNS servers if provided. If not, use those specified in local network adapter settings.
         if (CollectionUtils.isNotEmpty(iNetDnsServerIps)) {
 
             LOG.debug("Attempting to start DNS client with server IPs [{}] on port [{}] with timeout [{}]",
@@ -291,8 +291,8 @@ public class DnsClient {
             dnsAnswerBuilder.domain(topDomainName.toString());
         } else {
 
-            // Manually extract domain name.
-            // Eg. for hostname test.some-domain.com, only some-domain.com will be extracted. */
+            /* Manually extract domain name.
+             * Eg. for hostname test.some-domain.com, only some-domain.com will be extracted. */
             String[] split = hostname.split("\\.");
             if (split.length > 1) {
                 dnsAnswerBuilder.domain(split[split.length - 2] + "." + split[split.length - 1]);
