@@ -133,48 +133,45 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
         final String trimmedKey = StringUtils.trimToNull(key.toString());
         if (trimmedKey == null) {
-            LOG.debug("A blank value was supplied");
+            LOG.debug("A blank key was supplied");
             return LookupResult.empty();
         }
 
         LOG.debug("Beginning [{}] DNS resolution for key [{}]", config.lookupType(), trimmedKey);
 
-        LookupResult lookupResult = null;
-        if (config.lookupType() == DnsLookupType.A) {
-            final Timer.Context time = resolveDomainNameTimer.time();
-            try {
-                lookupResult = resolveAddressForHostname(false, trimmedKey);
-            } finally {
-                time.stop();
+        LookupResult lookupResult;
+        switch (config.lookupType()) {
+            case A:
+                try (final Timer.Context ignored = resolveDomainNameTimer.time()) {
+                    lookupResult = resolveIPv4AddressForHostname(trimmedKey);
+                }
+                break;
+            case AAAA: {
+                try (final Timer.Context ignored = resolveDomainNameTimer.time()) {
+                    lookupResult = resolveIPv4AddressForHostname(trimmedKey);
+                }
+                break;
             }
-        } else if (config.lookupType() == DnsLookupType.AAAA) {
-            final Timer.Context time = resolveDomainNameTimer.time();
-            try {
-                lookupResult = resolveAddressForHostname(true, trimmedKey);
-            } finally {
-                time.stop();
+            case A_AAAA: {
+                try (final Timer.Context ignored = resolveDomainNameTimer.time()) {
+                    lookupResult = resolveAllAddressesForHostname(trimmedKey);
+                }
+                break;
             }
-        } else if (config.lookupType() == DnsLookupType.A_AAAA) {
-            final Timer.Context time = resolveDomainNameTimer.time();
-            try {
-                lookupResult = resolveAllAddressesForHostname(trimmedKey);
-            } finally {
-                time.stop();
+            case PTR: {
+                try (final Timer.Context ignored = reverseLookupTimer.time()) {
+                    lookupResult = performReverseLookup(trimmedKey);
+                }
+                break;
             }
-        } else if (config.lookupType() == DnsLookupType.PTR) {
-            final Timer.Context time = reverseLookupTimer.time();
-            try {
-                lookupResult = performReverseLookup(trimmedKey);
-            } finally {
-                time.stop();
+            case TXT: {
+                try (final Timer.Context ignored = textLookupTimer.time()) {
+                    lookupResult = performTextLookup(trimmedKey);
+                }
+                break;
             }
-        } else if (config.lookupType() == DnsLookupType.TXT) {
-            final Timer.Context time = textLookupTimer.time();
-            try {
-                lookupResult = performTextLookup(trimmedKey);
-            } finally {
-                time.stop();
-            }
+            default:
+                throw new IllegalArgumentException(String.format(Locale.ENGLISH, "DnsLookupType [%s] is not supported", config.lookupType()));
         }
 
         LOG.debug("[{}] DNS resolution complete for key [{}]. Response [{}]", config.lookupType(), trimmedKey, lookupResult);
@@ -183,53 +180,72 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     }
 
     /**
-     * Resolves both IPv4 and IPv6 addresses.
-     *
-     * @param resolveIPv6Address true for resolving IPv6 addresses and false for IPv4 addresses
-     * @param key                a hostname
+     * Provides both single and multiple addresses in LookupResult. This is because the purpose of a hostname
+     * resolution request is to resolve to a single IP address (so that communication can be initiated with it).
+     * We also resolve all addresses in case they are needed.
      */
-    private LookupResult resolveAddressForHostname(boolean resolveIPv6Address, Object key) {
+    private LookupResult resolveIPv4AddressForHostname(Object key) {
 
-        /* Provide both single and multiple addresses in LookupResult. The reason for this
-         * is that the purpose of a hostname resolution request is to resolve to a single IP address
-         * (so that communication can be initiated with it). We also resolve all addresses in case they are
-         * needed. */
-        String recordLabel = resolveIPv6Address ? AAAA_RECORD_LABEL : A_RECORD_LABEL;
         try {
-            List<ADnsAnswer> aDnsAnswers;
-            if (resolveIPv6Address) {
-                aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
-            } else {
-                aDnsAnswers = dnsClient.resolveIPv4AddressForHostname(key.toString(), false);
-            }
-
+            final List<ADnsAnswer> aDnsAnswers = dnsClient.resolveIPv4AddressForHostname(key.toString(), false);
             if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
-
-                // Provide both a single and multiValue address.
-                Map<Object, Object> multiValueResults = new HashMap<>();
-                multiValueResults.put(RESULTS_FIELD, aDnsAnswers);
-
-                // Always read the first entry and place in singleValue
-                String singleValue = aDnsAnswers.get(0).ipAddress();
-                LookupResult.Builder builder = LookupResult.builder()
-                                                           .single(singleValue)
-                                                           .multiValue(multiValueResults);
-
-                assignMinimumTTL(aDnsAnswers, builder);
-
-                return builder.build();
+                return buildLookupResult(aDnsAnswers);
             }
 
-            LOG.debug("Could not resolve [{}] records for hostname [{}].", recordLabel, key);
+            LOG.debug("Could not resolve [{}] records for hostname [{}].", A_RECORD_LABEL, key);
             return LookupResult.empty();
         } catch (UnknownHostException e) {
             // UnknownHostException is a valid case when the DNS record does not exist. Silently ignore and do not log an error.
             return LookupResult.empty();
         } catch (Exception e) {
-            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", recordLabel, key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key,
+                      ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
             return LookupResult.empty();
         }
+    }
+
+    /**
+     * Provides both single and multiple addresses in LookupResult. This is because the purpose of a hostname
+     * resolution request is to resolve to a single IP address (so that communication can be initiated with it).
+     * We also resolve all addresses in case they are needed.
+     */
+    private LookupResult resolveIPv6AddressForHostname(Object key) {
+
+        try {
+            final List<ADnsAnswer> aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
+            if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
+                return buildLookupResult(aDnsAnswers);
+            }
+
+            LOG.debug("Could not resolve [{}] records for hostname [{}].", AAAA_RECORD_LABEL, key);
+            return LookupResult.empty();
+        } catch (UnknownHostException e) {
+            // UnknownHostException is a valid case when the DNS record does not exist. Silently ignore and do not log an error.
+            return LookupResult.empty();
+        } catch (Exception e) {
+            LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key,
+                      ExceptionUtils.getRootCauseMessage(e));
+            errorCounter.inc();
+            return LookupResult.empty();
+        }
+    }
+
+    private LookupResult buildLookupResult(List<ADnsAnswer> aDnsAnswers) {
+
+        // Provide both a single and multiValue addresses.
+        final Map<Object, Object> multiValueResults = new HashMap<>();
+        multiValueResults.put(RESULTS_FIELD, aDnsAnswers);
+
+        // Always read the first entry and place in singleValue
+        final String singleValue = aDnsAnswers.get(0).ipAddress();
+        LookupResult.Builder builder = LookupResult.builder()
+                                                   .single(singleValue)
+                                                   .multiValue(multiValueResults);
+
+        assignMinimumTTL(aDnsAnswers, builder);
+
+        return builder.build();
     }
 
     /**
@@ -309,8 +325,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
                     multiValueResults.put(PtrDnsAnswer.FIELD_DNS_TTL, dnsResponse.dnsTTL());
 
                     final LookupResult.Builder builder = LookupResult.builder()
-                                                               .single(dnsResponse.fullDomain())
-                                                               .multiValue(multiValueResults);
+                                                                     .single(dnsResponse.fullDomain())
+                                                                     .multiValue(multiValueResults);
 
                     if (config.hasOverrideTTL()) {
                         builder.cacheTTL(config.getCacheTTLOverrideMillis());
