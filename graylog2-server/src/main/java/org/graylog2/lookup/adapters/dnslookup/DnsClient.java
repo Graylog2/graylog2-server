@@ -83,11 +83,11 @@ public class DnsClient {
     public void start(String dnsServerIps, long requestTimeout) {
 
         LOG.debug("Attempting to start DNS client");
-        List<InetSocketAddress> iNetDnsServerIps = parseServerIpAddresses(dnsServerIps);
+        final List<InetSocketAddress> iNetDnsServerIps = parseServerIpAddresses(dnsServerIps);
 
         nettyEventLoop = new NioEventLoopGroup();
 
-        DnsNameResolverBuilder dnsNameResolverBuilder = new DnsNameResolverBuilder(nettyEventLoop.next());
+        final DnsNameResolverBuilder dnsNameResolverBuilder = new DnsNameResolverBuilder(nettyEventLoop.next());
         dnsNameResolverBuilder.channelType(NioDatagramChannel.class).queryTimeoutMillis(requestTimeout);
 
         // Specify custom DNS server if provided. If not, use local network adapter address.
@@ -96,7 +96,7 @@ public class DnsClient {
             LOG.debug("Attempting to start DNS client with server IPs [{}] on port [{}] with timeout [{}]",
                       dnsServerIps, DEFAULT_DNS_PORT, requestTimeout);
 
-            DnsServerAddressStreamProvider dnsServer = new SequentialDnsServerAddressStreamProvider(iNetDnsServerIps);
+            final DnsServerAddressStreamProvider dnsServer = new SequentialDnsServerAddressStreamProvider(iNetDnsServerIps);
             dnsNameResolverBuilder.nameServerProvider(dnsServer);
         } else {
             LOG.debug("Attempting to start DNS client with the local network adapter DNS server address on port [{}] with timeout [{}]",
@@ -131,7 +131,7 @@ public class DnsClient {
         }
 
         // Shutdown event loop (required by Netty).
-        Future<?> shutdownFuture = nettyEventLoop.shutdownGracefully();
+        final Future<?> shutdownFuture = nettyEventLoop.shutdownGracefully();
         shutdownFuture.addListener(future -> LOG.debug("DNS client shutdown successful"));
     }
 
@@ -158,7 +158,7 @@ public class DnsClient {
 
         validateHostName(hostName);
 
-        DefaultDnsQuestion aRecordDnsQuestion = new DefaultDnsQuestion(hostName, dnsRecordType);
+        final DefaultDnsQuestion aRecordDnsQuestion = new DefaultDnsQuestion(hostName, dnsRecordType);
 
         /* The DnsNameResolver.resolveAll(DnsQuestion) method handles all redirects through CNAME records to
          * ultimately resolve a list of IP addresses with TTL values. */
@@ -181,11 +181,10 @@ public class DnsClient {
 
         /* Read data from DNS record response. The data is a binary representation of the IP address
          * IPv4 address: 32 bits, IPv6 address: 128 bits */
-        ByteBuf byteBuf;
         byte[] ipAddressBytes;
-        DefaultDnsRawRecord dnsRawRecord = (DefaultDnsRawRecord) dnsRecord;
+        final DefaultDnsRawRecord dnsRawRecord = (DefaultDnsRawRecord) dnsRecord;
         try {
-            byteBuf = dnsRawRecord.content();
+            final ByteBuf byteBuf = dnsRawRecord.content();
             ipAddressBytes = new byte[byteBuf.readableBytes()];
             int readerIndex = byteBuf.readerIndex();
             byteBuf.getBytes(readerIndex, ipAddressBytes);
@@ -209,7 +208,7 @@ public class DnsClient {
 
         LOG.trace("The resulting IP address is [{}]", ipAddress.getHostAddress());
 
-        ADnsAnswer.Builder builder = ADnsAnswer.builder()
+        final ADnsAnswer.Builder builder = ADnsAnswer.builder()
                                                .ipAddress(ipAddress.getHostAddress())
                                                .dnsTTL(dnsRecord.timeToLive());
 
@@ -230,7 +229,7 @@ public class DnsClient {
 
         validateIpAddress(ipAddress);
 
-        String inverseAddressFormat = getInverseAddressFormat(ipAddress);
+        final String inverseAddressFormat = getInverseAddressFormat(ipAddress);
 
         DnsResponse content = null;
         try {
@@ -239,13 +238,13 @@ public class DnsClient {
 
                 // Return the first PTR record, because there should be only one as per
                 // http://tools.ietf.org/html/rfc1035#section-3.5
-                DnsRecord dnsRecord = content.recordAt(DnsSection.ANSWER, i);
+                final DnsRecord dnsRecord = content.recordAt(DnsSection.ANSWER, i);
                 if (dnsRecord instanceof DefaultDnsPtrRecord) {
 
-                    DefaultDnsPtrRecord ptrRecord = (DefaultDnsPtrRecord) dnsRecord;
-                    PtrDnsAnswer.Builder dnsAnswerBuilder = PtrDnsAnswer.builder();
+                    final DefaultDnsPtrRecord ptrRecord = (DefaultDnsPtrRecord) dnsRecord;
+                    final PtrDnsAnswer.Builder dnsAnswerBuilder = PtrDnsAnswer.builder();
 
-                    String hostname = ptrRecord.hostname();
+                    final String hostname = ptrRecord.hostname();
                     LOG.trace("PTR record retrieved with hostname [{}]", hostname);
 
                     try {
@@ -285,11 +284,11 @@ public class DnsClient {
 
         dnsAnswerBuilder.fullDomain(hostname);
 
-        InternetDomainName internetDomainName = InternetDomainName.from(hostname);
+        final InternetDomainName internetDomainName = InternetDomainName.from(hostname);
         if (internetDomainName.hasPublicSuffix()) {
 
             // Use Guava to extract domain name.
-            InternetDomainName topDomainName = internetDomainName.topDomainUnderRegistrySuffix();
+            final InternetDomainName topDomainName = internetDomainName.topDomainUnderRegistrySuffix();
             dnsAnswerBuilder.domain(topDomainName.toString());
         } else {
 
@@ -319,17 +318,17 @@ public class DnsClient {
         DnsResponse content = null;
         try {
             content = resolver.query(new DefaultDnsQuestion(hostName, DnsRecordType.TXT)).sync().get().content();
-            ArrayList<TxtDnsAnswer> txtRecords = new ArrayList<>();
+            final ArrayList<TxtDnsAnswer> txtRecords = new ArrayList<>();
             for (int i = 0; i < content.count(DnsSection.ANSWER); i++) {
 
-                DnsRecord dnsRecord = content.recordAt(DnsSection.ANSWER, i);
+                final DnsRecord dnsRecord = content.recordAt(DnsSection.ANSWER, i);
                 LOG.trace("TXT record [{}] retrieved with content [{}].", i, dnsRecord);
 
                 if (dnsRecord instanceof DefaultDnsRawRecord) {
-                    DefaultDnsRawRecord txtRecord = (DefaultDnsRawRecord) dnsRecord;
+                    final DefaultDnsRawRecord txtRecord = (DefaultDnsRawRecord) dnsRecord;
 
-                    TxtDnsAnswer.Builder dnsAnswerBuilder = TxtDnsAnswer.builder();
-                    String decodeTxtRecord = decodeTxtRecord(txtRecord);
+                    final TxtDnsAnswer.Builder dnsAnswerBuilder = TxtDnsAnswer.builder();
+                    final String decodeTxtRecord = decodeTxtRecord(txtRecord);
                     LOG.trace("The decoded TXT record is [{}]", decodeTxtRecord);
 
                     dnsAnswerBuilder.value(decodeTxtRecord)
@@ -382,24 +381,24 @@ public class DnsClient {
              * See https://www.dnscheck.co/ptr-record-monitor for more info. */
 
             // Parse the full address as an InetAddress to allow the full address bytes (16 bytes/128 bits) to be obtained.
-            byte[] addressBytes = InetAddresses.forString(ipAddress).getAddress();
+            final byte[] addressBytes = InetAddresses.forString(ipAddress).getAddress();
 
             if (addressBytes.length > 16) {
                 throw new IllegalArgumentException(String.format(Locale.ENGLISH, "[%s] is an invalid IPv6 address", ipAddress));
             }
 
             // Convert the raw address bytes to hex.
-            char[] resolvedHex = new char[addressBytes.length * 2];
+            final char[] resolvedHex = new char[addressBytes.length * 2];
             for (int i = 0; i < addressBytes.length; i++) {
-                int v = addressBytes[i] & 0xFF;
+                final int v = addressBytes[i] & 0xFF;
                 resolvedHex[i * 2] = HEX_CHARS_ARRAY[v >>> 4];
                 resolvedHex[i * 2 + 1] = HEX_CHARS_ARRAY[v & 0x0F];
             }
 
-            String fullHexAddress = new String(resolvedHex).toLowerCase(Locale.ENGLISH);
-            String[] reversedAndSplit = new StringBuilder(fullHexAddress).reverse().toString().split("");
+            final String fullHexAddress = new String(resolvedHex).toLowerCase(Locale.ENGLISH);
+            final String[] reversedAndSplit = new StringBuilder(fullHexAddress).reverse().toString().split("");
 
-            String invertedAddress = Joiner.on(".").join(reversedAndSplit);
+            final String invertedAddress = Joiner.on(".").join(reversedAndSplit);
 
             LOG.debug("Inverted address [{}] built for [{}]", invertedAddress, ipAddress);
 
@@ -414,7 +413,7 @@ public class DnsClient {
              * For example, the reverse format for the address 10.20.30.40 is
              * 40.30.20.10.in-addr.arpa */
             final String[] octets = ipAddress.split("\\.");
-            String invertedAddress = octets[3] + "." + octets[2] + "." + octets[1] + "." + octets[0] + IP_4_REVERSE_SUFFIX;
+            final String invertedAddress = octets[3] + "." + octets[2] + "." + octets[1] + "." + octets[0] + IP_4_REVERSE_SUFFIX;
 
             LOG.debug("Inverted address [{}] built for [{}]", invertedAddress, ipAddress);
 
@@ -452,7 +451,7 @@ public class DnsClient {
     public static boolean isIp4Address(String ipAddress) {
 
         try {
-            InetAddress address = InetAddresses.forString(ipAddress);
+            final InetAddress address = InetAddresses.forString(ipAddress);
             if (address instanceof Inet4Address) {
                 return true;
             }
@@ -466,7 +465,7 @@ public class DnsClient {
     public static boolean isIp6Address(String ipAddress) {
 
         try {
-            InetAddress address = InetAddresses.forString(ipAddress);
+            final InetAddress address = InetAddresses.forString(ipAddress);
             if (address instanceof Inet6Address) {
                 return true;
             }

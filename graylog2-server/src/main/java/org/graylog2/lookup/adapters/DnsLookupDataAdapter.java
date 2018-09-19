@@ -56,6 +56,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -130,7 +131,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     @Override
     protected LookupResult doGet(Object key) {
 
-        String trimmedKey = StringUtils.trimToNull(key.toString());
+        final String trimmedKey = StringUtils.trimToNull(key.toString());
         if (trimmedKey == null) {
             LOG.debug("A blank value was supplied");
             return LookupResult.empty();
@@ -256,7 +257,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
             }
 
             // Select answer for single value. Prefer use of IPv4 address. Only return IPv6 address if no IPv6 address found.
-            String singleValue = null;
+            String singleValue;
             if (CollectionUtils.isNotEmpty(ip4Answers)) {
                 singleValue = ip4Answers.get(0).ipAddress();
             } else if (CollectionUtils.isNotEmpty(ip6Answers)) {
@@ -266,14 +267,14 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
                 return LookupResult.empty();
             }
 
-            LookupResult.Builder builder = LookupResult.builder();
+            final LookupResult.Builder builder = LookupResult.builder();
             if (StringUtils.isNotBlank(singleValue)) {
                 builder.single(singleValue);
             }
 
-            Map<Object, Object> multiValueResults = new HashMap<>();
+            final Map<Object, Object> multiValueResults = new HashMap<>();
 
-            List<ADnsAnswer> allAnswers = new ArrayList<>();
+            final List<ADnsAnswer> allAnswers = new ArrayList<>();
             allAnswers.addAll(ip4Answers);
             allAnswers.addAll(ip6Answers);
 
@@ -286,7 +287,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
             return builder.build();
         } catch (Exception e) {
-             LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
+            LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
             return LookupResult.empty();
         }
@@ -296,18 +297,18 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
         // Only one PTR reverse record will be returned.
         try {
-            PtrDnsAnswer dnsResponse = dnsClient.reverseLookup(key.toString());
+            final PtrDnsAnswer dnsResponse = dnsClient.reverseLookup(key.toString());
             if (dnsResponse != null) {
 
                 if (!Strings.isNullOrEmpty(dnsResponse.fullDomain())) {
 
                     // Include answer in both single and multiValue fields.
-                    Map<Object, Object> multiValueResults = new LinkedHashMap<>();
+                    final Map<Object, Object> multiValueResults = new LinkedHashMap<>();
                     multiValueResults.put(PtrDnsAnswer.FIELD_DOMAIN, dnsResponse.domain());
                     multiValueResults.put(PtrDnsAnswer.FIELD_FULL_DOMAIN, dnsResponse.fullDomain());
                     multiValueResults.put(PtrDnsAnswer.FIELD_DNS_TTL, dnsResponse.dnsTTL());
 
-                    LookupResult.Builder builder = LookupResult.builder()
+                    final LookupResult.Builder builder = LookupResult.builder()
                                                                .single(dnsResponse.fullDomain())
                                                                .multiValue(multiValueResults);
 
@@ -335,14 +336,14 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         /* Query all TXT records for hostname, and provide them in the multiValue field as an array.
          * Do not attempt to attempt to choose a single value for the user (all are valid). */
         try {
-            List<TxtDnsAnswer> txtDnsAnswers = dnsClient.txtLookup(key.toString());
+            final List<TxtDnsAnswer> txtDnsAnswers = dnsClient.txtLookup(key.toString());
 
             if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {
 
-                Map<Object, Object> results = new HashMap<>();
+                final Map<Object, Object> results = new HashMap<>();
                 results.put(RAW_RESULTS_FIELD, txtDnsAnswers);
 
-                LookupResult.Builder builder = LookupResult.builder();
+                final LookupResult.Builder builder = LookupResult.builder();
                 builder.multiValue(results);
                 assignMinimumTTL(txtDnsAnswers, builder);
 
