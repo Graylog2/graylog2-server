@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Label, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import lodash from 'lodash';
 
 import SupportLink from 'components/support/SupportLink';
+
+const LIFECYCLE_DEFAULT_MESSAGES = {
+  experimental: 'This Graylog feature is new and should be considered experimental.',
+  legacy: 'This feature has been discontinued and will be removed in a future Graylog version.',
+};
 
 /**
  * Component that renders a page header, with a title and some optional content.
@@ -12,7 +18,7 @@ import SupportLink from 'components/support/SupportLink';
 class PageHeader extends React.Component {
   static propTypes = {
     /** Page header heading. */
-    title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+    title: PropTypes.node.isRequired,
     /**
      * One or more children, they will be used in the header in this order:
      *  1. Page description
@@ -21,31 +27,42 @@ class PageHeader extends React.Component {
      *
      * Please see the examples to see how to use this in practice.
      */
-    children: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
-    /** Flag that specifies if the page is experimental or not. */
-    experimental: PropTypes.bool,
+    children: PropTypes.node,
+    /** Indicates the lifecycle of the current page, which will display an indicator right next to the page title. */
+    lifecycle: PropTypes.oneOf(['experimental', 'legacy']),
+    /** Text to customize the default message for the given lifecycle. */
+    lifecycleMessage: PropTypes.node,
     /** Specifies if the page header is children of a content `Row` or not. */
     subpage: PropTypes.bool,
   };
 
   static defaultProps = {
-    experimental: false,
+    lifecycle: undefined,
+    lifecycleMessage: undefined,
     subpage: false,
+    children: [],
+  };
+
+  renderLifecycleIndicator = () => {
+    if (this.props.lifecycle === undefined) {
+      return null;
+    }
+
+    const label = lodash.upperFirst(this.props.lifecycle);
+    const defaultMessage = this.props.lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
+    const tooltip = <Tooltip id={this.props.lifecycle}>{this.props.lifecycleMessage || defaultMessage}</Tooltip>;
+
+    return (
+      <span style={{ cursor: 'help', marginLeft: 5, fontSize: 14, lineHeight: '20px', verticalAlign: 'text-top' }}>
+        <OverlayTrigger placement="bottom" overlay={tooltip}>
+          <Label bsStyle="primary">{label}</Label>
+        </OverlayTrigger>
+      </span>
+    );
   };
 
   render() {
     const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
-
-    let experimentalLabel;
-    if (this.props.experimental) {
-      experimentalLabel = (
-        <span style={{ cursor: 'help', marginLeft: 5, fontSize: 14, lineHeight: '20px', verticalAlign: 'text-top' }}>
-          <OverlayTrigger placement="bottom" overlay={<Tooltip id="experimental">This feature of Graylog is new and should be considered experimental.</Tooltip>}>
-            <Label bsStyle="primary">Experimental</Label>
-          </OverlayTrigger>
-        </span>
-      );
-    }
 
     const topLevelClassNames = this.props.subpage ? 'content-head' : 'content content-head';
     return (
@@ -61,7 +78,7 @@ class PageHeader extends React.Component {
             }
 
             <h1>
-              {this.props.title} <small>{experimentalLabel}</small>
+              {this.props.title} <small>{this.renderLifecycleIndicator()}</small>
             </h1>
             {children[0] &&
             <p className="description">
