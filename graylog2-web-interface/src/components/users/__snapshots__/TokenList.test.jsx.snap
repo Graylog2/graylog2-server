@@ -307,7 +307,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               <div
                 className="btn-group"
               >
-                <ClipboardButton
+                <clipboard-button
                   bsSize="xsmall"
                   text="beef2001"
                   title="Copy to clipboard"
@@ -342,7 +342,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               <div
                 className="btn-group"
               >
-                <ClipboardButton
+                <clipboard-button
                   bsSize="xsmall"
                   text="beef2002"
                   title="Copy to clipboard"
