@@ -59,14 +59,14 @@ public class ContentPackTest {
         objectMapper.setSubtypeResolver(new AutoValueSubtypeResolver());
     }
 
-    @Test
-    public void serializeContentPackV1() {
+    private ContentPack createTestContentPack() {
         final ObjectNode entityData = objectMapper.createObjectNode()
                 .put("bool", true)
                 .put("double", 1234.5678D)
                 .put("long", 1234L)
                 .put("string", "foobar");
-        final ContentPack contentPack = ContentPackV1.builder()
+
+        return ContentPackV1.builder()
                 .id(ModelId.of("a7917ee5-3e1a-4f89-951d-aeb604616998"))
                 .revision(1)
                 .name("Test")
@@ -86,7 +86,11 @@ public class ContentPackTest {
                 .entities(ImmutableSet.of(
                         EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData).build()))
                 .build();
+    }
 
+    @Test
+    public void serializeContentPackV1() {
+        final ContentPack contentPack = createTestContentPack();
 
         final JsonNode jsonNode = objectMapper.convertValue(contentPack, JsonNode.class);
         assertThat(jsonNode).isNotNull();
@@ -119,47 +123,28 @@ public class ContentPackTest {
     }
 
     @Test
-    public void doesNotContainAutoValue() throws Exception {
-        final ObjectNode entityData = objectMapper.createObjectNode()
-                .put("bool", true)
-                .put("double", 1234.5678D)
-                .put("long", 1234L)
-                .put("string", "foobar");
-
-        final ContentPack contentPack = ContentPackV1.builder()
-                .id(ModelId.of("a7917ee5-3e1a-4f89-951d-aeb604616998"))
-                .revision(1)
-                .name("Test")
-                .summary("Summary")
-                .description("Description")
-                .vendor("Graylog, Inc.")
-                .url(URI.create("https://www.graylog.org"))
-                .requires(ImmutableSet.of(
-                        GraylogVersionConstraint.builder().version("^3.0.0").build(),
-                        PluginVersionConstraint.builder().pluginId("org.example.TestPlugin").version("^1.2.3").build()))
-                .parameters(ImmutableSet.of(
-                        BooleanParameter.builder().name("MY_BOOLEAN").title("My Boolean").description("Some description").build(),
-                        DoubleParameter.builder().name("MY_DOUBLE").title("My Double").description("Some description").defaultValue(Optional.of(12.34D)).build(),
-                        IntegerParameter.builder().name("MY_INTEGER").title("My Integer").description("Some description").defaultValue(Optional.of(23)).build(),
-                        LongParameter.builder().name("MY_LONG").title("My Long").description("Some description").defaultValue(Optional.of(42L)).build(),
-                        StringParameter.builder().name("MY_STRING").title("My String").description("Some description").defaultValue(Optional.of("Default Value")).build()))
-                .entities(ImmutableSet.of(
-                        EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData).build()))
-                .build();
-
-        final String jsonTxt = objectMapper.writeValueAsString(contentPack);
-        assertThat(jsonTxt).doesNotContain("AutoValue_");
+    public void shouldDeserializeSerializedContentPack() throws Exception {
+        final ContentPack contentPack = createTestContentPack();
 
         final URL contentPackURL = ContentPackTest.class.getResource("expected_content_pack.json");
         Path path = Paths.get(contentPackURL.toURI());
         String expectedJSON = new String(Files.readAllBytes(path)).replace("\n", "").replace("\r", "");
 
+        final String jsonTxt = objectMapper.writeValueAsString(contentPack);
         assertThat(jsonTxt).isEqualTo(expectedJSON);
 
         final ContentPack readContentPack = objectMapper.readValue(jsonTxt, ContentPack.class);
         assertThat(readContentPack.id()).isEqualTo(contentPack.id());
         assertThat(readContentPack.version()).isEqualTo(contentPack.version());
         assertThat(readContentPack.revision()).isEqualTo(contentPack.revision());
+    }
+
+    @Test
+    public void doesNotContainAutoValue() throws Exception {
+        final ContentPack contentPack = createTestContentPack();
+
+        final String jsonTxt = objectMapper.writeValueAsString(contentPack);
+        assertThat(jsonTxt).doesNotContain("AutoValue_");
     }
 
     @Test
