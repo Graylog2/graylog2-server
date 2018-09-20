@@ -22,8 +22,8 @@
       "node_operating_system": "windows",
       "executable_path": "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
       "configuration_path": "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
-      "execute_parameters": "-c %s",
-      "validation_parameters": "test config -c %s",
+      "execute_parameters": "-c \"%s\"",
+      "validation_parameters": "test config -c \"%s\"",
       "default_template": ""
     },
     {
