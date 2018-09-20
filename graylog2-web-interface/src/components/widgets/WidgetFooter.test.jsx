@@ -23,7 +23,7 @@ describe('<WidgetFooter />', () => {
       onDelete={() => {}}
       replayHref={'http://example.org'}
       replayDisabled={false}
-      calculatedAt={date.getTime()}
+      calculatedAt={date.toISOString()}
       error={{}}
       errorMessage={''} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
@@ -37,7 +37,7 @@ describe('<WidgetFooter />', () => {
       onDelete={() => {}}
       replayHref={'http://example.org'}
       replayDisabled
-      calculatedAt={date.getTime()}
+      calculatedAt={date.toISOString()}
       error={{}}
       errorMessage={''} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
@@ -51,7 +51,7 @@ describe('<WidgetFooter />', () => {
       onDelete={() => {}}
       replayHref={'http://example.org'}
       replayDisabled={false}
-      calculatedAt={date.getTime()}
+      calculatedAt={date.toISOString()}
       error={{}}
       errorMessage={''} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
