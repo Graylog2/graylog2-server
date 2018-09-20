@@ -236,6 +236,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -365,6 +366,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div />
             </h3>
@@ -483,6 +485,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -607,6 +610,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -731,6 +735,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -866,6 +871,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -995,6 +1001,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div />
             </h3>
@@ -1113,6 +1120,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -1237,6 +1245,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
@@ -1361,6 +1370,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                
               <small>
                 Version: 
+                1
               </small>
               <div>
                 <span
