@@ -141,7 +141,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final Set<Stream> connectedStreams = connectedStreams(connectedStreamEntities, nativeEntities);
         createPipelineConnections(pipelineId, connectedStreams);
 
-        return NativeEntity.create(entity.id(), pipelineId, TYPE_V1, savedPipelineDao);
+        return NativeEntity.create(entity.id(), pipelineId, TYPE_V1, savedPipelineDao.title(), savedPipelineDao);
     }
 
     private Set<Stream> connectedStreams(Set<EntityDescriptor> connectedStreamEntities, Map<EntityDescriptor, Object> nativeEntities) {

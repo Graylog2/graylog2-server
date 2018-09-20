@@ -115,7 +115,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 .build();
 
         final CacheDto savedCacheDto = cacheService.save(cacheDto);
-        return NativeEntity.create(entity.id(), savedCacheDto.name(), TYPE_V1, savedCacheDto);
+        return NativeEntity.create(entity.id(), savedCacheDto.name(), TYPE_V1, savedCacheDto.title(), savedCacheDto);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
 
         final Optional<CacheDto> existingCache = cacheService.get(name);
 
-        return existingCache.map(cache -> NativeEntity.create(entity.id(), cache.id(), TYPE_V1, cache));
+        return existingCache.map(cache -> NativeEntity.create(entity.id(), cache.id(), TYPE_V1, cache.title(), cache));
     }
 
     @Override

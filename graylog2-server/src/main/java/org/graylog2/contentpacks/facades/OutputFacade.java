@@ -128,7 +128,7 @@ public class OutputFacade implements EntityFacade<Output> {
         );
         try {
             final Output output = outputService.create(createOutputRequest, username);
-            return NativeEntity.create(entity.id(), output.getId(), TYPE_V1, output);
+            return NativeEntity.create(entity.id(), output.getId(), TYPE_V1, output.getTitle(), output);
         } catch (ValidationException e) {
             throw new IllegalArgumentException(e);
         }

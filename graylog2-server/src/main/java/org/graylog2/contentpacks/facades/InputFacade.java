@@ -223,7 +223,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
             throw new RuntimeException("Couldn't create extractors", e);
         }
 
-        return NativeEntity.create(entity.id(), input.getId(), TYPE_V1, InputWithExtractors.create(input, extractors));
+        return NativeEntity.create(entity.id(), input.getId(), TYPE_V1, input.getTitle(), InputWithExtractors.create(input, extractors));
     }
 
     private MessageInput createMessageInput(
