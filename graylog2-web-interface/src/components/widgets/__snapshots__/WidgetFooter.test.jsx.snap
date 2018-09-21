@@ -14,11 +14,11 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
       />
     </span>
     <span
-      title={821849040000}
+      title="1996-01-17T03:24:00.000Z"
     >
       <time
-        dateTime={821849040000}
-        title={821849040000}
+        dateTime="1996-01-17T03:24:00.000Z"
+        title="1996-01-17T03:24:00.000Z"
       >
         22 years ago
       </time>
@@ -62,11 +62,11 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
       />
     </span>
     <span
-      title={821849040000}
+      title="1996-01-17T03:24:00.000Z"
     >
       <time
-        dateTime={821849040000}
-        title={821849040000}
+        dateTime="1996-01-17T03:24:00.000Z"
+        title="1996-01-17T03:24:00.000Z"
       >
         22 years ago
       </time>
@@ -125,11 +125,11 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
       />
     </span>
     <span
-      title={821849040000}
+      title="1996-01-17T03:24:00.000Z"
     >
       <time
-        dateTime={821849040000}
-        title={821849040000}
+        dateTime="1996-01-17T03:24:00.000Z"
+        title="1996-01-17T03:24:00.000Z"
       >
         22 years ago
       </time>

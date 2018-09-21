@@ -47,14 +47,27 @@ describe('<DataAdapterCreate />', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-  it('should render for types without defined frontend components', () => {
-    const callback = () => {};
-    const types = {
-      unknownType: {
-        type: 'unknownType',
-      },
-    };
-    const wrapper = renderer.create(<DataAdapterCreate saved={callback} types={types} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+  describe('with mocked console.error', () => {
+    const consoleError = console.error;
+
+    beforeAll(() => {
+      console.error = jest.fn();
+    });
+
+    afterAll(() => {
+      console.error = consoleError;
+    });
+
+    it('should render for types without defined frontend components', () => {
+      const callback = () => {};
+      const types = {
+        unknownType: {
+          type: 'unknownType',
+        },
+      };
+      const wrapper = renderer.create(<DataAdapterCreate saved={callback} types={types} />);
+      expect(wrapper.toJSON()).toMatchSnapshot();
+      expect(console.error.mock.calls.length).toBe(1);
+    });
   });
 });

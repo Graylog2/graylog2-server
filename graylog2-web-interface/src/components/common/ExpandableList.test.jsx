@@ -35,9 +35,9 @@ describe('<ExpandableList />', () => {
 
   it('should expand a expandable list item', () => {
     const wrapper = mount(<ExpandableList>
-      <ExpandableListItem expandable header="Wheel of time">
+      <ExpandableListItem expandable header="Wheel of time" readOnly>
         <ExpandableList>
-          <ExpandableListItem header="Edmonds Field" />
+          <ExpandableListItem header="Edmonds Field" readOnly />
         </ExpandableList>
       </ExpandableListItem>
     </ExpandableList>);
@@ -49,7 +49,7 @@ describe('<ExpandableList />', () => {
   it('should select a selectable list item', () => {
     const checkFn = jest.fn();
     const wrapper = mount(<ExpandableList>
-      <ExpandableListItem expanded header="Wheel of time">
+      <ExpandableListItem expanded header="Wheel of time" readOnly>
         <ExpandableList>
           <ExpandableListItem expanded selectable header="Edmonds Field" onChange={checkFn} />
         </ExpandableList>

@@ -49,7 +49,7 @@ describe('<MessageTableEntry />', () => {
 
   describe('timezone handling', () => {
     it('should render a in the UTC timezone', () => {
-      const wrapper = mount(<MessageTableEntry
+      const wrapper = mount(<table><MessageTableEntry
         allStreams={allStreams}
         allStreamsLoaded
         disableSurroundingSearch
@@ -61,13 +61,13 @@ describe('<MessageTableEntry />', () => {
         nodes={nodes}
         streams={streams}
         toggleDetail={jest.fn}
-      />);
+      /></table>);
       expect(wrapper.find('time').at(1).text()).toEqual('2018-01-22 16:36:02.189 +01:00');
     });
 
     it('should render a in the USA/Honolulu timezone', () => {
       DateTime.getBrowserTimezone = () => { return 'Pacific/Honolulu'; };
-      const wrapper = mount(<MessageTableEntry
+      const wrapper = mount(<table><MessageTableEntry
         allStreams={allStreams}
         allStreamsLoaded
         disableSurroundingSearch
@@ -79,7 +79,7 @@ describe('<MessageTableEntry />', () => {
         nodes={nodes}
         streams={streams}
         toggleDetail={jest.fn}
-      />);
+      /></table>);
       expect(wrapper.find('time').at(1).text()).toEqual('2018-01-22 05:36:02.189 -10:00');
     });
   });
