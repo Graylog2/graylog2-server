@@ -95,9 +95,8 @@ export const SearchStore = Reflux.createStore({
           this.executePromise = undefined;
           return { result, widgetMapping };
         }, displayError);
+      SearchActions.execute.promise(this.executePromise);
     }
-
-    SearchActions.execute.promise(this.executePromise);
   },
 
   parameters(newParameters) {

@@ -4,11 +4,9 @@ import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import { TitlesActions } from 'enterprise/stores/TitlesStore';
-import { ViewActions, ViewStore } from 'enterprise/stores/ViewStore';
+import { ViewActions } from 'enterprise/stores/ViewStore';
 import NewQueryActionHandler from 'enterprise/logic/NewQueryActionHandler';
-import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
-import UserNotification from 'util/UserNotification';
-import Routes from 'routing/Routes';
+import onSaveView from 'enterprise/logic/views/OnSaveViewAction';
 import { QueriesActions } from '../stores/QueriesStore';
 import { QueryIdsStore } from '../stores/QueryIdsStore';
 import { QueryTitlesStore } from '../stores/QueryTitlesStore';
@@ -24,13 +22,6 @@ const onSelectQuery = (queryId, executeSearch) => {
   } else {
     ViewActions.selectQuery(queryId);
   }
-};
-
-const onSaveView = (view, router) => {
-  ViewManagementActions.save(view)
-    .then(savedView => router.push(Routes.pluginRoute('VIEWS_VIEWID')(savedView.id)))
-    .then(() => UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!'))
-    .then(() => ViewStore.load(view));
 };
 
 const onCloseTab = (queryId, currentQuery, queries) => {
