@@ -9,3 +9,7 @@ global.jQuery = jQuery;
 registerBuiltinStores();
 
 configure({ adapter: new Adapter() });
+
+console.error = jest.fn((error) => {
+  throw new Error(error);
+});
