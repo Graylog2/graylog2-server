@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 
 import DateTime from 'logic/datetimes/DateTime';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import styles from './SearchDetails.css';
+
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 // eslint-disable-next-line react/prop-types
 const DateTimeTimestamp = ({ dateTime, timezone }) => {

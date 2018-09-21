@@ -5,7 +5,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { DocumentTitle, PageHeader } from 'components/common/index';
+import { DocumentTitle, PageHeader } from 'components/common';
 
 import { ViewManagementStore, ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
 import ViewList from 'enterprise/components/views/ViewList';

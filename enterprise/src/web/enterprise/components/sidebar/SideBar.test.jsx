@@ -3,55 +3,76 @@ import createReactClass from 'create-react-class';
 import { mount } from 'enzyme';
 import PropTypes from 'prop-types';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import SideBar from './SideBar';
+import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
 import QueryResult from '../../logic/QueryResult';
 
+// eslint-disable-next-line global-require
+const loadSUT = () => require('./SideBar').default;
+
 describe('<Sidebar />', () => {
-  const TestComponent = createReactClass({
-    propTypes: {
-      maximumHeight: PropTypes.number,
-    },
+  let TestComponent;
+  let viewMetaData;
+  let queryResult;
+  let query;
 
-    getDefaultProps() {
-      return { maximumHeight: undefined };
-    },
+  beforeEach(() => {
+    TestComponent = createReactClass({
+      propTypes: {
+        maximumHeight: PropTypes.number,
+      },
 
-    getContainerHeight() {
-      return this.props.maximumHeight;
-    },
+      getDefaultProps() {
+        return { maximumHeight: undefined };
+      },
 
-    render() {
-      expect(this.props).toHaveProperty('maximumHeight');
-      return <div id="martian">Marc Watney</div>;
-    },
+      getContainerHeight() {
+        return this.props.maximumHeight;
+      },
+
+      render() {
+        expect(this.props).toHaveProperty('maximumHeight');
+        return <div id="martian">Marc Watney</div>;
+      },
+    });
+
+    viewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      description: 'A description',
+      id: '5b34f4c44880a54df9616380',
+      summary: 'query summary',
+      title: 'Query Title',
+    };
+
+    // eslint-disable-next-line camelcase
+    const effective_timerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' };
+    const duration = 64;
+    const timestamp = '2018-08-28T14:39:26.127Z';
+    query = {
+      filter: { type: 'or', filters: [] },
+      id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      query: { type: 'elasticsearch', query_string: '*' },
+      search_types: [],
+      timerange: { type: 'relative', range: 300 },
+    };
+    const error = [];
+    // eslint-disable-next-line camelcase
+    const execution_stats = { effective_timerange, duration, timestamp };
+    queryResult = new QueryResult({ execution_stats, query, error });
+
+    const currentUser = { timezone: 'UTC' };
+    const CurrentUserStore = StoreMock('listen', ['get', () => currentUser], ['getInitialState', () => ({ currentUser })]);
+    const SessionStore = StoreMock('listen');
+    const combinedProviderMock = new CombinedProviderMock({
+      CurrentUser: { CurrentUserStore },
+      Session: { SessionStore },
+    });
+    jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
   });
 
-  CurrentUserStore.currentUser = { timezone: 'UTC' };
-  const viewMetaData = {
-    activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-    description: 'A description',
-    id: '5b34f4c44880a54df9616380',
-    summary: 'query summary',
-    title: 'Query Title',
-  };
-
-  const effective_timerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' };
-  const duration = 64;
-  const timestamp = '2018-08-28T14:39:26.127Z';
-  const query = {
-    filter: { type: 'or', filters: [] },
-    id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-    query: { type: 'elasticsearch', query_string: '*' },
-    search_types: [],
-    timerange: { type: 'relative', range: 300 },
-  };
-  const error = [];
-  const execution_stats = { effective_timerange, duration, timestamp };
-  const queryResult = new QueryResult({ execution_stats, query, error });
-
   it('should render a sidebar', () => {
+    const SideBar = loadSUT();
     const wrapper = mount(<SideBar viewMetadata={viewMetaData} queryId={query.id} results={queryResult}><TestComponent /></SideBar>);
+
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
     expect(wrapper.find('small').text()).toBe(viewMetaData.summary);
   });
@@ -62,7 +83,9 @@ describe('<Sidebar />', () => {
       id: '5b34f4c44880a54df9616380',
     };
 
+    const SideBar = loadSUT();
     const wrapper = mount(<SideBar viewMetadata={emptyViewMetaData} queryId={query.id} results={queryResult}><TestComponent /></SideBar>);
+
     expect(wrapper.find('h3').text()).toBe('New View');
     expect(wrapper.find('small').text()).toBe('No summary.');
     expect(wrapper.find('time').at(2).text()).toBe('2018-08-28 14:39:26.192');
@@ -71,9 +94,11 @@ describe('<Sidebar />', () => {
   });
 
   it('should render passed children', () => {
+    const SideBar = loadSUT();
     const wrapper = mount(<SideBar viewMetadata={viewMetaData} queryId={query.id} results={queryResult}>
       <TestComponent />
     </SideBar>);
+
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
 
@@ -85,9 +110,12 @@ describe('<Sidebar />', () => {
       };
     };
     let childRef;
-    const wrapper = mount(<SideBar viewMetadata={viewMetaData} queryId={query.id} results={queryResult}>
+    const SideBar = loadSUT();
+
+    mount(<SideBar viewMetadata={viewMetaData} queryId={query.id} results={queryResult}>
       <TestComponent ref={(node) => { childRef = node; }} />
     </SideBar>);
+
     expect(childRef.getContainerHeight()).toBe(698);
   });
 });

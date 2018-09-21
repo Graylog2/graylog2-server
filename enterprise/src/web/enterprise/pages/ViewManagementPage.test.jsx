@@ -1,10 +1,16 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { StoreMock } from 'helpers/mocking';
-
-import ViewList from './components/views/ViewList';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: x => x }));
+jest.mock('enterprise/components/views/ViewList', () => mockComponent('ViewList'));
+jest.mock('components/common', () => ({
+  /* eslint-disable global-require */
+  DocumentTitle: require('components/common/DocumentTitle'),
+  PageHeader: require('components/common/PageHeader'),
+  /* eslint-enable global-require */
+}));
 
 const mockViewManagementStore = StoreMock('listen', 'getInitialState');
 const mockViewManagementActions = { search: jest.fn(), delete: jest.fn() };
@@ -24,10 +30,10 @@ describe('ViewManagementPage', () => {
     mockViewManagementStore.getInitialState.mockImplementationOnce(() => viewsResult);
 
     // eslint-disable-next-line global-require
-    const ViewManagementPage = require('enterprise/ViewManagementPage').default;
+    const ViewManagementPage = require('./ViewManagementPage').default;
     const wrapper = shallow(<ViewManagementPage />);
 
-    const viewList = wrapper.find(ViewList);
+    const viewList = wrapper.find('ViewList');
     expect(viewList).toHaveLength(1);
     expect(viewList.at(0)).toHaveProp('views', viewsResult.list);
     expect(viewList.at(0)).toHaveProp('pagination', viewsResult.pagination);
