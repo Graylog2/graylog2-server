@@ -55,7 +55,13 @@ describe('<ContentPackSelection />', () => {
         expect(state.contentPack).toEqual(contentPack);
       }
     });
-    const contentPack = {};
+    const contentPack = {
+      name: '',
+      summary: '',
+      description: '',
+      vendor: '',
+      url: '',
+    };
     const wrapper = mount(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
     wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
     wrapper.find('input#summary').simulate('change', { target: { name: 'summary', value: 'summary' } });
