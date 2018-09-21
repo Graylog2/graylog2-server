@@ -1,1 +1,1 @@
-export MessageListHandler from './MessageListHandler';
+export { default as MessageListHandler } from './MessageListHandler';
