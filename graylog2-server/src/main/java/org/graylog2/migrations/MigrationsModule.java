@@ -36,5 +36,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20180214093600_AdjustDashboardPositionToNewResolution.class);
         addMigration(V2018070614390000_EnforceUniqueGrokPatterns.class);
         addMigration(V20180718155800_AddContentPackIdAndRev.class);
+        addMigration(V20180924111644_AddDefaultGrokPatterns.class);
     }
 }

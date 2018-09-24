@@ -1,0 +1,1313 @@
+{
+   "id":"a3ce55ad-bdf3-7a50-305c-1e5bf3de6eca",
+   "rev":1,
+   "v":"1",
+   "name":"Core Grok Patterns",
+   "summary":"The default Grok Patterns from graylog",
+   "description":"These are the default Grok Patterns provided by graylog.",
+   "vendor":"Graylog <hello@graylog.com>",
+   "url":"https://github.com/Graylog2/graylog2-server",
+   "requires":[
+      {
+         "type":"server-version",
+         "version":">=3.0.0-alpha.2+07766b9 <4.0.0"
+      }
+   ],
+   "parameters":[
+
+   ],
+   "entities":[
+      {
+         "id":"595e7897833ee75eda49ad58",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"USER"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{USERNAME}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad20",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"TIME"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad4b",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATESTAMP"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{DATE}[- ]%{TIME}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad55",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HTTPDUSER"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{EMAILADDRESS}|%{USER}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad13",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"URI"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{URIPROTO}://(?:%{USER}(?::[^@]*)?@)?(?:%{URIHOST})?(?:%{URIPATHPARAM})?"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad23",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"MONTHDAY"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01])|[1-9])"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad65",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"WINPATH"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?>[A-Za-z]+:|\\\\)(?:\\\\[^\\\\?*]*)+"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad16",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SYSLOGBASE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource} %{SYSLOGPROG}:"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad2e",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"POSINT"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\b(?:[1-9][0-9]*)\\b"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad45",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"NUMBER"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:%{BASE10NUM})"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad5e",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HTTPD24_ERRORLOG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{WORD:module}:%{LOGLEVEL:loglevel}\\] \\[pid %{POSINT:pid}:tid %{NUMBER:tid}\\]( \\(%{POSINT:proxy_errorcode}\\)%{DATA:proxy_errormessage}:)?( \\[client %{IPORHOST:client}:%{POSINT:clientport}\\])? %{DATA:errorcode}: %{GREEDYDATA:message}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad19",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"URIPARAM"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\?[A-Za-z0-9$.+!*'|(){},~@#%&/=:;_?\\-\\[\\]<>]*"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad40",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATESTAMP_RFC822"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{DAY} %{MONTH} %{MONTHDAY} %{YEAR} %{TIME} %{TZ}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad30",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SYSLOGTIMESTAMP"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{MONTH} +%{MONTHDAY} %{TIME}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad35",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"MONTHNUM"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:0?[1-9]|1[0-2])"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad4e",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"QUOTEDSTRING"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?>(?<!\\\\)(?>\"(?>\\\\.|[^\\\\\"]+)+\"|\"\"|(?>'(?>\\\\.|[^\\\\']+)+')|''|(?>`(?>\\\\.|[^\\\\`]+)+`)|``))"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad50",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"CISCOMAC"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:(?:[A-Fa-f0-9]{4}\\.){2}[A-Fa-f0-9]{4})"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad29",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"WORD"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\b\\w+\\b"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad64",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HTTPDATE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad5d",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATESTAMP_RFC2822"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{DAY}, %{MONTHDAY} %{MONTH} %{YEAR} %{TIME} %{ISO8601_TIMEZONE}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad25",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"YEAR"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?>\\d\\d){1,2}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad2c",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HTTPD20_ERRORLOG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{LOGLEVEL:loglevel}\\] (?:\\[client %{IPORHOST:clientip}\\] ){0,1}%{GREEDYDATA:errormsg}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad2f",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"NOTSPACE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\S+"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad18",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"BASE16NUM"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad4c",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"TZ"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:[PMCE][SD]T|UTC)"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad1b",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"URIHOST"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{IPORHOST}(?::%{POSINT:port})?"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad36",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATA"
+            },
+            "pattern":{
+               "type":"string",
+               "value":".*?"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad42",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"LOGLEVEL"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|INFO|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad3b",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SPACE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\s*"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad49",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HOUR"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:2[0123]|[01]?[0-9])"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad1e",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"EMAILLOCALPART"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"[a-zA-Z][a-zA-Z0-9_.+-=:]+"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad4a",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"URIPATH"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:/[A-Za-z0-9$.+!*'(){},~:;=@#%_\\-]*)+"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad33",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATE_EU"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad2a",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"COMMONAPACHELOG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad22",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SYSLOGHOST"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{IPORHOST}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad53",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"TTY"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:/dev/(pts|tty([pq])?)(\\w+)?/?(?:[0-9]+))"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad38",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"BASE10NUM"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad5b",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"GREEDYDATA"
+            },
+            "pattern":{
+               "type":"string",
+               "value":".*"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad3e",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"IPORHOST"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:%{IP}|%{HOSTNAME})"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad41",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DAY"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad37",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"NONNEGINT"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\b(?:[0-9]+)\\b"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad27",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"UUID"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad5f",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"IP"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:%{IPV6}|%{IPV4})"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad1d",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATE_US"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{MONTHNUM}[/-]%{MONTHDAY}[/-]%{YEAR}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad34",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"WINDOWSMAC"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:(?:[A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2})"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad31",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"BASE16FLOAT"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\\.[0-9A-Fa-f]*)?)|(?:\\.[0-9A-Fa-f]+)))\\b"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad4f",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"IPV4"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad5c",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"ISO8601_SECOND"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:%{SECOND}|60)"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad44",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SYSLOGPROG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{PROG:program}(?:\\[%{POSINT:pid}\\])?"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad24",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"INT"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:[+-]?(?:[0-9]+))"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad3d",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HTTPD_ERRORLOG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{HTTPD20_ERRORLOG}|%{HTTPD24_ERRORLOG}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad66",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"MAC"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:%{CISCOMAC}|%{WINDOWSMAC}|%{COMMONMAC})"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad61",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{DATE_US}|%{DATE_EU}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad56",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"IPV6"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad4d",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"MINUTE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:[0-5][0-9])"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad51",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"PATH"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:%{UNIXPATH}|%{WINPATH})"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad46",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"COMBINEDAPACHELOG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{COMMONAPACHELOG} %{QS:referrer} %{QS:agent}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad15",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HOSTNAME"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\\.?|\\b)"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad60",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HOSTPORT"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{IPORHOST}:%{POSINT}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad32",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SYSLOGFACILITY"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"<%{NONNEGINT:facility}.%{NONNEGINT:priority}>"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad39",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"COMMONMAC"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad26",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"ISO8601_TIMEZONE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:Z|[+-]%{HOUR}(?::?%{MINUTE}))"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad57",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATESTAMP_EVENTLOG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{YEAR}%{MONTHNUM2}%{MONTHDAY}%{HOUR}%{MINUTE}%{SECOND}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad5a",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"UNIXPATH"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(/([\\w_%!$@:.,~-]+|\\\\.)*)+"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad3c",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"USERNAME"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"[a-zA-Z0-9._-]+"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad59",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"TIMESTAMP_ISO8601"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad63",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"DATESTAMP_OTHER"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{TZ} %{YEAR}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad28",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"QS"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{QUOTEDSTRING}"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad21",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"SECOND"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?)"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad2b",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"URIPROTO"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"[A-Za-z]+(\\+[A-Za-z+]+)?"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad54",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"MONTHNUM2"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"(?:0[1-9]|1[0-2])"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad17",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"MONTH"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"\\b(?:Jan(?:uary|uar)?|Feb(?:ruary|ruar)?|M(?:a|ä)?r(?:ch|z)?|Apr(?:il)?|Ma(?:y|i)?|Jun(?:e|i)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|O(?:c|k)?t(?:ober)?|Nov(?:ember)?|De(?:c|z)(?:ember)?)\\b"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad1f",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"PROG"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"[\\x21-\\x5a\\x5c\\x5e-\\x7e]+"
+            }
+         }
+      },
+      {
+         "id":"595e7896833ee75eda49ad1a",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"EMAILADDRESS"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{EMAILLOCALPART}@%{HOSTNAME}"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad3a",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"URIPATHPARAM"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{URIPATH}(?:%{URIPARAM})?"
+            }
+         }
+      },
+      {
+         "id":"595e7897833ee75eda49ad43",
+         "type": {
+            "name": "grok_pattern", "version": "1"
+         },
+         "v":"1",
+         "data":{
+            "name":{
+               "type":"string",
+               "value":"HTTPDERROR_DATE"
+            },
+            "pattern":{
+               "type":"string",
+               "value":"%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
+            }
+         }
+      }
+   ]
+}
