@@ -24,13 +24,6 @@
                 <include>**/*</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/../misc/contentpacks</directory>
-            <outputDirectory>/data/contentpacks</outputDirectory>
-            <includes>
-                <include>**/*.json</include>
-            </includes>
-        </fileSet>
 
         <!-- empty directories -->
         <fileSet>
