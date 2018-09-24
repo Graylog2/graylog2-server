@@ -59,8 +59,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "windows",
                 "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
                 "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
-                "-c %s",
-                "test config -c %s",
+                "-c \"%s\"",
+                "test config -c \"%s\"",
                 ""
         );
         ensureCollector(
