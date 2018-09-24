@@ -1,4 +1,4 @@
 {
-  "presets": ["@babel/env"],
+  "presets": ["env", "stage-0"],
   "plugins": ["add-module-exports"]
 }
