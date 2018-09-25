@@ -114,7 +114,7 @@ if (TARGET === 'start') {
   console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
     mode: 'development',
-    devtool: 'eval',
+    devtool: 'cheap-module-source-map',
     output: {
       path: BUILD_PATH,
       filename: '[name].js',
