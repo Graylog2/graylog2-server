@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NotificationBadge renders count when there are notifications 1`] = `
+<NotificationBadge
+  total={42}
+>
+  <Nav
+    bsClass="nav"
+    justified={false}
+    navbar={true}
+    pullLeft={false}
+    pullRight={false}
+    stacked={false}
+  >
+    <ul
+      className="nav navbar-nav"
+      role={null}
+    >
+      <LinkContainer
+        action="push"
+        key=".0"
+        onSelect={null}
+        onlyActiveOnIndex={false}
+        to="/system/overview"
+      >
+        <InactiveNavItem
+          action="push"
+          className="notification-badge-link"
+          onClick={[Function]}
+          onSelect={null}
+        >
+          <NavItem
+            action="push"
+            active={false}
+            className="notification-badge-link"
+            disabled={false}
+            onClick={[Function]}
+            onSelect={null}
+          >
+            <li
+              className="notification-badge-link"
+              role="presentation"
+            >
+              <SafeAnchor
+                action="push"
+                componentClass="a"
+                disabled={false}
+                onClick={[Function]}
+              >
+                <a
+                  action="push"
+                  href="#"
+                  onClick={[Function]}
+                  onKeyDown={[Function]}
+                  role="button"
+                >
+                  <Badge
+                    bsClass="badge"
+                    className="badgeDanger"
+                    id="notification-badge"
+                    pullRight={false}
+                  >
+                    <span
+                      className="badgeDanger badge"
+                      id="notification-badge"
+                    >
+                      42
+                    </span>
+                  </Badge>
+                </a>
+              </SafeAnchor>
+            </li>
+          </NavItem>
+        </InactiveNavItem>
+      </LinkContainer>
+    </ul>
+  </Nav>
+</NotificationBadge>
+`;
+
+exports[`NotificationBadge renders nothing when there are no notifications 1`] = `
+<NotificationBadge
+  total={0}
+/>
+`;
