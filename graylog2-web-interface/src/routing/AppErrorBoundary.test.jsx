@@ -19,6 +19,7 @@ const suppressConsole = (fn) => {
 };
 
 const ErroneusComponent = () => {
+  // eslint-disable-next-line no-throw-literal
   throw {
     message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
     stack: 'This the stack trace.',
