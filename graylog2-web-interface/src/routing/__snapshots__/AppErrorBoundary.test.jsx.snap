@@ -55,7 +55,7 @@ exports[`AppErrorBoundary displays error after catching 1`] = `
     }
   >
     <DocumentTitle
-      title="Not Found"
+      title="Something went wrong."
     >
       <Row
         bsClass="row"
