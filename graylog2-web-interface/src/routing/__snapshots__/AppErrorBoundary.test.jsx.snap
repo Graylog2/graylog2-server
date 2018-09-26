@@ -1,0 +1,134 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AppErrorBoundary displays child component if there is no error 1`] = `
+<AppErrorBoundary
+  router={
+    Object {
+      "listen": [MockFunction] {
+        "calls": Array [
+          Array [
+            [Function],
+          ],
+        ],
+        "results": undefined,
+      },
+    }
+  }
+>
+  <WorkingComponent>
+    <div>
+      Hello World!
+    </div>
+  </WorkingComponent>
+</AppErrorBoundary>
+`;
+
+exports[`AppErrorBoundary displays error after catching 1`] = `
+<AppErrorBoundary
+  router={
+    Object {
+      "listen": [MockFunction] {
+        "calls": Array [
+          Array [
+            [Function],
+          ],
+        ],
+        "results": undefined,
+      },
+    }
+  }
+>
+  <ErrorPage
+    error={
+      Object {
+        "message": "Oh no, a banana peel fell on the party gorilla's head!",
+        "stack": "This the stack trace.",
+      }
+    }
+    info={
+      Object {
+        "componentStack": "
+    in ErroneusComponent
+    in AppErrorBoundary (created by WrapperComponent)
+    in WrapperComponent",
+      }
+    }
+  >
+    <DocumentTitle
+      title="Not Found"
+    >
+      <Row
+        bsClass="row"
+        className="jumbotron-container"
+        componentClass="div"
+      >
+        <div
+          className="jumbotron-container row"
+        >
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={8}
+            mdOffset={2}
+          >
+            <div
+              className="col-md-8 col-md-offset-2"
+            >
+              <Jumbotron
+                bsClass="jumbotron"
+                componentClass="div"
+              >
+                <div
+                  className="jumbotron"
+                >
+                  <h1>
+                    Something went wrong.
+                  </h1>
+                  <p>
+                    It seems like the page you navigated to contained an error.
+                  </p>
+                  <p>
+                    You can use the navigation to reach other parts of the product, refresh the page or submit an error report.
+                  </p>
+                  <p>
+                    The details of the error are below:
+                  </p>
+                  <dl>
+                    <dt>
+                      Error:
+                    </dt>
+                    <dd>
+                      <pre>
+                        Oh no, a banana peel fell on the party gorilla's head!
+                      </pre>
+                    </dd>
+                    <dt>
+                      Stack:
+                    </dt>
+                    <dd>
+                      <pre>
+                        This the stack trace.
+                      </pre>
+                    </dd>
+                    <dt>
+                      Component Tree:
+                    </dt>
+                    <dd>
+                      <pre>
+                        
+    in ErroneusComponent
+    in AppErrorBoundary (created by WrapperComponent)
+    in WrapperComponent
+                      </pre>
+                    </dd>
+                  </dl>
+                </div>
+              </Jumbotron>
+            </div>
+          </Col>
+        </div>
+      </Row>
+    </DocumentTitle>
+  </ErrorPage>
+</AppErrorBoundary>
+`;
