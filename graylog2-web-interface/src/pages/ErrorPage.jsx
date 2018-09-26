@@ -29,7 +29,7 @@ class ErrorPage extends React.Component {
     const { error, info } = this.props;
 
     return (
-      <DocumentTitle title="Not Found">
+      <DocumentTitle title="Something went wrong.">
         <Row className="jumbotron-container">
           <Col mdOffset={2} md={8}>
             <Jumbotron>
