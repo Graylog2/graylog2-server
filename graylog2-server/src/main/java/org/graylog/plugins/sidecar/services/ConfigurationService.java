@@ -181,6 +181,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
 
     private String renderTemplate(String configurationId, Map<String, Object> context) throws RenderTemplateException {
         Writer writer = new StringWriter();
+        String template;
         try {
             Template compiledTemplate = templateConfiguration.getTemplate(configurationId);
             compiledTemplate.process(context, writer);
@@ -192,6 +193,10 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
             throw new RenderTemplateException(e.getMessage(), e);
         }
 
-        return writer.toString();
+        template = writer.toString();
+        if (!template.substring(template.length() -1).equals("\n")) {
+            return template + "\n";
+        }
+        return template;
     }
 }
