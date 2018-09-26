@@ -1,43 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { flatten } from 'lodash';
 
-import connect from 'stores/connect';
 import Select from 'react-select';
-import AggregationFunctionsStore from 'enterprise/stores/AggregationFunctionsStore';
-import { FieldList } from './AggregationBuilderPropTypes';
+import ConfigurableElement from './ConfigurableElement';
+import SeriesConfiguration from './SeriesConfiguration';
+import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
+import Series from '../../logic/aggregationbuilder/Series';
 
 const parseSeries = series => (series ? series.map(s => s.value) : []);
 
-const combineFunctionsWithFields = (functions, fields) => flatten(fields.map(name => functions.map(f => `${f}(${name})`)));
-
-const _wrapOption = opt => ({ label: opt, value: opt });
-
-const _makeIncompleteFunction = fun => ({ label: `${fun}(...)`, value: fun, incomplete: true });
-
-const _defaultFunctions = (functions) => {
-  return [].concat(
-    [_wrapOption('count()')],
-    Object.keys(functions).map(_makeIncompleteFunction),
-  );
+const newSeriesConfigChange = (values, series, newSeries, onChange) => {
+  const newValues = values.map(s => (s === series ? newSeries : s));
+  return onChange(newValues);
 };
+
+const _wrapOption = series => ({ label: series.effectiveName, value: series });
 
 class SeriesSelect extends React.Component {
   constructor(props, context) {
     super(props, context);
-    const { functions } = props;
+    const { suggester } = props;
     this.state = {
-      options: _defaultFunctions(functions),
+      options: suggester.defaults,
     };
   }
   _onChange = (newSeries) => {
     const last = newSeries[newSeries.length - 1];
-    const { fields } = this.props;
+    if (!last) {
+      return false;
+    }
 
-    if (last && last.incomplete) {
+    const { incomplete, backToFunctions, value } = last;
+
+    if (incomplete) {
       const options = [].concat(
         [{ label: 'Back to function list', backToFunctions: true }],
-        combineFunctionsWithFields([last.value], fields).map(_wrapOption),
+        this.props.suggester.for(value),
       );
       this.setState({ options });
       return false;
@@ -45,7 +43,7 @@ class SeriesSelect extends React.Component {
 
     this._resetToFunctions();
 
-    if (last && last.backToFunctions) {
+    if (backToFunctions) {
       return false;
     }
 
@@ -54,8 +52,7 @@ class SeriesSelect extends React.Component {
   };
 
   _resetToFunctions = () => {
-    const { functions } = this.props;
-    this.setState({ options: _defaultFunctions(functions) });
+    this.setState({ options: this.props.suggester.defaults });
   };
 
   _onClose = () => {
@@ -63,11 +60,23 @@ class SeriesSelect extends React.Component {
   };
 
   render() {
-    const { series } = this.props;
+    const { onChange, series } = this.props;
+    const valueComponent = ({ children, ...rest }) => {
+      const element = rest.value.value;
+      return (
+        <ConfigurableElement {...rest}
+                             configuration={({ onClose }) => <SeriesConfiguration series={element} onClose={onClose} />}
+                             onChange={newElement => newSeriesConfigChange(series, element, newElement, onChange)}
+                             title="Series Configuration">
+          {children}
+        </ConfigurableElement>
+      );
+    };
     return (<Select placeholder="None: click to add series"
                     onChange={this._onChange}
                     options={this.state.options}
                     value={series.map(_wrapOption)}
+                    valueComponent={valueComponent}
                     onClose={this._onClose}
                     ignoreCase
                     closeOnSelect={false}
@@ -83,12 +92,13 @@ class SeriesSelect extends React.Component {
 }
 
 SeriesSelect.propTypes = {
-  fields: FieldList.isRequired,
-  functions: PropTypes.objectOf(PropTypes.shape({
-    type: PropTypes.string,
-  })).isRequired,
   onChange: PropTypes.func.isRequired,
-  series: PropTypes.arrayOf(PropTypes.string).isRequired,
+  series: PropTypes.arrayOf(PropTypes.instanceOf(Series)).isRequired,
+  suggester: PropTypes.any,
 };
 
-export default connect(SeriesSelect, { functions: AggregationFunctionsStore });
+SeriesSelect.defaultProps = {
+  suggester: new SeriesFunctionsSuggester(),
+};
+
+export default SeriesSelect;

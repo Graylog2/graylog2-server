@@ -4,20 +4,7 @@ import PropTypes from 'prop-types';
 import Select from 'react-select';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 
-import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
-import ConfigurablePivot from './ConfigurablePivot';
-
 import styles from './SortableSelect.css';
-import Pivot from '../../logic/aggregationbuilder/Pivot';
-
-const _onChange = (fields, newValue, onChange) => {
-  const newFields = newValue.map(v => v.value);
-
-  return onChange(newFields.map((field) => {
-    const existingField = fields.find(f => f.field === field);
-    return existingField || pivotForField(field);
-  }));
-};
 
 const SortableValueList = SortableContainer(({ children, ...rest }) => <span {...rest}>{children}</span>);
 
@@ -27,26 +14,7 @@ const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
   onChange(newItems.join(','));
 };
 
-const configFor = ({ value }, values) => (value === '' ? {} : values.find(({ field }) => field === value).config);
-const newPivotConfigChange = (values, value, newPivotConfig, onChange) => {
-  const newValues = values.map((pivot) => {
-    if (pivot.field === value.value) {
-      return new Pivot(pivot.field, pivot.type, newPivotConfig.config);
-    }
-    return pivot;
-  });
-  return onChange(newValues);
-};
-
-const SortableSelect = ({ onChange, value, sortableValueList, ...remainingProps }) => {
-  const SortableValue = SortableElement(({ children, ...rest }) => (
-    <ConfigurablePivot {...rest}
-                       config={configFor(rest.value, value)}
-                       onChange={newPivotConfig => newPivotConfigChange(value, rest.value, newPivotConfig, onChange)}>
-      {children}
-    </ConfigurablePivot>
-  ));
-
+const SortableSelect = ({ onChange, value, valueComponent, sortableValueList, ...remainingProps }) => {
   const ValueListComponent = sortableValueList;
   // eslint-disable-next-line react/prop-types
   const valueList = ({ children, ...rest }) => (
@@ -63,10 +31,10 @@ const SortableSelect = ({ onChange, value, sortableValueList, ...remainingProps 
     <Select
       multi
       {...remainingProps}
-      onChange={s => _onChange(value, s, onChange)}
+      onChange={onChange}
       value={values}
       valueListComponent={valueList}
-      valueComponent={SortableValue}
+      valueComponent={SortableElement(valueComponent)}
     />
   );
 };
@@ -75,6 +43,7 @@ SortableSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
   sortableValueList: PropTypes.func,
   value: PropTypes.any.isRequired,
+  valueComponent: PropTypes.func.isRequired,
 };
 
 SortableSelect.defaultProps = {

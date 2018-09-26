@@ -43,10 +43,10 @@ class DataTableEntry extends React.Component {
     const fieldColumns = fields.toSeq().map(fieldName => _c(fieldName, item[fieldName])).toJS();
     const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
       const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
-      return series.map((seriesName) => {
-        const fullPath = [].concat(translatedPath, [seriesName]);
+      return series.map(({ effectiveName }) => {
+        const fullPath = [].concat(translatedPath, [effectiveName]);
         const value = get(item, fullPath);
-        return _c(seriesName, value);
+        return _c(effectiveName, value);
       });
     }));
 

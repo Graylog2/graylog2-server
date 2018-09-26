@@ -1,9 +1,11 @@
 import { flatten, setWith } from 'lodash';
 
-const expandRows = (fieldNames, columnFieldNames, series, rows, expanded = []) => {
+const expandRows = (fieldNames, columnFieldNames, rows) => {
   if (!rows) {
     return [];
   }
+
+  const expanded = [];
 
   rows.forEach((row) => {
     const { values } = row;

@@ -103,9 +103,9 @@ class DataTable extends React.Component {
 
     const rowFieldNames = rowPivots.map(pivot => pivot.field);
     const columnFieldNames = columnPivots.map(pivot => pivot.field);
-    const fields = new Immutable.OrderedSet(rowFieldNames).merge(series);
+    const fields = new Immutable.OrderedSet(rowFieldNames).merge(series.map(({ effectiveName }) => effectiveName));
 
-    const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), series, rows.filter(r => r.source === 'leaf'));
+    const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter(r => r.source === 'leaf'));
 
     const actualColumnPivotFields = this._extractColumnPivotValues(rows, columnFieldNames);
     const rowPivotFields = rowFieldNames.map(this._headerField);
@@ -122,8 +122,9 @@ class DataTable extends React.Component {
                               series={series} />);
     });
 
-    const seriesFields = series.map(this._headerField);
-    const columnPivotFields = flatten(actualColumnPivotFields.map(key => series.map(s => this._headerField(s, key.join('-')))));
+    const effectiveSeries = series.map(s => s.effectiveName);
+    const seriesFields = effectiveSeries.map(this._headerField);
+    const columnPivotFields = flatten(actualColumnPivotFields.map(key => effectiveSeries.map(s => this._headerField(s, key.join('-')))));
     return (
       <div className="messages-container" style={{ overflow: 'auto', height: '100%' }}>
         <table className="table table-condensed messages">

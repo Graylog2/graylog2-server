@@ -12,6 +12,7 @@ import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import { PivotList } from './AggregationBuilderPropTypes';
 import DescriptionBox from './DescriptionBox';
+import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 
 export default class AggregationControls extends React.Component {
   static propTypes = {
@@ -79,6 +80,7 @@ export default class AggregationControls extends React.Component {
       .sort(naturalSort)
       .map(v => ({ label: v, value: v }));
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
+    const suggester = new SeriesFunctionsSuggester(formattedFields);
     return (
       <span>
         <Row>
@@ -106,7 +108,7 @@ export default class AggregationControls extends React.Component {
         <Row style={{ height: 'calc(100% - 110px)' }}>
           <Col md={2}>
             <DescriptionBox description="Series">
-              <SeriesSelect fields={formattedFields} onChange={this._onSeriesChange} series={series} />
+              <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
           </Col>
           <Col md={10} style={{ height: '100%' }}>

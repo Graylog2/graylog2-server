@@ -29,6 +29,6 @@ export default ({ columnPivots, rowPivots, series }) => [{
     rollup: true,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
-    series: series.map(Series.parseSeries),
+    series: series.map(s => Object.assign({ id: s.effectiveName }, Series.parseSeries(s.function))),
   },
 }];

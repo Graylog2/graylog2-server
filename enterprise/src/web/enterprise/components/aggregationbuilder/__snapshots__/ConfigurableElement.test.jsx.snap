@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfigurableElement renders something for minimal props 1`] = `
+<span
+  onKeyDown={[Function]}
+  onMouseDown={[Function]}
+>
+  <div
+    className="Select-value"
+  >
+    <a
+      className="Select-value-label"
+      onMouseDown={[Function]}
+      onTouchEnd={[Function]}
+    >
+      Hello World!
+    </a>
+  </div>
+</span>
+`;

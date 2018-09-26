@@ -16,7 +16,7 @@ const _groupDefinition = (pivot, series, groups) => {
   return Object.assign(
     {
       field,
-      metrics: series.map(s => Series.parseSeries(s)),
+      metrics: series.map(s => Series.parseSeries(s.function)),
       groups,
     },
     _typeForField(field, config),

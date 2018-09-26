@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import SortableSelect from './SortableSelect';
 import { FieldList, PivotList } from './AggregationBuilderPropTypes';
+import PivotSelect from './PivotSelect';
 
 const ColumnPivotSelect = ({ columnPivots, fields, onChange }) => (
-  <SortableSelect
+  <PivotSelect
     placeholder="None: click to add fields"
     onChange={onChange}
     options={fields}

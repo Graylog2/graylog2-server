@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SeriesConfiguration renders the configuration dialog 1`] = `
+<span>
+  <div
+    className="form-group"
+  >
+    <label
+      className="control-label"
+    >
+      Name
+    </label>
+    <input
+      className="form-control"
+      onChange={[Function]}
+      type="text"
+      value="count()"
+    />
+    <span
+      className="help-block"
+    >
+      The name of the series as it appears in the chart.
+    </span>
+  </div>
+  <div
+    className="pull-right"
+    style={
+      Object {
+        "marginBottom": "10px",
+      }
+    }
+  >
+    <button
+      className="btn btn-success"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Done
+    </button>
+  </div>
+</span>
+`;

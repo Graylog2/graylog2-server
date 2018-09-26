@@ -27,7 +27,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     public abstract List<PivotDTO> columnPivots();
 
     @JsonProperty(FIELD_SERIES)
-    public abstract List<String> series();
+    public abstract List<SeriesDTO> series();
 
     @JsonProperty(FIELD_SORT)
     public abstract List<String> sort();
@@ -44,7 +44,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         public abstract Builder columnPivots(List<PivotDTO> columnPivots);
 
         @JsonProperty(FIELD_SERIES)
-        public abstract Builder series(List<String> series);
+        public abstract Builder series(List<SeriesDTO> series);
 
         @JsonProperty(FIELD_SORT)
         public abstract Builder sort(List<String> sort);

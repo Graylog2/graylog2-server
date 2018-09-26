@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SeriesSelect renders with minimal props 1`] = `
+<div
+  className="Select is-clearable is-searchable Select--multi"
+>
+  <div
+    className="Select-control"
+    onKeyDown={[Function]}
+    onMouseDown={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+  >
+    <span
+      className="Select-multi-value-wrapper"
+      id="react-select-2--value"
+    >
+      <div
+        className="Select-placeholder"
+      >
+        None: click to add series
+      </div>
+      <div
+        className="Select-input"
+        style={
+          Object {
+            "display": "inline-block",
+          }
+        }
+      >
+        <input
+          aria-activedescendant="react-select-2--value"
+          aria-expanded="false"
+          aria-haspopup="false"
+          aria-owns=""
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          required={false}
+          role="combobox"
+          style={
+            Object {
+              "boxSizing": "content-box",
+              "width": "5px",
+            }
+          }
+          value=""
+        />
+        <div
+          style={
+            Object {
+              "height": 0,
+              "left": 0,
+              "overflow": "scroll",
+              "position": "absolute",
+              "top": 0,
+              "visibility": "hidden",
+              "whiteSpace": "pre",
+            }
+          }
+        >
+          
+        </div>
+      </div>
+    </span>
+    <span
+      className="Select-arrow-zone"
+      onMouseDown={[Function]}
+    >
+      <span
+        className="Select-arrow"
+        onMouseDown={[Function]}
+      />
+    </span>
+  </div>
+</div>
+`;

@@ -5,22 +5,14 @@ import { Popover } from 'react-bootstrap';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
-import connect from 'stores/connect';
-
-import PivotConfiguration from './PivotConfiguration';
-import { FieldTypesStore } from '../../stores/FieldTypesStore';
-import FieldType from '../../logic/fieldtypes/FieldType';
 import CustomPropTypes from '../CustomPropTypes';
 
-class ConfigurablePivot extends React.Component {
+export default class ConfigurableElement extends React.Component {
   static propTypes = {
     children: CustomPropTypes.OneOrMoreChildren.isRequired,
-    config: PropTypes.object.isRequired,
-    fields: CustomPropTypes.FieldListType.isRequired,
+    configuration: CustomPropTypes.OneOrMoreChildren.isRequired,
     onChange: PropTypes.func.isRequired,
-    value: PropTypes.shape({
-      label: PropTypes.string,
-    }).isRequired,
+    title: PropTypes.string.isRequired,
   };
 
   constructor(props, context) {
@@ -39,24 +31,27 @@ class ConfigurablePivot extends React.Component {
     this.props.onChange(config);
   };
 
+  _stopEvent = (e) => {
+    e.stopPropagation();
+  };
+
   render() {
-    const { value, config, fields } = this.props;
-    const fieldTypes = fields.all.filter(v => v.name === value.label);
-    const fieldType = fieldTypes.isEmpty() ? FieldType.Unknown : fieldTypes.first().type;
+    const ConfigurationElement = this.props.configuration;
+    const { title } = this.props;
     const popover = this.state.isOpen && (
       <Portal>
         <Position
           container={document.body}
           placement="bottom"
           target={this.target}>
-          <Popover title="Pivot Configuration">
-            <PivotConfiguration field={value.value} type={fieldType} config={config} onClose={this._onClose} />
+          <Popover title={title}>
+            <ConfigurationElement onClose={this._onClose} />
           </Popover>
         </Position>
       </Portal>
     );
     return (
-      <span>
+      <span onMouseDown={this._stopEvent} onKeyDown={this._stopEvent}>
         <Select.Value ref={(elem) => { this.target = elem; }} {...this.props} onClick={this._onClick}>
           {this.props.children}
         </Select.Value>
@@ -65,5 +60,3 @@ class ConfigurablePivot extends React.Component {
     );
   }
 }
-
-export default connect(ConfigurablePivot, { fields: FieldTypesStore });

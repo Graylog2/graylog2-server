@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import Pivot from './Pivot';
+import Series from './Series';
 
 export default class AggregationWidgetConfig {
   constructor(columnPivots, rowPivots, series, sort, visualization) {
@@ -66,7 +67,7 @@ export default class AggregationWidgetConfig {
     // eslint-disable-next-line camelcase
     const { row_pivots, column_pivots, series, sort, visualization } = value;
 
-    return new AggregationWidgetConfig(column_pivots.map(Pivot.fromJSON), row_pivots.map(Pivot.fromJSON), series, sort, visualization);
+    return new AggregationWidgetConfig(column_pivots.map(Pivot.fromJSON), row_pivots.map(Pivot.fromJSON), series.map(Series.fromJSON), sort, visualization);
   }
 }
 
