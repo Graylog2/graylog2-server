@@ -194,9 +194,6 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         }
 
         template = writer.toString();
-        if (!template.substring(template.length() -1).equals("\n")) {
-            return template + "\n";
-        }
-        return template;
+        return template.endsWith("\n") ? template : template + "\n";
     }
 }

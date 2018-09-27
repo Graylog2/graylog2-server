@@ -16,51 +16,32 @@
  */
 package org.graylog.plugins.sidecar.collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
-import com.lordofthejars.nosqlunit.annotation.IgnorePropertyValue;
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.sidecar.database.MongoConnectionRule;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
-import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
-import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.shared.bindings.ObjectMapperModule;
-import org.graylog2.shared.bindings.ValidatorModule;
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.validation.Validator;
-import java.util.List;
-
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class})
 @CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
 public class ConfigurationServiceTest {
     private final String FILEBEAT_CONF_ID = "5b8fe5f97ad37b17a44e2a34";
-    @Mock
-    private CollectorService collectorService;
 
     @Mock
     private Sidecar sidecar;
@@ -85,15 +66,16 @@ public class ConfigurationServiceTest {
     }
 
     @Before
-    public void setUp(MongoJackObjectMapperProvider mapperProvider,
-                      Validator validator) throws Exception {
+    public void setUp() throws Exception {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeDetails.operatingSystem()).thenReturn("DummyOS");
         when(nodeDetails.ip()).thenReturn("1.2.3.4");
         when(sidecar.nodeId()).thenReturn("42");
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mapperProvider);
+        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider);
     }
 
     @Test
