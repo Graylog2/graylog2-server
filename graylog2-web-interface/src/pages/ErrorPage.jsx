@@ -7,6 +7,8 @@ import { DocumentTitle } from 'components/common';
 import style from '!style/useable!css!./NotFoundPage.css';
 import errorPageStyles from './ErrorPage.css';
 import SupportSources from '../components/support/SupportSources';
+import ClipboardButton from '../components/common/ClipboardButton';
+import AppConfig from '../util/AppConfig';
 
 class ErrorPage extends React.Component {
   static propTypes = {
@@ -18,6 +20,13 @@ class ErrorPage extends React.Component {
     }).isRequired,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      showDetails: AppConfig.gl2DevMode(),
+    };
+  }
+
   componentDidMount() {
     style.use();
   }
@@ -26,8 +35,13 @@ class ErrorPage extends React.Component {
     style.unuse();
   }
 
+  _toggleDetails = () => this.setState(({ showDetails }) => ({ showDetails: !showDetails }));
+
   render() {
     const { error, info } = this.props;
+    const { showDetails } = this.state;
+
+    const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${info.componentStack}`;
 
     return (
       <div className="container-fluid">
@@ -45,17 +59,17 @@ class ErrorPage extends React.Component {
                   <dl>
                     <dt>Error:</dt>
                     <dd className={errorPageStyles.greyBackground}>
-                      <pre className="content">{error.message}</pre>
-                    </dd>
-
-                    <dt>Stack:</dt>
-                    <dd className={errorPageStyles.greyBackground}>
-                      <pre className="content">{error.stack}</pre>
-                    </dd>
-
-                    <dt>Component Tree:</dt>
-                    <dd className={errorPageStyles.greyBackground}>
-                      <pre className="content">{info.componentStack}</pre>
+                      <pre className="content">
+                        <div className="pull-right">
+                          <ClipboardButton title={<i className="fa fa-copy fa-fw" />}
+                                           bsSize="sm"
+                                           text={`${error.message}\n${errorDetails}`}
+                                           buttonTitle="Copy error details to clipboard" />
+                        </div>
+                        <a role="link" tabIndex={0} onClick={this._toggleDetails}><i className={`fa ${showDetails ? 'fa-caret-down' : 'fa-caret-right'}`} /></a>
+                        {error.message}
+                        {showDetails && errorDetails}
+                      </pre>
                     </dd>
                   </dl>
                 </div>
