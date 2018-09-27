@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
+import org.graylog2.lookup.adapters.DnsLookupDataAdapter;
 import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.lookup.caches.GuavaLookupCache;
 import org.graylog2.lookup.caches.NullCache;
@@ -45,6 +46,11 @@ public class LookupModule extends Graylog2Module {
                 CSVFileDataAdapter.class,
                 CSVFileDataAdapter.Factory.class,
                 CSVFileDataAdapter.Config.class);
+
+        installLookupDataAdapter(DnsLookupDataAdapter.NAME,
+                                 DnsLookupDataAdapter.class,
+                                 DnsLookupDataAdapter.Factory.class,
+                                 DnsLookupDataAdapter.Config.class);
 
         installLookupDataAdapter(HTTPJSONPathDataAdapter.NAME,
                 HTTPJSONPathDataAdapter.class,
