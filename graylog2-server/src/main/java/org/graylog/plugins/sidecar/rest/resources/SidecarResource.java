@@ -176,11 +176,10 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     public SidecarSummary get(@ApiParam(name = "sidecarId", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId) {
         final Sidecar sidecar = sidecarService.findByNodeId(sidecarId);
-        if (sidecar != null) {
-            return sidecar.toSummary(activeSidecarFilter);
-        } else {
-            throw new NotFoundException("Sidecar <" + sidecarId + "> not found!");
+        if (sidecar == null) {
+            throw new NotFoundException("Could not find sidecar <" + sidecarId + ">");
         }
+        return sidecar.toSummary(activeSidecarFilter);
     }
 
     @PUT
