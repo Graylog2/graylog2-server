@@ -284,22 +284,22 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 throw new IllegalArgumentException("Unknown TLS client authentication mode: " + tlsClientAuth);
         }
 
-        return buildSslHandlerCallable(nettyTransportConfiguration.getTlsProvider(), certFile, keyFile, tlsKeyPassword, clientAuth, tlsClientAuthCertFile);
+        return buildSslHandlerCallable(nettyTransportConfiguration.getTlsProvider(), certFile, keyFile, tlsKeyPassword, clientAuth, tlsClientAuthCertFile, input);
     }
 
-    private Callable<ChannelHandler> buildSslHandlerCallable(SslProvider tlsProvider, File certFile, File keyFile, String password, ClientAuth clientAuth, File clientAuthCertFile) {
+    private Callable<ChannelHandler> buildSslHandlerCallable(SslProvider tlsProvider, File certFile, File keyFile, String password, ClientAuth clientAuth, File clientAuthCertFile, MessageInput input) {
         return new Callable<ChannelHandler>() {
             @Override
             public ChannelHandler call() throws Exception {
                 try {
-                    return new SslHandler(createSslEngine());
+                    return new SslHandler(createSslEngine(input));
                 } catch (SSLException e) {
                     LOG.error("Error creating SSL context. Make sure the certificate and key are in the correct format: cert=X.509 key=PKCS#8");
                     throw e;
                 }
             }
 
-            private SSLEngine createSslEngine() throws IOException, CertificateException {
+            private SSLEngine createSslEngine(MessageInput input) throws IOException, CertificateException {
                 final X509Certificate[] clientAuthCerts;
                 if (EnumSet.of(ClientAuth.OPTIONAL, ClientAuth.REQUIRE).contains(clientAuth)) {
                     if (clientAuthCertFile.exists()) {
@@ -308,7 +308,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                                 .map(certificate -> (X509Certificate) certificate)
                                 .toArray(X509Certificate[]::new);
                     } else {
-                        LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured");
+                        LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured for input [{}/{}]",
+                                input.getName(), input.getId());
                         clientAuthCerts = null;
                     }
                 } else {
