@@ -5,6 +5,7 @@ import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/Aggrega
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import Series from 'enterprise/logic/aggregationbuilder/Series';
 
 class FieldTypeSpecificSeries {
   static NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card'];
@@ -39,7 +40,7 @@ class FieldTypeSpecificSeries {
 
 export default function (queryId, field) {
   const fieldTypeSpecificSeries = new FieldTypeSpecificSeries();
-  const series = fieldTypeSpecificSeries.seriesFor(field).map(f => `${f}(${field})`);
+  const series = fieldTypeSpecificSeries.seriesFor(field).map(f => `${f}(${field})`).map(Series.forFunction);
   const config = AggregationWidgetConfig.builder()
     .series(series)
     .visualization('table')

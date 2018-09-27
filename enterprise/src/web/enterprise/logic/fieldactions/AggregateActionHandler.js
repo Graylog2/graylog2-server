@@ -1,9 +1,10 @@
 import uuid from 'uuid/v4';
 
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import pivotForField from '../searchtypes/aggregation/PivotGenerator';
-import AggregationWidget from '../aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
+import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
+import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import Series from 'enterprise/logic/aggregationbuilder/Series';
 
 export default function (queryId, field) {
   const newWidget = new AggregationWidget(
@@ -11,7 +12,7 @@ export default function (queryId, field) {
     new AggregationWidgetConfig(
       [],
       [pivotForField(field)],
-      ['count()'],
+      [Series.forFunction('count()')],
       [],
       'table',
     ),
