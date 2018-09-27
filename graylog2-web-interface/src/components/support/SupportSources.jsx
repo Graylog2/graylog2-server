@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import DocumentationLink from './DocumentationLink';
 import DocsHelper from '../../util/DocsHelper';
@@ -15,15 +14,15 @@ const SupportSources = () => (
     <ul>
       <li>
         <i className="fa fa-group" />&nbsp;
-        <a href="https://www.graylog.org/community-support/" target="_blank">Community support</a>
+        <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">Community support</a>
       </li>
       <li>
         <i className="fa fa-github-alt" />&nbsp;
-        <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank">Issue tracker</a>
+        <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a>
       </li>
       <li>
         <i className="fa fa-heart" />&nbsp;
-        <a href="https://www.graylog.org/professional-support" target="_blank">Professional support</a>
+        <a href="https://www.graylog.org/professional-support" target="_blank" rel="noopener noreferrer">Professional support</a>
       </li>
     </ul>
   </div>
