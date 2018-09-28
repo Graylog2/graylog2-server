@@ -19,7 +19,7 @@ class IncludesHelper extends React.Component {
   _reloadConfiguration = () => {
     CollectorConfigurationsActions.all()
       .then((configurations) => {
-        this.setState({ configurations: configurations });
+        this.setState({ configurations: configurations.configurations });
       });
   };
 
