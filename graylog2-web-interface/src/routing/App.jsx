@@ -12,6 +12,7 @@ import 'c3/c3.css';
 import 'dc/dc.css';
 
 import StoreProvider from 'injection/StoreProvider';
+import AppErrorBoundary from './AppErrorBoundary';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -41,7 +42,9 @@ const App = createReactClass({
         <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
           <i className="fa fa-arrow-up" />
         </div>
-        {this.props.children}
+        <AppErrorBoundary>
+          {this.props.children}
+        </AppErrorBoundary>
         <Footer />
       </div>
     );
