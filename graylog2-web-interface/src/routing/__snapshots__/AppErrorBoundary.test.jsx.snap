@@ -54,81 +54,248 @@ exports[`AppErrorBoundary displays error after catching 1`] = `
       }
     }
   >
-    <DocumentTitle
-      title="Something went wrong."
+    <div
+      className="container-fluid"
     >
-      <Row
-        bsClass="row"
-        className="jumbotron-container"
-        componentClass="div"
+      <DocumentTitle
+        title="Something went wrong."
       >
-        <div
-          className="jumbotron-container row"
+        <Row
+          bsClass="row"
+          className="jumbotron-container"
+          componentClass="div"
         >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            md={8}
-            mdOffset={2}
+          <div
+            className="jumbotron-container row"
           >
-            <div
-              className="col-md-8 col-md-offset-2"
+            <Col
+              bsClass="col"
+              componentClass="div"
+              md={8}
+              mdOffset={2}
             >
-              <Jumbotron
-                bsClass="jumbotron"
-                componentClass="div"
+              <div
+                className="col-md-8 col-md-offset-2"
               >
-                <div
-                  className="jumbotron"
+                <Jumbotron
+                  bsClass="jumbotron"
+                  componentClass="div"
                 >
-                  <h1>
-                    Something went wrong.
-                  </h1>
-                  <p>
-                    It seems like the page you navigated to contained an error.
-                  </p>
-                  <p>
-                    You can use the navigation to reach other parts of the product, refresh the page or submit an error report.
-                  </p>
-                  <p>
-                    The details of the error are below:
-                  </p>
-                  <dl>
-                    <dt>
-                      Error:
-                    </dt>
-                    <dd>
-                      <pre>
-                        Oh no, a banana peel fell on the party gorilla's head!
-                      </pre>
-                    </dd>
-                    <dt>
-                      Stack:
-                    </dt>
-                    <dd>
-                      <pre>
-                        This the stack trace.
-                      </pre>
-                    </dd>
-                    <dt>
-                      Component Tree:
-                    </dt>
-                    <dd>
-                      <pre>
-                        
+                  <div
+                    className="jumbotron"
+                  >
+                    <h1>
+                      Something went wrong.
+                    </h1>
+                    <p>
+                      It seems like the page you navigated to contained an error.
+                    </p>
+                    <p>
+                      You can use the navigation to reach other parts of the product, refresh the page or submit an error report.
+                    </p>
+                    <div>
+                      <div
+                        className="content"
+                        style={
+                          Object {
+                            "padding": "2em",
+                          }
+                        }
+                      >
+                        <SupportSources>
+                          <div
+                            className="support-sources"
+                          >
+                            <h2>
+                              Need help?
+                            </h2>
+                            <p>
+                              Do not hesitate to consult the Graylog community if your questions are not answered in the
+                               
+                              <DocumentationLink
+                                page=""
+                                text="documentation"
+                              >
+                                <a
+                                  href="http://docs.graylog.org/en/3.0"
+                                  target="_blank"
+                                >
+                                  documentation
+                                </a>
+                              </DocumentationLink>
+                              .
+                            </p>
+                            <ul>
+                              <li>
+                                <i
+                                  className="fa fa-group"
+                                />
+                                 
+                                <a
+                                  href="https://www.graylog.org/community-support/"
+                                  rel="noopener noreferrer"
+                                  target="_blank"
+                                >
+                                  Community support
+                                </a>
+                              </li>
+                              <li>
+                                <i
+                                  className="fa fa-github-alt"
+                                />
+                                 
+                                <a
+                                  href="https://github.com/Graylog2/graylog2-server/issues"
+                                  rel="noopener noreferrer"
+                                  target="_blank"
+                                >
+                                  Issue tracker
+                                </a>
+                              </li>
+                              <li>
+                                <i
+                                  className="fa fa-heart"
+                                />
+                                 
+                                <a
+                                  href="https://www.graylog.org/professional-support"
+                                  rel="noopener noreferrer"
+                                  target="_blank"
+                                >
+                                  Professional support
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        </SupportSources>
+                      </div>
+                      <dl>
+                        <dt>
+                          Error:
+                          <div
+                            className="pull-right undefined"
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              role="link"
+                              tabIndex={0}
+                            >
+                              Show more
+                            </a>
+                          </div>
+                        </dt>
+                        <dd>
+                          <pre
+                            className="content"
+                          >
+                            <div
+                              className="pull-right"
+                            >
+                              <ClipboardButton
+                                action="copy"
+                                bsSize="sm"
+                                buttonTitle="Copy error details to clipboard"
+                                disabled={false}
+                                text="Oh no, a banana peel fell on the party gorilla's head!
+
+
+Stack Trace:
+
+This the stack trace.
+
+Component Stack:
+
     in ErroneusComponent
     in AppErrorBoundary (created by WrapperComponent)
-    in WrapperComponent
-                      </pre>
-                    </dd>
-                  </dl>
-                </div>
-              </Jumbotron>
-            </div>
-          </Col>
-        </div>
-      </Row>
-    </DocumentTitle>
+    in WrapperComponent"
+                                title={
+                                  <i
+                                    className="fa fa-copy fa-fw"
+                                  />
+                                }
+                              >
+                                <OverlayTrigger
+                                  defaultOverlayShown={false}
+                                  overlay={
+                                    <Tooltip
+                                      bsClass="tooltip"
+                                      id="copy-button-tooltip"
+                                      placement="right"
+                                    >
+                                      
+                                    </Tooltip>
+                                  }
+                                  placement="top"
+                                  rootClose={true}
+                                  trigger="click"
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="sm"
+                                    bsStyle="default"
+                                    data-clipboard-action="copy"
+                                    data-clipboard-button={true}
+                                    data-clipboard-text="Oh no, a banana peel fell on the party gorilla's head!
+
+
+Stack Trace:
+
+This the stack trace.
+
+Component Stack:
+
+    in ErroneusComponent
+    in AppErrorBoundary (created by WrapperComponent)
+    in WrapperComponent"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                    title="Copy error details to clipboard"
+                                  >
+                                    <button
+                                      className="btn btn-sm btn-default"
+                                      data-clipboard-action="copy"
+                                      data-clipboard-button={true}
+                                      data-clipboard-text="Oh no, a banana peel fell on the party gorilla's head!
+
+
+Stack Trace:
+
+This the stack trace.
+
+Component Stack:
+
+    in ErroneusComponent
+    in AppErrorBoundary (created by WrapperComponent)
+    in WrapperComponent"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      title="Copy error details to clipboard"
+                                      type="button"
+                                    >
+                                      <i
+                                        className="fa fa-copy fa-fw"
+                                      />
+                                    </button>
+                                  </Button>
+                                </OverlayTrigger>
+                              </ClipboardButton>
+                            </div>
+                            Oh no, a banana peel fell on the party gorilla's head!
+                          </pre>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+                </Jumbotron>
+              </div>
+            </Col>
+          </div>
+        </Row>
+      </DocumentTitle>
+    </div>
   </ErrorPage>
 </AppErrorBoundary>
 `;
