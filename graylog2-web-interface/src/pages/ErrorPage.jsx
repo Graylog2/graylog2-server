@@ -35,7 +35,10 @@ class ErrorPage extends React.Component {
     style.unuse();
   }
 
-  _toggleDetails = () => this.setState(({ showDetails }) => ({ showDetails: !showDetails }));
+  _toggleDetails = (e) => {
+    e.preventDefault();
+    this.setState(({ showDetails }) => ({ showDetails: !showDetails }));
+  };
 
   render() {
     const { error, info } = this.props;
