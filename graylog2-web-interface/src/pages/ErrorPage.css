@@ -11,3 +11,7 @@
 :local(.greyBackground) {
     background-color: #f5f5f5;
 }
+
+:local(.toggleDetails) {
+    font-weight: normal;
+}

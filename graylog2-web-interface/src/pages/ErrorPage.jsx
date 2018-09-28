@@ -57,7 +57,12 @@ class ErrorPage extends React.Component {
                     <SupportSources />
                   </div>
                   <dl>
-                    <dt>Error:</dt>
+                    <dt>
+                      Error:
+                      <div className={`pull-right ${errorPageStyles.toggleDetails}`}>
+                        <a role="link" tabIndex={0} onClick={this._toggleDetails}>{showDetails ? 'Show less' : 'Show more'}</a>
+                      </div>
+                    </dt>
                     <dd className={errorPageStyles.greyBackground}>
                       <pre className="content">
                         <div className="pull-right">
@@ -66,7 +71,6 @@ class ErrorPage extends React.Component {
                                            text={`${error.message}\n${errorDetails}`}
                                            buttonTitle="Copy error details to clipboard" />
                         </div>
-                        <a role="link" tabIndex={0} onClick={this._toggleDetails}><i className={`fa ${showDetails ? 'fa-caret-down' : 'fa-caret-right'}`} /></a>
                         {error.message}
                         {showDetails && errorDetails}
                       </pre>
