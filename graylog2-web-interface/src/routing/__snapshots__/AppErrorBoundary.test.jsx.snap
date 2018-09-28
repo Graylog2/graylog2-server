@@ -178,7 +178,6 @@ exports[`AppErrorBoundary displays error after catching 1`] = `
                             <a
                               href="#"
                               onClick={[Function]}
-                              role="link"
                               tabIndex={0}
                             >
                               Show more
