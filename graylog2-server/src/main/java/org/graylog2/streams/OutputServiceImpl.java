@@ -112,7 +112,7 @@ public class OutputServiceImpl implements OutputService {
         for (Map.Entry<String, Object> fields : deltas.entrySet())
             update = update.set(fields.getKey(), fields.getValue());
 
-        return coll.findAndModify(DBQuery.is(OutputImpl.FIELD_CREATOR_USER_ID, id), update);
+        return coll.findAndModify(DBQuery.is(OutputImpl.FIELD_ID, id), null, null, false, update, true, false);
     }
 
     @Override
