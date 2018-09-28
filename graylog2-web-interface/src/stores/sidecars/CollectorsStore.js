@@ -5,8 +5,6 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
-import history from '../../util/History';
-import Routes from '../../routing/Routes';
 
 const { CollectorsActions } = CombinedProvider.get('Collectors');
 
