@@ -60,7 +60,7 @@ class ErrorPage extends React.Component {
                     <dt>
                       Error:
                       <div className={`pull-right ${errorPageStyles.toggleDetails}`}>
-                        <a role="link" tabIndex={0} onClick={this._toggleDetails}>{showDetails ? 'Show less' : 'Show more'}</a>
+                        <a role="link" href="#" tabIndex={0} onClick={this._toggleDetails}>{showDetails ? 'Show less' : 'Show more'}</a>
                       </div>
                     </dt>
                     <dd className={errorPageStyles.greyBackground}>
