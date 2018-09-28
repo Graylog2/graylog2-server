@@ -46,6 +46,7 @@ class ErrorPage extends React.Component {
 
     const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${info.componentStack}`;
 
+    /* eslint-disable jsx-a11y/href-no-hash */
     return (
       <div className="container-fluid">
         <DocumentTitle title="Something went wrong.">
@@ -63,7 +64,7 @@ class ErrorPage extends React.Component {
                     <dt>
                       Error:
                       <div className={`pull-right ${errorPageStyles.toggleDetails}`}>
-                        <a role="link" href="#" tabIndex={0} onClick={this._toggleDetails}>{showDetails ? 'Show less' : 'Show more'}</a>
+                        <a href="#" tabIndex={0} onClick={this._toggleDetails}>{showDetails ? 'Show less' : 'Show more'}</a>
                       </div>
                     </dt>
                     <dd className={errorPageStyles.greyBackground}>
@@ -86,6 +87,7 @@ class ErrorPage extends React.Component {
         </DocumentTitle>
       </div>
     );
+    /* eslint-enable jsx-a11y/href-no-hash */
   }
 }
 
