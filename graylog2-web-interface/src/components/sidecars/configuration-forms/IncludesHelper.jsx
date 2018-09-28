@@ -16,6 +16,8 @@ class IncludesHelper extends React.Component {
     this._reloadConfiguration();
   }
 
+  modals = [];
+
   _reloadConfiguration = () => {
     CollectorConfigurationsActions.all()
       .then((configurations) => {
@@ -29,7 +31,7 @@ class IncludesHelper extends React.Component {
   };
 
   _onShowSource = (id) => {
-    this.refs[`modal_${id}`].open();
+    this.modals[id].open();
   };
 
   _configurationListFormatter = () => {
@@ -47,7 +49,7 @@ class IncludesHelper extends React.Component {
                     onClick={() => this._onShowSource(configuration.id)}>
               <i className="fa fa-envelope-open-o" />
             </Button>
-            <SourceViewModal ref={`modal_${configuration.id}`} configurationId={configuration.id} />
+            <SourceViewModal ref={(c) => { this.modals[configuration.id] = c; }} configurationId={configuration.id} />
           </td>
         </tr>,
       );
