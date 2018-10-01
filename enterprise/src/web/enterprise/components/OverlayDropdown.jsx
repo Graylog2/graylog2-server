@@ -28,6 +28,7 @@ export default class OverlayDropdown extends React.Component {
       paddingRight: '5px',
       minWidth: 'max-content',
       color: '#666666',
+      zIndex: 1050,
     };
 
     return (

@@ -11,9 +11,11 @@ EditWidgetDialog.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+const catchEvent = e => e.stopPropagation();
+
 const EditWidgetFrame = ({ children }) => (
   <Modal show animation={false} dialogComponentClass={EditWidgetDialog} enforceFocus={false}>
-    <div style={{ height: 'calc(100% - 20px)' }}>
+    <div style={{ height: 'calc(100% - 20px)' }} onMouseDown={catchEvent}>
       {children}
     </div>
   </Modal>
