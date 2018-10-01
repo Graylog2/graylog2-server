@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { kebabCase } from 'lodash';
 
 export default (name) => {
-  const MockComponent = props => (
-    <span className={name}>
-      <span {...props}>{props.children}</span>
-    </span>
-  );
+  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
+
   MockComponent.propTypes = {
-    children: PropTypes.element,
+    children: PropTypes.node,
   };
   MockComponent.defaultProps = {
     children: null,
