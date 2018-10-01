@@ -6,6 +6,8 @@ import lodash from 'lodash';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import DateTime from 'logic/datetimes/DateTime';
 
+import style from './StatusIndicator.css';
+
 class StatusIndicator extends React.Component {
   static propTypes = {
     id: PropTypes.string,
@@ -52,12 +54,12 @@ class StatusIndicator extends React.Component {
       const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{message}</Tooltip>;
       return (
         <OverlayTrigger placement="top" overlay={tooltip} rootClose>
-          <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
+          <span className={`${className} ${style.indicator}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
         </OverlayTrigger>
       );
     }
     return (
-      <span className={`${className}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
+      <span className={`${className} ${style.indicator}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
     );
   }
 }
