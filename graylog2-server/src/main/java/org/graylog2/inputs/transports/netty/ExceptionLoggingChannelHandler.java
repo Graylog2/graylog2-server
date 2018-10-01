@@ -39,13 +39,13 @@ public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter
                     input.getId(),
                     ctx.channel());
         } else {
-            logger.error("Error in Input [{}/{}] (channel {})",
+            logger.error("Error in Input [{}/{}] (channel {}) (cause {})",
                     input.getName(),
                     input.getId(),
                     ctx.channel(),
                     cause);
         }
 
-        super.exceptionCaught(ctx, cause);
+        ctx.close();
     }
 }
