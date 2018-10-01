@@ -1,11 +1,10 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import mockComponent from 'helpers/mocking/MockComponent';
 import AggregationBuilder from './AggregationBuilder';
 import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
-const mockDummyVisualization = mockComponent('DummyVisualization');
+const mockDummyVisualization = () => 'dummy-visualization';
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: () => ([
@@ -20,13 +19,19 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 describe('AggregationBuilder', () => {
   it('renders helpful advice instead of visualization when no documents were in result', () => {
-    const wrapper = mount(<AggregationBuilder data={{ total: 0 }} />);
+    const wrapper = mount(<AggregationBuilder data={{ total: 0 }}
+                                              config={{}}
+                                              fields={{}}
+                                              onChange={() => {}} />);
 
     expect(wrapper.find(EmptyResultWidget)).toHaveLength(1);
   });
 
   it('renders dummy component with rows from data', () => {
-    const wrapper = mount(<AggregationBuilder config={{ visualization: 'dummy' }}data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);
+    const wrapper = mount(<AggregationBuilder config={{ visualization: 'dummy' }}
+                                              fields={{}}
+                                              onChange={() => {}}
+                                              data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);
 
     expect(wrapper.find(EmptyResultWidget)).toHaveLength(0);
     const dummyVisualization = wrapper.find(mockDummyVisualization);

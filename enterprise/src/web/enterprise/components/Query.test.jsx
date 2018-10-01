@@ -10,9 +10,7 @@ import WidgetGrid from './WidgetGrid';
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
 jest.mock('./messagelist/StaticMessageList', () => mockComponent('StaticMessageList'));
-jest.mock('enterprise/logic/Widget', () => ({
-  widgetDefinition: () => ({}),
-}));
+jest.mock('enterprise/logic/Widget', () => ({ widgetDefinition: () => ({}) }));
 jest.mock('enterprise/components/widgets/Widget', () => mockComponent('Widget'));
 
 const widgetMapping = Immutable.Map([
@@ -27,17 +25,24 @@ const widget2 = AggregationWidget.builder()
   .id('widget2')
   .config(AggregationWidgetConfig.builder().build())
   .build();
-const widgets = Immutable.List([widget1, widget2]);
+const widgets = Immutable.Map({ widget1, widget2 });
 
 describe('Query', () => {
   it('renders provided children in the sidebar', () => {
     const SidebarContent = mockComponent('SidebarContent');
-    const wrapper = mount((
-      <Query results={{}} widgetMapping={Immutable.Map()} widgets={Immutable.List()}>
+    const wrapper = shallow((
+      <Query results={{}}
+             widgetMapping={Immutable.Map()}
+             widgets={Immutable.Map()}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}>
         <SidebarContent />
       </Query>
     ));
-    expect(wrapper.contains(<SidebarContent />)).toBeTruthy();
+    expect(wrapper.find(SidebarContent)).toHaveLength(1);
   });
 
   it('renders extracted results and provided widgets', () => {
@@ -48,7 +53,18 @@ describe('Query', () => {
         searchType2: { bar: 42 },
       },
     };
-    const wrapper = shallow(<Query results={results} widgetMapping={widgetMapping} widgets={widgets} />);
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}>
+        Sidebar Content
+      </Query>
+    ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', {});
@@ -64,7 +80,18 @@ describe('Query', () => {
         searchType2: { bar: 42 },
       },
     };
-    const wrapper = shallow(<Query results={results} widgetMapping={widgetMapping} widgets={widgets} />);
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}>
+        Sidebar Content
+      </Query>
+    ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget1: [error] });
@@ -81,7 +108,18 @@ describe('Query', () => {
         searchType1: { foo: 17 },
       },
     };
-    const wrapper = shallow(<Query results={results} widgetMapping={widgetMapping} widgets={widgets} />);
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}>
+        Sidebar Content
+      </Query>
+    ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget2: [error1, error2] });
@@ -96,7 +134,18 @@ describe('Query', () => {
       errors: [error1, error2],
       searchTypes: {},
     };
-    const wrapper = shallow(<Query results={results} widgetMapping={widgetMapping} widgets={widgets} />);
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()}>
+        Sidebar Content
+      </Query>
+    ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget1: [error1], widget2: [error2] });

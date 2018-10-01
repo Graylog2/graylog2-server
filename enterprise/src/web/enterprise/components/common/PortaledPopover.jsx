@@ -8,14 +8,16 @@ import CustomPropTypes from '../CustomPropTypes';
 export default class PortaledPopover extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([
-      PropTypes.element,
+      CustomPropTypes.OneOrMoreChildren,
       PropTypes.string,
     ]).isRequired,
+    container: PropTypes.any,
     popover: CustomPropTypes.OneOrMoreChildren.isRequired,
     title: PropTypes.string,
   };
 
   static defaultProps = {
+    container: document.body,
     title: null,
   };
 
@@ -26,11 +28,11 @@ export default class PortaledPopover extends React.Component {
   _onClick = () => this.setState(state => ({ isOpen: !state.isOpen }));
 
   render() {
-    const { popover, title, ...rest } = this.props;
+    const { container, popover, title, ...rest } = this.props;
     const popoverElem = this.state.isOpen && (
-      <Portal>
+      <Portal node={container}>
         <Position
-          container={document.body}
+          container={container}
           placement="bottom"
           target={this.target}>
           <Popover title={title} id={title}>

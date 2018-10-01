@@ -11,7 +11,7 @@ jest.mock('enterprise/components/common/WindowLeaveMessage', () => mockComponent
 
 describe('ExtendedSearchPage', () => {
   it('register a WindowLeaveMessage', () => {
-    const wrapper = shallow(<ExtendedSearchPage />);
+    const wrapper = shallow(<ExtendedSearchPage route={{}} />);
 
     expect(wrapper.find('WindowLeaveMessage')).toHaveLength(1);
   });

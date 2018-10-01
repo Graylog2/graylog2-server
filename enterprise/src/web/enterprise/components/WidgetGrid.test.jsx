@@ -3,14 +3,14 @@ import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
 import { mount } from 'enzyme';
 
-import mockComponent from 'helpers/mocking/MockComponent';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 import Widget from 'enterprise/components/widgets/Widget';
 import _Widget from 'enterprise/logic/widgets/Widget';
 import WidgetGrid from './WidgetGrid';
 
-jest.mock('./widgets/Widget', () => mockComponent('Widget'));
-jest.mock('components/common/ReactGridContainer', () => mockComponent('ReactGridContainer'));
+jest.mock('./widgets/Widget', () => () => 'widget');
+// eslint-disable-next-line react/prop-types
+jest.mock('components/common/ReactGridContainer', () => ({ children }) => <react-grid-container-mock>{children}</react-grid-container-mock>);
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: () => ([
@@ -25,8 +25,15 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 }));
 
 describe('<WidgetGrid />', () => {
-  it('should render with empty props', () => {
-    const wrapper = renderer.create(<WidgetGrid />);
+  it('should render with minimal props', () => {
+    const wrapper = renderer.create((
+      <WidgetGrid allFields={Immutable.List()}
+                  data={{}}
+                  onPositionsChange={() => {}}
+                  titles={Immutable.Map()}
+                  widgets={{}}
+                  fields={Immutable.List()} />
+    ));
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -44,7 +51,15 @@ describe('<WidgetGrid />', () => {
     const titles = Immutable.Map({
       widget1: 'A dummy widget',
     });
-    const wrapper = mount(<WidgetGrid widgets={widgets} positions={positions} data={data} titles={titles} />);
+    const wrapper = mount((
+      <WidgetGrid widgets={widgets}
+                  positions={positions}
+                  data={data}
+                  titles={titles}
+                  allFields={Immutable.List()}
+                  fields={Immutable.List()}
+                  onPositionsChange={() => {}} />
+    ));
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 
@@ -61,7 +76,15 @@ describe('<WidgetGrid />', () => {
     const titles = Immutable.Map({
       widget1: 'A dummy widget',
     });
-    const wrapper = mount(<WidgetGrid widgets={widgets} positions={positions} data={data} titles={titles} />);
+    const wrapper = mount((
+      <WidgetGrid widgets={widgets}
+                  positions={positions}
+                  data={data}
+                  titles={titles}
+                  allFields={Immutable.List()}
+                  fields={Immutable.List()}
+                  onPositionsChange={() => {}} />
+    ));
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 });

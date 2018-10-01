@@ -44,7 +44,7 @@ export default class ConfigurableElement extends React.Component {
           container={document.body}
           placement="bottom"
           target={this.target}>
-          <Popover title={title}>
+          <Popover title={title} id="configuration-popover">
             <ConfigurationElement onClose={this._onClose} />
           </Popover>
         </Position>

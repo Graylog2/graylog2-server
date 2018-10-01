@@ -1,26 +1,49 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import mockComponent from 'helpers/mocking/MockComponent';
 import PortaledPopover from './PortaledPopover';
 
-const popoverComponent = mockComponent('PopoverComponent');
+const PopoverComponent = () => 'popover-component';
 
 describe('PortaledPopover', () => {
+  let appRootContainer;
+  let portalsContainer;
+  beforeEach(() => {
+    appRootContainer = document.createElement('div');
+    portalsContainer = document.createElement('div');
+    portalsContainer.id = 'portals';
+  });
   it('does not render popover element when not clicked', () => {
-    const wrapper = mount(<PortaledPopover popover={popoverComponent} title="A title">click me!</PortaledPopover>, { attachTo: document.body });
+    const wrapper = mount((
+      <PortaledPopover
+        popover={<PopoverComponent />}
+        container={portalsContainer}
+        title="A title">
+        click me!
+      </PortaledPopover>
+    ), { attachTo: appRootContainer });
 
-    expect(global.document.body.childNodes).toHaveLength(1);
+    expect(appRootContainer.childNodes).toHaveLength(1);
+    expect(portalsContainer.childNodes).toHaveLength(0);
 
     wrapper.detach();
   });
 
   it('renders popover element after being clicked', () => {
-    const wrapper = mount(<PortaledPopover popover={popoverComponent} title="A title">click me!</PortaledPopover>, { attachTo: document.body });
+    const wrapper = mount((
+      <PortaledPopover
+        popover={<PopoverComponent />}
+        container={portalsContainer}
+        title="A title">
+        click me!
+      </PortaledPopover>
+    ), { attachTo: appRootContainer });
 
     wrapper.find('a').simulate('click');
 
-    expect(global.document.body.childNodes).toHaveLength(2);
+    expect(appRootContainer.childNodes).toHaveLength(1);
+    expect(portalsContainer.childNodes).toHaveLength(1);
+    expect(portalsContainer.childNodes[0].innerHTML).toMatchSnapshot();
 
     wrapper.detach();
   });

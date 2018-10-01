@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import EditableTitle from 'enterprise/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
+import CustomPropTypes from '../CustomPropTypes';
 
 const WidgetHeader = ({ children, onRename, hideDragHandle, title }) => (
   <div className={styles.widgetHeader}>
@@ -15,7 +16,7 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title }) => (
 );
 
 WidgetHeader.propTypes = {
-  children: PropTypes.node,
+  children: CustomPropTypes.OneOrMoreChildren,
   onRename: PropTypes.func,
   hideDragHandle: PropTypes.bool,
   title: PropTypes.node.isRequired,

@@ -6,6 +6,16 @@ import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import FieldList from './FieldList';
 
+jest.mock('enterprise/stores/ViewMetadataStore', () => ({
+  ViewMetadataStore: {
+    getInitialState: () => ({
+      activeQuery: 'aQueryId',
+      id: 'aViewId',
+    }),
+    listen: jest.fn(),
+  },
+}));
+
 describe('<FieldList />', () => {
   const properties = [{ enumerable: true }];
   const fieldType1 = new FieldType('string', properties, []);

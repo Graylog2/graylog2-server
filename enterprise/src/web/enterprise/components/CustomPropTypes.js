@@ -12,9 +12,14 @@ const CurrentView = PropTypes.shape({
   activeQuery: PropTypes.string.isRequired,
 });
 
-const OneOrMoreChildren = PropTypes.oneOfType([
+const ValidElements = PropTypes.oneOfType([
   PropTypes.element,
-  PropTypes.arrayOf(PropTypes.element),
+  PropTypes.func,
+  PropTypes.string,
+]);
+const OneOrMoreChildren = PropTypes.oneOfType([
+  ValidElements,
+  PropTypes.arrayOf(ValidElements),
 ]);
 
 export default Object.assign({ CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType }, PropTypes);

@@ -3,6 +3,7 @@
 exports[`<Widget /> should render with empty props 1`] = `
 <div
   className="widget"
+  data-widget-id="widgetId"
   style={
     Object {
       "overflow": "hidden",
@@ -26,41 +27,38 @@ exports[`<Widget /> should render with empty props 1`] = `
           }
         }
       >
-        <span
-          className="WidgetHeader"
+        <widget-header
+          editing={false}
+          onRename={[Function]}
+          title="Widget Title"
         >
-          <span
-            editing={false}
-            onRename={[Function]}
-          >
-            <span>
-              <i
-                className="fa fa-arrows-h button"
-                onClick={[Function]}
-                role="link"
-                tabIndex={0}
-              />
-            </span>
-             
+          <span>
             <i
-              className="fa fa-filter widgetActionDropdownCaret filterNotSet"
+              className="fa fa-arrows-h button"
               onClick={[Function]}
+              role="link"
+              tabIndex={0}
             />
-             
-            <span>
-              <span
-                onClick={[Function]}
-                role="presentation"
-              >
-                <span>
-                  <i
-                    className="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
-                  />
-                </span>
+          </span>
+           
+          <i
+            className="fa fa-filter widgetActionDropdownCaret filterNotSet"
+            onClick={[Function]}
+          />
+           
+          <span>
+            <span
+              onClick={[Function]}
+              role="presentation"
+            >
+              <span>
+                <i
+                  className="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+                />
               </span>
             </span>
           </span>
-        </span>
+        </widget-header>
         <div
           className="spinnerContainer"
         >

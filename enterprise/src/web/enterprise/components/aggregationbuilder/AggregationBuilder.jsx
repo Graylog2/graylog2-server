@@ -16,7 +16,9 @@ export default class AggregationBuilder extends React.Component {
 
   static propTypes = {
     config: AggregationType.isRequired,
-    data: PropTypes.array.isRequired,
+    data: PropTypes.shape({
+      total: PropTypes.number.isRequired,
+    }).isRequired,
     editing: PropTypes.bool,
     fields: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,

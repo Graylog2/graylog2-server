@@ -21,7 +21,7 @@ import EditWidgetFrame from './EditWidgetFrame';
 import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
-import { WidgetErrorsMap } from './WidgetPropTypes';
+import { WidgetErrorsList } from './WidgetPropTypes';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -31,7 +31,7 @@ class Widget extends React.Component {
       config: PropTypes.object.isRequired,
     }).isRequired,
     data: PropTypes.any,
-    errors: WidgetErrorsMap,
+    errors: WidgetErrorsList,
     height: PropTypes.number,
     width: PropTypes.number,
     fields: PropTypes.any.isRequired,
