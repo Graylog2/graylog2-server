@@ -3,8 +3,9 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const formatTimestamp = (timestamp, tz = 'Europe/Berlin') => {
-  return moment(timestamp).tz(tz).format();
+const formatTimestamp = (timestamp, tz = 'UTC') => {
+  // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
+  return moment(timestamp).tz(tz).toISOString(true);
 };
 
 const transformKey = (key, indices, tz) => {
@@ -29,7 +30,7 @@ export default (rowPivots, columnPivots, result) => {
     return result;
   }
   const currentUser = CurrentUserStore.get();
-  const tz = currentUser ? currentUser.timezone : 'GMT';
+  const tz = currentUser ? currentUser.timezone : 'UTC';
 
   return result.map((row) => {
     if (row.source !== 'leaf') {

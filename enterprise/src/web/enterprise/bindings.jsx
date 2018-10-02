@@ -82,9 +82,9 @@ export default {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
+          return `Aggregating ${widget.config.series.map(s => s.effectiveName)} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
         }
-        return `Aggregating ${widget.config.series}`;
+        return `Aggregating ${widget.config.series.map(s => s.effectiveName)}`;
       },
     },
     {

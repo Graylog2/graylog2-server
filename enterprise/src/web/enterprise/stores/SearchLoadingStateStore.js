@@ -1,9 +1,14 @@
 import Reflux from 'reflux';
+import { SearchActions } from './SearchStore';
 
 export const SearchLoadingStateActions = Reflux.createActions(['loading', 'finished']);
 export const SearchLoadingStateStore = Reflux.createStore({
   listenables: [SearchLoadingStateActions],
   isLoading: false,
+  init() {
+    SearchActions.execute.listen(this.loading);
+    SearchActions.execute.completed.listen(this.finished);
+  },
   getInitialState() {
     return this._state();
   },

@@ -40,22 +40,36 @@ export const QueriesStore = Reflux.createStore({
 
   remove(queryId) {
     const newQueries = this.queries.remove(queryId);
-    this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries);
+    QueriesActions.remove.promise(promise);
+    return promise;
   },
   update(queryId, query) {
     const newQueries = this.queries.set(queryId, query);
-    this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries);
+    QueriesActions.update.promise(promise);
+    return promise;
   },
 
   query(queryId, query) {
     const activeQuery = this.queries.get(queryId);
     const newQuery = activeQuery.toBuilder().query(Object.assign({}, activeQuery.query, { query_string: query })).build();
     const newQueries = this.queries.set(queryId, newQuery);
-    this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries);
+    QueriesActions.query.promise(promise);
+    return promise;
+  },
+  timerange(queryId, timerange) {
+    const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(timerange).build());
+    const promise = this._propagateQueryChange(newQueries);
+    QueriesActions.timerange.promise(promise);
+    return promise;
   },
   rangeParams(queryId, key, value) {
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { [key]: value })).build());
-    this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries);
+    QueriesActions.rangeParams.promise(promise);
+    return promise;
   },
   rangeType(queryId, type) {
     const oldQuery = this.queries.get(queryId);
@@ -79,7 +93,9 @@ export const QueriesStore = Reflux.createStore({
         break;
     }
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(newTimerange).build());
-    this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries);
+    QueriesActions.rangeType.promise(promise);
+    return promise;
   },
 
   _propagateQueryChange(newQueries) {

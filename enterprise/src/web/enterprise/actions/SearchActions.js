@@ -7,6 +7,9 @@ export default Reflux.createActions({
   execute: {
     asyncResult: true,
   },
+  executeWithCurrentState: {
+    asyncResult: true,
+  },
   parameters: {
     asyncResult: true,
   },

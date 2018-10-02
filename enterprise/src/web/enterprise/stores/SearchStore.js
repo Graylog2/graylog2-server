@@ -99,6 +99,12 @@ export const SearchStore = Reflux.createStore({
     }
   },
 
+  executeWithCurrentState() {
+    const promise = SearchActions.execute(this.executionState);
+    SearchActions.executeWithCurrentState.promise(promise);
+    return promise;
+  },
+
   parameters(newParameters) {
     const newSearch = this.search.toBuilder().parameters(newParameters).build();
     ViewActions.search(newSearch);
