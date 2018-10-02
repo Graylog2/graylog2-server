@@ -85,10 +85,16 @@ class ExpandableListItem extends React.Component {
     return inputProps;
   };
 
+  _clickOnHeader = () => {
+    if (this._checkbox) {
+      this._checkbox.click();
+    }
+  };
+
   render() {
     const { expanded } = this.state;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
-    const headerToRender = selectable ? (<span role="button" tabIndex={0} onClick={() => { this._checkbox.click(); }}>{header}</span>) : header;
+    const headerToRender = selectable ? (<span role="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</span>) : header;
     const inputProps = this._filterInputProps(otherProps);
 
     return (
