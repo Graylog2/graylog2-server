@@ -19,11 +19,11 @@ const CollectorsAdministrationActions = createReactClass({
     const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = this.props;
     return (
       <ButtonToolbar>
-        <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
         <CollectorConfigurationSelector collectors={collectors}
                                         configurations={configurations}
                                         selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
                                         onConfigurationSelectionChange={onConfigurationSelectionChange} />
+        <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
       </ButtonToolbar>
     );
   },
