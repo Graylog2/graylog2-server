@@ -48,7 +48,7 @@ public class ESGroupByHistogram implements ESSearchTypeHandler<GroupByHistogram>
                 .dateHistogramInterval(interval.toESInterval())
                 .subAggregation(esGroupBy.createTermsBuilder(mainField, stackedFields, groupBy));
 
-        queryContext.searchSourceBuilder(groupByHistogram.id()).aggregation(histogram);
+        queryContext.searchSourceBuilder(groupByHistogram).aggregation(histogram);
     }
 
     @Override

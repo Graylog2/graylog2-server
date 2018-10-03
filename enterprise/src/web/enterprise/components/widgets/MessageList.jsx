@@ -35,7 +35,6 @@ const MessageList = createReactClass({
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
-    filter: PropTypes.string,
     config: PropTypes.object,
     containerHeight: PropTypes.number,
     inputs: PropTypes.object,
@@ -103,35 +102,19 @@ const MessageList = createReactClass({
     this.setState({ expandedMessages: newSet });
   },
 
-  _parseFilter(filter) {
-    const terms = filter.split(/\s+(?:AND|OR)\s+/i);
-    return terms.map((term) => {
-      const [key, value] = term.split(/\s*:\s*/);
-      return { key, value };
-    });
-  },
-
-  _filterMessages(filter, messages) {
-    const filters = this._parseFilter(filter);
-    return messages.filter(({ message }) => {
-      return filters.every(({ key, value }) => message[key] === value);
-    });
-  },
-
   _fieldTypeFor(fieldName, fields) {
     return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
   },
 
   render() {
-    const { containerHeight, data, fields, filter } = this.props;
+    const { containerHeight, data, fields } = this.props;
     let maxHeight = null;
     if (containerHeight) {
       maxHeight = containerHeight - 60;
     }
     const pageSize = this.props.pageSize || 7;
     const messages = (data && data.messages) || [];
-    const filteredMessages = filter && filter !== '' ? this._filterMessages(filter, messages) : messages;
-    const messageSlice = filteredMessages
+    const messageSlice = messages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
       .map((m) => {
         return {

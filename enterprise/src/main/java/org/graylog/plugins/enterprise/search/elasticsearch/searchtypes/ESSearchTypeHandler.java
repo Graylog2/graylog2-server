@@ -1,7 +1,6 @@
 package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes;
 
 import io.searchbox.core.SearchResult;
-import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
@@ -21,9 +20,6 @@ public interface ESSearchTypeHandler<S extends SearchType> extends SearchTypeHan
         // if the search type was filtered, extract the sub-aggregation before passing it to the handler
         // this way we don't have to duplicate this step everywhere
         MetricAggregation aggregations = queryResult.getAggregations();
-        if (searchType.filter() != null) {
-            aggregations = queryResult.getAggregations().getAggregation(queryContext.filterName(searchType), FilterAggregation.class);
-        }
         return doExtractResult(job, query, searchType, queryResult, aggregations, queryContext);
     }
 

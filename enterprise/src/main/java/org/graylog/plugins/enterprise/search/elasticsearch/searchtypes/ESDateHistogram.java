@@ -25,7 +25,7 @@ public class ESDateHistogram implements ESSearchTypeHandler<DateHistogram> {
         AggregationBuilder builder = AggregationBuilders.dateHistogram(dateHistogram.id())
                 .field(Message.FIELD_TIMESTAMP)
                 .dateHistogramInterval(dateHistogram.interval().toESInterval());
-        queryContext.addFilteredAggregation(builder, dateHistogram);
+        queryContext.addAggregation(builder, dateHistogram);
     }
 
     @SuppressWarnings("unchecked")

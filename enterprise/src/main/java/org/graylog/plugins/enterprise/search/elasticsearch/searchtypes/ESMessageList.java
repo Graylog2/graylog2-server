@@ -25,10 +25,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
-        if (messageList.filter() != null) {
-            LOG.warn("Search type messages currently does not support filters yet.");
-        }
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList.id());
+        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList);
         searchSourceBuilder
                 .size(messageList.limit() - messageList.offset())
                 .from(messageList.offset());

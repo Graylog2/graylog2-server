@@ -4,12 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
-import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import one.util.streamex.EntryStream;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
@@ -50,7 +47,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot.id());
+        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
         final Map<Object, Object> contextMap = queryContext.contextMap();
         final AggTypes aggTypes = new AggTypes();
@@ -60,17 +57,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         AggregationBuilder topLevelAggregation = null;
         // holds the last complete bucket aggregation into which subsequent buckets get added
         AggregationBuilder previousAggregation = null;
-
-        // if there is a filter, we'll add it as the top level aggregation.
-        // the surrounding backend code will take care of removing it before passing the result into this handler
-        if (pivot.filter() != null) {
-            final Optional<QueryBuilder> queryBuilder = queryContext.generateFilterClause(pivot.filter());
-            if (queryBuilder.isPresent()) {
-                final QueryBuilder filterClause = queryBuilder.get();
-                previousAggregation = AggregationBuilders.filter(queryContext.filterName(pivot), filterClause);
-                searchSourceBuilder.aggregation(previousAggregation);
-            }
-        }
 
         // add global rollup series if those were requested
         if (pivot.rollup()) {
@@ -171,15 +157,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     private long extractDocumentCount(SearchResult queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
-        if (pivot.filter() != null) {
-            final MetricAggregation aggregations = queryResult.getAggregations();
-            if (aggregations == null) {
-                return 0;
-            }
-            final FilterAggregation filterAggregation = aggregations.getFilterAggregation(queryContext.filterName(pivot));
-            return filterAggregation == null ? 0 : filterAggregation.getCount();
-        }
-
         return queryResult.getTotal();
     }
 

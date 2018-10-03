@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
@@ -36,7 +35,6 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
 
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, Aggregation searchType, ESGeneratedQueryContext queryContext) {
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(searchType.id());
         // aggregation specs do not necessarily map 1 to 1 onto elasticsearch aggregations, for example field stacking required multiple
         // nested aggregations to produce the necessary data. our result also does not follow the elasticsearch query result directly
         // for the same reason.
@@ -52,7 +50,7 @@ public class ESAggregation implements ESSearchTypeHandler<Aggregation> {
                 builders.add(agg);
             });
         });
-        queryContext.addFilteredAggregations(builders, searchType);
+        queryContext.addAggregations(builders, searchType);
     }
 
     public ESAggregationSpecHandler<? extends AggregationSpec, ? extends io.searchbox.core.search.aggregation.Aggregation> handlerForType(String specType) {
