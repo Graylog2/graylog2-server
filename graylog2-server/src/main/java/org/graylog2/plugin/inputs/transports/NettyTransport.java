@@ -97,8 +97,17 @@ public abstract class NettyTransport implements Transport {
             @Override
             protected void initChannel(Channel ch) throws Exception {
                 final ChannelPipeline p = ch.pipeline();
+                Map.Entry<String, Callable<? extends ChannelHandler>> postentry = null;
                 for (final Map.Entry<String, Callable<? extends ChannelHandler>> entry : handlerList.entrySet()) {
-                    p.addLast(entry.getKey(), entry.getValue().call());
+                    // Handle exceptions at the top of the (bottom-up evaluated) pipeline
+                    if (entry.getKey().equals("exception-logger")) {
+                        postentry = entry;
+                    } else {
+                        p.addLast(entry.getKey(), entry.getValue().call());
+                    }
+                }
+                if (postentry != null) {
+                    p.addLast(postentry.getKey(), postentry.getValue().call());
                 }
             }
         };
