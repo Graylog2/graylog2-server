@@ -41,6 +41,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -56,14 +59,14 @@ public class ContentPackTest {
         objectMapper.setSubtypeResolver(new AutoValueSubtypeResolver());
     }
 
-    @Test
-    public void serializeContentPackV1() {
+    private ContentPack createTestContentPack() {
         final ObjectNode entityData = objectMapper.createObjectNode()
                 .put("bool", true)
                 .put("double", 1234.5678D)
                 .put("long", 1234L)
                 .put("string", "foobar");
-        final ContentPack contentPack = ContentPackV1.builder()
+
+        return ContentPackV1.builder()
                 .id(ModelId.of("a7917ee5-3e1a-4f89-951d-aeb604616998"))
                 .revision(1)
                 .name("Test")
@@ -83,7 +86,11 @@ public class ContentPackTest {
                 .entities(ImmutableSet.of(
                         EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData).build()))
                 .build();
+    }
 
+    @Test
+    public void serializeContentPackV1() {
+        final ContentPack contentPack = createTestContentPack();
 
         final JsonNode jsonNode = objectMapper.convertValue(contentPack, JsonNode.class);
         assertThat(jsonNode).isNotNull();
@@ -113,6 +120,31 @@ public class ContentPackTest {
         assertThat(entityDataNode.path("double").asDouble()).isEqualTo(1234.5678D);
         assertThat(entityDataNode.path("long").asLong()).isEqualTo(1234L);
         assertThat(entityDataNode.path("string").asText()).isEqualTo("foobar");
+    }
+
+    @Test
+    public void shouldDeserializeSerializedContentPack() throws Exception {
+        final ContentPack contentPack = createTestContentPack();
+
+        final URL contentPackURL = ContentPackTest.class.getResource("expected_content_pack.json");
+        Path path = Paths.get(contentPackURL.toURI());
+        String expectedJSON = String.join("", Files.readAllLines(path)).replace("\n", "").replace("\r", "");
+
+        final String jsonTxt = objectMapper.writeValueAsString(contentPack);
+        assertThat(jsonTxt).isEqualTo(expectedJSON);
+
+        final ContentPack readContentPack = objectMapper.readValue(jsonTxt, ContentPack.class);
+        assertThat(readContentPack.id()).isEqualTo(contentPack.id());
+        assertThat(readContentPack.version()).isEqualTo(contentPack.version());
+        assertThat(readContentPack.revision()).isEqualTo(contentPack.revision());
+    }
+
+    @Test
+    public void doesNotContainAutoValue() throws Exception {
+        final ContentPack contentPack = createTestContentPack();
+
+        final String jsonTxt = objectMapper.writeValueAsString(contentPack);
+        assertThat(jsonTxt).doesNotContain("AutoValue_");
     }
 
     @Test
