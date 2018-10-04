@@ -16,12 +16,26 @@
  */
 package org.graylog2.bootstrap;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
+import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
+
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.BaseConfiguration;
@@ -43,21 +57,6 @@ import org.graylog2.shared.system.stats.SystemStatsModule;
 import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
-import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);

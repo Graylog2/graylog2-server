@@ -16,6 +16,11 @@
  */
 package org.graylog2.shared.initializers;
 
+import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
+
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,12 +30,41 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Injector;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
@@ -59,36 +93,6 @@ import org.graylog2.shared.security.tls.PemKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.stream.Collectors;
-
-import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.requireNonNull;
-
 public class JerseyService extends AbstractIdleService {
     public static final String PLUGIN_PREFIX = "/plugins";
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
@@ -106,6 +110,7 @@ public class JerseyService extends AbstractIdleService {
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
     private final ErrorPageGenerator errorPageGenerator;
+    private final Injector injector;
 
     private HttpServer apiHttpServer = null;
 
@@ -120,7 +125,8 @@ public class JerseyService extends AbstractIdleService {
                          Set<PluginAuditEventTypes> pluginAuditEventTypes,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
-                         ErrorPageGenerator errorPageGenerator) {
+                         ErrorPageGenerator errorPageGenerator,
+                         Injector injector) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -132,6 +138,7 @@ public class JerseyService extends AbstractIdleService {
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
+        this.injector = injector;
     }
 
     @Override
@@ -297,7 +304,7 @@ public class JerseyService extends AbstractIdleService {
 
         final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
                 listenUri,
-                resourceConfig,
+                makeContainer(resourceConfig),
                 sslEngineConfigurator != null,
                 sslEngineConfigurator,
                 false);
@@ -325,6 +332,20 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return httpServer;
+    }
+
+    // ugly hack because the only combination of GrizzlyHttpServerFactory.createHttpServer arguments
+    // that is _not_ available, is of course the one we need to call
+    // instead, we need to construct the http container ourselves, but, of course, that is package-private
+    private GrizzlyHttpContainer makeContainer(ResourceConfig resourceConfig) {
+        try {
+            final Constructor<GrizzlyHttpContainer> declaredConstructor = GrizzlyHttpContainer.class
+                .getDeclaredConstructor(Application.class, Object.class);
+            declaredConstructor.setAccessible(true);
+            return declaredConstructor.newInstance(resourceConfig, injector);
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private SSLEngineConfigurator buildSslEngineConfigurator(Path certFile, Path keyFile, String keyPassword)
