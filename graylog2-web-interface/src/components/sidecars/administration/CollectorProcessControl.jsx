@@ -43,13 +43,13 @@ const CollectorProcessControl = createReactClass({
   },
 
   renderProcessActionSummary(selectedSidecarCollectorPairs, selectedAction) {
+    const selectedSidecars = lodash.uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
     const actionSummary = (
       <span>
         You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
-        <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecarCollectorPairs.length} />:
+        <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecars.length} />:
       </span>
     );
-    const formattedSummary = lodash.uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name)).join(', ');
 
     return (
       <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
@@ -58,7 +58,7 @@ const CollectorProcessControl = createReactClass({
                              onCancel={this.cancelProcessAction}>
         <div>
           <p>{actionSummary}</p>
-          <p>{formattedSummary}</p>
+          <p>{selectedSidecars.join(', ')}</p>
           <p>Are you sure you want to proceed with this action?</p>
         </div>
       </BootstrapModalConfirm>
