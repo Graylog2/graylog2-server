@@ -67,7 +67,7 @@ class ContentPackParameterList extends React.Component {
       modalRef.close();
     };
 
-    const open = () => {
+    const openModal = () => {
       modalRef.open();
     };
 
@@ -104,12 +104,14 @@ class ContentPackParameterList extends React.Component {
     );
 
     return (
-      <Button bsStyle="info"
-              bsSize={size}
-              onClick={() => { open(); }}>
-        {name}
+      <React.Fragment>
+        <Button bsStyle="info"
+                bsSize={size}
+                onClick={openModal}>
+          {name}
+        </Button>
         {modal}
-      </Button>
+      </React.Fragment>
     );
   }
 

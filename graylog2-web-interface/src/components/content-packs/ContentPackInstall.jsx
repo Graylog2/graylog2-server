@@ -105,7 +105,7 @@ class ContentPackInstall extends React.Component {
     });
     return (<div>
       <Row>
-        <Col smOffset={1}>
+        <Col smOffset={1} sm={10}>
           <h2>Install comment</h2>
           <br />
           <br />
@@ -123,7 +123,7 @@ class ContentPackInstall extends React.Component {
       </Row>
       {parameterInput.length > 0 &&
       <Row>
-        <Col smOffset={1}>
+        <Col smOffset={1} sm={10}>
           <h2>Configure Parameter</h2>
           <br />
           <br />

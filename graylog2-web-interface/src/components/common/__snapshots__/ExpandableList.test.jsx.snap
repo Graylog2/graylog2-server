@@ -40,7 +40,13 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
       <span
         className="header"
       >
-        Wheel of time
+        <span
+          onClick={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          Wheel of time
+        </span>
       </span>
     </div>
     <div
@@ -90,7 +96,13 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
       <span
         className="header"
       >
-        Wheel of time
+        <span
+          onClick={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          Wheel of time
+        </span>
       </span>
     </div>
     <div
@@ -135,7 +147,13 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
             <span
               className="header"
             >
-              Edmonds Field
+              <span
+                onClick={[Function]}
+                role="button"
+                tabIndex={0}
+              >
+                Edmonds Field
+              </span>
             </span>
           </div>
           <div

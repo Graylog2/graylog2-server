@@ -880,7 +880,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   <span
                     className="header"
                   >
-                    Dashboard
+                    <span
+                      onClick={[Function]}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      Dashboard
+                    </span>
                   </span>
                 </div>
                 <div

@@ -555,7 +555,13 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             <span
               className="header"
             >
-              Spaceship
+              <span
+                onClick={[Function]}
+                role="button"
+                tabIndex={0}
+              >
+                Spaceship
+              </span>
             </span>
           </div>
           <div
