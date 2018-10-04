@@ -71,7 +71,7 @@ class SourceViewModal extends React.Component {
             this.setState({ source: configuration.template, name: configuration.name });
           },
           (error) => {
-            this.setState({ source: `Error fetching configuration: ${error}` });
+            this.setState({ source: `Error fetching configuration: ${error.responseMessage || error}` });
           },
         );
     }

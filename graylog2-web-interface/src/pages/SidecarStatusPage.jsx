@@ -10,6 +10,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
+import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 
 const { SidecarsActions } = CombinedProvider.get('Sidecars');
@@ -37,7 +38,14 @@ class SidecarStatusPage extends React.Component {
   }
 
   reloadSidecar = () => {
-    SidecarsActions.getSidecar(this.props.params.sidecarId).then(sidecar => this.setState({ sidecar }));
+    SidecarsActions.getSidecar(this.props.params.sidecarId).then(
+      sidecar => this.setState({ sidecar }),
+      (error) => {
+        if (error.status === 404) {
+          history.push(Routes.SYSTEM.SIDECARS.OVERVIEW);
+        }
+      },
+    );
   };
 
   reloadCollectors = () => {

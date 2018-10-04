@@ -93,23 +93,25 @@ const CollectorConfigurationsStore = Reflux.createStore({
 
   getConfiguration(configurationId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}`));
-    promise
-      .catch(
-        (error) => {
-          UserNotification.error(`Fetching collector configuration failed with status: ${error}`,
-            'Could not retrieve configuration');
-        });
+    promise.catch((error) => {
+      let errorMessage = `Fetching Configuration failed with status: ${error}`;
+      if (error.status === 404) {
+        errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
+      }
+      UserNotification.error(errorMessage, 'Could not retrieve Configuration');
+    });
     CollectorConfigurationsActions.getConfiguration.promise(promise);
   },
 
   getConfigurationSidecars(configurationId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configurationId}/sidecars`));
-    promise
-      .catch(
-        (error) => {
-          UserNotification.error(`Fetching Sidecars for Configuration failed with status: ${error}`,
-            'Could not retrieve Sidecars for Configuration');
-        });
+    promise.catch((error) => {
+      let errorMessage = `Fetching Configuration failed with status: ${error}`;
+      if (error.status === 404) {
+        errorMessage = `Unable to find a Configuration with ID <${configurationId}>, please ensure it was not deleted.`;
+      }
+      UserNotification.error(errorMessage, 'Could not retrieve Configuration');
+    });
     CollectorConfigurationsActions.getConfigurationSidecars.promise(promise);
   },
 

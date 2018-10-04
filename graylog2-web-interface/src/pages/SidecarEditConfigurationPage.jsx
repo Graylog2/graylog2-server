@@ -10,6 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
+import history from 'util/History';
 
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
@@ -32,20 +33,23 @@ const SidecarEditConfigurationPage = createReactClass({
 
   _reloadConfiguration() {
     const configurationId = this.props.params.configurationId;
-    CollectorConfigurationsActions.getConfiguration(configurationId).then(this._setConfiguration);
-    CollectorConfigurationsActions.getConfigurationSidecars(configurationId).then(this._setConfigurationSidecars);
-  },
 
-  _setConfiguration(configuration) {
-    this.setState({ configuration });
-  },
-
-  _setConfigurationSidecars(configurationSidecars) {
-    this.setState({ configurationSidecars });
+    CollectorConfigurationsActions.getConfiguration(configurationId).then(
+      (configuration) => {
+        this.setState({ configuration: configuration });
+        CollectorConfigurationsActions.getConfigurationSidecars(configurationId)
+          .then(configurationSidecars => this.setState({ configurationSidecars: configurationSidecars }));
+      },
+      (error) => {
+        if (error.status === 404) {
+          history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION);
+        }
+      },
+    );
   },
 
   _isLoading() {
-    return !(this.state.configuration);
+    return !this.state.configuration || !this.state.configurationSidecars;
   },
 
   render() {

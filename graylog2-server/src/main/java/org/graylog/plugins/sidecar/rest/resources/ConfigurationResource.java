@@ -131,7 +131,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @ApiOperation(value = "Show configuration details")
     public Configuration getConfigurations(@ApiParam(name = "id", required = true)
                                            @PathParam("id") String id) {
-        return this.configurationService.find(id);
+        final Configuration configuration = this.configurationService.find(id);
+        if (configuration == null) {
+            throw new NotFoundException("Could not find Configuration <" + id + ">.");
+        }
+        return configuration;
     }
 
     @GET
@@ -141,7 +145,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @ApiOperation(value = "Show sidecars using the given configuration")
     public ConfigurationSidecarsResponse getConfigurationSidecars(@ApiParam(name = "id", required = true)
                                                                       @PathParam("id") String id) {
-        final Configuration configuration = configurationService.find(id);
+        final Configuration configuration = this.configurationService.find(id);
+        if (configuration == null) {
+            throw new NotFoundException("Could not find Configuration <" + id + ">.");
+        }
         final List<String> sidecarsWithConfiguration = sidecarService.all().stream()
                 .filter(sidecar -> isConfigurationAssignedToSidecar(configuration.id(), sidecar))
                 .map(Sidecar::id)
@@ -268,6 +275,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                              @ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
         final Configuration previousConfiguration = configurationService.find(id);
+        if (previousConfiguration == null) {
+            throw new NotFoundException("Could not find Configuration <" + id + ">.");
+        }
+
         // Only allow changing the associated collector ID if the configuration is not in use
         if (!previousConfiguration.collectorId().equals(request.collectorId())) {
             if (isConfigurationInUse(id)) {

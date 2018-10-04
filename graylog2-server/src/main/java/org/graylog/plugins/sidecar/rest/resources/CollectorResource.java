@@ -98,7 +98,13 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @ApiOperation(value = "Show collector details")
     public Collector getCollector(@ApiParam(name = "id", required = true)
                                   @PathParam("id") String id) {
-        return this.collectorService.find(id);
+
+        final Collector collector = this.collectorService.find(id);
+        if (collector == null) {
+            throw new NotFoundException("Cound not find collector <" + id + ">.");
+        }
+
+        return collector;
     }
 
     @GET
