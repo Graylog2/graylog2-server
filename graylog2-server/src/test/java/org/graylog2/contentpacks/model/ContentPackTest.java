@@ -128,7 +128,7 @@ public class ContentPackTest {
 
         final URL contentPackURL = ContentPackTest.class.getResource("expected_content_pack.json");
         Path path = Paths.get(contentPackURL.toURI());
-        String expectedJSON = new String(Files.readAllBytes(path)).replace("\n", "").replace("\r", "");
+        String expectedJSON = String.join("", Files.readAllLines(path)).replace("\n", "").replace("\r", "");
 
         final String jsonTxt = objectMapper.writeValueAsString(contentPack);
         assertThat(jsonTxt).isEqualTo(expectedJSON);
