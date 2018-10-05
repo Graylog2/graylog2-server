@@ -44,6 +44,7 @@ export default function (queryId, field) {
   const config = AggregationWidgetConfig.builder()
     .series(series)
     .visualization('table')
+    .rollup(true)
     .build();
   const widget = AggregationWidget.builder()
     .newId()

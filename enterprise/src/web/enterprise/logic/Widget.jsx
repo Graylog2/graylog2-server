@@ -24,6 +24,7 @@ export const resultHistogram = (id = uuid()) => {
     columnPivots: [],
     sort: [],
     visualization: 'bar',
+    rollup: true,
   };
-  return new AggregationWidget(id, new AggregationWidgetConfig(config.columnPivots, config.rowPivots, config.series, config.sort, config.visualization));
+  return new AggregationWidget(id, new AggregationWidgetConfig(config.columnPivots, config.rowPivots, config.series, config.sort, config.visualization, config.rollup));
 };

@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
+<div>
+  <div
+    className="form-group"
+  >
+    <span>
+      <div
+        className="checkbox"
+      >
+        <label
+          title=""
+        >
+          <input
+            autoFocus={true}
+            checked={true}
+            disabled={false}
+            label="Rollup"
+            name="rollup"
+            onChange={[Function]}
+            placeholder=""
+            type="checkbox"
+          />
+          Rollup
+        </label>
+      </div>
+      <span
+        className="help-block"
+      >
+        When rollup is enabled, an additional trace totalling individual subtraces will be included.
+      </span>
+    </span>
+  </div>
+  <div
+    className="pull-right"
+    style={
+      Object {
+        "marginBottom": "10px",
+      }
+    }
+  >
+    <button
+      className="btn btn-success"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Done
+    </button>
+  </div>
+</div>
+`;

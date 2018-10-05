@@ -15,6 +15,7 @@ export default function (queryId, field) {
       [Series.forFunction('count()')],
       [],
       'table',
+      true,
     ),
   );
   WidgetActions.create(newWidget);

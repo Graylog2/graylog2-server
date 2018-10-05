@@ -3,10 +3,8 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import { flatten, get } from 'lodash';
 
-import connect from 'stores/connect';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import Value from 'enterprise/components/Value';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import * as AggregationBuilderPropTypes from '../aggregationbuilder/AggregationBuilderPropTypes';
 
@@ -14,7 +12,7 @@ const _c = (field, value) => ({ field, value });
 
 class DataTableEntry extends React.Component {
   static propTypes = {
-    columnPivots: AggregationBuilderPropTypes.PivotList.isRequired,
+    columnPivots: PropTypes.arrayOf(PropTypes.string).isRequired,
     columnPivotValues: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
     currentView: CustomPropTypes.CurrentView.isRequired,
     fields: PropTypes.instanceOf(Immutable.OrderedSet).isRequired,
@@ -61,4 +59,4 @@ class DataTableEntry extends React.Component {
   }
 }
 
-export default connect(DataTableEntry, { currentView: ViewMetadataStore });
+export default DataTableEntry;

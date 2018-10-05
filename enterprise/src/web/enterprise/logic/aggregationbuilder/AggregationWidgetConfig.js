@@ -3,8 +3,8 @@ import Pivot from './Pivot';
 import Series from './Series';
 
 export default class AggregationWidgetConfig {
-  constructor(columnPivots, rowPivots, series, sort, visualization) {
-    this._value = { columnPivots, rowPivots, series, sort, visualization };
+  constructor(columnPivots, rowPivots, series, sort, visualization, rollup) {
+    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup };
   }
 
   get rowPivots() {
@@ -23,18 +23,23 @@ export default class AggregationWidgetConfig {
     return this._value.sort;
   }
 
+  get rollup() {
+    return this._value.rollup;
+  }
+
   get visualization() {
     return this._value.visualization;
   }
 
   toObject() {
-    const { rowPivots, columnPivots, series, sort, visualization } = this._value;
+    const { rowPivots, columnPivots, series, sort, visualization, rollup } = this._value;
     return {
       rowPivots: rowPivots.slice(0),
       columnPivots: columnPivots.slice(0),
       series: series.slice(0),
       sort: sort.slice(0),
       visualization,
+      rollup,
     };
   }
 
@@ -44,7 +49,8 @@ export default class AggregationWidgetConfig {
       .rowPivots([])
       .columnPivots([])
       .series([])
-      .sort([]);
+      .sort([])
+      .rollup(true);
   }
 
   toBuilder() {
@@ -53,21 +59,22 @@ export default class AggregationWidgetConfig {
   }
 
   toJSON() {
-    const { rowPivots, columnPivots, series, sort, visualization } = this._value;
+    const { rowPivots, columnPivots, series, sort, visualization, rollup } = this._value;
     return {
       row_pivots: rowPivots,
       column_pivots: columnPivots,
       series,
       sort,
       visualization,
+      rollup,
     };
   }
 
   static fromJSON(value) {
     // eslint-disable-next-line camelcase
-    const { row_pivots, column_pivots, series, sort, visualization } = value;
+    const { row_pivots, column_pivots, series, sort, visualization, rollup } = value;
 
-    return new AggregationWidgetConfig(column_pivots.map(Pivot.fromJSON), row_pivots.map(Pivot.fromJSON), series.map(Series.fromJSON), sort, visualization);
+    return new AggregationWidgetConfig(column_pivots.map(Pivot.fromJSON), row_pivots.map(Pivot.fromJSON), series.map(Series.fromJSON), sort, visualization, rollup);
   }
 }
 
@@ -96,8 +103,12 @@ class Builder {
     return new Builder(this.value.set('visualization', type));
   }
 
+  rollup(rollup) {
+    return new Builder(this.value.set('rollup', rollup));
+  }
+
   build() {
-    const { rowPivots, columnPivots, series, sort, visualization } = this.value.toObject();
-    return new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization);
+    const { rowPivots, columnPivots, series, sort, visualization, rollup } = this.value.toObject();
+    return new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization, rollup);
   }
 }

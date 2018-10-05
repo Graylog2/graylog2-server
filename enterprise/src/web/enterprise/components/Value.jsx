@@ -16,11 +16,12 @@ export default class Value extends React.Component {
     field: PropTypes.string.isRequired,
     menuContainer: PropTypes.object,
     queryId: PropTypes.string.isRequired,
-    type: CustomPropTypes.FieldType.isRequired,
+    type: CustomPropTypes.FieldType,
     value: PropTypes.node.isRequired,
   };
 
   static defaultProps = {
+    type: null,
     children: null,
     interactive: false,
     viewId: null,

@@ -54,9 +54,7 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
 PivotSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
   fields: CustomPropTypes.FieldListType.isRequired,
-  value: PropTypes.shape({
-    label: PropTypes.string,
-  }).isRequired,
+  value: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default connect(PivotSelect, { fields: FieldTypesStore });

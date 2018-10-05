@@ -11,6 +11,7 @@ export default function (queryId, field) {
     .rowPivots([pivotForField('timestamp')])
     .series([Series.forFunction(`avg(${field})`)])
     .visualization('line')
+    .rollup(true)
     .build();
   const widget = new AggregationWidget(uuid(), config);
   WidgetActions.create(widget);

@@ -22,11 +22,11 @@ const formatPivot = (pivot) => {
   };
 };
 
-export default ({ columnPivots, rowPivots, series }) => [{
+export default ({ columnPivots, rowPivots, series, rollup }) => [{
   type: 'pivot',
   config: {
     id: 'vals',
-    rollup: true,
+    rollup,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
     series: series.map(s => Object.assign({ id: s.effectiveName }, Series.parseSeries(s.function))),

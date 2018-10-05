@@ -183,7 +183,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
             // also add the series for the entire row
             // columnKeys is empty, because this is a rollup per row bucket, thus for all columns in that bucket (IOW it's not a leaf!)
-            processSeries(rowBuilder, searchResult, queryContext, pivot, new ArrayDeque<>(), aggregation, true, "row-leaf");
+            if (pivot.rollup()) {
+                processSeries(rowBuilder, searchResult, queryContext, pivot, new ArrayDeque<>(), aggregation, true, "row-leaf");
+            }
             resultBuilder.addRow(rowBuilder.source("leaf").build());
         } else {
             // this is not a leaf for the rows, so we add its key to the rowKeys and descend into the aggregation tree

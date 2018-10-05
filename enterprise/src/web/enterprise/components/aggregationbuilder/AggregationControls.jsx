@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row, Checkbox } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationTypeSelect from './VisualizationTypeSelect';
+import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
 import ColumnPivotSelect from './ColumnPivotSelect';
 import SortSelect from './SortSelect';
@@ -23,6 +24,7 @@ export default class AggregationControls extends React.Component {
       series: PropTypes.arrayOf(PropTypes.string),
       sort: PropTypes.arrayOf(PropTypes.string),
       visualization: PropTypes.string,
+      rollup: PropTypes.bool,
     }).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -40,8 +42,8 @@ export default class AggregationControls extends React.Component {
     super(props);
 
     const { config } = props;
-    const { columnPivots, rowPivots, sort, series, visualization } = config;
-    this.state = { config: new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization) };
+    const { columnPivots, rowPivots, sort, series, visualization, rollup } = config;
+    this.state = { config: new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization, rollup) };
   }
 
   _onColumnPivotChange = (columnPivots) => {
@@ -60,6 +62,10 @@ export default class AggregationControls extends React.Component {
     this.setState(state => ({ config: state.config.toBuilder().sort(sort.split(',')).build() }), this._propagateState);
   };
 
+  _onRollupChange = (checked) => {
+    this.setState(state => ({ config: state.config.toBuilder().rollup(checked).build() }), this._propagateState);
+  };
+
   _onVisualizationChange = (visualization) => {
     this.setState(state => ({ config: state.config.toBuilder().visualization(visualization).build() }), this._propagateState);
   };
@@ -70,7 +76,7 @@ export default class AggregationControls extends React.Component {
 
   render() {
     const { children, fields } = this.props;
-    const { columnPivots, rowPivots, series, sort, visualization } = this.state.config.toObject();
+    const { columnPivots, rowPivots, series, sort, visualization, rollup } = this.state.config.toObject();
     const formattedFields = fields
       .map(fieldType => fieldType.name)
       .valueSeq()
@@ -95,7 +101,7 @@ export default class AggregationControls extends React.Component {
             </DescriptionBox>
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <DescriptionBox description="Column Pivots">
+            <DescriptionBox description="Column Pivots" configurableOptions={<ColumnPivotConfiguration rollup={rollup} onRollupChange={this._onRollupChange} />}>
               <ColumnPivotSelect fields={formattedFieldsOptions} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
             </DescriptionBox>
           </Col>

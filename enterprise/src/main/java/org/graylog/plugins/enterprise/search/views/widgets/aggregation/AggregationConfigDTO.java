@@ -19,6 +19,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     static final String FIELD_SERIES = "series";
     static final String FIELD_SORT = "sort";
     static final String FIELD_VISUALIZATION = "visualization";
+    static final String FIELD_ROLLUP = "rollup";
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
@@ -34,6 +35,9 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
 
     @JsonProperty(FIELD_VISUALIZATION)
     public abstract String visualization();
+
+    @JsonProperty(FIELD_ROLLUP)
+    public abstract boolean rollup();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -52,11 +56,15 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_VISUALIZATION)
         public abstract Builder visualization(String visualization);
 
+        @JsonProperty(FIELD_ROLLUP)
+        public abstract Builder rollup(boolean roolup);
+
         public abstract AggregationConfigDTO build();
 
         @JsonCreator
         static Builder builder() {
-            return new AutoValue_AggregationConfigDTO.Builder();
+            return new AutoValue_AggregationConfigDTO.Builder()
+                    .rollup(true);
         }
     }
 }

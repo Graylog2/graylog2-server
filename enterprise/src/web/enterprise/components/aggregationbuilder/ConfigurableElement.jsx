@@ -41,6 +41,7 @@ export default class ConfigurableElement extends React.Component {
     const popover = this.state.isOpen && (
       <Portal>
         <Position
+          /* eslint-disable-next-line no-undef */
           container={document.body}
           placement="bottom"
           target={this.target}>

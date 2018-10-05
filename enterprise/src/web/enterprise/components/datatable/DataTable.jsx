@@ -98,24 +98,28 @@ class DataTable extends React.Component {
 
   render() {
     const { config, data } = this.props;
-    const { columnPivots, rowPivots, series } = config;
+    const { columnPivots, rowPivots, series, rollup } = config;
     const rows = data || [];
 
     const rowFieldNames = rowPivots.map(pivot => pivot.field);
     const columnFieldNames = columnPivots.map(pivot => pivot.field);
-    const fields = new Immutable.OrderedSet(rowFieldNames).merge(series.map(({ effectiveName }) => effectiveName));
+
+    const seriesToMerge = rollup ? series : [];
+    const fields = new Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({effectiveName}) => effectiveName));
 
     const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter(r => r.source === 'leaf'));
 
     const actualColumnPivotFields = this._extractColumnPivotValues(rows, columnFieldNames);
     const rowPivotFields = rowFieldNames.map(this._headerField);
 
-    const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, rowFieldNames.length + series.length);
+    const offset = rollup ? rowFieldNames.length + series.length : 1;
+    const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, offset);
     const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
       // eslint-disable-next-line react/no-array-index-key
       return (<DataTableEntry key={`datatableentry-${idx}`}
                               fields={fields}
                               item={reducedItem}
+                              currentView={this.props.currentView}
                               columnPivots={columnFieldNames}
                               columnPivotValues={actualColumnPivotFields}
                               types={this.props.fields}
@@ -132,7 +136,7 @@ class DataTable extends React.Component {
             {columnPivotFieldsHeaders}
             <tr>
               {rowPivotFields}
-              {seriesFields}
+              {rollup && seriesFields}
               {columnPivotFields}
             </tr>
           </thead>
