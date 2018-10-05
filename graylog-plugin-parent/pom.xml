@@ -66,6 +66,12 @@
             <artifactId>graylog2-server</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value</artifactId>
+            <version>${auto-value.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
