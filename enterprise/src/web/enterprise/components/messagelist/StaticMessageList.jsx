@@ -28,9 +28,18 @@ const StaticMessageList = createReactClass({
     messages: PropTypes.shape({
       total: PropTypes.number.isRequired,
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
-    }).isRequired,
+    }),
     onToggleMessages: PropTypes.func.isRequired,
     showMessages: PropTypes.bool.isRequired,
+  },
+
+  getDefaultProps() {
+    return {
+      messages: {
+        total: 0,
+        messages: [],
+      },
+    };
   },
 
   getInitialState() {
