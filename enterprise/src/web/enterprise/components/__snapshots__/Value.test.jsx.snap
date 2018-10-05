@@ -1,0 +1,255 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Value render without type information but no children 1`] = `
+<Value
+  field="foo"
+  interactive={false}
+  menuContainer={<body />}
+  queryId="someQueryId"
+  type={
+    FieldType {
+      "value": Immutable.Map {
+        "type": "unknown",
+        "properties": Immutable.Set [],
+        "indexNames": Immutable.Set [],
+      },
+    }
+  }
+  value={42}
+  viewId={null}
+>
+  <OverlayDropdown
+    menuContainer={<body />}
+    onToggle={[Function]}
+    show={false}
+    toggle={42}
+  >
+    <overlay-dropdown
+      menuContainer={<body />}
+      onToggle={[Function]}
+      show={false}
+      toggle={42}
+    >
+      <div
+        className="bottomSpacer"
+      >
+        <span
+          className="dropdownheader"
+        >
+          foo
+           = 
+          42
+        </span>
+      </div>
+      <MenuItem
+        bsClass="dropdown"
+        disabled={false}
+        divider={true}
+        header={false}
+      >
+        <li
+          className="divider"
+          role="separator"
+        />
+      </MenuItem>
+      <MenuItem
+        bsClass="dropdown"
+        disabled={false}
+        divider={false}
+        header={true}
+      >
+        <li
+          className="dropdown-header"
+          role="heading"
+        >
+          Actions
+        </li>
+      </MenuItem>
+      <Well
+        bsClass="well"
+        className="topSpacer"
+      >
+        <div
+          className="topSpacer well"
+        >
+          Found 3827 times in this result set.
+        </div>
+      </Well>
+    </overlay-dropdown>
+  </OverlayDropdown>
+</Value>
+`;
+
+exports[`Value renders booleans as strings 1`] = `
+<Value
+  field="foo"
+  interactive={false}
+  menuContainer={<body />}
+  queryId="someQueryId"
+  type={
+    FieldType {
+      "value": Immutable.Map {
+        "type": "boolean",
+        "properties": Immutable.Set [],
+        "indexNames": Immutable.Set [],
+      },
+    }
+  }
+  value={false}
+  viewId={null}
+>
+  <OverlayDropdown
+    menuContainer={<body />}
+    onToggle={[Function]}
+    show={false}
+    toggle="false"
+  >
+    <overlay-dropdown
+      menuContainer={<body />}
+      onToggle={[Function]}
+      show={false}
+      toggle="false"
+    >
+      <div
+        className="bottomSpacer"
+      >
+        <span
+          className="dropdownheader"
+        >
+          foo
+           = 
+          false
+        </span>
+      </div>
+      <MenuItem
+        bsClass="dropdown"
+        disabled={false}
+        divider={true}
+        header={false}
+      >
+        <li
+          className="divider"
+          role="separator"
+        />
+      </MenuItem>
+      <MenuItem
+        bsClass="dropdown"
+        disabled={false}
+        divider={false}
+        header={true}
+      >
+        <li
+          className="dropdown-header"
+          role="heading"
+        >
+          Actions
+        </li>
+      </MenuItem>
+      <Well
+        bsClass="well"
+        className="topSpacer"
+      >
+        <div
+          className="topSpacer well"
+        >
+          Found 3827 times in this result set.
+        </div>
+      </Well>
+    </overlay-dropdown>
+  </OverlayDropdown>
+</Value>
+`;
+
+exports[`Value renders timestamps with a custom component 1`] = `
+<Value
+  field="foo"
+  interactive={false}
+  menuContainer={<body />}
+  queryId="someQueryId"
+  type={
+    FieldType {
+      "value": Immutable.Map {
+        "type": "date",
+        "properties": Immutable.Set [],
+        "indexNames": Immutable.Set [],
+      },
+    }
+  }
+  value="2018-10-02T14:45:40Z"
+  viewId={null}
+>
+  <OverlayDropdown
+    menuContainer={<body />}
+    onToggle={[Function]}
+    show={false}
+    toggle={
+      <UserTimezoneTimestamp
+        dateTime="2018-10-02T14:45:40Z"
+      />
+    }
+  >
+    <overlay-dropdown
+      menuContainer={<body />}
+      onToggle={[Function]}
+      show={false}
+      toggle={
+        <UserTimezoneTimestamp
+          dateTime="2018-10-02T14:45:40Z"
+        />
+      }
+    >
+      <div
+        className="bottomSpacer"
+      >
+        <span
+          className="dropdownheader"
+        >
+          foo
+           = 
+          <UserTimezoneTimestamp
+            dateTime="2018-10-02T14:45:40Z"
+          >
+            <user-timezone-timestamp
+              dateTime="2018-10-02T14:45:40Z"
+            />
+          </UserTimezoneTimestamp>
+        </span>
+      </div>
+      <MenuItem
+        bsClass="dropdown"
+        disabled={false}
+        divider={true}
+        header={false}
+      >
+        <li
+          className="divider"
+          role="separator"
+        />
+      </MenuItem>
+      <MenuItem
+        bsClass="dropdown"
+        disabled={false}
+        divider={false}
+        header={true}
+      >
+        <li
+          className="dropdown-header"
+          role="heading"
+        >
+          Actions
+        </li>
+      </MenuItem>
+      <Well
+        bsClass="well"
+        className="topSpacer"
+      >
+        <div
+          className="topSpacer well"
+        >
+          Found 3827 times in this result set.
+        </div>
+      </Well>
+    </overlay-dropdown>
+  </OverlayDropdown>
+</Value>
+`;
