@@ -28,7 +28,10 @@ public class VerboseCsrfProtectionFilter extends CsrfProtectionFilter {
         try {
             super.filter(rc);
         } catch (BadRequestException badRequestException) {
-            throw new BadRequestException("CSRF protection header is missing.", badRequestException);
+            throw new BadRequestException(
+                    "CSRF protection header is missing. Please add a \"" + HEADER_NAME + "\" header to your request.",
+                    badRequestException
+            );
         }
     }
 }
