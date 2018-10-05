@@ -4,8 +4,9 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { MenuItem, Well } from 'react-bootstrap';
 
 import UserTimezoneTimestamp from 'enterprise/components/common/UserTimezoneTimestamp';
-import OverlayDropdown from './OverlayDropdown';
+import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
+import OverlayDropdown from './OverlayDropdown';
 import style from './Value.css';
 import CustomPropTypes from './CustomPropTypes';
 
@@ -24,6 +25,7 @@ export default class Value extends React.Component {
     interactive: false,
     viewId: null,
     menuContainer: document.body,
+    type: FieldType.Unknown,
   };
 
   constructor(props, context) {
@@ -65,7 +67,7 @@ export default class Value extends React.Component {
                        menuContainer={menuContainer}>
         <div className={style.bottomSpacer}>
           <span className={style.dropdownheader}>
-            {field} = {value}
+            {field} = {this._renderTypeSpecific(value, type)}
           </span>
         </div>
 
