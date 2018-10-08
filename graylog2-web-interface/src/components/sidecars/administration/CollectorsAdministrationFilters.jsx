@@ -140,8 +140,8 @@ const CollectorsAdministrationFilters = createReactClass({
       <ButtonToolbar>
         {this.getCollectorsFilter()}
         {this.getConfigurationFilter()}
-        {this.getOSFilter()}
         {this.getStatusFilter()}
+        {this.getOSFilter()}
       </ButtonToolbar>
     );
   },

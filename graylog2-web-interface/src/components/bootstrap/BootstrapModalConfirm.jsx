@@ -18,6 +18,10 @@ class BootstrapModalConfirm extends React.Component {
     cancelButtonText: PropTypes.string,
     /** Text to use in the confirmation button. */
     confirmButtonText: PropTypes.string,
+    /** Indicates whether the cancel button should be disabled or not. */
+    cancelButtonDisabled: PropTypes.bool,
+    /** Indicates whether the confirm button should be disabled or not. */
+    confirmButtonDisabled: PropTypes.bool,
     /** Function to call when the modal is opened. The function does not receive any arguments. */
     onModalOpen: PropTypes.func,
     /** Function to call when the modal is closed. The function does not receive any arguments. */
@@ -43,6 +47,8 @@ class BootstrapModalConfirm extends React.Component {
     showModal: false,
     cancelButtonText: 'Cancel',
     confirmButtonText: 'Confirm',
+    cancelButtonDisabled: false,
+    confirmButtonDisabled: false,
     onModalOpen: () => {},
     onModalClose: () => {},
     onCancel: () => {},
@@ -80,8 +86,8 @@ class BootstrapModalConfirm extends React.Component {
           {this.props.children}
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.onCancel}>{this.props.cancelButtonText}</Button>
-          <Button type="button" onClick={this.onConfirm} bsStyle="primary">{this.props.confirmButtonText}</Button>
+          <Button type="button" onClick={this.onCancel} disabled={this.props.cancelButtonDisabled}>{this.props.cancelButtonText}</Button>
+          <Button type="button" onClick={this.onConfirm} bsStyle="primary" disabled={this.props.confirmButtonDisabled}>{this.props.confirmButtonText}</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

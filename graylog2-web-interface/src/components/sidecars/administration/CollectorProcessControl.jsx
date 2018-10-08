@@ -2,7 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button } from 'react-bootstrap';
+import { Button, Panel } from 'react-bootstrap';
 
 import { Pluralize, SelectPopover } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
@@ -18,6 +18,7 @@ const CollectorProcessControl = createReactClass({
   getInitialState() {
     return {
       selectedAction: undefined,
+      isConfigurationWarningHidden: false,
     };
   },
 
@@ -42,24 +43,62 @@ const CollectorProcessControl = createReactClass({
     this.resetSelectedAction();
   },
 
-  renderProcessActionSummary(selectedSidecarCollectorPairs, selectedAction) {
-    const actionSummary = (
-      <span>
-        You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
-        <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecarCollectorPairs.length} />:
-      </span>
+  hideConfigurationWarning() {
+    this.setState({ isConfigurationWarningHidden: true });
+  },
+
+
+  renderSummaryContent(selectedAction, selectedSidecars) {
+    return (
+      <React.Fragment>
+        <p>
+          You are going to <strong>{selectedAction}</strong> log collectors in&nbsp;
+          <Pluralize singular="this sidecar" plural="these sidecars" value={selectedSidecars.length} />:
+        </p>
+        <p>{selectedSidecars.join(', ')}</p>
+        <p>Are you sure you want to proceed with this action?</p>
+      </React.Fragment>
     );
-    const formattedSummary = lodash.uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name)).join(', ');
+  },
+
+  renderConfigurationWarning(selectedAction) {
+    return (
+      <Panel bsStyle="info" header="Collectors without Configuration">
+        <p>
+          At least one selected Collector is not configured yet. To start a new Collector, assign a
+          Configuration to it and the Sidecar will start the process for you.
+        </p>
+        <p>
+          {lodash.capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
+        </p>
+        <Button bsSize="xsmall" bsStyle="primary" onClick={this.hideConfigurationWarning}>Understood, continue
+          anyway</Button>
+      </Panel>
+    );
+  },
+
+  renderProcessActionSummary(selectedSidecarCollectorPairs, selectedAction) {
+    const { isConfigurationWarningHidden } = this.state;
+    const selectedSidecars = lodash.uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
+
+    // Check if all selected collectors have assigned configurations
+    const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => {
+      // eslint-disable-next-line camelcase
+      return sidecar.assignments.some(({ collector_id }) => collector_id === collector.id);
+    });
+
+    const shouldShowConfigurationWarning = !isConfigurationWarningHidden && !allHaveConfigurationsAssigned;
 
     return (
       <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
                              title="Process action summary"
+                             confirmButtonDisabled={shouldShowConfigurationWarning}
                              onConfirm={this.confirmProcessAction}
                              onCancel={this.cancelProcessAction}>
         <div>
-          <p>{actionSummary}</p>
-          <p>{formattedSummary}</p>
-          <p>Are you sure you want to proceed with this action?</p>
+          {shouldShowConfigurationWarning ?
+            this.renderConfigurationWarning(selectedAction) :
+            this.renderSummaryContent(selectedAction, selectedSidecars)}
         </div>
       </BootstrapModalConfirm>
     );
