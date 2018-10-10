@@ -1,5 +1,7 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount, shallow } from 'enzyme';
+import mockComponent from 'helpers/mocking/MockComponent';
+
 import IfPermitted from './IfPermitted';
 
 jest.mock('stores/connect', () => x => x);
@@ -140,5 +142,20 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+  });
+  it('passes props to children', () => {
+    const Foo = mockComponent('Foo');
+    const Bar = mockComponent('Bar');
+    const wrapper = shallow((
+      <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
+        <Foo />
+        <Bar />
+      </IfPermitted>
+    ));
+
+    expect(wrapper.find(Foo)).toHaveProp('something', 42);
+    expect(wrapper.find(Foo)).toHaveProp('otherProp', { foo: 'bar!' });
+    expect(wrapper.find(Bar)).toHaveProp('something', 42);
+    expect(wrapper.find(Bar)).toHaveProp('otherProp', { foo: 'bar!' });
   });
 });
