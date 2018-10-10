@@ -115,6 +115,13 @@ describe('Navigation', () => {
                                         loginName="slowry" />);
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
     });
+    it('sets dropdown title based on match', () => {
+      currentUser.permissions = ['somethingelse', 'completelydifferent'];
+      const wrapper = mount(<Navigation fullName="Sam Lowry"
+                                        location={{ pathname: '/somethingelse' }}
+                                        loginName="slowry" />);
+      expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
+    });
   });
   describe('uses correct permissions:', () => {
     const verifyPermissions = ({ permissions, count, links }) => {
