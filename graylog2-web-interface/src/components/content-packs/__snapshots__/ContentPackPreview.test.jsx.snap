@@ -317,9 +317,10 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
           className="btn btn-info"
           disabled={false}
           id="download"
+          onClick={[Function]}
           type="button"
         >
-          Download
+          Create and Download
         </button>
       </a>
     </div>
@@ -660,9 +661,10 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
           className="btn btn-info"
           disabled={false}
           id="download"
+          onClick={[Function]}
           type="button"
         >
-          Download
+          Create and Download
         </button>
       </a>
     </div>
