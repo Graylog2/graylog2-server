@@ -455,21 +455,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     </span>
                   </dl>
                 </div>
-                <h2>
-                  Description
-                </h2>
-                <br />
-                <div
-                  className="well"
-                >
-                  <div
-                    dangerouslySetInnerHTML={
-                      Object {
-                        "__html": "",
-                      }
-                    }
-                  />
-                </div>
+                
                 <br />
                 <br />
                 <br />
@@ -994,20 +980,22 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     </span>
                   </dl>
                 </div>
-                <h2>
-                  Description
-                </h2>
-                <br />
-                <div
-                  className="well"
-                >
+                <div>
+                  <h2>
+                    Description
+                  </h2>
+                  <br />
                   <div
-                    dangerouslySetInnerHTML={
-                      Object {
-                        "__html": "<h2>No one dares</h2>",
+                    className="well"
+                  >
+                    <div
+                      dangerouslySetInnerHTML={
+                        Object {
+                          "__html": "<h2>No one dares</h2>",
+                        }
                       }
-                    }
-                  />
+                    />
+                  </div>
                 </div>
                 <br />
                 <br />
