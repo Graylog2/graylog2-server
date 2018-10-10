@@ -23,6 +23,7 @@ class ContentPackConstraints extends React.Component {
     return (
       <tr key={constraint.id}>
         <td>{constraint.type}</td>
+        <td>{constraint.plugin}</td>
         <td>{constraint.version}</td>
         <td><Badge className={fulfilledBg}>{fulfilledIcon}</Badge></td>
       </tr>
@@ -30,7 +31,12 @@ class ContentPackConstraints extends React.Component {
   };
 
   render() {
-    const headers = ['Type', 'Version', 'Fulfilled'];
+    const headers = ['Type', 'Plugin', 'Version', 'Fulfilled'];
+    const constraints = this.props.constraints.map((constraint) => {
+      const newConstraint = constraint.constraint || constraint;
+      newConstraint.fulfilled = constraint.fulfilled;
+      return newConstraint;
+    });
     return (
       <div>
         <h2>Constraints</h2>
@@ -40,9 +46,9 @@ class ContentPackConstraints extends React.Component {
           id="content-packs-constraints"
           headers={headers}
           headerCellFormatter={header => <th>{header}</th>}
-          sortBy={row => row.constraint.type}
+          sortBy={(row) => { return row.constraint ? row.constraint.type : row.type; }}
           dataRowFormatter={this._rowFormatter}
-          rows={this.props.constraints}
+          rows={constraints}
           filterKeys={[]}
         />
       </div>
