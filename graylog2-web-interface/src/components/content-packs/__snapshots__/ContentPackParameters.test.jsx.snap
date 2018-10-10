@@ -154,7 +154,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           role="toolbar"
                         >
                           <button
-                            className="btn btn-sm btn-primary"
+                            className="btn btn-xs btn-primary"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -162,7 +162,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             Delete
                           </button>
                           <button
-                            className="btn btn-sm btn-info"
+                            className="btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
