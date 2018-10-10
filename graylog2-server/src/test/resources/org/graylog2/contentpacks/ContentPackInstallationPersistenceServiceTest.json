@@ -23,6 +23,7 @@
             "name": "collector",
             "version": "1"
           },
+          "title": "A Collector",
           "content_pack_entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
@@ -31,6 +32,7 @@
             "name": "collector",
             "version": "1"
           },
+          "title": "Another Collector",
           "content_pack_entity_id": "5b1a49eb3d274631fe07beff"
         },
         {
@@ -39,6 +41,7 @@
             "name": "collector",
             "version": "1"
           },
+          "title": "And another Collector",
           "content_pack_entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
@@ -65,6 +68,7 @@
             "name": "dashboard",
             "version": "1"
           },
+          "title": "A dashboard",
           "content_pack_entity_id": "beef49eb3d274631fe07abfe"
         },
         {
@@ -73,6 +77,7 @@
             "name": "grok_pattern",
             "version": "1"
           },
+          "title": "A grok pattern",
           "content_pack_entity_id": "bee149eb3d274631fe07abfe"
         },
         {
@@ -81,6 +86,7 @@
             "name": "input",
             "version": "1"
           },
+          "title": "An input",
           "content_pack_entity_id": "bee249eb3d274631fe07abfe"
         },
         {
@@ -89,6 +95,7 @@
             "name": "output",
             "version": "1"
           },
+          "title": "An output",
           "content_pack_entity_id": "bee349eb3d274631fe07abfe"
         },
         {
@@ -97,6 +104,7 @@
             "name": "stream",
             "version": "1"
           },
+          "title": "A stream",
           "content_pack_entity_id": "bee449eb3d274631fe07abfe"
         }
       ],
@@ -123,6 +131,7 @@
             "name": "pipeline_rule",
             "version": "1"
           },
+          "title": "A pipeline rule",
           "content_pack_entity_id": "bee549eb3d274631fe07abfe"
         },
         {
@@ -131,6 +140,7 @@
             "name": "pipeline",
             "version": "1"
           },
+          "title": "A pipeline",
           "content_pack_entity_id": "bee649eb3d274631fe07abfe"
         },
         {
@@ -139,6 +149,7 @@
             "name": "lookup_adapter",
             "version": "1"
           },
+          "title": "A lookup adapter",
           "content_pack_entity_id": "bee749eb3d274631fe07abfe"
         },
         {
@@ -147,6 +158,7 @@
             "name": "lookup_cache",
             "version": "1"
           },
+          "title": "A lookup cache",
           "content_pack_entity_id": "bee849eb3d274631fe07abfe"
         },
         {
@@ -155,6 +167,7 @@
             "name": "lookup_table",
             "version": "1"
           },
+          "title": "A lookup table",
           "content_pack_entity_id": "bee949eb3d274631fe07abfe"
         }
       ],
