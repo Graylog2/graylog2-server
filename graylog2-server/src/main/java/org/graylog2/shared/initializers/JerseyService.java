@@ -32,7 +32,6 @@ import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -45,6 +44,7 @@ import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.NotAuthorizedResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.RestAccessLogFilter;
+import org.graylog2.shared.rest.VerboseCsrfProtectionFilter;
 import org.graylog2.shared.rest.XHRFilter;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
@@ -282,7 +282,7 @@ public class JerseyService extends AbstractIdleService {
                 .register(new PrefixAddingModelProcessor(packagePrefixes))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
-                        CsrfProtectionFilter.class,
+                        VerboseCsrfProtectionFilter.class,
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class,
