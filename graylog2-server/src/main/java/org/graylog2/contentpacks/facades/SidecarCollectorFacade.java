@@ -107,7 +107,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
                 .build();
 
         final Collector savedCollector = collectorService.save(collector);
-        return NativeEntity.create(entity.id(), savedCollector.id(), TYPE_V1, savedCollector);
+        return NativeEntity.create(entity.id(), savedCollector.id(), TYPE_V1, collector.name(), savedCollector);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByName(name));
         existingCollector.ifPresent(collector -> compareCollectors(name, serviceType, collector));
 
-        return existingCollector.map(collector -> NativeEntity.create(entity.id(), collector.id(), TYPE_V1, collector));
+        return existingCollector.map(collector -> NativeEntity.create(entity.id(), collector.id(), TYPE_V1, collector.name(), collector));
     }
 
     private void compareCollectors(String name, String serviceType, Collector existingCollector) {

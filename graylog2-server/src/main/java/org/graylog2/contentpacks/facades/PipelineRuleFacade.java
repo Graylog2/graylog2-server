@@ -102,7 +102,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
                 .build();
 
         final RuleDao savedRuleDao = ruleService.save(ruleDao);
-        return NativeEntity.create(entity.id(), savedRuleDao.id(), TYPE_V1, savedRuleDao);
+        return NativeEntity.create(entity.id(), savedRuleDao.id(), TYPE_V1, savedRuleDao.title(), savedRuleDao);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
             final RuleDao ruleDao = ruleService.loadByName(title);
             compareRuleSources(title, source, ruleDao.source());
 
-            return Optional.of(NativeEntity.create(entity.id(), ruleDao.id(), TYPE_V1, ruleDao));
+            return Optional.of(NativeEntity.create(entity.id(), ruleDao.id(), TYPE_V1, ruleDao.title(), ruleDao));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

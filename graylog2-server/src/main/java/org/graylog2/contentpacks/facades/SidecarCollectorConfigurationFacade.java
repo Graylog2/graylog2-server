@@ -98,7 +98,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
                 configurationEntity.template().asString(parameters));
 
         final Configuration savedConfiguration = configurationService.save(configuration);
-        return NativeEntity.create(entity.id(), savedConfiguration.id(), TYPE_V1, savedConfiguration);
+        return NativeEntity.create(entity.id(), savedConfiguration.id(), TYPE_V1, configuration.name(), savedConfiguration);
     }
 
     @Override
