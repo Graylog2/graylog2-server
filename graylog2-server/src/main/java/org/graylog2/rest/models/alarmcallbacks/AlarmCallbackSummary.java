@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.alarmcallbacks.AlarmCallbackConditionSubscription;
 
 import javax.annotation.Nullable;
 import java.util.Date;
@@ -45,6 +46,8 @@ public abstract class AlarmCallbackSummary {
     public abstract Date createdAt();
     @JsonProperty("creator_user_id")
     public abstract String creatorUserId();
+    @JsonProperty("alert_condition_subscription")
+    public abstract AlarmCallbackConditionSubscription alertConditionSubscription();
 
     @JsonCreator
     public static AlarmCallbackSummary create(@JsonProperty("id") String id,
@@ -53,7 +56,8 @@ public abstract class AlarmCallbackSummary {
                                               @JsonProperty("title") @Nullable String title,
                                               @JsonProperty("configuration") Map<String, Object> configuration,
                                               @JsonProperty("created_at") Date createdAt,
-                                              @JsonProperty("creator_user_id") String creatorUserId) {
-        return new AutoValue_AlarmCallbackSummary(id, streamId, type, title, configuration, createdAt, creatorUserId);
+                                              @JsonProperty("creator_user_id") String creatorUserId,
+                                              @JsonProperty("alert_condition_subscription") AlarmCallbackConditionSubscription alertConditionSubscription) {
+        return new AutoValue_AlarmCallbackSummary(id, streamId, type, title, configuration, createdAt, creatorUserId, alertConditionSubscription);
     }
 }

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.alarmcallbacks.AlarmCallbackConditionSubscription;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 
 import java.util.Map;
@@ -32,6 +33,7 @@ public abstract class CreateAlarmCallbackRequest {
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_CONFIGURATION = "configuration";
+    private static final String FIELD_ALERT_CONDITION_SUBSCRIPTION = "alert_condition_subscription";
 
     @JsonProperty(FIELD_TYPE)
     public abstract String type();
@@ -42,14 +44,18 @@ public abstract class CreateAlarmCallbackRequest {
     @JsonProperty(FIELD_CONFIGURATION)
     public abstract Map<String, Object> configuration();
 
+    @JsonProperty(FIELD_ALERT_CONDITION_SUBSCRIPTION)
+    public abstract AlarmCallbackConditionSubscription alertConditionSubscription();
+
     @JsonCreator
     public static CreateAlarmCallbackRequest create(@JsonProperty(FIELD_TYPE) String type,
                                                     @JsonProperty(FIELD_TITLE) String title,
-                                                    @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration) {
-        return new AutoValue_CreateAlarmCallbackRequest(type, title, configuration);
+                                                    @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
+                                                    @JsonProperty(FIELD_ALERT_CONDITION_SUBSCRIPTION) AlarmCallbackConditionSubscription alertConditionSubscription) {
+        return new AutoValue_CreateAlarmCallbackRequest(type, title, configuration, alertConditionSubscription);
     }
 
     public static CreateAlarmCallbackRequest create(AlarmCallbackConfiguration alarmCallbackConfiguration) {
-        return create(alarmCallbackConfiguration.getType(), alarmCallbackConfiguration.getTitle(), alarmCallbackConfiguration.getConfiguration());
+        return create(alarmCallbackConfiguration.getType(), alarmCallbackConfiguration.getTitle(), alarmCallbackConfiguration.getConfiguration(), alarmCallbackConfiguration.getAlertConditionSubscription());
     }
 }

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.alarmcallbacks.AlarmCallbackConditionSubscription;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
@@ -123,7 +124,8 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
                 CreateAlarmCallbackRequest.create(
                         EmailAlarmCallback.class.getCanonicalName(),
                         "Email Alert Notification",
-                        defaultConfig
+                        defaultConfig,
+                        AlarmCallbackConditionSubscription.all()
                 ),
                 localAdminUser.getId()
         );

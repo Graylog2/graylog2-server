@@ -84,6 +84,44 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
         assertNotNull("Returned list should not be null", configs);
         assertEquals("Returned list should contain a single document", 1, configs.size());
         assertNotNull("Returned Alarm Callback should not be null", alarmCallback);
+
+        // For backwards compatibility, alarm callbacks without a "alert_condition_subscription" field should default
+        // to be subscribed to all conditions.
+        assertEquals(AlarmCallbackConditionSubscription.all(), alarmCallback.getAlertConditionSubscription());
+    }
+
+    @Test
+    @UsingDataSet(locations = "alarmCallbackConfigurationsSingleDocumentWithConditionSubscription.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testGetForStreamSingleDocumentWithConditionSubscription() throws Exception {
+        final Stream stream = mock(StreamImpl.class);
+        final String streamId = "5400deadbeefdeadbeefaffe";
+        when(stream.getId()).thenReturn(streamId);
+
+        final List<AlarmCallbackConfiguration> configs = alarmCallbackConfigurationService.getForStream(stream);
+        final AlarmCallbackConfiguration alarmCallback = configs.get(0);
+
+        assertNotNull("Returned list should not be null", configs);
+        assertEquals("Returned list should contain a single document", 1, configs.size());
+        assertNotNull("Returned Alarm Callback should not be null", alarmCallback);
+
+        assertEquals(AlarmCallbackConditionSubscription.selection(Collections.singleton("alert-condition-id")), alarmCallback.getAlertConditionSubscription());
+    }
+
+    @Test
+    @UsingDataSet(locations = "alarmCallbackConfigurationsSingleDocumentWithNoConditionSubscription.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testGetForStreamSingleDocumentWithNoConditionSubscription() throws Exception {
+        final Stream stream = mock(StreamImpl.class);
+        final String streamId = "5400deadbeefdeadbeefaffe";
+        when(stream.getId()).thenReturn(streamId);
+
+        final List<AlarmCallbackConfiguration> configs = alarmCallbackConfigurationService.getForStream(stream);
+        final AlarmCallbackConfiguration alarmCallback = configs.get(0);
+
+        assertNotNull("Returned list should not be null", configs);
+        assertEquals("Returned list should contain a single document", 1, configs.size());
+        assertNotNull("Returned Alarm Callback should not be null", alarmCallback);
+
+        assertEquals(AlarmCallbackConditionSubscription.none(), alarmCallback.getAlertConditionSubscription());
     }
 
     @Test
@@ -146,7 +184,7 @@ public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTes
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCreate() throws Exception {
-        final CreateAlarmCallbackRequest request = CreateAlarmCallbackRequest.create("", "", Collections.emptyMap());
+        final CreateAlarmCallbackRequest request = CreateAlarmCallbackRequest.create("", "", Collections.emptyMap(), AlarmCallbackConditionSubscription.all());
 
         final String streamId = "54e3deadbeefdeadbeefaffe";
         final String userId = "someuser";

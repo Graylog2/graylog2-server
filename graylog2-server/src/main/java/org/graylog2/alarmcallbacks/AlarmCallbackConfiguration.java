@@ -27,4 +27,5 @@ public interface AlarmCallbackConfiguration {
     Map<String, Object> getConfiguration();
     Date getCreatedAt();
     String getCreatorUserId();
+    AlarmCallbackConditionSubscription getAlertConditionSubscription();
 }

@@ -23,6 +23,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
+import org.graylog2.alarmcallbacks.AlarmCallbackConditionSubscription;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -146,7 +147,8 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
-                "admin"
+                "admin",
+                AlarmCallbackConditionSubscription.all()
         );
         when(alarmCallbackConfigurationService.getForStream(eq(stream2))).thenReturn(ImmutableList.of(alarmCallback));
         when(alarmCallbackConfigurationService.save(eq(alarmCallback))).thenReturn(alarmCallbackId);
@@ -210,7 +212,8 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
-                "admin"
+                "admin",
+                AlarmCallbackConditionSubscription.all()
         );
         final String alarmCallbackId2 = new ObjectId().toHexString();
         final AlarmCallbackConfiguration alarmCallback2 = AlarmCallbackConfigurationImpl.create(
@@ -220,7 +223,8 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
-                "admin"
+                "admin",
+                AlarmCallbackConditionSubscription.all()
         );
         final String alarmCallbackId3 = new ObjectId().toHexString();
         final AlarmCallbackConfiguration alarmCallback3 = AlarmCallbackConfigurationImpl.create(
@@ -230,7 +234,8 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
-                "admin"
+                "admin",
+                AlarmCallbackConditionSubscription.all()
         );
         final String alarmCallbackId4 = new ObjectId().toHexString();
         final AlarmCallbackConfiguration alarmCallback4 = AlarmCallbackConfigurationImpl.create(
@@ -240,7 +245,8 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
-                "admin"
+                "admin",
+                AlarmCallbackConditionSubscription.all()
         );
         when(alarmCallbackConfigurationService.getForStream(eq(stream2))).thenReturn(ImmutableList.of(alarmCallback1));
         when(alarmCallbackConfigurationService.getForStream(eq(stream3))).thenReturn(ImmutableList.of(alarmCallback2, alarmCallback3, alarmCallback4));

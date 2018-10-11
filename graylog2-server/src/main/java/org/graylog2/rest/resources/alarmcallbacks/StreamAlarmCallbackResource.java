@@ -106,7 +106,8 @@ public class StreamAlarmCallbackResource extends RestResource {
                     callback.getTitle(),
                     callback.getConfiguration(),
                     callback.getCreatedAt(),
-                    callback.getCreatorUserId()
+                    callback.getCreatorUserId(),
+                    callback.getAlertConditionSubscription()
             ));
         }
 
@@ -130,7 +131,7 @@ public class StreamAlarmCallbackResource extends RestResource {
             throw new javax.ws.rs.NotFoundException("Couldn't find alarm callback " + alarmCallbackId + " in for steam " + streamid);
         }
 
-        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getTitle(), result.getConfiguration(), result.getCreatedAt(), result.getCreatorUserId());
+        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getTitle(), result.getConfiguration(), result.getCreatedAt(), result.getCreatorUserId(), result.getAlertConditionSubscription());
     }
 
     @POST
@@ -146,7 +147,7 @@ public class StreamAlarmCallbackResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         // make sure the values are correctly converted to the declared configuration types
-        final CreateAlarmCallbackRequest cr = CreateAlarmCallbackRequest.create(originalCr.type(), originalCr.title(), convertConfigurationValues(originalCr));
+        final CreateAlarmCallbackRequest cr = CreateAlarmCallbackRequest.create(originalCr.type(), originalCr.title(), convertConfigurationValues(originalCr), originalCr.alertConditionSubscription());
 
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr, getCurrentUser().getName());
 

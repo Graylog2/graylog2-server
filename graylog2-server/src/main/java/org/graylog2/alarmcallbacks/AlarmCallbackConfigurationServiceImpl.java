@@ -67,7 +67,7 @@ public class AlarmCallbackConfigurationServiceImpl implements AlarmCallbackConfi
 
     @Override
     public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId) {
-        return AlarmCallbackConfigurationImpl.create(new ObjectId().toHexString(), streamId, request.type(), request.title(), request.configuration(), new Date(), userId);
+        return AlarmCallbackConfigurationImpl.create(new ObjectId().toHexString(), streamId, request.type(), request.title(), request.configuration(), new Date(), userId, request.alertConditionSubscription());
     }
 
     @Override

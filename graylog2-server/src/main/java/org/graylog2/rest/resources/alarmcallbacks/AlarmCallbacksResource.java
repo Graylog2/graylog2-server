@@ -99,7 +99,8 @@ public class AlarmCallbacksResource extends RestResource {
                                 callback.getTitle(),
                                 callback.getConfiguration(),
                                 callback.getCreatedAt(),
-                                callback.getCreatorUserId()
+                                callback.getCreatorUserId(),
+                                callback.getAlertConditionSubscription()
                         )))
                 .collect(Collectors.toList());
 

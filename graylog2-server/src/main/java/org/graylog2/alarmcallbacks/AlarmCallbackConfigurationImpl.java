@@ -27,6 +27,8 @@ import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 @JsonAutoDetect
 @CollectionName("alarmcallbackconfigurations")
@@ -38,6 +40,7 @@ public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackCon
     static final String FIELD_CONFIGURATION = "configuration";
     static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    static final String FIELD_ALERT_CONDITION_SUBSCRIPTION = "alert_condition_subscription";
 
     @JsonProperty(FIELD_ID)
     @ObjectId
@@ -69,6 +72,10 @@ public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackCon
     @Override
     public abstract String getCreatorUserId();
 
+    @JsonProperty(FIELD_ALERT_CONDITION_SUBSCRIPTION)
+    @Override
+    public abstract AlarmCallbackConditionSubscription getAlertConditionSubscription();
+
     public abstract Builder toBuilder();
 
     @JsonCreator
@@ -79,17 +86,23 @@ public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackCon
                                                         @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
                                                         @JsonProperty(FIELD_CREATED_AT) Date createdAt,
                                                         @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
+                                                        @Nullable @JsonProperty(FIELD_ALERT_CONDITION_SUBSCRIPTION) AlarmCallbackConditionSubscription nullableAlertConditionSubscription,
                                                         @Nullable @JsonProperty("id") String redundantId) {
-        return create(id, streamId, type, title, configuration, createdAt, creatorUserId);
+        // For backwards compatibility, alarm callbacks without a "alert_condition_subscription" field should default to be subscribed to all conditions.
+        final AlarmCallbackConditionSubscription alertConditionSubscription = firstNonNull(nullableAlertConditionSubscription, AlarmCallbackConditionSubscription.all());
+
+        return create(id, streamId, type, title, configuration, createdAt, creatorUserId, alertConditionSubscription);
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static AlarmCallbackConfigurationImpl create(@JsonProperty(FIELD_ID) String id,
                                                         @JsonProperty(FIELD_STREAM_ID) String streamId,
                                                         @JsonProperty(FIELD_TYPE) String type,
                                                         @JsonProperty(FIELD_TITLE) @Nullable String title,
                                                         @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
                                                         @JsonProperty(FIELD_CREATED_AT) Date createdAt,
-                                                        @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId) {
+                                                        @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
+                                                        @JsonProperty(FIELD_ALERT_CONDITION_SUBSCRIPTION) AlarmCallbackConditionSubscription alertConditionSubscription) {
         return new AutoValue_AlarmCallbackConfigurationImpl.Builder()
                 .setId(id)
                 .setStreamId(streamId)
@@ -98,6 +111,7 @@ public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackCon
                 .setConfiguration(configuration)
                 .setCreatedAt(createdAt)
                 .setCreatorUserId(creatorUserId)
+                .setAlertConditionSubscription(alertConditionSubscription)
                 .build();
     }
 
@@ -116,6 +130,8 @@ public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackCon
         public abstract Builder setCreatedAt(Date createdAt);
 
         public abstract Builder setCreatorUserId(String creatorUserId);
+
+        public abstract Builder setAlertConditionSubscription(AlarmCallbackConditionSubscription alertConditionSubscription);
 
         public abstract AlarmCallbackConfigurationImpl build();
     }
