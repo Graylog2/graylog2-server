@@ -1,0 +1,14 @@
+{
+  "outputs": [
+    {
+      "_id" : { "$oid" : "5b927d32a7c8644ed44576ed" },
+      "title" : "Foo",
+      "type" : "org.graylog2.outputs.LoggingOutput",
+      "creator_user_id" : "admin",
+      "configuration" : {
+        "prefix" : "Writing message: "
+      },
+      "created_at" : { "$date" : "2018-09-07T13:29:22.589Z" }
+    }
+  ]
+}

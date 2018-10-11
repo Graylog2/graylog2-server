@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
@@ -113,5 +114,18 @@ public class OutputServiceImplTest {
                 .hasSize(2)
                 .containsEntry("org.graylog2.outputs.LoggingOutput", 1L)
                 .containsEntry("org.graylog2.outputs.GelfOutput", 1L);
+    }
+
+    @Test
+    @UsingDataSet(locations = "single-output.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void updatingOutputIsPersistent() throws Exception {
+        final String outputId = "5b927d32a7c8644ed44576ed";
+        final Output newOutput = outputService.update(outputId, Collections.singletonMap("title", "Some other Title"));
+
+        assertThat(newOutput.getTitle()).isEqualTo("Some other Title");
+
+        final Output retrievedOutput = outputService.load(outputId);
+
+        assertThat(retrievedOutput.getTitle()).isEqualTo("Some other Title");
     }
 }
