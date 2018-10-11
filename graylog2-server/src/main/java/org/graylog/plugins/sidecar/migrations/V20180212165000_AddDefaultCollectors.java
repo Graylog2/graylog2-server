@@ -43,6 +43,12 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     @Override
     public void upgrade() {
+        final String beatsPreambel =
+                "# Needed for Graylog\n" +
+                "fields_under_root: true\n" +
+                "fields.collector_node_id: ${nodeId}\n" +
+                "fields.gl2_source_collector: ${nodeName}\n";
+
         ensureCollector(
                 "filebeat",
                 "exec",
@@ -51,7 +57,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "/var/lib/graylog-sidecar/generated/filebeat.yml",
                 "-c  %s",
                 "test config -c %s",
-                ""
+                beatsPreambel
         );
         ensureCollector(
                 "winlogbeat",
@@ -61,7 +67,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
                 "-c \"%s\"",
                 "test config -c \"%s\"",
-                ""
+                beatsPreambel
         );
         ensureCollector(
                 "nxlog",
