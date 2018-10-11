@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ModelId;
 
+import java.util.Map;
 import java.util.Set;
 
 @JsonAutoDetect
@@ -36,8 +38,13 @@ public abstract class ContentPackList {
     @JsonProperty
     public abstract Set<ContentPack> contentPacks();
 
+    @JsonProperty
+    public abstract Map<ModelId, Integer> contentPacksInstallationCount();
+
     @JsonCreator
-    public static ContentPackList create(@JsonProperty("total") long total, @JsonProperty("content_packs") Set<ContentPack> contentPacks) {
-        return new AutoValue_ContentPackList(total, contentPacks);
+    public static ContentPackList create(@JsonProperty("total") long total,
+                                         @JsonProperty("content_packs")Set<ContentPack> contentPacks,
+                                         @JsonProperty("content_pack_installation_count") Map<ModelId, Integer> contentPacksInstalltionCount) {
+        return new AutoValue_ContentPackList(total, contentPacks, contentPacksInstalltionCount);
     }
 }

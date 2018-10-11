@@ -30,7 +30,10 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -89,5 +92,20 @@ public class ContentPackInstallationPersistenceService {
     public int deleteById(ObjectId id) {
         final WriteResult<ContentPackInstallation, ObjectId> writeResult = dbCollection.removeById(id);
         return writeResult.getN();
+    }
+
+    public Map<ModelId, Integer> getInstallationCount() {
+       Set<ContentPackInstallation> contentPackInstallations = loadAll();
+       Map<ModelId, Integer> installationCount = new HashMap();
+       for (ContentPackInstallation installation : contentPackInstallations) {
+           Integer count = installationCount.get(installation.contentPackId());
+           if (count == null) {
+               count = 1;
+           } else {
+               count++;
+           }
+           installationCount.put(installation.contentPackId(), count);
+       }
+       return installationCount;
     }
 }

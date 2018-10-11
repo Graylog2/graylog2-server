@@ -99,8 +99,9 @@ public class ContentPackResource extends RestResource {
     public ContentPackList listContentPacks() {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
+        Map<ModelId, Integer> installationCount = contentPackInstallationPersistenceService.getInstallationCount();
 
-        return ContentPackList.create(contentPacks.size(), contentPacks);
+        return ContentPackList.create(contentPacks.size(), contentPacks, installationCount);
     }
 
     @GET
@@ -115,7 +116,8 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
-        return ContentPackList.create(contentPacks.size(), contentPacks);
+        Map<ModelId, Integer> installationCount = contentPackInstallationPersistenceService.getInstallationCount();
+        return ContentPackList.create(contentPacks.size(), contentPacks, installationCount);
     }
 
     @GET

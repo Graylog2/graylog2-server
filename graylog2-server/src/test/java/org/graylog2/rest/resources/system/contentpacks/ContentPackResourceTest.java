@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import scala.Int;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -107,7 +108,8 @@ public class ContentPackResourceTest {
     public void listAndLatest() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
         final Set<ContentPack> contentPacks = Collections.singleton(contentPack);
-        final ContentPackList expectedList = ContentPackList.create(contentPacks.size(), contentPacks);
+        final Map<ModelId, Integer> installCount = Collections.EMPTY_MAP;
+        final ContentPackList expectedList = ContentPackList.create(contentPacks.size(), contentPacks, installCount);
 
         when(contentPackPersistenceService.loadAll()).thenReturn(Collections.singleton(contentPack));
         final ContentPackList contentPackList = contentPackResource.listContentPacks();
