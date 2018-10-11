@@ -51,6 +51,14 @@ public abstract class FsStats {
         public abstract String dev();
 
         @JsonProperty
+        @Nullable
+        public  abstract String typeName();
+
+        @JsonProperty
+        @Nullable
+        public  abstract String sysTypeName();
+
+        @JsonProperty
         public abstract long total();
 
         @JsonProperty
@@ -98,6 +106,8 @@ public abstract class FsStats {
         public static Filesystem create(String path,
                                         String mount,
                                         String dev,
+                                        String typeName,
+                                        String sysTypeName,
                                         long total,
                                         long free,
                                         long available,
@@ -114,7 +124,7 @@ public abstract class FsStats {
                                         double diskQueue,
                                         double diskServiceTime) {
             return new AutoValue_FsStats_Filesystem(
-                    path, mount, dev, total, free, available, used, usedPercent,
+                    path, mount, dev, typeName, sysTypeName, total, free, available, used, usedPercent,
                     inodesTotal, inodesFree, inodesUsed, inodesUsedPercent,
                     diskReads, diskWrites, diskReadBytes, diskWriteBytes, diskQueue, diskServiceTime);
         }
@@ -125,7 +135,7 @@ public abstract class FsStats {
                                         long available,
                                         long used,
                                         short usedPercent) {
-            return create(path, null, null, total, free, available, used, usedPercent,
+            return create(path, null, null, null, null, total, free, available, used, usedPercent,
                     -1L, -1L, -1L, (short) -1, -1L, -1L, -1L, -1L, -1L, -1L);
         }
     }
