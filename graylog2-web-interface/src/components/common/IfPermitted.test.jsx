@@ -107,6 +107,13 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+    it('user has exact required permission for action with entity id', () => {
+      wrapper = mount((
+        <IfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:id'] }}>
+          {element}
+        </IfPermitted>
+      ));
+    });
     it('user has wildcard permission', () => {
       wrapper = mount((
         <IfPermitted permissions={['something']} currentUser={{ permissions: ['*'] }}>
