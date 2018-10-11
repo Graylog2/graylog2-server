@@ -47,7 +47,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "# Needed for Graylog\n" +
                 "fields_under_root: true\n" +
                 "fields.collector_node_id: ${nodeId}\n" +
-                "fields.gl2_source_collector: ${nodeName}\n";
+                "fields.gl2_source_collector: ${nodeName}\n\n";
 
         ensureCollector(
                 "filebeat",
@@ -57,7 +57,17 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "/var/lib/graylog-sidecar/generated/filebeat.yml",
                 "-c  %s",
                 "test config -c %s",
-                beatsPreambel
+                beatsPreambel +
+                        "filebeat.inputs:\n" +
+                        "- input_type: log\n" +
+                        "  paths:\n" +
+                        "    - /var/log/*.log\n" +
+                        "  type: log\n" +
+                        "output.logstash:\n" +
+                        "   hosts: [\"192.168.1.1:5044\"]\n" +
+                        "path:\n" +
+                        "  data: /var/cache/graylog-sidecar/filebeat/data\n" +
+                        "  logs: /var/log/graylog-sidecar"
         );
         ensureCollector(
                 "winlogbeat",
@@ -67,7 +77,19 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
                 "-c \"%s\"",
                 "test config -c \"%s\"",
-                beatsPreambel
+                beatsPreambel +
+                        "output.logstash:\n" +
+                        "   hosts: [\"192.168.1.1:5044\"]\n" +
+                        "path:\n" +
+                        "  data: C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat\\data\n" +
+                        "  logs: C:\\Program Files\\Graylog\\sidecar\\logs\n" +
+                        "tags:\n" +
+                        " - windows\n" +
+                        "winlogbeat:\n" +
+                        "  event_logs:\n" +
+                        "   - name: Application\n" +
+                        "   - name: System\n" +
+                        "   - name: Security"
         );
         ensureCollector(
                 "nxlog",
