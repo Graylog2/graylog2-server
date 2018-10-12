@@ -33,7 +33,7 @@ describe('<ContentPacksList />', () => {
   });
 
   it('should render with content packs', () => {
-    const wrapper = renderer.create(<ContentPacksList contentPacks={contentPacks} contentPackInstallCount={{1: 3}} />);
+    const wrapper = renderer.create(<ContentPacksList contentPacks={contentPacks} contentPackInstallCount={{ 1: 3 }} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 

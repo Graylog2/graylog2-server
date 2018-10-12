@@ -3,7 +3,7 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
-import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar, Label } from 'react-bootstrap';
+import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
@@ -106,7 +106,7 @@ class ContentPacksList extends React.Component {
       />);
 
       const installationCount = this.props.contentPackInstallCount[item.id];
-      const states = installationCount ? [ 'installed' ] : [];
+      const states = installationCount ? ['installed'] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
       return (
