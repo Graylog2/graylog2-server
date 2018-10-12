@@ -1,40 +1,43 @@
+const _isWildCard = permissionSet => (permissionSet.indexOf('*') > -1);
+const _permissionPredicate = (permissionSet, p) => {
+  if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
+    return true;
+  }
+
+  const permissionParts = p.split(':');
+  if (permissionParts.length >= 2) {
+    const first = permissionParts[0];
+    const second = `${permissionParts[0]}:${permissionParts[1]}`;
+    return (permissionSet.indexOf(first) > -1)
+      || (permissionSet.indexOf(`${first}:*`) > -1)
+      || (permissionSet.indexOf(second) > -1)
+      || (permissionSet.indexOf(`${second}:*`) > -1);
+  }
+  return (permissionSet.indexOf(`${p}:*`) > -1);
+};
+
 const PermissionsMixin = {
-  _isWildCard(permissionSet) {
-    return (permissionSet.indexOf('*') > -1);
-  },
-
-  _permissionPredicate(permissionSet, p) {
-      if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
+  isPermitted(possessedPermissions, requiredPermissions) {
+    if (!possessedPermissions) {
+      return false;
+    }
+    if (_isWildCard(possessedPermissions)) {
       return true;
     }
-
-    let permissionParts = p.split(':');
-    if (permissionParts.length >= 2) {
-      let first = permissionParts[0];
-      let second = permissionParts[0] + ':' + permissionParts[1];
-      return (permissionSet.indexOf(first) > -1)
-        || (permissionSet.indexOf(first + ':*') > -1)
-        || (permissionSet.indexOf(second) > -1)
-        || (permissionSet.indexOf(second + ':*') > -1);
+    if (requiredPermissions.every) {
+      return requiredPermissions.every(p => _permissionPredicate(possessedPermissions, p));
     }
-    return (permissionSet.indexOf(`${p}:*`) > -1);
+    return _permissionPredicate(possessedPermissions, requiredPermissions);
   },
 
-  isPermitted(permissionSet, permissions) {
-    if (this._isWildCard(permissionSet)) {
+  isAnyPermitted(possessedPermissions, requiredPermissions) {
+    if (!possessedPermissions) {
+      return false;
+    }
+    if (_isWildCard(possessedPermissions)) {
       return true;
     }
-    if (permissions.every) {
-      return permissions.every(p => this._permissionPredicate(permissionSet, p));
-    }
-    return this._permissionPredicate(permissionSet, permissions);
-  },
-
-  isAnyPermitted(permissionSet, permissions) {
-    if (this._isWildCard(permissionSet)) {
-      return true;
-    }
-    return permissions.some(p => this._permissionPredicate(permissionSet, p));
+    return requiredPermissions.some(p => _permissionPredicate(possessedPermissions, p));
   },
 };
 
