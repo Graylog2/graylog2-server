@@ -108,7 +108,7 @@ public class ContentPackResourceTest {
     public void listAndLatest() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
         final Set<ContentPack> contentPacks = Collections.singleton(contentPack);
-        final Map<ModelId, Integer> installCount = Collections.EMPTY_MAP;
+        final Map<ModelId, Integer> installCount = Collections.emptyMap();
         final ContentPackList expectedList = ContentPackList.create(contentPacks.size(), contentPacks, installCount);
 
         when(contentPackPersistenceService.loadAll()).thenReturn(Collections.singleton(contentPack));
