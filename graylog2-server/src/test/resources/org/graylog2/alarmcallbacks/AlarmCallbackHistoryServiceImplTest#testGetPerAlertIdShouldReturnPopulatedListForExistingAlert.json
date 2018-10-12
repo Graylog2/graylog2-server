@@ -10,7 +10,11 @@
         },
         "stream_id" : "552b92b2e4b0c055e41ffb8e",
         "created_at" : {"$date" : "2015-07-20T09:49:02.503Z"},
-        "creator_user_id" : "admin"
+        "creator_user_id" : "admin",
+        "alert_condition_subscription": {
+          "subscription_type": "ALL",
+          "selected_alert_conditions": []
+        }
       },
       "alert_id" : "55ae105afbeaf123a6ddfc1b",
       "alertcondition_id" : "57cf1342-14f3-477c-90b9-109f1e2fc9dc",
@@ -42,7 +46,11 @@
         },
         "stream_id" : "552b92b2e4b0c055e41ffb8e",
         "created_at" : {"$date" : "2015-07-20T09:49:26.197Z"},
-        "creator_user_id" : "admin"
+        "creator_user_id" : "admin",
+        "alert_condition_subscription": {
+          "subscription_type": "ALL",
+          "selected_alert_conditions": []
+        }
       },
       "alert_id" : "55ae105afbeaf123a6ddfc1b",
       "alertcondition_id" : "57cf1342-14f3-477c-90b9-109f1e2fc9dc",

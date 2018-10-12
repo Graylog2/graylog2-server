@@ -193,6 +193,7 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
         when(alarmCallbackConfiguration.getCreatorUserId()).thenReturn("foouser");
         when(alarmCallbackConfiguration.getConfiguration()).thenReturn(new HashMap<String, Object>());
         when(alarmCallbackConfiguration.getType()).thenReturn("tld.domain.footype");
+        when(alarmCallbackConfiguration.getAlertConditionSubscription()).thenReturn(AlarmCallbackConditionSubscription.all());
         return alarmCallbackConfiguration;
     }
 }
