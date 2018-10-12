@@ -17,10 +17,7 @@ import ContentPackInstall from './ContentPackInstall';
 class ContentPacksList extends React.Component {
   static propTypes = {
     contentPacks: PropTypes.arrayOf(PropTypes.object),
-    contentPackInstallCount: PropTypes.shape({
-      contentPackId: PropTypes.string,
-      installCount: PropTypes.integer,
-    }),
+    contentPackInstallCount: PropTypes.object,
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
   };
