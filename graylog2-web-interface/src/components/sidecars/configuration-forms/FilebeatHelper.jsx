@@ -11,17 +11,17 @@ class FilebeatHelper extends React.Component {
   };
 
   static toc = {
-    prospectors: ['log'],
+    inputs: ['log'],
     outputs: ['logstash'],
     processors: ['fields', 'drop events'],
   };
 
-  prospectorsLog = () => {
+  inputsLog = () => {
     return (
       <div>
-        <h3>Log Prospector</h3>
+        <h3>Log Inputs</h3>
         Reads every line of the log file.
-        {this.example(`filebeat.prospectors:
+        {this.example(`filebeat.inputs:
   - type: log
     paths:
       - /var/log/apache/httpd-*.log`)}
@@ -72,7 +72,7 @@ class FilebeatHelper extends React.Component {
         {this.example(`ignore_older: 2h`)}
 
         <b>scan_frequency</b><br/>
-        How often the prospector checks for new files in the paths that are specified
+        How often the input checks for new files in the paths that are specified
         for harvesting.
         {this.example(`scan_frequency: 10s`)}
 
