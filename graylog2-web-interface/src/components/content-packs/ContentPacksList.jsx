@@ -3,7 +3,7 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
-import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'react-bootstrap';
+import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar, Label } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
@@ -17,6 +17,10 @@ import ContentPackInstall from './ContentPackInstall';
 class ContentPacksList extends React.Component {
   static propTypes = {
     contentPacks: PropTypes.arrayOf(PropTypes.object),
+    contentPackInstallCount: PropTypes.shape({
+      contentPackId: PropTypes.string,
+      installCount: PropTypes.integer,
+    }),
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
   };
@@ -25,6 +29,7 @@ class ContentPacksList extends React.Component {
     contentPacks: [],
     onDeletePack: () => {},
     onInstall: () => {},
+    contentPackInstallCount: {},
   };
 
   constructor(props) {
@@ -99,7 +104,9 @@ class ContentPacksList extends React.Component {
         contentPackId={item.id}
         revision={item.rev}
       />);
-      const states = item.states || [];
+
+      const installationCount = this.props.contentPackInstallCount[item.id];
+      const states = installationCount ? [ 'installed' ] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
       return (
@@ -107,7 +114,7 @@ class ContentPacksList extends React.Component {
           <Row className="row-sm">
             <Col md={9}>
               <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.rev}</small>
-                <ContentPackStatus states={states} />
+                <ContentPackStatus contentPackId={item.id} states={states} />
               </h3>
             </Col>
             <Col md={3} className="text-right">
@@ -117,9 +124,9 @@ class ContentPacksList extends React.Component {
               {installModal}
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Remove all</MenuItem>
+                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Delete All Versions</MenuItem>
                 <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
-                  <MenuItem>Edit</MenuItem>
+                  <MenuItem>Create New Version</MenuItem>
                 </LinkContainer>
                 <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
               </DropdownButton>

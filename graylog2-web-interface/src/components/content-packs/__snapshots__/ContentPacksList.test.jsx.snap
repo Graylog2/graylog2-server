@@ -239,16 +239,16 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 1
               </small>
               <div>
-                <span
-                  className="badge installed"
+                <a
+                  onClick={[Function]}
+                  style={Object {}}
                 >
-                  installed
-                </span>
-                <span
-                  className="badge edited"
-                >
-                  edited
-                </span>
+                  <span
+                    className="badge installed"
+                  >
+                    installed
+                  </span>
+                </a>
               </div>
             </h3>
           </div>
@@ -302,7 +302,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -317,7 +317,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -421,7 +421,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -436,7 +436,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -487,13 +487,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge installed"
-                >
-                  installed
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
@@ -546,7 +540,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -561,7 +555,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -612,13 +606,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge error"
-                >
-                  error
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
@@ -671,7 +659,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -686,7 +674,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -737,30 +725,13 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge installed"
-                >
-                  installed
-                </span>
-                <span
-                  className="badge updatable"
-                >
-                  updatable
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
             className="text-right col-md-3"
           >
-            <button
-              className="btn btn-sm btn-primary"
-              disabled={false}
-              type="button"
-            >
-              Update
-            </button>
+            
              
             <button
               className="btn btn-sm btn-info"
@@ -807,7 +778,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -822,7 +793,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -873,18 +844,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge installed"
-                >
-                  installed
-                </span>
-                <span
-                  className="badge edited"
-                >
-                  edited
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
@@ -937,7 +897,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -952,7 +912,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -1056,7 +1016,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -1071,7 +1031,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -1122,13 +1082,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge installed"
-                >
-                  installed
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
@@ -1181,7 +1135,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -1196,7 +1150,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -1247,13 +1201,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge error"
-                >
-                  error
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
@@ -1306,7 +1254,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -1321,7 +1269,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
@@ -1372,30 +1320,13 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
               </small>
-              <div>
-                <span
-                  className="badge installed"
-                >
-                  installed
-                </span>
-                <span
-                  className="badge updatable"
-                >
-                  updatable
-                </span>
-              </div>
+              <div />
             </h3>
           </div>
           <div
             className="text-right col-md-3"
           >
-            <button
-              className="btn btn-sm btn-primary"
-              disabled={false}
-              type="button"
-            >
-              Update
-            </button>
+            
              
             <button
               className="btn btn-sm btn-info"
@@ -1442,7 +1373,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Remove all
+                    Delete All Versions
                   </a>
                 </li>
                 <li
@@ -1457,7 +1388,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Edit
+                    Create New Version
                   </a>
                 </li>
                 <li
