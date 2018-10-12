@@ -54,12 +54,6 @@ export default {
     { path: viewsPath, component: ViewsLicenseCheck(ViewManagementPage), permissions: Permissions.View.Use },
     { path: showViewsPath, component: ViewsLicenseCheck(ShowViewPage) },
   ],
-  navigation: [
-    // Disabling navigation for extended search for now to avoid confusing alpha testers.
-    // TODO: Disable Views and ExtendedSearch menu items again for the next alpha release!
-    { path: extendedSearchPath, description: 'Extended Search', permissions: Permissions.ExtendedSearch.Use },
-    { path: viewsPath, description: 'Views', permissions: Permissions.View.Use },
-  ],
   enterpriseWidgets: [
     {
       type: 'MESSAGES',
