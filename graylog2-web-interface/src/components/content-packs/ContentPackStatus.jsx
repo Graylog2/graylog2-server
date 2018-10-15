@@ -31,9 +31,9 @@ class ContentPackStatus extends React.Component {
       </Link>);
     });
     return (
-      <div>
+      <span>
         {badges}
-      </div>
+      </span>
     );
   }
 }

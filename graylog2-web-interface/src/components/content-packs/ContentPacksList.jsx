@@ -110,8 +110,7 @@ class ContentPacksList extends React.Component {
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.rev}</small>
-                <ContentPackStatus contentPackId={item.id} states={states} />
+              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.rev} <ContentPackStatus contentPackId={item.id} states={states} /> </small>
               </h3>
             </Col>
             <Col md={3} className="text-right">
