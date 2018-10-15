@@ -26,6 +26,7 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -36,7 +37,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
+    protected static final String CK_QUERY = "query";
+    protected static final String CK_QUERY_DEFAULT_VALUE = "*";
 
     public enum Type {
         MESSAGE_COUNT,
@@ -155,6 +161,25 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         return repeatNotifications;
     }
 
+    /**
+     * Combines the given stream ID and query string into a single filter string.
+     *
+     * @param streamId the stream ID
+     * @param query    the query string (might be null or empty)
+     * @return the combined filter string
+     */
+    protected String buildQueryFilter(String streamId, String query) {
+        checkArgument(!isNullOrEmpty(streamId), "streamId parameter cannot be null or empty");
+
+        final StringBuilder builder = new StringBuilder().append("streams:").append(streamId);
+
+        if (!isNullOrEmpty(query) && !"*".equals(query)) {
+            builder.append(" ").append(query);
+        }
+
+        return builder.toString();
+    }
+
     public static class CheckResult implements AlertCondition.CheckResult {
 
         private final boolean isTriggered;
@@ -211,6 +236,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     public static List<ConfigurationField> getDefaultConfigurationFields() {
         return Lists.newArrayList(
+            // The query field needs to be optional for backwards compatibility
+            new TextField(CK_QUERY, "Search Query", CK_QUERY_DEFAULT_VALUE, "Query string that should be used to filter messages in the stream", ConfigurationField.Optional.OPTIONAL),
             new NumberField("grace", "Grace Period", 0, "Number of minutes to wait after an alert is resolved, to trigger another alert", ConfigurationField.Optional.NOT_OPTIONAL),
             new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notifications", ConfigurationField.Optional.NOT_OPTIONAL),
             new BooleanField("repeat_notifications", "Repeat notifications", false, "Check this box to send notifications every time the alert condition is evaluated and satisfied regardless of its state.")

@@ -132,6 +132,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     private final Number threshold;
     private final CheckType type;
     private final String field;
+    private final String query;
     private final DecimalFormat decimalFormat;
     private final Searches searches;
 
@@ -153,6 +154,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         this.threshold = Tools.getNumber(parameters.get("threshold"), 0.0).doubleValue();
         this.type = CheckType.valueOf(((String) parameters.get("type")).toUpperCase(Locale.ENGLISH));
         this.field = (String) parameters.get("field");
+        this.query = (String) parameters.getOrDefault(CK_QUERY, CK_QUERY_DEFAULT_VALUE);
     }
 
     @Override
@@ -170,7 +172,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     @Override
     public CheckResult runCheck() {
         try {
-            final String filter = "streams:" + stream.getId();
+            final String filter = buildQueryFilter(stream.getId(), query);
             // TODO we don't support cardinality yet
             final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter,
                 RelativeRange.create(time * 60), false, true, false);
