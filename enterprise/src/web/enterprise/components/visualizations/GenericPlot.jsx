@@ -17,6 +17,10 @@ const Plot = createPlotlyComponent(Plotly);
 class GenericPlot extends React.Component {
   static propTypes = {
     chartData: PropTypes.array.isRequired,
+    currentUser: PropTypes.shape({
+      timezone: PropTypes.string.isRequired,
+    }).isRequired,
+    currentQuery: PropTypes.string.isRequired,
   };
 
   _onRelayout = (axis) => {
@@ -55,6 +59,13 @@ class GenericPlot extends React.Component {
       },
       yaxis: {
         fixedrange: true,
+      },
+      legend: {
+        orientation: 'h',
+        y: -0.14,
+      },
+      hoverlabel: {
+        namelength: -1,
       },
     };
 
