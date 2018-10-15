@@ -9,10 +9,10 @@ import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
+import { TitlesStore } from 'enterprise/stores/TitlesStore';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
-import { TitlesStore } from '../stores/TitlesStore';
-import WidgetPosition from '../logic/widgets/WidgetPosition';
 
 const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 

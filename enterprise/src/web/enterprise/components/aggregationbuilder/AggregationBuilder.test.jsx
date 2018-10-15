@@ -1,6 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
+import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import AggregationBuilder from './AggregationBuilder';
 import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
@@ -20,7 +21,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 describe('AggregationBuilder', () => {
   it('renders helpful advice instead of visualization when no documents were in result', () => {
     const wrapper = mount(<AggregationBuilder data={{ total: 0 }}
-                                              config={{}}
+                                              config={AggregationWidgetConfig.builder().build()}
                                               fields={{}}
                                               onChange={() => {}} />);
 
@@ -28,7 +29,7 @@ describe('AggregationBuilder', () => {
   });
 
   it('renders dummy component with rows from data', () => {
-    const wrapper = mount(<AggregationBuilder config={{ visualization: 'dummy' }}
+    const wrapper = mount(<AggregationBuilder config={AggregationWidgetConfig.builder().visualization('dummy').build()}
                                               fields={{}}
                                               onChange={() => {}}
                                               data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);

@@ -1,53 +1,38 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment-timezone';
-import { get } from 'lodash';
+import { merge } from 'lodash';
 
-import connect from 'stores/connect';
 import Plotly from 'enterprise/custom-plotly';
-import CombinedProvider from 'injection/CombinedProvider';
 import createPlotlyComponent from 'react-plotly.js/factory';
-import { CurrentQueryStore } from 'enterprise/stores/CurrentQueryStore';
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import SearchActions from 'enterprise/actions/SearchActions';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const Plot = createPlotlyComponent(Plotly);
 
 class GenericPlot extends React.Component {
   static propTypes = {
     chartData: PropTypes.array.isRequired,
-    currentUser: PropTypes.shape({
-      timezone: PropTypes.string.isRequired,
-    }).isRequired,
-    currentQuery: PropTypes.string.isRequired,
+    layout: PropTypes.object,
+    onZoom: PropTypes.func,
+  };
+
+  static defaultProps = {
+    layout: {},
+    onZoom: () => {},
   };
 
   _onRelayout = (axis) => {
-    if (!axis.autosize && get(this.figure, 'layout.xaxis.type') === 'date') {
-      const { timezone } = this.props.currentUser;
-      const { currentQuery } = this.props;
-
+    if (!axis.autosize) {
+      const { onZoom } = this.props;
       const from = axis['xaxis.range[0]'];
       const to = axis['xaxis.range[1]'];
 
-      const newTimerange = {
-        type: 'absolute',
-        from: moment.tz(from, timezone).toISOString(),
-        to: moment.tz(to, timezone).toISOString(),
-      };
-
-      QueriesActions.timerange(currentQuery.id, newTimerange).then(SearchActions.executeWithCurrentState);
+      return onZoom(from, to);
     }
-  };
-
-  _onUpdate = (figure) => {
-    this.figure = figure;
+    return true;
   };
 
   render() {
-    const { chartData } = this.props;
-    const layout = {
+    const { chartData, layout } = this.props;
+    const plotLayout = merge({
       autosize: true,
       margin: {
         autoexpand: true,
@@ -57,9 +42,6 @@ class GenericPlot extends React.Component {
         b: 40,
         pad: 0,
       },
-      yaxis: {
-        fixedrange: true,
-      },
       legend: {
         orientation: 'h',
         y: -0.14,
@@ -67,7 +49,7 @@ class GenericPlot extends React.Component {
       hoverlabel: {
         namelength: -1,
       },
-    };
+    }, layout);
 
     const style = { height: 'calc(100% - 10px)', width: '100%' };
 
@@ -75,16 +57,12 @@ class GenericPlot extends React.Component {
 
     return (<Plot data={chartData}
                   useResizeHandler
-                  layout={layout}
+                  layout={plotLayout}
                   style={style}
-                  onUpdate={this._onUpdate}
                   onRelayout={this._onRelayout}
                   config={config} />
     );
   }
 }
 
-export default connect(GenericPlot, {
-  currentQuery: CurrentQueryStore,
-  currentUser: CurrentUserStore,
-});
+export default GenericPlot;

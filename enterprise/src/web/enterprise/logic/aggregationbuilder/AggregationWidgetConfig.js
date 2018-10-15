@@ -31,6 +31,10 @@ export default class AggregationWidgetConfig {
     return this._value.visualization;
   }
 
+  get isTimeline() {
+    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === 'timestamp';
+  }
+
   toObject() {
     const { rowPivots, columnPivots, series, sort, visualization, rollup } = this._value;
     return {
