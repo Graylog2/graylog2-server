@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -218,5 +219,63 @@ public class GrokPatternFacadeTest {
         assertThatThrownBy(() -> facade.findExisting(grokPatternEntity, Collections.emptyMap()))
                 .isInstanceOf(DivergingEntityConfigurationException.class)
                 .hasMessage("Expected Grok pattern for name \"Test\": <BOOM>; actual Grok pattern: <[a-z]+>");
+    }
+
+    @Test
+    public void resolveMatchingDependecyForInstallation() {
+        final Entity grokPatternEntity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(objectMapper.convertValue(GrokPatternEntity.create(
+                        ValueReference.of("Test"),
+                        ValueReference.of("%{PORTAL}")), JsonNode.class))
+                .build();
+
+        final Entity grokPatternEntityDependency = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(objectMapper.convertValue(GrokPatternEntity.create(
+                        ValueReference.of("PORTAL"),
+                        ValueReference.of("\\d\\d")), JsonNode.class))
+                .build();
+
+        final EntityDescriptor dependencyDescriptor = grokPatternEntityDependency.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap(1);
+        entityDescriptorEntityMap.put(dependencyDescriptor, grokPatternEntityDependency);
+
+        final Map<String, ValueReference> parameters = Collections.emptyMap();
+
+        Graph<Entity> graph = facade.resolveForInstallation(grokPatternEntity, parameters, entityDescriptorEntityMap);
+
+        assertThat(graph.nodes().toArray()).contains(grokPatternEntityDependency);
+    }
+
+    @Test
+    public void notResolveNotMatchingDependecyForInstallation() {
+        final Entity grokPatternEntity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(objectMapper.convertValue(GrokPatternEntity.create(
+                        ValueReference.of("Test"),
+                        ValueReference.of("%{DOOM}")), JsonNode.class))
+                .build();
+
+        final Entity grokPatternEntityDependency = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(objectMapper.convertValue(GrokPatternEntity.create(
+                        ValueReference.of("PORTAL"),
+                        ValueReference.of("\\d\\d")), JsonNode.class))
+                .build();
+
+        final EntityDescriptor dependencyDescriptor = grokPatternEntityDependency.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap(1);
+        entityDescriptorEntityMap.put(dependencyDescriptor, grokPatternEntityDependency);
+
+        final Map<String, ValueReference> parameters = Collections.emptyMap();
+
+        Graph<Entity> graph = facade.resolveForInstallation(grokPatternEntity, parameters, entityDescriptorEntityMap);
+
+        assertThat(graph.nodes().toArray()).doesNotContain(grokPatternEntityDependency);
     }
 }

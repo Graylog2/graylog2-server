@@ -18,6 +18,11 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
+import io.krakens.grok.api.GrokUtils;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -40,8 +45,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class GrokPatternFacade implements EntityFacade<GrokPattern> {
@@ -165,5 +172,43 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
             LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolveForInstallationV1((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolveForInstallationV1(EntityV1 entity,
+                                                   Map<String, ValueReference> parameters,
+                                                   Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
+
+        Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
+        String namedPattern = grokPatternEntity.pattern().asString();
+        Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
+        while (matcher.find()) {
+            Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
+            String patternName = group.get("pattern");
+
+            entities.entrySet().stream()
+                    .filter(x -> x.getValue().type().equals(ModelTypes.GROK_PATTERN_V1))
+                    .filter(x -> {
+                        EntityV1 entityV1 = (EntityV1) x.getValue();
+                        GrokPatternEntity grokPatternEntity1 = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
+                        return grokPatternEntity1.name().asString().equals(patternName);
+                    }).forEach(x -> mutableGraph.putEdge(entity, x.getValue()));
+        }
+
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }
