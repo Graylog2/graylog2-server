@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -56,8 +57,8 @@ public abstract class ThrottleableTransport implements Transport {
                     "Allow throttling this input.",
                     false,
                     "If enabled, no new messages will be read from this input until Graylog catches up with its message load. " +
-                            "This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. " +
-                            "If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
+                    "This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. " +
+                    "If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
 
             ));
             return request;
@@ -113,7 +114,7 @@ public abstract class ThrottleableTransport implements Transport {
     protected abstract void doStop();
 
     /**
-     * Only executed if this input is allowed to be throttled at all
+     * Only executed if the Allow Throttling checkbox is set in the input's configuration.
      * @param throttleState current processing system state
      */
     @Subscribe
@@ -199,7 +200,10 @@ public abstract class ThrottleableTransport implements Transport {
         log.debug("[{}] [unthrottled] fall through", transportName);
         return false;
     }
-    
+
+    /**
+     * Blocks until the blockLatch is released.
+     */
     public void blockUntilUnthrottled() {
         // sanity: if there's no latch, don't try to access it
         if (blockLatch == null) {
@@ -210,6 +214,25 @@ public abstract class ThrottleableTransport implements Transport {
             blockLatch.await();
         } catch (InterruptedException e) {
             // ignore
+        }
+    }
+
+    /**
+     * Blocks until the blockLatch is released or until timeout is exceeded.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit    the time unit of the {@code timeout} argument
+     */
+    public boolean blockUntilUnthrottled(long timeout, TimeUnit unit) {
+        // sanity: if there's no latch, don't try to access it
+        if (blockLatch == null) {
+            return false;
+        }
+        // purposely allow interrupts as a means to let the caller check if it should exit its run loop
+        try {
+            return blockLatch.await(timeout, unit);
+        } catch (InterruptedException e) {
+            return false;
         }
     }
 }
