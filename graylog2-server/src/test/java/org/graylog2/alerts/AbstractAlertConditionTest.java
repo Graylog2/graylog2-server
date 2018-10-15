@@ -45,17 +45,21 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         final AbstractAlertCondition condition = (AbstractAlertCondition) getDummyAlertCondition(ImmutableMap.of());
 
         assertThatThrownBy(() -> condition.buildQueryFilter(null, null))
-                .hasMessageContaining("streamId");
+                .hasMessageContaining("streamId")
+                .hasMessageContaining("be null");
         assertThatThrownBy(() -> condition.buildQueryFilter("", null))
-                .hasMessageContaining("streamId");
+                .hasMessageContaining("streamId")
+                .hasMessageContaining("be empty");
 
-        assertThat(condition.buildQueryFilter("abc123", null))
+        assertThat(condition.buildQueryFilter("  abc123 ", null))
                 .isEqualTo("streams:abc123");
         assertThat(condition.buildQueryFilter("abc123", ""))
                 .isEqualTo("streams:abc123");
         assertThat(condition.buildQueryFilter("abc123", "*"))
                 .isEqualTo("streams:abc123");
-        assertThat(condition.buildQueryFilter("abc123", "hello:world foo:\"bar baz\""))
+        assertThat(condition.buildQueryFilter("abc123", " *  "))
+                .isEqualTo("streams:abc123");
+        assertThat(condition.buildQueryFilter("abc123", " hello:world foo:\"bar baz\"   "))
                 .isEqualTo("streams:abc123 hello:world foo:\"bar baz\"");
     }
 

@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
     protected static final String CK_QUERY = "query";
@@ -169,12 +168,19 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
      * @return the combined filter string
      */
     protected String buildQueryFilter(String streamId, String query) {
-        checkArgument(!isNullOrEmpty(streamId), "streamId parameter cannot be null or empty");
+        checkArgument(streamId != null, "streamId parameter cannot be null");
 
-        final StringBuilder builder = new StringBuilder().append("streams:").append(streamId);
+        final String trimmedStreamId = streamId.trim();
 
-        if (!isNullOrEmpty(query) && !"*".equals(query)) {
-            builder.append(" ").append(query);
+        checkArgument(!trimmedStreamId.isEmpty(), "streamId parameter cannot be empty");
+
+        final StringBuilder builder = new StringBuilder().append("streams:").append(trimmedStreamId);
+
+        if (query != null) {
+            final String trimmedQuery = query.trim();
+            if (!trimmedQuery.isEmpty() && !"*".equals(trimmedQuery)) {
+                builder.append(" ").append(trimmedQuery);
+            }
         }
 
         return builder.toString();
