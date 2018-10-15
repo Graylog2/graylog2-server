@@ -23,8 +23,8 @@ public class BeatsInputPluginModule extends PluginModule {
     protected void configure() {
         addTransport("beats", BeatsTransport.class);
 
-        // Beats legacy input
-        addCodec("beats-legacy", BeatsCodec.class);
+        // Beats deprecated input
+        addCodec("beats-deprecated", BeatsCodec.class);
         addMessageInput(BeatsInput.class);
 
         // Beats input with improved field handling

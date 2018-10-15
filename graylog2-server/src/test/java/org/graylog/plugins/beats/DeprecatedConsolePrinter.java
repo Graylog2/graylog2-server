@@ -36,7 +36,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-public class LegacyConsolePrinter {
+public class DeprecatedConsolePrinter {
     public static void main(String[] args) throws Exception {
         String hostname = "127.0.0.1";
         int port = 5044;
@@ -59,7 +59,7 @@ public class LegacyConsolePrinter {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast("logging", new LoggingHandler());
                             ch.pipeline().addLast("beats-frame-decoder", new BeatsFrameDecoder());
-                            ch.pipeline().addLast("beats-legacy-codec", new BeatsCodecHandler());
+                            ch.pipeline().addLast("beats-deprecated-codec", new BeatsCodecHandler());
                         }
                     });
 
