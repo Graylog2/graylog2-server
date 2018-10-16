@@ -22,7 +22,17 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
 
 const IfPermitted = ({ children, currentUser, permissions, anyPermissions, ...rest }) => {
   if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
-    return React.Children.map(children, child => (React.isValidElement(child) ? React.cloneElement(child, rest) : child));
+    return React.Children.map(children, (child) => {
+      if (React.isValidElement(child)) {
+        const presentProps = (child && child.props) ? Object.keys(child.props) : [];
+        // do not pass overwrite present props on child
+        const filteredRest = Object.entries(rest)
+          .filter(entry => !presentProps.includes(entry[0]))
+          .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
+        return React.cloneElement(child, filteredRest);
+      }
+      return child;
+    });
   }
 
   return null;
