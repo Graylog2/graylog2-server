@@ -183,12 +183,12 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
 
-            Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
-            String namedPattern = grokPattern.pattern();
-            Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
+            final Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
+            final String namedPattern = grokPattern.pattern();
+            final Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
             while (matcher.find()) {
-                Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
-                String patternName = group.get("pattern");
+                final Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
+                final String patternName = group.get("pattern");
                 grokPatternService.loadByName(patternName).ifPresent(depPattern -> {
                     final EntityDescriptor depEntityDescriptor = EntityDescriptor.create(
                             depPattern.id(), ModelTypes.GROK_PATTERN_V1);
@@ -220,12 +220,12 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
 
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
 
-        Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
-        String namedPattern = grokPatternEntity.pattern().asString();
-        Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
+        final Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
+        final String namedPattern = grokPatternEntity.pattern().asString();
+        final Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
         while (matcher.find()) {
-            Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
-            String patternName = group.get("pattern");
+            final Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
+            final String patternName = group.get("pattern");
 
             entities.entrySet().stream()
                     .filter(x -> x.getValue().type().equals(ModelTypes.GROK_PATTERN_V1))
