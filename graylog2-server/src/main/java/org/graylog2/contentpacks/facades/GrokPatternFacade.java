@@ -181,7 +181,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
 
         final ModelId modelId = entityDescriptor.id();
         try {
-           final GrokPattern grokPattern = grokPatternService.load(modelId.id());
+            final GrokPattern grokPattern = grokPatternService.load(modelId.id());
 
             Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
             String namedPattern = grokPattern.pattern();
