@@ -165,4 +165,19 @@ describe('IfPermitted', () => {
     expect(wrapper.find(Bar)).toHaveProp('something', 42);
     expect(wrapper.find(Bar)).toHaveProp('otherProp', { foo: 'bar!' });
   });
+  it('does not pass property to children if already present', () => {
+    const Foo = mockComponent('Foo');
+    const Bar = mockComponent('Bar');
+    const wrapper = shallow((
+      <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
+        <Foo something={23} />
+        <Bar otherProp={{ hello: 'world!' }} />
+      </IfPermitted>
+    ));
+
+    expect(wrapper.find(Foo)).toHaveProp('something', 23);
+    expect(wrapper.find(Foo)).toHaveProp('otherProp', { foo: 'bar!' });
+    expect(wrapper.find(Bar)).toHaveProp('something', 42);
+    expect(wrapper.find(Bar)).toHaveProp('otherProp', { hello: 'world!' });
+  });
 });
