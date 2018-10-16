@@ -175,6 +175,33 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
+        final ModelId modelId = entityDescriptor.id();
+        try {
+           final GrokPattern grokPattern = grokPatternService.load(modelId.id());
+
+            Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
+            String namedPattern = grokPattern.pattern();
+            Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
+            while (matcher.find()) {
+                Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
+                String patternName = group.get("pattern");
+                grokPatternService.loadByName(patternName).ifPresent(depPattern -> {
+                    final EntityDescriptor depEntityDescriptor = EntityDescriptor.create(
+                            depPattern.id(), ModelTypes.GROK_PATTERN_V1);
+                    mutableGraph.putEdge(entityDescriptor, depEntityDescriptor);
+                });
+            }
+        } catch (NotFoundException e) {
+            LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
+        }
+        return mutableGraph;
+    }
+
+    @Override
     public Graph<Entity> resolveForInstallation(Entity entity,
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
