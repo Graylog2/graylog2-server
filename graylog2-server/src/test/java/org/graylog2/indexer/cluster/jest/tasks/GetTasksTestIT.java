@@ -17,10 +17,6 @@
 package org.graylog2.indexer.cluster.jest.tasks;
 
 
-import static com.google.common.collect.ImmutableMap.of;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,18 +27,23 @@ import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
 import io.searchbox.core.Index.Builder;
 import io.searchbox.indices.reindex.Reindex;
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.util.Collections;
 import org.assertj.core.api.ObjectAssert;
 import org.graylog2.ElasticsearchBase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetTasksTest extends ElasticsearchBase {
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.Collections;
 
-  private static final Logger LOG = LoggerFactory.getLogger(GetTasksTest.class);
+import static com.google.common.collect.ImmutableMap.of;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
+public class GetTasksTestIT extends ElasticsearchBase {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GetTasksTestIT.class);
   private static final MissingNode MISSING_NODE = MissingNode.getInstance();
 
   private final static ObjectMapper om = new ObjectMapper();
