@@ -1,25 +1,27 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
+import { Button, Tooltip } from 'react-bootstrap';
+import { Link } from 'react-router';
+import { LinkContainer } from 'react-router-bootstrap';
+
+import { OverlayElement, Pluralize } from 'components/common';
+import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
+import StreamRuleForm from 'components/streamrules/StreamRuleForm';
+
+import PermissionsMixin from 'util/PermissionsMixin';
+import UserNotification from 'util/UserNotification';
+import StoreProvider from 'injection/StoreProvider';
+import Routes from 'routing/Routes';
+
 import StreamThroughput from './StreamThroughput';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
-import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
-import PermissionsMixin from 'util/PermissionsMixin';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
-
-import StreamRuleForm from 'components/streamrules/StreamRuleForm';
-import { OverlayElement, Pluralize } from 'components/common';
-import UserNotification from 'util/UserNotification';
-import { Button, Tooltip } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router';
-import Routes from 'routing/Routes';
 
 import style from './Stream.css';
+
+const StreamsStore = StoreProvider.getStore('Streams');
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 const Stream = createReactClass({
   displayName: 'Stream',
@@ -144,7 +146,9 @@ const Stream = createReactClass({
       if (stream.disabled) {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume}
+            <Button bsStyle="success"
+                    className="toggle-stream-button"
+                    onClick={this._onResume}
                     disabled={isDefaultStream || this.state.loading}>
               {this.state.loading ? 'Starting...' : 'Start Stream'}
             </Button>
@@ -153,7 +157,9 @@ const Stream = createReactClass({
       } else {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause}
+            <Button bsStyle="primary"
+                    className="toggle-stream-button"
+                    onClick={this._onPause}
                     disabled={isDefaultStream || this.state.loading}>
               {this.state.loading ? 'Pausing...' : 'Pause Stream'}
             </Button>
@@ -166,15 +172,17 @@ const Stream = createReactClass({
       <i className="fa fa-cube" title="Created from content pack" /> : null);
 
     const streamRuleList = isDefaultStream ? null :
-                           (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
-                                 stream={stream}
-                                 streamRuleTypes={this.props.streamRuleTypes}
-                                 permissions={this.props.permissions} />);
+      (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
+                                  stream={stream}
+                                  streamRuleTypes={this.props.streamRuleTypes}
+                                  permissions={this.props.permissions} />);
     const streamControls = (
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-        <StreamControls stream={stream} permissions={this.props.permissions}
+        <StreamControls stream={stream}
+                        permissions={this.props.permissions}
                         user={this.props.user}
-                        onDelete={this._onDelete} onUpdate={this._onUpdate}
+                        onDelete={this._onDelete}
+                        onUpdate={this._onUpdate}
                         onClone={this._onClone}
                         onQuickAdd={this._onQuickAdd}
                         indexSets={this.props.indexSets}
@@ -213,7 +221,8 @@ const Stream = createReactClass({
             {streamRuleList}
           </div>
         </div>
-        <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }} title="New Stream Rule"
+        <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }}
+                        title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
                         streamRuleTypes={this.props.streamRuleTypes} />
       </li>
