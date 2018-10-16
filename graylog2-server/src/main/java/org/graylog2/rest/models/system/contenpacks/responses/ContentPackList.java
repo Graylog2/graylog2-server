@@ -39,12 +39,12 @@ public abstract class ContentPackList {
     public abstract Set<ContentPack> contentPacks();
 
     @JsonProperty
-    public abstract Map<ModelId, Integer> contentPacksInstallationCount();
+    public abstract Map<ModelId, ContentPackMetaData> contentPacksMetaData();
 
     @JsonCreator
     public static ContentPackList create(@JsonProperty("total") long total,
                                          @JsonProperty("content_packs")Set<ContentPack> contentPacks,
-                                         @JsonProperty("content_pack_installation_count") Map<ModelId, Integer> contentPacksInstalltionCount) {
-        return new AutoValue_ContentPackList(total, contentPacks, contentPacksInstalltionCount);
+                                         @JsonProperty("content_pack_installation_count") Map<ModelId, ContentPackMetaData> contentPacksMetaData) {
+        return new AutoValue_ContentPackList(total, contentPacks, contentPacksMetaData);
     }
 }

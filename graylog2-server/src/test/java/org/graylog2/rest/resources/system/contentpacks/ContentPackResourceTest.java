@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackList;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetaData;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackResponse;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackRevisions;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -108,8 +109,8 @@ public class ContentPackResourceTest {
     public void listAndLatest() throws Exception {
         final ContentPack contentPack = objectMapper.readValue(CONTENT_PACK, ContentPack.class);
         final Set<ContentPack> contentPacks = Collections.singleton(contentPack);
-        final Map<ModelId, Integer> installCount = Collections.emptyMap();
-        final ContentPackList expectedList = ContentPackList.create(contentPacks.size(), contentPacks, installCount);
+        final Map<ModelId, ContentPackMetaData> metaDataMap = Collections.emptyMap();
+        final ContentPackList expectedList = ContentPackList.create(contentPacks.size(), contentPacks, metaDataMap);
 
         when(contentPackPersistenceService.loadAll()).thenReturn(Collections.singleton(contentPack));
         final ContentPackList contentPackList = contentPackResource.listContentPacks();

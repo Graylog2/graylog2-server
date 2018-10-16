@@ -23,6 +23,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetaData;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -94,18 +95,24 @@ public class ContentPackInstallationPersistenceService {
         return writeResult.getN();
     }
 
-    public Map<ModelId, Integer> getInstallationCount() {
+    public Map<ModelId, ContentPackMetaData> getInstallationMetaData() {
        Set<ContentPackInstallation> contentPackInstallations = loadAll();
-       Map<ModelId, Integer> installationCount = new HashMap();
+       Map<ModelId, ContentPackMetaData> installationMetaData = new HashMap();
        for (ContentPackInstallation installation : contentPackInstallations) {
-           Integer count = installationCount.get(installation.contentPackId());
+           ContentPackMetaData metaData = installationMetaData.get(installation.contentPackId());
+           if (metaData == null) {
+               Map<Integer, Integer> installCount = new HashMap();
+               metaData = ContentPackMetaData.create(installCount);
+           }
+           Integer count = metaData.installationCount().get(installation.contentPackRevision());
            if (count == null) {
                count = 1;
            } else {
                count++;
            }
-           installationCount.put(installation.contentPackId(), count);
+           metaData.installationCount().put(installation.contentPackRevision(), count);
+           installationMetaData.put(installation.contentPackId(), metaData);
        }
-       return installationCount;
+       return installationMetaData;
     }
 }
