@@ -136,11 +136,22 @@ public abstract class ThrottleableTransport implements Transport {
                 return;
             }
             currentlyThrottled.set(false);
+            handleChangedThrottledState(false);
             blockLatch.countDown();
         } else if (throttled) {
             currentlyThrottled.set(true);
+            handleChangedThrottledState(true);
             blockLatch = new CountDownLatch(1);
         }
+    }
+
+    /**
+     * Transports can override this to be notified when the throttled state changes. Only called when throttled state changes.
+     *
+     * @param isThrottled the current throttled state.
+     */
+    public void handleChangedThrottledState(boolean isThrottled) {
+
     }
 
     public boolean isThrottled() {
