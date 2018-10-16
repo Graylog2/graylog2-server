@@ -74,7 +74,7 @@ const ContentPacksPage = createReactClass({
               <div id="react-configuration-bundles">
                 <ContentPacksList
                   contentPacks={this.state.contentPacks}
-                  contentPackInstallCount={this.state.contentPackInstallCount}
+                  contentPackMetaData={this.state.contentPackMetaData}
                   onDeletePack={this._deleteContentPack}
                   onInstall={this._installContentPack}
                 />
