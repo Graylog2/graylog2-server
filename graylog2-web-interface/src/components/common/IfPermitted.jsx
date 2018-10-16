@@ -25,7 +25,7 @@ const IfPermitted = ({ children, currentUser, permissions, anyPermissions, ...re
     return React.Children.map(children, (child) => {
       if (React.isValidElement(child)) {
         const presentProps = (child && child.props) ? Object.keys(child.props) : [];
-        // do not pass overwrite present props on child
+        // do not overwrite existing props
         const filteredRest = Object.entries(rest)
           .filter(entry => !presentProps.includes(entry[0]))
           .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
