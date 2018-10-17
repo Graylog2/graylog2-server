@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.Range;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -15,7 +16,8 @@ import java.time.Duration;
 @JsonTypeName(AutoInterval.type)
 public abstract class AutoInterval implements Interval {
     public static final String type = "auto";
-    private static final ImmutableRangeMap<Duration, DateHistogramInterval> boundaries = ImmutableRangeMap.<Duration, DateHistogramInterval>builder()
+    @VisibleForTesting
+    static final ImmutableRangeMap<Duration, DateHistogramInterval> boundaries = ImmutableRangeMap.<Duration, DateHistogramInterval>builder()
             .put(Range.atMost( Duration.ofMillis(10)), new DateHistogramInterval("1ms"))
             .put(Range.openClosed(Duration.ofMillis(10), Duration.ofMillis(100)), new DateHistogramInterval("5ms"))
             .put(Range.openClosed(Duration.ofMillis(100), Duration.ofMillis(250)), new DateHistogramInterval("10ms"))
@@ -43,10 +45,12 @@ public abstract class AutoInterval implements Interval {
             .put(Range.openClosed(Duration.ofDays(30), Duration.ofDays(60)), DateHistogramInterval.days(2))
             .put(Range.openClosed(Duration.ofDays(60), Duration.ofDays(90)), DateHistogramInterval.days(3))
             .put(Range.openClosed(Duration.ofDays(90), Duration.ofDays(180)), DateHistogramInterval.WEEK)
-            .put(Range.atLeast(Duration.ofDays(365)), DateHistogramInterval.days(14))
+            .put(Range.open(Duration.ofDays(180), Duration.ofDays(365)), DateHistogramInterval.days(14))
+            .put(Range.atLeast(Duration.ofDays(365)), DateHistogramInterval.MONTH)
             .build();
 
     @JsonProperty
+    @Override
     public abstract String type();
 
     @Override
