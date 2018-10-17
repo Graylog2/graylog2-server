@@ -93,30 +93,30 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 previousAggregation = aggregationBuilder;
             }
         }
-        if (previousAggregation == null) {
-            LOG.debug("No row aggregations were generated, cannot generate column groups.");
-        } else {
-            final Iterator<BucketSpec> colBuckets = pivot.columnGroups().iterator();
-            while (colBuckets.hasNext()) {
-                final BucketSpec bucketSpec = colBuckets.next();
+        final Iterator<BucketSpec> colBuckets = pivot.columnGroups().iterator();
+        while (colBuckets.hasNext()) {
+            final BucketSpec bucketSpec = colBuckets.next();
 
-                final String name = queryContext.nextName();
-                LOG.debug("Creating column group aggregation '{}' as {}", bucketSpec.type(), name);
-                final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
-                if (handler == null) {
-                    throw new IllegalArgumentException("Unknown column_group type " + bucketSpec.type());
+            final String name = queryContext.nextName();
+            LOG.debug("Creating column group aggregation '{}' as {}", bucketSpec.type(), name);
+            final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
+            if (handler == null) {
+                throw new IllegalArgumentException("Unknown column_group type " + bucketSpec.type());
+            }
+            final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
+            if (generatedAggregation.isPresent()) {
+                final AggregationBuilder aggregationBuilder = generatedAggregation.get();
+                // always insert the series for the final row group, or for each one if explicit rollup was requested
+                if (!colBuckets.hasNext() || pivot.rollup()) {
+                    seriesStream(pivot, queryContext, !colBuckets.hasNext() ? "leaf column" : "column rollup")
+                            .forEach(aggregationBuilder::subAggregation);
                 }
-                final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
-                if (generatedAggregation.isPresent()) {
-                    final AggregationBuilder aggregationBuilder = generatedAggregation.get();
-                    // always insert the series for the final row group, or for each one if explicit rollup was requested
-                    if (!colBuckets.hasNext() || pivot.rollup()) {
-                        seriesStream(pivot, queryContext, !colBuckets.hasNext() ? "leaf column" : "column rollup")
-                                .forEach(aggregationBuilder::subAggregation);
-                    }
+                if (previousAggregation != null) {
                     previousAggregation.subAggregation(aggregationBuilder);
-                    previousAggregation = aggregationBuilder;
+                } else {
+                    searchSourceBuilder.aggregation(aggregationBuilder);
                 }
+                previousAggregation = aggregationBuilder;
             }
         }
 
