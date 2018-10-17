@@ -6,12 +6,12 @@ import { Pluralize, Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
-class ConditionAlertNotifications extends React.Component {
+class StreamAlertNotifications extends React.Component {
   static propTypes = {
-    alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
   };
 
@@ -50,15 +50,18 @@ class ConditionAlertNotifications extends React.Component {
       <div>
         <h2>Notifications</h2>
         <p>
-          <Pluralize value={notifications.length} singular="This is" plural="These are" /> the notifications set
-          for the stream <em>{stream.title}</em>. They will be triggered when the alert condition is satisfied.
+          <Pluralize value={notifications.length} singular="This is the notification" plural="These are the notifications" />
+          {' '}set for the stream <em>{stream.title}</em>. <Pluralize value={notifications.length} singular="It" plural="They" />
+          {' '}will be triggered when the alert condition is satisfied.
         </p>
 
-        <AlertNotificationsList alertNotifications={notifications} streams={[this.props.stream]}
-                                onNotificationUpdate={this._loadData} onNotificationDelete={this._loadData} />
+        <AlertNotificationsList alertNotifications={notifications}
+                                streams={[this.props.stream]}
+                                onNotificationUpdate={this._loadData}
+                                onNotificationDelete={this._loadData} />
       </div>
     );
   }
 }
 
-export default ConditionAlertNotifications;
+export default StreamAlertNotifications;

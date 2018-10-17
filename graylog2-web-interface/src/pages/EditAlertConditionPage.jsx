@@ -7,7 +7,8 @@ import { Col, Row } from 'react-bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';
-import { ConditionAlertNotifications, EditAlertConditionForm } from 'components/alertconditions';
+import { EditAlertConditionForm } from 'components/alertconditions';
+import { StreamAlertNotifications } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -79,7 +80,7 @@ const EditAlertConditionPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <ConditionAlertNotifications alertCondition={condition} stream={stream} />
+              <StreamAlertNotifications stream={stream} />
             </Col>
           </Row>
         </div>
