@@ -370,7 +370,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Version: 
                 1
                  
-                <span />
+                <span>
+                  <a
+                    onClick={[Function]}
+                    style={Object {}}
+                  >
+                    <span
+                      className="badge installed"
+                    >
+                      installed
+                    </span>
+                  </a>
+                </span>
                  
               </small>
             </h3>

@@ -17,7 +17,7 @@ import ContentPackInstall from './ContentPackInstall';
 class ContentPacksList extends React.Component {
   static propTypes = {
     contentPacks: PropTypes.arrayOf(PropTypes.object),
-    contentPackMetaData: PropTypes.object,
+    contentPackMetadata: PropTypes.object,
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
   };
@@ -26,7 +26,7 @@ class ContentPacksList extends React.Component {
     contentPacks: [],
     onDeletePack: () => {},
     onInstall: () => {},
-    contentPackMetaData: {},
+    contentPackMetadata: {},
   };
 
   constructor(props) {
@@ -102,8 +102,9 @@ class ContentPacksList extends React.Component {
         revision={item.rev}
       />);
 
-      const metaData = this.props.contentPackMetaData[item.id] || {};
-      const states = metaData.installation_count ? ['installed'] : [];
+      const metadata = this.props.contentPackMetadata[item.id] || {};
+      const installed = Object.keys(metadata).find(rev => metadata[rev].installation_count > 0);
+      const states = installed ? ['installed'] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
       return (

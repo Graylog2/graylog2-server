@@ -33,7 +33,11 @@ describe('<ContentPacksList />', () => {
   });
 
   it('should render with content packs', () => {
-    const wrapper = renderer.create(<ContentPacksList contentPacks={contentPacks} contentPackMetaData={{ 1: { installation_count: { 1: 1 } } }} />);
+    const metadata = {
+      1: { 1: { installation_count: 1 } },
+      2: { 5: { installation_count: 2 } },
+    };
+    const wrapper = renderer.create(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
