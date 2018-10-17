@@ -20,10 +20,11 @@ class ContentPackConstraints extends React.Component {
     const constraint = item.constraint || item;
     const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
     const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
+    const name = constraint.type === "server-version" ? "Graylog" : constraint.plugin;
     return (
       <tr key={constraint.id}>
+        <td>{name}</td>
         <td>{constraint.type}</td>
-        <td>{constraint.plugin}</td>
         <td>{constraint.version}</td>
         <td><Badge className={fulfilledBg}>{fulfilledIcon}</Badge></td>
       </tr>
@@ -31,7 +32,7 @@ class ContentPackConstraints extends React.Component {
   };
 
   render() {
-    const headers = ['Type', 'Plugin', 'Version', 'Fulfilled'];
+    const headers = ['Name', 'Type', 'Version', 'Fulfilled'];
     const constraints = this.props.constraints.map((constraint) => {
       const newConstraint = constraint.constraint || constraint;
       newConstraint.fulfilled = constraint.fulfilled;
