@@ -20,7 +20,7 @@ class ContentPackConstraints extends React.Component {
     const constraint = item.constraint || item;
     const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
     const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
-    const name = constraint.type === "server-version" ? "Graylog" : constraint.plugin;
+    const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
     return (
       <tr key={constraint.id}>
         <td>{name}</td>
