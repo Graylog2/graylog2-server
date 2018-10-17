@@ -221,7 +221,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
 
         final Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
-        final String namedPattern = grokPatternEntity.pattern().asString();
+        final String namedPattern = grokPatternEntity.pattern().asString(parameters);
         final Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
         while (matcher.find()) {
             final Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
@@ -232,7 +232,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
                     .filter(x -> {
                         EntityV1 entityV1 = (EntityV1) x.getValue();
                         GrokPatternEntity grokPatternEntity1 = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
-                        return grokPatternEntity1.name().asString().equals(patternName);
+                        return grokPatternEntity1.name().asString(parameters).equals(patternName);
                     }).forEach(x -> mutableGraph.putEdge(entity, x.getValue()));
         }
 
