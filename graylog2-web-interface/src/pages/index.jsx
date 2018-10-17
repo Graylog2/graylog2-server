@@ -70,6 +70,7 @@ const SidecarNewCollectorPage = loadAsync(() => import('pages/SidecarNewCollecto
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarConfigurationPage = loadAsync(() => import('pages/SidecarConfigurationPage'));
 const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConfigurationPage'));
+const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverviewPage'));
 
 export {
   AlertConditionsPage,
@@ -142,4 +143,5 @@ export {
   SidecarsPage,
   SidecarConfigurationPage,
   SidecarNewConfigurationPage,
+  StreamAlertsOverviewPage,
 };

@@ -180,8 +180,9 @@ const Routes = {
   stream_search: (streamId, query, timeRange, resolution) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
-  legacy_stream_search: streamId => `/streams/${streamId}/messages`,
+  stream_alerts: streamId => `/streams/${streamId}/alerts`,
 
+  legacy_stream_search: streamId => `/streams/${streamId}/messages`,
   show_alert: alertId => `${Routes.ALERTS.LIST}/${alertId}`,
   show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
 

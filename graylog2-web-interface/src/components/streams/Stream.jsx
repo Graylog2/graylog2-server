@@ -132,6 +132,12 @@ const Stream = createReactClass({
         </OverlayElement>
       );
 
+      manageAlertsLink = (
+        <LinkContainer to={Routes.stream_alerts(stream.id)}>
+          <Button bsStyle="info">Manage Alerts</Button>
+        </LinkContainer>
+      );
+
       if (this.isPermitted(permissions, ['stream_outputs:read'])) {
         manageOutputsLink = (
           <LinkContainer to={Routes.stream_outputs(stream.id)}>
