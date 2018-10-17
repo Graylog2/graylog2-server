@@ -8,6 +8,7 @@ import { AlertsHeaderToolbar } from 'components/alerts';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { StreamAlertNotifications } from 'components/alertnotifications';
+import { StreamAlertConditions } from 'components/alertconditions';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
 
@@ -51,6 +52,12 @@ class StreamAlertsOverviewPage extends React.Component {
               <AlertsHeaderToolbar active={Routes.ALERTS.NOTIFICATIONS} />
             </span>
           </PageHeader>
+
+          <Row className="content">
+            <Col md={12}>
+              <StreamAlertConditions stream={stream} />
+            </Col>
+          </Row>
 
           <Row className="content">
             <Col md={12}>
