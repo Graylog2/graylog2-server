@@ -28,12 +28,12 @@ import java.util.Map;
 
 @AutoValue
 @WithBeanGetter
-public abstract class ContentPackMetaData {
+public abstract class ContentPackMetadata {
     @JsonProperty
-    public abstract Map<Integer, Integer> installationCount();
+    public abstract int installationCount();
 
     @JsonCreator
-    public static ContentPackMetaData create(@JsonProperty("installation_count") Map<Integer, Integer> installationCount) {
-        return new AutoValue_ContentPackMetaData(installationCount);
+    public static ContentPackMetadata create(@JsonProperty("installation_count") int installationCount) {
+        return new AutoValue_ContentPackMetadata(installationCount);
     }
 }

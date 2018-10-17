@@ -42,7 +42,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackInstallationRequest;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackInstallationsResponse;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackList;
-import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetaData;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetadata;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackResponse;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackRevisions;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -100,7 +100,7 @@ public class ContentPackResource extends RestResource {
     public ContentPackList listContentPacks() {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAll();
-        Map<ModelId, ContentPackMetaData> metaData = contentPackInstallationPersistenceService.getInstallationMetaData();
+        Map<ModelId, Map<Integer, ContentPackMetadata>> metaData = contentPackInstallationPersistenceService.getInstallationMetadata();
 
         return ContentPackList.create(contentPacks.size(), contentPacks, metaData);
     }
@@ -117,7 +117,7 @@ public class ContentPackResource extends RestResource {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
 
         Set<ContentPack> contentPacks = contentPackPersistenceService.loadAllLatest();
-        Map<ModelId, ContentPackMetaData> metaData = contentPackInstallationPersistenceService.getInstallationMetaData();
+        Map<ModelId, Map<Integer, ContentPackMetadata>> metaData = contentPackInstallationPersistenceService.getInstallationMetadata();
         return ContentPackList.create(contentPacks.size(), contentPacks, metaData);
     }
 

@@ -23,7 +23,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetaData;
+import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetadata;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -31,7 +31,6 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -95,24 +94,24 @@ public class ContentPackInstallationPersistenceService {
         return writeResult.getN();
     }
 
-    public Map<ModelId, ContentPackMetaData> getInstallationMetaData() {
-       Set<ContentPackInstallation> contentPackInstallations = loadAll();
-       Map<ModelId, ContentPackMetaData> installationMetaData = new HashMap();
-       for (ContentPackInstallation installation : contentPackInstallations) {
-           ContentPackMetaData metaData = installationMetaData.get(installation.contentPackId());
-           if (metaData == null) {
-               Map<Integer, Integer> installCount = new HashMap();
-               metaData = ContentPackMetaData.create(installCount);
-           }
-           Integer count = metaData.installationCount().get(installation.contentPackRevision());
-           if (count == null) {
-               count = 1;
-           } else {
-               count++;
-           }
-           metaData.installationCount().put(installation.contentPackRevision(), count);
-           installationMetaData.put(installation.contentPackId(), metaData);
-       }
-       return installationMetaData;
+    public Map<ModelId, Map<Integer, ContentPackMetadata>> getInstallationMetadata() {
+        final Set<ContentPackInstallation> contentPackInstallations = loadAll();
+        Map <Integer, ContentPackMetadata> contentPackMetadataMap = new HashMap();
+        Map<ModelId, Map<Integer, ContentPackMetadata>> installationMetaData = new HashMap();
+        for (ContentPackInstallation installation : contentPackInstallations) {
+            Map<Integer, ContentPackMetadata> metadataMap = installationMetaData.get(installation.contentPackId());
+            if (metadataMap == null) {
+                metadataMap = new HashMap();
+            }
+            ContentPackMetadata metadata = metadataMap.get(installation.contentPackRevision());
+            int count = 1;
+            if (metadata != null) {
+                count = metadata.installationCount() + 1;
+            }
+            ContentPackMetadata newMetadata = ContentPackMetadata.create(count);
+            metadataMap.put(installation.contentPackRevision(), newMetadata);
+            installationMetaData.put(installation.contentPackId(), metadataMap);
+        }
+        return installationMetaData;
     }
 }
