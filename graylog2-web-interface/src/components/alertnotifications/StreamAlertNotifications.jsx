@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
+import { Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { Pluralize, Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import Routes from 'routing/Routes';
 
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
@@ -48,6 +51,11 @@ class StreamAlertNotifications extends React.Component {
 
     return (
       <div>
+        <div className="pull-right">
+          <LinkContainer to={Routes.ALERTS.NEW_NOTIFICATION}>
+            <Button bsStyle="success">Add new notification</Button>
+          </LinkContainer>
+        </div>
         <h2>Notifications</h2>
         <p>
           <Pluralize value={notifications.length} singular="This is the notification" plural="These are the notifications" />
