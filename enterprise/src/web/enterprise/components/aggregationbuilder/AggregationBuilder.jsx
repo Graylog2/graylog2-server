@@ -35,9 +35,6 @@ export default class AggregationBuilder extends React.Component {
 
   render() {
     const { config, data } = this.props;
-    if (!data || data.total === 0) {
-      return <EmptyResultWidget />;
-    }
     const VisComponent = AggregationBuilder._visualizationForType(config.visualization || defaultVisualizationType);
     return (
       <FullSizeContainer>

@@ -19,13 +19,13 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 }));
 
 describe('AggregationBuilder', () => {
-  it('renders helpful advice instead of visualization when no documents were in result', () => {
+  it('does not render empty result widget when no documents were in result', () => {
     const wrapper = mount(<AggregationBuilder data={{ total: 0 }}
-                                              config={AggregationWidgetConfig.builder().build()}
+                                              config={AggregationWidgetConfig.builder().visualization('dummy').build()}
                                               fields={{}}
                                               onChange={() => {}} />);
 
-    expect(wrapper.find(EmptyResultWidget)).toHaveLength(1);
+    expect(wrapper.find(EmptyResultWidget)).toHaveLength(0);
   });
 
   it('renders dummy component with rows from data', () => {
