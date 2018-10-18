@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { AlertsHeaderToolbar } from 'components/alerts';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -48,9 +48,14 @@ class StreamAlertsOverviewPage extends React.Component {
               Remember to assign the notifications to use in the alert conditions page.
             </span>
 
-            <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.NOTIFICATIONS} />
-            </span>
+            <ButtonToolbar>
+              <LinkContainer to={Routes.STREAMS}>
+                <Button bsStyle="info">Streams</Button>
+              </LinkContainer>
+              <LinkContainer to={Routes.ALERTS.LIST}>
+                <Button bsStyle="info">Alerts</Button>
+              </LinkContainer>
+            </ButtonToolbar>
           </PageHeader>
 
           <Row className="content">
