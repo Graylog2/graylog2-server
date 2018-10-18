@@ -36,6 +36,7 @@ const AlertNotification = createReactClass({
   getInitialState() {
     return {
       isTestingAlert: false,
+      isConfigurationShown: false,
     };
   },
 
@@ -61,6 +62,10 @@ const AlertNotification = createReactClass({
     }
   },
 
+  _toggleIsConfigurationShown() {
+    this.setState({ isConfigurationShown: !this.state.isConfigurationShown });
+  },
+
   render() {
     if (!this.state.availableNotifications) {
       return <Spinner />;
@@ -68,15 +73,22 @@ const AlertNotification = createReactClass({
 
     const notification = this.props.alertNotification;
     const stream = this.props.stream;
+    const { isConfigurationShown } = this.state;
     const typeDefinition = this.state.availableNotifications[notification.type];
 
     if (!typeDefinition) {
       return <UnknownAlertNotification alertNotification={notification} onDelete={this._onDelete} />;
     }
 
+    const toggleConfigurationLink = (
+      <a href="#toggleconfiguration" onClick={this._toggleIsConfigurationShown}>
+        {isConfigurationShown ? 'Hide' : 'Show'} configuration
+      </a>
+    );
+
     const description = (stream ?
-      <span>Executed once per triggered alert condition in stream <em>{stream.title}</em></span>
-      : 'Not executed, as it is not connected to a stream');
+      <span>Executed once per triggered alert condition in stream <em>{stream.title}</em>. {toggleConfigurationLink}</span> :
+      <span>Not executed, as it is not connected to a stream. {toggleConfigurationLink}</span>);
 
     const actions = stream && (
       <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -110,7 +122,9 @@ const AlertNotification = createReactClass({
                              titleValue={notification.title}
                              submitAction={this._onSubmit}
                              values={notification.configuration} />
-          <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
+          {isConfigurationShown &&
+            <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
+          }
         </div>
       </Col>
     );
