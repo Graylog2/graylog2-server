@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
+import com.google.common.graph.ImmutableGraph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -52,6 +53,8 @@ import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.lookup.LookupTableService;
+import org.graylog2.lookup.db.DBLookupTableService;
+import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.Extractor;
@@ -98,6 +101,15 @@ public class InputFacadeTest {
     @Mock
     private LookupTableService lookupTableService;
     @Mock
+    private LookupTableService.Builder lookupuptableBuilder;
+    @Mock
+    private LookupTableService.Function lookupTable;
+    @Mock
+    private DBLookupTableService dbLookupTableService;
+    @Mock
+    private LookupTableDto lookupTableDto;
+
+    @Mock
     private MessageInputFactory messageInputFactory;
     @Mock
     private ServerStatus serverStatus;
@@ -133,6 +145,7 @@ public class InputFacadeTest {
                 objectMapper,
                 inputService,
                 inputRegistry,
+                dbLookupTableService,
                 messageInputFactory,
                 extractorFactory,
                 converterFactory,
@@ -346,4 +359,20 @@ public class InputFacadeTest {
                 .isInstanceOf(NotFoundException.class);
     }
 
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveNativeEntity() throws NotFoundException {
+        when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.build()).thenReturn(lookupTable);
+        when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
+        when(lookupTableService.hasTable("whois")).thenReturn(true);
+        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableDto));
+        when(lookupTableDto.id()).thenReturn("dead-beef");
+
+        final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
+        EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
+        EntityDescriptor expectedEntitiyDescriptor = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
+        Graph graph = facade.resolveNativeEntity(entityDescriptor);
+        assertThat(graph.nodes()).contains(expectedEntitiyDescriptor);
+    }
 }

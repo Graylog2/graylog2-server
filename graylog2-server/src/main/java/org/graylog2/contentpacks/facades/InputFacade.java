@@ -20,6 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import com.google.common.primitives.Ints;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -44,6 +48,10 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.LookupTableExtractor;
+import org.graylog2.lookup.LookupTable;
+import org.graylog2.lookup.db.DBLookupTableService;
+import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -80,6 +88,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
 
     private final ObjectMapper objectMapper;
     private final InputService inputService;
+    private final DBLookupTableService lookupTableService;
     private final InputRegistry inputRegistry;
     private final MessageInputFactory messageInputFactory;
     private final ExtractorFactory extractorFactory;
@@ -92,6 +101,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     public InputFacade(ObjectMapper objectMapper,
                        InputService inputService,
                        InputRegistry inputRegistry,
+                       DBLookupTableService lookupTableService,
                        MessageInputFactory messageInputFactory,
                        ExtractorFactory extractorFactory,
                        ConverterFactory converterFactory,
@@ -100,6 +110,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                        Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories) {
         this.objectMapper = objectMapper;
         this.inputService = inputService;
+        this.lookupTableService = lookupTableService;
         this.inputRegistry = inputRegistry;
         this.messageInputFactory = messageInputFactory;
         this.extractorFactory = extractorFactory;
@@ -449,5 +460,32 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         } catch (NotFoundException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
+        final ModelId modelId = entityDescriptor.id();
+        try {
+            final Input input = inputService.find(modelId.toString());
+            final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+            inputWithExtractors.extractors().stream()
+                    .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
+                    .map(e -> (String) e.getExtractorConfig().get(LookupTableExtractor.CONFIG_LUT_NAME))
+                    .map(name -> lookupTableService.get(name))
+                    .forEach(optional -> {
+                        optional.ifPresent(lookupTableDto -> {
+                            EntityDescriptor lookupTable = EntityDescriptor.create(
+                                    ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
+                            mutableGraph.putEdge(entityDescriptor, lookupTable);
+                        });
+                    });
+
+        } catch (NotFoundException e) {
+            LOG.debug("Couldn't find input {}", entityDescriptor, e);
+        }
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }
