@@ -5,15 +5,15 @@ import Reflux from 'reflux';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
+import { EntityListItem, IfPermitted, Spinner } from 'components/common';
+import { UnknownAlertNotification } from 'components/alertnotifications';
+import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
+
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-import { EntityListItem, Spinner } from 'components/common';
-import { UnknownAlertNotification } from 'components/alertnotifications';
-import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
 const AlertNotification = createReactClass({
   displayName: 'AlertNotification',
@@ -21,11 +21,17 @@ const AlertNotification = createReactClass({
   propTypes: {
     alertNotification: PropTypes.object.isRequired,
     stream: PropTypes.object,
-    onNotificationUpdate: PropTypes.func,
-    onNotificationDelete: PropTypes.func,
+    onNotificationUpdate: PropTypes.func.isRequired,
+    onNotificationDelete: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  getDefaultProps() {
+    return {
+      stream: undefined,
+    };
+  },
 
   getInitialState() {
     return {
@@ -45,21 +51,13 @@ const AlertNotification = createReactClass({
 
   _onSubmit(data) {
     AlarmCallbacksActions.update(this.props.alertNotification.stream_id, this.props.alertNotification.id, data)
-      .then(() => {
-        if (typeof this.props.onNotificationUpdate === 'function') {
-          this.props.onNotificationUpdate();
-        }
-      });
+      .then(this.props.onNotificationUpdate);
   },
 
   _onDelete() {
     if (window.confirm('Really delete alert notification?')) {
       AlarmCallbacksActions.delete(this.props.alertNotification.stream_id, this.props.alertNotification.id)
-        .then(() => {
-          if (typeof this.props.onNotificationUpdate === 'function') {
-            this.props.onNotificationUpdate();
-          }
-        });
+        .then(this.props.onNotificationDelete);
     }
   },
 
@@ -80,17 +78,26 @@ const AlertNotification = createReactClass({
       <span>Executed once per triggered alert condition in stream <em>{stream.title}</em></span>
       : 'Not executed, as it is not connected to a stream');
 
-    const actions = this.isPermitted(this.state.currentUser.permissions, [`streams:edit:${stream.id}`]) && [
-      <Button key="test-button" bsStyle="info" disabled={this.state.isTestingAlert} onClick={this._onTestNotification}>
-        {this.state.isTestingAlert ? 'Testing...' : 'Test'}
-      </Button>,
-      <DropdownButton key="more-actions-button" title="More actions" pullRight
-                      id={`more-actions-dropdown-${notification.id}`}>
-        <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
-        <MenuItem divider />
-        <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
-      </DropdownButton>,
-    ];
+    const actions = stream && (
+      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+        <React.Fragment>
+          <Button key="test-button"
+                  bsStyle="info"
+                  disabled={this.state.isTestingAlert}
+                  onClick={this._onTestNotification}>
+            {this.state.isTestingAlert ? 'Testing...' : 'Test'}
+          </Button>
+          <DropdownButton key="more-actions-button"
+                          title="More actions"
+                          pullRight
+                          id={`more-actions-dropdown-${notification.id}`}>
+            <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
+            <MenuItem divider />
+            <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
+          </DropdownButton>
+        </React.Fragment>
+      </IfPermitted>
+    );
 
     const content = (
       <Col md={12}>

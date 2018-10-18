@@ -12,6 +12,11 @@ class AlertNotificationsList extends React.Component {
     onNotificationDelete: PropTypes.func,
   };
 
+  static defaultProps = {
+    onNotificationUpdate: () => {},
+    onNotificationDelete: () => {},
+  };
+
   state = {
     currentPage: 0,
   };
@@ -29,7 +34,9 @@ class AlertNotificationsList extends React.Component {
   _formatNotification = (notification) => {
     const stream = this.props.streams.find(s => s.id === notification.stream_id);
     return (
-      <AlertNotification key={notification.id} alertNotification={notification} stream={stream}
+      <AlertNotification key={notification.id}
+                         alertNotification={notification}
+                         stream={stream}
                          onNotificationUpdate={this.props.onNotificationUpdate}
                          onNotificationDelete={this.props.onNotificationDelete} />
     );
@@ -39,8 +46,10 @@ class AlertNotificationsList extends React.Component {
     const notifications = this.props.alertNotifications;
 
     return (
-      <PaginatedList totalItems={notifications.length} onChange={this._onChangePaginatedList}
-                     showPageSizeSelect={false} pageSize={this.PAGE_SIZE}>
+      <PaginatedList totalItems={notifications.length}
+                     onChange={this._onChangePaginatedList}
+                     showPageSizeSelect={false}
+                     pageSize={this.PAGE_SIZE}>
         <EntityList bsNoItemsStyle="info"
                     noItemsText="There are no configured notifications."
                     items={this._paginatedNotifications().map(notification => this._formatNotification(notification))} />
