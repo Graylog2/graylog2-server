@@ -275,8 +275,14 @@ public class InputFacadeTest {
                 .title("Local Raw UDP")
                 .build();
 
+        final EntityExcerpt expectedEntityExcerpt3 = EntityExcerpt.builder()
+                .id(ModelId.of("5ae2eb0a3d27464477f0fd8b"))
+                .type(ModelTypes.INPUT_V1)
+                .title("TEST PLAIN TEXT")
+                .build();
+
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
-        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt1, expectedEntityExcerpt2);
+        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt1, expectedEntityExcerpt2, expectedEntityExcerpt3);
     }
 
     @Test
@@ -363,10 +369,10 @@ public class InputFacadeTest {
         final Input input = inputService.find("5acc84f84b900a4ff290d9a7");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
 
-        assertThat(inputService.totalCount()).isEqualTo(2L);
+        assertThat(inputService.totalCount()).isEqualTo(3L);
         facade.delete(inputWithExtractors);
 
-        assertThat(inputService.totalCount()).isEqualTo(1L);
+        assertThat(inputService.totalCount()).isEqualTo(2L);
         assertThatThrownBy(() -> inputService.find("5acc84f84b900a4ff290d9a7"))
                 .isInstanceOf(NotFoundException.class);
     }
