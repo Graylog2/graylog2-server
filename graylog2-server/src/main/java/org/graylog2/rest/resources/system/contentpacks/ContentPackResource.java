@@ -221,6 +221,10 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
             @PathParam("contentPackId") final ModelId contentPackId) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
+        if (contentPackInstallationPersistenceService.findByContentPackId(contentPackId).size() > 0) {
+               throw new BadRequestException("Content pack " + contentPackId +
+                       " with all his revisions can't be deleted: There are still installations of this content pack");
+        }
         final int deleted = contentPackPersistenceService.deleteById(contentPackId);
 
         LOG.debug("Deleted {} content packs with id {}", deleted, contentPackId);
@@ -242,6 +246,12 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "revision", value = "Content Pack revision", required = true)
             @PathParam("revision") final int revision) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
+
+        if (contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision).size() > 0) {
+            throw new BadRequestException("Content pack " + contentPackId + " and Revision " + revision +
+                    " can't be deleted: There are still installations of this content packs revision.");
+        }
+
         final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
 
         LOG.debug("Deleted {} content packs with id {} and revision", deleted, contentPackId, revision);
