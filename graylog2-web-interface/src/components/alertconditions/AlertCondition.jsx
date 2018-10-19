@@ -4,19 +4,19 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
-import CombinedProvider from 'injection/CombinedProvider';
-const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
 import { AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const AlertCondition = createReactClass({
   displayName: 'AlertCondition',
 
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
-    stream: PropTypes.object,
+    stream: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
@@ -41,7 +41,9 @@ const AlertCondition = createReactClass({
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
-        <DropdownButton key="more-actions-button" title="Actions" pullRight
+        <DropdownButton key="more-actions-button"
+                        title="Actions"
+                        pullRight
                         id={`more-actions-dropdown-${condition.id}`}>
           <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
         </DropdownButton>,

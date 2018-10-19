@@ -9,6 +9,7 @@ import { AlertConditionForm, AlertConditionSummary } from 'components/alertcondi
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 

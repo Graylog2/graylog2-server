@@ -33,8 +33,10 @@ class AlertConditionsList extends React.Component {
     const alertConditions = this.props.alertConditions;
 
     return (
-      <PaginatedList totalItems={alertConditions.length} onChange={this._onChangePaginatedList}
-                     showPageSizeSelect={false} pageSize={this.PAGE_SIZE}>
+      <PaginatedList totalItems={alertConditions.length}
+                     onChange={this._onChangePaginatedList}
+                     showPageSizeSelect={false}
+                     pageSize={this.PAGE_SIZE}>
         <EntityList bsNoItemsStyle="info"
                     noItemsText="There are no configured conditions."
                     items={this._paginatedConditions().map(condition => this._formatCondition(condition))} />
