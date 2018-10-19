@@ -26,6 +26,8 @@ import com.google.common.graph.ImmutableGraph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import com.mongodb.client.model.ValidationLevel;
+import org.elasticsearch.common.recycler.Recycler;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -33,8 +35,11 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
@@ -50,8 +55,12 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.LookupTableExtractor;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
+import org.graylog2.lookup.LookupDefaultMultiValue;
+import org.graylog2.lookup.LookupDefaultSingleValue;
+import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -72,9 +81,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -374,5 +386,66 @@ public class InputFacadeTest {
         EntityDescriptor expectedEntitiyDescriptor = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
         Graph graph = facade.resolveNativeEntity(entityDescriptor);
         assertThat(graph.nodes()).contains(expectedEntitiyDescriptor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveForInstallation() throws NotFoundException {
+        when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.build()).thenReturn(lookupTable);
+        when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
+        when(lookupTableService.hasTable("whois")).thenReturn(true);
+        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableDto));
+        when(lookupTableDto.id()).thenReturn("dead-beef");
+        final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+        final LookupTableExtractor extractor = (LookupTableExtractor) inputWithExtractors.extractors().iterator().next();
+        final ExtractorEntity extractorEntity = ExtractorEntity.create(
+                ValueReference.of(extractor.getTitle()),
+                ValueReference.of(extractor.getType()),
+                ValueReference.of(extractor.getCursorStrategy()),
+                ValueReference.of(extractor.getTargetField()),
+                ValueReference.of(extractor.getSourceField()),
+                ReferenceMapUtils.toReferenceMap(extractor.getExtractorConfig()),
+                Collections.emptyList(),
+                ValueReference.of(extractor.getConditionType()),
+                ValueReference.of(extractor.getConditionValue()),
+                ValueReference.of(extractor.getOrder())
+        );
+        List<ExtractorEntity> extractors = new ArrayList();
+        extractors.add(extractorEntity);
+        InputEntity inputEntity = InputEntity.create(
+                ValueReference.of(input.getTitle()),
+                ReferenceMapUtils.toReferenceMap(input.getConfiguration()),
+                Collections.emptyMap(),
+                ValueReference.of(input.getType()),
+                ValueReference.of(input.isGlobal()),
+                extractors);
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of(input.getId()))
+                .type(ModelTypes.INPUT_V1)
+                .data(objectMapper.convertValue(inputEntity, JsonNode.class))
+                .build();
+        final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
+                ValueReference.of("whois"),
+                ValueReference.of("title"),
+                ValueReference.of("description"),
+                ValueReference.of("cache_name"),
+                ValueReference.of("dataadapter_name"),
+                ValueReference.of("default_single_value"),
+                ValueReference.of("BOOLEAN"),
+                ValueReference.of("default_multi_value"),
+                ValueReference.of("BOOLEAN")
+        );
+        final Entity expectedEntity = EntityV1.builder()
+                .id(ModelId.of("dead-beef"))
+                .data(objectMapper.convertValue(lookupTableEntity, JsonNode.class))
+                .type(ModelTypes.LOOKUP_TABLE_V1)
+                .build();
+        final EntityDescriptor entityDescriptor = expectedEntity.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap<>(1);
+        entityDescriptorEntityMap.put(entityDescriptor, expectedEntity);
+        Graph graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
+        assertThat(graph.nodes()).contains(expectedEntity);
     }
 }

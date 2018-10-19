@@ -26,6 +26,7 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.primitives.Ints;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.jackson.ReferenceConverter;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -39,6 +40,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
@@ -487,5 +489,40 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
             LOG.debug("Couldn't find input {}", entityDescriptor, e);
         }
         return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
+        if(entity instanceof EntityV1) {
+            return resolveForInstallationV1((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolveForInstallationV1(EntityV1 entity,
+                                                   Map<String, ValueReference> parameters,
+                                                   Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph graph = GraphBuilder.directed().build();
+        graph.addNode(entity);
+
+        final InputEntity input = objectMapper.convertValue(entity.data(), InputEntity.class);
+        final Set<String> lookupTableNames = input.extractors().stream()
+                .filter(e -> e.type().asString(parameters).equals(Extractor.Type.LOOKUP_TABLE.toString()))
+                .map(e -> e.configuration())
+                .map(c -> ((ValueReference) c.get(LookupTableExtractor.CONFIG_LUT_NAME)).asString(parameters))
+                .collect(Collectors.toSet());
+        entities.entrySet().stream()
+                .filter(x -> x.getValue().type().equals(ModelTypes.LOOKUP_TABLE_V1))
+                .filter(x -> {
+                    EntityV1 entityV1 = (EntityV1) x.getValue();
+                    LookupTableEntity lookupTableEntity = objectMapper.convertValue(entityV1.data(), LookupTableEntity.class);
+                    return  lookupTableNames.contains(lookupTableEntity.name().asString(parameters));
+                })
+                .forEach(x -> graph.putEdge(entity, x.getValue()));
+
+        return ImmutableGraph.copyOf(graph);
     }
 }
