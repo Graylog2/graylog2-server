@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
-import { AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
+import { AlertConditionForm, AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -20,6 +20,16 @@ const AlertCondition = createReactClass({
   },
 
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  _onEdit() {
+    this.updateForm.open();
+  },
+
+  _onUpdate(request) {
+    AlertConditionsActions.update(this.props.stream.id, this.props.alertCondition.id, request).then(() => {
+      AlertConditionsActions.get(this.props.stream.id, this.props.alertCondition.id);
+    });
+  },
 
   _onDelete() {
     if (window.confirm('Really delete alert condition?')) {
@@ -45,14 +55,25 @@ const AlertCondition = createReactClass({
                         title="Actions"
                         pullRight
                         id={`more-actions-dropdown-${condition.id}`}>
+          <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
+          <MenuItem divider />
           <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
         </DropdownButton>,
       ];
     }
 
     return (
-      <AlertConditionSummary alertCondition={condition} typeDefinition={typeDefinition} stream={stream}
-                             actions={actions} linkToDetails />
+      <React.Fragment>
+        <AlertConditionForm ref={(updateForm) => { this.updateForm = updateForm; }}
+                            type={condition.type}
+                            alertCondition={condition}
+                            onSubmit={this._onUpdate} />
+        <AlertConditionSummary alertCondition={condition}
+                               typeDefinition={typeDefinition}
+                               stream={stream}
+                               actions={actions}
+                               linkToDetails />
+      </React.Fragment>
     );
   },
 });
