@@ -8,6 +8,13 @@ class AlertConditionsList extends React.Component {
   static propTypes = {
     alertConditions: PropTypes.array.isRequired,
     streams: PropTypes.array.isRequired,
+    onConditionUpdate: PropTypes.func,
+    onConditionDelete: PropTypes.func,
+  };
+
+  static defaultProps = {
+    onConditionUpdate: () => {},
+    onConditionDelete: () => {},
   };
 
   state = {
@@ -26,7 +33,13 @@ class AlertConditionsList extends React.Component {
 
   _formatCondition = (condition) => {
     const stream = this.props.streams.find(s => s.alert_conditions.find(c => c.id === condition.id));
-    return <AlertCondition key={condition.id} alertCondition={condition} stream={stream} />;
+    return (
+      <AlertCondition key={condition.id}
+                      alertCondition={condition}
+                      stream={stream}
+                      onUpdate={this.props.onConditionUpdate}
+                      onDelete={this.props.onConditionDelete} />
+    );
   };
 
   render() {

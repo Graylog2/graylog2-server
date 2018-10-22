@@ -51,7 +51,10 @@ const StreamAlertConditions = createReactClass({
         </div>
         <h2>Conditions</h2>
         <p>These are all configured alert conditions for the stream <em>{this.props.stream.title}</em>.</p>
-        <AlertConditionsList alertConditions={alertConditions} streams={[this.props.stream]} />
+        <AlertConditionsList alertConditions={alertConditions}
+                             streams={[this.props.stream]}
+                             onConditionUpdate={this.loadData}
+                             onConditionDelete={this.loadData} />
       </div>
     );
   },

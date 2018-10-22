@@ -60,7 +60,10 @@ const AlertConditionsComponent = createReactClass({
         </div>
         <h2>Conditions</h2>
         <p>These are all configured alert conditions.</p>
-        <AlertConditionsList alertConditions={alertConditions} streams={this.state.streams} />
+        <AlertConditionsList alertConditions={alertConditions}
+                             streams={this.state.streams}
+                             onConditionUpdate={this._loadData}
+                             onConditionDelete={this._loadData} />
       </div>
     );
   },
