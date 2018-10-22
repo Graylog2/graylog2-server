@@ -12,8 +12,9 @@ import { StreamAlertNotifications } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-
+import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
@@ -39,6 +40,14 @@ const EditAlertConditionPage = createReactClass({
     });
 
     AlertConditionsActions.get(this.props.params.streamId, this.props.params.conditionId);
+  },
+
+  _handleUpdate(streamId, conditionId) {
+    AlertConditionsActions.get(streamId, conditionId);
+  },
+
+  _handleDelete() {
+    history.push(Routes.ALERTS.CONDITIONS);
   },
 
   _isLoading() {
@@ -74,7 +83,10 @@ const EditAlertConditionPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <EditAlertConditionForm alertCondition={condition} stream={stream} />
+              <EditAlertConditionForm alertCondition={condition}
+                                      stream={stream}
+                                      onUpdate={this._handleUpdate}
+                                      onDelete={this._handleDelete} />
             </Col>
           </Row>
 

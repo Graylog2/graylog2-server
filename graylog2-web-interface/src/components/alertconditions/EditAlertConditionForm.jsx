@@ -18,9 +18,18 @@ const EditAlertConditionForm = createReactClass({
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
+    onUpdate: PropTypes.func,
+    onDelete: PropTypes.func,
   },
 
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  getDefaultProps() {
+    return {
+      onUpdate: () => {},
+      onDelete: () => {},
+    };
+  },
 
   _isLoading() {
     return !this.state.types;
@@ -37,7 +46,14 @@ const EditAlertConditionForm = createReactClass({
       <div>
         <h2>Condition details</h2>
         <p>Define the condition to evaluate when triggering a new alert.</p>
-        <EntityList items={[<AlertCondition key={alertCondition.id} stream={stream} alertCondition={alertCondition} isDetailsView />]} />
+        <EntityList items={[
+          <AlertCondition key={alertCondition.id}
+                          stream={stream}
+                          alertCondition={alertCondition}
+                          onUpdate={this.props.onUpdate}
+                          onDelete={this.props.onDelete}
+                          isDetailsView />,
+        ]} />
       </div>
     );
   },

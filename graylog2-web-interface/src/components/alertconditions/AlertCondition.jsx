@@ -18,12 +18,16 @@ const AlertCondition = createReactClass({
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
     isDetailsView: PropTypes.bool,
+    onUpdate: PropTypes.func,
+    onDelete: PropTypes.func,
   },
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   getDefaultProps() {
     return {
       isDetailsView: false,
+      onUpdate: () => {},
+      onDelete: () => {},
     };
   },
 
@@ -32,14 +36,14 @@ const AlertCondition = createReactClass({
   },
 
   _onUpdate(request) {
-    AlertConditionsActions.update(this.props.stream.id, this.props.alertCondition.id, request).then(() => {
-      AlertConditionsActions.get(this.props.stream.id, this.props.alertCondition.id);
-    });
+    AlertConditionsActions.update(this.props.stream.id, this.props.alertCondition.id, request)
+      .then(() => this.props.onUpdate(this.props.stream.id, this.props.alertCondition.id));
   },
 
   _onDelete() {
     if (window.confirm('Really delete alert condition?')) {
-      AlertConditionsActions.delete(this.props.stream.id, this.props.alertCondition.id);
+      AlertConditionsActions.delete(this.props.stream.id, this.props.alertCondition.id)
+        .then(() => this.props.onDelete(this.props.stream.id, this.props.alertCondition.id));
     }
   },
 
