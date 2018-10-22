@@ -37,7 +37,7 @@ const EditAlertConditionForm = createReactClass({
       <div>
         <h2>Condition details</h2>
         <p>Define the condition to evaluate when triggering a new alert.</p>
-        <EntityList items={[<AlertCondition stream={stream} alertCondition={alertCondition} />]} />
+        <EntityList items={[<AlertCondition key={alertCondition.id} stream={stream} alertCondition={alertCondition} isDetailsView />]} />
       </div>
     );
   },

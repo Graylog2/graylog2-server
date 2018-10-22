@@ -17,9 +17,15 @@ const AlertCondition = createReactClass({
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
+    isDetailsView: PropTypes.bool,
   },
-
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  getDefaultProps() {
+    return {
+      isDetailsView: false,
+    };
+  },
 
   _onEdit() {
     this.updateForm.open();
@@ -72,7 +78,7 @@ const AlertCondition = createReactClass({
                                typeDefinition={typeDefinition}
                                stream={stream}
                                actions={actions}
-                               linkToDetails />
+                               isDetailsView={this.props.isDetailsView} />
       </React.Fragment>
     );
   },

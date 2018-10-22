@@ -16,7 +16,12 @@ class AlertConditionSummary extends React.Component {
     typeDefinition: PropTypes.object.isRequired,
     stream: PropTypes.object,
     actions: PropTypes.array.isRequired,
-    linkToDetails: PropTypes.bool,
+    isDetailsView: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    stream: undefined,
+    isDetailsView: false,
   };
 
   render() {
@@ -36,14 +41,14 @@ class AlertConditionSummary extends React.Component {
     );
 
     let title;
-    if (this.props.linkToDetails) {
+    if (this.props.isDetailsView) {
+      title = (condition.title ? condition.title : 'Untitled');
+    } else {
       title = (
         <Link to={Routes.show_alert_condition(stream.id, condition.id)}>
           {condition.title ? condition.title : 'Untitled'}
         </Link>
       );
-    } else {
-      title = (condition.title ? condition.title : 'Untitled');
     }
 
     return (
