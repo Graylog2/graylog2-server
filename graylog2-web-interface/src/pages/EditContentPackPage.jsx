@@ -37,9 +37,7 @@ const EditContentPackPage = createReactClass({
   componentDidMount() {
     ContentPacksActions.get(this.props.params.contentPackId).then(() => {
       const originContentPackRev = this.props.params.contentPackRev;
-      const newContentPack = this.state.contentPack[originContentPackRev];
-      const nextContentPackRev = Math.max(...Object.keys(this.state.contentPack).map(x => parseInt(x, 10))) + 1;
-      newContentPack.rev = nextContentPackRev;
+      const newContentPack = this.state.contentPackRevisions.createNewVersionFromRev(originContentPackRev);
       this.setState({ contentPack: newContentPack });
 
       CatalogActions.showEntityIndex().then(() => {
