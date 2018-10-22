@@ -1,12 +1,12 @@
 import { Map } from 'immutable';
 
 export default class ContentPack {
-  constructor(version, id, revision, name, summary, description, vendor, url, requires,
+  constructor(v, id, rev, name, summary, description, vendor, url, requires,
     parameters, entities) {
     this._value = {
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,
@@ -18,16 +18,16 @@ export default class ContentPack {
     };
   }
 
-  get version() {
-    return this._value.version;
+  get v() {
+    return this._value.v;
   }
 
   get id() {
     return this._value.id;
   }
 
-  get revision() {
-    return this._value.revision;
+  get rev() {
+    return this._value.rev;
   }
 
   get name() {
@@ -64,9 +64,9 @@ export default class ContentPack {
 
   toBuilder() {
     const {
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,
@@ -78,9 +78,9 @@ export default class ContentPack {
     } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,
@@ -94,9 +94,9 @@ export default class ContentPack {
 
   static fromJSON(value) {
     const {
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,
@@ -107,9 +107,9 @@ export default class ContentPack {
       entities,
     } = value;
     return new ContentPack(
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,
@@ -132,8 +132,8 @@ class Builder {
     this.value = value;
   }
 
-  version(value) {
-    this.value = this.value.set('version', value);
+  v(value) {
+    this.value = this.value.set('v', value);
     return this;
   }
 
@@ -142,8 +142,8 @@ class Builder {
     return this;
   }
 
-  revision(value) {
-    this.value = this.value.set('revision', value);
+  rev(value) {
+    this.value = this.value.set('rev', value);
     return this;
   }
 
@@ -189,9 +189,9 @@ class Builder {
 
   build() {
     const {
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,
@@ -202,9 +202,9 @@ class Builder {
       entities,
     } = this.value.toObject();
     return new ContentPack(
-      version,
+      v,
       id,
-      revision,
+      rev,
       name,
       summary,
       description,

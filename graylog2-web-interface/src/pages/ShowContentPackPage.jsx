@@ -83,11 +83,11 @@ const ShowContentPackPage = createReactClass({
   },
 
   render() {
-    if (!this.state.contentPack) {
+    if (!this.state.contentPackRevisions) {
       return (<Spinner />);
     }
 
-    const { contentPack, selectedVersion, constraints } = this.state;
+    const { contentPackRevisions, selectedVersion, constraints } = this.state;
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -114,7 +114,7 @@ const ShowContentPackPage = createReactClass({
                 <Row className={ShowContentPackStyle.leftRow}>
                   <Col>
                     <h2>Versions</h2>
-                    <ContentPackVersions contentPack={contentPack}
+                    <ContentPackVersions contentPackRevisions={contentPackRevisions}
                                          onInstall={this._installContentPack}
                                          onChange={this._onVersionChanged}
                                          onDeletePack={this._deleteContentPackRev} />
@@ -131,7 +131,10 @@ const ShowContentPackPage = createReactClass({
               </div>
             </Col>
             <Col md={8} className="content">
-              <ContentPackDetails contentPack={contentPack[selectedVersion]} constraints={constraints[selectedVersion]} showConstraints verbose />
+              <ContentPackDetails contentPack={contentPackRevisions[selectedVersion]}
+                                  constraints={constraints[selectedVersion]}
+                                  showConstraints
+                                  verbose />
             </Col>
           </Row>
         </span>

@@ -14,7 +14,7 @@ import './ContentPackVersions.css';
 
 class ContentPackVersions extends React.Component {
   static propTypes = {
-    contentPack: PropTypes.object.isRequired,
+    contentPackRevisions: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
@@ -28,8 +28,8 @@ class ContentPackVersions extends React.Component {
 
   constructor(props) {
     super(props);
-    const versions = Object.keys(this.props.contentPack);
-    this.state = { selectedVersion: versions[0] };
+    const { contentPackRevisions } = this.props;
+    this.state = { selectedVersion: contentPackRevisions.latestRevision };
 
     this.onChange = this.onChange.bind(this);
     this.rowFormatter = this.rowFormatter.bind(this);
@@ -84,8 +84,7 @@ class ContentPackVersions extends React.Component {
     return { openFunc: open, installModal: modal };
   }
 
-  rowFormatter(rev) {
-    const pack = this.props.contentPack[parseInt(rev.version, 10)];
+  rowFormatter(pack) {
     const { openFunc, installModal } = this._installModal(pack);
     let downloadRef;
     const downloadModal = (<ContentPackDownloadControl
@@ -126,16 +125,16 @@ class ContentPackVersions extends React.Component {
   };
 
   render() {
-    const versions = Object.keys(this.props.contentPack).map((rev) => { return { version: rev }; });
+    const contentPacks = this.props.contentPackRevisions.contentPacks;
     const headers = ['Select', 'Revision', 'Action'];
     return (
       <DataTable
         id="content-packs-versions"
         headers={headers}
         headerCellFormatter={this.headerFormatter}
-        sortByKey="version"
+        sortByKey="rev"
         dataRowFormatter={this.rowFormatter}
-        rows={versions}
+        rows={contentPacks}
         filterKeys={[]}
       />);
   }
