@@ -62,7 +62,9 @@ public class GelfCodec extends AbstractCodec {
     public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator) {
         super(configuration);
         this.aggregator = aggregator;
-        this.objectMapper = new ObjectMapper().enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS);
+        this.objectMapper = new ObjectMapper().enable(
+            JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
+            JsonParser.Feature.ALLOW_TRAILING_COMMA);
         this.decompressSizeLimit = configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT);
     }
 

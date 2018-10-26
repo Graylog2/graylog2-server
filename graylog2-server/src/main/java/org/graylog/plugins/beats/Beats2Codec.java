@@ -75,6 +75,11 @@ public class Beats2Codec extends AbstractCodec {
             return null;
         }
 
+        // Adhere to the legacy behaviour
+        if (event == null) {
+            return null;
+        }
+
         return parseEvent(event);
     }
 
