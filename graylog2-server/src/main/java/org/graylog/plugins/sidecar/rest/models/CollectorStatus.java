@@ -33,10 +33,14 @@ public abstract class CollectorStatus {
     @JsonProperty("message")
     public abstract String message();
 
+    @JsonProperty("verbose_message")
+    public abstract String verboseMessage();
+
     @JsonCreator
     public static CollectorStatus create(@JsonProperty("collector_id") String collectorId,
                                          @JsonProperty("status") int status,
-                                         @JsonProperty("message") String message) {
-        return new AutoValue_CollectorStatus(collectorId, status, message);
+                                         @JsonProperty("message") String message,
+                                         @JsonProperty("verbose_message") String verboseMessage) {
+        return new AutoValue_CollectorStatus(collectorId, status, message, verboseMessage);
     }
 }
