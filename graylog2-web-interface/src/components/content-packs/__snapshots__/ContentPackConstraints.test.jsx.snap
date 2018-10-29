@@ -24,10 +24,10 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
             <thead>
               <tr>
                 <th>
-                  Type
+                  Name
                 </th>
                 <th>
-                  Plugin
+                  Type
                 </th>
                 <th>
                   Version
@@ -40,10 +40,10 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
             <tbody>
               <tr>
                 <td>
-                  plugin-version
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
                 </td>
                 <td>
-                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                  plugin-version
                 </td>
                 <td>
                   &gt;=3.0.0-alpha.2
@@ -60,9 +60,11 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
               </tr>
               <tr>
                 <td>
+                  Graylog
+                </td>
+                <td>
                   server-version
                 </td>
-                <td />
                 <td>
                   &gt;=3.0.0-alpha.2+af8d8e0
                 </td>
@@ -109,10 +111,10 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
             <thead>
               <tr>
                 <th>
-                  Type
+                  Name
                 </th>
                 <th>
-                  Plugin
+                  Type
                 </th>
                 <th>
                   Version
@@ -125,10 +127,10 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
             <tbody>
               <tr>
                 <td>
-                  plugin-version
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
                 </td>
                 <td>
-                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                  plugin-version
                 </td>
                 <td>
                   &gt;=3.0.0-alpha.2
@@ -145,9 +147,11 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
               </tr>
               <tr>
                 <td>
+                  Graylog
+                </td>
+                <td>
                   server-version
                 </td>
-                <td />
                 <td>
                   &gt;=3.0.0-alpha.2+af8d8e0
                 </td>
@@ -194,10 +198,10 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
             <thead>
               <tr>
                 <th>
-                  Type
+                  Name
                 </th>
                 <th>
-                  Plugin
+                  Type
                 </th>
                 <th>
                   Version
@@ -210,10 +214,10 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
             <tbody>
               <tr>
                 <td>
-                  plugin-version
+                  org.graylog.plugins.threatintel.ThreatIntelPlugin
                 </td>
                 <td>
-                  org.graylog.plugins.threatintel.ThreatIntelPlugin
+                  plugin-version
                 </td>
                 <td>
                   &gt;=3.0.0-alpha.2
@@ -230,9 +234,11 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
               </tr>
               <tr>
                 <td>
+                  Graylog
+                </td>
+                <td>
                   server-version
                 </td>
-                <td />
                 <td>
                   &gt;=3.0.0-alpha.2+af8d8e0
                 </td>
