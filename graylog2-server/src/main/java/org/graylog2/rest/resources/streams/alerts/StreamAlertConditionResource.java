@@ -27,6 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -218,6 +219,7 @@ public class StreamAlertConditionResource extends RestResource {
     @Path("test")
     @Timed
     @ApiOperation("Test new alert condition")
+    @NoAuditEvent("resource doesn't modify any data")
     public Response testNew(@ApiParam(name = "streamId", value = "The stream ID this alert condition belongs to.", required = true) @PathParam("streamId") String streamId,
                             @ApiParam(name = "Alert condition parameters", required = true) @Valid @NotNull CreateConditionRequest ccr) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
@@ -237,6 +239,7 @@ public class StreamAlertConditionResource extends RestResource {
     @Path("{conditionId}/test")
     @Timed
     @ApiOperation("Test existing alert condition")
+    @NoAuditEvent("resource doesn't modify any data")
     public Response testExisting(@ApiParam(name = "streamId", value = "The stream ID this alert condition belongs to.", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "conditionId", value = "The alert condition ID to be fetched", required = true)
