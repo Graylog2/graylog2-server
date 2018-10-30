@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import lodash from 'lodash';
-
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
 
 class VerboseMessageModal extends React.Component {
+  static propTypes = {
+    collectorName: PropTypes.string.isRequired,
+    collectorVerbose: PropTypes.string.isRequired,
+  };
 
   open = () => {
     this.sourceModal.open();
