@@ -3,6 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -10,6 +11,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { EntityListItem, IfPermitted, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
+import Routes from 'routing/Routes';
 
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
@@ -23,6 +25,7 @@ const AlertNotification = createReactClass({
     stream: PropTypes.object,
     onNotificationUpdate: PropTypes.func.isRequired,
     onNotificationDelete: PropTypes.func.isRequired,
+    isStreamView: PropTypes.bool,
   },
 
   mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
@@ -30,6 +33,7 @@ const AlertNotification = createReactClass({
   getDefaultProps() {
     return {
       stream: undefined,
+      isStreamView: false,
     };
   },
 
@@ -103,6 +107,11 @@ const AlertNotification = createReactClass({
                           title="More actions"
                           pullRight
                           id={`more-actions-dropdown-${notification.id}`}>
+            {!this.props.isStreamView && (
+              <LinkContainer to={Routes.stream_alerts(stream.id)}>
+                <MenuItem>Alerts for this Stream</MenuItem>
+              </LinkContainer>
+            )}
             <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
             <MenuItem divider />
             <MenuItem onSelect={this._onDelete}>Delete</MenuItem>

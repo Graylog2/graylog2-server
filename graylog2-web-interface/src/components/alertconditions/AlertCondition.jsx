@@ -3,10 +3,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { AlertConditionForm, AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
+import Routes from 'routing/Routes';
 
 const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -18,6 +20,7 @@ const AlertCondition = createReactClass({
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
     isDetailsView: PropTypes.bool,
+    isStreamView: PropTypes.bool,
     onUpdate: PropTypes.func,
     onDelete: PropTypes.func,
   },
@@ -26,6 +29,7 @@ const AlertCondition = createReactClass({
   getDefaultProps() {
     return {
       isDetailsView: false,
+      isStreamView: false,
       onUpdate: () => {},
       onDelete: () => {},
     };
@@ -65,6 +69,11 @@ const AlertCondition = createReactClass({
                         title="Actions"
                         pullRight
                         id={`more-actions-dropdown-${condition.id}`}>
+          {!this.props.isStreamView && (
+            <LinkContainer to={Routes.stream_alerts(stream.id)}>
+              <MenuItem>Alerts for this Stream</MenuItem>
+            </LinkContainer>
+          )}
           <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this._onDelete}>Delete</MenuItem>

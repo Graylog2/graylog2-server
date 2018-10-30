@@ -60,13 +60,14 @@ class StreamAlertNotifications extends React.Component {
         <p>
           <Pluralize value={notifications.length} singular="This is the notification" plural="These are the notifications" />
           {' '}set for the stream <em>{stream.title}</em>. <Pluralize value={notifications.length} singular="It" plural="They" />
-          {' '}will be triggered when the alert condition is satisfied.
+          {' '}will be triggered when an alert condition is satisfied.
         </p>
 
         <AlertNotificationsList alertNotifications={notifications}
                                 streams={[this.props.stream]}
                                 onNotificationUpdate={this._loadData}
-                                onNotificationDelete={this._loadData} />
+                                onNotificationDelete={this._loadData}
+                                isStreamView />
       </div>
     );
   }

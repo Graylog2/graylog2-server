@@ -54,7 +54,8 @@ const StreamAlertConditions = createReactClass({
         <AlertConditionsList alertConditions={alertConditions}
                              streams={[this.props.stream]}
                              onConditionUpdate={this.loadData}
-                             onConditionDelete={this.loadData} />
+                             onConditionDelete={this.loadData}
+                             isStreamView />
       </div>
     );
   },

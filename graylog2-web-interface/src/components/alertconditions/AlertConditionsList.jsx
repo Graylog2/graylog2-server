@@ -10,11 +10,13 @@ class AlertConditionsList extends React.Component {
     streams: PropTypes.array.isRequired,
     onConditionUpdate: PropTypes.func,
     onConditionDelete: PropTypes.func,
+    isStreamView: PropTypes.bool,
   };
 
   static defaultProps = {
     onConditionUpdate: () => {},
     onConditionDelete: () => {},
+    isStreamView: false,
   };
 
   state = {
@@ -38,7 +40,8 @@ class AlertConditionsList extends React.Component {
                       alertCondition={condition}
                       stream={stream}
                       onUpdate={this.props.onConditionUpdate}
-                      onDelete={this.props.onConditionDelete} />
+                      onDelete={this.props.onConditionDelete}
+                      isStreamView={this.props.isStreamView} />
     );
   };
 

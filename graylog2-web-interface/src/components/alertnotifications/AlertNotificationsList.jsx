@@ -10,11 +10,13 @@ class AlertNotificationsList extends React.Component {
     streams: PropTypes.array.isRequired,
     onNotificationUpdate: PropTypes.func,
     onNotificationDelete: PropTypes.func,
+    isStreamView: PropTypes.bool,
   };
 
   static defaultProps = {
     onNotificationUpdate: () => {},
     onNotificationDelete: () => {},
+    isStreamView: false,
   };
 
   state = {
@@ -38,7 +40,8 @@ class AlertNotificationsList extends React.Component {
                          alertNotification={notification}
                          stream={stream}
                          onNotificationUpdate={this.props.onNotificationUpdate}
-                         onNotificationDelete={this.props.onNotificationDelete} />
+                         onNotificationDelete={this.props.onNotificationDelete}
+                         isStreamView={this.props.isStreamView} />
     );
   };
 
