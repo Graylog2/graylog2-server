@@ -249,7 +249,7 @@ public class ContentPackResource extends RestResource {
 
         if (!contentPackInstallationPersistenceService.findByContentPackIdAndRevision(contentPackId, revision).isEmpty()) {
             throw new BadRequestException("Content pack " + contentPackId + " and revision " + revision +
-                    " can't be deleted: There are still installations of this content packs revision.");
+                    " can't be deleted: There are still installations of this content pack revision.");
         }
 
         final int deleted = contentPackPersistenceService.deleteByIdAndRevision(contentPackId, revision);
