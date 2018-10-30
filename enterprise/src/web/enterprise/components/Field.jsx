@@ -70,8 +70,6 @@ export default class Field extends React.Component {
         <MenuItem divider />
         <MenuItem header>Actions</MenuItem>
         {fieldActions}
-
-        <Well style={{ marginTop: '10px', fontWeight: 200 }}>These are very useful stats about the field.</Well>
       </OverlayDropdown>
     );
   }

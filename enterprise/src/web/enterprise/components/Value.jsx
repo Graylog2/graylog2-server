@@ -75,8 +75,6 @@ export default class Value extends React.Component {
         <MenuItem divider />
         <MenuItem header>Actions</MenuItem>
         {valueActions}
-
-        <Well className={style.topSpacer}>Found 3827 times in this result set.</Well>
       </OverlayDropdown>
     );
   }

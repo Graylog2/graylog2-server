@@ -65,16 +65,6 @@ exports[`Value render without type information but no children 1`] = `
           Actions
         </li>
       </MenuItem>
-      <Well
-        bsClass="well"
-        className="topSpacer"
-      >
-        <div
-          className="topSpacer well"
-        >
-          Found 3827 times in this result set.
-        </div>
-      </Well>
     </overlay-dropdown>
   </OverlayDropdown>
 </Value>
@@ -145,16 +135,6 @@ exports[`Value renders booleans as strings 1`] = `
           Actions
         </li>
       </MenuItem>
-      <Well
-        bsClass="well"
-        className="topSpacer"
-      >
-        <div
-          className="topSpacer well"
-        >
-          Found 3827 times in this result set.
-        </div>
-      </Well>
     </overlay-dropdown>
   </OverlayDropdown>
 </Value>
@@ -239,16 +219,6 @@ exports[`Value renders timestamps with a custom component 1`] = `
           Actions
         </li>
       </MenuItem>
-      <Well
-        bsClass="well"
-        className="topSpacer"
-      >
-        <div
-          className="topSpacer well"
-        >
-          Found 3827 times in this result set.
-        </div>
-      </Well>
     </overlay-dropdown>
   </OverlayDropdown>
 </Value>
