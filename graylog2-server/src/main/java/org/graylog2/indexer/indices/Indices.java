@@ -16,15 +16,12 @@
  */
 package org.graylog2.indexer.indices;
 
-import static java.util.stream.Collectors.toList;
-import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
-import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -67,22 +64,6 @@ import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
 import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -113,6 +94,27 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
 
 @Singleton
 public class Indices {
@@ -664,6 +666,35 @@ public class Indices {
                 .map(JsonNode::asLong)
                 .map(creationDate -> new DateTime(creationDate, DateTimeZone.UTC));
     }
+
+    /**
+     * For the given wildcard retrieve the version.created index setting for each concrete index.
+     *
+     * @param indexWildcard the wildcard for an index set
+     * @return (name, semver version) -> map of creation versions of all indices for the wildcard
+     */
+    public Map<String, Version> indicesCreationVersion(String indexWildcard) {
+        final GetSettings request = new GetSettings.Builder()
+                .addIndex(indexWildcard)
+                .ignoreUnavailable(true)
+                .build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read settings of index wildcard " + indexWildcard);
+
+        final ImmutableMap.Builder<String, Version> resultBuilder = ImmutableMap.builder();
+        final JsonNode jsonObject = jestResult.getJsonObject();
+        // the first level of the result are the concrete index names
+        // find the creation version and add to the result map if found
+        jsonObject.fieldNames().forEachRemaining(index -> {
+            Optional.of(jsonObject.path(index).path("settings").path("index").path("version").path("created"))
+                    .filter(JsonNode::isValueNode)
+                    .map(JsonNode::asInt)
+                    .map(org.elasticsearch.Version::fromId)
+                    .map(esVersion -> Version.valueOf(esVersion.toString()))
+                    .ifPresent(v -> resultBuilder.put(index, v));
+        });
+        return resultBuilder.build();
+    }
+
 
     /**
      * Calculate min and max message timestamps in the given index.

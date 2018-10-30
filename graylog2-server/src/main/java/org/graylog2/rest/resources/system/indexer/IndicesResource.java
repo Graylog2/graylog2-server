@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +40,7 @@ import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
+import org.graylog2.rest.models.system.indexer.responses.OutdatedIndices;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -49,6 +51,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -56,6 +59,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.HashMap;
@@ -299,6 +303,28 @@ public class IndicesResource extends RestResource {
                 .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
+    }
+
+    @GET
+    @Path("/{indexSetId}/outdated")
+    @Timed
+    @ApiOperation(value = "Get a list of all indices that were created by an Elasticsearch version prior to the current major version",
+            notes = "Elasticsearch drops support for index formats that were created by older versions, requiring " +
+                    "physical upgrades before major versions updates are possible. This endpoint lists the indices that " +
+                    "require reindexing.")
+    @RequiresPermissions(RestPermissions.INDICES_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    public OutdatedIndices indexSetOutdated(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId,
+                                            @ApiParam(name = "versionExpression", value = "A semantic version expression describing which versions are acceptable") @QueryParam("versionExpression") @DefaultValue("^5 | ^6") String versionExpression) {
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
+
+        final Map<String, Version> nameVersionMap = indices.indicesCreationVersion(indexSet.getIndexWildcard());
+        Set<String> outdated = nameVersionMap.entrySet().stream()
+                .filter(e -> !e.getValue().satisfies(versionExpression))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        return OutdatedIndices.create(outdated);
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
