@@ -221,7 +221,7 @@ public class ContentPackResource extends RestResource {
             @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
             @PathParam("contentPackId") final ModelId contentPackId) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
-        if (contentPackInstallationPersistenceService.findByContentPackId(contentPackId).size() > 0) {
+        if (!contentPackInstallationPersistenceService.findByContentPackId(contentPackId).isEmpty()) {
                throw new BadRequestException("Content pack " + contentPackId +
                        " with all his revisions can't be deleted: There are still installations of this content pack");
         }
