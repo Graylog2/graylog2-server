@@ -27,8 +27,15 @@ const ContentPacksPage = createReactClass({
       ContentPacksActions.delete(contentPackId).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
         ContentPacksActions.list();
-      }, () => {
-        UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
+      }, (error) => {
+        /* eslint-disable camelcase */
+        let err_message = error.message;
+        const err_body = error.additional.body;
+        /* eslint-enable camlecase */
+        if (err_body && err_body.message) {
+          err_message = error.additional.body.message;
+        }
+        UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
       });
     }
   },

@@ -21,6 +21,7 @@ import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
@@ -37,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.util.Collections;
@@ -74,6 +76,9 @@ public class ContentPackResourceTest {
     private ContentPackPersistenceService contentPackPersistenceService;
     @Mock
     private ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
+
+    @Mock
+    private Set<ContentPackInstallation> contentPackInstallations;
 
     private ContentPackResource contentPackResource;
     private ObjectMapper objectMapper;
@@ -152,6 +157,34 @@ public class ContentPackResourceTest {
         when(contentPackPersistenceService.deleteByIdAndRevision(id, 1)).thenReturn(1);
         contentPackResource.deleteContentPack(id, 1);
         verify(contentPackPersistenceService, times(1)).deleteByIdAndRevision(id, 1);
+    }
+
+    @Test
+    public void notDeleteContentPack() throws Exception {
+        final ModelId id = ModelId.of("1");
+        when(contentPackInstallations.size()).thenReturn(1);
+        when(contentPackInstallationPersistenceService.findByContentPackId(id)).thenReturn(contentPackInstallations);
+        boolean exceptionCalled = false;
+        try {
+            contentPackResource.deleteContentPack(id);
+        } catch (BadRequestException e) {
+            exceptionCalled = true;
+        }
+        assertThat(exceptionCalled).isEqualTo(true);
+        verify(contentPackInstallationPersistenceService, times(1)).findByContentPackId(id);
+        verify(contentPackPersistenceService, times(0)).deleteById(id);
+
+        when(contentPackInstallations.size()).thenReturn(1);
+        when(contentPackInstallationPersistenceService.findByContentPackIdAndRevision(id, 1)).thenReturn(contentPackInstallations);
+        exceptionCalled = false;
+        try {
+            contentPackResource.deleteContentPack(id, 1);
+        } catch (BadRequestException e) {
+            exceptionCalled = true;
+        }
+        assertThat(exceptionCalled).isEqualTo(true);
+        verify(contentPackInstallationPersistenceService, times(1)).findByContentPackIdAndRevision(id, 1);
+        verify(contentPackPersistenceService, times(0)).deleteByIdAndRevision(id, 1);
     }
 
     static class PermittedTestResource extends ContentPackResource {
