@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -114,7 +115,7 @@ public class ConnectionCounterTest {
 
             assertThat(clientChannel.isWritable()).isTrue();
             // We have to send a message here to make sure that channelReadComplete gets called in the handler
-            clientChannel.writeAndFlush(Unpooled.wrappedBuffer("canary".getBytes())).syncUninterruptibly();
+            clientChannel.writeAndFlush(Unpooled.wrappedBuffer("canary".getBytes(StandardCharsets.UTF_8))).syncUninterruptibly();
 
             // Wait until the server read the message
             readCompleteLatch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
