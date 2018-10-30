@@ -18,6 +18,8 @@ package org.graylog2.contentpacks;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
@@ -36,6 +38,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 public class ContentPackInstallationPersistenceService {
@@ -61,6 +64,16 @@ public class ContentPackInstallationPersistenceService {
         try (final DBCursor<ContentPackInstallation> installations = dbCollection.find()) {
             return ImmutableSet.copyOf((Iterator<ContentPackInstallation>) installations);
         }
+    }
+
+    public Set<ContentPackInstallation> findByContentPackIds(Set<ModelId> ids) {
+        final Set<String> stringIds = ids.stream().map(x -> x.toString()).collect(Collectors.toSet());
+        final DBObject query = BasicDBObjectBuilder.start()
+                .push(ContentPackInstallation.FIELD_CONTENT_PACK_ID)
+                .append("$in", stringIds)
+                .get();
+        final DBCursor<ContentPackInstallation> result = dbCollection.find(query);
+        return ImmutableSet.copyOf((Iterable<ContentPackInstallation>) result);
     }
 
     public Optional<ContentPackInstallation> findById(ObjectId id) {
@@ -94,9 +107,8 @@ public class ContentPackInstallationPersistenceService {
         return writeResult.getN();
     }
 
-    public Map<ModelId, Map<Integer, ContentPackMetadata>> getInstallationMetadata() {
-        final Set<ContentPackInstallation> contentPackInstallations = loadAll();
-        Map <Integer, ContentPackMetadata> contentPackMetadataMap = new HashMap();
+    public Map<ModelId, Map<Integer, ContentPackMetadata>> getInstallationMetadata(Set<ModelId> ids) {
+        final Set<ContentPackInstallation> contentPackInstallations = findByContentPackIds(ids);
         Map<ModelId, Map<Integer, ContentPackMetadata>> installationMetaData = new HashMap();
         for (ContentPackInstallation installation : contentPackInstallations) {
             Map<Integer, ContentPackMetadata> metadataMap = installationMetaData.get(installation.contentPackId());
