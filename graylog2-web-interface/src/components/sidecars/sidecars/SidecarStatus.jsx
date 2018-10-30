@@ -17,7 +17,7 @@ const SidecarStatus = createReactClass({
   },
 
   getInitialState() {
-    return { collectorName: "", collectorVerbose: "" };
+    return { collectorName: '', collectorVerbose: '' };
   },
 
   formatNodeDetails(details) {
@@ -78,9 +78,13 @@ const SidecarStatus = createReactClass({
           statusBadge = <i className="fa fa-warning fa-fw" />;
 
           if (status.verbose_message) {
-            verboseButton = <Button bsStyle="link" bsSize="sm" onClick={() => {
-              this._onShowVerbose(collector.name, status.verbose_message)
-            }}> (Show Details...) </Button>;
+            verboseButton = (
+              <Button bsStyle="link"
+                      bsSize="xs"
+                      onClick={() => this._onShowVerbose(collector.name, status.verbose_message)}>
+                Show Details
+              </Button>
+            );
           }
           break;
         case SidecarStatusEnum.STOPPED:
@@ -110,7 +114,7 @@ const SidecarStatus = createReactClass({
   },
 
   _onShowVerbose(name, verbose) {
-    this.setState({collectorName: name, collectorVerbose: verbose});
+    this.setState({ collectorName: name, collectorVerbose: verbose });
     this.modal.open();
   },
 
