@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row, Checkbox } from 'react-bootstrap';
-import naturalSort from 'javascript-natural-sort';
+import { Col, Row } from 'react-bootstrap';
 
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import { defaultCompare } from 'enterprise/logic/DefaultCompare';
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
@@ -81,9 +81,9 @@ export default class AggregationControls extends React.Component {
       .map(fieldType => fieldType.name)
       .valueSeq()
       .toJS()
-      .sort((v1, v2) => naturalSort(v1, v2));
+      .sort(defaultCompare);
     const currentlyUsedFields = [].concat(rowPivots, columnPivots, series)
-      .sort(naturalSort)
+      .sort(defaultCompare)
       .map(v => ({ label: v, value: v }));
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);

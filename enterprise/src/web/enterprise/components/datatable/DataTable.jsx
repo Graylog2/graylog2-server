@@ -5,8 +5,8 @@ import Immutable from 'immutable';
 import { flatten, get, isEqual, last, uniqWith } from 'lodash';
 
 import expandRows from 'enterprise/logic/ExpandRows';
+import { defaultCompare } from 'enterprise/logic/DefaultCompare';
 import connect from 'stores/connect';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import Field from 'enterprise/components/Field';
 import Value from 'enterprise/components/Value';
@@ -82,11 +82,11 @@ class DataTable extends React.Component {
     if (ary1.length < ary2.length) {
       return -1;
     }
-    const diffIdx = ary1.findIndex((v, idx) => (naturalSortIgnoreCase(v, ary2[idx]) !== 0));
+    const diffIdx = ary1.findIndex((v, idx) => (defaultCompare(v, ary2[idx]) !== 0));
     if (diffIdx === -1) {
       return 0;
     }
-    return naturalSortIgnoreCase(ary1[diffIdx], ary2[diffIdx]);
+    return defaultCompare(ary1[diffIdx], ary2[diffIdx]);
   };
 
   _extractColumnPivotValues = (rows) => {
@@ -105,7 +105,7 @@ class DataTable extends React.Component {
     const columnFieldNames = columnPivots.map(pivot => pivot.field);
 
     const seriesToMerge = rollup ? series : [];
-    const fields = new Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({effectiveName}) => effectiveName));
+    const fields = new Immutable.OrderedSet(rowFieldNames).merge(seriesToMerge.map(({ effectiveName }) => effectiveName));
 
     const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter(r => r.source === 'leaf'));
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col } from 'react-bootstrap';
-import naturalSort from 'javascript-natural-sort';
 import Immutable from 'immutable';
 
 import connect from 'stores/connect';
@@ -9,6 +8,7 @@ import Select from 'components/common/Select';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { SelectedFieldsActions, SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
+import { defaultCompare} from 'enterprise/logic/DefaultCompare';
 import DescriptionBox from '../aggregationbuilder/DescriptionBox';
 
 const _onFieldSelectionChanged = (fields, config, id) => {
@@ -30,7 +30,7 @@ const EditMessageList = ({ children, config, containerHeight, fields, id, select
     .map(fieldName => ({ label: fieldName, value: fieldName }))
     .valueSeq()
     .toJS()
-    .sort((v1, v2) => naturalSort(v1.label, v2.label));
+    .sort((v1, v2) => defaultCompare(v1.label, v2.label));
   const selectedFieldsForSelect = (config ? Immutable.Set(config.fields) : selectedFields).join(',');
 
   return (
