@@ -83,7 +83,7 @@ const CollectorForm = createReactClass({
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);
-    CollectorsActions.validate(nextName).then(validation => (
+    CollectorsActions.validate(nextName, this.props.collector.id).then(validation => (
       this.setState({ error: validation.error, error_message: validation.error_message })
     ));
   },

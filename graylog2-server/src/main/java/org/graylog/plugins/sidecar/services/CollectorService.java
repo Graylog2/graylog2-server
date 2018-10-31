@@ -53,6 +53,15 @@ public class CollectorService extends PaginatedDbService<Collector> {
         return db.findOne(DBQuery.is("name", name));
     }
 
+    @Nullable
+    public Collector findByNameExcludeId(String name, String id) {
+        return db.findOne(
+                DBQuery.and(
+                    DBQuery.is("name", name),
+                    DBQuery.notEquals("_id", id))
+        );
+    }
+
     public long count() {
         return db.count();
     }

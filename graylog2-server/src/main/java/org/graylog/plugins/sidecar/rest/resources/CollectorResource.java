@@ -243,8 +243,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates collector name")
-    public ValidationResponse validateCollector(@ApiParam(name = "name", required = true) @QueryParam("name") String name) {
-        final Collector collector = collectorService.findByName(name);
+    public ValidationResponse validateCollector(
+            @ApiParam(name = "name", required = true) @QueryParam("name") String name,
+            @ApiParam(name = "id", required = false) @QueryParam("id") String id) {
+        final Collector collector;
+        if (id == null) {
+            collector = collectorService.findByName(name);
+        } else {
+            collector = collectorService.findByNameExcludeId(name, id);
+        }
         if (collector == null) {
             return ValidationResponse.create(false, null);
         }
