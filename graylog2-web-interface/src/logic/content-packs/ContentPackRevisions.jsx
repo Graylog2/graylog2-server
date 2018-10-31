@@ -6,7 +6,7 @@ export default class ContentPackRevisions {
     this._value = Object.keys(contentPackRevision).reduce((acc, rev) => {
       const contentPack = contentPackRevision[rev];
       /* eslint-disable-next-line no-return-assign */
-      acc[parseInt(rev, 10)] = new ContentPack.fromJSON(contentPack);
+      acc[parseInt(rev, 10)] = ContentPack.fromJSON(contentPack);
       return acc;
     }, {});
   }
@@ -16,7 +16,7 @@ export default class ContentPackRevisions {
   }
 
   get revisions() {
-    return Object.keys(this._value);
+    return Object.keys(this._value).map(rev => parseInt(rev, 10));
   }
 
   get latest() {
@@ -28,10 +28,9 @@ export default class ContentPackRevisions {
   }
 
   createNewVersionFromRev(rev) {
-    const newContentPack = this.contentPack(parseInt(rev, 10)).toBuilder()
+    return this.contentPack(parseInt(rev, 10)).toBuilder()
       .rev(this.latestRevision + 1)
       .build();
-    return newContentPack;
   }
 
   contentPack(revision) {

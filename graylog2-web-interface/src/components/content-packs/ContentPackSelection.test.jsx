@@ -3,23 +3,24 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 
+import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
-    const contentPack = {};
+    const contentPack = new ContentPack.builder().build();
     const wrapper = renderer.create(<ContentPackSelection contentPack={contentPack} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render with filled content pack', () => {
-    const contentPack = {
-      name: 'name',
-      summary: 'summmary',
-      description: 'descr',
-      vendor: 'vendor',
-      url: 'http://example.com',
-    };
+    const contentPack = ContentPack.builder()
+      .name('name')
+      .summary('summary')
+      .description('description')
+      .vendor('vendor')
+      .url('http://example.com')
+      .build();
 
     const entities = {
       spaceship: [{
@@ -43,25 +44,17 @@ describe('<ContentPackSelection />', () => {
   it('should update the state when filling out the form', () => {
     let called = 0;
     const changeFn = jest.fn((state) => {
-      const contentPack = {
-        name: 'name',
-        summary: 'summary',
-        description: 'descr',
-        vendor: 'vendor',
-        url: 'url',
-      };
       called += 1;
-      if (called === Object.keys(contentPack).length) {
-        expect(state.contentPack).toEqual(contentPack);
+      if (called === 5) {
+        expect(state.contentPack.name).toEqual('name');
+        expect(state.contentPack.summary).toEqual('summary');
+        expect(state.contentPack.description).toEqual('descr');
+        expect(state.contentPack.vendor).toEqual('vendor');
+        expect(state.contentPack.url).toEqual('url');
       }
     });
-    const contentPack = {
-      name: '',
-      summary: '',
-      description: '',
-      vendor: '',
-      url: '',
-    };
+    const contentPack = ContentPack.builder().build();
+
     const wrapper = mount(<ContentPackSelection contentPack={contentPack} onStateChange={changeFn} />);
     wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'name' } });
     wrapper.find('input#summary').simulate('change', { target: { name: 'summary', value: 'summary' } });

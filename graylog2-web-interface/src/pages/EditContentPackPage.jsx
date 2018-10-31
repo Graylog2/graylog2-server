@@ -97,7 +97,7 @@ const EditContentPackPage = createReactClass({
   },
 
   _onSave() {
-    ContentPacksActions.create.triggerPromise(this.state.contentPack)
+    ContentPacksActions.create.triggerPromise(this.state.contentPack.toObject())
       .then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
@@ -117,9 +117,10 @@ const EditContentPackPage = createReactClass({
 
   _getEntities(selectedEntities) {
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
-      const contentPack = ObjectUtils.clone(this.state.contentPack);
-      contentPack.entities = result.entities;
-      contentPack.requires = result.constraints;
+      const contentPack = this.state.contentPack.toBuilder()
+        .entities(result.entities)
+        .requires(result.constraints)
+        .build();
       this.setState({ contentPack: contentPack, fetchedEntities: result.entities });
     });
   },

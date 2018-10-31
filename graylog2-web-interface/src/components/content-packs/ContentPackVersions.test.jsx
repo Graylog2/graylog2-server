@@ -4,31 +4,31 @@ import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
 
+import ContentPack from 'logic/content-packs/ContentPack';
+import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 
 describe('<ContentPackVersions />', () => {
   URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
-  const buildPack = (rev) => {
-    return {
-      id: '1',
-      rev: rev,
-      title: 'UFW Grok Patterns',
-      description: 'Grok Patterns to extract informations from UFW logfiles',
-      states: ['installed', 'edited'],
-      summary: 'This is a summary',
-      vendor: 'graylog.com',
-      url: 'www.graylog.com',
-    };
-  };
+  const contentPackRev = ContentPack.builder()
+    .id('1')
+    .name('UFW Grok Patterns')
+    .description('Grok Patterns to extract informations from UFW logfiles')
+    .summary('This is a summary')
+    .vendor('graylog.com')
+    .url('www.graylog.com');
+
   const contentPack = {
-    1: buildPack(1),
-    2: buildPack(2),
-    3: buildPack(3),
-    4: buildPack(4),
+    1: contentPackRev.rev(1).build().toObject(),
+    2: contentPackRev.rev(2).build().toObject(),
+    3: contentPackRev.rev(3).build().toObject(),
+    4: contentPackRev.rev(4).build().toObject(),
   };
 
+  const contentPackRevision = new ContentPackRevisions(contentPack);
+
   it('should render with content pack versions', () => {
-    const wrapper = renderer.create(<ContentPackVersions contentPack={contentPack} />);
+    const wrapper = renderer.create(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -36,7 +36,7 @@ describe('<ContentPackVersions />', () => {
     const changeFn = jest.fn((version) => {
       expect(version).toEqual('1');
     });
-    const wrapper = mount(<ContentPackVersions onChange={changeFn} contentPack={contentPack} />);
+    const wrapper = mount(<ContentPackVersions onChange={changeFn} contentPackRevisions={contentPackRevision} />);
     wrapper.find('input[value=1]').simulate('change', { target: { checked: true, value: '1' } });
     expect(changeFn.mock.calls.length).toBe(1);
   });
@@ -46,7 +46,7 @@ describe('<ContentPackVersions />', () => {
       expect(version).toEqual('1');
       expect(revision).toEqual(1);
     });
-    const wrapper = mount(<ContentPackVersions onDeletePack={deleteFn} contentPack={contentPack} />);
+    const wrapper = mount(<ContentPackVersions onDeletePack={deleteFn} contentPackRevisions={contentPackRevision} />);
     wrapper.find('a[children="Delete"]').at(0).simulate('click');
     expect(deleteFn.mock.calls.length).toBe(1);
   });

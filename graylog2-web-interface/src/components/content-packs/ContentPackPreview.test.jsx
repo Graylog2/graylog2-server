@@ -3,38 +3,37 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 
+import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 
 describe('<ContentPackPreview />', () => {
   it('should render with empty content pack', () => {
-    const contentPack = {};
+    const contentPack = ContentPack.builder().build();
     const wrapper = renderer.create(<ContentPackPreview contentPack={contentPack} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render with filled content pack', () => {
-    const contentPack = {
-      name: 'name',
-      summary: 'summmary',
-      description: 'descr',
-      vendor: 'vendor',
-      url: 'http://example.com',
-      parameters: [],
-    };
+    const contentPack = ContentPack.builder()
+      .name('name')
+      .summary('summary')
+      .description('descr')
+      .vendor('vendor')
+      .url('http://example.com')
+      .build();
 
     const wrapper = renderer.create(<ContentPackPreview contentPack={contentPack} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should call onSave when creating a content pack', () => {
-    const contentPack = {
-      name: 'name',
-      summary: 'summmary',
-      description: 'descr',
-      vendor: 'vendor',
-      url: 'http://example.com',
-      parameters: [],
-    };
+    const contentPack = ContentPack.builder()
+      .name('name')
+      .summary('summary')
+      .description('descr')
+      .vendor('vendor')
+      .url('http://example.com')
+      .build();
 
     const onSave = jest.fn();
     const wrapper = mount(<ContentPackPreview contentPack={contentPack} onSave={onSave} />);

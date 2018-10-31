@@ -39,7 +39,7 @@ class ContentPackParameters extends React.Component {
   }
 
   _addNewParameter = (newParameter, oldParameter) => {
-    const newContentPack = ObjectUtils.clone(this.props.contentPack);
+    let newContentPackBuilder = this.props.contentPack.toBuilder();
     const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
     if (oldParameter) {
       /* If the name of the parameter changed we need to update the reference in appliedParameter */
@@ -52,12 +52,10 @@ class ContentPackParameters extends React.Component {
         });
       });
       /* If we update a parameter we remove the old one first */
-      lodash.remove(newContentPack.parameters, (parameter) => {
-        return parameter.name === oldParameter.name;
-      });
+      newContentPackBuilder = newContentPackBuilder.removeParameter(oldParameter);
     }
-    newContentPack.parameters.push(newParameter);
-    this.props.onStateChange({ contentPack: newContentPack, appliedParameter: newAppliedParameter });
+    newContentPackBuilder.addParameter(newParameter);
+    this.props.onStateChange({ contentPack: newContentPackBuilder.build(), appliedParameter: newAppliedParameter });
   };
 
   _onParameterApply = (id, configKey, paramName) => {
@@ -75,7 +73,7 @@ class ContentPackParameters extends React.Component {
   };
 
   _deleteParameter = (parameter) => {
-    const newContentPack = ObjectUtils.clone(this.props.contentPack);
+    const { contentPack } = this.props;
     const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
     /* If we delete a parameter we need to remove the reference from appliedParameter */
     Object.keys(newAppliedParameter).forEach((id) => {
@@ -84,7 +82,7 @@ class ContentPackParameters extends React.Component {
         delete newAppliedParameter[id];
       }
     });
-    lodash.remove(newContentPack.parameters, (param) => { return param.name === parameter.name; });
+    const newContentPack = contentPack.toBuilder().removeParameter(parameter).build();
     this.props.onStateChange({ contentPack: newContentPack, appliedParameter: newAppliedParameter });
     this._closeConfirmModal();
   };

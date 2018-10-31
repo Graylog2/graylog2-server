@@ -1,4 +1,6 @@
 import { Map } from 'immutable';
+import { concat, remove } from 'lodash';
+import uuid from 'uuid/v4';
 
 export default class ContentPack {
   constructor(v, id, rev, name, summary, description, vendor, url, requires,
@@ -92,6 +94,10 @@ export default class ContentPack {
     }));
   }
 
+  toObject() {
+    return this._value;
+  }
+
   static fromJSON(value) {
     const {
       v,
@@ -118,12 +124,23 @@ export default class ContentPack {
       requires,
       parameters,
       entities,
-    )
+    );
   }
 
   static builder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder();
+    return new Builder()
+      .v(1)
+      .id(uuid())
+      .rev(1)
+      .name('')
+      .summary('')
+      .description('')
+      .vendor('')
+      .url('')
+      .requires([])
+      .parameters([])
+      .entities([]);
   }
 }
 
@@ -179,6 +196,20 @@ class Builder {
 
   parameters(value) {
     this.value = this.value.set('parameters', value);
+    return this;
+  }
+
+  removeParameter(value) {
+    const parameters = this.value.get('parameters').slice(0);
+    remove(parameters, parameter => parameter.name === value.name);
+    this.value = this.value.set('parameters', parameters);
+    return this;
+  }
+
+  addParameter(value) {
+    const parameters = this.value.get('parameters');
+    const newParameters = concat(parameters, value);
+    this.value = this.value.set('parameters', newParameters);
     return this;
   }
 
