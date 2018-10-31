@@ -6,7 +6,7 @@ import connect from 'stores/connect';
 import UserNotification from 'util/UserNotification';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { TitlesActions } from 'enterprise/stores/TitlesStore';
+import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
 import { DashboardWidgetsActions } from 'enterprise/stores/DashboardWidgetsStore';
 
 import WidgetFrame from './WidgetFrame';
@@ -74,7 +74,10 @@ class Widget extends React.Component {
   };
 
   _onDuplicate = (widgetId) => {
-    WidgetActions.duplicate(widgetId);
+    const { title } = this.props;
+    WidgetActions.duplicate(widgetId).then((newWidget) => {
+      TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`);
+    });
   };
 
   _onToggleEdit = () => {

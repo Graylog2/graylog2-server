@@ -5,15 +5,15 @@ import { get, isEqual } from 'lodash';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
-export const WidgetActions = Reflux.createActions([
-  'create',
-  'duplicate',
-  'filter',
-  'load',
-  'remove',
-  'update',
-  'updateConfig',
-]);
+export const WidgetActions = Reflux.createActions({
+  create: { asyncResult: true },
+  duplicate: { asyncResult: true },
+  filter: { asyncResult: true },
+  load: { asyncResult: true },
+  remove: { asyncResult: true },
+  update: { asyncResult: true },
+  updateConfig: { asyncResult: true },
+});
 
 export const WidgetStore = Reflux.createStore({
   listenables: [WidgetActions],
@@ -57,6 +57,7 @@ export const WidgetStore = Reflux.createStore({
     const duplicatedWidget = widget.duplicate(uuid());
     const newWidgets = this.widgets.set(duplicatedWidget, duplicatedWidget);
     this._updateWidgets(newWidgets);
+    WidgetActions.duplicate.promise(Promise.resolve(duplicatedWidget));
     return duplicatedWidget;
   },
   filter(widgetId, filter) {

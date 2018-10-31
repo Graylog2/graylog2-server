@@ -3,8 +3,11 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
+import { WidgetActions } from 'enterprise/stores/WidgetStore';
+import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+
 import Widget from './Widget';
-import WidgetPosition from '../../logic/widgets/WidgetPosition';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 
@@ -21,6 +24,9 @@ jest.mock('graylog-web-plugin/plugin', () => ({
     ]),
   },
 }));
+
+jest.mock('enterprise/stores/WidgetStore');
+jest.mock('enterprise/stores/TitlesStore');
 
 const createNodeMock = (element) => {
   if (element.type === 'div') {
@@ -106,5 +112,32 @@ describe('<Widget />', () => {
     ));
     expect(wrapper.find(LoadingWidget)).toHaveLength(0);
     expect(wrapper.find('dummy-visualization')).toHaveLength(1);
+  });
+
+  it('copies title when duplicating widget', (done) => {
+    const wrapper = mount((
+      <Widget widget={widget}
+              id="widgetId"
+              onSizeChange={() => {}}
+              data={[]}
+              fields={[]}
+              title="Dummy Widget"
+              onPositionsChange={() => {}}
+              position={new WidgetPosition(1, 1, 1, 1)} />
+    ));
+
+    wrapper.find('WidgetActionToggle').simulate('click');
+    const duplicate = wrapper.find('a[children="Duplicate"]');
+    WidgetActions.duplicate = jest.fn(() => Promise.resolve({ id: 'duplicatedWidgetId' }));
+    TitlesActions.set = jest.fn((type, id, title) => {
+      expect(type).toEqual(TitleTypes.Widget);
+      expect(id).toEqual('duplicatedWidgetId');
+      expect(title).toEqual('Dummy Widget (copy)');
+      done();
+    });
+
+    duplicate.simulate('click');
+
+    expect(WidgetActions.duplicate).toHaveBeenCalled();
   });
 });

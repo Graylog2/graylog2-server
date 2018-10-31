@@ -29,7 +29,11 @@ WidgetActionToggle.defaultProps = {
   onClick: () => {},
 };
 
-class WidgetActionDropdown extends React.Component {
+const FilterProps = ({ children, style }) => React.Children.map(children,
+  child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }),
+);
+
+  class WidgetActionDropdown extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -59,10 +63,12 @@ class WidgetActionDropdown extends React.Component {
                  rootClose
                  onHide={this._onToggle}
                  target={() => this.target}>
-          <ul className="dropdown-menu" style={Object.assign({}, listStyle, displayMenu)}>
-            <MenuItem header>Actions</MenuItem>
-            {children}
-          </ul>
+          <FilterProps>
+            <ul className="dropdown-menu" style={Object.assign({}, listStyle, displayMenu)}>
+              <MenuItem header>Actions</MenuItem>
+              {children}
+            </ul>
+          </FilterProps>
         </Overlay>
       </span>
     );

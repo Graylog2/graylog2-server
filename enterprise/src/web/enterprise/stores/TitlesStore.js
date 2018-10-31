@@ -8,6 +8,11 @@ export const TitlesActions = Reflux.createActions([
   'set',
 ]);
 
+export const TitleTypes = {
+  Tab: 'tab',
+  Widget: 'widget',
+};
+
 export const TitlesStore = Reflux.createStore({
   listenables: [TitlesActions],
 
