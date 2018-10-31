@@ -390,7 +390,7 @@ public class InputFacadeTest {
         final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
         EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
         EntityDescriptor expectedEntitiyDescriptor = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
-        Graph graph = facade.resolveNativeEntity(entityDescriptor);
+        Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
         assertThat(graph.nodes()).contains(expectedEntitiyDescriptor);
     }
 
@@ -418,7 +418,7 @@ public class InputFacadeTest {
                 ValueReference.of(extractor.getConditionValue()),
                 ValueReference.of(extractor.getOrder())
         );
-        List<ExtractorEntity> extractors = new ArrayList();
+        List<ExtractorEntity> extractors = new ArrayList<>();
         extractors.add(extractorEntity);
         InputEntity inputEntity = InputEntity.create(
                 ValueReference.of(input.getTitle()),
@@ -451,7 +451,7 @@ public class InputFacadeTest {
         final EntityDescriptor entityDescriptor = expectedEntity.toEntityDescriptor();
         final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap<>(1);
         entityDescriptorEntityMap.put(entityDescriptor, expectedEntity);
-        Graph graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
+        Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
         assertThat(graph.nodes()).contains(expectedEntity);
     }
 }

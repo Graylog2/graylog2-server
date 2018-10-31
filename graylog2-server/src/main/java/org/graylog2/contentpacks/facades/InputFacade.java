@@ -505,7 +505,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     private Graph<Entity> resolveForInstallationV1(EntityV1 entity,
                                                    Map<String, ValueReference> parameters,
                                                    Map<EntityDescriptor, Entity> entities) {
-        final MutableGraph graph = GraphBuilder.directed().build();
+        final MutableGraph<Entity> graph = GraphBuilder.directed().build();
         graph.addNode(entity);
 
         final InputEntity input = objectMapper.convertValue(entity.data(), InputEntity.class);
