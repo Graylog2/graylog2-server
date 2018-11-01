@@ -2,15 +2,15 @@
    "id":"a3ce55ad-bdf3-7a50-305c-1e5bf3de6eca",
    "rev":1,
    "v":"1",
-   "name":"Core Grok Patterns",
-   "summary":"The default Grok Patterns from graylog",
-   "description":"These are the default Grok Patterns provided by graylog.",
+   "name":"Default Grok Patterns",
+   "summary":"The Graylog default Grok patterns",
+   "description":"These are the default Grok patterns provided by Graylog.",
    "vendor":"Graylog <hello@graylog.com>",
    "url":"https://github.com/Graylog2/graylog2-server",
    "requires":[
       {
          "type":"server-version",
-         "version":">=3.0.0-alpha.2+07766b9 <4.0.0"
+         "version":">=3.0.0-alpha.2+07766b9"
       }
    ],
    "parameters":[
