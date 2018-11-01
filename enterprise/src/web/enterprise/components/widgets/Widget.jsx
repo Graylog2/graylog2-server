@@ -84,14 +84,6 @@ class Widget extends React.Component {
     this.setState(state => ({ editing: !state.editing }));
   };
 
-  _onAddToOverview = (queryId, widgetId) => {
-    DashboardWidgetsActions.addToDashboard(queryId, widgetId)
-      .then(
-        () => UserNotification.success('Added widget to dashboard.', 'Success!'),
-        e => UserNotification.error(`Failed adding widget to dashboard: ${e}`, 'Error!'),
-      );
-  };
-
   _onWidgetConfigChange = (widgetId, config) => {
     WidgetActions.updateConfig(widgetId, config);
   };
@@ -176,8 +168,6 @@ class Widget extends React.Component {
               <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => container}>
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                 <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                <MenuItem divider />
-                <MenuItem onSelect={() => this._onAddToOverview(activeQuery, id)}>Add to overview</MenuItem>
                 <MenuItem divider />
                 <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
               </WidgetActionDropdown>
