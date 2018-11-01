@@ -12,22 +12,19 @@ jest.mock('enterprise/logic/fieldactions/AddMessageCountActionHandler', () => { 
 let mockAddMessageTableActionHandler;
 jest.mock('enterprise/logic/fieldactions/AddMessageTableActionHandler', () => { mockAddMessageTableActionHandler = jest.fn(); return mockAddMessageTableActionHandler; });
 
-let mockAddAlertStatusActionHandler;
-jest.mock('enterprise/logic/fieldactions/AddAlertStatusActionHandler', () => { mockAddAlertStatusActionHandler = jest.fn(); return mockAddAlertStatusActionHandler; });
-
 describe('AddWidgetButton', () => {
   it('renders a dropdown', () => {
     const wrapper = mount(<AddWidgetButton />);
 
     const dropdownButton = wrapper.find('DropdownButton');
     expect(dropdownButton).toHaveLength(1);
-    expect(dropdownButton.find('MenuItem')).toHaveLength(4);
+    expect(dropdownButton.find('MenuItem')).toHaveLength(3);
   });
   it('contains menu items for all widget types', () => {
     const wrapper = mount(<AddWidgetButton />);
 
     const dropdownButton = wrapper.find('DropdownButton');
-    ['Aggregation', 'Alert Status', 'Message Count', 'Message Table']
+    ['Aggregation', 'Message Count', 'Message Table']
       .forEach(title => expect(dropdownButton.find(`a[children="${title}"]`)).toExist());
   });
   it('clicking on option to add aggregation calls AggregateActionHandler', () => {
@@ -57,14 +54,5 @@ describe('AddWidgetButton', () => {
     addMessageTable.simulate('click');
 
     expect(mockAddMessageTableActionHandler).toHaveBeenCalled();
-  });
-  it('clicking on option to add alert status calls AddAlertStatusActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton />);
-
-    const addAlertStatus = wrapper.find('a[children="Alert Status"]');
-    expect(addAlertStatus).toExist(0);
-    addAlertStatus.simulate('click');
-
-    expect(mockAddAlertStatusActionHandler).toHaveBeenCalled();
   });
 });

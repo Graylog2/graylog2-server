@@ -15,7 +15,7 @@ import PivotConfigGenerator from 'enterprise/logic/searchtypes/aggregation/Pivot
 import PivotHandler from 'enterprise/logic/searchtypes/pivot/PivotHandler';
 import PivotTransformer from 'enterprise/logic/searchresulttransformers/PivotTransformer';
 
-import { AlertStatus, MessageList } from 'enterprise/components/widgets';
+import { MessageList } from 'enterprise/components/widgets';
 import Widget from 'enterprise/logic/widgets/Widget';
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
@@ -80,15 +80,6 @@ export default {
         }
         return `Aggregating ${widget.config.series.map(s => s.effectiveName)}`;
       },
-    },
-    {
-      type: 'ALERT_STATUS',
-      displayName: 'Alert Status',
-      defaultHeight: 2,
-      defaultWidth: 2,
-      visualizationComponent: AlertStatus,
-      searchResultTransformer: data => data,
-      searchTypes: () => [],
     },
   ],
   searchTypes: [

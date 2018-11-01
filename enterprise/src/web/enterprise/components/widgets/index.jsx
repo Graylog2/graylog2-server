@@ -1,4 +1,3 @@
-export { default as AlertStatus } from './AlertStatus';
 export { default as Histogram } from './Histogram';
 export { default as MessageList } from './MessageList';
 export { default as WidgetConfigModal } from './WidgetConfigModal';
