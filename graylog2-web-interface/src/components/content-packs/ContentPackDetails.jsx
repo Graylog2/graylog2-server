@@ -33,12 +33,15 @@ const ContentPackDetails = (props) => {
               { contentPack.entities && !props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
             </dl>
           </div>
-          <h2>Description</h2>
-          <br />
-          <Well>
-            {/* eslint-disable-next-line react/no-danger */}
-            <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
-          </Well>
+          { contentPack.description &&
+          <div>
+            <h2>Description</h2>
+            <br />
+            <Well>
+              {/* eslint-disable-next-line react/no-danger */}
+              <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
+            </Well>
+          </div> }
           <br />
           { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
           <br />

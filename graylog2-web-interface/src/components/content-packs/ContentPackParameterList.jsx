@@ -49,7 +49,7 @@ class ContentPackParameterList extends React.Component {
         {!this.props.readOnly &&
         <td>
           <ButtonToolbar>
-            <Button bsStyle="primary" bsSize="small" onClick={() => { this.props.onDeleteParameter(parameter); }}>
+            <Button bsStyle="primary" bsSize="xs" onClick={() => { this.props.onDeleteParameter(parameter); }}>
               Delete
             </Button>{this._parameterModal(parameter)}
           </ButtonToolbar>
@@ -75,7 +75,7 @@ class ContentPackParameterList extends React.Component {
       editParameter.addNewParameter();
     };
 
-    const size = parameter ? 'small' : 'small';
+    const size = parameter ? 'xsmall' : 'small';
     const name = parameter ? 'Edit' : 'Create parameter';
 
     const modal = (

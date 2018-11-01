@@ -61,21 +61,6 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 </dd>
               </dl>
             </div>
-            <h2>
-              Description
-            </h2>
-            <br />
-            <div
-              className="well"
-            >
-              <div
-                dangerouslySetInnerHTML={
-                  Object {
-                    "__html": "",
-                  }
-                }
-              />
-            </div>
             <br />
             <br />
             <br />
@@ -317,9 +302,10 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
           className="btn btn-info"
           disabled={false}
           id="download"
+          onClick={[Function]}
           type="button"
         >
-          Download
+          Create and Download
         </button>
       </a>
     </div>
@@ -404,20 +390,22 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 </span>
               </dl>
             </div>
-            <h2>
-              Description
-            </h2>
-            <br />
-            <div
-              className="well"
-            >
+            <div>
+              <h2>
+                Description
+              </h2>
+              <br />
               <div
-                dangerouslySetInnerHTML={
-                  Object {
-                    "__html": "<p>descr</p>",
+                className="well"
+              >
+                <div
+                  dangerouslySetInnerHTML={
+                    Object {
+                      "__html": "<p>descr</p>",
+                    }
                   }
-                }
-              />
+                />
+              </div>
             </div>
             <br />
             <br />
@@ -660,9 +648,10 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
           className="btn btn-info"
           disabled={false}
           id="download"
+          onClick={[Function]}
           type="button"
         >
-          Download
+          Create and Download
         </button>
       </a>
     </div>

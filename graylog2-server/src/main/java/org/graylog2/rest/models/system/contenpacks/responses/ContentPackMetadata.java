@@ -21,30 +21,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.contentpacks.model.ContentPack;
-import org.graylog2.contentpacks.model.ModelId;
 
 import java.util.Map;
-import java.util.Set;
 
 @JsonAutoDetect
 
 @AutoValue
 @WithBeanGetter
-public abstract class ContentPackList {
+public abstract class ContentPackMetadata {
     @JsonProperty
-    public abstract long total();
-
-    @JsonProperty
-    public abstract Set<ContentPack> contentPacks();
-
-    @JsonProperty
-    public abstract Map<ModelId, Map<Integer, ContentPackMetadata>> contentPacksMetadata();
+    public abstract int installationCount();
 
     @JsonCreator
-    public static ContentPackList create(@JsonProperty("total") long total,
-                                         @JsonProperty("content_packs")Set<ContentPack> contentPacks,
-                                         @JsonProperty("content_pack_metadata") Map<ModelId, Map<Integer, ContentPackMetadata>> contentPacksMetadata) {
-        return new AutoValue_ContentPackList(total, contentPacks, contentPacksMetadata);
+    public static ContentPackMetadata create(@JsonProperty("installation_count") int installationCount) {
+        return new AutoValue_ContentPackMetadata(installationCount);
     }
 }

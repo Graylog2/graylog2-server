@@ -481,7 +481,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                     role="toolbar"
                   >
                     <button
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-xs btn-primary"
                       disabled={false}
                       onClick={[Function]}
                       type="button"
@@ -489,7 +489,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       Delete
                     </button>
                     <button
-                      className="btn btn-sm btn-info"
+                      className="btn btn-xs btn-info"
                       disabled={false}
                       onClick={[Function]}
                       type="button"

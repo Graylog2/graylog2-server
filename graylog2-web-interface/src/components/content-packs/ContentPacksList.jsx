@@ -17,6 +17,7 @@ import ContentPackInstall from './ContentPackInstall';
 class ContentPacksList extends React.Component {
   static propTypes = {
     contentPacks: PropTypes.arrayOf(PropTypes.object),
+    contentPackMetadata: PropTypes.object,
     onDeletePack: PropTypes.func,
     onInstall: PropTypes.func,
   };
@@ -25,6 +26,7 @@ class ContentPacksList extends React.Component {
     contentPacks: [],
     onDeletePack: () => {},
     onInstall: () => {},
+    contentPackMetadata: {},
   };
 
   constructor(props) {
@@ -99,15 +101,17 @@ class ContentPacksList extends React.Component {
         contentPackId={item.id}
         revision={item.rev}
       />);
-      const states = item.states || [];
+
+      const metadata = this.props.contentPackMetadata[item.id] || {};
+      const installed = Object.keys(metadata).find(rev => metadata[rev].installation_count > 0);
+      const states = installed ? ['installed'] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
 
       return (
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={9}>
-              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Version: {item.rev}</small>
-                <ContentPackStatus states={states} />
+              <h3><Link to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>{item.name}</Link> <small>Latest Version: {item.rev} <ContentPackStatus contentPackId={item.id} states={states} /> </small>
               </h3>
             </Col>
             <Col md={3} className="text-right">
@@ -117,9 +121,9 @@ class ContentPacksList extends React.Component {
               {installModal}
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Remove all</MenuItem>
+                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Delete All Versions</MenuItem>
                 <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
-                  <MenuItem>Edit</MenuItem>
+                  <MenuItem>Create New Version</MenuItem>
                 </LinkContainer>
                 <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
               </DropdownButton>
