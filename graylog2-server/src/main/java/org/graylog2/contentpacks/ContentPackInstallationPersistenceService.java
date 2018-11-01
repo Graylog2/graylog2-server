@@ -109,11 +109,11 @@ public class ContentPackInstallationPersistenceService {
 
     public Map<ModelId, Map<Integer, ContentPackMetadata>> getInstallationMetadata(Set<ModelId> ids) {
         final Set<ContentPackInstallation> contentPackInstallations = findByContentPackIds(ids);
-        Map<ModelId, Map<Integer, ContentPackMetadata>> installationMetaData = new HashMap();
+        Map<ModelId, Map<Integer, ContentPackMetadata>> installationMetaData = new HashMap<>();
         for (ContentPackInstallation installation : contentPackInstallations) {
             Map<Integer, ContentPackMetadata> metadataMap = installationMetaData.get(installation.contentPackId());
             if (metadataMap == null) {
-                metadataMap = new HashMap();
+                metadataMap = new HashMap<>();
             }
             ContentPackMetadata metadata = metadataMap.get(installation.contentPackRevision());
             int count = 1;
