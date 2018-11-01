@@ -2,17 +2,22 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
 
 import SidecarStatusFileList from './SidecarStatusFileList';
+import VerboseMessageModal from './VerboseMessageModal';
 
 const SidecarStatus = createReactClass({
   propTypes: {
     sidecar: PropTypes.object.isRequired,
     collectors: PropTypes.array.isRequired,
+  },
+
+  getInitialState() {
+    return { collectorName: '', collectorVerbose: '' };
   },
 
   formatNodeDetails(details) {
@@ -60,6 +65,7 @@ const SidecarStatus = createReactClass({
       let statusMessage;
       let statusBadge;
       let statusClass;
+      let verboseButton;
       switch (status.status) {
         case SidecarStatusEnum.RUNNING:
           statusMessage = 'Collector is running.';
@@ -70,6 +76,16 @@ const SidecarStatus = createReactClass({
           statusMessage = status.message;
           statusClass = 'text-danger';
           statusBadge = <i className="fa fa-warning fa-fw" />;
+
+          if (status.verbose_message) {
+            verboseButton = (
+              <Button bsStyle="link"
+                      bsSize="xs"
+                      onClick={() => this._onShowVerbose(collector.name, status.verbose_message)}>
+                Show Details
+              </Button>
+            );
+          }
           break;
         case SidecarStatusEnum.STOPPED:
           statusMessage = status.message;
@@ -85,7 +101,7 @@ const SidecarStatus = createReactClass({
       if (collector) {
         statuses.push(
           <dt key={`${collector.id}-key`} className={statusClass}>{collector.name}</dt>,
-          <dd key={`${collector.id}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}</dd>,
+          <dd key={`${collector.id}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}&ensp;{verboseButton}</dd>,
         );
       }
     });
@@ -95,6 +111,11 @@ const SidecarStatus = createReactClass({
         {statuses}
       </dl>
     );
+  },
+
+  _onShowVerbose(name, verbose) {
+    this.setState({ collectorName: name, collectorVerbose: verbose });
+    this.modal.open();
   },
 
   render() {
@@ -127,6 +148,9 @@ const SidecarStatus = createReactClass({
             </div>
           </Col>
         </Row>
+        <VerboseMessageModal ref={(c) => { this.modal = c; }}
+                             collectorName={this.state.collectorName}
+                             collectorVerbose={this.state.collectorVerbose} />,
       </div>
     );
   },
