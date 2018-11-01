@@ -73,7 +73,7 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
             final ContentPack pack = this.contentPackPersistenceService.insert(contentPack)
                     .orElseThrow(() -> new Error("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!"));
 
-            contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default grok patterns", "admin");
+            contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", "admin");
 
             configService.write(MigrationCompleted.create(pack.id().toString()));
         } catch (IOException e) {
