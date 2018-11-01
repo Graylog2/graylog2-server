@@ -888,7 +888,8 @@
       "node_modules/react-dom/cjs/react-dom.production.min.js": 23,
       "node_modules/react/cjs/react.production.min.js": 24,
       "node_modules/moment/locale sync /^\\.\\/.*$/": 25,
-      "node_modules/moment-timezone/node_modules/moment/locale sync /^\\.\\/.*$/": 32
+      "node_modules/moment-timezone/node_modules/moment/locale sync /^\\.\\/.*$/": 32,
+      "node_modules/moment/locale/mn.js": 13
     },
     "usedIds": {
       "0": 0,
