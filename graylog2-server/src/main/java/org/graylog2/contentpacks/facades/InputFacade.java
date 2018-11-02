@@ -485,6 +485,19 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                         });
                     });
 
+            inputWithExtractors.extractors().stream()
+                    .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
+                    .forEach(e -> e.getConverters().stream().filter(c -> c.getType().equals(Converter.Type.LOOKUP_TABLE))
+                            .map(c -> (String) c.getConfig().get("lookup_table_name"))
+                            .map(name -> lookupTableService.get(name))
+                            .forEach(optional -> {
+                                optional.ifPresent(lookupTableDto -> {
+                                    EntityDescriptor lookupTable = EntityDescriptor.create(
+                                            ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
+                                    mutableGraph.putEdge(entityDescriptor, lookupTable);
+                                });
+                            }));
+
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find input {}", entityDescriptor, e);
         }

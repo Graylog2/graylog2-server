@@ -114,6 +114,8 @@ public class InputFacadeTest {
     private DBLookupTableService dbLookupTableService;
     @Mock
     private LookupTableDto lookupTableWhois;
+    @Mock
+    private LookupTableDto lookupTableTor;
 
     @Mock
     private MessageInputFactory messageInputFactory;
@@ -375,17 +377,25 @@ public class InputFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveNativeEntity() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.build()).thenReturn(lookupTable);
         when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
         when(lookupTableService.hasTable("whois")).thenReturn(true);
-        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableWhois));
+        when(lookupTableService.hasTable("tor-exit-node-list")).thenReturn(true);
+
         when(lookupTableWhois.id()).thenReturn("dead-beef");
+        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableWhois));
+
+        when(lookupTableTor.id()).thenReturn("dead-feed");
+        when(dbLookupTableService.get("tor-exit-node-list")).thenReturn(Optional.of(lookupTableTor));
 
         final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
         EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
-        EntityDescriptor expectedEntitiyDescriptor = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
+        EntityDescriptor expectedEntitiyDescriptorWhois = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
+        EntityDescriptor expectedEntitiyDescriptorTor = EntityDescriptor.create(ModelId.of("dead-feed"), ModelTypes.LOOKUP_TABLE_V1);
         Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
-        assertThat(graph.nodes()).contains(expectedEntitiyDescriptor);
+        assertThat(graph.nodes()).contains(expectedEntitiyDescriptorWhois);
+        assertThat(graph.nodes()).contains(expectedEntitiyDescriptorTor);
     }
 
     @Test
