@@ -528,7 +528,9 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .collect(Collectors.toSet());
 
         input.extractors().stream().map(c -> c.converters()
-                .stream().map(con -> ((ValueReference) con.configuration().get("lookup_table_name")).asString(parameters))
+                .stream()
+                .filter(con -> con.type().asString(parameters).equals(Converter.Type.LOOKUP_TABLE.name()))
+                .map(con -> ((ValueReference) con.configuration().get("lookup_table_name")).asString(parameters))
                 .collect(Collectors.toSet()))
                 .forEach(lookupTableNames::addAll);
 

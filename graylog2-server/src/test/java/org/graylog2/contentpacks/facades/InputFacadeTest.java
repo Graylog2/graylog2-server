@@ -61,6 +61,7 @@ import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.SuppressForbidden;
@@ -411,7 +412,7 @@ public class InputFacadeTest {
         final Map<String, Object> lookupTableConfig = new HashedMap(1);
         lookupTableConfig.put("lookup_table_name", "tor-exit-node-list");
         final ConverterEntity converterEntity = ConverterEntity.create(
-                ValueReference.of("lookup_table"), ReferenceMapUtils.toReferenceMap(lookupTableConfig));
+                ValueReference.of(Converter.Type.LOOKUP_TABLE.name()), ReferenceMapUtils.toReferenceMap(lookupTableConfig));
         final List<ConverterEntity> converterEntities = new ArrayList<>(1);
         converterEntities.add(converterEntity);
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
