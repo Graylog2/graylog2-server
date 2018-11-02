@@ -22,14 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
-import com.google.common.graph.ImmutableGraph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import com.mongodb.client.model.ValidationLevel;
-import org.elasticsearch.common.recycler.Recycler;
+import org.apache.commons.collections.map.HashedMap;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -39,7 +38,6 @@ import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
-import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.dashboards.DashboardImpl;
@@ -58,9 +56,6 @@ import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.LookupTableExtractor;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
-import org.graylog2.lookup.LookupDefaultMultiValue;
-import org.graylog2.lookup.LookupDefaultSingleValue;
-import org.graylog2.lookup.LookupDefaultValue;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -82,7 +77,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -119,7 +113,7 @@ public class InputFacadeTest {
     @Mock
     private DBLookupTableService dbLookupTableService;
     @Mock
-    private LookupTableDto lookupTableDto;
+    private LookupTableDto lookupTableWhois;
 
     @Mock
     private MessageInputFactory messageInputFactory;
@@ -384,8 +378,8 @@ public class InputFacadeTest {
         when(lookupuptableBuilder.build()).thenReturn(lookupTable);
         when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
         when(lookupTableService.hasTable("whois")).thenReturn(true);
-        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableDto));
-        when(lookupTableDto.id()).thenReturn("dead-beef");
+        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableWhois));
+        when(lookupTableWhois.id()).thenReturn("dead-beef");
 
         final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
         EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
@@ -398,12 +392,20 @@ public class InputFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void resolveForInstallation() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.build()).thenReturn(lookupTable);
         when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
         when(lookupTableService.hasTable("whois")).thenReturn(true);
-        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableDto));
-        when(lookupTableDto.id()).thenReturn("dead-beef");
+        when(lookupTableService.hasTable("tor-exit-node-list")).thenReturn(true);
         final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
+        final Map<String, String> lookupTableConfig = new HashedMap(1);
+        lookupTableConfig.put("lookup_table_name", "tor-exit-node-list");
+        final Map<String, Object> config = new HashMap<>(1);
+        config.put("config", lookupTableConfig);
+        final ConverterEntity converterEntity = ConverterEntity.create(
+                ValueReference.of("lookup_table"), ReferenceMapUtils.toReferenceMap(config));
+        final List<ConverterEntity> converterEntities = new ArrayList<>(1);
+        converterEntities.add(converterEntity);
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
         final LookupTableExtractor extractor = (LookupTableExtractor) inputWithExtractors.extractors().iterator().next();
         final ExtractorEntity extractorEntity = ExtractorEntity.create(
@@ -413,7 +415,7 @@ public class InputFacadeTest {
                 ValueReference.of(extractor.getTargetField()),
                 ValueReference.of(extractor.getSourceField()),
                 ReferenceMapUtils.toReferenceMap(extractor.getExtractorConfig()),
-                Collections.emptyList(),
+                converterEntities,
                 ValueReference.of(extractor.getConditionType()),
                 ValueReference.of(extractor.getConditionValue()),
                 ValueReference.of(extractor.getOrder())
@@ -432,7 +434,7 @@ public class InputFacadeTest {
                 .type(ModelTypes.INPUT_V1)
                 .data(objectMapper.convertValue(inputEntity, JsonNode.class))
                 .build();
-        final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
+        final LookupTableEntity whoIsEntity = LookupTableEntity.create(
                 ValueReference.of("whois"),
                 ValueReference.of("title"),
                 ValueReference.of("description"),
@@ -443,15 +445,36 @@ public class InputFacadeTest {
                 ValueReference.of("default_multi_value"),
                 ValueReference.of("BOOLEAN")
         );
-        final Entity expectedEntity = EntityV1.builder()
+
+        final LookupTableEntity torNodeEntity = LookupTableEntity.create(
+                ValueReference.of("tor-exit-node-list"),
+                ValueReference.of("title"),
+                ValueReference.of("description"),
+                ValueReference.of("cache_name"),
+                ValueReference.of("dataadapter_name"),
+                ValueReference.of("default_single_value"),
+                ValueReference.of("BOOLEAN"),
+                ValueReference.of("default_multi_value"),
+                ValueReference.of("BOOLEAN")
+        );
+        final Entity expectedWhoIsEntity = EntityV1.builder()
                 .id(ModelId.of("dead-beef"))
-                .data(objectMapper.convertValue(lookupTableEntity, JsonNode.class))
+                .data(objectMapper.convertValue(whoIsEntity, JsonNode.class))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .build();
-        final EntityDescriptor entityDescriptor = expectedEntity.toEntityDescriptor();
-        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap<>(1);
-        entityDescriptorEntityMap.put(entityDescriptor, expectedEntity);
+
+        final Entity expectedTorEntity = EntityV1.builder()
+                .id(ModelId.of("dead-feed"))
+                .data(objectMapper.convertValue(torNodeEntity, JsonNode.class))
+                .type(ModelTypes.LOOKUP_TABLE_V1)
+                .build();
+        final EntityDescriptor whoisDescriptor = expectedWhoIsEntity.toEntityDescriptor();
+        final EntityDescriptor torDescriptor = expectedTorEntity.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap<>(2);
+        entityDescriptorEntityMap.put(whoisDescriptor, expectedWhoIsEntity);
+        entityDescriptorEntityMap.put(torDescriptor, expectedTorEntity);
         Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
-        assertThat(graph.nodes()).contains(expectedEntity);
+        assertThat(graph.nodes()).contains(expectedWhoIsEntity);
+        assertThat(graph.nodes()).contains(expectedTorEntity);
     }
 }

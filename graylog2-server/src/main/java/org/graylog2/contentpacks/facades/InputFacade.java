@@ -514,6 +514,13 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .map(e -> e.configuration())
                 .map(c -> ((ValueReference) c.get(LookupTableExtractor.CONFIG_LUT_NAME)).asString(parameters))
                 .collect(Collectors.toSet());
+
+        input.extractors().stream().filter(e -> e.type().asString(parameters).
+                equals(Extractor.Type.LOOKUP_TABLE.toString())).map(c -> c.converters()
+                .stream().map(con -> ((String)(((ValueReference)((ReferenceMap) con.configuration()
+                        .get("config")).get("lookup_table_name")).asString()))).collect(Collectors.toSet()))
+                .forEach(lookupTableNames::addAll);
+
         entities.entrySet().stream()
                 .filter(x -> x.getValue().type().equals(ModelTypes.LOOKUP_TABLE_V1))
                 .filter(x -> {

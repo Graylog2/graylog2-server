@@ -194,8 +194,15 @@
             "lookup_table_name" : "whois"
           },
           "condition_value" : "",
-          "converters" : [],
-          "id" : "7e7aee30-d212-11e8-bda9-00e18cb9c35a",
+          "converters" : [
+            {
+              "type" : "lookup_table",
+              "config" : {
+                "lookup_table_name" : "tor-exit-node-list"
+              }
+            }
+          ],
+          "id" : "7e7aee30-d212-11e8-bda9-00e18cb9c35a"
         }
       ]
     }
