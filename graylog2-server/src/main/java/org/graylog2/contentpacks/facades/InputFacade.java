@@ -486,7 +486,6 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                     });
 
             inputWithExtractors.extractors().stream()
-                    .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
                     .forEach(e -> e.getConverters().stream().filter(c -> c.getType().equals(Converter.Type.LOOKUP_TABLE))
                             .map(c -> (String) c.getConfig().get("lookup_table_name"))
                             .map(name -> lookupTableService.get(name))
@@ -528,8 +527,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .map(c -> ((ValueReference) c.get(LookupTableExtractor.CONFIG_LUT_NAME)).asString(parameters))
                 .collect(Collectors.toSet());
 
-        input.extractors().stream().filter(e -> e.type().asString(parameters).
-                equals(Extractor.Type.LOOKUP_TABLE.toString())).map(c -> c.converters()
+        input.extractors().stream().map(c -> c.converters()
                 .stream().map(con -> ((ValueReference) con.configuration().get("lookup_table_name")).asString(parameters))
                 .collect(Collectors.toSet()))
                 .forEach(lookupTableNames::addAll);
