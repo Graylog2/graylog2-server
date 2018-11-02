@@ -162,7 +162,7 @@ const FieldList = createReactClass({
     const { showFieldsBy } = this.state;
     return (
       <div>
-        <form className={`form-inline ${styles.filterContainer}`}>
+        <form className={`form-inline ${styles.filterContainer}`} onSubmit={e => e.preventDefault()}>
           <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
             <input id="common-search-form-query-input"
                    className="query form-control"
