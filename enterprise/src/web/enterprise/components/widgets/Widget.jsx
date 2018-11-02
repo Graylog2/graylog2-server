@@ -31,6 +31,7 @@ class Widget extends React.Component {
       config: PropTypes.object.isRequired,
     }).isRequired,
     data: PropTypes.any,
+    editing: PropTypes.bool,
     errors: WidgetErrorsList,
     height: PropTypes.number,
     width: PropTypes.number,
@@ -49,6 +50,7 @@ class Widget extends React.Component {
     width: 1,
     data: undefined,
     errors: undefined,
+    editing: false,
   };
 
   static _visualizationForType(type) {
@@ -61,9 +63,11 @@ class Widget extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      editing: false,
-    };
+    const { editing } = props;
+    this.state = { editing };
+    if (editing) {
+      this.state.oldConfig = props.widget.config;
+    }
   }
 
   _onDelete = (widget) => {
@@ -81,10 +85,32 @@ class Widget extends React.Component {
   };
 
   _onToggleEdit = () => {
-    this.setState(state => ({ editing: !state.editing }));
+    this.setState((state) => {
+      if (state.editing) {
+        return {
+          editing: false,
+          oldConfig: undefined,
+          configChanged: undefined,
+        };
+      }
+      return {
+        editing: true,
+        oldConfig: this.props.widget.config,
+      };
+    });
+  };
+
+  _onCancelEdit = () => {
+    if (this.state.configChanged) {
+      const { id } = this.props;
+      const { oldConfig } = this.state;
+      WidgetActions.updateConfig(id, oldConfig);
+    }
+    this._onToggleEdit();
   };
 
   _onWidgetConfigChange = (widgetId, config) => {
+    this.setState({ configChanged: true });
     WidgetActions.updateConfig(widgetId, config);
   };
 
@@ -135,6 +161,7 @@ class Widget extends React.Component {
                 {' '}
                 <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => editWidgetFrameContent}>
                   <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
+                  <MenuItem onSelect={this._onCancelEdit}>Cancel</MenuItem>
                 </WidgetActionDropdown>
               </WidgetHeader>
               <EditComponent config={config}
