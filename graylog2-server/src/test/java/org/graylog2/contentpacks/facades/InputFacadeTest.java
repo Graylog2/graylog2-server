@@ -408,12 +408,10 @@ public class InputFacadeTest {
         when(lookupTableService.hasTable("whois")).thenReturn(true);
         when(lookupTableService.hasTable("tor-exit-node-list")).thenReturn(true);
         final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
-        final Map<String, String> lookupTableConfig = new HashedMap(1);
+        final Map<String, Object> lookupTableConfig = new HashedMap(1);
         lookupTableConfig.put("lookup_table_name", "tor-exit-node-list");
-        final Map<String, Object> config = new HashMap<>(1);
-        config.put("config", lookupTableConfig);
         final ConverterEntity converterEntity = ConverterEntity.create(
-                ValueReference.of("lookup_table"), ReferenceMapUtils.toReferenceMap(config));
+                ValueReference.of("lookup_table"), ReferenceMapUtils.toReferenceMap(lookupTableConfig));
         final List<ConverterEntity> converterEntities = new ArrayList<>(1);
         converterEntities.add(converterEntity);
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
