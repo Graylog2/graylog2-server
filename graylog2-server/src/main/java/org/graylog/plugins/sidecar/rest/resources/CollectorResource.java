@@ -246,6 +246,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     public ValidationResponse validateCollector(
             @ApiParam(name = "name", required = true) @QueryParam("name") String name,
             @ApiParam(name = "id", required = false) @QueryParam("id") String id) {
+        if (!name.matches("^[A-Za-z0-9_.-]+$")) {
+            return ValidationResponse.create(true, "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+        }
         final Collector collector;
         if (id == null) {
             collector = collectorService.findByName(name);
