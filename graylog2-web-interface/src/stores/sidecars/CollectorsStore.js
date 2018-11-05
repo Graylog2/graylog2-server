@@ -177,8 +177,16 @@ const CollectorsStore = Reflux.createStore({
     CollectorsActions.copy.promise(promise);
   },
 
-  validate(name) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/validate/?name=${name}`));
+  validate(name, collectorId) {
+    const search = {
+      name: name,
+    };
+    if (collectorId) {
+      search.id = collectorId;
+    }
+    const url = URI(`${this.sourceUrl}/collectors/validate`).search(search).toString();
+    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+
     promise
       .then(
         response => response,
