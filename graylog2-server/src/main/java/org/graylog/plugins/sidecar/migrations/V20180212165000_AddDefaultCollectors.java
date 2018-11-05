@@ -16,8 +16,14 @@
  */
 package org.graylog.plugins.sidecar.migrations;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +32,19 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.exists;
+
 public class V20180212165000_AddDefaultCollectors extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20180212165000_AddDefaultCollectors.class);
 
     private final CollectorService collectorService;
+    private final MongoCollection<Document> collection;
 
     @Inject
-    public V20180212165000_AddDefaultCollectors(CollectorService collectorService) {
+    public V20180212165000_AddDefaultCollectors(CollectorService collectorService, MongoConnection mongoConnection) {
         this.collectorService = collectorService;
+        this.collection = mongoConnection.getMongoDatabase().getCollection(CollectorService.COLLECTION_NAME);
     }
 
     @Override
@@ -43,6 +54,9 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
 
     @Override
     public void upgrade() {
+
+        removeConfigPath();
+
         final String beatsPreambel =
                 "# Needed for Graylog\n" +
                 "fields_under_root: true\n" +
@@ -54,7 +68,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "exec",
                 "linux",
                 "/usr/lib/graylog-sidecar/filebeat",
-                "/var/lib/graylog-sidecar/generated/filebeat.yml",
                 "-c  %s",
                 "test config -c %s",
                 beatsPreambel +
@@ -74,7 +87,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "svc",
                 "windows",
                 "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
-                "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
                 "-c \"%s\"",
                 "test config -c \"%s\"",
                 beatsPreambel +
@@ -96,11 +108,25 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "exec",
                 "linux",
                 "/usr/lib/graylog-sidecar/nxlog",
-                "/var/lib/graylog-sidecar/generated/nxlog.conf",
                 "-f -c %s",
                 "-v -c %s",
                 ""
         );
+    }
+
+    private void removeConfigPath() {
+        final FindIterable<Document> documentsWithConfigPath = collection.find(exists("configuration_path"));
+        for (Document document : documentsWithConfigPath) {
+            final ObjectId objectId = document.getObjectId("_id");
+            System.out.print( document);
+            document.remove("configuration_path");
+            final UpdateResult updateResult = collection.replaceOne(eq("_id", objectId), document);
+            if (updateResult.wasAcknowledged()) {
+                LOG.debug("Successfully updated document with ID <{}>", objectId);
+            } else {
+                LOG.error("Failed to update document with ID <{}>", objectId);
+            }
+        }
     }
 
     @Nullable
@@ -108,7 +134,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                    String serviceType,
                                    String nodeOperatingSystem,
                                    String executablePath,
-                                   String configurationPath,
                                    String executeParameters,
                                    String validationCommand,
                                    String defaultTemplate) {
@@ -129,7 +154,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                     serviceType,
                     nodeOperatingSystem,
                     executablePath,
-                    configurationPath,
                     executeParameters,
                     validationCommand,
                     defaultTemplate

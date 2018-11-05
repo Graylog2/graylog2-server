@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 
 @Singleton
 public class CollectorService extends PaginatedDbService<Collector> {
-    private static final String COLLECTION_NAME = "sidecar_collectors";
+    public static final String COLLECTION_NAME = "sidecar_collectors";
 
     @Inject
     public CollectorService(MongoConnection mongoConnection,
@@ -90,7 +90,6 @@ public class CollectorService extends PaginatedDbService<Collector> {
                 request.serviceType(),
                 request.nodeOperatingSystem(),
                 request.executablePath(),
-                request.configurationPath(),
                 request.executeParameters(),
                 request.validationParameters(),
                 request.defaultTemplate());

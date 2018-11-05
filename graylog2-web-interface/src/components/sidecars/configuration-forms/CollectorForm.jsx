@@ -43,7 +43,6 @@ const CollectorForm = createReactClass({
         name: this.props.collector.name,
         service_type: this.props.collector.service_type,
         node_operating_system: this.props.collector.node_operating_system,
-        configuration_path: this.props.collector.configuration_path,
         executable_path: this.props.collector.executable_path,
         execute_parameters: this.props.collector.execute_parameters,
         validation_parameters: this.props.collector.validation_parameters,
@@ -165,14 +164,6 @@ const CollectorForm = createReactClass({
             </FormGroup>
 
             <Input type="text"
-                   id="configurationFilePath"
-                   label="Configuration Path"
-                   onChange={this._onInputChange('configuration_path')}
-                   help="Path to the collector configuration file"
-                   value={this.state.formData.configuration_path}
-                   required />
-
-            <Input type="text"
                    id="executablePath"
                    label="Executable Path"
                    onChange={this._onInputChange('executable_path')}
@@ -184,14 +175,14 @@ const CollectorForm = createReactClass({
                    id="executeParameters"
                    label="Execute Parameters"
                    onChange={this._onInputChange('execute_parameters')}
-                   help="Parameters the collector is started with. %s will be replaced by the path to the configuration file."
+                   help={<span>Parameters the collector is started with.<strong> %s will be replaced by the path to the configuration file.</strong></span>}
                    value={executeParameters} />
 
             <Input type="text"
                    id="validationParameters"
                    label="Parameters for Configuration Validation"
                    onChange={this._onInputChange('validation_parameters')}
-                   help="Parameters that validate the configuration file. %s will be replaced by the path to the configuration file."
+                   help={<span>Parameters that validate the configuration file. <strong> %s will be replaced by the path to the configuration file.</strong></span>}
                    value={validationParameters} />
 
             <FormGroup controlId="defaultTemplate">
