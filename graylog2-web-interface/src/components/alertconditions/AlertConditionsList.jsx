@@ -35,6 +35,11 @@ class AlertConditionsList extends React.Component {
 
   _formatCondition = (condition) => {
     const stream = this.props.streams.find(s => s.alert_conditions.find(c => c.id === condition.id));
+    // Condition was deleted while rendering, don't render anything at this stage
+    if (!stream) {
+      return null;
+    }
+
     return (
       <AlertCondition key={condition.id}
                       alertCondition={condition}
