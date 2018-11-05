@@ -178,11 +178,15 @@ const CollectorsStore = Reflux.createStore({
   },
 
   validate(name, collectorId) {
-    let url = `${this.sourceUrl}/collectors/validate/?name=${name}`;
+    const search = {
+      name: name,
+    };
     if (collectorId) {
-      url += `&id=${collectorId}`;
+      search.id = collectorId;
     }
+    const url = URI(`${this.sourceUrl}/collectors/validate`).search(search).toString();
     const promise = fetch('GET', URLUtils.qualifyUrl(url));
+
     promise
       .then(
         response => response,
