@@ -98,7 +98,7 @@
         <gelfclient.version>1.4.1</gelfclient.version>
         <grok.version>0.1.7-graylog</grok.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>23.0</guava.version>
+        <guava.version>23.6.1-jre</guava.version>
         <guice.version>4.1.0</guice.version>
         <HdrHistogram.version>2.1.10</HdrHistogram.version>
         <hibernate-validator.version>6.0.2.Final</hibernate-validator.version>
@@ -125,6 +125,7 @@
         <mongojack.version>2.7.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>3.10.6.Final</netty.version>
+        <netty4.version>4.1.31.Final</netty4.version>
         <okhttp.version>3.9.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.2</os-platform-finder.version>
