@@ -35,6 +35,7 @@ import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -44,24 +45,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,7 +165,11 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @ApiOperation(value = "Create a new collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
     public Collector createCollector(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull Collector request) {
+                                     @Valid @NotNull Collector request) throws ValidationException {
+        final ValidationResponse validation = validate(request.name(), null);
+        if (validation.error()) {
+            throw new ValidationException(validation.errorMessage());
+        }
         etagService.invalidateAll();
         Collector collector = collectorService.fromRequest(request);
         return collectorService.save(collector);
@@ -195,7 +184,11 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     public Collector updateCollector(@ApiParam(name = "id", required = true)
                                      @PathParam("id") String id,
                                      @ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull Collector request) {
+                                     @Valid @NotNull Collector request) throws ValidationException {
+        final ValidationResponse validation = validate(request.name(), id);
+        if (validation.error()) {
+            throw new ValidationException(validation.errorMessage());
+        }
         etagService.invalidateAll();
         Collector collector = collectorService.fromRequest(id, request);
         return collectorService.save(collector);
@@ -208,7 +201,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CLONE)
     public Response copyCollector(@ApiParam(name = "id", required = true)
                                   @PathParam("id") String id,
+                                  @ApiParam(name = "name", required = true)
                                   @PathParam("name") String name) throws NotFoundException {
+        final ValidationResponse validation = validate(name, null);
+        if (validation.error()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validation).build();
+        }
         etagService.invalidateAll();
         final Collector collector = collectorService.copy(id, name);
         collectorService.save(collector);
@@ -246,6 +244,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     public ValidationResponse validateCollector(
             @ApiParam(name = "name", required = true) @QueryParam("name") String name,
             @ApiParam(name = "id", required = false) @QueryParam("id") String id) {
+        return validate(name, id);
+    }
+
+    private ValidationResponse validate(String name, String id) {
         if (!name.matches("^[A-Za-z0-9_.-]+$")) {
             return ValidationResponse.create(true, "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
         }
