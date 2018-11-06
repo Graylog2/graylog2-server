@@ -46,7 +46,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 /**
  * {@link Periodical} that creates and maintains index field type information in the database.
@@ -210,7 +209,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             } catch (TooManyAliasesException e) {
                 LOG.error("Couldn't get active write index", e);
             } catch (Exception e) {
-                LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId);
+                LOG.error("Couldn't update field types for index set <{}/{}>", indexSetTitle, indexSetId, e);
             }
         }, 0, refreshInterval.getMillis(), TimeUnit.MILLISECONDS);
 
