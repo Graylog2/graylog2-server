@@ -60,7 +60,11 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         assertThat(condition.buildQueryFilter("abc123", " *  "))
                 .isEqualTo("streams:abc123");
         assertThat(condition.buildQueryFilter("abc123", " hello:world foo:\"bar baz\"   "))
-                .isEqualTo("streams:abc123 hello:world foo:\"bar baz\"");
+                .isEqualTo("streams:abc123 AND (hello:world foo:\"bar baz\")");
+        assertThat(condition.buildQueryFilter("abc123", "hello:world AND foo:\"bar baz\""))
+                .isEqualTo("streams:abc123 AND (hello:world AND foo:\"bar baz\")");
+        assertThat(condition.buildQueryFilter("abc123", "hello:world AND (foo:\"bar baz\" OR foo:yolo)"))
+                .isEqualTo("streams:abc123 AND (hello:world AND (foo:\"bar baz\" OR foo:yolo))");
     }
 
     private AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {

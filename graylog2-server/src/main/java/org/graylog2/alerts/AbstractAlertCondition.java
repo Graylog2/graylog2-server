@@ -179,7 +179,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         if (query != null) {
             final String trimmedQuery = query.trim();
             if (!trimmedQuery.isEmpty() && !"*".equals(trimmedQuery)) {
-                builder.append(" ").append(trimmedQuery);
+                builder.append(" AND (").append(trimmedQuery).append(")");
             }
         }
 
