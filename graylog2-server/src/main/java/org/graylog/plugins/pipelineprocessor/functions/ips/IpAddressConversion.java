@@ -46,6 +46,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
         final Object ip = ipParam.required(args, context);
         try {
             if (ip instanceof Number) {
+                // this is only valid for IPv4 addresses, v6 requires 128 bits which we don't support
                 return new IpAddress(InetAddresses.fromInteger(((Number) ip).intValue()));
             } else {
                 return new IpAddress(InetAddresses.forString(String.valueOf(ip)));
