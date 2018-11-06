@@ -16,18 +16,17 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.ips;
 
+import static com.google.common.collect.ImmutableList.of;
+
 import com.google.common.net.InetAddresses;
+import java.net.InetAddress;
+import java.util.IllegalFormatException;
+import java.util.Optional;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-
-import java.net.InetAddress;
-import java.util.IllegalFormatException;
-import java.util.Optional;
-
-import static com.google.common.collect.ImmutableList.of;
 
 public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
@@ -44,11 +43,13 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
     @Override
     public IpAddress evaluate(FunctionArgs args, EvaluationContext context) {
-        final String ipString = String.valueOf(ipParam.required(args, context));
-
+        final Object ip = ipParam.required(args, context);
         try {
-            final InetAddress inetAddress = InetAddresses.forString(ipString);
-            return new IpAddress(inetAddress);
+            if (ip instanceof Number) {
+                return new IpAddress(InetAddresses.fromInteger(((Number) ip).intValue()));
+            } else {
+                return new IpAddress(InetAddresses.forString(String.valueOf(ip)));
+            }
         } catch (IllegalArgumentException e) {
             final Optional<String> defaultValue = defaultParam.optional(args, context);
             if (!defaultValue.isPresent()) {

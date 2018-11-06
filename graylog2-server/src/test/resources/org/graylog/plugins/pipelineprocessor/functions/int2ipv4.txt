@@ -1,0 +1,5 @@
+rule "int2ipv4"
+when to_ip("8.8.8.8") == to_ip(134744072)
+then
+   trigger_test();
+end
