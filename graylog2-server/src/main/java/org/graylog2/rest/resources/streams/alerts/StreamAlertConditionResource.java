@@ -27,6 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -36,6 +37,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.AlertConditionListSummary;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
+import org.graylog2.rest.resources.streams.responses.AlertConditionTestResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -210,6 +212,60 @@ public class StreamAlertConditionResource extends RestResource {
                 condition.getParameters(),
                 alertService.inGracePeriod(condition),
                 condition.getTitle());
+    }
+
+
+    @POST
+    @Path("test")
+    @Timed
+    @ApiOperation("Test new alert condition")
+    @NoAuditEvent("resource doesn't modify any data")
+    public Response testNew(@ApiParam(name = "streamId", value = "The stream ID this alert condition belongs to.", required = true) @PathParam("streamId") String streamId,
+                            @ApiParam(name = "Alert condition parameters", required = true) @Valid @NotNull CreateConditionRequest ccr) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+
+        final Stream stream = streamService.load(streamId);
+
+        try {
+            final AlertCondition alertCondition = alertService.fromRequest(convertConfigurationInRequest(ccr), stream, getCurrentUser().getName());
+
+            return Response.ok(testAlertCondition(alertCondition)).build();
+        } catch (ConfigurationException e) {
+            throw new BadRequestException("Invalid alert condition parameters", e);
+        }
+    }
+
+    @POST
+    @Path("{conditionId}/test")
+    @Timed
+    @ApiOperation("Test existing alert condition")
+    @NoAuditEvent("resource doesn't modify any data")
+    public Response testExisting(@ApiParam(name = "streamId", value = "The stream ID this alert condition belongs to.", required = true)
+                                 @PathParam("streamId") String streamId,
+                                 @ApiParam(name = "conditionId", value = "The alert condition ID to be fetched", required = true)
+                                 @PathParam("conditionId") String conditionId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+
+        final Stream stream = streamService.load(streamId);
+        final AlertCondition alertCondition = streamService.getAlertCondition(stream, conditionId);
+
+        final AlertConditionTestResponse testResultResponse = testAlertCondition(alertCondition);
+
+        if (testResultResponse.error()) {
+            return Response.status(400).entity(testResultResponse).build();
+        } else {
+            return Response.ok(testResultResponse).build();
+        }
+    }
+
+    private AlertConditionTestResponse testAlertCondition(AlertCondition alertCondition) {
+        try {
+            final AlertCondition.CheckResult checkResult = alertCondition.runCheck();
+
+            return AlertConditionTestResponse.create(checkResult.isTriggered(), checkResult.getResultDescription());
+        } catch (Exception e) {
+            return AlertConditionTestResponse.createWithError(e);
+        }
     }
 
     private CreateConditionRequest convertConfigurationInRequest(final CreateConditionRequest request) {

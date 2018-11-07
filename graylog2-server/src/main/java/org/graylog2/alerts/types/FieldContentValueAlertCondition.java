@@ -52,6 +52,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     private final Configuration configuration;
     private final String field;
     private final String value;
+    private final String query;
 
     public interface Factory extends AlertCondition.Factory {
         @Override
@@ -109,11 +110,12 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
         this.configuration = configuration;
         this.field = (String) parameters.get("field");
         this.value = (String) parameters.get("value");
+        this.query = (String) parameters.getOrDefault(CK_QUERY, CK_QUERY_DEFAULT_VALUE);
     }
 
     @Override
     public CheckResult runCheck() {
-        String filter = "streams:" + stream.getId();
+        String filter = buildQueryFilter(stream.getId(), query);
         String query = field + ":\"" + value + "\"";
         Integer backlogSize = getBacklog();
         boolean backlogEnabled = false;
