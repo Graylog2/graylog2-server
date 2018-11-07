@@ -26,7 +26,6 @@ import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.primitives.Ints;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.jackson.ReferenceConverter;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -51,9 +50,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.LookupTableExtractor;
-import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.db.DBLookupTableService;
-import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -78,6 +75,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
@@ -473,29 +471,23 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         try {
             final Input input = inputService.find(modelId.toString());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            inputWithExtractors.extractors().stream()
+            final Stream<String> extractorLookupNames = inputWithExtractors.extractors().stream()
                     .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
-                    .map(e -> (String) e.getExtractorConfig().get(LookupTableExtractor.CONFIG_LUT_NAME))
-                    .map(name -> lookupTableService.get(name))
-                    .forEach(optional -> {
-                        optional.ifPresent(lookupTableDto -> {
-                            EntityDescriptor lookupTable = EntityDescriptor.create(
-                                    ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
-                            mutableGraph.putEdge(entityDescriptor, lookupTable);
-                        });
-                    });
+                    .map(e -> (String) e.getExtractorConfig().get(LookupTableExtractor.CONFIG_LUT_NAME));
+            final Stream<String> converterLookupNames = inputWithExtractors.extractors().stream()
+                    .flatMap(e -> e.getConverters().stream())
+                    .filter(c -> c.getType().equals(Converter.Type.LOOKUP_TABLE))
+                    .map(c -> (String) c.getConfig().get("lookup_table_name"));
 
-            inputWithExtractors.extractors().stream()
-                    .forEach(e -> e.getConverters().stream().filter(c -> c.getType().equals(Converter.Type.LOOKUP_TABLE))
-                            .map(c -> (String) c.getConfig().get("lookup_table_name"))
-                            .map(name -> lookupTableService.get(name))
-                            .forEach(optional -> {
-                                optional.ifPresent(lookupTableDto -> {
-                                    EntityDescriptor lookupTable = EntityDescriptor.create(
-                                            ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
-                                    mutableGraph.putEdge(entityDescriptor, lookupTable);
-                                });
-                            }));
+            Stream.concat(extractorLookupNames, converterLookupNames)
+                    .map(lookupTableService::get)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(lookupTableDto -> {
+                        EntityDescriptor lookupTable = EntityDescriptor.create(
+                                ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
+                        mutableGraph.putEdge(entityDescriptor, lookupTable);
+                    });
 
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find input {}", entityDescriptor, e);
@@ -527,12 +519,10 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .map(c -> ((ValueReference) c.get(LookupTableExtractor.CONFIG_LUT_NAME)).asString(parameters))
                 .collect(Collectors.toSet());
 
-        input.extractors().stream().map(c -> c.converters()
-                .stream()
+        input.extractors().stream().flatMap(c -> c.converters().stream())
                 .filter(con -> con.type().asString(parameters).equals(Converter.Type.LOOKUP_TABLE.name()))
                 .map(con -> ((ValueReference) con.configuration().get("lookup_table_name")).asString(parameters))
-                .collect(Collectors.toSet()))
-                .forEach(lookupTableNames::addAll);
+                .forEach(lookupTableNames::add);
 
         entities.entrySet().stream()
                 .filter(x -> x.getValue().type().equals(ModelTypes.LOOKUP_TABLE_V1))
