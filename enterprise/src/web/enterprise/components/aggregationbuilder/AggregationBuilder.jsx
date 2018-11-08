@@ -4,13 +4,13 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { AggregationType } from './AggregationBuilderPropTypes';
 import FullSizeContainer from './FullSizeContainer';
-import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
 const defaultVisualizationType = 'table';
 
 export default class AggregationBuilder extends React.Component {
   static defaultProps = {
     editing: false,
+    onChange: () => {},
     visualization: defaultVisualizationType,
   };
 
@@ -21,7 +21,7 @@ export default class AggregationBuilder extends React.Component {
     }).isRequired,
     editing: PropTypes.bool,
     fields: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
   };
 
   static _visualizationForType(type) {

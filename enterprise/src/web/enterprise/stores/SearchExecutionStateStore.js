@@ -13,23 +13,19 @@ const newParameterBindingValue = value => Immutable.fromJS({
   value: value,
 });
 
-const setParameterBindings = (executionState, bindings) => {
-  return executionState.set('parameter_bindings', bindings);
-};
-
 const getParameterBindings = executionState => executionState.get('parameter_bindings');
 const getParameterBindingValue = (executionState, parameterName) => executionState.getIn(['parameter_bindings', parameterName, 'value']);
 
 const getParameterBindingsAsMap = bindings => bindings.flatMap((value, name) => ({ [name]: value.get('value') }));
 
-export { newParameterBindingValue, setParameterBindings, getParameterBindings, getParameterBindingsAsMap, getParameterBindingValue };
+export { newParameterBindingValue, getParameterBindings, getParameterBindingsAsMap, getParameterBindingValue };
 
-export const SearchExecutionStateActions = Reflux.createActions([
-  'bindParameterValue',
-  'setParameterValues',
-  'replace',
-  'clear',
-]);
+export const SearchExecutionStateActions = Reflux.createActions({
+  bindParameterValue: { asyncResult: true },
+  setParameterValues: { asyncResult: true },
+  replace: { asyncResult: true },
+  clear: { asyncResult: true },
+});
 
 export const SearchExecutionStateStore = Reflux.createStore({
   listenables: [SearchExecutionStateActions],
@@ -48,12 +44,12 @@ export const SearchExecutionStateStore = Reflux.createStore({
   handleViewMetadataChange({ id }) {
     if (this.viewId !== id) {
       this.clear();
+      this.viewId = id;
     }
-    this.viewId = id;
   },
 
   handleSearchParameterChange(parameters) {
-    const bindings = this.executionState.get('parameter_bindings');
+    const bindings = getParameterBindings(this.executionState);
 
     if (bindings) {
       // Cleanup the parameter bindings to only keep declared parameters
@@ -64,7 +60,9 @@ export const SearchExecutionStateStore = Reflux.createStore({
   },
 
   clear() {
-    this.trigger(defaultExecutionState);
+    this.executionState = defaultExecutionState;
+    this.trigger(this.executionState);
+    SearchExecutionStateActions.clear.promise(Promise.resolve(this.executionState));
   },
 
   replace(executionState, trigger = true) {
@@ -72,6 +70,7 @@ export const SearchExecutionStateStore = Reflux.createStore({
     if (trigger) {
       this.trigger(this.executionState);
     }
+    SearchExecutionStateActions.replace.promise(Promise.resolve(executionState));
   },
 
   setParameterValues(parameterMap) {
@@ -79,11 +78,13 @@ export const SearchExecutionStateStore = Reflux.createStore({
       this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], newParameterBindingValue(value));
     });
     this.trigger(this.executionState);
+    SearchExecutionStateActions.setParameterValues.promise(Promise.resolve(this.executionState));
     return this.executionState;
   },
 
   bindParameterValue(parameterName, value) {
     this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], newParameterBindingValue(value));
     this.trigger(this.executionState);
+    SearchExecutionStateActions.bindParameterValue.promise(Promise.resolve(this.executionState));
   },
 });

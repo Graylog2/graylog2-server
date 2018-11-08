@@ -7,10 +7,10 @@ import { TitlesActions } from 'enterprise/stores/TitlesStore';
 import { ViewActions } from 'enterprise/stores/ViewStore';
 import NewQueryActionHandler from 'enterprise/logic/NewQueryActionHandler';
 import onSaveView from 'enterprise/logic/views/OnSaveViewAction';
-import { QueriesActions } from '../stores/QueriesStore';
-import { QueryIdsStore } from '../stores/QueryIdsStore';
-import { QueryTitlesStore } from '../stores/QueryTitlesStore';
-import { ViewMetadataStore } from '../stores/ViewMetadataStore';
+import { QueriesActions } from 'enterprise/stores/QueriesStore';
+import { QueryIdsStore } from 'enterprise/stores/QueryIdsStore';
+import { QueryTitlesStore } from 'enterprise/stores/QueryTitlesStore';
+import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import QueryTabs from './QueryTabs';
 import CustomPropTypes from './CustomPropTypes';
 

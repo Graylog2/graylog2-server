@@ -22,8 +22,7 @@ describe('AggregationBuilder', () => {
   it('does not render empty result widget when no documents were in result', () => {
     const wrapper = mount(<AggregationBuilder data={{ total: 0 }}
                                               config={AggregationWidgetConfig.builder().visualization('dummy').build()}
-                                              fields={{}}
-                                              onChange={() => {}} />);
+                                              fields={{}} />);
 
     expect(wrapper.find(EmptyResultWidget)).toHaveLength(0);
   });
@@ -31,7 +30,6 @@ describe('AggregationBuilder', () => {
   it('renders dummy component with rows from data', () => {
     const wrapper = mount(<AggregationBuilder config={AggregationWidgetConfig.builder().visualization('dummy').build()}
                                               fields={{}}
-                                              onChange={() => {}}
                                               data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);
 
     expect(wrapper.find(EmptyResultWidget)).toHaveLength(0);

@@ -9,7 +9,7 @@ import Input from 'components/bootstrap/Input';
 export default class ViewPropertiesModal extends React.Component {
   static propTypes = {
     view: PropTypes.object.isRequired,
-    show: PropTypes.bool.isRequired,
+    show: PropTypes.bool,
     title: PropTypes.string.isRequired,
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func,
@@ -17,6 +17,7 @@ export default class ViewPropertiesModal extends React.Component {
 
   static defaultProps = {
     onClose: () => {},
+    show: false,
   };
 
   constructor(props) {

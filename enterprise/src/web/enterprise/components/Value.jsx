@@ -21,7 +21,6 @@ export default class Value extends React.Component {
   };
 
   static defaultProps = {
-    type: null,
     children: null,
     interactive: false,
     viewId: null,
