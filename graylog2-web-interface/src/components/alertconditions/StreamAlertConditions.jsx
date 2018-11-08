@@ -16,7 +16,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 const StreamAlertConditions = createReactClass({
-  displayName: 'AlertConditionsComponent',
+  displayName: 'StreamAlertConditions',
   propTypes: {
     stream: PropTypes.object.isRequired,
   },

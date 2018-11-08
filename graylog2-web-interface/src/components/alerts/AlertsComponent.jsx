@@ -4,13 +4,13 @@ import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 import Promise from 'bluebird';
 
+import { Alert } from 'components/alerts';
+import { EntityList, PaginatedList, Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
-
-import { Alert } from 'components/alerts';
-import { EntityList, PaginatedList, Spinner } from 'components/common';
 
 const AlertsComponent = createReactClass({
   displayName: 'AlertsComponent',
@@ -61,9 +61,16 @@ const AlertsComponent = createReactClass({
   },
 
   _formatAlert(alert) {
+    const condition = this.state.allAlertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
+    const stream = this.state.streams.find(s => s.id === alert.stream_id);
+    const conditionType = condition ? this.state.types[condition.type] : {};
+
     return (
-      <Alert key={alert.id} alert={alert} alertConditions={this.state.allAlertConditions} streams={this.state.streams}
-             conditionTypes={this.state.types} />
+      <Alert key={alert.id}
+             alert={alert}
+             alertCondition={condition}
+             stream={stream}
+             conditionType={conditionType} />
     );
   },
 
@@ -93,7 +100,9 @@ const AlertsComponent = createReactClass({
           {this.state.displayAllAlerts ? 'all' : 'unresolved'} alerts.
         </p>
 
-        <PaginatedList totalItems={this.state.alerts.total} pageSize={this.pageSize} onChange={this._onChangePaginatedList}
+        <PaginatedList totalItems={this.state.alerts.total}
+                       pageSize={this.pageSize}
+                       onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle={this.state.displayAllAlerts ? 'info' : 'success'}
                       noItemsText={this.state.displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
