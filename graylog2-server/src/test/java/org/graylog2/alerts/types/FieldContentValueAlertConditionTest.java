@@ -127,6 +127,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final int alertCheckInterval = 42;
         final RelativeRange relativeRange = RelativeRange.create(alertCheckInterval);
 
+        when(stream.getId()).thenReturn("stream-id");
         when(configuration.getAlertCheckInterval()).thenReturn(alertCheckInterval);
 
         when(searches.search(anyString(),

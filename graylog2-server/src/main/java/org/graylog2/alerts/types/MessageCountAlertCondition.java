@@ -120,6 +120,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
+    private final String query;
     private final Searches searches;
 
     @AssistedInject
@@ -152,6 +153,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         }
         this.thresholdType = ThresholdType.valueOf(upperCaseThresholdType);
         this.threshold = Tools.getNumber(parameters.get("threshold"), 0).intValue();
+        this.query = (String) parameters.getOrDefault(CK_QUERY, CK_QUERY_DEFAULT_VALUE);
     }
 
     @Override
@@ -174,7 +176,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             final RelativeRange relativeRange = RelativeRange.create(time * 60);
             final AbsoluteRange range = AbsoluteRange.create(relativeRange.getFrom(), relativeRange.getTo());
 
-            final String filter = "streams:" + stream.getId();
+            final String filter = buildQueryFilter(stream.getId(), query);
             final CountResult result = searches.count("*", range, filter);
             final long count = result.count();
 
