@@ -1,6 +1,5 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import {} from 'components/maps/adapter';
 import CSVFileAdapterFieldSet from './CSVFileAdapterFieldSet';
 import CSVFileAdapterSummary from './CSVFileAdapterSummary';
 import CSVFileAdapterDocumentation from './CSVFileAdapterDocumentation';
