@@ -1,42 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
-import { Spinner } from 'components/common';
 import { AlertConditionsList } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';
-
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 const StreamAlertConditions = createReactClass({
   displayName: 'StreamAlertConditions',
   propTypes: {
     stream: PropTypes.object.isRequired,
-  },
-  mixins: [Reflux.connect(AlertConditionsStore)],
-
-  componentDidMount() {
-    this.loadData();
-  },
-
-  loadData() {
-    AlertConditionsActions.list(this.props.stream.id);
+    alertConditions: PropTypes.array.isRequired,
   },
 
   render() {
-    const isLoading = !this.state.alertConditions;
-    if (isLoading) {
-      return <Spinner />;
-    }
-
-    const alertConditions = this.state.alertConditions.sort((a1, a2) => {
+    const alertConditions = this.props.alertConditions.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';
       const t2 = a2.title || 'Untitled';
       return naturalSort(t1.toLowerCase(), t2.toLowerCase());

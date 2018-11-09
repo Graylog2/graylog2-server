@@ -2,7 +2,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import Promise from 'bluebird';
 import { Link } from 'react-router';
 
 import { Alert } from 'components/alerts';
@@ -11,18 +10,19 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 const StreamAlerts = createReactClass({
   displayName: 'StreamAlerts',
   propTypes: {
     stream: PropTypes.object.isRequired,
+    alertConditions: PropTypes.array.isRequired,
+    conditionTypes: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
+  mixins: [Reflux.connect(AlertsStore)],
 
   getInitialState() {
     return {
-      loading: false,
+      loading: true,
     };
   },
 
@@ -35,13 +35,8 @@ const StreamAlerts = createReactClass({
 
   loadData(pageNo, limit) {
     this.setState({ loading: true });
-    const promises = [
-      AlertsActions.listPaginated(this.props.stream.id, (pageNo - 1) * limit, limit),
-      AlertConditionsActions.list(this.props.stream.id),
-      AlertConditionsActions.available(),
-    ];
-
-    Promise.all(promises).finally(() => this.setState({ loading: false }));
+    AlertsActions.listPaginated(this.props.stream.id, (pageNo - 1) * limit, limit)
+      .finally(() => this.setState({ loading: false }));
   },
 
   _refreshData() {
@@ -55,8 +50,8 @@ const StreamAlerts = createReactClass({
   },
 
   _formatAlert(alert) {
-    const condition = this.state.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
-    const conditionType = condition ? this.state.types[condition.type] : {};
+    const condition = this.props.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
+    const conditionType = condition ? this.props.conditionTypes[condition.type] : {};
 
     return (
       <Alert key={alert.id}
@@ -67,12 +62,8 @@ const StreamAlerts = createReactClass({
     );
   },
 
-  _isLoading() {
-    return !this.state.alerts || !this.state.alertConditions || !this.state.types;
-  },
-
   render() {
-    if (this._isLoading()) {
+    if (this.state.loading) {
       return <Spinner />;
     }
 

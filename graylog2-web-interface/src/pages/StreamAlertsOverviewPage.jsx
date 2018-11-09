@@ -7,9 +7,7 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-import { StreamAlertNotifications } from 'components/alertnotifications';
-import { StreamAlertConditions } from 'components/alertconditions';
-import { StreamAlerts } from 'components/alerts';
+import { StreamAlertsOverviewContainer } from 'components/alerts';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
 
@@ -59,23 +57,7 @@ class StreamAlertsOverviewPage extends React.Component {
             </ButtonToolbar>
           </PageHeader>
 
-          <Row className="content">
-            <Col md={12}>
-              <StreamAlerts stream={stream} />
-            </Col>
-          </Row>
-
-          <Row className="content">
-            <Col md={12}>
-              <StreamAlertConditions stream={stream} />
-            </Col>
-          </Row>
-
-          <Row className="content">
-            <Col md={12}>
-              <StreamAlertNotifications stream={stream} />
-            </Col>
-          </Row>
+          <StreamAlertsOverviewContainer stream={stream} />
         </div>
       </DocumentTitle>
     );
