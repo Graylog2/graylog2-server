@@ -75,7 +75,7 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider);
+        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider, null);
     }
 
     @Test

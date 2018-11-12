@@ -8,7 +8,7 @@ import DocsHelper from 'util/DocsHelper';
 
 import FilebeatHelper from './FilebeatHelper';
 import TemplatesHelper from './TemplatesHelper';
-import IncludesHelper from './IncludesHelper';
+import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 class ConfigurationHelper extends React.Component {
@@ -62,21 +62,29 @@ class ConfigurationHelper extends React.Component {
 
   render() {
     return (
-      <Panel header="Filebeat quick reference">
-        <Row className="row-sm">
-          <Col md={12}>
-            <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-              Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                          text="full documentation" />{' '}
-              to gain a better understanding of how the Filebeat collector work.
-            </p>
-          </Col>
-        </Row>
+      <Panel header="Collector Configuration Reference">
 
         <Row className="row-sm">
           <Col md={12}>
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
-              <Tab eventKey={1} title="Reference">
+              <Tab eventKey={1} title="Variables">
+                <br />
+                <ConfigurationVariablesHelper />
+              </Tab>
+              <Tab eventKey={2} title="Runtime Variables">
+                <br />
+                <TemplatesHelper />
+              </Tab>
+              <Tab eventKey={3} title="Reference">
+                <Row className="row-sm">
+                  <Col md={12}>
+                    <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                      Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
+                                                  text="full documentation" />{' '}
+                      to gain a better understanding of how the Filebeat collector work.
+                    </p>
+                  </Col>
+                </Row>
                 <br />
                 <Navbar collapseOnSelect>
                   <Navbar.Collapse>
@@ -88,14 +96,6 @@ class ConfigurationHelper extends React.Component {
                 <Panel>
                   <FilebeatHelper section={this.state.section} paragraph={this.state.paragraph} />
                 </Panel>
-              </Tab>
-              <Tab eventKey={2} title="Templates">
-                <br />
-                <TemplatesHelper />
-              </Tab>
-              <Tab eventKey={3} title="Includes">
-                <br />
-                <IncludesHelper />
               </Tab>
             </Tabs>
           </Col>

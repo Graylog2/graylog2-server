@@ -250,6 +250,7 @@ const ConfigurationForm = createReactClass({
             <FormGroup controlId="template" validationState={this.state.errors.template ? 'error' : null}>
               <ControlLabel>Configuration</ControlLabel>
               <SourceCodeEditor id="template"
+                                height={400}
                                 value={this.state.formData.template}
                                 onChange={this._onTemplateChange} />
               <Button className="pull-right"

@@ -5,8 +5,7 @@ class TemplatesHelper extends React.Component {
   render() {
     return (
       <div>
-        <h3>Variables</h3>
-        <h5 style={{ marginBottom: 10 }}>Operating System</h5>
+        <h5>These variables will be filled with the runtime information from each Sidecar</h5>
         <Table responsive>
           <thead>
             <tr>

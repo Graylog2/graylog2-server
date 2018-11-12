@@ -35,6 +35,7 @@ import org.graylog.plugins.sidecar.periodical.PurgeExpiredSidecarsThread;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
+import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog2.migrations.Migration;
@@ -56,6 +57,7 @@ public class SidecarModule extends PluginModule {
         bind(ConfigurationService.class).asEagerSingleton();
         bind(SidecarService.class).asEagerSingleton();
         bind(CollectorService.class).asEagerSingleton();
+        bind(ConfigurationVariableService.class).asEagerSingleton();
 
         install(new FactoryModuleBuilder()
                 .implement(AdministrationFilter.class, Names.named("collector"), CollectorAdministrationFilter.class)

@@ -59,12 +59,14 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
     private static final freemarker.template.Configuration templateConfiguration =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
     private static final StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
+    private ConfigurationVariableService configurationVariableService;
 
     private static final String COLLECTION_NAME = "sidecar_configurations";
 
     @Inject
     public ConfigurationService(MongoConnection mongoConnection,
-                                MongoJackObjectMapperProvider mapper) {
+                                MongoJackObjectMapperProvider mapper,
+                                ConfigurationVariableService configurationVariableService) {
         super(mongoConnection, mapper, Configuration.class, COLLECTION_NAME);
         MongoDbTemplateLoader mongoDbTemplateLoader = new MongoDbTemplateLoader(db);
         MultiTemplateLoader multiTemplateLoader = new MultiTemplateLoader(new TemplateLoader[] {
@@ -75,6 +77,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         templateConfiguration.setDefaultEncoding(UTF_8);
         templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfiguration.setLogTemplateExceptions(false);
+        this.configurationVariableService = configurationVariableService;
     }
 
     public Configuration find(String id) {
@@ -182,6 +185,8 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
     private String renderTemplate(String configurationId, Map<String, Object> context) throws RenderTemplateException {
         Writer writer = new StringWriter();
         String template;
+
+        configurationVariableService.all().stream().forEach(configVar -> context.put(configVar.name(), configVar.content()));
         try {
             Template compiledTemplate = templateConfiguration.getTemplate(configurationId);
             compiledTemplate.process(context, writer);
