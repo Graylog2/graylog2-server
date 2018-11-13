@@ -118,7 +118,6 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         final FindIterable<Document> documentsWithConfigPath = collection.find(exists("configuration_path"));
         for (Document document : documentsWithConfigPath) {
             final ObjectId objectId = document.getObjectId("_id");
-            System.out.print( document);
             document.remove("configuration_path");
             final UpdateResult updateResult = collection.replaceOne(eq("_id", objectId), document);
             if (updateResult.wasAcknowledged()) {
