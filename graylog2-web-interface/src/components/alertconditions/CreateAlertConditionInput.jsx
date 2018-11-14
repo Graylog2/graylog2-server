@@ -1,5 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -12,12 +13,22 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const CreateAlertConditionInput = createReactClass({
   displayName: 'CreateAlertConditionInput',
+  propTypes: {
+    initialSelectedStream: PropTypes.string,
+  },
   mixins: [Reflux.connect(AlertConditionsStore)],
+
+  getDefaultProps() {
+    return {
+      initialSelectedStream: undefined,
+    };
+  },
 
   getInitialState() {
     return {
@@ -29,7 +40,12 @@ const CreateAlertConditionInput = createReactClass({
 
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams: streams });
+      const nextState = { streams: streams };
+      const initialSelectedStream = this.props.initialSelectedStream;
+      if (initialSelectedStream) {
+        nextState.selectedStream = this._findStream(streams, initialSelectedStream);
+      }
+      this.setState(nextState);
     });
     AlertConditionsActions.available();
   },
@@ -40,8 +56,12 @@ const CreateAlertConditionInput = createReactClass({
     this.setState({ type: evt.target.value });
   },
 
+  _findStream(streams, streamId) {
+    return streams.find(s => s.id === streamId);
+  },
+
   _onStreamChange(nextStream) {
-    this.setState({ selectedStream: this.state.streams.find(s => s.id === nextStream) });
+    this.setState({ selectedStream: this._findStream(this.state.streams, nextStream) });
   },
 
   _onSubmit(data) {
@@ -100,7 +120,10 @@ const CreateAlertConditionInput = createReactClass({
           <Col md={6}>
             <form>
               <Input id="stream-selector" label="Alert on stream" help="Select the stream that the condition will use to trigger alerts.">
-                <Select placeholder="Select a stream" options={formattedStreams} onChange={this._onStreamChange} />
+                <Select placeholder="Select a stream"
+                        options={formattedStreams}
+                        onChange={this._onStreamChange}
+                        value={this.state.selectedStream ? this.state.selectedStream.id : undefined} />
               </Input>
 
               <Input id="condition-type-selector"

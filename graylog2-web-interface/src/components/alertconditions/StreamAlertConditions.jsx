@@ -27,7 +27,7 @@ const StreamAlertConditions = createReactClass({
     return (
       <div>
         <div className="pull-right">
-          <LinkContainer to={Routes.ALERTS.NEW_CONDITION}>
+          <LinkContainer to={Routes.new_alert_condition_for_stream(this.props.stream.id)}>
             <Button bsStyle="success">Add new condition</Button>
           </LinkContainer>
         </div>
