@@ -65,7 +65,6 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
                 ValueReference.of(collector.serviceType()),
                 ValueReference.of(collector.nodeOperatingSystem()),
                 ValueReference.of(collector.executablePath()),
-                ValueReference.of(collector.configurationPath()),
                 ValueReference.of(collector.executeParameters()),
                 ValueReference.of(collector.validationParameters()),
                 ValueReference.of(collector.defaultTemplate())
@@ -100,7 +99,6 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
                 .serviceType(collectorEntity.serviceType().asString(parameters))
                 .nodeOperatingSystem(collectorEntity.nodeOperatingSystem().asString(parameters))
                 .executablePath(collectorEntity.executablePath().asString(parameters))
-                .configurationPath(collectorEntity.configurationPath().asString(parameters))
                 .executeParameters(collectorEntity.executeParameters().asString(parameters))
                 .validationParameters(collectorEntity.validationParameters().asString(parameters))
                 .defaultTemplate(collectorEntity.defaultTemplate().asString(parameters))

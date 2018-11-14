@@ -16,9 +16,7 @@
  */
 package org.graylog.plugins.sidecar.rest.models;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -33,7 +31,6 @@ public abstract class Collector {
     public static final String FIELD_SERVICE_TYPE = "service_type";
     public static final String FIELD_NODE_OPERATING_SYSTEM = "node_operating_system";
     public static final String FIELD_EXECUTABLE_PATH = "executable_path";
-    public static final String FIELD_CONFIGURATION_PATH = "configuration_path";
     public static final String FIELD_EXECUTE_PARAMETERS = "execute_parameters";
     public static final String FIELD_VALIDATION_PARAMETERS = "validation_parameters";
     public static final String FIELD_DEFAULT_TEMPLATE = "default_template";
@@ -56,9 +53,6 @@ public abstract class Collector {
 
     @JsonProperty(FIELD_EXECUTABLE_PATH)
     public abstract String executablePath();
-
-    @JsonProperty(FIELD_CONFIGURATION_PATH)
-    public abstract String configurationPath();
 
     @JsonProperty(FIELD_EXECUTE_PARAMETERS)
     @Nullable
@@ -84,7 +78,6 @@ public abstract class Collector {
         public abstract Builder serviceType(String serviceType);
         public abstract Builder nodeOperatingSystem(String nodeOperatingSystem);
         public abstract Builder executablePath(String executablePath);
-        public abstract Builder configurationPath(String configurationPath);
         public abstract Builder executeParameters(String executeParameters);
         public abstract Builder validationParameters(String validationParameters);
         public abstract Builder defaultTemplate(String defaultTemplate);
@@ -97,7 +90,6 @@ public abstract class Collector {
                                    @JsonProperty(FIELD_SERVICE_TYPE) String serviceType,
                                    @JsonProperty(FIELD_NODE_OPERATING_SYSTEM) String nodeOperatingSystem,
                                    @JsonProperty(FIELD_EXECUTABLE_PATH) String executablePath,
-                                   @JsonProperty(FIELD_CONFIGURATION_PATH) String configurationPath,
                                    @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable String executeParameters,
                                    @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable String validationParameters,
                                    @JsonProperty(FIELD_DEFAULT_TEMPLATE) String defaultTemplate) {
@@ -107,7 +99,6 @@ public abstract class Collector {
                 .serviceType(serviceType)
                 .nodeOperatingSystem(nodeOperatingSystem)
                 .executablePath(executablePath)
-                .configurationPath(configurationPath)
                 .executeParameters(executeParameters)
                 .validationParameters(validationParameters)
                 .defaultTemplate(defaultTemplate)

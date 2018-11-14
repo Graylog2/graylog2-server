@@ -39,9 +39,6 @@ public abstract class SidecarCollectorEntity {
     @JsonProperty("executable_path")
     public abstract ValueReference executablePath();
 
-    @JsonProperty("configuration_path")
-    public abstract ValueReference configurationPath();
-
     @JsonProperty("execute_parameters")
     public abstract ValueReference executeParameters();
 
@@ -56,7 +53,6 @@ public abstract class SidecarCollectorEntity {
                                          @JsonProperty("service_type") ValueReference serviceType,
                                          @JsonProperty("node_operating_system") ValueReference nodeOperatingSystem,
                                          @JsonProperty("executable_path") ValueReference executablePath,
-                                         @JsonProperty("configuration_path") ValueReference configurationPath,
                                          @JsonProperty("execute_parameters") ValueReference executeParameters,
                                          @JsonProperty("validation_parameters") ValueReference validationParameters,
                                          @JsonProperty("default_template") ValueReference defaultTemplate) {
@@ -64,7 +60,6 @@ public abstract class SidecarCollectorEntity {
                 serviceType,
                 nodeOperatingSystem,
                 executablePath,
-                configurationPath,
                 executeParameters,
                 validationParameters,
                 defaultTemplate);

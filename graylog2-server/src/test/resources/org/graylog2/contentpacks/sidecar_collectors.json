@@ -8,7 +8,6 @@
       "service_type": "exec",
       "node_operating_system": "linux",
       "executable_path": "/usr/lib/graylog-sidecar/filebeat",
-      "configuration_path": "/var/lib/graylog-sidecar/generated/filebeat.yml",
       "execute_parameters": "-c %s",
       "validation_parameters": "test config -c %s",
       "default_template": ""
@@ -21,7 +20,6 @@
       "service_type": "svc",
       "node_operating_system": "windows",
       "executable_path": "C:\\Program Files\\Graylog\\sidecar\\winlogbeat.exe",
-      "configuration_path": "C:\\Program Files\\Graylog\\sidecar\\generated\\winlogbeat.yml",
       "execute_parameters": "-c \"%s\"",
       "validation_parameters": "test config -c \"%s\"",
       "default_template": ""
@@ -34,7 +32,6 @@
       "service_type": "exec",
       "node_operating_system": "linux",
       "executable_path": "/usr/lib/graylog-sidecar/nxlog",
-      "configuration_path": "/var/lib/graylog-sidecar/generated/nxlog.conf",
       "execute_parameters": "-f -c %s",
       "validation_parameters": "-v -c %s",
       "default_template": ""

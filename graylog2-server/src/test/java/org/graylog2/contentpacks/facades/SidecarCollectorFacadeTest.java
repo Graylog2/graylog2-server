@@ -82,7 +82,6 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("/var/lib/graylog-sidecar/generated/filebeat.yml"),
                         ValueReference.of("-c %s"),
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
@@ -105,7 +104,6 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("/var/lib/graylog-sidecar/generated/filebeat.yml"),
                         ValueReference.of("-c %s"),
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
@@ -124,7 +122,6 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("/var/lib/graylog-sidecar/generated/filebeat.yml"),
                         ValueReference.of("-c %s"),
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
@@ -154,7 +151,6 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("/var/lib/graylog-sidecar/generated/filebeat.yml"),
                         ValueReference.of("-c %s"),
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
@@ -234,7 +230,6 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("exec"),
                         ValueReference.of("linux"),
                         ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("/var/lib/graylog-sidecar/generated/filebeat.yml"),
                         ValueReference.of("-c %s"),
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
