@@ -64,7 +64,7 @@ const ShowAlertPage = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.alert || !this.state.alertCondition || !this.state.types || !this.state.stream;
+    return !this.state.alert || !this.state.alertCondition || !this.state.availableConditions || !this.state.stream;
   },
 
   render() {
@@ -75,7 +75,7 @@ const ShowAlertPage = createReactClass({
     const alert = this.state.alert;
     const condition = this.state.alertCondition;
     const conditionExists = Object.keys(condition).length > 0;
-    const type = this.state.types[condition.type] || {};
+    const conditionType = this.state.availableConditions[condition.type] || {};
     const stream = this.state.stream;
 
     let statusLabel;
@@ -144,7 +144,7 @@ const ShowAlertPage = createReactClass({
             </span>
           </PageHeader>
 
-          <AlertDetails alert={alert} condition={conditionExists && condition} conditionType={type} stream={stream} />
+          <AlertDetails alert={alert} condition={conditionExists && condition} conditionType={conditionType} stream={stream} />
         </div>
       </DocumentTitle>
     );

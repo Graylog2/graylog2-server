@@ -3,13 +3,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { EntityList, Spinner } from 'components/common';
+import { EntityList } from 'components/common';
 import { AlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
-const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const EditAlertConditionForm = createReactClass({
@@ -17,12 +16,13 @@ const EditAlertConditionForm = createReactClass({
 
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
+    conditionType: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
     onUpdate: PropTypes.func,
     onDelete: PropTypes.func,
   },
 
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   getDefaultProps() {
     return {
@@ -31,16 +31,8 @@ const EditAlertConditionForm = createReactClass({
     };
   },
 
-  _isLoading() {
-    return !this.state.types;
-  },
-
   render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
-
-    const { alertCondition, stream } = this.props;
+    const { alertCondition, conditionType, stream } = this.props;
 
     return (
       <div>
@@ -50,6 +42,7 @@ const EditAlertConditionForm = createReactClass({
           <AlertCondition key={alertCondition.id}
                           stream={stream}
                           alertCondition={alertCondition}
+                          conditionType={conditionType}
                           onUpdate={this.props.onUpdate}
                           onDelete={this.props.onDelete}
                           isDetailsView />,

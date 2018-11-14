@@ -63,7 +63,7 @@ const AlertsComponent = createReactClass({
   _formatAlert(alert) {
     const condition = this.state.allAlertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
     const stream = this.state.streams.find(s => s.id === alert.stream_id);
-    const conditionType = condition ? this.state.types[condition.type] : {};
+    const conditionType = condition ? this.state.availableConditions[condition.type] : {};
 
     return (
       <Alert key={alert.id}
@@ -75,7 +75,7 @@ const AlertsComponent = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.alerts || !this.state.allAlertConditions || !this.state.types || !this.state.streams;
+    return !this.state.alerts || !this.state.allAlertConditions || !this.state.availableConditions || !this.state.streams;
   },
 
   render() {

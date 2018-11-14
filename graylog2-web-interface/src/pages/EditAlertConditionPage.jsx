@@ -40,6 +40,7 @@ const EditAlertConditionPage = createReactClass({
     });
 
     AlertConditionsActions.get(this.props.params.streamId, this.props.params.conditionId);
+    AlertConditionsActions.available();
   },
 
   _handleUpdate(streamId, conditionId) {
@@ -51,7 +52,7 @@ const EditAlertConditionPage = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.stream || !this.state.alertCondition;
+    return !this.state.stream || !this.state.alertCondition || !this.state.availableConditions;
   },
 
   render() {
@@ -60,6 +61,7 @@ const EditAlertConditionPage = createReactClass({
     }
 
     const condition = this.state.alertCondition;
+    const conditionType = this.state.availableConditions[condition.type];
     const stream = this.state.stream;
 
     return (
@@ -84,6 +86,7 @@ const EditAlertConditionPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <EditAlertConditionForm alertCondition={condition}
+                                      conditionType={conditionType}
                                       stream={stream}
                                       onUpdate={this._handleUpdate}
                                       onDelete={this._handleDelete} />

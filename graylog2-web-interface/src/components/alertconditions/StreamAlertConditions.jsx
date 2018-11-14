@@ -14,6 +14,7 @@ const StreamAlertConditions = createReactClass({
   propTypes: {
     stream: PropTypes.object.isRequired,
     alertConditions: PropTypes.array.isRequired,
+    availableConditions: PropTypes.object.isRequired,
   },
 
   render() {
@@ -33,6 +34,7 @@ const StreamAlertConditions = createReactClass({
         <h2>Conditions</h2>
         <p>These are all configured alert conditions for the stream <em>{this.props.stream.title}</em>.</p>
         <AlertConditionsList alertConditions={alertConditions}
+                             availableConditions={this.props.availableConditions}
                              streams={[this.props.stream]}
                              onConditionUpdate={this.loadData}
                              onConditionDelete={this.loadData}

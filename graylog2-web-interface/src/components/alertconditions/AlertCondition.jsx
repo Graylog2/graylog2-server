@@ -10,7 +10,7 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 
-const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
+const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const AlertCondition = createReactClass({
@@ -18,13 +18,14 @@ const AlertCondition = createReactClass({
 
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
+    conditionType: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
     isDetailsView: PropTypes.bool,
     isStreamView: PropTypes.bool,
     onUpdate: PropTypes.func,
     onDelete: PropTypes.func,
   },
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   getDefaultProps() {
     return {
@@ -52,12 +53,11 @@ const AlertCondition = createReactClass({
   },
 
   render() {
-    const type = this.props.alertCondition.type;
     const stream = this.props.stream;
     const condition = this.props.alertCondition;
-    const typeDefinition = this.state.types[type];
+    const conditionType = this.props.conditionType;
 
-    if (!typeDefinition) {
+    if (!conditionType) {
       return <UnknownAlertCondition alertCondition={condition} onDelete={this._onDelete} stream={stream} />;
     }
 
@@ -84,11 +84,11 @@ const AlertCondition = createReactClass({
     return (
       <React.Fragment>
         <AlertConditionForm ref={(updateForm) => { this.updateForm = updateForm; }}
-                            type={condition.type}
+                            conditionType={conditionType}
                             alertCondition={condition}
                             onSubmit={this._onUpdate} />
         <AlertConditionSummary alertCondition={condition}
-                               typeDefinition={typeDefinition}
+                               conditionType={conditionType}
                                stream={stream}
                                actions={actions}
                                isDetailsView={this.props.isDetailsView} />

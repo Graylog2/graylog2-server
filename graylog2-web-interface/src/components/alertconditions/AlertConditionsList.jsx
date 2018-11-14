@@ -7,6 +7,7 @@ import { EntityList, PaginatedList } from 'components/common';
 class AlertConditionsList extends React.Component {
   static propTypes = {
     alertConditions: PropTypes.array.isRequired,
+    availableConditions: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onConditionUpdate: PropTypes.func,
     onConditionDelete: PropTypes.func,
@@ -39,10 +40,12 @@ class AlertConditionsList extends React.Component {
     if (!stream) {
       return null;
     }
+    const conditionType = this.props.availableConditions[condition.type];
 
     return (
       <AlertCondition key={condition.id}
                       alertCondition={condition}
+                      conditionType={conditionType}
                       stream={stream}
                       onUpdate={this.props.onConditionUpdate}
                       onDelete={this.props.onConditionDelete}

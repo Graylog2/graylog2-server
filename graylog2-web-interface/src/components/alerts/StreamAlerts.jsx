@@ -16,7 +16,7 @@ const StreamAlerts = createReactClass({
   propTypes: {
     stream: PropTypes.object.isRequired,
     alertConditions: PropTypes.array.isRequired,
-    conditionTypes: PropTypes.object.isRequired,
+    availableConditions: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(AlertsStore)],
 
@@ -51,7 +51,7 @@ const StreamAlerts = createReactClass({
 
   _formatAlert(alert) {
     const condition = this.props.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
-    const conditionType = condition ? this.props.conditionTypes[condition.type] : {};
+    const conditionType = condition ? this.props.availableConditions[condition.type] : {};
 
     return (
       <Alert key={alert.id}

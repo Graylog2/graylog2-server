@@ -31,6 +31,7 @@ const CreateAlertConditionInput = createReactClass({
     StreamsStore.listStreams().then((streams) => {
       this.setState({ streams: streams });
     });
+    AlertConditionsActions.available();
   },
 
   PLACEHOLDER: 'placeholder',
@@ -63,7 +64,10 @@ const CreateAlertConditionInput = createReactClass({
 
   _formatConditionForm(type) {
     return (
-      <AlertConditionForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} onCancel={this._resetForm} onSubmit={this._onSubmit} type={type} />
+      <AlertConditionForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                          onCancel={this._resetForm}
+                          onSubmit={this._onSubmit}
+                          conditionType={this.state.availableConditions[type]} />
     );
   },
 
@@ -72,7 +76,7 @@ const CreateAlertConditionInput = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.types || !this.state.streams;
+    return !this.state.availableConditions || !this.state.streams;
   },
 
   render() {
@@ -81,8 +85,8 @@ const CreateAlertConditionInput = createReactClass({
     }
 
     const conditionForm = (this.state.type !== this.PLACEHOLDER ? this._formatConditionForm(this.state.type) : null);
-    const availableTypes = Object.keys(this.state.types).map((value) => {
-      return <option key={`type-option-${value}`} value={value}>{this.state.types[value].name}</option>;
+    const availableTypes = Object.keys(this.state.availableConditions).map((value) => {
+      return <option key={`type-option-${value}`} value={value}>{this.state.availableConditions[value].name}</option>;
     });
     const formattedStreams = this.state.streams
       .map(stream => this._formatOption(stream.title, stream.id))
