@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
@@ -10,14 +11,17 @@ import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 const CreateAlertNotificationInput = createReactClass({
   displayName: 'CreateAlertNotificationInput',
+  propTypes: {
+    initialSelectedStream: PropTypes.string,
+  },
   mixins: [Reflux.connect(AlertNotificationsStore)],
 
   getInitialState() {
@@ -30,7 +34,12 @@ const CreateAlertNotificationInput = createReactClass({
 
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams: streams });
+      const nextState = { streams: streams };
+      const initialSelectedStream = this.props.initialSelectedStream;
+      if (initialSelectedStream) {
+        nextState.selectedStream = this._findStream(streams, initialSelectedStream);
+      }
+      this.setState(nextState);
     });
     AlertNotificationsActions.available();
   },
@@ -41,8 +50,12 @@ const CreateAlertNotificationInput = createReactClass({
     this.setState({ type: evt.target.value });
   },
 
+  _findStream(streams, streamId) {
+    return streams.find(s => s.id === streamId);
+  },
+
   _onStreamChange(nextStream) {
-    this.setState({ selectedStream: this.state.streams.find(s => s.id === nextStream) });
+    this.setState({ selectedStream: this._findStream(this.state.streams, nextStream) });
   },
 
   _onSubmit(data) {
@@ -130,7 +143,10 @@ const CreateAlertNotificationInput = createReactClass({
               <Input id="stream-selector"
                      label="Notify on stream"
                      help="Select the stream that should use this notification when its alert conditions are triggered.">
-                <Select placeholder="Select a stream" options={formattedStreams} onChange={this._onStreamChange} />
+                <Select placeholder="Select a stream"
+                        options={formattedStreams}
+                        onChange={this._onStreamChange}
+                        value={this.state.selectedStream ? this.state.selectedStream.id : undefined} />
               </Input>
 
               <Input id="notification-type-selector"

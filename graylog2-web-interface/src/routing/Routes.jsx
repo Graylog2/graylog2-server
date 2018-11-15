@@ -186,6 +186,7 @@ const Routes = {
   show_alert: alertId => `${Routes.ALERTS.LIST}/${alertId}`,
   show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
   new_alert_condition_for_stream: streamId => `${Routes.ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
+  new_alert_notification_for_stream: streamId => `${Routes.ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
   dashboard_show: dashboardId => `/dashboards/${dashboardId}`,
 

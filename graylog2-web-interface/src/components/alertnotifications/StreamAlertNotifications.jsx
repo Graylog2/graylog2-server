@@ -52,7 +52,7 @@ class StreamAlertNotifications extends React.Component {
     return (
       <div>
         <div className="pull-right">
-          <LinkContainer to={Routes.ALERTS.NEW_NOTIFICATION}>
+          <LinkContainer to={Routes.new_alert_notification_for_stream(stream.id)}>
             <Button bsStyle="success">Add new notification</Button>
           </LinkContainer>
         </div>
