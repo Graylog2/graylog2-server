@@ -57,7 +57,11 @@ const StreamAlertsOverviewContainer = createReactClass({
 
         <Row className="content">
           <Col md={12}>
-            <StreamAlertConditions stream={stream} alertConditions={alertConditions} availableConditions={availableConditions} />
+            <StreamAlertConditions stream={stream}
+                                   alertConditions={alertConditions}
+                                   availableConditions={availableConditions}
+                                   onConditionUpdate={this.loadData}
+                                   onConditionDelete={this.loadData} />
           </Col>
         </Row>
 

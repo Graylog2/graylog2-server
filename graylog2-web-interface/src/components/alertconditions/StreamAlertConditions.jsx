@@ -15,6 +15,15 @@ const StreamAlertConditions = createReactClass({
     stream: PropTypes.object.isRequired,
     alertConditions: PropTypes.array.isRequired,
     availableConditions: PropTypes.object.isRequired,
+    onConditionUpdate: PropTypes.func,
+    onConditionDelete: PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      onConditionUpdate: () => {},
+      onConditionDelete: () => {},
+    };
   },
 
   render() {
@@ -36,8 +45,8 @@ const StreamAlertConditions = createReactClass({
         <AlertConditionsList alertConditions={alertConditions}
                              availableConditions={this.props.availableConditions}
                              streams={[this.props.stream]}
-                             onConditionUpdate={this.loadData}
-                             onConditionDelete={this.loadData}
+                             onConditionUpdate={this.props.onConditionUpdate}
+                             onConditionDelete={this.props.onConditionDelete}
                              isStreamView />
       </div>
     );
