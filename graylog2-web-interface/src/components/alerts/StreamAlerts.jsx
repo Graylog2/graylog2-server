@@ -31,11 +31,11 @@ const StreamAlerts = createReactClass({
   },
 
   currentPage: 1,
-  pageSize: 5,
+  pageSize: 3,
 
   loadData(pageNo, limit) {
     this.setState({ loading: true });
-    AlertsActions.listPaginated(this.props.stream.id, (pageNo - 1) * limit, limit)
+    AlertsActions.listPaginated(this.props.stream.id, (pageNo - 1) * limit, limit, 'unresolved')
       .finally(() => this.setState({ loading: false }));
   },
 
@@ -69,10 +69,10 @@ const StreamAlerts = createReactClass({
 
     return (
       <div>
-        <h2>Stream alerts</h2>
+        <h2>Unresolved stream alerts</h2>
         <p className="description">
-          Here you can see the currently unresolved alerts for this stream. To see resolved alerts on this stream
-          or alerts on other streams, visit the <Link to={Routes.ALERTS.LIST}>alerts</Link> page.
+          These are the currently unresolved alerts for this stream. To see all alerts or alerts on other streams,
+          visit the <Link to={Routes.ALERTS.LIST}>alerts</Link> page.
         </p>
 
         <PaginatedList totalItems={this.state.alerts.total}

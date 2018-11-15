@@ -33,7 +33,7 @@ const AlertsComponent = createReactClass({
   loadData(pageNo, limit) {
     this.setState({ loading: true });
     const promises = [
-      AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'all' : 'unresolved'),
+      AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'any' : 'unresolved'),
       AlertConditionsActions.listAll(),
       AlertConditionsActions.available(),
       StreamsStore.listStreams().then((streams) => {
