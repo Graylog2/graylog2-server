@@ -229,10 +229,12 @@ public abstract class ThrottleableTransport implements Transport {
     }
 
     /**
-     * Blocks until the blockLatch is released or until timeout is exceeded.
+     * Blocks until the blockLatch is released or until the timeout is exceeded.
      *
      * @param timeout the maximum time to wait
-     * @param unit    the time unit of the {@code timeout} argument
+     * @param unit the time unit of the {@code timeout} argument
+     * @return {@code true} if the blockLatch was released before the {@code timeout} elapsed
+     *         and {@code false} if the {@code timeout} was exceeded before the blockLatch was released.
      */
     public boolean blockUntilUnthrottled(long timeout, TimeUnit unit) {
         // sanity: if there's no latch, don't try to access it
