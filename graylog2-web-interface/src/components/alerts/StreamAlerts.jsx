@@ -11,6 +11,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 
+const ALERTS_REFRESH_INTERVAL = 10000;
+
 const StreamAlerts = createReactClass({
   displayName: 'StreamAlerts',
   propTypes: {
@@ -27,7 +29,14 @@ const StreamAlerts = createReactClass({
   },
 
   componentDidMount() {
-    this._refreshData();
+    this.loadData(this.currentPage, this.pageSize);
+    this.interval = setInterval(() => this.fetchData(this.currentPage, this.pageSize), ALERTS_REFRESH_INTERVAL)
+  },
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   },
 
   currentPage: 1,
@@ -35,12 +44,12 @@ const StreamAlerts = createReactClass({
 
   loadData(pageNo, limit) {
     this.setState({ loading: true });
-    AlertsActions.listPaginated(this.props.stream.id, (pageNo - 1) * limit, limit, 'unresolved')
-      .finally(() => this.setState({ loading: false }));
+    this.fetchData(pageNo, limit).finally(() => this.setState({ loading: false }));
   },
 
-  _refreshData() {
-    this.loadData(this.currentPage, this.pageSize);
+  // Loads data without setting the loading state, which makes the page jump
+  fetchData(pageNo, limit) {
+    return AlertsActions.listPaginated(this.props.stream.id, (pageNo - 1) * limit, limit, 'unresolved');
   },
 
   _onChangePaginatedList(page, size) {

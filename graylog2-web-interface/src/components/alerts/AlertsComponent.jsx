@@ -12,6 +12,8 @@ const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
+const ALERTS_REFRESH_INTERVAL = 10000;
+
 const AlertsComponent = createReactClass({
   displayName: 'AlertsComponent',
   mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
@@ -25,6 +27,13 @@ const AlertsComponent = createReactClass({
 
   componentDidMount() {
     this.loadData(this.currentPage, this.pageSize);
+    this.interval = setInterval(() => this.fetchData(this.currentPage, this.pageSize), ALERTS_REFRESH_INTERVAL);
+  },
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   },
 
   currentPage: 1,
@@ -32,7 +41,13 @@ const AlertsComponent = createReactClass({
 
   loadData(pageNo, limit) {
     this.setState({ loading: true });
-    const promises = [
+    const promises = this.fetchData(pageNo, limit);
+
+    Promise.all(promises).finally(() => this.setState({ loading: false }));
+  },
+
+  fetchData(pageNo, limit) {
+    return [
       AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'any' : 'unresolved'),
       AlertConditionsActions.listAll(),
       AlertConditionsActions.available(),
@@ -40,11 +55,9 @@ const AlertsComponent = createReactClass({
         this.setState({ streams: streams });
       }),
     ];
-
-    Promise.all(promises).finally(() => this.setState({ loading: false }));
   },
 
-  _refreshData() {
+  refreshData() {
     this.loadData(this.currentPage, this.pageSize);
   },
 
@@ -86,7 +99,7 @@ const AlertsComponent = createReactClass({
     return (
       <div>
         <div className="pull-right">
-          <Button bsStyle="info" onClick={this._refreshData} disabled={this.state.loading}>
+          <Button bsStyle="info" onClick={this.refreshData} disabled={this.state.loading}>
             {this.state.loading ? 'Refreshing...' : 'Refresh'}
           </Button>
           &nbsp;
