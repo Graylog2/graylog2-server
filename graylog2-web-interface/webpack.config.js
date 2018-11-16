@@ -123,6 +123,7 @@ if (TARGET === 'start') {
     plugins: [
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
+        GRAYLOG_HTTP_PUBLISH_URI: JSON.stringify(process.env.GRAYLOG_HTTP_PUBLISH_URI),
       }),
       new CopyWebpackPlugin([{ from: 'config.js' }]),
       new webpack.HotModuleReplacementPlugin(),
