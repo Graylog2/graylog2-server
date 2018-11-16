@@ -31,12 +31,16 @@ const StreamAlertsOverviewContainer = createReactClass({
 
   loadData() {
     this.setState({ loading: true });
-    const promises = [
+    const promises = this.fetchData();
+
+    Promise.all(promises).finally(() => this.setState({ loading: false }));
+  },
+
+  fetchData() {
+    return [
       AlertConditionsActions.list(this.props.stream.id),
       AlertConditionsActions.available(),
     ];
-
-    Promise.all(promises).finally(() => this.setState({ loading: false }));
   },
 
   render() {
@@ -60,8 +64,8 @@ const StreamAlertsOverviewContainer = createReactClass({
             <StreamAlertConditions stream={stream}
                                    alertConditions={alertConditions}
                                    availableConditions={availableConditions}
-                                   onConditionUpdate={this.loadData}
-                                   onConditionDelete={this.loadData} />
+                                   onConditionUpdate={this.fetchData}
+                                   onConditionDelete={this.fetchData} />
           </Col>
         </Row>
 
