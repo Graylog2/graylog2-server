@@ -131,17 +131,17 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     }
 
     @GET
-    @Path("/imports")
+    @Path("/uploads")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "List all imports")
+    @ApiOperation(value = "List all uploaded configurations")
     public CollectorUploadListResponse listImports(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("10") int perPage,
                                                    @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                    @ApiParam(name = "sort",
                                                            value = "The field to sort the result on",
                                                            required = true,
-                                                           allowableValues = "name,id,collector_id")
+                                                           allowableValues = "id,collector_id, created")
                                                    @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
                                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                    @DefaultValue("asc") @QueryParam("order") String order) {

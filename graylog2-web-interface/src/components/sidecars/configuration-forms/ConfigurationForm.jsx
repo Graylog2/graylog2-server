@@ -13,7 +13,7 @@ import ColorLabel from 'components/sidecars/common/ColorLabel';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import SourceViewModal from './SourceViewModal';
-import ConfigurationsViewModal from './ConfigurationsViewModal';
+import ImportsViewModal from './ImportsViewModal';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
@@ -157,6 +157,14 @@ const ConfigurationForm = createReactClass({
     this.setState({ formData: nextFormData });
   },
 
+  _onTemplateImport(nextTemplate) {
+    const nextFormData = lodash.cloneDeep(this.state.formData);
+    if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
+      nextFormData.template = nextTemplate;
+      this.setState({ formData: nextFormData });
+    }
+  },
+
   _onTemplateChange(nextTemplate) {
     this._formDataUpdate('template')(nextTemplate);
     this._validateTemplate(nextTemplate);
@@ -175,8 +183,8 @@ const ConfigurationForm = createReactClass({
     this.previewModal.open();
   },
 
-  _onShowConfigurations() {
-    this.configurationsModal.open();
+  _onShowImports() {
+    this.uploadsModal.open();
   },
 
   _formatCollector(collector) {
@@ -276,7 +284,7 @@ const ConfigurationForm = createReactClass({
               <Button className="pull-right"
                       bsStyle="link"
                       bsSize="sm"
-                      onClick={this._onShowConfigurations}>
+                      onClick={this._onShowImports}>
                 Import
               </Button>
               <HelpBlock>
@@ -304,7 +312,8 @@ const ConfigurationForm = createReactClass({
         </form>
         <SourceViewModal ref={(c) => { this.previewModal = c; }}
                          templateString={this.state.formData.template} />
-        <ConfigurationsViewModal ref={(c) => { this.configurationsModal = c; }} />
+        <ImportsViewModal ref={(c) => { this.uploadsModal = c; }}
+                          onApply={this._onTemplateImport} />
       </div>
     );
   },

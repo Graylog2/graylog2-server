@@ -44,6 +44,21 @@ const CollectorConfigurationsStore = Reflux.createStore({
     return fetch('GET', URLUtils.qualifyUrl(uri));
   },
 
+  _fetchUploads({ query, page, pageSize }) {
+    const baseUrl = `${this.sourceUrl}/configurations/uploads`;
+    const search = {
+      query: query,
+      page: page,
+      per_page: pageSize,
+      sort: 'created',
+      order: 'desc',
+    };
+
+    const uri = URI(baseUrl).search(search).toString();
+
+    return fetch('GET', URLUtils.qualifyUrl(uri));
+  },
+
   all() {
     const promise = this._fetchConfigurations({ pageSize: 0 });
     promise
@@ -85,6 +100,18 @@ const CollectorConfigurationsStore = Reflux.createStore({
         });
 
     CollectorConfigurationsActions.list.promise(promise);
+  },
+
+  listUploads({ query = '', page = 1, pageSize = 10 }) {
+    const promise = this._fetchUploads({ query: query, page: page, pageSize: pageSize });
+    promise
+      .catch(
+        (error) => {
+          UserNotification.error(`Fetching configuration uploads failed with status: ${error}`,
+            'Could not retrieve configurations');
+        });
+
+    CollectorConfigurationsActions.listUploads.promise(promise);
   },
 
   refreshList() {
