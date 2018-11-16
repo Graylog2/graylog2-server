@@ -165,8 +165,8 @@
         <system-rules.version>1.18.0</system-rules.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v8.12.0</nodejs.version>
-        <yarn.version>v1.10.1</yarn.version>
+        <nodejs.version>v10.13.0</nodejs.version>
+        <yarn.version>v1.12.3</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>2.11</license-maven.version>
