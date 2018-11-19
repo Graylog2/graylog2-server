@@ -18,19 +18,19 @@ describe('AddWidgetButton', () => {
 
     const dropdownButton = wrapper.find('DropdownButton');
     expect(dropdownButton).toHaveLength(1);
-    expect(dropdownButton.find('MenuItem')).toHaveLength(3);
+    expect(dropdownButton.find('MenuItem')).toHaveLength(4);
   });
   it('contains menu items for all widget types', () => {
     const wrapper = mount(<AddWidgetButton />);
 
     const dropdownButton = wrapper.find('DropdownButton');
-    ['Aggregation', 'Message Count', 'Message Table']
+    ['Custom Aggregation', 'Message Count', 'Message Table']
       .forEach(title => expect(dropdownButton.find(`a[children="${title}"]`)).toExist());
   });
   it('clicking on option to add aggregation calls AggregateActionHandler', () => {
     const wrapper = mount(<AddWidgetButton />);
 
-    const addAggregation = wrapper.find('a[children="Aggregation"]');
+    const addAggregation = wrapper.find('a[children="Custom Aggregation"]');
     expect(addAggregation).toExist(0);
     addAggregation.simulate('click');
 
