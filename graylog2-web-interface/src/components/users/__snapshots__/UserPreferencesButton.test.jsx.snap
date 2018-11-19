@@ -32,6 +32,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
         onModalClose={[Function]}
         onModalOpen={[Function]}
         onSubmitForm={[Function]}
+        show={false}
         submitButtonDisabled={false}
         submitButtonText="Save"
         title="Preferences for user Full"
