@@ -24,6 +24,12 @@ const CreateAlertNotificationInput = createReactClass({
   },
   mixins: [Reflux.connect(AlertNotificationsStore)],
 
+  getDefaultProps() {
+    return {
+      initialSelectedStream: undefined,
+    };
+  },
+
   getInitialState() {
     return {
       streams: undefined,
@@ -64,9 +70,7 @@ const CreateAlertNotificationInput = createReactClass({
     }
 
     AlarmCallbacksActions.save(this.state.selectedStream.id, data).then(
-      () => {
-        history.push(Routes.ALERTS.NOTIFICATIONS);
-      },
+      () => history.push(Routes.stream_alerts(this.state.selectedStream.id)),
       () => this.configurationForm.open(),
     );
   },

@@ -69,8 +69,8 @@ const CreateAlertConditionInput = createReactClass({
       UserNotification.error('Please select the stream that the condition should check.', 'Could not save condition');
     }
 
-    AlertConditionsActions.save(this.state.selectedStream.id, data).then((conditionId) => {
-      history.push(Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
+    AlertConditionsActions.save(this.state.selectedStream.id, data).then(() => {
+      history.push(Routes.stream_alerts(this.state.selectedStream.id));
     });
   },
 
