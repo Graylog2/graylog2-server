@@ -2,6 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
+import { QueriesActions } from 'enterprise/stores/QueriesStore';
 
 describe('SearchBar', () => {
   const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');
@@ -57,6 +58,34 @@ describe('SearchBar', () => {
     const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
     wrapper.setState({ currentQuery });
     wrapper.find('form').simulate('submit');
-    expect(executeFn.mock.calls.length).toBe(1);
+    expect(executeFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('changing the time range type executes a new search', () => {
+    const executeFn = jest.fn();
+    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
+    wrapper.setState({ currentQuery });
+
+    const timeRangeTypeSelector = wrapper.find('TimeRangeTypeSelector');
+    const onSelect = timeRangeTypeSelector.at(0).props().onSelect;
+    QueriesActions.rangeType = jest.fn(() => ({ then: x => x() }));
+
+    onSelect('absolute');
+
+    expect(executeFn).toHaveBeenCalled();
+  });
+
+  it('changing the time range value executes a new search', () => {
+    const executeFn = jest.fn();
+    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
+    wrapper.setState({ currentQuery });
+
+    const timeRangeInput = wrapper.find('TimeRangeInput');
+    const onChange = timeRangeInput.at(0).props().onChange;
+    QueriesActions.rangeParams = jest.fn(() => ({ then: x => x() }));
+
+    onChange({ range: 300 });
+
+    expect(executeFn).toHaveBeenCalled();
   });
 });

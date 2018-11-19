@@ -14,11 +14,11 @@ import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
 import { QueriesActions } from 'enterprise/stores/QueriesStore';
+import { CurrentQueryStore } from 'enterprise/stores/CurrentQueryStore';
+import { StreamsStore } from 'enterprise/stores/StreamsStore';
+import { QueryFiltersActions, QueryFiltersStore } from 'enterprise/stores/QueryFiltersStore';
 
 import StreamsFilter from './searchbar/StreamsFilter';
-import { QueryFiltersActions, QueryFiltersStore } from '../stores/QueryFiltersStore';
-import { CurrentQueryStore } from '../stores/CurrentQueryStore';
-import { StreamsStore } from '../stores/StreamsStore';
 import ScrollToHint from './common/ScrollToHint';
 
 const SearchBar = createReactClass({
@@ -79,9 +79,9 @@ const SearchBar = createReactClass({
 
                   <Row className="no-bm extended-search-query-metadata">
                     <Col md={4}>
-                      <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType)}
+                      <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(this.props.onExecute)}
                                              value={rangeType} />
-                      <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value)}
+                      <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(this.props.onExecute)}
                                       rangeType={rangeType}
                                       rangeParams={rangeParams}
                                       config={this.props.config} />

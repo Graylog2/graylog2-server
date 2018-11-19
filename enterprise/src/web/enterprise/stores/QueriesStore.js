@@ -77,7 +77,7 @@ export const QueriesStore = Reflux.createStore({
     const oldType = oldTimerange.type;
 
     if (type === oldType) {
-      return;
+      return Promise.resolve();
     }
 
     const newTimerange = { type };
@@ -90,6 +90,9 @@ export const QueriesStore = Reflux.createStore({
         break;
       case 'relative':
         newTimerange.range = 300;
+        break;
+      case 'keyword':
+        newTimerange.keyword = 'Last five Minutes';
         break;
     }
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(newTimerange).build());
