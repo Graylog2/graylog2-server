@@ -1,76 +1,102 @@
-import Immutable from 'immutable';
+// @flow strict
+
+import * as Immutable from 'immutable';
 import ObjectID from 'bson-objectid';
 
 import Query from '../queries/Query';
+import Parameter from '../parameters/Parameter';
+import type { ParameterJson } from '../parameters/Parameter';
+import type { QueryJson } from '../queries/Query';
+
+type SearchId = string;
+type InternalState = {
+  id: SearchId,
+  queries: Immutable.Set<Query>,
+  parameters: Immutable.Set<Parameter>,
+};
+
+export type SearchJson = {
+  id: SearchId,
+  queries: Array<QueryJson>,
+  parameters: Array<ParameterJson>,
+};
 
 export default class Search {
-  constructor(id, queries, parameters) {
-    this._value = { id, queries: Immutable.fromJS(queries), parameters: Immutable.fromJS(parameters) };
+  _value: InternalState;
+
+  constructor(id: SearchId, queries: Array<Query>, parameters: Array<Parameter>) {
+    this._value = { id, queries: Immutable.Set(queries), parameters: Immutable.Set(parameters) };
   }
 
-  static create() {
+  static create(): Search {
     // eslint-disable-next-line no-use-before-define
-    return new Builder().newId().queries([]).parameters([])
+    return new Builder()
+      .newId()
+      .queries([])
+      .parameters([])
       .build();
   }
 
-  get id() {
+  get id(): SearchId {
     return this._value.id;
   }
 
-  get queries() {
+  get queries(): Immutable.Set<Query> {
     return this._value.queries;
   }
 
-  get parameters() {
+  get parameters(): Immutable.Set<Parameter> {
     return this._value.parameters;
   }
 
-  toBuilder() {
+  // eslint-disable-next-line no-use-before-define
+  toBuilder(): Builder {
     const { id, queries, parameters } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, queries, parameters }));
   }
 
-  toJSON() {
+  toJSON(): SearchJson {
     const { id, queries, parameters } = this._value;
     return {
       id,
-      queries,
-      parameters,
+      queries: queries.toJS(),
+      parameters: parameters.toJS(),
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: SearchJson): Search {
     const { id, parameters } = value;
 
     const queries = value.queries.map(q => Query.fromJSON(q));
-    return new Search(id, queries, parameters);
+    return new Search(id, queries, parameters.map(p => Parameter.fromJSON(p)));
   }
 }
 
 class Builder {
-  constructor(value = Immutable.Map()) {
+  value: Immutable.Map<string, *>;
+
+  constructor(value: Immutable.Map<string, *> = Immutable.Map()) {
     this.value = value;
   }
 
-  id(value) {
+  id(value: SearchId): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  newId() {
+  newId(): Builder {
     return this.id(ObjectID().toString());
   }
 
-  queries(value) {
+  queries(value: Array<Query>): Builder {
     return new Builder(this.value.set('queries', value));
   }
 
-  parameters(value) {
+  parameters(value: Array<Parameter>): Builder {
     return new Builder(this.value.set('parameters', value));
   }
 
-  build() {
+  build(): Search {
     const { id, queries, parameters } = this.value.toObject();
     return new Search(id, queries, parameters);
   }

@@ -1,10 +1,12 @@
-import Immutable from 'immutable';
+// @flow
+import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { CurrentViewStateStore } from './CurrentViewStateStore';
 import ViewState from '../logic/views/ViewState';
 import { ViewStatesActions } from './ViewStatesStore';
 import WidgetPosition from '../logic/widgets/WidgetPosition';
+import MessagesWidget from '../logic/widgets/MessagesWidget';
 
 describe('CurrentViewStateStore', () => {
   const viewState = ViewState.create();
@@ -33,7 +35,7 @@ describe('CurrentViewStateStore', () => {
     const widgetPos = new WidgetPosition(1, 1, 5, 6);
     const widgetPositionsMap = { dead: widgetPos };
     const widgets = [
-      { id: 'dead', type: 'MESSAGES' },
+      MessagesWidget.builder().id('dead').build(),
     ];
     const newView = viewState.toBuilder()
       .widgetPositions(widgetPositionsMap)
@@ -55,7 +57,7 @@ describe('CurrentViewStateStore', () => {
   it('should add new widgets', () => {
     const widgetPos = new WidgetPosition(1, 1, 5, 6);
     const widgetPositionsMap = { dead: widgetPos };
-    const oldWidget = { id: 'dead', type: 'MESSAGES' };
+    const oldWidget = MessagesWidget.builder().id('dead').build();
     const oldWidgets = [oldWidget];
     const oldView = viewState.toBuilder()
       .widgetPositions(widgetPositionsMap)
@@ -65,7 +67,7 @@ describe('CurrentViewStateStore', () => {
     viewMap[viewId] = oldView;
     const sMap = Immutable.Map(viewMap);
 
-    const newWidget = { id: 'feed', type: 'MESSAGES' };
+    const newWidget = MessagesWidget.builder().id('feed').build();
     const expectedWidgets = [oldWidget, newWidget];
     const newView = viewState.toBuilder()
       .widgetPositions(widgetPositionsMap)

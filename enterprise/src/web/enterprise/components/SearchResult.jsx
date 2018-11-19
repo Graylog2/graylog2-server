@@ -18,9 +18,9 @@ import { getUndeclaredParameters, getUsedParameters, SearchMetadataStore } from 
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import { WidgetStore } from 'enterprise/stores/WidgetStore';
 import LoadingIndicator from 'components/common/LoadingIndicator';
-import { getParameterBindingsAsMap } from 'enterprise/stores/SearchExecutionStateStore';
-import { SearchLoadingStateStore } from '../stores/SearchLoadingStateStore';
-import { SearchConfigStore } from '../stores/SearchConfigStore';
+import { SearchLoadingStateStore } from 'enterprise/stores/SearchLoadingStateStore';
+import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
+import { getParameterBindingsAsMap } from 'enterprise/logic/search/SearchExecutionState';
 
 const _disableSearch = (undeclaredParameters, parameterBindings) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);

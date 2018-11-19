@@ -6,38 +6,41 @@ type State = {
   id: string,
   type: string,
   config: any,
-  filter: string;
+  filter: ?string;
 };
 
 class Widget {
   _value: State;
-  constructor(id: string, type: string, config: any, filter: string) {
+
+  static Builder: typeof Builder;
+
+  constructor(id: string, type: string, config: any, filter: ?string) {
     this._value = { id, type, config, filter: filter === null ? undefined : filter };
   }
 
-  static __registrations = {};
+  static __registrations: Map<string, typeof Widget> = {};
 
-  get id() : string {
+  get id(): string {
     return this._value.id;
   }
 
-  get type() : string {
+  get type(): string {
     return this._value.type;
   }
 
-  get config() {
+  get config(): any {
     return this._value.config;
   }
 
-  get filter() : string {
+  get filter(): ?string {
     return this._value.filter;
   }
 
-  duplicate(newId: string) : Widget {
+  duplicate(newId: string): Widget {
     return this.toBuilder().id(newId).build();
   }
 
-  toBuilder() : Builder {
+  toBuilder(): Builder {
     const { id, type, config, filter } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({ id, type, config, filter }));
@@ -49,7 +52,7 @@ class Widget {
     return { id, type: type.toLocaleLowerCase(), config, filter };
   }
 
-  static fromJSON(value: State) : Widget {
+  static fromJSON(value: State): Widget {
     const { id, type, config, filter } = value;
     const implementingClass = Widget.__registrations[type.toLocaleLowerCase()];
 
@@ -72,7 +75,8 @@ class Widget {
 
 class Builder {
   value: Map<string, any>;
-  constructor(value = Map()) {
+
+  constructor(value: Map<string, any> = Map()) {
     this.value = value;
   }
 
@@ -90,7 +94,7 @@ class Builder {
     return this;
   }
 
-  config(value) {
+  config(value: any) {
     this.value = this.value.set('config', value);
     return this;
   }
@@ -100,7 +104,7 @@ class Builder {
     return this;
   }
 
-  build() : Widget {
+  build(): Widget {
     const { id, type, config, filter } = this.value.toObject();
     return new Widget(id, type, config, filter);
   }

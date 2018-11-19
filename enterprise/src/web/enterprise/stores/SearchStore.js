@@ -5,12 +5,12 @@ import { debounce, get, isEqual } from 'lodash';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
+import { SearchExecutionStateStore } from 'enterprise/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'enterprise/stores/SearchMetadataStore';
 import { SearchJobActions } from 'enterprise/stores/SearchJobStore';
 import { ViewStore, ViewActions } from 'enterprise/stores/ViewStore';
 import SearchResult from 'enterprise/logic/SearchResult';
-import { SearchExecutionStateStore } from './SearchExecutionStateStore';
-import SearchActions from '../actions/SearchActions';
+import SearchActions from 'enterprise/actions/SearchActions';
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -106,8 +106,10 @@ export const SearchStore = Reflux.createStore({
   },
 
   parameters(newParameters) {
-    const newSearch = this.search.toBuilder().parameters(newParameters).build();
-    ViewActions.search(newSearch);
+    const newSearch = this.search.toBuilder().newId().parameters(newParameters).build();
+    const promise = ViewActions.search(newSearch);
+    SearchActions.parameters.promise(promise);
+    return promise;
   },
   _state() {
     return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };

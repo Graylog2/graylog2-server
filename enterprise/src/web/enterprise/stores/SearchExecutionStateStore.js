@@ -1,26 +1,26 @@
+// @flow
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
+import { trim } from 'lodash';
 
-import { SearchParameterStore } from './SearchParameterStore';
+import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
+import Parameter from 'enterprise/logic/parameters/Parameter';
+import ParameterBinding from 'enterprise/logic/parameters/ParameterBinding';
+import { SearchParameterActions } from './SearchParameterStore';
 import { ViewMetadataStore } from './ViewMetadataStore';
 
-const defaultExecutionState = Immutable.fromJS({
-  parameter_bindings: {},
-});
+const defaultExecutionState = SearchExecutionState.empty();
 
-const newParameterBindingValue = value => Immutable.fromJS({
-  type: 'value',
-  value: value,
-});
+type ParameterMap = Immutable.Map<string, any>;
 
-const getParameterBindings = executionState => executionState.get('parameter_bindings');
-const getParameterBindingValue = (executionState, parameterName) => executionState.getIn(['parameter_bindings', parameterName, 'value']);
+export type SearchExecutionStateActionsType = {
+  bindParameterValue: (string, any) => Promise<SearchExecutionState>,
+  setParameterValues: (ParameterMap) => Promise<SearchExecutionState>,
+  replace: (SearchExecutionState, ?boolean) => Promise<SearchExecutionState>,
+  clear: () => Promise<SearchExecutionState>,
+};
 
-const getParameterBindingsAsMap = bindings => bindings.flatMap((value, name) => ({ [name]: value.get('value') }));
-
-export { newParameterBindingValue, getParameterBindings, getParameterBindingsAsMap, getParameterBindingValue };
-
-export const SearchExecutionStateActions = Reflux.createActions({
+export const SearchExecutionStateActions: SearchExecutionStateActionsType = Reflux.createActions({
   bindParameterValue: { asyncResult: true },
   setParameterValues: { asyncResult: true },
   replace: { asyncResult: true },
@@ -33,11 +33,12 @@ export const SearchExecutionStateStore = Reflux.createStore({
   executionState: defaultExecutionState,
 
   init() {
-    this.listenTo(SearchParameterStore, this.handleSearchParameterChange, this.handleSearchParameterChange);
+    this.listenTo(SearchParameterActions.remove, this._removeParameterBindingForRemovedParameter);
+    this.listenTo(SearchParameterActions.update, this._updateParameterBindingForUpdatedParameter);
     this.listenTo(ViewMetadataStore, this.handleViewMetadataChange, this.handleViewMetadataChange);
   },
 
-  getInitialState() {
+  getInitialState(): SearchExecutionState {
     return this.executionState;
   },
 
@@ -48,43 +49,58 @@ export const SearchExecutionStateStore = Reflux.createStore({
     }
   },
 
-  handleSearchParameterChange(parameters) {
-    const bindings = getParameterBindings(this.executionState);
-
-    if (bindings) {
-      // Cleanup the parameter bindings to only keep declared parameters
-      const filteredBindings = bindings.filter((_, name) => parameters.has(name));
-      this.executionState = this.executionState.set('parameter_bindings', filteredBindings);
+  _removeParameterBindingForRemovedParameter(parameterName: string) {
+    const { parameterBindings } = this.executionState;
+    if (parameterBindings.has(parameterName)) {
+      const newParameterBindings = parameterBindings.delete(parameterName);
+      this.executionState = this.executionState.toBuilder().parameterBindings(newParameterBindings).build();
       this.trigger(this.executionState);
     }
   },
 
-  clear() {
+  _updateParameterBindingForUpdatedParameter(parameterName: string, newParameter: Parameter) {
+    const { parameterBindings } = this.executionState;
+    if (!trim(parameterBindings.get(parameterName, ParameterBinding.empty()).value) && newParameter.defaultValue) {
+      const newParameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(newParameter.defaultValue));
+      this.executionState = this.executionState.toBuilder().parameterBindings(newParameterBindings).build();
+      this.trigger(this.executionState);
+    }
+  },
+
+  clear(): SearchExecutionState {
     this.executionState = defaultExecutionState;
     this.trigger(this.executionState);
     SearchExecutionStateActions.clear.promise(Promise.resolve(this.executionState));
+    return this.executionState;
   },
 
-  replace(executionState, trigger = true) {
+  replace(executionState: SearchExecutionState, trigger?: boolean = true): SearchExecutionState {
     this.executionState = executionState;
     if (trigger) {
       this.trigger(this.executionState);
     }
     SearchExecutionStateActions.replace.promise(Promise.resolve(executionState));
+    return this.executionState;
   },
 
-  setParameterValues(parameterMap) {
+  setParameterValues(parameterMap: ParameterMap): SearchExecutionState {
+    let parameterBindings = this.executionState.parameterBindings;
+
     parameterMap.forEach((value, parameterName) => {
-      this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], newParameterBindingValue(value));
+      parameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(value));
     });
+    this.executionState = this.executionState.toBuilder().parameterBindings(parameterBindings).build();
     this.trigger(this.executionState);
     SearchExecutionStateActions.setParameterValues.promise(Promise.resolve(this.executionState));
     return this.executionState;
   },
 
-  bindParameterValue(parameterName, value) {
-    this.executionState = this.executionState.setIn(['parameter_bindings', parameterName], newParameterBindingValue(value));
+  bindParameterValue(parameterName: String, value: any): SearchExecutionState {
+    this.executionState = this.executionState.toBuilder()
+      .parameterBindings(this.executionState.parameterBindings.set(parameterName, ParameterBinding.forValue(value)))
+      .build();
     this.trigger(this.executionState);
     SearchExecutionStateActions.bindParameterValue.promise(Promise.resolve(this.executionState));
+    return this.executionState;
   },
 });

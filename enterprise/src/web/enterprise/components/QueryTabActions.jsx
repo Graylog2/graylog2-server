@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -8,10 +9,14 @@ import connect from 'stores/connect';
 import DebugOverlay from 'enterprise/components/DebugOverlay';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
+import { getUndeclaredParameters, SearchMetadataStore } from '../stores/SearchMetadataStore';
 
 const QueryTabActions = createReactClass({
   propTypes: {
     onSaveView: PropTypes.func.isRequired,
+    metadata: PropTypes.shape({
+      undeclared: ImmutablePropTypes.Set,
+    }).isRequired,
     view: PropTypes.shape({
       view: PropTypes.object.isRequired,
     }).isRequired,
@@ -57,15 +62,23 @@ const QueryTabActions = createReactClass({
     return !view.title;
   },
 
+  _hasUndeclaredParameters(searchMetadata) {
+    const undeclaredParameters = getUndeclaredParameters(searchMetadata);
+    return undeclaredParameters.size > 0;
+  },
+
   render() {
     const { view } = this.props.view;
     const onSave = () => this.handleSaveView(view);
+    const { metadata } = this.props;
+    const hasUndeclaredParameters = this._hasUndeclaredParameters(metadata);
+    const isNewView = this._isNewView(view);
     return (
       <span>
         <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
-          <MenuItem onSelect={this.handleEdit} disabled={this._isNewView(view)}>Edit</MenuItem>
-          <MenuItem onSelect={onSave} disabled={this._isNewView(view)}>Save</MenuItem>
-          <MenuItem onSelect={this.handleSaveAs}>Save as</MenuItem>
+          <MenuItem onSelect={this.handleEdit} disabled={isNewView}>Edit</MenuItem>
+          <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters}>Save</MenuItem>
+          <MenuItem onSelect={this.handleSaveAs} disabled={hasUndeclaredParameters}>Save as</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
         </DropdownButton>
@@ -77,4 +90,4 @@ const QueryTabActions = createReactClass({
   },
 });
 
-export default connect(QueryTabActions, { view: ViewStore });
+export default connect(QueryTabActions, { metadata: SearchMetadataStore, view: ViewStore });

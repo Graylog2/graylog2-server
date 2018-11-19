@@ -17,12 +17,14 @@ type State = {
   widgetPositions: Array<WidgetPosition>
 };
 
+type BuilderState = Map<string, any>;
+
 type JsonState = {
   selected_fields: FieldNameList,
   titles: TitlesMap,
   widgets: Array<any>,
   widget_mapping: WidgetMapping,
-  widget_positions: Array<WidgetPosition>
+  positions: Array<WidgetPosition>
 };
 
 export default class ViewState {
@@ -33,7 +35,8 @@ export default class ViewState {
   }
 
   static create(): ViewState {
-    return new ViewState([], {}, [], {}, {});
+    // eslint-disable-next-line no-use-before-define
+    return new Builder().widgets([]).widgetPositions({}).build();
   }
 
   get fields(): FieldNameList {
@@ -63,7 +66,7 @@ export default class ViewState {
     return new Builder(Map({ fields, titles, widgets, widgetMapping, widgetPositions }));
   }
 
-  equals(other) {
+  equals(other: any) {
     if (other === undefined) {
       return false;
     }
@@ -103,29 +106,29 @@ export default class ViewState {
 }
 
 class Builder {
-  value: Map<string, any>;
+  value: BuilderState;
 
-  constructor(value = Map()) {
+  constructor(value: BuilderState = Map()) {
     this.value = value;
   }
 
-  fields(value: FieldNameList) {
+  fields(value: FieldNameList): Builder {
     return new Builder(this.value.set('fields', value));
   }
 
-  titles(value: TitlesMap) {
+  titles(value: TitlesMap): Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
-  widgets(value: Array<Widget>) {
+  widgets(value: Array<Widget>): Builder {
     return new Builder(this.value.set('widgets', value));
   }
 
-  widgetMapping(value: WidgetMapping) {
+  widgetMapping(value: WidgetMapping): Builder {
     return new Builder(this.value.set('widgetMapping', value));
   }
 
-  widgetPositions(value: Array<WidgetPosition>) {
+  widgetPositions(value: Map<string, WidgetPosition>): Builder {
     return new Builder(this.value.set('widgetPositions', value));
   }
 

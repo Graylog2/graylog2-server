@@ -1,37 +1,64 @@
-import Immutable, { is } from 'immutable';
+// @flow
+
+import * as Immutable from 'immutable';
+import { is } from 'immutable';
+
+export type QueryId = string;
+
+type FilterType = Immutable.Map<string, any>;
+type SearchTypeList = Array<any>;
+type InternalBuilderState = Immutable.Map<string, any>;
+
+type InternalState = {
+  id: QueryId,
+  query: any,
+  timerange: any,
+  filter?: FilterType,
+  searchTypes: SearchTypeList,
+};
+
+export type QueryJson = {
+  id: QueryId,
+  query: any,
+  timerange: any,
+  filter?: FilterType,
+  search_types: any,
+};
 
 export default class Query {
-  constructor(id, query, timerange, filter, searchTypes) {
+  _value: InternalState;
+
+  constructor(id: QueryId, query: any, timerange: any, filter?: FilterType, searchTypes: SearchTypeList) {
     this._value = { id, query, timerange, filter, searchTypes };
   }
 
-  get id() {
+  get id(): QueryId {
     return this._value.id;
   }
 
-  get query() {
+  get query(): any {
     return this._value.query;
   }
 
-  get timerange() {
+  get timerange(): any {
     return this._value.timerange;
   }
 
-  get filter() {
+  get filter(): ?FilterType {
     return this._value.filter;
   }
 
-  get searchTypes() {
+  get searchTypes(): Array<any> {
     return this._value.searchTypes;
   }
 
-  toBuilder() {
+  toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, query, timerange, filter, searchTypes }));
   }
 
-  equals(other) {
+  equals(other: any): boolean {
     if (other === undefined) {
       return false;
     }
@@ -46,7 +73,7 @@ export default class Query {
     return true;
   }
 
-  toJSON() {
+  toJSON(): QueryJson {
     const { id, query, timerange, filter, searchTypes } = this._value;
 
     return {
@@ -58,7 +85,7 @@ export default class Query {
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: QueryJson): Query {
     // eslint-disable-next-line camelcase
     const { id, query, timerange, filter, search_types } = value;
     return new Query(id, query, timerange, Immutable.fromJS(filter), search_types);
@@ -66,31 +93,33 @@ export default class Query {
 }
 
 class Builder {
-  constructor(value = Immutable.Map()) {
+  value: InternalBuilderState;
+
+  constructor(value: InternalBuilderState = Immutable.Map()) {
     this.value = value;
   }
 
-  id(value) {
+  id(value: QueryId): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  query(value) {
+  query(value: any): Builder {
     return new Builder(this.value.set('query', value));
   }
 
-  timerange(value) {
+  timerange(value: any): Builder {
     return new Builder(this.value.set('timerange', value));
   }
 
-  filter(value) {
+  filter(value: FilterType): Builder {
     return new Builder(this.value.set('filter', Immutable.fromJS(value)));
   }
 
-  searchTypes(value) {
+  searchTypes(value: SearchTypeList): Builder {
     return new Builder(this.value.set('searchTypes', value));
   }
 
-  build() {
+  build(): Query {
     const { id, query, timerange, filter, searchTypes } = this.value.toObject();
     return new Query(id, query, timerange, filter, searchTypes);
   }

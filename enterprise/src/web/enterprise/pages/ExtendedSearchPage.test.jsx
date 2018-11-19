@@ -1,16 +1,21 @@
+// @flow
 import React from 'react';
 import Immutable from 'immutable';
 import { mount, shallow } from 'enzyme';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
 import { StreamsActions } from 'enterprise/stores/StreamsStore';
 import { WidgetStore } from 'enterprise/stores/WidgetStore';
 import { QueryFiltersStore } from 'enterprise/stores/QueryFiltersStore';
 import SearchActions from 'enterprise/actions/SearchActions';
+import { SearchExecutionStateActions } from 'enterprise/stores/SearchExecutionStateStore';
+import { SearchParameterActions } from 'enterprise/stores/SearchParameterStore';
+import Parameter from 'enterprise/logic/parameters/Parameter';
+import ParameterBinding from 'enterprise/logic/parameters/ParameterBinding';
+import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
-import { SearchParameterActions } from '../stores/SearchParameterStore';
-import { SearchExecutionStateActions } from '../stores/SearchExecutionStateStore';
 
 jest.mock('enterprise/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('enterprise/components/SearchResult', () => mockComponent('SearchResult'));
@@ -48,14 +53,8 @@ describe('ExtendedSearchPage', () => {
   });
   it('does not execute search upon mount if parameters are missing values', () => {
     const parameters = Immutable.fromJS({
-      foo: {
-        name: 'foo',
-        title: 'FooTitle',
-      },
-      bar: {
-        name: 'bar',
-        title: 'BarTitle',
-      },
+      foo: Parameter.create('foo', 'FooTitle', '', 'string', undefined, false, ParameterBinding.empty()),
+      bar: Parameter.create('bar', 'BarTitle', '', 'string', undefined, false, ParameterBinding.empty()),
     });
 
     mount(<ExtendedSearchPage route={{}} parameters={parameters} />);
@@ -103,24 +102,19 @@ describe('ExtendedSearchPage', () => {
     const { onHandleParameterSave } = searchResult.at(0).props();
 
     const parameters = Immutable.fromJS({
-      hostname: {
-        name: 'hostname',
-        title: 'Hostname',
-        default_value: 'localhost',
-      },
-      destination: {
-        name: 'destination',
-        title: 'Destination',
-      },
+      hostname: Parameter.create('hostname', 'Hostname', '', 'string', 'localhost', false, ParameterBinding.empty()),
+      destination: Parameter.create('destination', 'Destination', '', 'string', undefined, false, ParameterBinding.empty()),
     });
 
     SearchParameterActions.declare = jest.fn((newParameters) => {
       expect(newParameters).toEqual(parameters);
+      // $FlowFixMe: Poor man's mocking of Promise, enforcing immediate execution.
       return { then: fn => fn() };
     });
     SearchExecutionStateActions.bindParameterValue = jest.fn((name, defaultValue) => {
       expect(name).toBe('hostname');
       expect(defaultValue).toBe('localhost');
+      return Promise.resolve(SearchExecutionState.empty());
     });
 
     onHandleParameterSave(parameters, ['hostname', 'destination']);
