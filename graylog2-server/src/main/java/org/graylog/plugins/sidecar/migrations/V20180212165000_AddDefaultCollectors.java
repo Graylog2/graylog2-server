@@ -60,8 +60,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         final String beatsPreambel =
                 "# Needed for Graylog\n" +
                 "fields_under_root: true\n" +
-                "fields.collector_node_id: ${nodeId}\n" +
-                "fields.gl2_source_collector: ${nodeName}\n\n";
+                "fields.collector_node_id: ${nodeName}\n" +
+                "fields.gl2_source_collector: ${nodeId}\n\n";
 
         ensureCollector(
                 "filebeat",
