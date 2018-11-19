@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
@@ -5,11 +6,13 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import DebugOverlay from 'enterprise/components/DebugOverlay';
 import { ViewStore } from 'enterprise/stores/ViewStore';
+import { SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
+import SearchMetadata from 'enterprise/logic/search/SearchMetadata';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
-import { getUndeclaredParameters, SearchMetadataStore } from '../stores/SearchMetadataStore';
 
 const QueryTabActions = createReactClass({
   propTypes: {
@@ -62,9 +65,8 @@ const QueryTabActions = createReactClass({
     return !view.title;
   },
 
-  _hasUndeclaredParameters(searchMetadata) {
-    const undeclaredParameters = getUndeclaredParameters(searchMetadata);
-    return undeclaredParameters.size > 0;
+  _hasUndeclaredParameters(searchMetadata: SearchMetadata) {
+    return searchMetadata.undeclared.size > 0;
   },
 
   render() {

@@ -14,7 +14,7 @@ import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
 import { SearchStore } from 'enterprise/stores/SearchStore';
 import { CurrentViewStateStore } from 'enterprise/stores/CurrentViewStateStore';
 import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
-import { getUndeclaredParameters, getUsedParameters, SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
+import { SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import { WidgetStore } from 'enterprise/stores/WidgetStore';
 import LoadingIndicator from 'components/common/LoadingIndicator';
@@ -62,8 +62,8 @@ class SearchResult extends React.Component {
     const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
     const positions = viewState.state && viewState.state.widgetPositions;
 
-    const usedParameters = getUsedParameters(searchMetadata);
-    const undeclaredParameters = getUndeclaredParameters(searchMetadata);
+    const usedParameters = searchMetadata.used;
+    const undeclaredParameters = searchMetadata.undeclared;
     const disableSearch = _disableSearch(undeclaredParameters, parameterBindings);
 
     const content = currentResults ? (

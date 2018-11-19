@@ -132,3 +132,5 @@ class Builder {
     return new Parameter(name, title, description, dataType, defaultValue, optional, binding);
   }
 }
+
+export type ParameterMap = Immutable.Map<string, Parameter>;
