@@ -19,7 +19,6 @@ class BootstrapModalForm extends React.Component {
     submitButtonDisabled: false,
     onModalOpen: () => {},
     onModalClose: () => {},
-    bsSize: 'lg',
     onSubmitForm: undefined,
     onCancel: () => {},
     bsSize: undefined,
