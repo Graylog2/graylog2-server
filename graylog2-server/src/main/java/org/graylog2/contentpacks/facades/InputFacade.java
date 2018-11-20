@@ -515,7 +515,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         final InputEntity input = objectMapper.convertValue(entity.data(), InputEntity.class);
         final Set<String> lookupTableNames = input.extractors().stream()
                 .filter(e -> e.type().asString(parameters).equals(Extractor.Type.LOOKUP_TABLE.toString()))
-                .map(e -> e.configuration())
+                .map(ExtractorEntity::configuration)
                 .map(c -> ((ValueReference) c.get(LookupTableExtractor.CONFIG_LUT_NAME)).asString(parameters))
                 .collect(Collectors.toSet());
 
