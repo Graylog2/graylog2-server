@@ -6,6 +6,7 @@ import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
 
+import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import UserNotification from 'util/UserNotification';
@@ -35,8 +36,9 @@ const ShowContentPackPage = createReactClass({
 
 
   componentDidMount() {
-    ContentPacksActions.get(this.props.params.contentPackId).catch(() => {
-      window.location = '/system/contentpacks';
+    ContentPacksActions.get(this.props.params.contentPackId).catch((error) => {
+      UserNotification.error("Cannot find a matching Content Pack.");
+      history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
     });
     ContentPacksActions.installList(this.props.params.contentPackId);
   },
@@ -50,7 +52,7 @@ const ShowContentPackPage = createReactClass({
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
         ContentPacksActions.get(contentPackId).catch(() => {
-          window.location = '/system/contentpacks';
+          history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         });
       }, (error) => {
         let errMessage = error.message;
