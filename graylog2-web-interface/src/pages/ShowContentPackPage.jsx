@@ -35,7 +35,9 @@ const ShowContentPackPage = createReactClass({
 
 
   componentDidMount() {
-    ContentPacksActions.get(this.props.params.contentPackId);
+    ContentPacksActions.get(this.props.params.contentPackId).catch(() => {
+      window.location = '/system/contentpacks';
+    });
     ContentPacksActions.installList(this.props.params.contentPackId);
   },
 
@@ -47,16 +49,16 @@ const ShowContentPackPage = createReactClass({
     if (window.confirm('You are about to delete this content pack, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
-        ContentPacksActions.get(contentPackId);
+        ContentPacksActions.get(contentPackId).catch(() => {
+          window.location = '/system/contentpacks';
+        });
       }, (error) => {
-        /* eslint-disable camelcase */
-        let err_message = error.message;
-        const err_body = error.additional.body;
-        /* eslint-enable camlecase */
-        if (err_body && err_body.message) {
-          err_message = error.additional.body.message;
+        let errMessage = error.message;
+        const errBody = error.additional.body;
+        if (errBody && errBody.message) {
+          errMessage = error.additional.body.message;
         }
-        UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
+        UserNotification.error(`Deleting bundle failed: ${errMessage}`, 'Error');
       });
     }
   },
