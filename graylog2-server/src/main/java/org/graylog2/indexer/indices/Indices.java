@@ -57,7 +57,6 @@ import io.searchbox.indices.aliases.GetAliases;
 import io.searchbox.indices.aliases.ModifyAliases;
 import io.searchbox.indices.aliases.RemoveAliasMapping;
 import io.searchbox.indices.reindex.Reindex;
-import io.searchbox.indices.reindex.Reindex.Builder;
 import io.searchbox.indices.settings.GetSettings;
 import io.searchbox.indices.settings.UpdateSettings;
 import io.searchbox.indices.template.DeleteTemplate;
@@ -134,7 +133,8 @@ public class Indices {
     @Inject
     public Indices(JestClient jestClient, ObjectMapper objectMapper, IndexMappingFactory indexMappingFactory,
                    Messages messages, NodeId nodeId, AuditEventSender auditEventSender,
-                   EventBus eventBus, ElasticsearchTaskView.Factory taskFactory) {
+                   EventBus eventBus,
+                   ElasticsearchTaskView.Factory taskFactory) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.indexMappingFactory = indexMappingFactory;
@@ -770,7 +770,7 @@ public class Indices {
 
         // Reindexing happens asynchronously, we will get back the task id (and it is someone else's
         // responsibility to track its progress/cancel it/make sure not to start more than one of them.
-        final Reindex reindex = new Builder(src, dst)
+        final Reindex reindex = new Reindex.Builder(src, dst)
             .waitForCompletion(false)
             .build();
 
