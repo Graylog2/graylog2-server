@@ -28,12 +28,16 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 public abstract class ContentPackUninstallation {
     private static final String FIELD_ENTITIES = "entities";
     private static final String FIELD_FAILED_ENTITIES = "failed_entities";
+    private static final String FIELD_SKIPPED_ENTITIES = "skipped_entities";
 
     @JsonProperty(FIELD_ENTITIES)
     public abstract ImmutableSet<NativeEntityDescriptor> entities();
 
     @JsonProperty(FIELD_FAILED_ENTITIES)
     public abstract ImmutableSet<NativeEntityDescriptor> failedEntities();
+
+    @JsonProperty(FIELD_SKIPPED_ENTITIES)
+    public abstract ImmutableSet<NativeEntityDescriptor> skippedEntities();
 
     public static Builder builder() {
         return Builder.create();
@@ -53,6 +57,9 @@ public abstract class ContentPackUninstallation {
 
         @JsonProperty(FIELD_FAILED_ENTITIES)
         public abstract Builder failedEntities(ImmutableSet<NativeEntityDescriptor> failedEntities);
+
+        @JsonProperty(FIELD_SKIPPED_ENTITIES)
+        public abstract Builder skippedEntities(ImmutableSet<NativeEntityDescriptor> skippedEntities);
 
         public abstract ContentPackUninstallation build();
     }

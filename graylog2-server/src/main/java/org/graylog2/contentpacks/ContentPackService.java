@@ -201,6 +201,7 @@ public class ContentPackService {
 
         final Set<NativeEntityDescriptor> removedEntities = new HashSet<>();
         final Set<NativeEntityDescriptor> failedEntities = new HashSet<>();
+        final Set<NativeEntityDescriptor> skippedEntities = new HashSet<>();
 
         try {
             for (Entity entity : entitiesInOrder) {
@@ -218,7 +219,12 @@ public class ContentPackService {
                     final NativeEntityDescriptor nativeEntityDescriptor = nativeEntityDescriptorOptional.get();
                     final Optional nativeEntityOptional = facade.loadNativeEntity(nativeEntityDescriptor);
 
-                    if (nativeEntityOptional.isPresent()) {
+                    if (contentPackInstallationPersistenceService
+                            .countInstallationOfEntityById(nativeEntityDescriptor.contentPackEntityId()) > 1) {
+                       skippedEntities.add(nativeEntityDescriptor);
+                       LOG.debug("Did not remove entity since other content pack installations still use them: {}",
+                               nativeEntityDescriptor);
+                    } else if (nativeEntityOptional.isPresent()) {
                         final Object nativeEntity = nativeEntityOptional.get();
                         LOG.trace("Removing existing native entity for {} ({})", nativeEntityDescriptor);
                         try {
@@ -244,6 +250,7 @@ public class ContentPackService {
 
         return ContentPackUninstallation.builder()
                 .entities(ImmutableSet.copyOf(removedEntities))
+                .skippedEntities(ImmutableSet.copyOf(skippedEntities))
                 .failedEntities(ImmutableSet.copyOf(failedEntities))
                 .build();
     }

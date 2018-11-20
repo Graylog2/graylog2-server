@@ -16,17 +16,28 @@
  */
 package org.graylog2.contentpacks;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
+import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
+import org.graylog2.contentpacks.model.ContentPackInstallation;
+import org.graylog2.contentpacks.model.ContentPackUninstallation;
+import org.graylog2.contentpacks.model.ContentPackV1;
+import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -45,6 +56,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.net.URI;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +66,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ContentPackServiceTest {
@@ -70,6 +82,10 @@ public class ContentPackServiceTest {
     private IndexSetService indexSetService;
     @Mock
     private OutputService outputService;
+    @Mock
+    private GrokPatternService patternService;
+    @Mock
+    private ContentPackInstallationPersistenceService contentPackInstallService;
 
     private ContentPackService contentPackService;
     private Set<PluginMetaData> pluginMetaData;
@@ -78,11 +94,12 @@ public class ContentPackServiceTest {
     @Before
     public void setUp() throws Exception {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
-                mock(ContentPackInstallationPersistenceService.class);
+                contentPackInstallService;
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
         final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
+                ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories)
         );
@@ -145,5 +162,85 @@ public class ContentPackServiceTest {
                 EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1),
                 EntityDescriptor.create("output-1234", ModelTypes.OUTPUT_V1)
         );
+    }
+
+    @Test
+    public void uninstallContentPack() throws NotFoundException {
+        Map<String, Map<String, String>> entityData = new HashMap<>(2);
+        Map<String, String> patternName = new HashMap<>(2);
+        patternName.put("type", "string");
+        patternName.put("value", "NAME");
+        Map<String, String> patternPattern = new HashMap<>(2);
+        patternPattern.put("type", "string");
+        patternPattern.put("value", "\\w");
+        entityData.put("name", patternName);
+        entityData.put("pattern", patternPattern);
+        GrokPattern grokPattern = GrokPattern.builder()
+                .pattern("\\w")
+                .name("NAME")
+                .build();
+
+        JsonNode jsonData = objectMapper.convertValue(entityData, JsonNode.class);
+        EntityV1 entityV1 = EntityV1.builder()
+                .id(ModelId.of("12345"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(jsonData)
+                .build();
+        ImmutableSet<Entity> entities = ImmutableSet.of(entityV1);
+        NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
+                .create(ModelId.of("12345"), "dead-beef1", ModelTypes.GROK_PATTERN_V1, "NAME");
+        ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors = ImmutableSet.of(nativeEntityDescriptor);
+        ContentPackV1 contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+        ContentPackInstallation contentPackInstallation = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(1)
+                .entities(nativeEntityDescriptors)
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
+
+        /* Test successful uninstall */
+        when(patternService.load("dead-beef1")).thenReturn(grokPattern);
+        ContentPackUninstallation expectSuccess = ContentPackUninstallation.builder()
+                .skippedEntities(ImmutableSet.of())
+                .failedEntities(ImmutableSet.of())
+                .entities(nativeEntityDescriptors)
+                .build();
+
+        ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
+        assertThat(resultSuccess).isEqualTo(expectSuccess);
+
+       /* Test skipped uninstall */
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(2);
+        ContentPackUninstallation expectSkip = ContentPackUninstallation.builder()
+                .skippedEntities(nativeEntityDescriptors)
+                .failedEntities(ImmutableSet.of())
+                .entities(ImmutableSet.of())
+                .build();
+        ContentPackUninstallation resultSkip = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
+        assertThat(resultSkip).isEqualTo(expectSkip);
+
+        /* Test not found while uninstall */
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(1);
+        when(patternService.load("dead-beef1")).thenThrow(new NotFoundException("Not found."));
+        ContentPackUninstallation expectFailure = ContentPackUninstallation.builder()
+                .skippedEntities(ImmutableSet.of())
+                .failedEntities(ImmutableSet.of())
+                .entities(ImmutableSet.of())
+                .build();
+
+        ContentPackUninstallation resultFailure = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
+        assertThat(resultFailure).isEqualTo(expectFailure);
     }
 }

@@ -170,13 +170,13 @@ public class ContentPackInstallationPersistenceServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void countInstallationOfEntityById() {
-        final int countedInstallations1 = persistenceService.countInstallationOfEntityById(ModelId.of("5b4c920b4b900a0024af2b5d"));
+        final int countedInstallations1 = persistenceService.countInstallationOfEntityById(ModelId.of("5b1a49eb3d274631fe07c86a"));
         assertThat(countedInstallations1).isEqualTo(2);
 
         final int countedInstallations2 = persistenceService.countInstallationOfEntityById(ModelId.of("non-exsistant"));
         assertThat(countedInstallations2).isEqualTo(0);
 
-        final int countedInstallations3 = persistenceService.countInstallationOfEntityById(ModelId.of("5b4c920b4b900abeefaf2b5c"));
+        final int countedInstallations3 = persistenceService.countInstallationOfEntityById(ModelId.of("5b1a49eb3d274631fe07befa"));
         assertThat(countedInstallations3).isEqualTo(1);
     }
 }

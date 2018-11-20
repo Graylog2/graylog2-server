@@ -127,12 +127,12 @@ public class ContentPackInstallationPersistenceService {
         return installationMetaData;
     }
 
-    public int countInstallationOfEntityById(ModelId id) {
+    public int countInstallationOfEntityById(ModelId contentPackEntityId) {
         final Set<ContentPackInstallation> allInstallations = loadAll();
         Optional<Integer> result = allInstallations.stream().map(contentPackInstallation -> {
             return contentPackInstallation.entities().stream().
-                    filter(nativeEntityDescriptor -> nativeEntityDescriptor.id()
-                            .equals(id)).collect(Collectors.toSet()).size();
+                    filter(nativeEntityDescriptor -> nativeEntityDescriptor.contentPackEntityId()
+                            .equals(contentPackEntityId)).collect(Collectors.toSet()).size();
         }).reduce((acc, next) -> acc + next );
 
 
