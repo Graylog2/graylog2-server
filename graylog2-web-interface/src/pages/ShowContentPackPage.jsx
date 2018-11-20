@@ -37,7 +37,7 @@ const ShowContentPackPage = createReactClass({
 
   componentDidMount() {
     ContentPacksActions.get(this.props.params.contentPackId).catch(() => {
-      UserNotification.error("Cannot find a matching Content Pack.");
+      UserNotification.error('Cannot find a matching Content Pack.');
       history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
     });
     ContentPacksActions.installList(this.props.params.contentPackId);
