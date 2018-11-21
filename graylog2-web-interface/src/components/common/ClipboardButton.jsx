@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
-import Clipboard from 'clipboard';
+import ClipboardJS from 'clipboard';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
@@ -44,7 +44,7 @@ class ClipboardButton extends React.Component {
   };
 
   componentDidMount() {
-    this.clipboard = new Clipboard('[data-clipboard-button]');
+    this.clipboard = new ClipboardJS('[data-clipboard-button]');
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
   }
