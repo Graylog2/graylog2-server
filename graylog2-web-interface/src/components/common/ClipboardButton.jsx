@@ -31,6 +31,8 @@ class ClipboardButton extends React.Component {
     disabled: PropTypes.bool,
     /** Text to display when hovering over the button. */
     buttonTitle: PropTypes.string,
+    /** Container element which is focussed */
+    container: PropTypes.any,
   };
 
   static defaultProps = {
@@ -44,7 +46,11 @@ class ClipboardButton extends React.Component {
   };
 
   componentDidMount() {
-    this.clipboard = new ClipboardJS('[data-clipboard-button]');
+    const options = {};
+    if (this.props.container) {
+      options.container = this.props.container;
+    }
+    this.clipboard = new ClipboardJS('[data-clipboard-button]', options);
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
   }
