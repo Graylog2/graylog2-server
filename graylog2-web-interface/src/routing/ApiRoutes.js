@@ -42,6 +42,7 @@ const ApiRoutes = {
     install: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}/installations` }; },
     installList: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}/installations` }; },
     uninstall: (contentPackId, installId) => { return { url: `/system/content_packs/${contentPackId}/installations/${installId}` }; },
+    uninstallDetails: (contentPackId, installId) => { return { url: `/system/content_packs/${contentPackId}/installations/${installId}/uninstallDetails` }; },
   },
   CountsApiController: {
     total: () => { return { url: '/count/total' }; },

@@ -315,7 +315,7 @@ public class ContentPackResource extends RestResource {
     }
 
     @GET
-    @Path("{contentPackId}/installations/{installationId}/uninstall")
+    @Path("{contentPackId}/installations/{installationId}/uninstallDetails")
     @Timed
     @ApiOperation(value="Get details about which entities will actually be uninstalled")
     @ApiResponses(value = {
