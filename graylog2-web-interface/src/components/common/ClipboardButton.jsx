@@ -39,6 +39,7 @@ class ClipboardButton extends React.Component {
     action: 'copy',
     disabled: false,
     buttonTitle: undefined,
+    container: undefined,
   };
 
   state = {
