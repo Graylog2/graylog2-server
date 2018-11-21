@@ -157,6 +157,18 @@ public class MongoIndexSetTest {
         assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive"));
         assertTrue(mongoIndexSet.isManagedIndex("graylog_42_restored_archive"));
 
+        // The reindexed indices should NOT be taken into account when getting the new deflector number
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es5"));
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es6"));
+        // ... but they should be detected as managed index
+        assertTrue(mongoIndexSet.isManagedIndex("graylog_42_reindex_es5"));
+        assertTrue(mongoIndexSet.isManagedIndex("graylog_42_reindex_es6"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es6heyna"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog_42_reindex_es6heyna"));
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es6_12"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog_42_reindex_es6_12"));
+
         assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive123"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog_42_restored_archive123"));
 
@@ -188,7 +200,8 @@ public class MongoIndexSetTest {
                 "graylog_1", Collections.emptySet(),
                 "graylog_2", Collections.emptySet(),
                 "graylog_3", Collections.singleton("graylog_deflector"),
-                "graylog_4_restored_archive", Collections.emptySet());
+                "graylog_4_restored_archive", Collections.emptySet(),
+                "graylog_4_reindex_es5", Collections.emptySet());
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
@@ -200,7 +213,7 @@ public class MongoIndexSetTest {
     @Test
     public void getAllGraylogIndexNames() {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
-                "graylog_1", Collections.emptySet(),
+                "graylog_1_reindex_es5", Collections.emptySet(),
                 "graylog_2", Collections.emptySet(),
                 "graylog_3", Collections.emptySet(),
                 "graylog_4_restored_archive", Collections.emptySet(),
@@ -217,7 +230,7 @@ public class MongoIndexSetTest {
     @Test
     public void getAllGraylogDeflectorIndices() {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
-                "graylog_1", Collections.emptySet(),
+                "graylog_1_reindex_es5", Collections.emptySet(),
                 "graylog_2", Collections.emptySet(),
                 "graylog_3", Collections.emptySet(),
                 "graylog_4_restored_archive", Collections.emptySet(),
@@ -228,7 +241,7 @@ public class MongoIndexSetTest {
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllIndexAliases();
 
-        assertThat(deflectorIndices).containsOnlyKeys("graylog_1", "graylog_2", "graylog_3", "graylog_5");
+        assertThat(deflectorIndices).containsOnlyKeys("graylog_2", "graylog_3", "graylog_5");
     }
 
     @Test
