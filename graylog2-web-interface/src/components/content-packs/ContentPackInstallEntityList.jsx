@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Spinner from 'components/common/Spinner';
-import { DataTable, Timestamp } from 'components/common';
+import { DataTable } from 'components/common';
 
 import 'components/content-packs/ContentPackDetails.css';
 
