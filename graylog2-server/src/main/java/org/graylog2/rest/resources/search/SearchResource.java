@@ -65,6 +65,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
+    protected static final String DEFAULT_SCROLL_BATCH_SIZE = "500";
+
     protected final Searches searches;
     private final ClusterConfigService clusterConfigService;
     private final DecoratorProcessor decoratorProcessor;
