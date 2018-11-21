@@ -39,7 +39,7 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   openModal = () => {
-    this.refs.modal.open();
+    this.modal.open();
   };
 
   _getId = (prefixIdName) => {
@@ -47,7 +47,7 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _closeModal = () => {
-    this.refs.modal.close();
+    this.modal.close();
   };
 
   _saved = () => {
@@ -99,7 +99,7 @@ class EditConfigurationVariableModal extends React.Component {
                 className={this.props.create ? 'pull-right' : ''}>
           {triggerButtonContent}
         </Button>
-        <BootstrapModalForm ref="modal"
+        <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
                             title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;{this.state.name}&#125;</React.Fragment>}
                             onSubmitForm={this._save}
                             submitButtonDisabled={this._hasErrors()}

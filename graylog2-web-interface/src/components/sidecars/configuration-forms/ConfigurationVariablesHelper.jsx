@@ -17,7 +17,7 @@ class ConfigurationVariablesHelper extends React.Component {
     this._reloadConfiguration();
   }
 
-  rightAlignStyle = { textAlign: 'right'};
+  rightAlignStyle = { textAlign: 'right' };
 
   _reloadConfiguration = () => {
     ConfigurationVariableActions.all()
