@@ -2419,10 +2419,10 @@ clipboard-copy@^2.0.0:
   resolved "https://registry.yarnpkg.com/clipboard-copy/-/clipboard-copy-2.0.0.tgz#663abcd8be9c641de6e92a2eb9afef6e0afa727e"
   integrity sha512-7goBFzT1qI6TnzmaKUq9afyT3+hodAk3zNpktsK00a9vRwACUliCZzBBxBqRWVWNhBy+aQ1Uw6E/rlbuoqkBMg==
 
-clipboard@^1.5.5:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/clipboard/-/clipboard-1.7.1.tgz#360d6d6946e99a7a1fef395e42ba92b5e9b5a16b"
-  integrity sha1-Ng1taUbpmnof7zleQrqStem1oWs=
+clipboard@^2.0.0:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/clipboard/-/clipboard-2.0.4.tgz#836dafd66cf0fea5d71ce5d5b0bf6e958009112d"
+  integrity sha512-Vw26VSLRpJfBofiVaFb/I8PVfdI1OxKcYShe6fm0sP/DtmiWQNCjhM/okTvdCo0G+lMMm1rMYbk4IK4x1X+kgQ==
   dependencies:
     good-listener "^1.2.2"
     select "^1.1.2"
@@ -4723,12 +4723,12 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   integrity sha1-Dovf5NHduIVNZOBOp8AOKgJuVlg=
 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
-  version "3.0.0-alpha.4-SNAPSHOT"
+  version "3.0.0-alpha.5-SNAPSHOT"
   dependencies:
     "@babel/preset-env" "^7.1.0"
     babel-eslint "^9.0.0"
     eslint "^4.3.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v3/npm-graylog-web-plugin-3.0.0-alpha.4-SNAPSHOT-e7eac202-4a6c-493f-984a-1dd18e6207d2-1542296283251/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v3/npm-graylog-web-plugin-3.0.0-alpha.5-SNAPSHOT-3adca812-7c9d-4691-b50d-541b960f4a01-1542792528077/node_modules/eslint-config-graylog"
     html-webpack-plugin "^3.2.0"
     javascript-natural-sort "^0.7.1"
     jquery "^3.3.1"

@@ -50,7 +50,7 @@
     "bootstrap": "^3.3.7",
     "c3": "^0.4.11-rc4",
     "classnames": "^2.2.0",
-    "clipboard": "^1.5.5",
+    "clipboard": "^2.0.0",
     "crossfilter": "1.3.x",
     "d3": "3.5.17",
     "dc": "2.0.5",
