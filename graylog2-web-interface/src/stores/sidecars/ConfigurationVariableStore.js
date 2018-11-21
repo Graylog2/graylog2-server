@@ -46,6 +46,7 @@ const ConfigurationVariableStore = Reflux.createStore({
 
   save(configurationVariable) {
     const request = {
+      id: configurationVariable.id,
       name: configurationVariable.name,
       description: configurationVariable.description,
       content: configurationVariable.content,
