@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
+import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackView;
 import org.graylog2.contentpacks.model.ModelId;
@@ -65,6 +66,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -310,6 +312,28 @@ public class ContentPackResource extends RestResource {
 
         final Set<ContentPackInstallation> installations = contentPackInstallationPersistenceService.findByContentPackId(id);
         return ContentPackInstallationsResponse.create(installations.size(), installations);
+    }
+
+    @GET
+    @Path("{contentPackId}/installations/{installationId}/uninstall")
+    @Timed
+    @ApiOperation(value="Get details about which entities will actually be uninstalled")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading content packs")
+    })
+    @JsonView(ContentPackView.HttpView.class)
+    public ContentPackUninstallDetails uninstallDetails(
+            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @PathParam("contentPackId") ModelId id,
+            @ApiParam(name = "installationId", value = "Installation ID", required = true)
+            @PathParam("installationId") String installationId) {
+        final ContentPackInstallation installation = contentPackInstallationPersistenceService.findById(new ObjectId(installationId))
+                .orElseThrow(() -> new NotFoundException("Couldn't find installation " + installationId));
+
+        final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(installation.contentPackId(), installation.contentPackRevision())
+                .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));
+
+        return contentPackService.getUninstallDetails(contentPack, installation);
     }
 
     @DELETE

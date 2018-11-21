@@ -38,6 +38,7 @@ import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.UnsupportedEntityFacade;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
+import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelType;
@@ -172,6 +173,43 @@ public class ContentPackService {
             LOG.debug("Removing entity {}", entityDescriptor);
             facade.delete(entity);
         }
+    }
+
+    public ContentPackUninstallDetails getUninstallDetails(ContentPack contentPack, ContentPackInstallation installation) {
+        if (contentPack instanceof ContentPackV1) {
+            return getUninstallDetails((ContentPackV1) contentPack, installation);
+        } else {
+            throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
+        }
+    }
+
+    private ContentPackUninstallDetails getUninstallDetails(ContentPackV1 contentPack, ContentPackInstallation installation) {
+        final Entity rootEntity = EntityV1.createRoot(contentPack);
+        final ImmutableMap<String, ValueReference> parameters = installation.parameters();
+        final ImmutableGraph<Entity> dependencyGraph = buildEntityGraph(rootEntity, contentPack.entities(), parameters);
+
+        final Traverser<Entity> entityTraverser = Traverser.forGraph(dependencyGraph);
+        final Iterable<Entity> entitiesInOrder = entityTraverser.breadthFirst(rootEntity);
+        final Set<NativeEntityDescriptor> nativeEntityDescriptors = new HashSet<>();
+
+        entitiesInOrder.forEach((entity -> {
+            if (entity.equals(rootEntity)) {
+                return;
+            }
+
+            final Optional<NativeEntityDescriptor> nativeEntityDescriptorOptional = installation.entities().stream()
+                    .filter(descriptor -> entity.id().equals(descriptor.contentPackEntityId()))
+                    .findFirst();
+            if (nativeEntityDescriptorOptional.isPresent()) {
+                NativeEntityDescriptor nativeEntityDescriptor = nativeEntityDescriptorOptional.get();
+                if (contentPackInstallationPersistenceService
+                        .countInstallationOfEntityById(nativeEntityDescriptor.contentPackEntityId()) <= 1) {
+                    nativeEntityDescriptors.add(nativeEntityDescriptor);
+                }
+            }
+        }));
+
+        return ContentPackUninstallDetails.create(nativeEntityDescriptors);
     }
 
     public ContentPackUninstallation uninstallContentPack(ContentPack contentPack, ContentPackInstallation installation) {

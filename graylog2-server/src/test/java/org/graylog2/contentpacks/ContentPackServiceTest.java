@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.OutputFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
+import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelId;
@@ -91,6 +92,11 @@ public class ContentPackServiceTest {
     private Set<PluginMetaData> pluginMetaData;
     private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
 
+    private ContentPackV1 contentPack;
+    private ContentPackInstallation contentPackInstallation;
+    private GrokPattern grokPattern;
+    private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
+
     @Before
     public void setUp() throws Exception {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
@@ -105,6 +111,50 @@ public class ContentPackServiceTest {
         );
 
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+
+        Map<String, Map<String, String>> entityData = new HashMap<>(2);
+        Map<String, String> patternName = new HashMap<>(2);
+        patternName.put("type", "string");
+        patternName.put("value", "NAME");
+        Map<String, String> patternPattern = new HashMap<>(2);
+        patternPattern.put("type", "string");
+        patternPattern.put("value", "\\w");
+        entityData.put("name", patternName);
+        entityData.put("pattern", patternPattern);
+        grokPattern = GrokPattern.builder()
+                .pattern("\\w")
+                .name("NAME")
+                .build();
+
+        JsonNode jsonData = objectMapper.convertValue(entityData, JsonNode.class);
+        EntityV1 entityV1 = EntityV1.builder()
+                .id(ModelId.of("12345"))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .data(jsonData)
+                .build();
+        ImmutableSet<Entity> entities = ImmutableSet.of(entityV1);
+        NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
+                .create(ModelId.of("12345"), "dead-beef1", ModelTypes.GROK_PATTERN_V1, "NAME");
+        nativeEntityDescriptors = ImmutableSet.of(nativeEntityDescriptor);
+        contentPack = ContentPackV1.builder()
+                .description("test")
+                .entities(entities)
+                .name("test")
+                .revision(1)
+                .summary("")
+                .vendor("")
+                .url(URI.create("http://graylog.com"))
+                .id(ModelId.of("dead-beef"))
+                .build();
+        contentPackInstallation = ContentPackInstallation.builder()
+                .contentPackId(ModelId.of("dead-beef"))
+                .contentPackRevision(1)
+                .entities(nativeEntityDescriptors)
+                .comment("Installed")
+                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
+                .createdAt(Instant.now())
+                .createdBy("me")
+                .build();
     }
 
     @Test
@@ -166,50 +216,6 @@ public class ContentPackServiceTest {
 
     @Test
     public void uninstallContentPack() throws NotFoundException {
-        Map<String, Map<String, String>> entityData = new HashMap<>(2);
-        Map<String, String> patternName = new HashMap<>(2);
-        patternName.put("type", "string");
-        patternName.put("value", "NAME");
-        Map<String, String> patternPattern = new HashMap<>(2);
-        patternPattern.put("type", "string");
-        patternPattern.put("value", "\\w");
-        entityData.put("name", patternName);
-        entityData.put("pattern", patternPattern);
-        GrokPattern grokPattern = GrokPattern.builder()
-                .pattern("\\w")
-                .name("NAME")
-                .build();
-
-        JsonNode jsonData = objectMapper.convertValue(entityData, JsonNode.class);
-        EntityV1 entityV1 = EntityV1.builder()
-                .id(ModelId.of("12345"))
-                .type(ModelTypes.GROK_PATTERN_V1)
-                .data(jsonData)
-                .build();
-        ImmutableSet<Entity> entities = ImmutableSet.of(entityV1);
-        NativeEntityDescriptor nativeEntityDescriptor = NativeEntityDescriptor
-                .create(ModelId.of("12345"), "dead-beef1", ModelTypes.GROK_PATTERN_V1, "NAME");
-        ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors = ImmutableSet.of(nativeEntityDescriptor);
-        ContentPackV1 contentPack = ContentPackV1.builder()
-                .description("test")
-                .entities(entities)
-                .name("test")
-                .revision(1)
-                .summary("")
-                .vendor("")
-                .url(URI.create("http://graylog.com"))
-                .id(ModelId.of("dead-beef"))
-                .build();
-        ContentPackInstallation contentPackInstallation = ContentPackInstallation.builder()
-                .contentPackId(ModelId.of("dead-beef"))
-                .contentPackRevision(1)
-                .entities(nativeEntityDescriptors)
-                .comment("Installed")
-                .parameters(ImmutableMap.copyOf(Collections.emptyMap()))
-                .createdAt(Instant.now())
-                .createdBy("me")
-                .build();
-
         /* Test successful uninstall */
         when(patternService.load("dead-beef1")).thenReturn(grokPattern);
         ContentPackUninstallation expectSuccess = ContentPackUninstallation.builder()
@@ -242,5 +248,20 @@ public class ContentPackServiceTest {
 
         ContentPackUninstallation resultFailure = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
         assertThat(resultFailure).isEqualTo(expectFailure);
+    }
+
+    @Test
+    public void getUninstallDetails() throws NotFoundException {
+        /* Test will be uninstalled */
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(1);
+        ContentPackUninstallDetails expect = ContentPackUninstallDetails.create(nativeEntityDescriptors);
+        ContentPackUninstallDetails result = contentPackService.getUninstallDetails(contentPack, contentPackInstallation);
+        assertThat(result).isEqualTo(expect);
+
+        /* Test nothing will be uninstalled */
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(2);
+        ContentPackUninstallDetails expectNon = ContentPackUninstallDetails.create(ImmutableSet.of());
+        ContentPackUninstallDetails resultNon = contentPackService.getUninstallDetails(contentPack, contentPackInstallation);
+        assertThat(resultNon).isEqualTo(expectNon);
     }
 }
