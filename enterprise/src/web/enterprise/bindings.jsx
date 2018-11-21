@@ -36,6 +36,10 @@ import {
 import * as Permissions from './Permissions';
 import ScatterVisualization from './components/visualizations/scatter/ScatterVisualization';
 import ViewsLicenseCheck from './components/common/ViewsLicenseCheck';
+import AddMessageCountActionHandler from './logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler from './logic/fieldactions/AddMessageTableActionHandler';
+import CreateParameterDialog from './logic/creatoractions/CreateParameterDialog';
+import CreateCustomAggregation from './logic/creatoractions/CreateCustomAggregation';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -78,7 +82,10 @@ export default {
         if (widget.config.rowPivots.length > 0) {
           return `Aggregating ${widget.config.series.map(s => s.effectiveName)} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
         }
-        return `Aggregating ${widget.config.series.map(s => s.effectiveName)}`;
+        if (widget.config.series.length > 0) {
+          return `Aggregating ${widget.config.series.map(s => s.effectiveName)}`;
+        }
+        return 'Empty Aggregation';
       },
     },
   ],
@@ -174,6 +181,28 @@ export default {
       type: ScatterVisualization.type,
       displayName: 'Scatter Plot',
       component: ScatterVisualization,
+    },
+  ],
+  creators: [
+    {
+      type: 'preset',
+      title: 'Message Count',
+      func: AddMessageCountActionHandler,
+    },
+    {
+      type: 'preset',
+      title: 'Message Table',
+      func: AddMessageTableActionHandler,
+    },
+    {
+      type: 'generic',
+      title: 'Custom Aggregation',
+      func: CreateCustomAggregation,
+    },
+    {
+      type: 'generic',
+      title: 'Parameter',
+      component: CreateParameterDialog,
     },
   ],
 };

@@ -48,6 +48,8 @@ export const WidgetStore = Reflux.createStore({
     }
     const newWidgets = this.widgets.set(widget.id, widget);
     this._updateWidgets(newWidgets);
+    WidgetActions.create.promise(Promise.resolve(widget));
+    return widget;
   },
   duplicate(widgetId) {
     const widget = this.widgets.get(widgetId);
