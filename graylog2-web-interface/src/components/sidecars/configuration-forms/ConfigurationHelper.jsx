@@ -11,7 +11,6 @@ import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 class ConfigurationHelper extends React.Component {
-
   state = {
     section: undefined,
     paragraph: undefined,
