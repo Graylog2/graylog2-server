@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
 import { Col, MenuItem, Nav, Navbar, NavDropdown, Panel, Row, Tab, Tabs } from 'react-bootstrap';
@@ -12,9 +11,6 @@ import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 class ConfigurationHelper extends React.Component {
-  static propTypes = {
-    type: PropTypes.string.isRequired,
-  };
 
   state = {
     section: undefined,
@@ -39,7 +35,7 @@ class ConfigurationHelper extends React.Component {
     const dropDowns = [];
     Object.keys(content).forEach((section) => {
       if (!Object.prototype.hasOwnProperty.call(content, section)) {
-        return undefined;
+        return;
       }
 
       const paragraphs = content[section];
@@ -47,7 +43,7 @@ class ConfigurationHelper extends React.Component {
 
       for (let i = 0; i < paragraphs.length; i += 1) {
         menuItems.push(
-          <MenuItem key={this._getId(section,i)} eventKey={this._getEventKey(section, paragraphs[i])}>{lodash.capitalize(paragraphs[i])}</MenuItem>,
+          <MenuItem key={this._getId(section, i)} eventKey={this._getEventKey(section, paragraphs[i])}>{lodash.capitalize(paragraphs[i])}</MenuItem>,
         );
       }
       dropDowns.push(
