@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Row, Col } from 'react-bootstrap';
-import { DataTable, Timestamp } from 'components/common';
+import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
-import ContentPackInstallEntityList from './ContentPackInstallEntityList';
 import 'components/content-packs/ContentPackDetails.css';
+import ContentPackInstallEntityList from './ContentPackInstallEntityList';
 
 const ContentPackInstallView = (props) => {
   const { comment } = props.install;
@@ -28,7 +28,7 @@ const ContentPackInstallView = (props) => {
     </Row>
     <Row>
       <Col smOffset={1} sm={10}>
-        <ContentPackInstallEntityList entities={props.install.entities}/>
+        <ContentPackInstallEntityList entities={props.install.entities} />
       </Col>
     </Row>
   </div>);
