@@ -248,12 +248,12 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1}>
+          <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1}>
+          <Col smOffset={1} lg={8}>
             <SearchForm
               id="filter-input"
               onSearch={this._onSetFilter}
@@ -263,7 +263,7 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1} sm={8}>
+          <Col smOffset={1} sm={8} lg={8}>
             {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel> }
             <ExpandableList>
               {entitiesComponent}
