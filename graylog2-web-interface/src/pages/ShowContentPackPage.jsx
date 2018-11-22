@@ -36,8 +36,13 @@ const ShowContentPackPage = createReactClass({
 
 
   componentDidMount() {
-    ContentPacksActions.get(this.props.params.contentPackId).catch(() => {
-      UserNotification.error('Cannot find a matching Content Pack.');
+    ContentPacksActions.get(this.props.params.contentPackId).catch((error) => {
+      if (error.status === 404) {
+        UserNotification.error(
+          `Cannot find Content Pack with the id ${this.props.params.contentPackId} and may have been deleted.`);
+      } else {
+        UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+      }
       history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
     });
     ContentPacksActions.installList(this.props.params.contentPackId);
@@ -51,14 +56,16 @@ const ShowContentPackPage = createReactClass({
     if (window.confirm('You are about to delete this content pack, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
-        ContentPacksActions.get(contentPackId).catch(() => {
+        ContentPacksActions.get(contentPackId).catch((error) => {
+          if (error.status !== 404) {
+            UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+          }
           history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         });
       }, (error) => {
         let errMessage = error.message;
-        const errBody = error.additional.body;
-        if (errBody && errBody.message) {
-          errMessage = error.additional.body.message;
+        if (error.responseMessage) {
+          errMessage = error.responseMessage;
         }
         UserNotification.error(`Deleting bundle failed: ${errMessage}`, 'Error');
       });
