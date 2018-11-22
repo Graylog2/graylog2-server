@@ -5,6 +5,7 @@ const ConfigurationVariableActions = Reflux.createActions({
   save: { asyncResult: true },
   delete: { asyncResult: true },
   validate: { asyncResult: true },
+  getConfigurations: { asyncResult: true },
 });
 
 export default ConfigurationVariableActions;

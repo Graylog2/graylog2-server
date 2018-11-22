@@ -104,6 +104,12 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
     }
 
+    public List<Configuration> findByQuery(DBQuery.Query query) {
+        try (final Stream<Configuration> collectorConfigurationStream = streamQuery(query)) {
+            return collectorConfigurationStream.collect(Collectors.toList());
+        }
+    }
+
     @Override
     public Configuration save(Configuration configuration) {
         return db.findAndModify(DBQuery.is("_id", configuration.id()), new BasicDBObject(),

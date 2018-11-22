@@ -21,3 +21,9 @@
 :local(.monoSpaceFont) {
     font-family: monospace;
 }
+
+:local(.ulStyle) {
+    list-style-type: disc;
+    padding-left: 20px;
+    padding-top: 20px;
+}

@@ -12,15 +12,8 @@ const ConfigurationVariableStore = Reflux.createStore({
   listenables: [ConfigurationVariableActions],
   sourceUrl: '/sidecar/configuration_variables',
 
-  propagateChanges() {
-    this.trigger({
-      configurationVariables: this.configurationVariables,
-    });
-  },
-
   _fetchConfigurationVariables() {
     const baseUrl = `${this.sourceUrl}`;
-
     const uri = URI(baseUrl).toString();
 
     return fetch('GET', URLUtils.qualifyUrl(uri));
@@ -30,12 +23,7 @@ const ConfigurationVariableStore = Reflux.createStore({
     const promise = this._fetchConfigurationVariables();
     promise
       .then(
-        (response) => {
-          this.configurationVariables = response.configurationVariables;
-          this.propagateChanges();
-
-          return response.configurationVariables;
-        },
+        () => {},
         (error) => {
           UserNotification.error(`Fetching configuration variables failed with status: ${error}`,
             'Could not retrieve configuration variables');
@@ -72,6 +60,17 @@ const ConfigurationVariableStore = Reflux.createStore({
       });
 
     ConfigurationVariableActions.save.promise(promise);
+  },
+
+  getConfigurations(configurationVariable) {
+    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/${configurationVariable.id}/configurations`);
+    const promise = fetch('GET', url);
+    promise.then(
+      () => {},
+      (error) => {
+        UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);
+      });
+    ConfigurationVariableActions.getConfigurations.promise(promise);
   },
 
   delete(configurationVariable) {

@@ -1,23 +1,23 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Alert, Button, Table, Modal } from 'react-bootstrap';
 import { Spinner } from 'components/common';
+import { BootstrapModalConfirm } from 'components/bootstrap';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CombinedProvider from 'injection/CombinedProvider';
 import EditConfigurationVariableModal from './EditConfigurationVariableModal';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
-import DeleteConfirmButton from './DeleteConfirmButton';
 
 const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
 
 class ConfigurationVariablesHelper extends React.Component {
   state = {
     configurationVariables: [],
+    errorModalContent: {},
   };
 
   componentDidMount() {
     this._reloadConfiguration();
   }
-
-  rightAlignStyle = { textAlign: 'right' };
 
   _reloadConfiguration = () => {
     ConfigurationVariableActions.all()
@@ -31,20 +31,54 @@ class ConfigurationVariablesHelper extends React.Component {
     return idName + idIndex;
   };
 
+  _renderConfigList = (configurations) => {
+    return (<ul className={ConfigurationHelperStyle.ulStyle}>
+      {configurations.map(conf => <li key={conf.id}><a href={conf.id}>{conf.name}</a></li>)}
+    </ul>);
+  };
+
   _configurationVariableListFormatter = () => {
     const variableRows = [];
-    Object.values(this.state.configurationVariables).forEach((configurationVar) => {
-      const escapedName = `\${${configurationVar.name}}`;
+
+    Object.values(this.state.configurationVariables).forEach((configVar) => {
+      let deleteConfirmationModal;
+      const _handleDeleteCheck = () => {
+        ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
+          // Variable still in use: Report error
+          if (response.length > 0) {
+            this.setState({ errorModalContent: this._renderConfigList(response) });
+            this.errorModal.open();
+          // Not in use, ask for confirmation
+          } else {
+            deleteConfirmationModal.open();
+          }
+        });
+      };
+
+      const _handleDeleteConfirm = () => {
+        ConfigurationVariableActions.delete(configVar)
+          .then(() => this._onSuccessfulUpdate());
+      };
+
+      const escapedName = `\${${configVar.name}}`;
       variableRows.push(
-        <tr key={this._getId(configurationVar.id)}>
+        <tr key={this._getId(configVar.id)}>
           <td><code>{escapedName}</code></td>
-          <td>{configurationVar.description}</td>
-          <td style={this.rightAlignStyle}>
-            <DeleteConfirmButton entity={configurationVar} type="Variable" onClick={this._deleteConfigurationVariable} />
-            <EditConfigurationVariableModal id={configurationVar.id}
-                                            name={configurationVar.name}
-                                            description={configurationVar.description}
-                                            content={configurationVar.content}
+          <td>{configVar.description}</td>
+          <td style={{ textAlign: 'right' }}>
+            <BootstrapModalConfirm ref={(c) => { deleteConfirmationModal = c; }}
+                                   title="Delete Configuration Variable?"
+                                   onConfirm={_handleDeleteConfirm}
+                                   onCancel={() => {}}>
+              <p>Are you sure you want to remove the configuration variable <strong>{configVar.name}</strong>?</p>
+            </BootstrapModalConfirm>
+            <Button bsStyle="primary" bsSize="xsmall" onClick={_handleDeleteCheck}>
+              Delete
+            </Button>
+            <EditConfigurationVariableModal id={configVar.id}
+                                            name={configVar.name}
+                                            description={configVar.description}
+                                            content={configVar.content}
                                             create={false}
                                             saveConfigurationVariable={this._saveConfigurationVariable} />
           </td>
@@ -56,11 +90,6 @@ class ConfigurationVariablesHelper extends React.Component {
 
   _isLoading = () => {
     return !(this.state.configurationVariables);
-  };
-
-  _deleteConfigurationVariable = (configurationVariable, callback) => {
-    ConfigurationVariableActions.delete.triggerPromise(configurationVariable)
-      .then(() => this._onSuccessfulUpdate(callback));
   };
 
   _saveConfigurationVariable = (configurationVariable, callback) => {
@@ -93,11 +122,24 @@ class ConfigurationVariablesHelper extends React.Component {
               <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th style={this.rightAlignStyle}>Actions</th>
+                <th style={{ textAlign: 'right' }} >Actions</th>
               </tr>
             </thead>
             <tbody>
               {this._configurationVariableListFormatter()}
+              <BootstrapModalWrapper ref={(modal) => { this.errorModal = modal; }}>
+                <Modal.Body>
+                  <Alert bsStyle="warning">
+                    <h4>Cannot delete this configuration variable. <br /> It is still used in the following configurations:</h4>
+                    <p>
+                      {this.state.errorModalContent}
+                    </p>
+                  </Alert>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button onClick={() => { this.errorModal.close(); }}>Close</Button>
+                </Modal.Footer>
+              </BootstrapModalWrapper>
             </tbody>
           </Table>
         </div>

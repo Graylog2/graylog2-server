@@ -19,18 +19,22 @@ package org.graylog.plugins.sidecar.rest.resources;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
+import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
-import org.graylog.plugins.sidecar.services.EtagService;
+import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
+import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -47,6 +51,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Api(value = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables")
 @Path("/sidecar/configuration_variables")
@@ -55,14 +60,15 @@ import java.util.List;
 @RequiresAuthentication
 public class ConfigurationVariableResource extends RestResource implements PluginRestResource {
     private final ConfigurationVariableService configurationVariableService;
+    private final ConfigurationService configurationService;
     private final EtagService etagService;
 
     @Inject
-    public ConfigurationVariableResource(ConfigurationVariableService configurationVariableService, EtagService etagService) {
+    public ConfigurationVariableResource(ConfigurationVariableService configurationVariableService, ConfigurationService configurationService, EtagService etagService) {
         this.configurationVariableService = configurationVariableService;
+        this.configurationService = configurationService;
         this.etagService = etagService;
     }
-
 
     @GET
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
@@ -74,14 +80,36 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         return configurationVariables;
     }
 
+    @GET
+    @Path("/{id}/configurations")
+    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Show configurations using this variable")
+    public List<Configuration> getConfigurationVariablesConfigurations(@ApiParam(name = "id", required = true)
+                                                                       @PathParam("id") String id) {
+        final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
+        if (configurationVariable == null) {
+            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
+        }
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote("${" + configurationVariable.name() +"}")));
+        final List<Configuration> configurations = this.configurationService.findByQuery(query);
+
+        return configurations;
+    }
+
     @POST
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create new configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
-    public ConfigurationVariable createConfigurationVariable(@ApiParam(name = "JSON body", required = true)
+    public Response createConfigurationVariable(@ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull ConfigurationVariable request) {
-        return persistConfigurationVariable(null, request);
+        ValidationResult validationResult = validateConfigurationVariableHelper(request);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+        final ConfigurationVariable configurationVariable = persistConfigurationVariable(null, request);
+        return Response.ok().entity(configurationVariable).build();
     }
 
     @PUT
@@ -145,7 +173,13 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         } else if (!confVar.name().matches("^[A-Za-z0-9_]+$")) {
             validationResult.addError("name", "Variable name can only contain the following characters: A-Z,a-z,0-9,_.");
         }
-        final ConfigurationVariable dupVar = confVar.id().isEmpty() ? configurationVariableService.findByName(confVar.name()) : configurationVariableService.findByNameExcludeId(confVar.name(), confVar.id());
+
+        final ConfigurationVariable dupVar;
+        if (StringUtils.isBlank(confVar.id())) {
+            dupVar = configurationVariableService.findByName(confVar.name());
+        } else {
+            dupVar = configurationVariableService.findByNameExcludeId(confVar.name(), confVar.id());
+        }
         if (dupVar != null) {
             validationResult.addError("name", "A variable with that name already exists.");
         }
