@@ -63,10 +63,10 @@ public abstract class IndexStatistics {
         final long getTotalTimeSeconds = get.path("total_time_in_millis").asLong() / 1000L;
 
         final JsonNode indexing = stats.path("indexing");
-        final long indexingTotal = indexing.path("total").asLong();
-        final long indexingTotalTimeSeconds = indexing.path("total_time_in_millis").asLong() / 1000L;
+        final long indexingTotal = indexing.path("index_total").asLong();
+        final long indexingTotalTimeSeconds = indexing.path("index_time_in_millis").asLong() / 1000L;
 
-        final JsonNode merge = stats.path("merge");
+        final JsonNode merge = stats.path("merges");
         final long mergeTotal = merge.path("total").asLong();
         final long mergeTotalTimeSeconds = merge.path("total_time_in_millis").asLong() / 1000L;
 
