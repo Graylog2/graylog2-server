@@ -1,4 +1,5 @@
 import React from 'react';
+import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
 import 'brace';
@@ -134,7 +135,7 @@ class SourceCodeEditor extends React.Component {
   render() {
     const { height, width } = this.state;
     const { theme, resizable } = this.props;
-    const validCssWidth = Number.isNaN(width) ? '100%' : width;
+    const validCssWidth = lodash.isFinite(width) ? width : '100%';
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
     const overlay = <Tooltip id={'paste-button-tooltip'}>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
     return (
