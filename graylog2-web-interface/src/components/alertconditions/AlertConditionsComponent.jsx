@@ -11,6 +11,7 @@ import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 

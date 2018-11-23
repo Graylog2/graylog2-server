@@ -4,7 +4,7 @@ import naturalSort from 'javascript-natural-sort';
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Pluralize, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
 import CombinedProvider from 'injection/CombinedProvider';

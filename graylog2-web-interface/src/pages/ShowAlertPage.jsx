@@ -13,11 +13,11 @@ import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import style from './ShowAlertPage.css';
+
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
-
-import style from './ShowAlertPage.css';
 
 const ShowAlertPage = createReactClass({
   displayName: 'ShowAlertPage',
@@ -134,7 +134,9 @@ const ShowAlertPage = createReactClass({
                 <LinkContainer to={Routes.ALERTS.LIST}>
                   <Button bsStyle="info" className="active">Alerts</Button>
                 </LinkContainer>
-                <OverlayElement overlay={conditionDetailsTooltip} placement="top" useOverlay={!condition.id}
+                <OverlayElement overlay={conditionDetailsTooltip}
+                                placement="top"
+                                useOverlay={!condition.id}
                                 trigger={['hover', 'focus']}>
                   <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)} disabled={!condition.id}>
                     <Button bsStyle="info">Condition details</Button>

@@ -7,6 +7,7 @@ import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 
 const AlertConditionForm = createReactClass({
@@ -23,10 +24,9 @@ const AlertConditionForm = createReactClass({
 
   getDefaultProps() {
     return {
-      onCancel: () => {
-      },
-      onSubmit: () => {
-      },
+      alertCondition: undefined,
+      onCancel: () => {},
+      onSubmit: () => {},
     };
   },
 

@@ -2,11 +2,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import { Link } from 'react-router';
 
 import { Alert } from 'components/alerts';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
-import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
@@ -30,7 +28,7 @@ const StreamAlerts = createReactClass({
 
   componentDidMount() {
     this.loadData(this.currentPage, this.pageSize);
-    this.interval = setInterval(() => this.fetchData(this.currentPage, this.pageSize), ALERTS_REFRESH_INTERVAL)
+    this.interval = setInterval(() => this.fetchData(this.currentPage, this.pageSize), ALERTS_REFRESH_INTERVAL);
   },
 
   componentWillUnmount() {
