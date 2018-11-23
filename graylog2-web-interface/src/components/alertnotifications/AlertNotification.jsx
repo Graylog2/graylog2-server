@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -92,7 +92,7 @@ const AlertNotification = React.createClass({
 
     const actions = stream && (
       <IfPermitted permissions={`streams:edit:${stream.id}`}>
-        <React.Fragment>
+        <ButtonToolbar>
           <Button key="test-button"
                   bsStyle="info"
                   disabled={this.state.isTestingAlert}
@@ -112,7 +112,7 @@ const AlertNotification = React.createClass({
             <MenuItem divider />
             <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
           </DropdownButton>
-        </React.Fragment>
+        </ButtonToolbar>
       </IfPermitted>
     );
 
