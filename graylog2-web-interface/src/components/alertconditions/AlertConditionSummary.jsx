@@ -13,18 +13,23 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 class AlertConditionSummary extends React.Component {
   static propTypes = {
     alertCondition: PropTypes.object.isRequired,
-    typeDefinition: PropTypes.object.isRequired,
+    conditionType: PropTypes.object.isRequired,
     stream: PropTypes.object,
     actions: PropTypes.array.isRequired,
-    linkToDetails: PropTypes.bool,
+    isDetailsView: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    stream: undefined,
+    isDetailsView: false,
   };
 
   render() {
     const stream = this.props.stream;
     const condition = this.props.alertCondition;
-    const typeDefinition = this.props.typeDefinition;
-    const conditionType = PluginStore.exports('alertConditions').find(c => c.type === condition.type) || {};
-    const SummaryComponent = conditionType.summaryComponent || GenericAlertConditionSummary;
+    const conditionType = this.props.conditionType;
+    const conditionPlugin = PluginStore.exports('alertConditions').find(c => c.type === condition.type) || {};
+    const SummaryComponent = conditionPlugin.summaryComponent || GenericAlertConditionSummary;
 
     const description = (stream ?
       <span>Alerting on stream <em>{stream.title}</em></span> : 'Not alerting on any stream');
@@ -36,20 +41,20 @@ class AlertConditionSummary extends React.Component {
     );
 
     let title;
-    if (this.props.linkToDetails) {
+    if (this.props.isDetailsView) {
+      title = (condition.title ? condition.title : 'Untitled');
+    } else {
       title = (
         <Link to={Routes.show_alert_condition(stream.id, condition.id)}>
           {condition.title ? condition.title : 'Untitled'}
         </Link>
       );
-    } else {
-      title = (condition.title ? condition.title : 'Untitled');
     }
 
     return (
       <EntityListItem key={`entry-list-${condition.id}`}
                       title={title}
-                      titleSuffix={`(${typeDefinition.name})`}
+                      titleSuffix={`(${conditionType.name})`}
                       description={description}
                       actions={this.props.actions}
                       contentRow={content} />

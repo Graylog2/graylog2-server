@@ -1,5 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
@@ -8,15 +9,20 @@ import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertNotificationInput } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const NewAlertNotificationPage = createReactClass({
   displayName: 'NewAlertNotificationPage',
+  propTypes: {
+    location: PropTypes.object.isRequired,
+  },
   mixins: [Reflux.connect(CurrentUserStore)],
 
   render() {
+    const streamId = this.props.location.query.stream_id;
+
     return (
       <DocumentTitle title="New alert notification">
         <div>
@@ -36,7 +42,7 @@ const NewAlertNotificationPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <CreateAlertNotificationInput />
+              <CreateAlertNotificationInput initialSelectedStream={streamId} />
             </Col>
           </Row>
         </div>

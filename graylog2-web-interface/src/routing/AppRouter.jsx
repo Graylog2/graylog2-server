@@ -79,6 +79,7 @@ import {
   SidecarsPage,
   SidecarConfigurationPage,
   SidecarNewConfigurationPage,
+  StreamAlertsOverviewPage,
 } from 'pages';
 
 const AppRouter = () => {
@@ -104,6 +105,7 @@ const AppRouter = () => {
             <Route path={Routes.STREAMS} component={StreamsPage} />
             <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
+            <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
             <Route path={Routes.ALERTS.LIST} component={AlertsPage} />
             <Route path={Routes.ALERTS.CONDITIONS} component={AlertConditionsPage} />
             <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />

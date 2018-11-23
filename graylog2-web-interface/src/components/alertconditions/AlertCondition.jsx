@@ -3,37 +3,61 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import CombinedProvider from 'injection/CombinedProvider';
-const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-import { AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
+import { AlertConditionForm, AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
+import CombinedProvider from 'injection/CombinedProvider';
+import Routes from 'routing/Routes';
+
+const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const AlertCondition = createReactClass({
   displayName: 'AlertCondition',
 
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
-    stream: PropTypes.object,
+    conditionType: PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
+    isDetailsView: PropTypes.bool,
+    isStreamView: PropTypes.bool,
+    onUpdate: PropTypes.func,
+    onDelete: PropTypes.func,
+  },
+  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  getDefaultProps() {
+    return {
+      isDetailsView: false,
+      isStreamView: false,
+      onUpdate: () => {},
+      onDelete: () => {},
+    };
   },
 
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  _onEdit() {
+    this.updateForm.open();
+  },
+
+  _onUpdate(request) {
+    AlertConditionsActions.update(this.props.stream.id, this.props.alertCondition.id, request)
+      .then(() => this.props.onUpdate(this.props.stream.id, this.props.alertCondition.id));
+  },
 
   _onDelete() {
     if (window.confirm('Really delete alert condition?')) {
-      AlertConditionsActions.delete(this.props.stream.id, this.props.alertCondition.id);
+      AlertConditionsActions.delete(this.props.stream.id, this.props.alertCondition.id)
+        .then(() => this.props.onDelete(this.props.stream.id, this.props.alertCondition.id));
     }
   },
 
   render() {
-    const type = this.props.alertCondition.type;
     const stream = this.props.stream;
     const condition = this.props.alertCondition;
-    const typeDefinition = this.state.types[type];
+    const conditionType = this.props.conditionType;
 
-    if (!typeDefinition) {
+    if (!conditionType) {
       return <UnknownAlertCondition alertCondition={condition} onDelete={this._onDelete} stream={stream} />;
     }
 
@@ -41,16 +65,34 @@ const AlertCondition = createReactClass({
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
-        <DropdownButton key="more-actions-button" title="Actions" pullRight
+        <DropdownButton key="more-actions-button"
+                        title="Actions"
+                        pullRight
                         id={`more-actions-dropdown-${condition.id}`}>
+          {!this.props.isStreamView && (
+            <LinkContainer to={Routes.stream_alerts(stream.id)}>
+              <MenuItem>Alerting overview for Stream</MenuItem>
+            </LinkContainer>
+          )}
+          <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
+          <MenuItem divider />
           <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
         </DropdownButton>,
       ];
     }
 
     return (
-      <AlertConditionSummary alertCondition={condition} typeDefinition={typeDefinition} stream={stream}
-                             actions={actions} linkToDetails />
+      <React.Fragment>
+        <AlertConditionForm ref={(updateForm) => { this.updateForm = updateForm; }}
+                            conditionType={conditionType}
+                            alertCondition={condition}
+                            onSubmit={this._onUpdate} />
+        <AlertConditionSummary alertCondition={condition}
+                               conditionType={conditionType}
+                               stream={stream}
+                               actions={actions}
+                               isDetailsView={this.props.isDetailsView} />
+      </React.Fragment>
     );
   },
 });

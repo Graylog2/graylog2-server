@@ -3,8 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Alert } from 'react-bootstrap';
 
-import Stream from './Stream';
 import PermissionsMixin from 'util/PermissionsMixin';
+import Stream from './Stream';
 
 const StreamList = createReactClass({
   displayName: 'StreamList',
@@ -15,7 +15,6 @@ const StreamList = createReactClass({
     indexSets: PropTypes.array.isRequired,
     user: PropTypes.object.isRequired,
     permissions: PropTypes.array.isRequired,
-    onStreamSave: PropTypes.func.isRequired,
   },
 
   mixins: [PermissionsMixin],
@@ -26,8 +25,12 @@ const StreamList = createReactClass({
 
   _formatStream(stream) {
     return (
-      <Stream key={`stream-${stream.id}`} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
-                   permissions={this.props.permissions} user={this.props.user} indexSets={this.props.indexSets} />
+      <Stream key={`stream-${stream.id}`}
+              stream={stream}
+              streamRuleTypes={this.props.streamRuleTypes}
+              permissions={this.props.permissions}
+              user={this.props.user}
+              indexSets={this.props.indexSets} />
     );
   },
 
@@ -48,7 +51,7 @@ const StreamList = createReactClass({
     return (
       <Alert bsStyle="info">
         <i className="fa fa-info-circle" />&nbsp;No streams match your search filter.
-        </Alert>
+      </Alert>
     );
   },
 });

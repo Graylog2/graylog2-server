@@ -22,6 +22,7 @@ import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -149,13 +150,23 @@ public class StreamAlertResource extends RestResource {
                                           @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
                                           @QueryParam("skip") @DefaultValue("0") int skip,
                                           @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                          @QueryParam("limit") @DefaultValue("300") int limit) throws NotFoundException {
+                                          @QueryParam("limit") @DefaultValue("300") int limit,
+                                          @ApiParam(name = "state", value = "Alert state (resolved/unresolved)")
+                                          @QueryParam("state") String state) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        final Stream stream = streamService.load(streamId);
-        final List<AlertSummary> conditions = toSummaryList(alertService.listForStreamId(stream.getId(), skip, limit));
+        Alert.AlertState alertState;
+        try {
+            alertState = Alert.AlertState.fromString(state);
+        } catch (IllegalArgumentException e) {
+            alertState = Alert.AlertState.ANY;
+        }
 
-        return AlertListSummary.create(alertService.totalCountForStream(streamId), conditions);
+        final Stream stream = streamService.load(streamId);
+        final List<String> streamIdList = Lists.newArrayList(stream.getId());
+        final List<AlertSummary> conditions = toSummaryList(alertService.listForStreamIds(streamIdList, alertState, skip, limit));
+
+        return AlertListSummary.create(alertService.totalCountForStreams(streamIdList, alertState), conditions);
     }
 
     @GET
