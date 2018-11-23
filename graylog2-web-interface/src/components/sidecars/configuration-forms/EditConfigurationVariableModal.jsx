@@ -63,6 +63,10 @@ class EditConfigurationVariableModal extends React.Component {
     });
   };
 
+  _debouncedValidate = lodash.debounce(() => {
+    this._validate();
+  }, 200);
+
   _save = () => {
     const configuration = this.state;
 
@@ -72,7 +76,7 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _changeName = (event) => {
-    this.setState({ name: event.target.value }, () => this._validate());
+    this.setState({ name: event.target.value }, () => this._debouncedValidate());
   };
 
   _changeDescription = (event) => {
