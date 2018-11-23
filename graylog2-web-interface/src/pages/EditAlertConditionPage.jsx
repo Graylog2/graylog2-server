@@ -1,22 +1,27 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { ConditionAlertNotifications, EditAlertConditionForm } from 'components/alertconditions';
+import { AlertsHeaderToolbar } from 'components/alerts';
+import { EditAlertConditionForm } from 'components/alertconditions';
+import { StreamAlertNotifications } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-
+import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
-const EditAlertConditionPage = React.createClass({
+const EditAlertConditionPage = createReactClass({
+  displayName: 'EditAlertConditionPage',
+
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -35,10 +40,19 @@ const EditAlertConditionPage = React.createClass({
     });
 
     AlertConditionsActions.get(this.props.params.streamId, this.props.params.conditionId);
+    AlertConditionsActions.available();
+  },
+
+  _handleUpdate(streamId, conditionId) {
+    AlertConditionsActions.get(streamId, conditionId);
+  },
+
+  _handleDelete() {
+    history.push(Routes.ALERTS.CONDITIONS);
   },
 
   _isLoading() {
-    return !this.state.stream || !this.state.alertCondition;
+    return !this.state.stream || !this.state.alertCondition || !this.state.availableConditions;
   },
 
   render() {
@@ -47,6 +61,7 @@ const EditAlertConditionPage = React.createClass({
     }
 
     const condition = this.state.alertCondition;
+    const conditionType = this.state.availableConditions[condition.type];
     const stream = this.state.stream;
 
     return (
@@ -64,25 +79,23 @@ const EditAlertConditionPage = React.createClass({
             </span>
 
             <span>
-              <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-                <Button bsStyle="info">Manage conditions</Button>
-              </LinkContainer>
-              &nbsp;
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
-                <Button bsStyle="info">Manage notifications</Button>
-              </LinkContainer>
+              <AlertsHeaderToolbar active={Routes.ALERTS.CONDITIONS} />
             </span>
           </PageHeader>
 
           <Row className="content">
             <Col md={12}>
-              <EditAlertConditionForm alertCondition={condition} stream={stream} />
+              <EditAlertConditionForm alertCondition={condition}
+                                      conditionType={conditionType}
+                                      stream={stream}
+                                      onUpdate={this._handleUpdate}
+                                      onDelete={this._handleDelete} />
             </Col>
           </Row>
 
           <Row className="content">
             <Col md={12}>
-              <ConditionAlertNotifications alertCondition={condition} stream={stream} />
+              <StreamAlertNotifications stream={stream} />
             </Col>
           </Row>
         </div>

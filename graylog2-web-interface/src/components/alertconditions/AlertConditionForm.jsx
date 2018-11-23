@@ -6,23 +6,23 @@ import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 
 const AlertConditionForm = React.createClass({
   propTypes: {
     alertCondition: PropTypes.object,
+    conditionType: PropTypes.object.isRequired,
     onCancel: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
-    type: PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(AlertConditionsStore)],
 
   getDefaultProps() {
     return {
-      onCancel: () => {
-      },
-      onSubmit: () => {
-      },
+      alertCondition: undefined,
+      onCancel: () => {},
+      onSubmit: () => {},
     };
   },
 
@@ -30,7 +30,7 @@ const AlertConditionForm = React.createClass({
     const values = this.refs.configurationForm.getValue();
     return {
       title: values.title,
-      type: this.props.type,
+      type: this.props.conditionType.type,
       parameters: values.configuration,
     };
   },
@@ -51,24 +51,23 @@ const AlertConditionForm = React.createClass({
   },
 
   render() {
-    const type = this.props.type;
     const alertCondition = this.props.alertCondition;
-    const typeDefinition = this.state.types[type];
+    const conditionType = this.props.conditionType;
 
     return (
       <ConfigurationForm ref="configurationForm"
                          key="configuration-form-alert-condition"
-                         configFields={typeDefinition.requested_configuration}
-                         title={this._formatTitle(alertCondition, typeDefinition.name)}
-                         typeName={type}
+                         configFields={conditionType.requested_configuration}
+                         title={this._formatTitle(alertCondition, conditionType.name)}
+                         typeName={conditionType.name}
                          submitAction={this._onSubmit}
                          cancelAction={this._onCancel}
                          titleValue={alertCondition ? alertCondition.title : ''}
                          helpBlock="The alert condition title"
                          values={alertCondition ? alertCondition.parameters : {}}>
         <FormGroup>
-          <ControlLabel>{`${typeDefinition.name} description`}</ControlLabel>
-          <FormControl.Static>{typeDefinition.human_name}</FormControl.Static>
+          <ControlLabel>{`${conditionType.name} description`}</ControlLabel>
+          <FormControl.Static>{conditionType.human_name}</FormControl.Static>
         </FormGroup>
       </ConfigurationForm>
     );

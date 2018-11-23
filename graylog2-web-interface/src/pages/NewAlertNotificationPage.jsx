@@ -1,19 +1,28 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
+import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertNotificationInput } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const NewAlertNotificationPage = React.createClass({
+const NewAlertNotificationPage = createReactClass({
+  displayName: 'NewAlertNotificationPage',
+  propTypes: {
+    location: PropTypes.object.isRequired,
+  },
   mixins: [Reflux.connect(CurrentUserStore)],
+
   render() {
+    const streamId = this.props.location.query.stream_id;
+
     return (
       <DocumentTitle title="New alert notification">
         <div>
@@ -27,19 +36,13 @@ const NewAlertNotificationPage = React.createClass({
             </span>
 
             <span>
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
-                <Button bsStyle="info">Manage notifications</Button>
-              </LinkContainer>
-              &nbsp;
-              <Button bsStyle="info" href="https://marketplace.graylog.org/" target="_blank">
-                <i className="fa fa-external-link" />&nbsp; Find more notifications
-              </Button>
+              <AlertsHeaderToolbar active={Routes.ALERTS.NOTIFICATIONS} />
             </span>
           </PageHeader>
 
           <Row className="content">
             <Col md={12}>
-              <CreateAlertNotificationInput />
+              <CreateAlertNotificationInput initialSelectedStream={streamId} />
             </Col>
           </Row>
         </div>

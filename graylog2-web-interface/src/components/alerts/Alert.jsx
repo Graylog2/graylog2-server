@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Label } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { EntityListItem, Timestamp } from 'components/common';
 
@@ -10,33 +10,32 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import styles from './Alert.css';
 
-const Alert = React.createClass({
-  propTypes: {
+class Alert extends React.Component {
+  static propTypes = {
     alert: PropTypes.object.isRequired,
-    alertConditions: PropTypes.array.isRequired,
-    streams: PropTypes.array.isRequired,
-    conditionTypes: PropTypes.object.isRequired,
-  },
+    alertCondition: PropTypes.object,
+    stream: PropTypes.object.isRequired,
+    conditionType: PropTypes.object.isRequired,
+  };
 
-  getInitialState() {
-    return {
-      showAlarmCallbackHistory: false,
-    };
-  },
+  static defaultProps = {
+    alertCondition: {},
+  };
+
+  state = {
+    showAlarmCallbackHistory: false,
+  };
 
   render() {
-    const alert = this.props.alert;
-    const condition = this.props.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
-    const stream = this.props.streams.find(s => s.id === alert.stream_id);
-    const conditionType = condition ? this.props.conditionTypes[condition.type] : {};
+    const { alert, alertCondition, stream, conditionType } = this.props;
 
     let alertTitle;
-    if (condition) {
+    if (alertCondition) {
       alertTitle = (
         <span>
-          <LinkContainer to={Routes.show_alert(alert.id)}>
-            <a>{condition.title || 'Untitled alert'}</a>
-          </LinkContainer>
+          <Link to={Routes.show_alert(alert.id)}>
+            {alertCondition.title || 'Untitled alert'}
+          </Link>
           {' '}
           <small>on stream <em>{stream.title}</em></small>
         </span>
@@ -44,7 +43,7 @@ const Alert = React.createClass({
     } else {
       alertTitle = (
         <span>
-          <LinkContainer to={Routes.show_alert(alert.id)}><a>Unknown alert</a></LinkContainer>
+          <Link to={Routes.show_alert(alert.id)}>Unknown alert</Link>
         </span>
       );
     }
@@ -92,7 +91,7 @@ const Alert = React.createClass({
                       description={alertTime}
                       contentRow={content} />
     );
-  },
-});
+  }
+}
 
 export default Alert;

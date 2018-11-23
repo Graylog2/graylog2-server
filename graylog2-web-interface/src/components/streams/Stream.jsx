@@ -1,25 +1,31 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
+import { Button, Tooltip } from 'react-bootstrap';
+import { Link } from 'react-router';
+import { LinkContainer } from 'react-router-bootstrap';
+
+import { OverlayElement, Pluralize } from 'components/common';
+import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
+import StreamRuleForm from 'components/streamrules/StreamRuleForm';
+
+import PermissionsMixin from 'util/PermissionsMixin';
+import UserNotification from 'util/UserNotification';
+import StoreProvider from 'injection/StoreProvider';
+import Routes from 'routing/Routes';
+
 import StreamThroughput from './StreamThroughput';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
-import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
-import PermissionsMixin from 'util/PermissionsMixin';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
-
-import StreamRuleForm from 'components/streamrules/StreamRuleForm';
-import { OverlayElement, Pluralize } from 'components/common';
-import UserNotification from 'util/UserNotification';
-import { Button, Tooltip } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import Routes from 'routing/Routes';
 
 import style from './Stream.css';
 
-const Stream = React.createClass({
+const StreamsStore = StoreProvider.getStore('Streams');
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
+
+const Stream = createReactClass({
+  displayName: 'Stream',
+
   propTypes() {
     return {
       stream: PropTypes.object.isRequired,
@@ -29,6 +35,7 @@ const Stream = React.createClass({
       indexSets: PropTypes.array.isRequired,
     };
   },
+
   mixins: [PermissionsMixin],
 
   getInitialState() {
@@ -59,6 +66,7 @@ const Stream = React.createClass({
       </span>
     );
   },
+
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
@@ -67,23 +75,27 @@ const Stream = React.createClass({
       });
     }
   },
+
   _onResume() {
     this.setState({ loading: true });
     StreamsStore.resume(this.props.stream.id, response => response)
       .finally(() => this.setState({ loading: false }));
   },
+
   _onUpdate(streamId, stream) {
     StreamsStore.update(streamId, stream, (response) => {
       UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
       return response;
     });
   },
+
   _onClone(streamId, stream) {
     StreamsStore.cloneStream(streamId, stream, (response) => {
       UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
       return response;
     });
   },
+
   _onPause() {
     if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
       this.setState({ loading: true });
@@ -91,12 +103,15 @@ const Stream = React.createClass({
         .finally(() => this.setState({ loading: false }));
     }
   },
+
   _onQuickAdd() {
-    this.refs.quickAddStreamRuleForm.open();
+    this.quickAddStreamRuleForm.open();
   },
+
   _onSaveStreamRule(streamRuleId, streamRule) {
     StreamRulesStore.create(this.props.stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
   },
+
   render() {
     const stream = this.props.stream;
     const permissions = this.props.permissions;
@@ -117,6 +132,12 @@ const Stream = React.createClass({
         </OverlayElement>
       );
 
+      manageAlertsLink = (
+        <LinkContainer to={Routes.stream_alerts(stream.id)}>
+          <Button bsStyle="info">Manage Alerts</Button>
+        </LinkContainer>
+      );
+
       if (this.isPermitted(permissions, ['stream_outputs:read'])) {
         manageOutputsLink = (
           <LinkContainer to={Routes.stream_outputs(stream.id)}>
@@ -131,7 +152,9 @@ const Stream = React.createClass({
       if (stream.disabled) {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume}
+            <Button bsStyle="success"
+                    className="toggle-stream-button"
+                    onClick={this._onResume}
                     disabled={isDefaultStream || this.state.loading}>
               {this.state.loading ? 'Starting...' : 'Start Stream'}
             </Button>
@@ -140,7 +163,9 @@ const Stream = React.createClass({
       } else {
         toggleStreamLink = (
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-            <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause}
+            <Button bsStyle="primary"
+                    className="toggle-stream-button"
+                    onClick={this._onPause}
                     disabled={isDefaultStream || this.state.loading}>
               {this.state.loading ? 'Pausing...' : 'Pause Stream'}
             </Button>
@@ -153,15 +178,17 @@ const Stream = React.createClass({
       <i className="fa fa-cube" title="Created from content pack" /> : null);
 
     const streamRuleList = isDefaultStream ? null :
-                           (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
-                                 stream={stream}
-                                 streamRuleTypes={this.props.streamRuleTypes}
-                                 permissions={this.props.permissions} />);
+      (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
+                                  stream={stream}
+                                  streamRuleTypes={this.props.streamRuleTypes}
+                                  permissions={this.props.permissions} />);
     const streamControls = (
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
-        <StreamControls stream={stream} permissions={this.props.permissions}
+        <StreamControls stream={stream}
+                        permissions={this.props.permissions}
                         user={this.props.user}
-                        onDelete={this._onDelete} onUpdate={this._onUpdate}
+                        onDelete={this._onDelete}
+                        onUpdate={this._onUpdate}
                         onClone={this._onClone}
                         onQuickAdd={this._onQuickAdd}
                         indexSets={this.props.indexSets}
@@ -184,9 +211,7 @@ const Stream = React.createClass({
         </div>
 
         <h2 className={style.streamTitle}>
-          <LinkContainer to={Routes.stream_search(stream.id)}>
-            <a>{stream.title}</a>
-          </LinkContainer>
+          <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
           {' '}
           <small>{indexSetDetails}<StreamStateBadge stream={stream} /></small>
         </h2>
@@ -202,7 +227,8 @@ const Stream = React.createClass({
             {streamRuleList}
           </div>
         </div>
-        <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule"
+        <StreamRuleForm ref={(quickAddStreamRuleForm) => { this.quickAddStreamRuleForm = quickAddStreamRuleForm; }}
+                        title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
                         streamRuleTypes={this.props.streamRuleTypes} />
       </li>

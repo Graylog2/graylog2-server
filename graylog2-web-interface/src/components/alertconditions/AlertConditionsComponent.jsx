@@ -10,6 +10,7 @@ import { AlertConditionsList } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
@@ -32,10 +33,11 @@ const AlertConditionsComponent = React.createClass({
     });
 
     AlertConditionsActions.listAll();
+    AlertConditionsActions.available();
   },
 
   _isLoading() {
-    return !this.state.streams || !this.state.allAlertConditions;
+    return !this.state.streams || !this.state.allAlertConditions || !this.state.availableConditions;
   },
 
   render() {
@@ -58,7 +60,11 @@ const AlertConditionsComponent = React.createClass({
         </div>
         <h2>Conditions</h2>
         <p>These are all configured alert conditions.</p>
-        <AlertConditionsList alertConditions={alertConditions} streams={this.state.streams} />
+        <AlertConditionsList alertConditions={alertConditions}
+                             availableConditions={this.state.availableConditions}
+                             streams={this.state.streams}
+                             onConditionUpdate={this._loadData}
+                             onConditionDelete={this._loadData} />
       </div>
     );
   },
