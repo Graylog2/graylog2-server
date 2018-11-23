@@ -6,6 +6,8 @@ import 'helpers/mocking/react-dom_mock';
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 
+jest.mock('uuid/v4', () => () => 'dead-beef');
+
 describe('<ContentPackPreview />', () => {
   it('should render with empty content pack', () => {
     const contentPack = ContentPack.builder().build();
