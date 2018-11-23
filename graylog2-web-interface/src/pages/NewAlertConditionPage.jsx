@@ -1,21 +1,30 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
+import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertConditionInput } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const NewAlertConditionPage = React.createClass({
+const NewAlertConditionPage = createReactClass({
+  displayName: 'NewAlertConditionPage',
+  propTypes: {
+    location: PropTypes.object.isRequired,
+  },
   mixins: [Reflux.connect(CurrentUserStore)],
+
   render() {
+    const streamId = this.props.location.query.stream_id;
+
     return (
       <DocumentTitle title="New alert condition">
         <div>
@@ -31,19 +40,13 @@ const NewAlertConditionPage = React.createClass({
             </span>
 
             <span>
-              <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-                <Button bsStyle="info">Manage conditions</Button>
-              </LinkContainer>
-              &nbsp;
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
-                <Button bsStyle="info">Manage notifications</Button>
-              </LinkContainer>
+              <AlertsHeaderToolbar active={Routes.ALERTS.CONDITIONS} />
             </span>
           </PageHeader>
 
           <Row className="content">
             <Col md={12}>
-              <CreateAlertConditionInput />
+              <CreateAlertConditionInput initialSelectedStream={streamId} />
             </Col>
           </Row>
         </div>

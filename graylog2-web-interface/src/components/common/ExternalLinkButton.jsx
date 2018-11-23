@@ -32,7 +32,7 @@ const ExternalLinkButton = React.createClass({
   getDefaultProps() {
     return {
       bsStyle: 'default',
-      bsSize: '',
+      bsSize: undefined,
       target: '_blank',
       iconClass: 'fa-external-link',
       className: '',

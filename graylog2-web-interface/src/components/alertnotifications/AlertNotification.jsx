@@ -1,31 +1,42 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
+import { EntityListItem, IfPermitted, Spinner } from 'components/common';
+import { UnknownAlertNotification } from 'components/alertnotifications';
+import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
+import Routes from 'routing/Routes';
+
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-import { EntityListItem, Spinner } from 'components/common';
-import { UnknownAlertNotification } from 'components/alertnotifications';
-import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
 const AlertNotification = React.createClass({
   propTypes: {
     alertNotification: PropTypes.object.isRequired,
     stream: PropTypes.object,
-    onNotificationUpdate: PropTypes.func,
-    onNotificationDelete: PropTypes.func,
+    onNotificationUpdate: PropTypes.func.isRequired,
+    onNotificationDelete: PropTypes.func.isRequired,
+    isStreamView: PropTypes.bool,
   },
   mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  getDefaultProps() {
+    return {
+      stream: undefined,
+      isStreamView: false,
+    };
+  },
 
   getInitialState() {
     return {
       isTestingAlert: false,
+      isConfigurationShown: false,
     };
   },
 
@@ -41,22 +52,18 @@ const AlertNotification = React.createClass({
 
   _onSubmit(data) {
     AlarmCallbacksActions.update(this.props.alertNotification.stream_id, this.props.alertNotification.id, data)
-      .then(() => {
-        if (typeof this.props.onNotificationUpdate === 'function') {
-          this.props.onNotificationUpdate();
-        }
-      });
+      .then(this.props.onNotificationUpdate);
   },
 
   _onDelete() {
     if (window.confirm('Really delete alert notification?')) {
       AlarmCallbacksActions.delete(this.props.alertNotification.stream_id, this.props.alertNotification.id)
-        .then(() => {
-          if (typeof this.props.onNotificationUpdate === 'function') {
-            this.props.onNotificationUpdate();
-          }
-        });
+        .then(this.props.onNotificationDelete);
     }
+  },
+
+  _toggleIsConfigurationShown() {
+    this.setState({ isConfigurationShown: !this.state.isConfigurationShown });
   },
 
   render() {
@@ -66,27 +73,48 @@ const AlertNotification = React.createClass({
 
     const notification = this.props.alertNotification;
     const stream = this.props.stream;
+    const { isConfigurationShown } = this.state;
     const typeDefinition = this.state.availableNotifications[notification.type];
 
     if (!typeDefinition) {
       return <UnknownAlertNotification alertNotification={notification} onDelete={this._onDelete} />;
     }
 
-    const description = (stream ?
-      <span>Executed once per triggered alert condition in stream <em>{stream.title}</em></span>
-      : 'Not executed, as it is not connected to a stream');
+    const toggleConfigurationLink = (
+      <a href="#toggleconfiguration" onClick={this._toggleIsConfigurationShown}>
+        {isConfigurationShown ? 'Hide' : 'Show'} configuration
+      </a>
+    );
 
-    const actions = this.isPermitted(this.state.currentUser.permissions, [`streams:edit:${stream.id}`]) && [
-      <Button key="test-button" bsStyle="info" disabled={this.state.isTestingAlert} onClick={this._onTestNotification}>
-        {this.state.isTestingAlert ? 'Testing...' : 'Test'}
-      </Button>,
-      <DropdownButton key="more-actions-button" title="More actions" pullRight
-                      id={`more-actions-dropdown-${notification.id}`}>
-        <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
-        <MenuItem divider />
-        <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
-      </DropdownButton>,
-    ];
+    const description = (stream ?
+      <span>Executed once per triggered alert condition in stream <em>{stream.title}</em>. {toggleConfigurationLink}</span> :
+      <span>Not executed, as it is not connected to a stream. {toggleConfigurationLink}</span>);
+
+    const actions = stream && (
+      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+        <ButtonToolbar>
+          <Button key="test-button"
+                  bsStyle="info"
+                  disabled={this.state.isTestingAlert}
+                  onClick={this._onTestNotification}>
+            {this.state.isTestingAlert ? 'Testing...' : 'Test'}
+          </Button>
+          <DropdownButton key="more-actions-button"
+                          title="More actions"
+                          pullRight
+                          id={`more-actions-dropdown-${notification.id}`}>
+            {!this.props.isStreamView && (
+              <LinkContainer to={Routes.stream_alerts(stream.id)}>
+                <MenuItem>Alerting overview for Stream</MenuItem>
+              </LinkContainer>
+            )}
+            <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
+            <MenuItem divider />
+            <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
+          </DropdownButton>
+        </ButtonToolbar>
+      </IfPermitted>
+    );
 
     const content = (
       <Col md={12}>
@@ -99,7 +127,9 @@ const AlertNotification = React.createClass({
                              titleValue={notification.title}
                              submitAction={this._onSubmit}
                              values={notification.configuration} />
-          <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
+          {isConfigurationShown &&
+            <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
+          }
         </div>
       </Col>
     );

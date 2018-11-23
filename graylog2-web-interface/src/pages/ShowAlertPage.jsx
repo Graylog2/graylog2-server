@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Label, Tooltip } from 'react-bootstrap';
+import { Button, ButtonToolbar, Label, Tooltip } from 'react-bootstrap';
 
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
@@ -12,13 +13,15 @@ import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import style from './ShowAlertPage.css';
+
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
-import style from './ShowAlertPage.css';
+const ShowAlertPage = createReactClass({
+  displayName: 'ShowAlertPage',
 
-const ShowAlertPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -61,7 +64,7 @@ const ShowAlertPage = React.createClass({
   },
 
   _isLoading() {
-    return !this.state.alert || !this.state.alertCondition || !this.state.types || !this.state.stream;
+    return !this.state.alert || !this.state.alertCondition || !this.state.availableConditions || !this.state.stream;
   },
 
   render() {
@@ -72,7 +75,7 @@ const ShowAlertPage = React.createClass({
     const alert = this.state.alert;
     const condition = this.state.alertCondition;
     const conditionExists = Object.keys(condition).length > 0;
-    const type = this.state.types[condition.type] || {};
+    const conditionType = this.state.availableConditions[condition.type] || {};
     const stream = this.state.stream;
 
     let statusLabel;
@@ -127,20 +130,23 @@ const ShowAlertPage = React.createClass({
             </span>
 
             <span>
-              <OverlayElement overlay={conditionDetailsTooltip} placement="top" useOverlay={!condition.id}
-                              trigger={['hover', 'focus']}>
-                <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)} disabled={!condition.id}>
-                  <Button bsStyle="info">Condition details</Button>
+              <ButtonToolbar>
+                <LinkContainer to={Routes.ALERTS.LIST}>
+                  <Button bsStyle="info" className="active">Alerts</Button>
                 </LinkContainer>
-              </OverlayElement>
-              &nbsp;
-              <LinkContainer to={Routes.ALERTS.LIST}>
-                <Button bsStyle="info">Alerts overview</Button>
-              </LinkContainer>
+                <OverlayElement overlay={conditionDetailsTooltip}
+                                placement="top"
+                                useOverlay={!condition.id}
+                                trigger={['hover', 'focus']}>
+                  <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)} disabled={!condition.id}>
+                    <Button bsStyle="info">Condition details</Button>
+                  </LinkContainer>
+                </OverlayElement>
+              </ButtonToolbar>
             </span>
           </PageHeader>
 
-          <AlertDetails alert={alert} condition={conditionExists && condition} conditionType={type} stream={stream} />
+          <AlertDetails alert={alert} condition={conditionExists && condition} conditionType={conditionType} stream={stream} />
         </div>
       </DocumentTitle>
     );
