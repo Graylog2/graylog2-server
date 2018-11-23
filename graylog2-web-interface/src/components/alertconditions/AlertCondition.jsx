@@ -71,7 +71,7 @@ const AlertCondition = createReactClass({
                         id={`more-actions-dropdown-${condition.id}`}>
           {!this.props.isStreamView && (
             <LinkContainer to={Routes.stream_alerts(stream.id)}>
-              <MenuItem>Alerts for this Stream</MenuItem>
+              <MenuItem>Alerting overview for Stream</MenuItem>
             </LinkContainer>
           )}
           <MenuItem onSelect={this._onEdit}>Edit</MenuItem>

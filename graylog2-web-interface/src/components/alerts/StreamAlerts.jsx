@@ -78,10 +78,10 @@ const StreamAlerts = createReactClass({
 
     return (
       <div>
-        <h2>Unresolved stream alerts</h2>
+        <h2>Unresolved Alerts</h2>
         <p className="description">
-          These are the currently unresolved alerts for this stream. To see all alerts or alerts on other streams,
-          visit the <Link to={Routes.ALERTS.LIST}>alerts</Link> page.
+          These are the Alerts for this Stream that require your attention. Alerts will be resolved automatically
+          when the Condition that triggered them is no longer satisfied.
         </p>
 
         <PaginatedList totalItems={this.state.alerts.total}

@@ -57,10 +57,8 @@ class StreamAlertNotifications extends React.Component {
           </LinkContainer>
         </div>
         <h2>Notifications</h2>
-        <p>
-          <Pluralize value={notifications.length} singular="This is the notification" plural="These are the notifications" />
-          {' '}set for the stream <em>{stream.title}</em>. <Pluralize value={notifications.length} singular="It" plural="They" />
-          {' '}will be triggered when an alert condition is satisfied.
+        <p className="description">
+          Alert Notifications will be executed when a Condition belonging to this Stream is satisfied.
         </p>
 
         <AlertNotificationsList alertNotifications={notifications}
