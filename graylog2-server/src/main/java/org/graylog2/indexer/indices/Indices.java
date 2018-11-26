@@ -348,7 +348,7 @@ public class Indices {
         return indices.stream().findFirst();
     }
 
-    private void ensureIndexTemplate(IndexSet indexSet) {
+    public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
         final IndexMapping indexMapping = indexMappingFactory.createIndexMapping();
@@ -361,6 +361,19 @@ public class Indices {
         if (jestResult.isSucceeded()) {
             LOG.info("Successfully created index template {}", templateName);
         }
+    }
+
+    /**
+     * Returns the generated Elasticsearch index template for the given index set.
+     *
+     * @param indexSet the index set
+     * @return the generated index template
+     */
+    public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
+        final String indexWildcard = indexSet.getIndexWildcard();
+        final String analyzer = indexSet.getConfig().indexAnalyzer();
+
+        return indexMappingFactory.createIndexMapping().messageTemplate(indexWildcard, analyzer);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
