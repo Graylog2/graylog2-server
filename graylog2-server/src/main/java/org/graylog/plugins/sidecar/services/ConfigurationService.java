@@ -111,7 +111,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         }
     }
 
-    public boolean replaceVariableNames(String oldName, String newName) {
+    public void replaceVariableNames(String oldName, String newName) {
         final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(oldName)));
         List<Configuration> configurations = findByQuery(query);
         for (Configuration config : configurations) {
@@ -119,7 +119,6 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
             db.findAndModify(DBQuery.is("_id", config.id()), new BasicDBObject(),
                     new BasicDBObject(), false, config.toBuilder().template(newTemplate).build(), true, true);
         }
-        return true;
     }
 
     @Override

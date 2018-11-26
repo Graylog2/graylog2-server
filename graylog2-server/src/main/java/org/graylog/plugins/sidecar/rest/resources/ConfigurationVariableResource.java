@@ -52,6 +52,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Api(value = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables")
 @Path("/sidecar/configuration_variables")
@@ -160,6 +161,19 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
     public Response deleteConfigurationVariable(@ApiParam(name = "id", required = true)
                                                    @PathParam("id") String id) {
+        final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
+        if (configurationVariable == null) {
+            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
+        }
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote("${" + configurationVariable.name() +"}")));
+        final List<Configuration> configurations = this.configurationService.findByQuery(query);
+        if (!configurations.isEmpty()) {
+            final ValidationResult validationResult = new ValidationResult();
+            validationResult.addError("name", "Variable is still used in the following configurations: " +
+                    configurations.stream().map(c -> c.name()).collect(Collectors.joining(", ")));
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
         int deleted = configurationVariableService.delete(id);
         if (deleted == 0) {
             return Response.notModified().build();
