@@ -29,6 +29,7 @@ class EditConfigurationVariableModal extends React.Component {
   state = {
     id: this.props.id,
     name: this.props.name,
+    savedName: this.props.name,
     description: this.props.description,
     content: this.props.content,
     errors: {},
@@ -52,6 +53,7 @@ class EditConfigurationVariableModal extends React.Component {
 
   _saved = () => {
     this._closeModal();
+    this.setState({ savedName: this.state.name });
     if (this.props.create) {
       this.setState({ name: '', description: '', type: '', content: '' });
     }

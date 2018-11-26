@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
 import { Col, MenuItem, Nav, Navbar, NavDropdown, Panel, Row, Tab, Tabs } from 'react-bootstrap';
@@ -11,6 +12,10 @@ import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 class ConfigurationHelper extends React.Component {
+  static propTypes = {
+    variableRenameHandler: PropTypes.func.isRequired,
+  };
+
   state = {
     section: undefined,
     paragraph: undefined,
@@ -64,7 +69,7 @@ class ConfigurationHelper extends React.Component {
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
               <Tab eventKey={1} title="Variables">
                 <br />
-                <ConfigurationVariablesHelper />
+                <ConfigurationVariablesHelper variableRenameHandler={this.props.variableRenameHandler} />
               </Tab>
               <Tab eventKey={2} title="Runtime Variables">
                 <br />

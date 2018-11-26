@@ -109,6 +109,15 @@ const ConfigurationForm = createReactClass({
     this.setState({ errors: nextErrors });
   },
 
+  _replaceConfigurationVariableName(oldname, newname) {
+    if (oldname === newname) {
+      return;
+    }
+    // replaceAll without having to use a Regex
+    const updatedTemplate = this.state.formData.template.split(`\${${oldname}}`).join(`\${${newname}}`);
+    this._onTemplateChange(updatedTemplate);
+  },
+
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Button, Table, Modal } from 'react-bootstrap';
 import { Spinner } from 'components/common';
@@ -10,16 +11,20 @@ import ConfigurationHelperStyle from './ConfigurationHelper.css';
 const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
 
 class ConfigurationVariablesHelper extends React.Component {
+  static propTypes = {
+    variableRenameHandler: PropTypes.func.isRequired,
+  };
+
   state = {
     configurationVariables: [],
     errorModalContent: {},
   };
 
   componentDidMount() {
-    this._reloadConfiguration();
+    this._reloadVariables();
   }
 
-  _reloadConfiguration = () => {
+  _reloadVariables = () => {
     ConfigurationVariableActions.all()
       .then((configurationVariables) => {
         this.setState({ configurationVariables: configurationVariables });
@@ -94,14 +99,17 @@ class ConfigurationVariablesHelper extends React.Component {
 
   _saveConfigurationVariable = (configurationVariable, callback) => {
     ConfigurationVariableActions.save.triggerPromise(configurationVariable)
-      .then(() => this._onSuccessfulUpdate(callback));
+      .then(() => this._onSuccessfulUpdate(() => {
+        this.props.variableRenameHandler(configurationVariable.savedName, configurationVariable.name);
+        callback();
+      }));
   };
 
   _onSuccessfulUpdate = (callback) => {
     if (typeof callback === 'function') {
       callback();
     }
-    this._reloadConfiguration();
+    this._reloadVariables();
   };
 
   render() {
