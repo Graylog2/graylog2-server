@@ -127,10 +127,12 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
             throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
         }
 
-        //TODO check against previous use when renaming
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+        if (!previousConfigurationVariable.name().equals(request.name())) {
+            configurationService.replaceVariableNames("${" + previousConfigurationVariable.name() + "}", "${" + request.name() + "}");
         }
         final ConfigurationVariable updatedConfigurationVariable = persistConfigurationVariable(id, request);
         etagService.invalidateAll();
