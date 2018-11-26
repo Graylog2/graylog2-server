@@ -332,7 +332,7 @@ class SearchStore {
         escapedTerm = escapedTerm.replace(/<br>/g, " ");
 
         if (this.isPhrase(escapedTerm)) {
-            escapedTerm = String(escapedTerm).replace(/\"/g, '\\"');
+            escapedTerm = String(escapedTerm).replace(/(\"|\\)/g, '\\$&');
             escapedTerm = '"' + escapedTerm + '"';
         } else {
             // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
