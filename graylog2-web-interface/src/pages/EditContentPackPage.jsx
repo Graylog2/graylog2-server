@@ -14,6 +14,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 import ObjectUtils from 'util/ObjectUtils';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 
+import Entity from 'logic/content-packs/Entity';
+
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
 
@@ -121,7 +123,8 @@ const EditContentPackPage = createReactClass({
         .entities(result.entities)
         .requires(result.constraints)
         .build();
-      this.setState({ contentPack: contentPack, fetchedEntities: result.entities });
+      const fetchedEntities = result.entities.map(e => Entity.of(e));
+      this.setState({ contentPack: contentPack, fetchedEntities });
     });
   },
 

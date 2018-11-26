@@ -1,10 +1,18 @@
 import { Map } from 'immutable';
-import { concat, remove } from 'lodash';
+import { concat, remove, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
+import Entity from './Entity';
 
 export default class ContentPack {
   constructor(v, id, rev, name, summary, description, vendor, url, requires,
-    parameters, entities) {
+    parameters, entitieValues) {
+    const entities = entitieValues.map((e) => {
+      if (e instanceof Entity) {
+        return e;
+      }
+      return Entity.of(e);
+    });
+
     this._value = {
       v,
       id,
@@ -108,6 +116,8 @@ export default class ContentPack {
       parameters,
       entities,
     } = this._value;
+
+    const entitiesJSON = entities.map(e => e.toJSON());
     return {
       v,
       id,
@@ -119,7 +129,7 @@ export default class ContentPack {
       url,
       requires,
       parameters,
-      entities,
+      entities: entitiesJSON,
     };
   }
 

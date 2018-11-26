@@ -40,7 +40,7 @@ class ContentPackEntitiesList extends React.Component {
   }
 
   _filterEntities = (filter, entitiesArg) => {
-    const entities = ObjectUtils.clone(entitiesArg || this.props.contentPack.entities);
+    const entities = entitiesArg || this.props.contentPack.entities;
     if (!filter || filter.length <= 0) {
       this.setState({ filteredEntities: entities, filter: undefined });
       return;
@@ -48,17 +48,9 @@ class ContentPackEntitiesList extends React.Component {
 
     const regexp = RegExp(filter, 'i');
     const filteredEntities = entities.filter((entity) => {
-      return regexp.test(this._entityTitle(entity)) || regexp.test(this._entityDescription(entity));
+      return regexp.test(entity.title) || regexp.test(entity.description);
     });
     this.setState({ filteredEntities: filteredEntities, filter: filter });
-  };
-
-  _entityTitle = (entity) => {
-    return (entity.data.title || entity.data.name || {}).value || '';
-  };
-
-  _entityDescription = (entity) => {
-    return (entity.data.description || {}).value || '';
   };
 
   _entityRowFormatter = (entity) => {
@@ -126,9 +118,9 @@ class ContentPackEntitiesList extends React.Component {
     const appliedParameterCount = (this.props.appliedParameter[entity.id] || []).length;
     return (
       <tr key={entity.id}>
-        <td className={ContentPackEntitiesListStyle.bigColumns}>{this._entityTitle(entity)}</td>
+        <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
-        <td className={ContentPackEntitiesListStyle.bigColumns}>{this._entityDescription(entity)}</td>
+        <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>

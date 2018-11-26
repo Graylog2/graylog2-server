@@ -57,8 +57,8 @@ class ContentPackEdit extends React.Component {
     const typeRegExp = RegExp(/\.type$/);
     const newEntities = this.props.fetchedEntities.map((entity) => {
       const parameters = this.props.appliedParameter[entity.id] || [];
-      const newEntity = ObjectUtils.clone(entity);
-      const entityData = newEntity.data;
+      const newEntityBuilder = entity.toBuilder();
+      const entityData = entity.data;
       const configKeys = ObjectUtils.getPaths(entityData)
         .filter(configKey => typeRegExp.test(configKey))
         .map((configKey) => { return configKey.replace(typeRegExp, ''); });
@@ -72,8 +72,8 @@ class ContentPackEdit extends React.Component {
         }
         ObjectUtils.setValue(entityData, path, newValue);
       });
-      newEntity.data = entityData;
-      return newEntity;
+      newEntityBuilder.data(entityData);
+      return newEntityBuilder.build();
     });
     const newContentPack = this.props.contentPack.toBuilder()
       .entities(newEntities)

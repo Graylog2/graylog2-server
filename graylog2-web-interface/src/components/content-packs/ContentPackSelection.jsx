@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
+import { cloneDeep } from 'lodash';
 
 import { Row, Col, Panel } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
-import ObjectUtils from 'util/ObjectUtils';
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
@@ -29,10 +29,11 @@ class ContentPackSelection extends React.Component {
 
   constructor(props) {
     super(props);
+
     this._bindValue = this._bindValue.bind(this);
     this.state = {
       contentPack: this.props.contentPack,
-      filteredEntities: ObjectUtils.clone(this.props.entities),
+      filteredEntities: cloneDeep(this.props.entities),
       filter: '',
       isFiltered: false,
       errors: {},
@@ -81,7 +82,7 @@ class ContentPackSelection extends React.Component {
 
   _updateSelectionEntity = (entity) => {
     const typeName = entity.type.name;
-    const newSelection = ObjectUtils.clone(this.props.selectedEntities);
+    const newSelection = cloneDeep(this.props.selectedEntities);
     newSelection[typeName] = (newSelection[typeName] || []);
     const index = newSelection[typeName].findIndex((e) => { return e.id === entity.id; });
     if (index < 0) {
@@ -94,7 +95,7 @@ class ContentPackSelection extends React.Component {
   };
 
   _updateSelectionGroup = (type) => {
-    const newSelection = ObjectUtils.clone(this.props.selectedEntities);
+    const newSelection = cloneDeep(this.props.selectedEntities);
     if (this._isGroupSelected(type)) {
       newSelection[type] = [];
     } else {
@@ -141,11 +142,11 @@ class ContentPackSelection extends React.Component {
   _filterEntities = (filterArg) => {
     const filter = filterArg;
     if (filter.length <= 0) {
-      this.setState({ filteredEntities: ObjectUtils.clone(this.props.entities), isFiltered: false, filter: filter });
+      this.setState({ filteredEntities: cloneDeep(this.props.entities), isFiltered: false, filter: filter });
       return;
     }
     const filtered = Object.keys(this.props.entities).reduce((result, type) => {
-      const filteredEntities = ObjectUtils.clone(result);
+      const filteredEntities = cloneDeep(result);
       filteredEntities[type] = this.props.entities[type].filter((entity) => {
         const regexp = RegExp(filter, 'i');
         return regexp.test(entity.title);
