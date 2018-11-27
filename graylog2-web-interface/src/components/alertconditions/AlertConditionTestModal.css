@@ -1,0 +1,3 @@
+ul:local(.errorMessages) {
+    list-style-type: disc;
+}
