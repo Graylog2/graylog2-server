@@ -10,7 +10,7 @@ const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVari
 
 class EditConfigurationVariableModal extends React.Component {
   static propTypes = {
-    create: PropTypes.boolean,
+    create: PropTypes.bool,
     id: PropTypes.string,
     name: PropTypes.string,
     description: PropTypes.string,
@@ -26,13 +26,20 @@ class EditConfigurationVariableModal extends React.Component {
     content: '',
   };
 
-  state = {
-    id: this.props.id,
-    name: this.props.name,
-    savedName: this.props.name,
-    description: this.props.description,
-    content: this.props.content,
-    errors: {},
+  constructor(props) {
+    super(props);
+    this.state = this._cleanState();
+  }
+
+  _cleanState = () => {
+    return {
+      id: this.props.id,
+      name: this.props.name,
+      savedName: this.props.name,
+      description: this.props.description,
+      content: this.props.content,
+      errors: {},
+    };
   };
 
   _hasErrors = () => {
@@ -40,23 +47,21 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   openModal = () => {
+    this.setState(this._cleanState());
     this.modal.open();
   };
 
   _getId = (prefixIdName) => {
-    return prefixIdName + this.state.name;
+    return prefixIdName + this.state.id || 'new';
   };
 
   _closeModal = () => {
+    this.setState(this._cleanState());
     this.modal.close();
   };
 
   _saved = () => {
     this._closeModal();
-    this.setState({ savedName: this.state.name });
-    if (this.props.create) {
-      this.setState({ name: '', description: '', type: '', content: '' });
-    }
   };
 
   _validate = () => {
@@ -96,16 +101,17 @@ class EditConfigurationVariableModal extends React.Component {
     }
 
     return (
-      <span>
+      <React.Fragment>
         <Button onClick={this.openModal}
                 bsStyle={this.props.create ? 'success' : 'info'}
-                bsSize={this.props.create ? null : 'xsmall'}
+                bsSize={this.props.create ? 'small' : 'xsmall'}
                 className={this.props.create ? 'pull-right' : ''}>
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
                             title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;{this.state.name}&#125;</React.Fragment>}
                             onSubmitForm={this._save}
+                            onModalClose={this._cleanState}
                             submitButtonDisabled={this._hasErrors()}
                             submitButtonText="Save">
           <fieldset>
@@ -140,7 +146,7 @@ class EditConfigurationVariableModal extends React.Component {
                    required />
           </fieldset>
         </BootstrapModalForm>
-      </span>
+      </React.Fragment>
     );
   }
 }

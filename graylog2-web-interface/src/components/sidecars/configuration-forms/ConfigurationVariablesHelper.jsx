@@ -18,6 +18,7 @@ class ConfigurationVariablesHelper extends React.Component {
   state = {
     configurationVariables: [],
     errorModalContent: {},
+    variableToDelete: {},
   };
 
   componentDidMount() {
@@ -31,9 +32,8 @@ class ConfigurationVariablesHelper extends React.Component {
       });
   };
 
-  _getId = (idName, index) => {
-    const idIndex = index !== undefined ? `. ${index}` : '';
-    return idName + idIndex;
+  _closeErrorModal = () => {
+    this.errorModal.close();
   };
 
   _renderConfigList = (configurations) => {
@@ -42,44 +42,42 @@ class ConfigurationVariablesHelper extends React.Component {
     </ul>);
   };
 
-  _configurationVariableListFormatter = () => {
+  _handleDeleteConfirm = () => {
+    ConfigurationVariableActions.delete(this.state.variableToDelete)
+      .then(() => this._onSuccessfulUpdate(() => this.deleteConfirmModal.close()));
+  };
+
+  _handleDeleteCheck = (configVar) => {
+    return () => {
+      this.setState({variableToDelete: configVar});
+
+      ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
+        // Variable still in use: Report error
+        if (response.length > 0) {
+          this.setState({errorModalContent: this._renderConfigList(response)});
+          this.errorModal.open();
+          // Not in use, ask for confirmation
+        } else {
+          this.deleteConfirmModal.open();
+        }
+      });
+    };
+  };
+
+  _configurationVariableListBuilder = () => {
     const variableRows = [];
 
     Object.values(this.state.configurationVariables).forEach((configVar) => {
-      let deleteConfirmationModal;
-      const _handleDeleteCheck = () => {
-        ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
-          // Variable still in use: Report error
-          if (response.length > 0) {
-            this.setState({ errorModalContent: this._renderConfigList(response) });
-            this.errorModal.open();
-          // Not in use, ask for confirmation
-          } else {
-            deleteConfirmationModal.open();
-          }
-        });
-      };
-
-      const _handleDeleteConfirm = () => {
-        ConfigurationVariableActions.delete(configVar)
-          .then(() => this._onSuccessfulUpdate());
-      };
-
       const escapedName = `\${${configVar.name}}`;
       variableRows.push(
-        <tr key={this._getId(configVar.id)}>
+        <tr key={configVar.id}>
           <td><code>{escapedName}</code></td>
           <td>{configVar.description}</td>
-          <td style={{ textAlign: 'right' }}>
-            <BootstrapModalConfirm ref={(c) => { deleteConfirmationModal = c; }}
-                                   title="Delete Configuration Variable?"
-                                   onConfirm={_handleDeleteConfirm}
-                                   onCancel={() => {}}>
-              <p>Are you sure you want to remove the configuration variable <strong>{configVar.name}</strong>?</p>
-            </BootstrapModalConfirm>
-            <Button bsStyle="primary" bsSize="xsmall" onClick={_handleDeleteCheck}>
+          <td>
+            <Button bsStyle="primary" bsSize="xsmall" onClick={this._handleDeleteCheck(configVar)}>
               Delete
             </Button>
+            &nbsp;
             <EditConfigurationVariableModal id={configVar.id}
                                             name={configVar.name}
                                             description={configVar.description}
@@ -121,36 +119,45 @@ class ConfigurationVariablesHelper extends React.Component {
       <div>
         <EditConfigurationVariableModal create
                                         saveConfigurationVariable={this._saveConfigurationVariable} />
-        <br />
-        <br />
-        <br />
+        <div className="clearfix" />
         <div className={`table-responsive ${ConfigurationHelperStyle.tableMaxHeight}`}>
           <Table responsive>
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th style={{ textAlign: 'right' }} >Actions</th>
+                <th className="actions">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {this._configurationVariableListFormatter()}
-              <BootstrapModalWrapper ref={(modal) => { this.errorModal = modal; }}>
-                <Modal.Body>
-                  <Alert bsStyle="warning">
-                    <h4>Cannot delete this configuration variable. <br /> It is still used in the following configurations:</h4>
-                    <p>
-                      {this.state.errorModalContent}
-                    </p>
-                  </Alert>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button onClick={() => { this.errorModal.close(); }}>Close</Button>
-                </Modal.Footer>
-              </BootstrapModalWrapper>
+              {this._configurationVariableListBuilder()}
             </tbody>
           </Table>
         </div>
+
+        <BootstrapModalWrapper ref={(modal) => { this.errorModal = modal; }}>
+          <Modal.Header>
+            <Modal.Title>Error deleting configuration variable <strong>{this.state.variableToDelete.name}</strong></Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Alert bsStyle="warning">
+              <p>
+              Cannot delete this configuration variable as it is still in use. Please remove the variable from
+                the following configurations and try again.
+                {this.state.errorModalContent}
+              </p>
+            </Alert>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this._closeErrorModal}>Close</Button>
+          </Modal.Footer>
+        </BootstrapModalWrapper>
+
+        <BootstrapModalConfirm ref={(c) => { this.deleteConfirmModal = c; }}
+                               title="Delete Configuration Variable?"
+                               onConfirm={this._handleDeleteConfirm} >
+          <p>Are you sure you want to remove the configuration variable <strong>{this.state.variableToDelete.name}</strong>?</p>
+        </BootstrapModalConfirm>
       </div>
     );
   }

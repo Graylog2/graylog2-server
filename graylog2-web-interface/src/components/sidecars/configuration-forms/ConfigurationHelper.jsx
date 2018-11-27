@@ -68,11 +68,15 @@ class ConfigurationHelper extends React.Component {
           <Col md={12}>
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
               <Tab eventKey={1} title="Variables">
-                <br />
+                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                  Use variables to share text snippets across multiple configurations
+                </p>
                 <ConfigurationVariablesHelper variableRenameHandler={this.props.variableRenameHandler} />
               </Tab>
               <Tab eventKey={2} title="Runtime Variables">
-                <br />
+                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                  These variables will be filled with the runtime information from each Sidecar
+                </p>
                 <TemplatesHelper />
               </Tab>
               <Tab eventKey={3} title="Reference">
@@ -85,7 +89,6 @@ class ConfigurationHelper extends React.Component {
                     </p>
                   </Col>
                 </Row>
-                <br />
                 <Navbar collapseOnSelect>
                   <Navbar.Collapse>
                     <Nav onSelect={this._onSelect}>

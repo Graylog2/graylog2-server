@@ -12,18 +12,10 @@ const ConfigurationVariableStore = Reflux.createStore({
   listenables: [ConfigurationVariableActions],
   sourceUrl: '/sidecar/configuration_variables',
 
-  _fetchConfigurationVariables() {
-    const baseUrl = `${this.sourceUrl}`;
-    const uri = URI(baseUrl).toString();
-
-    return fetch('GET', URLUtils.qualifyUrl(uri));
-  },
-
   all() {
-    const promise = this._fetchConfigurationVariables();
+    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
     promise
-      .then(
-        () => {},
+      .catch(
         (error) => {
           UserNotification.error(`Fetching configuration variables failed with status: ${error}`,
             'Could not retrieve configuration variables');
@@ -42,17 +34,19 @@ const ConfigurationVariableStore = Reflux.createStore({
 
     let url = URLUtils.qualifyUrl(`${this.sourceUrl}`);
     let method;
+    let action;
     if (configurationVariable.id === '') {
       method = 'POST';
+      action = 'created';
     } else {
       url += `/${configurationVariable.id}`;
       method = 'PUT';
+      action = 'updated';
     }
 
     const promise = fetch(method, url, request);
     promise
       .then(() => {
-        const action = configurationVariable.id === '' ? 'created' : 'updated';
         UserNotification.success(`Configuration variable "${configurationVariable.name}" successfully ${action}`);
       }, (error) => {
         UserNotification.error(`Saving variable "${configurationVariable.name}" failed with status: ${error.message}`,
@@ -65,8 +59,7 @@ const ConfigurationVariableStore = Reflux.createStore({
   getConfigurations(configurationVariable) {
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/${configurationVariable.id}/configurations`);
     const promise = fetch('GET', url);
-    promise.then(
-      () => {},
+    promise.catch(
       (error) => {
         UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);
       });
@@ -98,9 +91,7 @@ const ConfigurationVariableStore = Reflux.createStore({
     const method = 'POST';
 
     const promise = fetch(method, url, request);
-    promise
-      .then(() =>
-        response => response,
+    promise.catch(
       (error) => {
         UserNotification.error(`Validating variable "${configurationVariable.name}" failed with status: ${error.message}`,
           'Could not validate variable');

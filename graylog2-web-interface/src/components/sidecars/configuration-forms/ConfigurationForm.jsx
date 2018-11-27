@@ -110,7 +110,7 @@ const ConfigurationForm = createReactClass({
   },
 
   _replaceConfigurationVariableName(oldname, newname) {
-    if (oldname === newname) {
+    if (oldname === '' || oldname === newname) {
       return;
     }
     // replaceAll without having to use a Regex

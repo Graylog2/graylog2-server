@@ -88,10 +88,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @ApiOperation(value = "Show configurations using this variable")
     public List<Configuration> getConfigurationVariablesConfigurations(@ApiParam(name = "id", required = true)
                                                                        @PathParam("id") String id) {
-        final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
-        if (configurationVariable == null) {
-            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
-        }
+        final ConfigurationVariable configurationVariable = findVariableOrFail(id);
         final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote("${" + configurationVariable.name() +"}")));
         final List<Configuration> configurations = this.configurationService.findByQuery(query);
 
@@ -123,10 +120,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
                                              @PathParam("id") String id,
                                                 @ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull ConfigurationVariable request) {
-        final ConfigurationVariable previousConfigurationVariable = configurationVariableService.find(id);
-        if (previousConfigurationVariable == null) {
-            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
-        }
+        final ConfigurationVariable previousConfigurationVariable = findVariableOrFail(id);
 
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
@@ -161,10 +155,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
     public Response deleteConfigurationVariable(@ApiParam(name = "id", required = true)
                                                    @PathParam("id") String id) {
-        final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
-        if (configurationVariable == null) {
-            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
-        }
+        final ConfigurationVariable configurationVariable = findVariableOrFail(id);
         final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote("${" + configurationVariable.name() +"}")));
         final List<Configuration> configurations = this.configurationService.findByQuery(query);
         if (!configurations.isEmpty()) {
@@ -200,6 +191,14 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
             validationResult.addError("name", "A variable with that name already exists.");
         }
         return validationResult;
+    }
+
+    private ConfigurationVariable findVariableOrFail(String id) {
+        final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
+        if (configurationVariable == null) {
+            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
+        }
+        return configurationVariable;
     }
 
     private ConfigurationVariable persistConfigurationVariable(String id, ConfigurationVariable request) {
