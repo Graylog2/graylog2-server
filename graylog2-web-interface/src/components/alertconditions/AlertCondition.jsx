@@ -71,7 +71,7 @@ const AlertCondition = createReactClass({
       actions = [
         <Button key="test-button" bsStyle="info" onClick={this._openTestModal}>Test</Button>,
         <DropdownButton key="more-actions-button"
-                        title="Actions"
+                        title="More actions"
                         pullRight
                         id={`more-actions-dropdown-${condition.id}`}>
           {!this.props.isStreamView && (
