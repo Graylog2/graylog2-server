@@ -166,6 +166,7 @@ const ApiRoutes = {
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     update: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
     sendDummyAlert: (streamId) => { return { url: `/streams/${streamId}/alerts/sendDummyAlert` }; },
+    test: (streamId, conditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}/test` }; },
   },
   StreamsApiController: {
     get: (streamId) => { return { url: `/streams/${streamId}` }; },
