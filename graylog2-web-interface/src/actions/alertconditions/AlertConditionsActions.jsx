@@ -8,6 +8,7 @@ const AlertConditionsActions = Reflux.createActions({
   save: { asyncResult: true },
   update: { asyncResult: true },
   get: { asyncResult: true },
+  test: { asyncResult: true },
 });
 
 export default AlertConditionsActions;
