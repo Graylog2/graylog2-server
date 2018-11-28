@@ -179,6 +179,8 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
             validationResult.addError("name", "Variable name can not be empty.");
         } else if (!confVar.name().matches("^[A-Za-z0-9_]+$")) {
             validationResult.addError("name", "Variable name can only contain the following characters: A-Z,a-z,0-9,_.");
+        } else if (confVar.name().matches("^[0-9].*")) {
+            validationResult.addError("name", "Variable name can not start with numbers.");
         }
 
         final ConfigurationVariable dupVar;

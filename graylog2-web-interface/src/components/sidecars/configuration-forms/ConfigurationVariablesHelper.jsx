@@ -126,7 +126,7 @@ class ConfigurationVariablesHelper extends React.Component {
               <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th className="actions">Actions</th>
+                <th className={ConfigurationHelperStyle.actionsColumn}>Actions</th>
               </tr>
             </thead>
             <tbody>
