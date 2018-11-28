@@ -134,7 +134,7 @@
     "phantomjs-prebuilt": ">=1.9",
     "react-immutable-proptypes": "^2.1.0",
     "react-styleguidist": "^7.0.7",
-    "react-test-renderer": "16.5.1",
+    "react-test-renderer": "16.6.3",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
     "ts-jest": "^22.4.1",
