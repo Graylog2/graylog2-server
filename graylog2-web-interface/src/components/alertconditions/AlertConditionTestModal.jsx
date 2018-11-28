@@ -73,14 +73,23 @@ class AlertConditionTestModal extends React.Component {
   renderSatisfiedCondition = (testResults) => {
     return (
       <span>
-        <p>Condition was satisfied and an Alert would be triggered.</p>
-        <p><b>Details</b>: {testResults.description}</p>
+        <i className={`fa fa-bell ${style.testResultIcon}`} />
+        <p className={style.testResultText}>Condition was satisfied and an Alert would be triggered.<br />
+          <b>Details</b>: {testResults.description}
+        </p>
       </span>
     );
   };
 
   renderUnsatisfiedCondition = () => {
-    return <p>Condition was <b>not</b> satisfied and an Alert would <b>not</b> be triggered.</p>;
+    return (
+      <div>
+        <i className={`fa fa-bell-slash ${style.testResultIcon}`} />
+        <p className={style.testResultText}>
+          Condition was <b>not</b> satisfied and an Alert would <b>not</b> be triggered.
+        </p>
+      </div>
+    );
   };
 
   renderTestResults = (testResults) => {
