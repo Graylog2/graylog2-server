@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { AlertConditionForm, AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
+import { AlertConditionForm, AlertConditionSummary, AlertConditionTestModal, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
@@ -52,6 +52,10 @@ const AlertCondition = createReactClass({
     }
   },
 
+  _openTestModal() {
+    this.modal.open();
+  },
+
   render() {
     const stream = this.props.stream;
     const condition = this.props.alertCondition;
@@ -65,8 +69,9 @@ const AlertCondition = createReactClass({
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
+        <Button key="test-button" bsStyle="info" onClick={this._openTestModal}>Test</Button>,
         <DropdownButton key="more-actions-button"
-                        title="Actions"
+                        title="More actions"
                         pullRight
                         id={`more-actions-dropdown-${condition.id}`}>
           {!this.props.isStreamView && (
@@ -87,6 +92,9 @@ const AlertCondition = createReactClass({
                             conditionType={conditionType}
                             alertCondition={condition}
                             onSubmit={this._onUpdate} />
+        <AlertConditionTestModal ref={(c) => { this.modal = c; }}
+                                 stream={stream}
+                                 condition={condition} />
         <AlertConditionSummary alertCondition={condition}
                                conditionType={conditionType}
                                stream={stream}
