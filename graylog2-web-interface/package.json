@@ -42,7 +42,7 @@
     },
     "transform": {
       "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest"
     }
   },
   "dependencies": {
