@@ -10,7 +10,12 @@ exports[`AppErrorBoundary displays child component if there is no error 1`] = `
             [Function],
           ],
         ],
-        "results": undefined,
+        "results": Array [
+          Object {
+            "isThrow": false,
+            "value": undefined,
+          },
+        ],
       },
     }
   }
@@ -33,7 +38,12 @@ exports[`AppErrorBoundary displays error after catching 1`] = `
             [Function],
           ],
         ],
-        "results": undefined,
+        "results": Array [
+          Object {
+            "isThrow": false,
+            "value": undefined,
+          },
+        ],
       },
     }
   }
