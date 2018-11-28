@@ -26,6 +26,16 @@ const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 // eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
+const getCssLoaderOptions = () => {
+  // Development
+  if (TARGET === 'start') {
+    return {
+      localIdentName: '[name]__[local]--[hash:base64:5]',
+    };
+  }
+  return {};
+};
+
 const webpackConfig = {
   name: 'app',
   dependencies: ['vendor'],
@@ -58,7 +68,14 @@ const webpackConfig = {
         ],
       },
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      { test: /\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: getCssLoaderOptions(),
+          },
+        ] },
     ],
   },
   resolve: {
