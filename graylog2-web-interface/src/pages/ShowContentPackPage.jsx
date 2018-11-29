@@ -53,9 +53,9 @@ const ShowContentPackPage = createReactClass({
   },
 
   _deleteContentPackRev(contentPackId, revision) {
-    if (window.confirm('You are about to delete this content pack, are you sure?')) {
+    if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
-        UserNotification.success('Content Pack deleted successfully.', 'Success');
+        UserNotification.success('Content pack revision deleted successfully.', 'Success');
         ContentPacksActions.get(contentPackId).catch((error) => {
           if (error.status !== 404) {
             UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
@@ -67,7 +67,7 @@ const ShowContentPackPage = createReactClass({
         if (error.responseMessage) {
           errMessage = error.responseMessage;
         }
-        UserNotification.error(`Deleting bundle failed: ${errMessage}`, 'Error');
+        UserNotification.error(`Deleting content pack failed: ${errMessage}`, 'Error');
       });
     }
   },
