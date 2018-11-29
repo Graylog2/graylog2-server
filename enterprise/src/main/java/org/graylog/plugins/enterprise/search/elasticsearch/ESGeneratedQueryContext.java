@@ -9,6 +9,9 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Filter;
+import org.graylog.plugins.enterprise.search.Query;
+import org.graylog.plugins.enterprise.search.QueryResult;
+import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.errors.SearchError;
@@ -33,10 +36,16 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private Set<SearchError> errors = Sets.newHashSet();
     private final SearchSourceBuilder ssb;
+    private final SearchJob job;
+    private final Query query;
+    private final Set<QueryResult> results;
 
-    public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb) {
+    public ESGeneratedQueryContext(ElasticsearchBackend elasticsearchBackend, SearchSourceBuilder ssb, SearchJob job, Query query, Set<QueryResult> results) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
+        this.job = job;
+        this.query = query;
+        this.results = results;
     }
 
     public SearchSourceBuilder searchSourceBuilder(SearchType searchType) {
@@ -77,7 +86,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
-        return elasticsearchBackend.generateFilterClause(filter);
+        return elasticsearchBackend.generateFilterClause(filter, job, query, results);
     }
 
     public String filterName(SearchType searchType) {
