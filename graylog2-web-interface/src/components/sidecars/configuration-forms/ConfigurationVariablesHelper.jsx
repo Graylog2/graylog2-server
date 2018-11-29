@@ -16,7 +16,7 @@ class ConfigurationVariablesHelper extends React.Component {
   };
 
   state = {
-    configurationVariables: [],
+    configurationVariables: undefined,
     errorModalContent: {},
     variableToDelete: {},
   };
@@ -49,12 +49,12 @@ class ConfigurationVariablesHelper extends React.Component {
 
   _handleDeleteCheck = (configVar) => {
     return () => {
-      this.setState({variableToDelete: configVar});
+      this.setState({ variableToDelete: configVar });
 
       ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
         // Variable still in use: Report error
         if (response.length > 0) {
-          this.setState({errorModalContent: this._renderConfigList(response)});
+          this.setState({ errorModalContent: this._renderConfigList(response) });
           this.errorModal.open();
           // Not in use, ask for confirmation
         } else {

@@ -24,6 +24,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 @AutoValue
 public abstract class ConfigurationVariable {
@@ -67,6 +68,6 @@ public abstract class ConfigurationVariable {
 
     @JsonIgnore
     public String fullName() {
-       return String.format("${%s.%s}", VARIABLE_PREFIX, name());
+       return String.format(Locale.ENGLISH, "${%s.%s}", VARIABLE_PREFIX, name());
     }
 }
