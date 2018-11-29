@@ -1,5 +1,5 @@
 import { Map } from 'immutable';
-import { concat, remove, cloneDeep } from 'lodash';
+import { concat, remove } from 'lodash';
 import uuid from 'uuid/v4';
 
 export default class ContentPack {
