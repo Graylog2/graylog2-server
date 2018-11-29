@@ -125,10 +125,9 @@ public class UsersResource extends RestResource {
     })
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                            @PathParam("username") String username) {
-        final String requestingUser = getSubject().getPrincipal().toString();
-        final boolean isSelf = requestingUser.equals(username);
-        final boolean isAdmin = userService.getAdminUser().getName().equals(requestingUser);
-        if (!(isSelf || isAdmin)) {
+        // If a user has permissions to edit another user's profile, it should be able to see it.
+        // Reader users always have permissions to edit their own profile.
+        if (!isPermitted(USERS_EDIT, username)) {
             throw new ForbiddenException("Not allowed to view user " + username);
         }
 
@@ -136,9 +135,12 @@ public class UsersResource extends RestResource {
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
-        final boolean permissionsAllowed = isSelf || isAdmin;
 
-        return toUserResponse(user, permissionsAllowed, Optional.empty());
+        final String requestingUser = getSubject().getPrincipal().toString();
+        final boolean isSelf = requestingUser.equals(username);
+        final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
+
+        return toUserResponse(user, isSelf || canEditUserPermissions, Optional.empty());
     }
 
     @GET
