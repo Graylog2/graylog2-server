@@ -4,10 +4,11 @@ import createReactClass from 'create-react-class';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { IfPermitted } from 'components/common';
-import StreamForm from './StreamForm';
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import StoreProvider from 'injection/StoreProvider';
+
+import StreamForm from './StreamForm';
+
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 const StreamControls = createReactClass({
@@ -26,22 +27,21 @@ const StreamControls = createReactClass({
 
   mixins: [PermissionsMixin],
 
-  getInitialState() {
-    return {};
+  getDefaultProps() {
+    return {
+      isDefaultStream: false,
+    };
   },
 
-  _onDelete(_, event) {
-    event.preventDefault();
+  _onDelete() {
     this.props.onDelete(this.props.stream);
   },
 
-  _onEdit(_, event) {
-    event.preventDefault();
+  _onEdit() {
     this.streamForm.open();
   },
 
-  _onClone(_, event) {
-    event.preventDefault();
+  _onClone() {
     this.cloneForm.open();
   },
 
@@ -49,13 +49,11 @@ const StreamControls = createReactClass({
     this.props.onClone(this.props.stream.id, stream);
   },
 
-  _onQuickAdd(_, event) {
-    event.preventDefault();
+  _onQuickAdd() {
     this.props.onQuickAdd(this.props.stream.id);
   },
 
-  _setStartpage(_, event) {
-    event.preventDefault();
+  _setStartpage() {
     StartpageStore.set(this.props.user.username, 'stream', this.props.stream.id);
   },
 
@@ -64,8 +62,10 @@ const StreamControls = createReactClass({
 
     return (
       <span>
-        <DropdownButton title="More Actions" pullRight
-                        id={`more-actions-dropdown-${stream.id}`} disabled={this.props.isDefaultStream}>
+        <DropdownButton title="More Actions"
+                        pullRight
+                        id={`more-actions-dropdown-${stream.id}`}
+                        disabled={this.props.isDefaultStream}>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`editStreams-${stream.id}`} onSelect={this._onEdit}>Edit stream</MenuItem>
           </IfPermitted>

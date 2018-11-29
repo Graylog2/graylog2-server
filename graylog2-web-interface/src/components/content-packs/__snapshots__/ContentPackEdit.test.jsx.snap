@@ -265,7 +265,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="row"
         >
           <div
-            className="col-sm-offset-1"
+            className="col-lg-8 col-sm-offset-1"
           >
             <h2>
               Content Pack selection
@@ -276,7 +276,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="row"
         >
           <div
-            className="col-sm-offset-1"
+            className="col-lg-8 col-sm-offset-1"
           >
             <div
               className="search"
@@ -350,7 +350,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="row"
         >
           <div
-            className="col-sm-8 col-sm-offset-1"
+            className="col-lg-8 col-sm-8 col-sm-offset-1"
           >
             <ul
               className="list"
@@ -739,7 +739,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="row"
         >
           <div
-            className="col-sm-offset-1"
+            className="col-lg-8 col-sm-offset-1"
           >
             <h2>
               Content Pack selection
@@ -750,7 +750,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="row"
         >
           <div
-            className="col-sm-offset-1"
+            className="col-lg-8 col-sm-offset-1"
           >
             <div
               className="search"
@@ -824,7 +824,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="row"
         >
           <div
-            className="col-sm-8 col-sm-offset-1"
+            className="col-lg-8 col-sm-8 col-sm-offset-1"
           >
             <ul
               className="list"

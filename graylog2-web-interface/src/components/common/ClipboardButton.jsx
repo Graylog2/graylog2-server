@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
-import Clipboard from 'clipboard';
+import ClipboardJS from 'clipboard';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
@@ -31,12 +31,15 @@ class ClipboardButton extends React.Component {
     disabled: PropTypes.bool,
     /** Text to display when hovering over the button. */
     buttonTitle: PropTypes.string,
+    /** Container element which is focussed */
+    container: PropTypes.any,
   };
 
   static defaultProps = {
     action: 'copy',
     disabled: false,
     buttonTitle: undefined,
+    container: undefined,
   };
 
   state = {
@@ -44,7 +47,11 @@ class ClipboardButton extends React.Component {
   };
 
   componentDidMount() {
-    this.clipboard = new Clipboard('[data-clipboard-button]');
+    const options = {};
+    if (this.props.container) {
+      options.container = this.props.container;
+    }
+    this.clipboard = new ClipboardJS('[data-clipboard-button]', options);
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
   }
