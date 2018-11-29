@@ -62,7 +62,7 @@ class DataTable extends React.Component {
       }, []);
       return (
         <tr key={`header-table-row-${columnPivot}`}>
-          {this._spacer(1, offset)}
+          {offset > 0 && this._spacer(1, offset)}
           {actualValuesWithoutDuplicates.map(value => this._headerFieldForValue(columnPivot, value.key, value.count * series.length, value.path))}
         </tr>
       );
@@ -112,7 +112,7 @@ class DataTable extends React.Component {
     const actualColumnPivotFields = this._extractColumnPivotValues(rows, columnFieldNames);
     const rowPivotFields = rowFieldNames.map(this._headerField);
 
-    const offset = rollup ? rowFieldNames.length + series.length : 1;
+    const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
     const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, offset);
     const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
       // eslint-disable-next-line react/no-array-index-key

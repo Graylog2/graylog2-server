@@ -1,5 +1,156 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`DataTable renders column pivot header without offset when rollup is disabled 1`] = `
+<div
+  className="messages-container"
+  style={
+    Object {
+      "height": "100%",
+      "overflow": "auto",
+    }
+  }
+>
+  <table
+    className="table table-condensed messages"
+  >
+    <thead>
+      <tr>
+        <th
+          colSpan={1}
+          style={
+            Object {
+              "left": "0px",
+            }
+          }
+        >
+          <span>
+            <span
+              className="dropdowntoggle"
+              onClick={[Function]}
+              role="presentation"
+            >
+              TCP
+              <span
+                className="caret"
+              />
+            </span>
+          </span>
+        </th>
+        <th
+          colSpan={1}
+          style={
+            Object {
+              "left": "0px",
+            }
+          }
+        >
+          <span>
+            <span
+              className="dropdowntoggle"
+              onClick={[Function]}
+              role="presentation"
+            >
+              UDP
+              <span
+                className="caret"
+              />
+            </span>
+          </span>
+        </th>
+      </tr>
+      <tr>
+        <th
+          colSpan={1}
+          style={
+            Object {
+              "left": "0px",
+            }
+          }
+        >
+          <span>
+            <span
+              className="dropdowntoggle"
+              onClick={[Function]}
+              role="presentation"
+            >
+              <span
+                className="field-element  "
+              >
+                count()
+              </span>
+              <span
+                className="caret"
+              />
+            </span>
+          </span>
+        </th>
+        <th
+          colSpan={1}
+          style={
+            Object {
+              "left": "0px",
+            }
+          }
+        >
+          <span>
+            <span
+              className="dropdowntoggle"
+              onClick={[Function]}
+              role="presentation"
+            >
+              <span
+                className="field-element  "
+              >
+                count()
+              </span>
+              <span
+                className="caret"
+              />
+            </span>
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody
+      className="message-group"
+    >
+      <tr
+        className="fields-row"
+      >
+        <td>
+          <span>
+            <span
+              className="dropdowntoggle"
+              onClick={[Function]}
+              role="presentation"
+            >
+              239
+              <span
+                className="caret"
+              />
+            </span>
+          </span>
+        </td>
+        <td>
+          <span>
+            <span
+              className="dropdowntoggle"
+              onClick={[Function]}
+              role="presentation"
+            >
+              226
+              <span
+                className="caret"
+              />
+            </span>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
 exports[`DataTable should render with empty data 1`] = `
 <div
   className="messages-container"
@@ -69,7 +220,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
         <th
           colSpan={
             Array [
-              "source",
+              "timestamp",
             ]
           }
           style={
@@ -87,7 +238,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
               <span
                 className="field-element  "
               >
-                source
+                timestamp
               </span>
               <span
                 className="caret"
@@ -254,7 +405,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
         <th
           colSpan={
             Array [
-              "source",
+              "timestamp",
             ]
           }
           style={
@@ -272,7 +423,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
               <span
                 className="field-element  "
               >
-                source
+                timestamp
               </span>
               <span
                 className="caret"

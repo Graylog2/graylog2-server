@@ -41,7 +41,14 @@ describe('DataTable', () => {
   const series = new Series('count()');
 
   it('should render with empty data', () => {
-    const config = new AggregationWidgetConfig([], [], [], [], 'table', true);
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([])
+      .columnPivots([])
+      .series([])
+      .sort([])
+      .visualization('table')
+      .rollup(true)
+      .build();
     const wrapper = renderer.create(<DataTable config={config}
                                                currentView={currentView}
                                                data={[]}
@@ -50,7 +57,14 @@ describe('DataTable', () => {
   });
 
   it('should render with filled data with rollup', () => {
-    const config = new AggregationWidgetConfig([rowPivot], [columnPivot], [series], [], 'table', true);
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(true)
+      .build();
     const wrapper = renderer.create(<DataTable config={config}
                                                currentView={currentView}
                                                data={data}
@@ -59,10 +73,45 @@ describe('DataTable', () => {
   });
 
   it('should render with filled data without rollup', () => {
-    const config = new AggregationWidgetConfig([rowPivot], [columnPivot], [series], [], 'table', false);
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([rowPivot])
+      .columnPivots([columnPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(false)
+      .build();
     const wrapper = renderer.create(<DataTable config={config}
                                                currentView={currentView}
                                                data={data}
+                                               fields={Immutable.List([])} />);
+    expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('renders column pivot header without offset when rollup is disabled', () => {
+    const protocolPivot = new Pivot('nf_proto_name', 'values', { limit: 15 });
+    const protocolData = [{
+      key: [],
+      values: [{
+        key: ['TCP', 'count()'],
+        value: 239,
+        rollup: false,
+        source: 'col-leaf',
+      }, { key: ['UDP', 'count()'], value: 226, rollup: false, source: 'col-leaf' }],
+      source: 'leaf',
+    }];
+
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([])
+      .columnPivots([protocolPivot])
+      .series([series])
+      .sort([])
+      .visualization('table')
+      .rollup(false)
+      .build();
+    const wrapper = renderer.create(<DataTable config={config}
+                                               currentView={currentView}
+                                               data={protocolData}
                                                fields={Immutable.List([])} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
