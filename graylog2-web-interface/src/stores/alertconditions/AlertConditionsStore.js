@@ -132,6 +132,13 @@ const AlertConditionsStore = Reflux.createStore({
 
     AlertConditionsActions.get.promise(promise);
   },
+
+  test(streamId, conditionId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.test(streamId, conditionId).url);
+    const promise = fetch('POST', url);
+
+    AlertConditionsActions.test.promise(promise);
+  },
 });
 
 export default AlertConditionsStore;
