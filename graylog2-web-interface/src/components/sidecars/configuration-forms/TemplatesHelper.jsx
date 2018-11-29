@@ -14,31 +14,31 @@ class TemplatesHelper extends React.Component {
           </thead>
           <tbody>
             <tr>
-              <td><code>{'${'}operatingSystem{'}'}</code></td>
+              <td><code>{'${sidecar.'}operatingSystem{'}'}</code></td>
               <td>Name of the operating system the sidecar is running on, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
             </tr>
             <tr>
-              <td><code>{'${'}nodeName{'}'}</code></td>
+              <td><code>{'${sidecar.'}nodeName{'}'}</code></td>
               <td>The name of the sidecar, defaults to hostname if not set.</td>
             </tr>
             <tr>
-              <td><code>{'${'}nodeId{'}'}</code></td>
+              <td><code>{'${sidecar.'}nodeId{'}'}</code></td>
               <td>UUID of the sidecar.</td>
             </tr>
             <tr>
-              <td><code>{'${'}sidecarVersion{'}'}</code></td>
+              <td><code>{'${sidecar.'}sidecarVersion{'}'}</code></td>
               <td>Version string of the running sidecar.</td>
             </tr>
             <tr>
-              <td><code>{'${'}ip{'}'}</code></td>
+              <td><code>{'${sidecar.'}ip{'}'}</code></td>
               <td>First public IP address of the machine the sidecar is running on.</td>
             </tr>
             <tr>
-              <td><code>{'${'}cpuIdle{'}'}</code></td>
+              <td><code>{'${sidecar.'}cpuIdle{'}'}</code></td>
               <td>Current CPU idle value.</td>
             </tr>
             <tr>
-              <td><code>{'${'}load1{'}'}</code></td>
+              <td><code>{'${sidecar.'}load1{'}'}</code></td>
               <td>Current system load.</td>
             </tr>
           </tbody>

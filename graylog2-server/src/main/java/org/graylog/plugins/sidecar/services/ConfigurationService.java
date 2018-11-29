@@ -24,6 +24,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
+import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
 import org.graylog.plugins.sidecar.rest.models.NodeMetrics;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
@@ -199,11 +200,17 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return result;
     }
 
-    private String renderTemplate(String configurationId, Map<String, Object> context) throws RenderTemplateException {
+    private String renderTemplate(String configurationId, Map<String, Object> sidecarContext) throws RenderTemplateException {
         Writer writer = new StringWriter();
         String template;
 
-        configurationVariableService.all().stream().forEach(configVar -> context.put(configVar.name(), configVar.content()));
+        final Map<String, Object> context = new HashMap<>();
+        context.put("sidecar", sidecarContext);
+
+        final Map<String, Object> userContext =
+                configurationVariableService.all().stream().collect(Collectors.toMap(ConfigurationVariable::name, ConfigurationVariable::content));
+        context.put(ConfigurationVariable.VARIABLE_PREFIX, userContext);
+
         try {
             Template compiledTemplate = templateConfiguration.getTemplate(configurationId);
             compiledTemplate.process(context, writer);

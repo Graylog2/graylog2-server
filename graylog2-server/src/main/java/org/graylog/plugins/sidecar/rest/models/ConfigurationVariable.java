@@ -17,6 +17,7 @@
 package org.graylog.plugins.sidecar.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
@@ -30,6 +31,8 @@ public abstract class ConfigurationVariable {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_CONTENT = "content";
+
+    public static final String VARIABLE_PREFIX = "user";
 
     @Id
     @ObjectId
@@ -60,5 +63,10 @@ public abstract class ConfigurationVariable {
                 name,
                 description,
                 content);
+    }
+
+    @JsonIgnore
+    public String fullName() {
+       return String.format("${%s.%s}", VARIABLE_PREFIX, name());
     }
 }

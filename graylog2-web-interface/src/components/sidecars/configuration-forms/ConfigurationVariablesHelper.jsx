@@ -68,7 +68,7 @@ class ConfigurationVariablesHelper extends React.Component {
     const variableRows = [];
 
     Object.values(this.state.configurationVariables).forEach((configVar) => {
-      const escapedName = `\${${configVar.name}}`;
+      const escapedName = `\${user.${configVar.name}}`;
       variableRows.push(
         <tr key={configVar.id}>
           <td><code>{escapedName}</code></td>
@@ -137,7 +137,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
         <BootstrapModalWrapper ref={(modal) => { this.errorModal = modal; }}>
           <Modal.Header>
-            <Modal.Title>Error deleting configuration variable <strong>{this.state.variableToDelete.name}</strong></Modal.Title>
+            <Modal.Title>Error deleting configuration variable <strong>$&#123;user.{this.state.variableToDelete.name}&#125;</strong></Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Alert bsStyle="warning">

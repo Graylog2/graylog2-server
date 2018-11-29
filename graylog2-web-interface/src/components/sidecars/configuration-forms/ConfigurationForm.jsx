@@ -114,7 +114,7 @@ const ConfigurationForm = createReactClass({
       return;
     }
     // replaceAll without having to use a Regex
-    const updatedTemplate = this.state.formData.template.split(`\${${oldname}}`).join(`\${${newname}}`);
+    const updatedTemplate = this.state.formData.template.split(`\${user.${oldname}}`).join(`\${user.${newname}}`);
     this._onTemplateChange(updatedTemplate);
   },
 

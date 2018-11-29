@@ -84,7 +84,7 @@ public class ConfigurationServiceTest {
 
     @Test
     public void testTemplateRender() throws Exception {
-        final String TEMPLATE = "foo bar\n nodename: ${nodeName}\n";
+        final String TEMPLATE = "foo bar\n nodename: ${sidecar.nodeName}\n";
         final String TEMPLATE_RENDERED = "foo bar\n nodename: mockymock\n";
         configuration = buildTestConfig(TEMPLATE);
         this.configurationService.save(configuration);
@@ -106,7 +106,7 @@ public class ConfigurationServiceTest {
 
     @Test
     public void testTemplateRenderWithConfigurationVariables() throws Exception {
-        final String TEMPLATE = "foo bar\n myVariable: ${myVariable}\n";
+        final String TEMPLATE = "foo bar\n myVariable: ${user.myVariable}\n";
         final String TEMPLATE_RENDERED = "foo bar\n myVariable: content of myVariable\n";
         configuration = buildTestConfig(TEMPLATE);
         this.configurationService.save(configuration);

@@ -109,7 +109,7 @@ class EditConfigurationVariableModal extends React.Component {
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
-                            title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;{this.state.name}&#125;</React.Fragment>}
+                            title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;user.{this.state.name}&#125;</React.Fragment>}
                             onSubmitForm={this._save}
                             onModalClose={this._cleanState}
                             submitButtonDisabled={this._hasErrors()}

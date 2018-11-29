@@ -89,7 +89,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     public List<Configuration> getConfigurationVariablesConfigurations(@ApiParam(name = "id", required = true)
                                                                        @PathParam("id") String id) {
         final ConfigurationVariable configurationVariable = findVariableOrFail(id);
-        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote("${" + configurationVariable.name() +"}")));
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(configurationVariable.fullName())));
         final List<Configuration> configurations = this.configurationService.findByQuery(query);
 
         return configurations;
@@ -127,7 +127,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
         if (!previousConfigurationVariable.name().equals(request.name())) {
-            configurationService.replaceVariableNames("${" + previousConfigurationVariable.name() + "}", "${" + request.name() + "}");
+            configurationService.replaceVariableNames(previousConfigurationVariable.fullName(), request.fullName());
         }
         final ConfigurationVariable updatedConfigurationVariable = persistConfigurationVariable(id, request);
         etagService.invalidateAll();
@@ -156,7 +156,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     public Response deleteConfigurationVariable(@ApiParam(name = "id", required = true)
                                                    @PathParam("id") String id) {
         final ConfigurationVariable configurationVariable = findVariableOrFail(id);
-        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote("${" + configurationVariable.name() +"}")));
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(configurationVariable.fullName())));
         final List<Configuration> configurations = this.configurationService.findByQuery(query);
         if (!configurations.isEmpty()) {
             final ValidationResult validationResult = new ValidationResult();
