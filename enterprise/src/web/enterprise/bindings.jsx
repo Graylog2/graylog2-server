@@ -40,6 +40,7 @@ import AddMessageCountActionHandler from './logic/fieldactions/AddMessageCountAc
 import AddMessageTableActionHandler from './logic/fieldactions/AddMessageTableActionHandler';
 import CreateParameterDialog from './logic/creatoractions/CreateParameterDialog';
 import CreateCustomAggregation from './logic/creatoractions/CreateCustomAggregation';
+import ExecuteViewWithValue from './components/views/ExecuteViewWithValue';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -145,6 +146,12 @@ export default {
       handler: new AddToQueryHandler().handle,
       condition: ({ field }) => !isFunction(field),
     },
+    {
+      type: 'execute-view-with-value',
+      title: 'Insert into view',
+      condition: ({ field }) => !isFunction(field),
+      component: ExecuteViewWithValue,
+    }
   ],
   visualizationTypes: [
     {

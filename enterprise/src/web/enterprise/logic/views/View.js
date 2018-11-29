@@ -28,8 +28,8 @@ export type ViewJson = {
   description: string,
   search_id: string,
   properties: Properties,
-  state: Map<QueryId, ViewState>,
-  dashboard_state: DashboardState,
+  state: { [QueryId]: ViewState },
+  dashboard_state: any,
   created_at: Date,
 };
 

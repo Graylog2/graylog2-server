@@ -47,8 +47,8 @@ public class SearchesCleanUpJobTestWithDBServices {
     private SearchDbService searchDbService;
 
     class TestViewService extends ViewService {
-        TestViewService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper, ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mapper, clusterConfigService);
+        TestViewService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper, ClusterConfigService clusterConfigService, SearchDbService searchDbService) {
+            super(mongoConnection, mapper, clusterConfigService, searchDbService);
         }
     }
 
@@ -57,7 +57,8 @@ public class SearchesCleanUpJobTestWithDBServices {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
         final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
-        final ViewService viewService = new TestViewService(mongoRule.getMongoConnection(), mapperProvider, clusterConfigService);
+        final SearchDbService searchDbService = mock(SearchDbService.class);
+        final ViewService viewService = new TestViewService(mongoRule.getMongoConnection(), mapperProvider, clusterConfigService, searchDbService);
         this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider));
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
     }

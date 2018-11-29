@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.database.MongoConnectionRule;
+import org.graylog.plugins.enterprise.search.db.SearchDbService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.PaginatedList;
@@ -45,7 +46,8 @@ public class ViewServiceTest {
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );
-        this.dbService = new ViewService(mongoRule.getMongoConnection(), objectMapperProvider, clusterConfigService);
+        final SearchDbService searchDbService = mock(SearchDbService.class);
+        this.dbService = new ViewService(mongoRule.getMongoConnection(), objectMapperProvider, clusterConfigService, searchDbService);
 
     }
 

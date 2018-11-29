@@ -1,12 +1,38 @@
+// @flow strict
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
+
 import ViewGenerator from 'enterprise/logic/views/ViewGenerator';
 import SearchTypesGenerator from 'enterprise/logic/searchtypes/SearchTypesGenerator';
 import QueryGenerator from 'enterprise/logic/queries/QueryGenerator';
 import { QueriesActions } from 'enterprise/actions/QueriesActions';
+import View from 'enterprise/logic/views/View';
+import DashboardState from 'enterprise/logic/views/DashboardState';
+import Search from 'enterprise/logic/search/Search';
+import ViewState from 'enterprise/logic/views/ViewState';
+import type { Properties } from 'enterprise/logic/views/View';
 
-export const ViewActions = Reflux.createActions({
+type ViewStoreState = {
+  activeQuery: string,
+  view: View,
+  dirty: boolean,
+};
+
+type ViewActionsType = {
+  create: () => Promise<ViewStoreState>,
+  dashboardState: (DashboardState) => Promise<void>,
+  description: (string) => Promise<void>,
+  load: (View) => Promise<ViewStoreState>,
+  properties: (Properties) => Promise<void>,
+  search: (Search) => Promise<View>,
+  selectQuery: (string) => Promise<void>,
+  state: (ViewState) => Promise<View>,
+  summary: (string) => Promise<void>,
+  title: (string) => Promise<void>,
+};
+
+export const ViewActions: ViewActionsType = Reflux.createActions({
   create: { asyncResult: true },
   dashboardState: { asyncResult: true },
   description: { asyncResult: true },
@@ -19,7 +45,13 @@ export const ViewActions = Reflux.createActions({
   title: { asyncResult: true },
 });
 
-export const ViewStore = Reflux.createStore({
+type ViewStoreUnsubscribe = () => void;
+
+type ViewStoreType = {
+  listen: ((ViewStoreState) => void) => ViewStoreUnsubscribe;
+};
+
+export const ViewStore: ViewStoreType = Reflux.createStore({
   listenables: [ViewActions],
   view: undefined,
   activeQuery: undefined,
@@ -29,7 +61,7 @@ export const ViewStore = Reflux.createStore({
     QueriesActions.create.listen(this.createQuery);
   },
 
-  getInitialState() {
+  getInitialState(): ViewStoreState {
     return this._state();
   },
 
@@ -66,17 +98,17 @@ export const ViewStore = Reflux.createStore({
 
     QueriesActions.create.promise(Promise.resolve(this.view));
   },
-  dashboardState(newDashboardState) {
+  dashboardState(newDashboardState: DashboardState) {
     this.dirty = true;
     this.view = this.view.toBuilder().dashboardState(newDashboardState).build();
     this._trigger();
   },
-  description(newDescription) {
+  description(newDescription: string) {
     this.dirty = true;
     this.view = this.view.toBuilder().description(newDescription).build();
     this._trigger();
   },
-  load(view) {
+  load(view: View) {
     this.view = this._updateSearch(view);
     this.dirty = false;
 
@@ -89,12 +121,12 @@ export const ViewStore = Reflux.createStore({
 
     ViewActions.load.promise(Promise.resolve(this._state()));
   },
-  properties(newProperties) {
+  properties(newProperties: Properties) {
     this.dirty = true;
     this.view = this.view.toBuilder().properties(newProperties).build();
     this._trigger();
   },
-  search(newSearch) {
+  search(newSearch: Search) {
     this.dirty = true;
     this.view = this.view.toBuilder().search(newSearch).build();
     this._trigger();
@@ -104,7 +136,7 @@ export const ViewStore = Reflux.createStore({
     this.activeQuery = queryId;
     this._trigger();
   },
-  state(newState) {
+  state(newState: ViewState) {
     this.dirty = true;
     this.view = this._updateSearch(this.view.toBuilder().state(newState).build());
     this._trigger();
@@ -148,7 +180,7 @@ export const ViewStore = Reflux.createStore({
 
     return view;
   },
-  _state() {
+  _state(): ViewStoreState {
     return {
       activeQuery: this.activeQuery,
       view: this.view,
