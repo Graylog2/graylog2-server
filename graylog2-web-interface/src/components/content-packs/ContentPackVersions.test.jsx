@@ -19,10 +19,10 @@ describe('<ContentPackVersions />', () => {
     .url('www.graylog.com');
 
   const contentPack = {
-    1: contentPackRev.rev(1).build().toObject(),
-    2: contentPackRev.rev(2).build().toObject(),
-    3: contentPackRev.rev(3).build().toObject(),
-    4: contentPackRev.rev(4).build().toObject(),
+    1: contentPackRev.rev(1).build().toJSON(),
+    2: contentPackRev.rev(2).build().toJSON(),
+    3: contentPackRev.rev(3).build().toJSON(),
+    4: contentPackRev.rev(4).build().toJSON(),
   };
 
   const contentPackRevision = new ContentPackRevisions(contentPack);

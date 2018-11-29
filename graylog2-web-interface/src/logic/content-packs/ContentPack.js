@@ -1,5 +1,5 @@
 import { Map } from 'immutable';
-import { concat, remove } from 'lodash';
+import { concat, remove, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
 
 export default class ContentPack {
@@ -94,8 +94,33 @@ export default class ContentPack {
     }));
   }
 
-  toObject() {
-    return this._value;
+  toJSON() {
+    const {
+      v,
+      id,
+      rev,
+      name,
+      summary,
+      description,
+      vendor,
+      url,
+      requires,
+      parameters,
+      entities,
+    } = this._value;
+    return {
+      v,
+      id,
+      rev,
+      name,
+      summary,
+      description,
+      vendor,
+      url,
+      requires,
+      parameters,
+      entities,
+    };
   }
 
   static fromJSON(value) {
