@@ -7,6 +7,9 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
@@ -46,5 +49,23 @@ public class ImportService extends PaginatedDbService<CollectorUpload> {
 
     public long count() {
         return db.count();
+    }
+
+    public int destroyExpired(Period period) {
+        final DateTime threshold = DateTime.now(DateTimeZone.UTC).minus(period);
+        int count;
+
+        try (final Stream<CollectorUpload> uploadStream = streamAll()) {
+            count = uploadStream
+                    .mapToInt(upload -> {
+                        if (upload.created().isBefore(threshold)) {
+                            return delete(upload.id());
+                        }
+                        return 0;
+                    })
+                    .sum();
+        }
+
+        return count;
     }
 }

@@ -31,6 +31,7 @@ import org.graylog.plugins.sidecar.filter.StatusAdministrationFilter;
 import org.graylog.plugins.sidecar.migrations.V20180212165000_AddDefaultCollectors;
 import org.graylog.plugins.sidecar.migrations.V20180323150000_AddSidecarUser;
 import org.graylog.plugins.sidecar.migrations.V20180601151500_AddDefaultConfiguration;
+import org.graylog.plugins.sidecar.periodical.PurgeExpiredConfigurationUploads;
 import org.graylog.plugins.sidecar.periodical.PurgeExpiredSidecarsThread;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.services.CollectorService;
@@ -69,6 +70,7 @@ public class SidecarModule extends PluginModule {
         registerRestControllerPackage(getClass().getPackage().getName());
         addPermissions(SidecarRestPermissions.class);
         addPeriodical(PurgeExpiredSidecarsThread.class);
+        addPeriodical(PurgeExpiredConfigurationUploads.class);
 
         addAuditEventTypes(SidecarAuditEventTypes.class);
 
