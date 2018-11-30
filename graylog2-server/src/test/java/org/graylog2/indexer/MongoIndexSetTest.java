@@ -241,7 +241,7 @@ public class MongoIndexSetTest {
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllIndexAliases();
 
-        assertThat(deflectorIndices).containsOnlyKeys("graylog_2", "graylog_3", "graylog_5");
+        assertThat(deflectorIndices).containsOnlyKeys("graylog_1_reindex_es5", "graylog_2", "graylog_3", "graylog_4_restored_archive", "graylog_5");
     }
 
     @Test
