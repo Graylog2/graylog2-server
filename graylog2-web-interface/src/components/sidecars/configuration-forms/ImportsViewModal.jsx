@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Alert, Button, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -86,7 +86,7 @@ class ImportsViewModal extends React.Component {
       return (
         <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
           <Modal.Header closeButton>
-            <Modal.Title><span>Imports</span></Modal.Title>
+            <Modal.Title><span>Configuration Imports</span></Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Spinner />
@@ -102,10 +102,31 @@ class ImportsViewModal extends React.Component {
     const { uploads, totalUploads } = this.state;
     const formattedUploads = uploads.map(upload => (this._formatUpload(upload)));
 
+    if (totalUploads === 0) {
+      return (
+        <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
+          <Modal.Header closeButton>
+            <Modal.Title><span>Configuration Imports</span></Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Alert bsStyle="info">
+              <i className="fa fa-info-circle" />&nbsp;
+              There are no configuration uploads available. Please go to<br />
+              <strong>System-&gt;Collectors-&gt;Details-&gt;Import Configuration</strong><br />
+              and import your first configuration.
+            </Alert>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button type="button" onClick={this.hide}>Close</Button>
+          </Modal.Footer>
+        </BootstrapModalWrapper>
+      );
+    }
+
     return (
       <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
         <Modal.Header closeButton>
-          <Modal.Title><span>Imports</span></Modal.Title>
+          <Modal.Title><span>Configuration Imports</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <PaginatedList totalItems={totalUploads}
