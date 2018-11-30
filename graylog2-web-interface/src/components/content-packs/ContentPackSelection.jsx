@@ -3,10 +3,12 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, Label } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
+
+import Entity from 'logic/content-packs/Entity';
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
@@ -156,6 +158,13 @@ class ContentPackSelection extends React.Component {
     this.setState({ filteredEntities: filtered, isFiltered: true, filter: filter });
   };
 
+  _entityItemHeader = (entity) => {
+    if (entity.constructor.name === Entity.name) {
+      return <span><span>{entity.title}</span>{' '}<Label bsStyle="success"><i className="fa fa-archive" /></Label></span>;
+    }
+    return <span><span>{entity.title}</span>{' '}<Label bsStyle="info"><i className="fa fa-server" /></Label></span>;
+  };
+
   render() {
     const entitiesComponent = Object.keys(this.state.filteredEntities || {})
       .sort((a, b) => naturalSort(a, b))
@@ -163,11 +172,13 @@ class ContentPackSelection extends React.Component {
         const group = this.state.filteredEntities[entityType];
         const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
           const checked = this._isSelected(entity);
+          const header = this._entityItemHeader(entity);
           return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
                                       key={entity.id}
                                       checked={checked}
                                       expandable={false}
-                                      header={entity.title} />);
+                                      padded={false}
+                                      header={header} />);
         });
         if (group.length <= 0) {
           return null;
@@ -179,6 +190,7 @@ class ContentPackSelection extends React.Component {
                               checked={this._isGroupSelected(entityType)}
                               stayExpanded={this.state.isFiltered}
                               expanded={this.state.isFiltered}
+                              padded={false}
                               header={ContentPackSelection._toDisplayTitle(entityType)}>
             <ExpandableList>
               {entities}
