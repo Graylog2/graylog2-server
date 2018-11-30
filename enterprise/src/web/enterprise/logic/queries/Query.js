@@ -1,7 +1,6 @@
-// @flow
+// @flow strict
 
-import * as Immutable from 'immutable';
-import { is } from 'immutable';
+import Immutable, { is } from 'immutable';
 
 export type QueryId = string;
 
@@ -25,6 +24,31 @@ export type QueryJson = {
   search_types: any,
 };
 
+export type ElasticsearchQueryString = {
+  type: 'elasticsearch',
+  query_string: string,
+};
+
+export type QueryString = ElasticsearchQueryString;
+
+export type RelativeTimeRange = {
+  type: 'relative',
+  range: number,
+};
+
+export type AbsoluteTimeRange = {
+  type: 'absolute',
+  from: Date,
+  to: Date,
+};
+
+export type KeywordTimeRange = {
+  type: 'keyword',
+  keyword: string,
+};
+
+export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
+
 export default class Query {
   _value: InternalState;
 
@@ -36,11 +60,11 @@ export default class Query {
     return this._value.id;
   }
 
-  get query(): any {
+  get query(): QueryString {
     return this._value.query;
   }
 
-  get timerange(): any {
+  get timerange(): TimeRange {
     return this._value.timerange;
   }
 
@@ -55,7 +79,9 @@ export default class Query {
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map({ id, query, timerange, filter, searchTypes }));
+    return Query.builder().id(id).query(query).timerange(timerange)
+      .filter(filter)
+      .searchTypes(searchTypes);
   }
 
   equals(other: any): boolean {
@@ -85,6 +111,12 @@ export default class Query {
     };
   }
 
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder()
+      .searchTypes([]);
+  }
+
   static fromJSON(value: QueryJson): Query {
     // eslint-disable-next-line camelcase
     const { id, query, timerange, filter, search_types } = value;
@@ -103,11 +135,11 @@ class Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  query(value: any): Builder {
+  query(value: QueryString): Builder {
     return new Builder(this.value.set('query', value));
   }
 
-  timerange(value: any): Builder {
+  timerange(value: TimeRange): Builder {
     return new Builder(this.value.set('timerange', value));
   }
 

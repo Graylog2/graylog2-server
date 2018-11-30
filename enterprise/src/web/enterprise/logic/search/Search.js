@@ -21,6 +21,8 @@ export type SearchJson = {
   parameters: Array<ParameterJson>,
 };
 
+export type QuerySet = Immutable.Set<Query>;
+
 export default class Search {
   _value: InternalState;
 
@@ -41,7 +43,7 @@ export default class Search {
     return this._value.id;
   }
 
-  get queries(): Immutable.Set<Query> {
+  get queries(): QuerySet {
     return this._value.queries;
   }
 

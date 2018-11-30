@@ -5,13 +5,14 @@ import { get, isEqualWith } from 'lodash';
 
 import ViewGenerator from 'enterprise/logic/views/ViewGenerator';
 import SearchTypesGenerator from 'enterprise/logic/searchtypes/SearchTypesGenerator';
-import QueryGenerator from 'enterprise/logic/queries/QueryGenerator';
 import { QueriesActions } from 'enterprise/actions/QueriesActions';
 import View from 'enterprise/logic/views/View';
 import DashboardState from 'enterprise/logic/views/DashboardState';
 import Search from 'enterprise/logic/search/Search';
 import ViewState from 'enterprise/logic/views/ViewState';
 import type { Properties } from 'enterprise/logic/views/View';
+import type { QuerySet } from 'enterprise/logic/search/Search';
+import Query from 'enterprise/logic/queries/Query';
 
 type ViewStoreState = {
   activeQuery: string,
@@ -70,21 +71,21 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     this.view = view;
     this.dirty = false;
 
-    const queries = get(view, 'search.queries', Immutable.List());
+    const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
     const firstQueryId = queries.first().id;
     this.activeQuery = firstQueryId;
 
     ViewActions.create.promise(Promise.resolve(this._state()));
     this._trigger();
   },
-  createQuery(query = QueryGenerator(), viewState) {
+  createQuery(query: Query, viewState: ViewState) {
     if (query.id === undefined) {
       throw new Error('Unable to add query without id to view.');
     }
 
-    const { search } = this.view;
+    const { search }: View = this.view;
 
-    const newQueries = search.queries.push(query);
+    const newQueries = search.queries.add(query);
 
     const newSearch = search.toBuilder().queries(newQueries).build();
     const newState = this.view.state.set(query.id, viewState);
@@ -152,7 +153,7 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     this.view = this.view.toBuilder().title(newTitle).build();
     this._trigger();
   },
-  _updateSearch(view) {
+  _updateSearch(view: View): View {
     if (!view.search) {
       return view;
     }
