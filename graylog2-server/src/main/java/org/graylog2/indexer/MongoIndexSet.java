@@ -211,12 +211,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public Map<String, Set<String>> getAllIndexAliases() {
-        final Map<String, Set<String>> indexNamesAndAliases = indices.getIndexNamesAndAliases(getIndexWildcard());
-
-        // filter out the restored archives from the result set
-        return indexNamesAndAliases.entrySet().stream()
-                .filter(e -> isGraylogDeflectorIndex(e.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return indices.getIndexNamesAndAliases(getIndexWildcard());
     }
 
     @Override
