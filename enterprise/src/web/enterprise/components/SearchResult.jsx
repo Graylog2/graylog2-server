@@ -62,7 +62,6 @@ class SearchResult extends React.Component {
     const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
     const positions = viewState.state && viewState.state.widgetPositions;
 
-    const usedParameters = searchMetadata.used;
     const undeclaredParameters = searchMetadata.undeclared;
     const disableSearch = _disableSearch(undeclaredParameters, parameterBindings);
 
@@ -88,8 +87,7 @@ class SearchResult extends React.Component {
                    results={currentResults}
                    disableSearch={disableSearch}
                    onExecute={onExecute} />
-        <ParameterBar usedParameters={usedParameters}
-                      undeclaredParameters={undeclaredParameters}
+        <ParameterBar undeclaredParameters={undeclaredParameters}
                       onParameterSave={onHandleParameterSave} />
         {content}
         <SearchLoadingIndicator />
