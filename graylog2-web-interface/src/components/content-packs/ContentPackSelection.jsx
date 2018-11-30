@@ -33,7 +33,7 @@ class ContentPackSelection extends React.Component {
     this._bindValue = this._bindValue.bind(this);
     this.state = {
       contentPack: this.props.contentPack,
-      filteredEntities: cloneDeep(this.props.entities),
+      filteredEntities: this.props.entities,
       filter: '',
       isFiltered: false,
       errors: {},

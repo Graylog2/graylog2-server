@@ -10,7 +10,7 @@ export default class Entity {
     };
   }
 
-  static of(value) {
+  static fromJSON(value) {
     const { v, type, id, data } = value;
     return new Entity(v, type, id, data);
   }

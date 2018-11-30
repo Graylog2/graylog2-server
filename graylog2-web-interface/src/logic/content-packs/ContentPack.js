@@ -10,7 +10,7 @@ export default class ContentPack {
       if (e instanceof Entity) {
         return e;
       }
-      return Entity.of(e);
+      return Entity.fromJSON(e);
     });
 
     this._value = {
