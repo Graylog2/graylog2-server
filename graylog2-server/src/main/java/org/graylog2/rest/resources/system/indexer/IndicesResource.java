@@ -220,6 +220,42 @@ public class IndicesResource extends RestResource {
         indices.close(index);
     }
 
+    @POST
+    @Timed
+    @Path("/{index}/deletion-protection/enable")
+    @ApiOperation(value = "Enable deletion protection for an index.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_OPEN)
+    public void enableDeletionProtection(@ApiParam(name = "index") @PathParam("index") String index) {
+        checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
+
+        if (!indexSetRegistry.isManagedIndex(index)) {
+            final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
+            LOG.info(msg);
+            throw new NotFoundException(msg);
+        }
+
+        indices.enableDeletionProtection(index);
+    }
+
+    @POST
+    @Timed
+    @Path("/{index}/deletion-protection/disable")
+    @ApiOperation(value = "Disable deletion protection for an index.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_OPEN)
+    public void disableDeletionProtection(@ApiParam(name = "index") @PathParam("index") String index) {
+        checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
+
+        if (!indexSetRegistry.isManagedIndex(index)) {
+            final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
+            LOG.info(msg);
+            throw new NotFoundException(msg);
+        }
+
+        indices.disableDeletionProtection(index);
+    }
+
     @DELETE
     @Timed
     @Path("/{index}")

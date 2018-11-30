@@ -114,6 +114,7 @@ import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
 public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
     private static final String REOPENED_ALIAS_SUFFIX = "_reopened";
+    private static final String DELETION_PROTECTION_SUFFIX = "_deletion_protection";
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -485,6 +486,48 @@ public class Indices {
 
     public void flush(String index) {
         JestUtils.execute(jestClient, new Flush.Builder().addIndex(index).force().build(), () -> "Couldn't flush index " + index);
+    }
+
+    /**
+     * Returns the deletion protection alias for the given index.
+     *
+     * @param indexName the index name
+     * @return the deletion protection alias
+     */
+    private String deletionProtectionAlias(String indexName) {
+        return indexName + DELETION_PROTECTION_SUFFIX;
+    }
+
+    /**
+     * Enables deletion protection for an index. A protected index will never be deleted by index retention.
+     * @param indexName the index to protect
+     */
+    public void enableDeletionProtection(String indexName) {
+        final String aliasName = deletionProtectionAlias(indexName);
+        final ModifyAliases request = new ModifyAliases.Builder(new AddAliasMapping.Builder(indexName, aliasName).build()).build();
+
+        JestUtils.execute(jestClient, request, () -> "Couldn't enable deletion protection for index " + indexName);
+    }
+
+    /**
+     * Disable deletion protection for an index.
+     * @param indexName the index to unprotect
+     */
+    public void disableDeletionProtection(String indexName) {
+        // Removing an alias that doesn't exists results in an error so check first
+        if (!hasDeletionProtection(indexName)) {
+            return;
+        }
+        final String aliasName = deletionProtectionAlias(indexName);
+        final ModifyAliases request = new ModifyAliases.Builder(new RemoveAliasMapping.Builder(indexName, aliasName).build()).build();
+
+        JestUtils.execute(jestClient, request, () -> "Couldn't disable deletion protection for index " + indexName);
+    }
+
+    public boolean hasDeletionProtection(String indexName) {
+        final Optional<String> aliasTarget = aliasTarget(deletionProtectionAlias(indexName));
+
+        return aliasTarget.map(target -> target.equals(indexName)).orElse(false);
     }
 
     public void reopenIndex(String index) {

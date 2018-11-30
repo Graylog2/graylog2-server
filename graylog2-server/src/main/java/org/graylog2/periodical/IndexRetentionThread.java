@@ -33,8 +33,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-
 public class IndexRetentionThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
@@ -133,6 +131,6 @@ public class IndexRetentionThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return (int) MINUTES.toSeconds(5);
+        return 5;
     }
 }

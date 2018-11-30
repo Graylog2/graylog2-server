@@ -77,7 +77,6 @@ public class MongoIndexSet implements IndexSet {
     private final IndexSetConfig config;
     private final Indices indices;
     private final Pattern indexPattern;
-    private final Pattern deflectorIndexPattern;
     private final String indexWildcard;
     private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
@@ -109,11 +108,9 @@ public class MongoIndexSet implements IndexSet {
         if (isNullOrEmpty(config.indexMatchPattern())) {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
             this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + "|" + REINDEX_SUFFIX + ")?");
-            this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
         } else {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
             this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + "|" + REINDEX_SUFFIX + ")?");
-            this.deflectorIndexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+");
         }
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
@@ -161,7 +158,7 @@ public class MongoIndexSet implements IndexSet {
 
         int highestIndexNumber = -1;
         for (String indexName : indexNames) {
-            if (!isGraylogDeflectorIndex(indexName)) {
+            if (!isManagedIndex(indexName)) {
                 continue;
             }
 
@@ -185,7 +182,10 @@ public class MongoIndexSet implements IndexSet {
             return Optional.empty();
         }
 
-        final String suffix = indexName.substring(beginIndex);
+        final String suffix = indexName.substring(beginIndex)
+                // Remove our known suffixes from the number part so we can actually extract it into a number
+                .replace(RESTORED_ARCHIVE_SUFFIX, "")
+                .replaceAll(REINDEX_SUFFIX, "");
         try {
             return Optional.of(Integer.parseInt(suffix));
         } catch (NumberFormatException e) {
@@ -196,11 +196,6 @@ public class MongoIndexSet implements IndexSet {
     @VisibleForTesting
     String buildIndexName(final int number) {
         return config.indexPrefix() + SEPARATOR + number;
-    }
-
-    @VisibleForTesting
-    boolean isGraylogDeflectorIndex(final String indexName) {
-        return !isNullOrEmpty(indexName) && !isWriteIndexAlias(indexName) && deflectorIndexPattern.matcher(indexName).matches();
     }
 
     @Override

@@ -43,9 +43,12 @@ import org.mockito.junit.MockitoRule;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -108,6 +111,35 @@ public class MongoIndexSetTest {
         assertThat(mongoIndexSet.extractIndexNumber("graylog_0")).contains(0);
         assertThat(mongoIndexSet.extractIndexNumber("graylog_4")).contains(4);
         assertThat(mongoIndexSet.extractIndexNumber("graylog_52")).contains(52);
+
+        // Make sure the extraction can handle our known suffixes
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_42_restored_archive")).contains(42);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_43_restored_archive")).contains(43);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_23_reindex_es5")).contains(23);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_24_reindex_es6")).contains(24);
+
+        // These suffixes should not work
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_yolo")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_42_restored_archivesss")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_reindex_es")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_reindex_es5_wrong")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_reindex_es5sowrong")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_reindex_es5_23")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_reindex")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52_reindex_es")).isEmpty();
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_42_restored")).isEmpty();
+    }
+
+    @Test
+    public void testExtractIndexNumberSorting() {
+        // This tests that sorting based on the extracted index number actually works as expected. This sorting is used
+        // in index retention and we want to make really sure that it works. (even though the test might be redundant)
+        final LinkedHashSet<String> sortedIndices = ImmutableSet.of("graylog_2", "graylog_3", "graylog_0", "graylog_1_reindex_es5").stream()
+                .sorted((indexName1, indexName2) -> mongoIndexSet.extractIndexNumber(indexName2).orElse(0).compareTo(mongoIndexSet.extractIndexNumber(indexName1).orElse(0)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        assertThat(sortedIndices).containsExactly("graylog_3", "graylog_2", "graylog_1_reindex_es5", "graylog_0");
+        assertThat(sortedIndices.stream().skip(sortedIndices.size() - 1).findFirst()).isEqualTo(Optional.of("graylog_0"));
     }
 
     @Test
@@ -144,53 +176,25 @@ public class MongoIndexSetTest {
 
     @Test
     public void testIsGraylogIndex() {
-        assertTrue(mongoIndexSet.isGraylogDeflectorIndex("graylog_1"));
         assertTrue(mongoIndexSet.isManagedIndex("graylog_1"));
-
-        assertTrue(mongoIndexSet.isGraylogDeflectorIndex("graylog_42"));
         assertTrue(mongoIndexSet.isManagedIndex("graylog_42"));
-
-        assertTrue(mongoIndexSet.isGraylogDeflectorIndex("graylog_100000000"));
         assertTrue(mongoIndexSet.isManagedIndex("graylog_100000000"));
 
-        // The restored archive indices should NOT be taken into account when getting the new deflector number.
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive"));
+        // We also take indices with our known suffixes into account
         assertTrue(mongoIndexSet.isManagedIndex("graylog_42_restored_archive"));
-
-        // The reindexed indices should NOT be taken into account when getting the new deflector number
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es5"));
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es6"));
-        // ... but they should be detected as managed index
         assertTrue(mongoIndexSet.isManagedIndex("graylog_42_reindex_es5"));
         assertTrue(mongoIndexSet.isManagedIndex("graylog_42_reindex_es6"));
 
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es6heyna"));
+        // But the rest should not be a managed index
         assertFalse(mongoIndexSet.isManagedIndex("graylog_42_reindex_es6heyna"));
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_reindex_es6_12"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog_42_reindex_es6_12"));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive123"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog_42_restored_archive123"));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive_123"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog_42_restored_archive_123"));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex(null));
         assertFalse(mongoIndexSet.isManagedIndex(null));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex(""));
         assertFalse(mongoIndexSet.isManagedIndex(""));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_deflector"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog_deflector"));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog2beta_1"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog2beta_1"));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_1_suffix"));
         assertFalse(mongoIndexSet.isManagedIndex("graylog_1_suffix"));
-
-        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("HAHA"));
         assertFalse(mongoIndexSet.isManagedIndex("HAHA"));
     }
 
@@ -199,15 +203,47 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
                 "graylog_1", Collections.emptySet(),
                 "graylog_2", Collections.emptySet(),
-                "graylog_3", Collections.singleton("graylog_deflector"),
-                "graylog_4_restored_archive", Collections.emptySet(),
-                "graylog_4_reindex_es5", Collections.emptySet());
+                "graylog_3_restored_archive", Collections.singleton("graylog_deflector"),
+                "graylog_4_reindex_es5", Collections.emptySet(),
+                "graylog_5", Collections.emptySet());
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
 
         final int number = mongoIndexSet.getNewestIndexNumber();
-        assertEquals(3, number);
+        assertEquals(5, number);
+    }
+
+    @Test
+    public void getNewestTargetNumberFromSuffixIndex() throws NoTargetIndexException {
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                "graylog_2", Collections.emptySet(),
+                "graylog_3", Collections.emptySet(),
+                "graylog_4", Collections.singleton("graylog_deflector"),
+                "graylog_5_restored_archive", Collections.emptySet(),
+                "graylog_6_reindex_es6", Collections.emptySet());
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+
+        final int number = mongoIndexSet.getNewestIndexNumber();
+        assertEquals(6, number);
+    }
+
+    @Test
+    public void getNewestTargetNumberFromInvalidSuffixIndex() throws NoTargetIndexException {
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                "graylog_2", Collections.emptySet(),
+                "graylog_3", Collections.emptySet(),
+                "graylog_4", Collections.singleton("graylog_deflector"),
+                "graylog_5_restored_archivewaa", Collections.emptySet(),
+                "graylog_6_reindex_es6_yolowrong", Collections.emptySet());
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+
+        final int number = mongoIndexSet.getNewestIndexNumber();
+        assertEquals(4, number);
     }
 
     @Test
