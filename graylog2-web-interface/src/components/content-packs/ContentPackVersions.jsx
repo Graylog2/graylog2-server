@@ -95,7 +95,10 @@ class ContentPackVersions extends React.Component {
     return (
       <tr key={pack.id + pack.rev}>
         <td>
-          <input type="radio" value={pack.rev} onChange={this.onChange} checked={this.state.selectedVersion === pack.rev} />
+          <input type="radio"
+                 value={pack.rev}
+                 onChange={this.onChange}
+                 checked={parseInt(this.state.selectedVersion, 10) === pack.rev} />
         </td>
         <td>{pack.rev}</td>
         <td className="text-right">
