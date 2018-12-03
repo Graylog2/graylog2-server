@@ -116,7 +116,7 @@ const EditContentPackPage = createReactClass({
   },
 
   _onSave() {
-    ContentPacksActions.create.triggerPromise(this.state.contentPack.toObject())
+    ContentPacksActions.create.triggerPromise(this.state.contentPack.toJSON())
       .then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');

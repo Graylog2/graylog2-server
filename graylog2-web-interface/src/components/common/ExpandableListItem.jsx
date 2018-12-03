@@ -48,7 +48,7 @@ class ExpandableListItem extends React.Component {
     children: [],
     subheader: undefined,
     stayExpanded: false,
-    padded: false,
+    padded: true,
   };
 
   state = {
@@ -84,7 +84,7 @@ class ExpandableListItem extends React.Component {
   };
 
   _filterInputProps = (props) => {
-    const { expanded, indetermined, stayExpanded, ...inputProps } = props;
+    const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
     return inputProps;
   };
 

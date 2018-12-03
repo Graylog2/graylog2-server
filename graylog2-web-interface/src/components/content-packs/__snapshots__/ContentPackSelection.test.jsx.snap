@@ -524,7 +524,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
         className="list"
       >
         <li
-          className="listItem"
+          className=""
         >
           <div
             className="listItemContainer"

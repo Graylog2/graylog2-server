@@ -5,7 +5,7 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
   className="list"
 >
   <li
-    className="listItem"
+    className="listItemPadding"
   >
     <div
       className="listItemContainer"
@@ -61,7 +61,7 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
   className="list"
 >
   <li
-    className="listItem"
+    className="listItemPadding"
   >
     <div
       className="listItemContainer"
@@ -112,7 +112,7 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
         className="list"
       >
         <li
-          className="listItem"
+          className="listItemPadding"
         >
           <div
             className="listItemContainer"
