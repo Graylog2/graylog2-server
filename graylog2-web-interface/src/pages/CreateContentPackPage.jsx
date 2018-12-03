@@ -12,7 +12,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
-import Entity from "../logic/content-packs/Entity";
+import Entity from 'logic/content-packs/Entity';
 
 
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');

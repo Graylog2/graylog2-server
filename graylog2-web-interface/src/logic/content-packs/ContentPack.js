@@ -1,5 +1,4 @@
 import { Map } from 'immutable';
-import { concat, remove, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
 import Entity from './Entity';
 

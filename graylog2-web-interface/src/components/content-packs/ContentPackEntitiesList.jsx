@@ -5,7 +5,6 @@ import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
 import { SearchForm, DataTable } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-import ObjectUtils from 'util/ObjectUtils';
 import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
 
