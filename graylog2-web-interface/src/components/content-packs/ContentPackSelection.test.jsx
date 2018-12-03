@@ -42,16 +42,9 @@ describe('<ContentPackSelection />', () => {
   });
 
   it('should update the state when filling out the form', () => {
-    let called = 0;
+    let resultedState;
     const changeFn = jest.fn((state) => {
-      called += 1;
-      if (called === 5) {
-        expect(state.contentPack.name).toEqual('name');
-        expect(state.contentPack.summary).toEqual('summary');
-        expect(state.contentPack.description).toEqual('descr');
-        expect(state.contentPack.vendor).toEqual('vendor');
-        expect(state.contentPack.url).toEqual('url');
-      }
+      resultedState = state;
     });
     const contentPack = ContentPack.builder().build();
 
@@ -62,6 +55,11 @@ describe('<ContentPackSelection />', () => {
     wrapper.find('input#vendor').simulate('change', { target: { name: 'vendor', value: 'vendor' } });
     wrapper.find('input#url').simulate('change', { target: { name: 'url', value: 'url' } });
     expect(changeFn.mock.calls.length).toBe(5);
+    expect(resultedState.contentPack.name).toEqual('name');
+    expect(resultedState.contentPack.summary).toEqual('summary');
+    expect(resultedState.contentPack.description).toEqual('descr');
+    expect(resultedState.contentPack.vendor).toEqual('vendor');
+    expect(resultedState.contentPack.url).toEqual('url');
   });
 
   it('should add a entity if content selection was checked', () => {
