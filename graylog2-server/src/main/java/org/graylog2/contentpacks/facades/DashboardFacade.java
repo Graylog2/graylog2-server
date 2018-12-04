@@ -105,7 +105,6 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 dashboardWidgets);
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(dashboard.getId()))
                 .type(ModelTypes.DASHBOARD_V1)
                 .data(data)
                 .build();

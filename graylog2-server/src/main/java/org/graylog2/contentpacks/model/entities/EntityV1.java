@@ -26,6 +26,7 @@ import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.ModelVersion;
+import java.util.UUID;
 
 @AutoValue
 @JsonAutoDetect
@@ -67,6 +68,7 @@ public abstract class EntityV1 implements Entity {
 
         public EntityV1 build() {
             version(ModelVersion.of(VERSION));
+            id(ModelId.of(UUID.randomUUID().toString()));
             return autoBuild();
         }
     }

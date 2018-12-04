@@ -77,7 +77,6 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
                 ValueReference.of(lookupTableDto.defaultMultiValueType()));
         final JsonNode data = objectMapper.convertValue(lookupTableEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(lookupTableDto.id()))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(data)
                 .build();

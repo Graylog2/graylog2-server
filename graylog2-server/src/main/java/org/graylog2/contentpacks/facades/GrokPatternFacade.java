@@ -72,7 +72,6 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
                 ValueReference.of(grokPattern.pattern()));
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(grokPattern.id()))
                 .type(ModelTypes.GROK_PATTERN_V1)
                 .data(data)
                 .build();

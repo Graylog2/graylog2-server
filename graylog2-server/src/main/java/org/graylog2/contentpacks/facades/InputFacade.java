@@ -129,7 +129,6 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 extractors);
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(input.getId()))
                 .type(ModelTypes.INPUT_V1)
                 .data(data)
                 .build();

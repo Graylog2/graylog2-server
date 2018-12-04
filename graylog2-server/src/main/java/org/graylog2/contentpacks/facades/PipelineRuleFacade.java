@@ -67,7 +67,6 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
                 ValueReference.of(ruleDao.source()));
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(ruleDao.title()))
                 .type(ModelTypes.PIPELINE_RULE_V1)
                 .data(data)
                 .build();

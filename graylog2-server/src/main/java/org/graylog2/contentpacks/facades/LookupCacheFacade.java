@@ -74,7 +74,6 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 toReferenceMap(configuration));
         final JsonNode data = objectMapper.convertValue(lookupCacheEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(cacheDto.id()))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .data(data)
                 .build();

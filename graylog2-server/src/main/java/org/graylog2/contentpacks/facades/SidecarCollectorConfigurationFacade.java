@@ -70,7 +70,6 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
                 ValueReference.of(configuration.template()));
         final JsonNode data = objectMapper.convertValue(configurationEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(configuration.id()))
                 .type(TYPE_V1)
                 .data(data)
                 .build();
