@@ -284,7 +284,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>3.1.5</version>
+                    <version>3.1.9</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
