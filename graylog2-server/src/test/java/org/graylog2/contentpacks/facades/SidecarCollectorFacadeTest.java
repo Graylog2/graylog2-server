@@ -74,7 +74,7 @@ public class SidecarCollectorFacadeTest {
         final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(collector);
 
         assertThat(entityWithConstraints.constraints()).isEmpty();
-        final Entity expectedEntity = EntityV1.builder()
+        final EntityV1 expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.SIDECAR_COLLECTOR_V1)
                 .data(objectMapper.convertValue(SidecarCollectorEntity.create(
@@ -86,7 +86,8 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
-        assertThat(entityWithConstraints.entity()).isEqualTo(expectedEntity);
+        assertThat(entityWithConstraints.entity().type()).isEqualTo(expectedEntity.type());
+        assertThat(((EntityV1) entityWithConstraints.entity()).data()).isEqualTo(expectedEntity.data());
     }
 
     @Test
@@ -96,7 +97,7 @@ public class SidecarCollectorFacadeTest {
 
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         assertThat(entityWithConstraints.constraints()).isEmpty();
-        final Entity expectedEntity = EntityV1.builder()
+        final EntityV1 expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.SIDECAR_COLLECTOR_V1)
                 .data(objectMapper.convertValue(SidecarCollectorEntity.create(
@@ -108,7 +109,8 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
-        assertThat(entityWithConstraints.entity()).isEqualTo(expectedEntity);
+        assertThat(entityWithConstraints.entity().type()).isEqualTo(expectedEntity.type());
+        assertThat(((EntityV1) entityWithConstraints.entity()).data()).isEqualTo(expectedEntity.data());
     }
 
     @Test

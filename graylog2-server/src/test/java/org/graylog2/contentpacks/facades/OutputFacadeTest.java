@@ -121,7 +121,7 @@ public class OutputFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("01234567890"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -140,7 +140,7 @@ public class OutputFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf239e4b900a0fdb4e5197"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -265,7 +265,7 @@ public class OutputFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf239e4b900a0fdb4e5197"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         assertThat(outputEntity.title()).isEqualTo(ValueReference.of("STDOUT"));

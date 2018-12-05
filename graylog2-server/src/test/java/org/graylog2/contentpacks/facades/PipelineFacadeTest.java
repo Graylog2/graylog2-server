@@ -121,7 +121,7 @@ public class PipelineFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("title"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -140,7 +140,7 @@ public class PipelineFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("Test"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -270,7 +270,7 @@ public class PipelineFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("Test"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
         final PipelineEntity pipelineEntity = objectMapper.convertValue(entity.data(), PipelineEntity.class);
         assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("Test"));

@@ -48,7 +48,8 @@ public abstract class EntityV1 implements Entity {
     }
 
     public static Builder builder() {
-        return new AutoValue_EntityV1.Builder();
+        return new AutoValue_EntityV1.Builder()
+            .id(ModelId.of(UUID.randomUUID().toString()));
     }
 
     public static Entity createRoot(ContentPack contentPack) {
@@ -68,7 +69,6 @@ public abstract class EntityV1 implements Entity {
 
         public EntityV1 build() {
             version(ModelVersion.of(VERSION));
-            id(ModelId.of(UUID.randomUUID().toString()));
             return autoBuild();
         }
     }
