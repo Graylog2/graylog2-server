@@ -1,4 +1,4 @@
-package org.graylog.plugins.integrations;
+package org.graylog.integrations;
 
 /**
  * This is the plugin. Your class should implement one of the existing plugin

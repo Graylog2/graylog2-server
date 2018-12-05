@@ -1,4 +1,4 @@
-package org.graylog.plugins.integrations;
+package org.graylog.integrations;
 
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -12,11 +12,11 @@ import java.util.Set;
  * Implement the PluginMetaData interface here.
  */
 public class IntegrationsMetaData implements PluginMetaData {
-    private static final String PLUGIN_PROPERTIES = "org.graylog.plugins.integrations.graylog-plugin-integrations/graylog-plugin.properties";
+    private static final String PLUGIN_PROPERTIES = "org.graylog.integrations.graylog-plugin-integrations/graylog-plugin.properties";
 
     @Override
     public String getUniqueId() {
-        return "org.graylog.plugins.integrations.IntegrationsPlugin";
+        return "org.graylog.integrations.IntegrationsPlugin";
     }
 
     @Override
