@@ -2,7 +2,6 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 class TemplatesHelper extends React.Component {
-
   _buildVariableName = (name) => {
     return `\${sidecar.${name}}`;
   };
