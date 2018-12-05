@@ -21,7 +21,7 @@ public class IntegrationsMetaData implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "Integrations";
+        return "Enterprise Integrations";
     }
 
     @Override
