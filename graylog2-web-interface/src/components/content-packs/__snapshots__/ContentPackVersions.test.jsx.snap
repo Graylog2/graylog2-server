@@ -34,7 +34,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
             <tr>
               <td>
                 <input
-                  checked={true}
+                  checked={false}
                   onChange={[Function]}
                   type="radio"
                   value={1}
@@ -349,7 +349,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
             <tr>
               <td>
                 <input
-                  checked={false}
+                  checked={true}
                   onChange={[Function]}
                   type="radio"
                   value={4}

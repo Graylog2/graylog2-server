@@ -31,7 +31,7 @@ class ContentPackSelection extends React.Component {
     super(props);
     this._bindValue = this._bindValue.bind(this);
     this.state = {
-      contentPack: ObjectUtils.clone(this.props.contentPack),
+      contentPack: this.props.contentPack,
       filteredEntities: ObjectUtils.clone(this.props.entities),
       filter: '',
       isFiltered: false,
@@ -47,8 +47,7 @@ class ContentPackSelection extends React.Component {
   }
 
   _updateField(name, value) {
-    const updatedPack = ObjectUtils.clone(this.state.contentPack);
-    updatedPack[name] = value;
+    const updatedPack = this.state.contentPack.toBuilder()[name](value).build();
     this.props.onStateChange({ contentPack: updatedPack });
     this.setState({ contentPack: updatedPack }, this._validate);
   }
