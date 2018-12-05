@@ -109,7 +109,7 @@ const ConfigurationForm = createReactClass({
     this.setState({ errors: nextErrors });
   },
 
-  _replaceConfigurationVariableName(oldname, newname) {
+  replaceConfigurationVariableName(oldname, newname) {
     if (oldname === '' || oldname === newname) {
       return;
     }

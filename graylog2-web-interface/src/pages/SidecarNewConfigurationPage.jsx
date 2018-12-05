@@ -12,8 +12,8 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 const SidecarNewConfigurationPage = createReactClass({
   displayName: 'SidecarNewConfigurationPage',
 
-  _configurationVariableRenameHandler(oldname, newname) {
-    this.configurationForm._replaceConfigurationVariableName(oldname, newname);
+  _variableRenameHandler(oldname, newname) {
+    this.configurationForm.replaceConfigurationVariableName(oldname, newname);
   },
 
   render() {
@@ -48,7 +48,7 @@ const SidecarNewConfigurationPage = createReactClass({
                                  action="create" />
             </Col>
             <Col md={6}>
-              <ConfigurationHelper variableRenameHandler={this._configurationVariableRenameHandler} />
+              <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
             </Col>
           </Row>
         </span>

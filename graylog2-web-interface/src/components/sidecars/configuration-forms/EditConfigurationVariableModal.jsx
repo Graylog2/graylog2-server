@@ -55,13 +55,8 @@ class EditConfigurationVariableModal extends React.Component {
     return prefixIdName + this.state.id || 'new';
   };
 
-  _closeModal = () => {
-    this.setState(this._cleanState());
-    this.modal.close();
-  };
-
   _saved = () => {
-    this._closeModal();
+    this.modal.close();
   };
 
   _validate = () => {

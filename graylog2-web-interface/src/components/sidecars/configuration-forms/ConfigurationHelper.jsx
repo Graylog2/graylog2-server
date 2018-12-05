@@ -13,7 +13,7 @@ import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 class ConfigurationHelper extends React.Component {
   static propTypes = {
-    variableRenameHandler: PropTypes.func.isRequired,
+    onVariableRename: PropTypes.func.isRequired,
   };
 
   state = {
@@ -71,7 +71,7 @@ class ConfigurationHelper extends React.Component {
                 <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
                   Use variables to share text snippets across multiple configurations
                 </p>
-                <ConfigurationVariablesHelper variableRenameHandler={this.props.variableRenameHandler} />
+                <ConfigurationVariablesHelper onVariableRename={this.props.onVariableRename} />
               </Tab>
               <Tab eventKey={2} title="Runtime Variables">
                 <p className={ConfigurationHelperStyle.marginQuickReferenceText}>

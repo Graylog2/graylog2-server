@@ -12,7 +12,7 @@ const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVari
 
 class ConfigurationVariablesHelper extends React.Component {
   static propTypes = {
-    variableRenameHandler: PropTypes.func.isRequired,
+    onVariableRename: PropTypes.func.isRequired,
   };
 
   state = {
@@ -98,7 +98,7 @@ class ConfigurationVariablesHelper extends React.Component {
   _saveConfigurationVariable = (configurationVariable, callback) => {
     ConfigurationVariableActions.save.triggerPromise(configurationVariable)
       .then(() => this._onSuccessfulUpdate(() => {
-        this.props.variableRenameHandler(configurationVariable.savedName, configurationVariable.name);
+        this.props.onVariableRename(configurationVariable.savedName, configurationVariable.name);
         callback();
       }));
   };
