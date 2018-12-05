@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.searchtypes.pivot.buckets;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
@@ -10,11 +11,14 @@ import com.google.common.collect.Range;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(AutoInterval.type)
 public abstract class AutoInterval implements Interval {
+    private static final double CK_DEFAULT_SCALINGFACTOR = 0.5;
     public static final String type = "auto";
     @VisibleForTesting
     static final ImmutableRangeMap<Duration, DateHistogramInterval> boundaries = ImmutableRangeMap.<Duration, DateHistogramInterval>builder()
@@ -53,17 +57,22 @@ public abstract class AutoInterval implements Interval {
     @Override
     public abstract String type();
 
+    @JsonIgnore
+    public abstract Double scaling();
+
     @Override
     public DateHistogramInterval toDateHistogramInterval(TimeRange timerange) {
         //noinspection UnnecessaryBoxing
         final Duration duration = Duration.ofMillis(
-                Math.round(new Double(timerange.getTo().getMillis() - timerange.getFrom().getMillis()) / 1000) * 1000
+                Math.round(new Double(timerange.getTo().getMillis() - timerange.getFrom().getMillis()) / 1000 * scaling()) * 1000
         );
         return boundaries.get(duration);
     }
 
     @JsonCreator
     public static AutoInterval create() {
-        return new AutoValue_AutoInterval(type);
+        return create(null);
     }
+
+    public static AutoInterval create(@Nullable Double scalingFactor) { return new AutoValue_AutoInterval(type, Optional.ofNullable(scalingFactor).orElse(CK_DEFAULT_SCALINGFACTOR)); }
 }

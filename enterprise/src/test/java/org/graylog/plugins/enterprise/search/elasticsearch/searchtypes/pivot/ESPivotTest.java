@@ -136,7 +136,7 @@ public class ESPivotTest {
         extractAggregation(context, "values-agg")
                 .isEqualTo("Values{type=values, field=action, limit=10}");
         extractAggregation(context, "values-agg.time-agg")
-                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto}}");
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=0.5}}");
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ESPivotTest {
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "time-agg")
-                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto}}");
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=0.5}}");
         extractAggregation(context, "time-agg.values-agg")
                 .isEqualTo("Values{type=values, field=action, limit=10}");
     }
@@ -195,7 +195,7 @@ public class ESPivotTest {
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "time-agg")
-                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto}}");
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=0.5}}");
         extractAggregation(context, "time-agg.values-agg")
                 .isEqualTo("Values{type=values, field=action, limit=10}");
     }
@@ -242,7 +242,7 @@ public class ESPivotTest {
 
         final DocumentContext context = JsonPath.parse(searchSourceBuilder.toString());
         extractAggregation(context, "rowPivot1")
-                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto}}");
+                .isEqualTo("Time{type=time, field=timestamp, interval=AutoInterval{type=auto, scaling=0.5}}");
         extractAggregation(context, "rowPivot1.rowPivot2")
                 .isEqualTo("Values{type=values, field=http_method, limit=10}");
         extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1")
