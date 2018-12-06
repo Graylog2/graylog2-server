@@ -58,8 +58,7 @@ const ShowContentPackPage = createReactClass({
   },
 
   _deleteContentPackRev(contentPackId, revision) {
-
-  /* eslint-disable-next-line no-alert */
+    /* eslint-disable-next-line no-alert */
     if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content pack revision deleted successfully.', 'Success');
