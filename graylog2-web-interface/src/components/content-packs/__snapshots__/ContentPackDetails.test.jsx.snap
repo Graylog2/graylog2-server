@@ -22,12 +22,15 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
             Version:
           </dt>
            
-          <dd />
+          <dd>
+            1
+          </dd>
           <dt>
             Name:
           </dt>
            
           <dd>
+            UFW Grok Patterns
              
           </dd>
           <dt>

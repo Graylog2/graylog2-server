@@ -18,6 +18,9 @@ const _permissionPredicate = (permissionSet, p) => {
 
 const PermissionsMixin = {
   isPermitted(possessedPermissions, requiredPermissions) {
+    if (!requiredPermissions || requiredPermissions.length === 0) {
+      return true;
+    }
     if (!possessedPermissions) {
       return false;
     }
@@ -31,6 +34,9 @@ const PermissionsMixin = {
   },
 
   isAnyPermitted(possessedPermissions, requiredPermissions) {
+    if (!requiredPermissions || requiredPermissions.length === 0) {
+      return true;
+    }
     if (!possessedPermissions) {
       return false;
     }
