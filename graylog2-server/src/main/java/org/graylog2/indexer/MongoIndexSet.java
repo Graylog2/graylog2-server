@@ -65,11 +65,6 @@ public class MongoIndexSet implements IndexSet {
     // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
 
-    // This is needed to detect re-indexed indices as managed Graylog indices. The number at the end of the suffix
-    // is the Elasticsearch major version. That allows reindexing the same data with different ES major versions if
-    // necessary. (if users need to keep their data in indices for a long time)
-    public static final String REINDEX_SUFFIX = "_reindex_es\\d+";
-
     public interface Factory {
         MongoIndexSet create(IndexSetConfig config);
     }
@@ -108,11 +103,11 @@ public class MongoIndexSet implements IndexSet {
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
         if (isNullOrEmpty(config.indexMatchPattern())) {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
-            this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + "|" + REINDEX_SUFFIX + ")?");
+            this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
             this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
         } else {
             // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
-            this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + "|" + REINDEX_SUFFIX + ")?");
+            this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
             this.deflectorIndexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+");
         }
 
