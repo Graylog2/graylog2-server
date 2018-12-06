@@ -55,9 +55,7 @@ class ContentPackEdit extends React.Component {
 
   _prepareForPreview() {
     const typeRegExp = RegExp(/\.type$/);
-    const newContentPack = ObjectUtils.clone(this.props.contentPack);
-    const entities = ObjectUtils.clone(this.props.fetchedEntities);
-    newContentPack.entities = entities.map((entity) => {
+    const newEntities = this.props.fetchedEntities.map((entity) => {
       const parameters = this.props.appliedParameter[entity.id] || [];
       const newEntity = ObjectUtils.clone(entity);
       const entityData = newEntity.data;
@@ -77,6 +75,9 @@ class ContentPackEdit extends React.Component {
       newEntity.data = entityData;
       return newEntity;
     });
+    const newContentPack = this.props.contentPack.toBuilder()
+      .entities(newEntities)
+      .build();
 
     this.props.onStateChange({ contentPack: newContentPack });
   }
@@ -84,8 +85,9 @@ class ContentPackEdit extends React.Component {
   _stepChanged = (selectedStep) => {
     switch (selectedStep) {
       case 'parameters': {
-        const newContentPack = ObjectUtils.clone(this.props.contentPack);
-        newContentPack.entities = this.props.fetchedEntities || [];
+        const newContentPack = this.props.contentPack.toBuilder()
+          .entities(this.props.fetchedEntities || [])
+          .build();
         this.props.onStateChange({ contentPack: newContentPack });
         if (Object.keys(this.props.selectedEntities).length > 0) {
           this.props.onGetEntities(this.props.selectedEntities);
