@@ -6,6 +6,7 @@ import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
 
+import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import UserNotification from 'util/UserNotification';
@@ -35,7 +36,15 @@ const ShowContentPackPage = createReactClass({
 
 
   componentDidMount() {
-    ContentPacksActions.get(this.props.params.contentPackId);
+    ContentPacksActions.get(this.props.params.contentPackId).catch((error) => {
+      if (error.status === 404) {
+        UserNotification.error(
+          `Cannot find Content Pack with the id ${this.props.params.contentPackId} and may have been deleted.`);
+      } else {
+        UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+      }
+      history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+    });
     ContentPacksActions.installList(this.props.params.contentPackId);
   },
 
@@ -44,19 +53,21 @@ const ShowContentPackPage = createReactClass({
   },
 
   _deleteContentPackRev(contentPackId, revision) {
-    if (window.confirm('You are about to delete this content pack, are you sure?')) {
+    if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
-        UserNotification.success('Content Pack deleted successfully.', 'Success');
-        ContentPacksActions.get(contentPackId);
+        UserNotification.success('Content pack revision deleted successfully.', 'Success');
+        ContentPacksActions.get(contentPackId).catch((error) => {
+          if (error.status !== 404) {
+            UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+          }
+          history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+        });
       }, (error) => {
-        /* eslint-disable camelcase */
-        let err_message = error.message;
-        const err_body = error.additional.body;
-        /* eslint-enable camlecase */
-        if (err_body && err_body.message) {
-          err_message = error.additional.body.message;
+        let errMessage = error.message;
+        if (error.responseMessage) {
+          errMessage = error.responseMessage;
         }
-        UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
+        UserNotification.error(`Deleting content pack failed: ${errMessage}`, 'Error');
       });
     }
   },
