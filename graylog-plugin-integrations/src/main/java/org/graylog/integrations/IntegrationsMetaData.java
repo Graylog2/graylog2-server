@@ -42,7 +42,7 @@ public class IntegrationsMetaData implements PluginMetaData {
     @Override
     public String getDescription() {
         // TODO Insert correct plugin description
-        return "Description of Integrations plugin";
+        return "A collection of plugins that integrate external systems with Graylog.";
     }
 
     @Override
