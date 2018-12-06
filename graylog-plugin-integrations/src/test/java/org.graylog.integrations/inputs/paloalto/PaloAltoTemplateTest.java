@@ -1,4 +1,4 @@
-package org.graylog.integrations.inputs;
+package org.graylog.integrations.inputs.paloalto;
 
 import org.graylog.integrations.inputs.paloalto.PaloAltoTemplateDefaults;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTemplates;

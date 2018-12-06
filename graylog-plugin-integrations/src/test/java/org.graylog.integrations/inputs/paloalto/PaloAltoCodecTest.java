@@ -1,4 +1,4 @@
-package org.graylog.integrations.inputs;
+package org.graylog.integrations.inputs.paloalto;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -113,8 +113,8 @@ public class PaloAltoCodecTest {
         assertEquals(message.getField("receive_time"), "2018/09/19 11:50:32");
         assertEquals(message.getField("outbound_interface"), "ethernet1/1");
         assertEquals(message.getField("packets"), 6L);
-        assertEquals(message.getField("destination_location"), "10.20.30.40-10.20.30.40");
-        assertEquals(message.getField("src_ip"), "10.20.30.40");
+        assertEquals(message.getField("dest_location"), "10.20.30.40-10.20.30.40");
+        assertEquals(message.getField("src_addr"), "10.20.30.40");
         assertEquals(message.getField("generated_time"), "2018/09/19 11:50:32");
         assertEquals(message.getField("protocol"), "tcp");
         assertEquals(message.getField("threat_content_type"), "end");
@@ -122,28 +122,28 @@ public class PaloAltoCodecTest {
         assertEquals(message.getField("packets_received"), 2L);
         assertEquals(message.getField("action"), "allow");
         assertEquals(message.getField("virtual_system"), "vsys1");
-        assertEquals(message.getField("destination_port"), 443L);
+        assertEquals(message.getField("dest_port"), 443L);
         assertEquals(((DateTime) message.getField("timestamp")).compareTo(new DateTime("2018-09-19T11:50:32.000-05:00")), 0);
         assertEquals(message.getField("rule_name"), "HTTPS-strict");
-        assertEquals(message.getField("nat_src_ip"), "10.20.30.40");
+        assertEquals(message.getField("nat_src_addr"), "10.20.30.40");
         assertEquals(message.getField("session_id"), 205742L);
         assertEquals(message.getField("serial_number"), "007255000045717");
         assertEquals(message.getField("message"), "1,2018/09/19 11:50:32,007255000045717,TRAFFIC,end,2049,2018/09/19 11:50:32,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,incomplete,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:32,205742,1,64575,443,41304,443,0x400070,tcp,allow,412,272,140,6,2018/09/19 11:50:15,0,any,0,54196730,0x8000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,4,2,tcp-fin,13,16,0,0,,Prod--2,from-policy,,,0,,0,,N/A,0,0,0,0");
         assertEquals(message.getField("bytes_sent"), 272L);
-        assertEquals(message.getField("destination_zone"), "Public");
-        assertEquals(message.getField("nat_source_port"), 41304L);
-        assertEquals(message.getField("source_port"), 64575L);
-        assertEquals(message.getField("source_location"), "10.20.30.40-10.20.30.40");
+        assertEquals(message.getField("dest_zone"), "Public");
+        assertEquals(message.getField("nat_src_port"), 41304L);
+        assertEquals(message.getField("src_port"), 64575L);
+        assertEquals(message.getField("src_location"), "10.20.30.40-10.20.30.40");
         assertEquals(message.getField("log_action"), "ALK Logging");
         assertEquals(message.getField("inbound_interface"), "ethernet1/1");
         assertEquals(message.getField("application"), "incomplete");
-        assertEquals(message.getField("source_zone"), "Public");
+        assertEquals(message.getField("src_zone"), "Public");
         assertEquals(message.getField("bytes"), 412L);
-        assertEquals(message.getField("dest_ip"), "10.20.30.40");
+        assertEquals(message.getField("dest_addr"), "10.20.30.40");
         assertEquals(message.getField("type"), "TRAFFIC");
-        assertEquals(message.getField("nat_dest_ip"), "10.20.30.40");
+        assertEquals(message.getField("nat_dest_addr"), "10.20.30.40");
         assertEquals(message.getField("category"), "any");
-        assertEquals(message.getField("nat_destination_port"), 443L);
+        assertEquals(message.getField("nat_dest_port"), 443L);
 
         // TODO: Implement and test THREAT parsing.
         // message = codec.decode(new RawMessage(THREAT_MESSAGE.getBytes()));
