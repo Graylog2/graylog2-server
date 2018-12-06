@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 public class IndexMappingFactoryTest {
@@ -71,11 +71,11 @@ public class IndexMappingFactoryTest {
 
     @Test
     public void createIndexMappingFailsIfElasticsearch6VersionIsTooHigh() throws Exception {
-        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("6.0.0")));
+        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("7.0.0")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
                 .isInstanceOf(ElasticsearchException.class)
-                .hasMessageStartingWith("Unsupported Elasticsearch version: 6.0.0")
+                .hasMessageStartingWith("Unsupported Elasticsearch version: 7.0.0")
                 .hasNoCause();
     }
 
@@ -89,6 +89,7 @@ public class IndexMappingFactoryTest {
                     {"5.2.0", IndexMapping5.class},
                     {"5.3.0", IndexMapping5.class},
                     {"5.4.0", IndexMapping5.class},
+                    {"6.3.1", IndexMapping6.class},
             });
         }
 
