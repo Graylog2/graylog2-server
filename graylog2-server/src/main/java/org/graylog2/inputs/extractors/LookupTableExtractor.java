@@ -30,8 +30,8 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class LookupTableExtractor extends Extractor {
-    private static final String CONFIG_LUT_NAME = "lookup_table_name";
     private final LookupTableService.Function lookupTable;
+    public static final String CONFIG_LUT_NAME = "lookup_table_name";
 
     public LookupTableExtractor(final MetricRegistry metricRegistry,
                                 final LookupTableService lookupTableService,
