@@ -3,6 +3,7 @@ import { mount } from 'enzyme';
 import renderer from 'react-test-renderer';
 import 'helpers/mocking/react-dom_mock';
 
+import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 
 describe('<ContentPackEntitiesList />', () => {
@@ -38,16 +39,19 @@ describe('<ContentPackEntitiesList />', () => {
       },
     },
   };
-  const contentPack = {
-    entities: [entity1, entity2],
-    parameters: [{
-      name: 'A parameter name',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }],
+
+  const parameter = {
+    name: 'A parameter name',
+    title: 'A parameter title',
+    description: 'A parameter descriptions',
+    type: 'string',
+    default_value: 'test',
   };
+
+  const contentPack = ContentPack.builder()
+    .entities([entity1, entity2])
+    .parameters([parameter])
+    .build();
 
   it('should render with empty entities', () => {
     const emptyContentPack = { entities: [] };

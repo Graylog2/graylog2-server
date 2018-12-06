@@ -1,17 +1,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
+import { Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import { Pluralize, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import Routes from 'routing/Routes';
+
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
-class ConditionAlertNotifications extends React.Component {
+class StreamAlertNotifications extends React.Component {
   static propTypes = {
-    alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
   };
 
@@ -48,17 +51,24 @@ class ConditionAlertNotifications extends React.Component {
 
     return (
       <div>
+        <div className="pull-right">
+          <LinkContainer to={Routes.new_alert_notification_for_stream(stream.id)}>
+            <Button bsStyle="success">Add new notification</Button>
+          </LinkContainer>
+        </div>
         <h2>Notifications</h2>
-        <p>
-          <Pluralize value={notifications.length} singular="This is" plural="These are" /> the notifications set
-          for the stream <em>{stream.title}</em>. They will be triggered when the alert condition is satisfied.
+        <p className="description">
+          Alert Notifications will be executed when a Condition belonging to this Stream is satisfied.
         </p>
 
-        <AlertNotificationsList alertNotifications={notifications} streams={[this.props.stream]}
-                                onNotificationUpdate={this._loadData} onNotificationDelete={this._loadData} />
+        <AlertNotificationsList alertNotifications={notifications}
+                                streams={[this.props.stream]}
+                                onNotificationUpdate={this._loadData}
+                                onNotificationDelete={this._loadData}
+                                isStreamView />
       </div>
     );
   }
 }
 
-export default ConditionAlertNotifications;
+export default StreamAlertNotifications;

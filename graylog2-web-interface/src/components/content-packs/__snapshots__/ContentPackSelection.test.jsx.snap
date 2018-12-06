@@ -38,6 +38,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
+                value=""
               />
               <span
                 className="help-block"
@@ -66,6 +67,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
+                value=""
               />
               <span
                 className="help-block"
@@ -93,6 +95,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 rows={6}
                 type="textarea"
+                value=""
               />
               <span
                 className="help-block"
@@ -121,6 +124,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
+                value=""
               />
               <span
                 className="help-block"
@@ -148,6 +152,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 onChange={[Function]}
                 placeholder=""
                 type="text"
+                value=""
               />
               <span
                 className="help-block"
@@ -164,7 +169,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-offset-1"
+      className="col-lg-8 col-sm-offset-1"
     >
       <h2>
         Content Pack selection
@@ -175,7 +180,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-offset-1"
+      className="col-lg-8 col-sm-offset-1"
     >
       <div
         className="search"
@@ -249,7 +254,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-8 col-sm-offset-1"
+      className="col-lg-8 col-sm-8 col-sm-offset-1"
     >
       <ul
         className="list"
@@ -326,7 +331,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 placeholder=""
                 required={true}
                 type="text"
-                value="summmary"
+                value="summary"
               />
               <span
                 className="help-block"
@@ -354,7 +359,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 placeholder=""
                 rows={6}
                 type="textarea"
-                value="descr"
+                value="description"
               />
               <span
                 className="help-block"
@@ -428,7 +433,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-offset-1"
+      className="col-lg-8 col-sm-offset-1"
     >
       <h2>
         Content Pack selection
@@ -439,7 +444,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-offset-1"
+      className="col-lg-8 col-sm-offset-1"
     >
       <div
         className="search"
@@ -513,7 +518,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     className="row"
   >
     <div
-      className="col-sm-8 col-sm-offset-1"
+      className="col-lg-8 col-sm-8 col-sm-offset-1"
     >
       <ul
         className="list"

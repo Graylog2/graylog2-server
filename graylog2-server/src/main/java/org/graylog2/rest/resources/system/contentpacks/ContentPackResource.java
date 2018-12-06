@@ -145,6 +145,9 @@ public class ContentPackResource extends RestResource {
                 .collect(Collectors.toMap(Revisioned::revision, Function.identity()));
         Map<Integer, Set<ConstraintCheckResult>> constraintMap = contentPacks.stream()
                 .collect(Collectors.toMap(Revisioned::revision, contentPackService::checkConstraints));
+        if(contentPackMap.size() <= 0) {
+            throw new NotFoundException("Content pack " + id + " not found!");
+        }
 
         return ContentPackRevisions.create(contentPackMap, constraintMap);
     }

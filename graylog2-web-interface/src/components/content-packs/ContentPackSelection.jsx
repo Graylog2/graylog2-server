@@ -31,7 +31,7 @@ class ContentPackSelection extends React.Component {
     super(props);
     this._bindValue = this._bindValue.bind(this);
     this.state = {
-      contentPack: ObjectUtils.clone(this.props.contentPack),
+      contentPack: this.props.contentPack,
       filteredEntities: ObjectUtils.clone(this.props.entities),
       filter: '',
       isFiltered: false,
@@ -47,8 +47,7 @@ class ContentPackSelection extends React.Component {
   }
 
   _updateField(name, value) {
-    const updatedPack = ObjectUtils.clone(this.state.contentPack);
-    updatedPack[name] = value;
+    const updatedPack = this.state.contentPack.toBuilder()[name](value).build();
     this.props.onStateChange({ contentPack: updatedPack });
     this.setState({ contentPack: updatedPack }, this._validate);
   }
@@ -248,12 +247,12 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1}>
+          <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1}>
+          <Col smOffset={1} lg={8}>
             <SearchForm
               id="filter-input"
               onSearch={this._onSetFilter}
@@ -263,7 +262,7 @@ class ContentPackSelection extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col smOffset={1} sm={8}>
+          <Col smOffset={1} sm={8} lg={8}>
             {errors.selection && <Panel bsStyle="danger">{errors.selection}</Panel> }
             <ExpandableList>
               {entitiesComponent}

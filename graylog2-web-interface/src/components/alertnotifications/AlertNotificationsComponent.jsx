@@ -9,8 +9,8 @@ import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
@@ -61,8 +61,10 @@ const AlertNotificationsComponent = createReactClass({
         </div>
         <h2>Notifications</h2>
         <p>These are all configured alert notifications.</p>
-        <AlertNotificationsList alertNotifications={notifications} streams={this.state.streams}
-                                onNotificationUpdate={this._loadData} onNotificationDelete={this._loadData} />
+        <AlertNotificationsList alertNotifications={notifications}
+                                streams={this.state.streams}
+                                onNotificationUpdate={this._loadData}
+                                onNotificationDelete={this._loadData} />
       </div>
     );
   },
