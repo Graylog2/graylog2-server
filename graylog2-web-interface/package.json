@@ -72,7 +72,7 @@
     "react-ace": "^5.9.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^5.0.0",
-    "react-dnd": "^2.0.2",
+    "react-dnd": "^7.0.2",
     "react-dnd-html5-backend": "^2.0.0",
     "react-grid-layout": "^0.14.3",
     "react-isolated-scroll": "^0.1.1",
