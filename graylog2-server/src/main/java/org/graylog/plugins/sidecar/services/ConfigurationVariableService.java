@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @Singleton
 public class ConfigurationVariableService extends PaginatedDbService<ConfigurationVariable> {
     private static final String COLLECTION_NAME = "sidecar_configuration_variables";
@@ -70,12 +72,20 @@ public class ConfigurationVariableService extends PaginatedDbService<Configurati
         return db.findOne(DBQuery.is("name", name));
     }
 
-    public ConfigurationVariable findByNameExcludeId(String name, String id) {
-        return db.findOne(
-                DBQuery.and(
-                        DBQuery.is("name", name),
-                        DBQuery.notEquals("_id", id))
-        );
+    public boolean hasConflict(ConfigurationVariable variable) {
+       final DBQuery.Query query;
+
+       if (isNullOrEmpty(variable.id())) {
+           query = DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name());
+       } else {
+           // updating an existing variable, don't match against itself
+           query = DBQuery.and(
+                           DBQuery.is(ConfigurationVariable.FIELD_NAME, variable.name()),
+                           DBQuery.notEquals("_id", variable.id()
+                           )
+           );
+       }
+       return db.getCount(query) > 0;
     }
 
     @Override

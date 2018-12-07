@@ -112,6 +112,11 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         }
     }
 
+    public List<Configuration> findByConfigurationVariable(ConfigurationVariable configurationVariable) {
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(configurationVariable.fullName())));
+        return findByQuery(query);
+    }
+
     public void replaceVariableNames(String oldName, String newName) {
         final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(oldName)));
         List<Configuration> configurations = findByQuery(query);

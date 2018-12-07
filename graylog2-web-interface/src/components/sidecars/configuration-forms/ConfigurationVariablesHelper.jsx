@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Routes from 'routing/Routes';
 import { Alert, Button, Table, Modal } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
@@ -38,7 +39,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
   _renderConfigList = (configurations) => {
     return (<ul className={ConfigurationHelperStyle.ulStyle}>
-      {configurations.map(conf => <li key={conf.id}><a href={conf.id}>{conf.name}</a></li>)}
+      {configurations.map(conf => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
     </ul>);
   };
 

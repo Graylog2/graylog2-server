@@ -70,9 +70,11 @@ class ConfigurationHelper extends React.Component {
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
               <Tab eventKey={1} title="Variables">
                 <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-                  Use variables to share text snippets across multiple configurations.<br />
-                  Unexpanded literals like <code>$&#123;foo&#125;</code> can be written as
-                  <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>
+                  Use variables to share text snippets across multiple configurations.
+                  <br />
+                  If your configuration format needs to use literals like <code>$&#123;foo&#125;</code>,
+                  which shall not act as a variable, you will have to write it as
+                  <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
                 </p>
                 <ConfigurationVariablesHelper onVariableRename={this.props.onVariableRename} />
               </Tab>
