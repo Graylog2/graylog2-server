@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetadata;
 import org.mongojack.DBCursor;
@@ -35,6 +36,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -127,18 +129,14 @@ public class ContentPackInstallationPersistenceService {
         return installationMetaData;
     }
 
-    public int countInstallationOfEntityById(ModelId contentPackEntityId) {
-        final Set<ContentPackInstallation> allInstallations = loadAll();
-        Optional<Integer> result = allInstallations.stream().map(contentPackInstallation -> {
-            return contentPackInstallation.entities().stream().
-                    filter(nativeEntityDescriptor -> nativeEntityDescriptor.contentPackEntityId()
-                            .equals(contentPackEntityId)).collect(Collectors.toSet()).size();
-        }).reduce((acc, next) -> acc + next );
+    /**
+     * Returns the number of installations the given content pack entity ID is used in.
+     * @param contentPackEntityId the content pack entity ID
+     * @return number of installations
+     */
+    public long countInstallationOfEntityById(ModelId contentPackEntityId) {
+        final String field = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_ENTITY_ID);
 
-
-        if (result.isPresent())
-            return result.get();
-        else
-            return -1;
+        return dbCollection.getCount(DBQuery.is(field, contentPackEntityId));
     }
 }

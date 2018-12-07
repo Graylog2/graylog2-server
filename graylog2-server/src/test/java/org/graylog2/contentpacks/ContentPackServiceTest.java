@@ -228,7 +228,7 @@ public class ContentPackServiceTest {
         assertThat(resultSuccess).isEqualTo(expectSuccess);
 
        /* Test skipped uninstall */
-        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(2);
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn((long) 2);
         ContentPackUninstallation expectSkip = ContentPackUninstallation.builder()
                 .skippedEntities(nativeEntityDescriptors)
                 .failedEntities(ImmutableSet.of())
@@ -238,7 +238,7 @@ public class ContentPackServiceTest {
         assertThat(resultSkip).isEqualTo(expectSkip);
 
         /* Test not found while uninstall */
-        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(1);
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn((long) 1);
         when(patternService.load("dead-beef1")).thenThrow(new NotFoundException("Not found."));
         ContentPackUninstallation expectFailure = ContentPackUninstallation.builder()
                 .skippedEntities(ImmutableSet.of())
@@ -253,13 +253,13 @@ public class ContentPackServiceTest {
     @Test
     public void getUninstallDetails() throws NotFoundException {
         /* Test will be uninstalled */
-        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(1);
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn((long) 1);
         ContentPackUninstallDetails expect = ContentPackUninstallDetails.create(nativeEntityDescriptors);
         ContentPackUninstallDetails result = contentPackService.getUninstallDetails(contentPack, contentPackInstallation);
         assertThat(result).isEqualTo(expect);
 
         /* Test nothing will be uninstalled */
-        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn(2);
+        when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("12345"))).thenReturn((long) 2);
         ContentPackUninstallDetails expectNon = ContentPackUninstallDetails.create(ImmutableSet.of());
         ContentPackUninstallDetails resultNon = contentPackService.getUninstallDetails(contentPack, contentPackInstallation);
         assertThat(resultNon).isEqualTo(expectNon);
