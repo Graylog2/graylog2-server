@@ -177,6 +177,7 @@ const EditContentPackPage = createReactClass({
                            selectedEntities={this.state.selectedEntities}
                            entityIndex={this.state.entityCatalog}
                            appliedParameter={this.state.appliedParameter}
+                           edit
                            onSave={this._onSave}
           />
         </span>

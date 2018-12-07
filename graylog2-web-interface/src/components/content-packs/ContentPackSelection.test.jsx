@@ -5,6 +5,7 @@ import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
+import Entity from 'logic/content-packs/Entity';
 
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
@@ -22,19 +23,21 @@ describe('<ContentPackSelection />', () => {
       .url('http://example.com')
       .build();
 
+    const entity = Entity.builder()
+      .v('1')
+      .type({ name: 'spaceship', version: '1' })
+      .id('beef123')
+      .data({
+        title: { value: 'breq', type: 'string' },
+      })
+      .build();
     const entities = {
-      spaceship: [{
-        title: 'breq',
-        type: {
-          name: 'spaceship',
-          version: '1',
-        },
-        id: 'beef123',
-      }],
+      spaceship: [entity],
     };
 
     const wrapper = renderer.create(
       <ContentPackSelection contentPack={contentPack}
+                            edit
                             entities={entities}
                             selectedEntities={{}}
       />);

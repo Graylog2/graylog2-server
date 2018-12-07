@@ -20,9 +20,11 @@ class ContentPackEdit extends React.Component {
     entityIndex: PropTypes.object,
     selectedEntities: PropTypes.object,
     appliedParameter: PropTypes.object,
+    edit: PropTypes.bool,
   };
 
   static defaultProps = {
+    edit: false,
     contentPack: undefined,
     onGetEntities: () => {},
     onStateChange: () => {},
@@ -113,6 +115,7 @@ class ContentPackEdit extends React.Component {
     const selectionComponent = (
       <ContentPackSelection contentPack={this.props.contentPack}
                             selectedEntities={this.props.selectedEntities}
+                            edit={this.props.edit}
                             onStateChange={this.props.onStateChange}
                             entities={this.props.entityIndex} />);
     const parameterComponent = (
