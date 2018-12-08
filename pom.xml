@@ -298,14 +298,6 @@
                     <version>1.6</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>6.6</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-maven-plugin</artifactId>
                     <version>${antlr.version}</version>
