@@ -69,7 +69,7 @@ public class ElasticsearchInstance extends ExternalResource {
             image = DEFAULT_IMAGE + ":" + version.toString();
         }
 
-        LOG.info("Creating instance {}", image);
+        LOG.debug("Creating instance {}", image);
 
         return new ElasticsearchInstance(image, version);
     }
@@ -86,7 +86,7 @@ public class ElasticsearchInstance extends ExternalResource {
     protected void before() {
         container.start();
 
-        LOG.info("Started container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
+        LOG.debug("Started container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
 
         jestClient = new JestClientProvider(
                 ImmutableList.of(URI.create("http://"+ container.getHttpHostAddress())),
@@ -106,7 +106,7 @@ public class ElasticsearchInstance extends ExternalResource {
 
     @Override
     protected void after() {
-        LOG.info("Stopping container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
+        LOG.debug("Stopping container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
         container.stop();
         try {
             network.close();
