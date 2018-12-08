@@ -177,8 +177,6 @@ public class Indices {
                 bulkRequestBuilder.addAction(messages.prepareIndexRequest(target, doc, id));
             }
 
-            bulkRequestBuilder.setParameter(Parameters.CONSISTENCY, "one");
-
             final BulkResult bulkResult = JestUtils.execute(jestClient, bulkRequestBuilder.build(), () -> "Couldn't bulk index messages into index " + target);
 
             final boolean hasFailedItems = !bulkResult.getFailedItems().isEmpty();
