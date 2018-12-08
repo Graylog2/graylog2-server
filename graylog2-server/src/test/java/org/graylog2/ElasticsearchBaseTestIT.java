@@ -16,11 +16,13 @@
  */
 package org.graylog2;
 
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-public class ElasticsearchBaseIT extends ElasticsearchBase {
+
+public class ElasticsearchBaseTestIT extends ElasticsearchBaseTest {
     @Before
     public void setUp() throws Exception {
         assertThat(client()).isNotNull();

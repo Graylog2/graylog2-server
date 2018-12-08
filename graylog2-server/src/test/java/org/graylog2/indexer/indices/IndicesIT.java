@@ -21,15 +21,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.State;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -69,7 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
-public class IndicesIT extends ElasticsearchBase {
+public class IndicesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
 
     @Rule
@@ -97,15 +94,6 @@ public class IndicesIT extends ElasticsearchBase {
     private EventBus eventBus;
     private Indices indices;
     private IndexMappingFactory indexMappingFactory;
-
-    @Override
-    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
-        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
-        return super.elasticsearchConfiguration()
-                .indexTemplates(messageTemplates)
-                .createIndices(false)
-                .deleteAllIndices(true);
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -212,8 +200,9 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndex() throws Exception {
+        importFixture("IndicesIT.json");
+
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
@@ -333,7 +322,7 @@ public class IndicesIT extends ElasticsearchBase {
 
     @Test
     public void testIndexTemplateCanBeOverridden_Elasticsearch5() throws Exception {
-        assumeTrue(getElasticsearchVersion().getMajorVersion() == 5);
+        assumeTrue(elasticsearchVersion().getMajorVersion() == 5);
 
         final String testIndexName = "graylog_override_template";
         final String customTemplateName = "custom-template";

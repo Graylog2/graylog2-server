@@ -18,12 +18,9 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.TestIndexSet;
@@ -42,14 +39,13 @@ import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 // JSON data in: src/test/resources/org/graylog2/indexer/fieldtypes/IndexFieldTypePollerIT.json
-public class IndexFieldTypePollerIT extends ElasticsearchBase {
+public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -74,13 +70,6 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
             .build();
     private TestIndexSet indexSet;
 
-    @Override
-    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
-        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
-        return super.elasticsearchConfiguration()
-                .indexTemplates(messageTemplates)
-                .deleteAllIndices(true);
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -93,10 +82,11 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
                 new EventBus("index-field-type-poller-it"));
         poller = new IndexFieldTypePoller(client(), indices, new MetricRegistry());
         indexSet = new TestIndexSet(indexSetConfig);
+
+        importFixture("IndexFieldTypePollerIT.json");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void poll() throws Exception {
         final String indexSetId = indexSet.getConfig().id();
         final IndexFieldTypesDTO existingFieldTypes = IndexFieldTypesDTO.builder()
@@ -134,7 +124,6 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void pollIndex() throws Exception {
         final String indexSetId = indexSet.getConfig().id();
 

@@ -21,7 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +39,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ClusterIT extends ElasticsearchBase {
+public class ClusterIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "cluster_it_" + System.nanoTime();
     private static final String ALIAS_NAME = "cluster_it_alias_" + System.nanoTime();
 

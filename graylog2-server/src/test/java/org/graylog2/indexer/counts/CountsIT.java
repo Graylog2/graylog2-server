@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CountsIT extends ElasticsearchBase {
+public class CountsIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     @Rule

@@ -20,7 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.junit.Before;
@@ -33,7 +33,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 
-public class MessagesIT extends ElasticsearchBase {
+public class MessagesIT extends ElasticsearchBaseTest {
     private Messages messages;
 
     @Before
