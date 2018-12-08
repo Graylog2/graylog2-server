@@ -79,6 +79,7 @@ public class ElasticsearchInstance extends ExternalResource {
         this.network = Network.newNetwork();
         this.container = new ElasticsearchContainer(image)
                 .withNetwork(network)
+                .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .waitingFor(Wait.forHttp("/").forPort(9200));
     }
 
