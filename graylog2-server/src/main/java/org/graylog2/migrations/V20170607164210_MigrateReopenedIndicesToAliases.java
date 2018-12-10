@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.State;
+import javax.annotation.Nonnull;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
@@ -117,18 +118,18 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
         return reopenedIndices.build();
     }
 
-    private boolean checkForReopened(@Nullable JsonNode indexSettings, Version elasticsearchVersion) {
+    private boolean checkForReopened(@Nonnull JsonNode indexSettings, Version elasticsearchVersion) {
         final JsonNode settings;
         if (elasticsearchVersion.satisfies(">=2.1.0 & <5.0.0")) {
             settings = indexSettings;
-        } else if (elasticsearchVersion.satisfies("^5.0.0")) {
+        } else if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0")) {
             settings = indexSettings.path("archived");
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }
 
-        final JsonNode reopened = settings.path("index").path(REOPENED_INDEX_SETTING);
-        return reopened.isMissingNode() ? false : reopened.asBoolean();
+        // if this is a missing node, asBoolean() returns false
+        return settings.path("index").path(REOPENED_INDEX_SETTING).asBoolean();
     }
 
     private Set<String> getReopenedIndices(final IndexSet indexSet) {
