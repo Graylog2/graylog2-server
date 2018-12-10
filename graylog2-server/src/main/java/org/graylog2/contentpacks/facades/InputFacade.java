@@ -470,28 +470,39 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         try {
             final Input input = inputService.find(modelId.toString());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            final Stream<String> extractorLookupNames = inputWithExtractors.extractors().stream()
-                    .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
-                    .map(e -> (String) e.getExtractorConfig().get(LookupTableExtractor.CONFIG_LUT_NAME));
-            final Stream<String> converterLookupNames = inputWithExtractors.extractors().stream()
-                    .flatMap(e -> e.getConverters().stream())
-                    .filter(c -> c.getType().equals(Converter.Type.LOOKUP_TABLE))
-                    .map(c -> (String) c.getConfig().get("lookup_table_name"));
 
-            Stream.concat(extractorLookupNames, converterLookupNames)
-                    .map(lookupTableService::get)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(lookupTableDto -> {
-                        EntityDescriptor lookupTable = EntityDescriptor.create(
-                                ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
-                        mutableGraph.putEdge(entityDescriptor, lookupTable);
-                    });
+            final MutableGraph<EntityDescriptor> lookupGraph = resolveNativeEntityLookupTable(entityDescriptor,
+                    inputWithExtractors, mutableGraph);
 
+            return ImmutableGraph.copyOf(lookupGraph);
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find input {}", entityDescriptor, e);
         }
         return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    private MutableGraph<EntityDescriptor> resolveNativeEntityLookupTable(EntityDescriptor entityDescriptor,
+                                                                InputWithExtractors inputWithExtractors,
+                                                                MutableGraph<EntityDescriptor> mutableGraph) {
+
+        final Stream<String> extractorLookupNames = inputWithExtractors.extractors().stream()
+                .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
+                .map(e -> (String) e.getExtractorConfig().get(LookupTableExtractor.CONFIG_LUT_NAME));
+        final Stream<String> converterLookupNames = inputWithExtractors.extractors().stream()
+                .flatMap(e -> e.getConverters().stream())
+                .filter(c -> c.getType().equals(Converter.Type.LOOKUP_TABLE))
+                .map(c -> (String) c.getConfig().get("lookup_table_name"));
+
+        Stream.concat(extractorLookupNames, converterLookupNames)
+                .map(lookupTableService::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(lookupTableDto -> {
+                    EntityDescriptor lookupTable = EntityDescriptor.create(
+                            ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
+                    mutableGraph.putEdge(entityDescriptor, lookupTable);
+                });
+        return mutableGraph;
     }
 
     @Override
@@ -510,6 +521,17 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                                                    Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> graph = GraphBuilder.directed().build();
         graph.addNode(entity);
+
+        final MutableGraph<Entity> lookupGraph = resolveForInstallationV1LookupTable(entity,
+                parameters, entities, graph);
+
+        return ImmutableGraph.copyOf(lookupGraph);
+    }
+
+    private MutableGraph<Entity> resolveForInstallationV1LookupTable(EntityV1 entity,
+                                                               Map<String, ValueReference> parameters,
+                                                               Map<EntityDescriptor, Entity> entities,
+                                                               MutableGraph<Entity> graph) {
 
         final InputEntity input = objectMapper.convertValue(entity.data(), InputEntity.class);
         final Set<String> lookupTableNames = input.extractors().stream()
@@ -532,6 +554,6 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 })
                 .forEach(x -> graph.putEdge(entity, x.getValue()));
 
-        return ImmutableGraph.copyOf(graph);
+        return graph;
     }
 }
