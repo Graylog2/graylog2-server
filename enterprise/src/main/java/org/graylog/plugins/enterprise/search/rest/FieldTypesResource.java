@@ -3,7 +3,9 @@ package org.graylog.plugins.enterprise.search.rest;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
@@ -79,6 +81,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     }
 
     @GET
+    @ApiOperation(value = "Retrieve the list of all fields present in the system")
     public Set<MappedFieldTypeDTO> allFieldTypes() {
         if (allowedToReadStream("*")) {
             return mergeCompoundFieldTypes(indexFieldTypesService.findAll()
@@ -101,6 +104,8 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     }
 
     @POST
+    @ApiOperation(value = "Retrieve the field list of a given set of streams")
+    @NoAuditEvent("This is not changing any data")
     public Set<MappedFieldTypeDTO> byStreams(FieldTypesForStreamsRequest request) {
         request.streams().forEach(s -> checkPermission(RestPermissions.STREAMS_READ, s));
 
