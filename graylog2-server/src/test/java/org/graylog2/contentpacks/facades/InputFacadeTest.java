@@ -177,7 +177,7 @@ public class InputFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of(input.getId()));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -196,7 +196,7 @@ public class InputFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(id);
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -292,7 +292,7 @@ public class InputFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf25294b900a0fdb4e5365"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
         assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Global Random HTTP"));

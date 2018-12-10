@@ -97,7 +97,7 @@ public class LookupCacheFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -116,7 +116,7 @@ public class LookupCacheFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf24b24b900a0fdb4e52dd"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -281,7 +281,7 @@ public class LookupCacheFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf24b24b900a0fdb4e52dd"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE_V1);
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);
         assertThat(lookupCacheEntity.name()).isEqualTo(ValueReference.of("no-op-cache"));

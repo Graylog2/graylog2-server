@@ -82,7 +82,6 @@ public class OutputFacade implements EntityFacade<Output> {
         );
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(output.getId()))
                 .type(ModelTypes.OUTPUT_V1)
                 .data(data)
                 .build();

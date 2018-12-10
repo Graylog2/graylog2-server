@@ -151,7 +151,7 @@ public class StreamCatalogTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of(streamId.toHexString()));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -204,7 +204,7 @@ public class StreamCatalogTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf23894b900a0fdb4e517d"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         assertThat(streamEntity.title()).isEqualTo(ValueReference.of("Test"));

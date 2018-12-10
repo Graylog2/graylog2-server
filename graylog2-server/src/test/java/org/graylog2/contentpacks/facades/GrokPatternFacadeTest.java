@@ -74,7 +74,7 @@ public class GrokPatternFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("01234567890"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -124,17 +124,13 @@ public class GrokPatternFacadeTest {
                 "name", ValueReference.of("Test1"),
                 "pattern", ValueReference.of("[a-z]+"));
         final JsonNode entityData = objectMapper.convertValue(entity, JsonNode.class);
-        final Entity expectedEntity = EntityV1.builder()
-                .type(ModelTypes.GROK_PATTERN_V1)
-                .id(ModelId.of("1"))
-                .data(entityData)
-                .build();
 
         final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1));
         assertThat(collectedEntity)
-                .isPresent()
-                .map(EntityWithConstraints::entity)
-                .contains(expectedEntity);
+                .isPresent();
+        final EntityV1 entityV1 = (EntityV1) collectedEntity.get().entity();
+        assertThat(entityV1.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
+        assertThat(entityV1.data()).isEqualTo(entityData);
     }
 
     @Test
@@ -190,7 +186,9 @@ public class GrokPatternFacadeTest {
         final GrokPattern expectedGrokPattern = GrokPattern.create("1", "Test", "[a-z]+", null);
         final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create("1", "1", ModelTypes.GROK_PATTERN_V1, "Test");
 
-        assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
+        assertThat(nativeEntity.descriptor().title()).isEqualTo(expectedDescriptor.title());
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(expectedDescriptor.type());
+
         assertThat(nativeEntity.entity()).isEqualTo(expectedGrokPattern);
         assertThat(grokPatternService.load("1")).isEqualTo(expectedGrokPattern);
     }

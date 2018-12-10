@@ -141,7 +141,7 @@ public class DashboardFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of(dashboard.getId()));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -177,7 +177,7 @@ public class DashboardFacadeTest {
         final Entity entity = entityWithConstraints.orElseThrow(AssertionError::new).entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5a82f5974b900a7a97caa1e5"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -229,7 +229,7 @@ public class DashboardFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5a82f5974b900a7a97caa1e5"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         assertThat(dashboardEntity.title()).isEqualTo(ValueReference.of("Test"));

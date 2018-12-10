@@ -93,7 +93,7 @@ public class PipelineRuleFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("title"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -110,7 +110,7 @@ public class PipelineRuleFacadeTest {
         final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final Entity entity = entityWithConstraints.entity();
 
-        assertThat(entity.id()).isEqualTo(ModelId.of("debug"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -234,7 +234,7 @@ public class PipelineRuleFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("debug"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
         final PipelineRuleEntity pipelineRuleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);
         assertThat(pipelineRuleEntity.title()).isEqualTo(ValueReference.of("debug"));

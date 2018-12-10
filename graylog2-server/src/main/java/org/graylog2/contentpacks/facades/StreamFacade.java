@@ -102,7 +102,6 @@ public class StreamFacade implements EntityFacade<Stream> {
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(stream.getId()))
                 .type(ModelTypes.STREAM_V1)
                 .data(data)
                 .build();
