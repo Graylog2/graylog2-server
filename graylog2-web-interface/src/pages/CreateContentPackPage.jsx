@@ -12,6 +12,8 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
+import Entity from 'logic/content-packs/Entity';
+
 
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
@@ -55,7 +57,7 @@ const CreateContentPackPage = createReactClass({
   },
 
   _onSave() {
-    ContentPacksActions.create.triggerPromise(this.state.contentPack.toObject())
+    ContentPacksActions.create.triggerPromise(this.state.contentPack.toJSON())
       .then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
@@ -79,7 +81,8 @@ const CreateContentPackPage = createReactClass({
         .entities(result.entities)
         .requires(result.constraints)
         .build();
-      this.setState({ contentPack: newContentPack, fetchedEntities: result.entities });
+      const fetchedEntities = result.entities.map(e => Entity.fromJSON(e));
+      this.setState({ contentPack: newContentPack, fetchedEntities });
     });
   },
 
