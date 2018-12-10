@@ -24,6 +24,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
+import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
 import org.graylog.plugins.sidecar.rest.models.NodeMetrics;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
@@ -48,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,12 +61,14 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
     private static final freemarker.template.Configuration templateConfiguration =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
     private static final StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
+    private ConfigurationVariableService configurationVariableService;
 
     private static final String COLLECTION_NAME = "sidecar_configurations";
 
     @Inject
     public ConfigurationService(MongoConnection mongoConnection,
-                                MongoJackObjectMapperProvider mapper) {
+                                MongoJackObjectMapperProvider mapper,
+                                ConfigurationVariableService configurationVariableService) {
         super(mongoConnection, mapper, Configuration.class, COLLECTION_NAME);
         MongoDbTemplateLoader mongoDbTemplateLoader = new MongoDbTemplateLoader(db);
         MultiTemplateLoader multiTemplateLoader = new MultiTemplateLoader(new TemplateLoader[] {
@@ -75,6 +79,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         templateConfiguration.setDefaultEncoding(UTF_8);
         templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfiguration.setLogTemplateExceptions(false);
+        this.configurationVariableService = configurationVariableService;
     }
 
     public Configuration find(String id) {
@@ -99,6 +104,27 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         final DBQuery.Query dbQuery = searchQuery.toDBQuery();
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    }
+
+    public List<Configuration> findByQuery(DBQuery.Query query) {
+        try (final Stream<Configuration> collectorConfigurationStream = streamQuery(query)) {
+            return collectorConfigurationStream.collect(Collectors.toList());
+        }
+    }
+
+    public List<Configuration> findByConfigurationVariable(ConfigurationVariable configurationVariable) {
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(configurationVariable.fullName())));
+        return findByQuery(query);
+    }
+
+    public void replaceVariableNames(String oldName, String newName) {
+        final DBQuery.Query query = DBQuery.regex(Configuration.FIELD_TEMPLATE, Pattern.compile(Pattern.quote(oldName)));
+        List<Configuration> configurations = findByQuery(query);
+        for (Configuration config : configurations) {
+            final String newTemplate = config.template().replace(oldName, newName);
+            db.findAndModify(DBQuery.is("_id", config.id()), new BasicDBObject(),
+                    new BasicDBObject(), false, config.toBuilder().template(newTemplate).build(), true, true);
+        }
     }
 
     @Override
@@ -179,9 +205,17 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         return result;
     }
 
-    private String renderTemplate(String configurationId, Map<String, Object> context) throws RenderTemplateException {
+    private String renderTemplate(String configurationId, Map<String, Object> sidecarContext) throws RenderTemplateException {
         Writer writer = new StringWriter();
         String template;
+
+        final Map<String, Object> context = new HashMap<>();
+        context.put("sidecar", sidecarContext);
+
+        final Map<String, Object> userContext =
+                configurationVariableService.all().stream().collect(Collectors.toMap(ConfigurationVariable::name, ConfigurationVariable::content));
+        context.put(ConfigurationVariable.VARIABLE_PREFIX, userContext);
+
         try {
             Template compiledTemplate = templateConfiguration.getTemplate(configurationId);
             compiledTemplate.process(context, writer);

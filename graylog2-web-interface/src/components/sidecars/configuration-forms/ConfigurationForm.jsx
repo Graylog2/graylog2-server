@@ -109,6 +109,15 @@ const ConfigurationForm = createReactClass({
     this.setState({ errors: nextErrors });
   },
 
+  replaceConfigurationVariableName(oldname, newname) {
+    if (oldname === '' || oldname === newname) {
+      return;
+    }
+    // replaceAll without having to use a Regex
+    const updatedTemplate = this.state.formData.template.split(`\${user.${oldname}}`).join(`\${user.${newname}}`);
+    this._onTemplateChange(updatedTemplate);
+  },
+
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);
@@ -250,6 +259,7 @@ const ConfigurationForm = createReactClass({
             <FormGroup controlId="template" validationState={this.state.errors.template ? 'error' : null}>
               <ControlLabel>Configuration</ControlLabel>
               <SourceCodeEditor id="template"
+                                height={400}
                                 value={this.state.formData.template}
                                 onChange={this._onTemplateChange} />
               <Button className="pull-right"
