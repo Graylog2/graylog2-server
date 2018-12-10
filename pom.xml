@@ -160,7 +160,6 @@
         <junit.version>4.12</junit.version>
         <mockito.version>2.23.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
-        <nosqlunit-elasticsearch-http.version>1.0.0-4+jackson</nosqlunit-elasticsearch-http.version>
         <restassured.version>2.9.0</restassured.version>
         <system-rules.version>1.18.0</system-rules.version>
         <testcontainers.version>1.10.2</testcontainers.version>

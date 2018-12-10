@@ -574,12 +574,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.joschi.nosqlunit</groupId>
-                <artifactId>nosqlunit-elasticsearch-http</artifactId>
-                <version>${nosqlunit-elasticsearch-http.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
