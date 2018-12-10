@@ -64,7 +64,7 @@ public class ContentPackInstallationPersistenceServiceTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void loadAll() {
         final Set<ContentPackInstallation> contentPacks = persistenceService.loadAll();
-        assertThat(contentPacks).hasSize(3);
+        assertThat(contentPacks).hasSize(4);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ContentPackInstallationPersistenceServiceTest {
 
         assertThat(deletedContentPacks).isEqualTo(1);
         assertThat(contentPacks)
-                .hasSize(2)
+                .hasSize(3)
                 .noneSatisfy(contentPack -> assertThat(contentPack.id()).isEqualTo(objectId));
     }
 
@@ -164,6 +164,19 @@ public class ContentPackInstallationPersistenceServiceTest {
         final Set<ContentPackInstallation> contentPacks = persistenceService.loadAll();
 
         assertThat(deletedContentPacks).isEqualTo(0);
-        assertThat(contentPacks).hasSize(3);
+        assertThat(contentPacks).hasSize(4);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void countInstallationOfEntityById() {
+        final long countedInstallations1 = persistenceService.countInstallationOfEntityById(ModelId.of("5b1a49eb3d274631fe07c86a"));
+        assertThat(countedInstallations1).isEqualTo(2);
+
+        final long countedInstallations2 = persistenceService.countInstallationOfEntityById(ModelId.of("non-exsistant"));
+        assertThat(countedInstallations2).isEqualTo(0);
+
+        final long countedInstallations3 = persistenceService.countInstallationOfEntityById(ModelId.of("5b1a49eb3d274631fe07befa"));
+        assertThat(countedInstallations3).isEqualTo(1);
     }
 }

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
+import { BootstrapModalConfirm } from 'components/bootstrap';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -14,6 +15,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
+import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
 import CombinedProvider from 'injection/CombinedProvider';
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
@@ -31,6 +33,9 @@ const ShowContentPackPage = createReactClass({
   getInitialState() {
     return {
       selectedVersion: undefined,
+      uninstallEntities: undefined,
+      uninstallContentPackId: undefined,
+      uninstallInstallId: undefined,
     };
   },
 
@@ -53,6 +58,7 @@ const ShowContentPackPage = createReactClass({
   },
 
   _deleteContentPackRev(contentPackId, revision) {
+    /* eslint-disable-next-line no-alert */
     if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content pack revision deleted successfully.', 'Success');
@@ -72,15 +78,35 @@ const ShowContentPackPage = createReactClass({
     }
   },
 
-  _uninstallContentPackRev(contentPackId, installId) {
-    if (window.confirm('You are about to uninstall this content pack installation, are you sure?')) {
-      ContentPacksActions.uninstall(contentPackId, installId).then(() => {
-        UserNotification.success('Content Pack uninstalled successfully.', 'Success');
-        ContentPacksActions.installList(contentPackId);
-      }, () => {
-        UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
-      });
-    }
+  _onUninstallContentPackRev(contentPackId, installId) {
+    ContentPacksActions.uninstallDetails(contentPackId, installId).then((result) => {
+      this.setState({ uninstallEntities: result.entities });
+    });
+    this.setState({
+      uninstallContentPackId: contentPackId,
+      uninstallInstallId: installId,
+    });
+    this.modal.open();
+  },
+
+  _clearUninstall() {
+    this.setState({
+      uninstallContentPackId: undefined,
+      uninstallInstallId: undefined,
+      uninstallEntities: undefined,
+    });
+    this.modal.close();
+  },
+
+  _uninstallContentPackRev() {
+    const contentPackId = this.state.uninstallContentPackId;
+    ContentPacksActions.uninstall(this.state.uninstallContentPackId, this.state.uninstallInstallId).then(() => {
+      UserNotification.success('Content Pack uninstalled successfully.', 'Success');
+      ContentPacksActions.installList(contentPackId);
+      this._clearUninstall();
+    }, () => {
+      UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
+    });
   },
 
   _installContentPack(contentPackId, contentPackRev, parameters) {
@@ -135,7 +161,7 @@ const ShowContentPackPage = createReactClass({
                   <Col>
                     <h2>Installations</h2>
                     <ContentPackInstallations installations={this.state.installations}
-                                              onUninstall={this._uninstallContentPackRev}
+                                              onUninstall={this._onUninstallContentPackRev}
                     />
                   </Col>
                 </Row>
@@ -149,6 +175,14 @@ const ShowContentPackPage = createReactClass({
             </Col>
           </Row>
         </span>
+        <BootstrapModalConfirm
+          ref={(c) => { this.modal = c; }}
+          title="Do you really want to uninstall this Content Pack?"
+          onConfirm={this._uninstallContentPackRev}
+          onCancel={this._clearUninstall}
+        >
+          <ContentPackInstallEntityList uninstall entities={this.state.uninstallEntities} />
+        </BootstrapModalConfirm>
       </DocumentTitle>
     );
   },

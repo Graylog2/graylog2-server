@@ -90,6 +90,17 @@ const ContentPacksStore = Reflux.createStore({
     const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstall(contentPackId, installId).url));
     ContentPacksActions.uninstall.promise(promise);
   },
+  uninstallDetails(contentPackId, installId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstallDetails(contentPackId, installId).url);
+    const promise = fetch('GET', url)
+      .then((result) => {
+        this.trigger({ uninstallEntities: result.entities });
+
+        return result;
+      });
+
+    ContentPacksActions.uninstallDetails.promise(promise);
+  },
 });
 
 export default ContentPacksStore;

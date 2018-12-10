@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ContentPackInstallEntityList /> should render with empty entities 1`] = `
+<div>
+  <h3>
+    Installed Entities
+  </h3>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="installed-entities"
+        >
+          <p>
+            No data available.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
+<div>
+  <h3>
+    Installed Entities
+  </h3>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="installed-entities"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Title
+                </th>
+                <th>
+                  Type
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Threat Intel Uncached Adapters
+                </td>
+                <td>
+                  lookup_cache
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Tor Exit Node
+                </td>
+                <td>
+                  lookup_adapter
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Tor Exit Node List
+                </td>
+                <td>
+                  lookup_table
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackInstallEntityList /> should render with uninstall and entities 1`] = `
+<div>
+  <h3>
+    Entites to be uninstalled
+  </h3>
+  <div>
+    <div
+      className="row "
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="data-table table-responsive"
+          id="installed-entities"
+        >
+          <table
+            className="table undefined"
+          >
+            <thead>
+              <tr>
+                <th>
+                  Title
+                </th>
+                <th>
+                  Type
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Threat Intel Uncached Adapters
+                </td>
+                <td>
+                  lookup_cache
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Tor Exit Node
+                </td>
+                <td>
+                  lookup_adapter
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Tor Exit Node List
+                </td>
+                <td>
+                  lookup_table
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<ContentPackInstallEntityList /> should render without entities 1`] = `
+<span>
+  <i
+    className="fa fa-spin fa-spinner"
+  />
+   
+  Loading...
+</span>
+`;
