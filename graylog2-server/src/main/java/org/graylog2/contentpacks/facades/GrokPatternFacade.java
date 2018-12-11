@@ -182,18 +182,15 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
 
-            final Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
             final String namedPattern = grokPattern.pattern();
-            final Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
-            while (matcher.find()) {
-                final Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
-                final String patternName = group.get("pattern");
+            final Set<String> patterns = GrokPatternService.extractPatternNames(namedPattern);
+            patterns.stream().forEach(patternName -> {
                 grokPatternService.loadByName(patternName).ifPresent(depPattern -> {
                     final EntityDescriptor depEntityDescriptor = EntityDescriptor.create(
                             depPattern.id(), ModelTypes.GROK_PATTERN_V1);
                     mutableGraph.putEdge(entityDescriptor, depEntityDescriptor);
                 });
-            }
+            });
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
         }
@@ -218,14 +215,9 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         mutableGraph.addNode(entity);
 
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
-
-        final Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
         final String namedPattern = grokPatternEntity.pattern().asString(parameters);
-        final Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
-        while (matcher.find()) {
-            final Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
-            final String patternName = group.get("pattern");
-
+        final Set<String> patterns = GrokPatternService.extractPatternNames(namedPattern);
+        patterns.stream().forEach(patternName -> {
             entities.entrySet().stream()
                     .filter(x -> x.getValue().type().equals(ModelTypes.GROK_PATTERN_V1))
                     .filter(x -> {
@@ -233,7 +225,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
                         GrokPatternEntity grokPatternEntity1 = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
                         return grokPatternEntity1.name().asString(parameters).equals(patternName);
                     }).forEach(x -> mutableGraph.putEdge(entity, x.getValue()));
-        }
+        });
 
         return ImmutableGraph.copyOf(mutableGraph);
     }

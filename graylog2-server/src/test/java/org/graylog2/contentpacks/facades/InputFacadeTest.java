@@ -155,6 +155,7 @@ public class InputFacadeTest {
                 inputService,
                 inputRegistry,
                 dbLookupTableService,
+                grokPatternService,
                 messageInputFactory,
                 extractorFactory,
                 converterFactory,
