@@ -85,9 +85,15 @@ public class ConnectionCounterTest {
                     }
                 });
 
+        final CountDownLatch serverChannelLatch = new CountDownLatch(1);
         serverBootstrap.bind(InetAddress.getLocalHost(), 0)
-                .addListener((ChannelFutureListener) future -> serverChannel = future.channel())
+                .addListener((ChannelFutureListener) future -> {
+                    serverChannel = future.channel();
+                    serverChannelLatch.countDown();
+                })
                 .syncUninterruptibly();
+        // Wait for serverChannel to be set to make sure we can use it in tests
+        serverChannelLatch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
     }
 
     @After

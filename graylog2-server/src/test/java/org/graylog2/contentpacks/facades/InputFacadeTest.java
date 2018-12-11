@@ -25,14 +25,18 @@ import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.apache.commons.collections.map.HashedMap;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
+import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
+import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -49,11 +53,15 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.LookupTableExtractor;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.lookup.LookupTableService;
+import org.graylog2.lookup.db.DBLookupTableService;
+import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.SuppressForbidden;
@@ -69,9 +77,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -97,6 +107,17 @@ public class InputFacadeTest {
 
     @Mock
     private LookupTableService lookupTableService;
+    @Mock
+    private LookupTableService.Builder lookupuptableBuilder;
+    @Mock
+    private LookupTableService.Function lookupTable;
+    @Mock
+    private DBLookupTableService dbLookupTableService;
+    @Mock
+    private LookupTableDto lookupTableWhois;
+    @Mock
+    private LookupTableDto lookupTableTor;
+
     @Mock
     private MessageInputFactory messageInputFactory;
     @Mock
@@ -133,6 +154,7 @@ public class InputFacadeTest {
                 objectMapper,
                 inputService,
                 inputRegistry,
+                dbLookupTableService,
                 messageInputFactory,
                 extractorFactory,
                 converterFactory,
@@ -155,7 +177,7 @@ public class InputFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of(input.getId()));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -174,7 +196,7 @@ public class InputFacadeTest {
         final Entity entity = entityWithConstraints.entity();
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(id);
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -250,8 +272,14 @@ public class InputFacadeTest {
                 .title("Local Raw UDP")
                 .build();
 
+        final EntityExcerpt expectedEntityExcerpt3 = EntityExcerpt.builder()
+                .id(ModelId.of("5ae2eb0a3d27464477f0fd8b"))
+                .type(ModelTypes.INPUT_V1)
+                .title("TEST PLAIN TEXT")
+                .build();
+
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
-        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt1, expectedEntityExcerpt2);
+        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt1, expectedEntityExcerpt2, expectedEntityExcerpt3);
     }
 
     @Test
@@ -264,7 +292,7 @@ public class InputFacadeTest {
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf25294b900a0fdb4e5365"));
+        assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);
         assertThat(inputEntity.title()).isEqualTo(ValueReference.of("Global Random HTTP"));
@@ -338,12 +366,124 @@ public class InputFacadeTest {
         final Input input = inputService.find("5acc84f84b900a4ff290d9a7");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
 
-        assertThat(inputService.totalCount()).isEqualTo(2L);
+        assertThat(inputService.totalCount()).isEqualTo(3L);
         facade.delete(inputWithExtractors);
 
-        assertThat(inputService.totalCount()).isEqualTo(1L);
+        assertThat(inputService.totalCount()).isEqualTo(2L);
         assertThatThrownBy(() -> inputService.find("5acc84f84b900a4ff290d9a7"))
                 .isInstanceOf(NotFoundException.class);
     }
 
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveNativeEntity() throws NotFoundException {
+        when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.build()).thenReturn(lookupTable);
+        when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
+        when(lookupTableService.hasTable("whois")).thenReturn(true);
+        when(lookupTableService.hasTable("tor-exit-node-list")).thenReturn(true);
+
+        when(lookupTableWhois.id()).thenReturn("dead-beef");
+        when(dbLookupTableService.get("whois")).thenReturn(Optional.of(lookupTableWhois));
+
+        when(lookupTableTor.id()).thenReturn("dead-feed");
+        when(dbLookupTableService.get("tor-exit-node-list")).thenReturn(Optional.of(lookupTableTor));
+
+        final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
+        EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
+        EntityDescriptor expectedEntitiyDescriptorWhois = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
+        EntityDescriptor expectedEntitiyDescriptorTor = EntityDescriptor.create(ModelId.of("dead-feed"), ModelTypes.LOOKUP_TABLE_V1);
+        Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
+        assertThat(graph.nodes()).contains(expectedEntitiyDescriptorWhois);
+        assertThat(graph.nodes()).contains(expectedEntitiyDescriptorTor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveForInstallation() throws NotFoundException {
+        when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
+        when(lookupuptableBuilder.build()).thenReturn(lookupTable);
+        when(lookupTableService.newBuilder()).thenReturn(lookupuptableBuilder);
+        when(lookupTableService.hasTable("whois")).thenReturn(true);
+        when(lookupTableService.hasTable("tor-exit-node-list")).thenReturn(true);
+        final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
+        final Map<String, Object> lookupTableConfig = new HashedMap(1);
+        lookupTableConfig.put("lookup_table_name", "tor-exit-node-list");
+        final ConverterEntity converterEntity = ConverterEntity.create(
+                ValueReference.of(Converter.Type.LOOKUP_TABLE.name()), ReferenceMapUtils.toReferenceMap(lookupTableConfig));
+        final List<ConverterEntity> converterEntities = new ArrayList<>(1);
+        converterEntities.add(converterEntity);
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+        final LookupTableExtractor extractor = (LookupTableExtractor) inputWithExtractors.extractors().iterator().next();
+        final ExtractorEntity extractorEntity = ExtractorEntity.create(
+                ValueReference.of(extractor.getTitle()),
+                ValueReference.of(extractor.getType()),
+                ValueReference.of(extractor.getCursorStrategy()),
+                ValueReference.of(extractor.getTargetField()),
+                ValueReference.of(extractor.getSourceField()),
+                ReferenceMapUtils.toReferenceMap(extractor.getExtractorConfig()),
+                converterEntities,
+                ValueReference.of(extractor.getConditionType()),
+                ValueReference.of(extractor.getConditionValue()),
+                ValueReference.of(extractor.getOrder())
+        );
+        List<ExtractorEntity> extractors = new ArrayList<>();
+        extractors.add(extractorEntity);
+        InputEntity inputEntity = InputEntity.create(
+                ValueReference.of(input.getTitle()),
+                ReferenceMapUtils.toReferenceMap(input.getConfiguration()),
+                Collections.emptyMap(),
+                ValueReference.of(input.getType()),
+                ValueReference.of(input.isGlobal()),
+                extractors);
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of(input.getId()))
+                .type(ModelTypes.INPUT_V1)
+                .data(objectMapper.convertValue(inputEntity, JsonNode.class))
+                .build();
+        final LookupTableEntity whoIsEntity = LookupTableEntity.create(
+                ValueReference.of("whois"),
+                ValueReference.of("title"),
+                ValueReference.of("description"),
+                ValueReference.of("cache_name"),
+                ValueReference.of("dataadapter_name"),
+                ValueReference.of("default_single_value"),
+                ValueReference.of("BOOLEAN"),
+                ValueReference.of("default_multi_value"),
+                ValueReference.of("BOOLEAN")
+        );
+
+        final LookupTableEntity torNodeEntity = LookupTableEntity.create(
+                ValueReference.of("tor-exit-node-list"),
+                ValueReference.of("title"),
+                ValueReference.of("description"),
+                ValueReference.of("cache_name"),
+                ValueReference.of("dataadapter_name"),
+                ValueReference.of("default_single_value"),
+                ValueReference.of("BOOLEAN"),
+                ValueReference.of("default_multi_value"),
+                ValueReference.of("BOOLEAN")
+        );
+        final Entity expectedWhoIsEntity = EntityV1.builder()
+                .id(ModelId.of("dead-beef"))
+                .data(objectMapper.convertValue(whoIsEntity, JsonNode.class))
+                .type(ModelTypes.LOOKUP_TABLE_V1)
+                .build();
+
+        final Entity expectedTorEntity = EntityV1.builder()
+                .id(ModelId.of("dead-feed"))
+                .data(objectMapper.convertValue(torNodeEntity, JsonNode.class))
+                .type(ModelTypes.LOOKUP_TABLE_V1)
+                .build();
+        final EntityDescriptor whoisDescriptor = expectedWhoIsEntity.toEntityDescriptor();
+        final EntityDescriptor torDescriptor = expectedTorEntity.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = new HashMap<>(2);
+        entityDescriptorEntityMap.put(whoisDescriptor, expectedWhoIsEntity);
+        entityDescriptorEntityMap.put(torDescriptor, expectedTorEntity);
+        Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
+        assertThat(graph.nodes()).contains(expectedWhoIsEntity);
+        assertThat(graph.nodes()).contains(expectedTorEntity);
+    }
 }

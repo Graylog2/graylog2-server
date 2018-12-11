@@ -92,7 +92,6 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(pipelineDao.title()))
                 .type(ModelTypes.PIPELINE_V1)
                 .data(data)
                 .build();

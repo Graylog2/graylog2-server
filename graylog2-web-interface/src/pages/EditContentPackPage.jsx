@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
+import { cloneDeep, groupBy } from 'lodash';
 
 import Routes from 'routing/Routes';
 import { Button } from 'react-bootstrap';
@@ -13,6 +14,8 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import ObjectUtils from 'util/ObjectUtils';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
+
+import Entity from 'logic/content-packs/Entity';
 
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
@@ -30,23 +33,38 @@ const EditContentPackPage = createReactClass({
     return {
       selectedEntities: {},
       selectedStep: undefined,
+      contentPackEntities: undefined,
       appliedParameter: {},
+      entityCatalog: {},
     };
   },
 
   componentDidMount() {
     ContentPacksActions.get(this.props.params.contentPackId).then(() => {
       const originContentPackRev = this.props.params.contentPackRev;
-      const newContentPack = this.state.contentPack[originContentPackRev];
-      const nextContentPackRev = Math.max(...Object.keys(this.state.contentPack).map(x => parseInt(x, 10))) + 1;
-      newContentPack.rev = nextContentPackRev;
-      this.setState({ contentPack: newContentPack });
+      const newContentPack = this.state.contentPackRevisions.createNewVersionFromRev(originContentPackRev);
+      this.setState({ contentPack: newContentPack, contentPackEntities: cloneDeep(newContentPack.entities) });
 
       CatalogActions.showEntityIndex().then(() => {
+        this._createEntityCatalog();
         this._getSelectedEntities();
         this._getAppliedParameter();
       });
     });
+  },
+
+  _createEntityCatalog() {
+    if (!this.state.contentPack || !this.state.entityIndex) {
+      return;
+    }
+    const groupedContentPackEntities = groupBy(this.state.contentPackEntities, 'type.name');
+    const entityCatalog = Object.keys(this.state.entityIndex)
+      .reduce((result, entityType) => {
+        /* eslint-disable-next-line no-param-reassign */
+        result[entityType] = this.state.entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
+        return result;
+      }, {});
+    this.setState({ entityCatalog });
   },
 
   _getSelectedEntities() {
@@ -54,12 +72,11 @@ const EditContentPackPage = createReactClass({
       return;
     }
     const selectedEntities = this.state.contentPack.entities.reduce((result, entity) => {
-      if (this.state.entityIndex[entity.type.name] &&
-        this.state.entityIndex[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
+      if (this.state.entityCatalog[entity.type.name] &&
+        this.state.entityCatalog[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
         const newResult = result;
-        const selectedEntity = { type: entity.type, id: entity.id };
         newResult[entity.type.name] = result[entity.type.name] || [];
-        newResult[entity.type.name].push(selectedEntity);
+        newResult[entity.type.name].push(entity);
         return newResult;
       }
       return result;
@@ -99,7 +116,7 @@ const EditContentPackPage = createReactClass({
   },
 
   _onSave() {
-    ContentPacksActions.create.triggerPromise(this.state.contentPack)
+    ContentPacksActions.create.triggerPromise(this.state.contentPack.toJSON())
       .then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
@@ -119,10 +136,17 @@ const EditContentPackPage = createReactClass({
 
   _getEntities(selectedEntities) {
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
-      const contentPack = ObjectUtils.clone(this.state.contentPack);
-      contentPack.entities = result.entities;
-      contentPack.requires = result.constraints;
-      this.setState({ contentPack: contentPack, fetchedEntities: result.entities });
+      const contentPackEntities = Object.keys(selectedEntities)
+        .reduce((acc, entityType) => {
+          return acc.concat(selectedEntities[entityType]);
+        }, []).filter(e => e.constructor.name === Entity.name);
+      const entities = contentPackEntities.concat(result.entities);
+      const contentPack = this.state.contentPack.toBuilder()
+        .entities(entities)
+        /* TODO: graylog2-server#5335 */
+        .requires(result.constraints)
+        .build();
+      this.setState({ contentPack: contentPack, fetchedEntities: contentPack.entities });
     });
   },
 
@@ -151,8 +175,9 @@ const EditContentPackPage = createReactClass({
                            onStateChange={this._onStateChanged}
                            fetchedEntities={this.state.fetchedEntities}
                            selectedEntities={this.state.selectedEntities}
-                           entityIndex={this.state.entityIndex}
+                           entityIndex={this.state.entityCatalog}
                            appliedParameter={this.state.appliedParameter}
+                           edit
                            onSave={this._onSave}
           />
         </span>

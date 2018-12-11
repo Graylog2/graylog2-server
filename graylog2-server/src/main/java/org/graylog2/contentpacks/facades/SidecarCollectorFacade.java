@@ -72,7 +72,6 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
 
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(collector.id()))
                 .type(TYPE_V1)
                 .data(data)
                 .build();

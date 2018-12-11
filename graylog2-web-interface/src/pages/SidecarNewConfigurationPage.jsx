@@ -12,6 +12,10 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 const SidecarNewConfigurationPage = createReactClass({
   displayName: 'SidecarNewConfigurationPage',
 
+  _variableRenameHandler(oldname, newname) {
+    this.configurationForm.replaceConfigurationVariableName(oldname, newname);
+  },
+
   render() {
     return (
       <DocumentTitle title="New Collector Configuration">
@@ -40,10 +44,11 @@ const SidecarNewConfigurationPage = createReactClass({
 
           <Row className="content">
             <Col md={6}>
-              <ConfigurationForm action="create" />
+              <ConfigurationForm ref={(c) => { this.configurationForm = c; }}
+                                 action="create" />
             </Col>
             <Col md={6}>
-              <ConfigurationHelper type="filebeat" />
+              <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
             </Col>
           </Row>
         </span>

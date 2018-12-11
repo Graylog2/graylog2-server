@@ -74,7 +74,6 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
                 toReferenceMap(configuration));
         final JsonNode data = objectMapper.convertValue(lookupDataAdapterEntity, JsonNode.class);
         final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(dataAdapterDto.id()))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .data(data)
                 .build();

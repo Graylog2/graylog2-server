@@ -8,12 +8,12 @@ import DocsHelper from 'util/DocsHelper';
 
 import FilebeatHelper from './FilebeatHelper';
 import TemplatesHelper from './TemplatesHelper';
-import IncludesHelper from './IncludesHelper';
+import ConfigurationVariablesHelper from './ConfigurationVariablesHelper';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 class ConfigurationHelper extends React.Component {
   static propTypes = {
-    type: PropTypes.string.isRequired,
+    onVariableRename: PropTypes.func.isRequired,
   };
 
   state = {
@@ -39,7 +39,7 @@ class ConfigurationHelper extends React.Component {
     const dropDowns = [];
     Object.keys(content).forEach((section) => {
       if (!Object.prototype.hasOwnProperty.call(content, section)) {
-        return undefined;
+        return;
       }
 
       const paragraphs = content[section];
@@ -47,7 +47,7 @@ class ConfigurationHelper extends React.Component {
 
       for (let i = 0; i < paragraphs.length; i += 1) {
         menuItems.push(
-          <MenuItem key={this._getId(section,i)} eventKey={this._getEventKey(section, paragraphs[i])}>{lodash.capitalize(paragraphs[i])}</MenuItem>,
+          <MenuItem key={this._getId(section, i)} eventKey={this._getEventKey(section, paragraphs[i])}>{lodash.capitalize(paragraphs[i])}</MenuItem>,
         );
       }
       dropDowns.push(
@@ -62,22 +62,38 @@ class ConfigurationHelper extends React.Component {
 
   render() {
     return (
-      <Panel header="Filebeat quick reference">
-        <Row className="row-sm">
-          <Col md={12}>
-            <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-              Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                          text="full documentation" />{' '}
-              to gain a better understanding of how the Filebeat collector work.
-            </p>
-          </Col>
-        </Row>
+      /* eslint-disable no-template-curly-in-string */
+      <Panel header="Collector Configuration Reference">
 
         <Row className="row-sm">
           <Col md={12}>
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
-              <Tab eventKey={1} title="Reference">
-                <br />
+              <Tab eventKey={1} title="Variables">
+                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                  Use variables to share text snippets across multiple configurations.
+                  <br />
+                  If your configuration format needs to use literals like <code>$&#123;foo&#125;</code>,
+                  which shall not act as a variable, you will have to write it as
+                  <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
+                </p>
+                <ConfigurationVariablesHelper onVariableRename={this.props.onVariableRename} />
+              </Tab>
+              <Tab eventKey={2} title="Runtime Variables">
+                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                  These variables will be filled with the runtime information from each Sidecar
+                </p>
+                <TemplatesHelper />
+              </Tab>
+              <Tab eventKey={3} title="Reference">
+                <Row className="row-sm">
+                  <Col md={12}>
+                    <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                      Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
+                                                  text="full documentation" />{' '}
+                      to gain a better understanding of how the Filebeat collector work.
+                    </p>
+                  </Col>
+                </Row>
                 <Navbar collapseOnSelect>
                   <Navbar.Collapse>
                     <Nav onSelect={this._onSelect}>
@@ -89,19 +105,12 @@ class ConfigurationHelper extends React.Component {
                   <FilebeatHelper section={this.state.section} paragraph={this.state.paragraph} />
                 </Panel>
               </Tab>
-              <Tab eventKey={2} title="Templates">
-                <br />
-                <TemplatesHelper />
-              </Tab>
-              <Tab eventKey={3} title="Includes">
-                <br />
-                <IncludesHelper />
-              </Tab>
             </Tabs>
           </Col>
         </Row>
       </Panel>
     );
+    /* eslint-enable no-template-curly-in-string */
   }
 }
 

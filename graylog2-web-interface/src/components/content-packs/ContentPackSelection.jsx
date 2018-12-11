@@ -1,12 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
+import { cloneDeep } from 'lodash';
 
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, HelpBlock } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
-import ObjectUtils from 'util/ObjectUtils';
+import Entity from 'logic/content-packs/Entity';
+
+import style from './ContentPackSelection.css';
+
 
 class ContentPackSelection extends React.Component {
   static propTypes = {
@@ -14,9 +18,11 @@ class ContentPackSelection extends React.Component {
     onStateChange: PropTypes.func,
     entities: PropTypes.object,
     selectedEntities: PropTypes.object,
+    edit: PropTypes.bool,
   };
 
   static defaultProps = {
+    edit: false,
     onStateChange: () => {},
     entities: {},
     selectedEntities: {},
@@ -29,10 +35,11 @@ class ContentPackSelection extends React.Component {
 
   constructor(props) {
     super(props);
+
     this._bindValue = this._bindValue.bind(this);
     this.state = {
-      contentPack: ObjectUtils.clone(this.props.contentPack),
-      filteredEntities: ObjectUtils.clone(this.props.entities),
+      contentPack: this.props.contentPack,
+      filteredEntities: this.props.entities,
       filter: '',
       isFiltered: false,
       errors: {},
@@ -47,8 +54,7 @@ class ContentPackSelection extends React.Component {
   }
 
   _updateField(name, value) {
-    const updatedPack = ObjectUtils.clone(this.state.contentPack);
-    updatedPack[name] = value;
+    const updatedPack = this.state.contentPack.toBuilder()[name](value).build();
     this.props.onStateChange({ contentPack: updatedPack });
     this.setState({ contentPack: updatedPack }, this._validate);
   }
@@ -82,7 +88,7 @@ class ContentPackSelection extends React.Component {
 
   _updateSelectionEntity = (entity) => {
     const typeName = entity.type.name;
-    const newSelection = ObjectUtils.clone(this.props.selectedEntities);
+    const newSelection = cloneDeep(this.props.selectedEntities);
     newSelection[typeName] = (newSelection[typeName] || []);
     const index = newSelection[typeName].findIndex((e) => { return e.id === entity.id; });
     if (index < 0) {
@@ -95,7 +101,7 @@ class ContentPackSelection extends React.Component {
   };
 
   _updateSelectionGroup = (type) => {
-    const newSelection = ObjectUtils.clone(this.props.selectedEntities);
+    const newSelection = cloneDeep(this.props.selectedEntities);
     if (this._isGroupSelected(type)) {
       newSelection[type] = [];
     } else {
@@ -142,11 +148,11 @@ class ContentPackSelection extends React.Component {
   _filterEntities = (filterArg) => {
     const filter = filterArg;
     if (filter.length <= 0) {
-      this.setState({ filteredEntities: ObjectUtils.clone(this.props.entities), isFiltered: false, filter: filter });
+      this.setState({ filteredEntities: cloneDeep(this.props.entities), isFiltered: false, filter: filter });
       return;
     }
     const filtered = Object.keys(this.props.entities).reduce((result, type) => {
-      const filteredEntities = ObjectUtils.clone(result);
+      const filteredEntities = cloneDeep(result);
       filteredEntities[type] = this.props.entities[type].filter((entity) => {
         const regexp = RegExp(filter, 'i');
         return regexp.test(entity.title);
@@ -156,6 +162,13 @@ class ContentPackSelection extends React.Component {
     this.setState({ filteredEntities: filtered, isFiltered: true, filter: filter });
   };
 
+  _entityItemHeader = (entity) => {
+    if (entity.constructor.name === Entity.name) {
+      return <span><i className={`fa fa-archive ${style.contentPackEntity}`} />{' '}<span>{entity.title}</span></span>;
+    }
+    return <span><i className="fa fa-server" />{' '}<span>{entity.title}</span></span>;
+  };
+
   render() {
     const entitiesComponent = Object.keys(this.state.filteredEntities || {})
       .sort((a, b) => naturalSort(a, b))
@@ -163,11 +176,13 @@ class ContentPackSelection extends React.Component {
         const group = this.state.filteredEntities[entityType];
         const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
           const checked = this._isSelected(entity);
+          const header = this._entityItemHeader(entity);
           return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
                                       key={entity.id}
                                       checked={checked}
                                       expandable={false}
-                                      header={entity.title} />);
+                                      padded={false}
+                                      header={header} />);
         });
         if (group.length <= 0) {
           return null;
@@ -179,6 +194,7 @@ class ContentPackSelection extends React.Component {
                               checked={this._isGroupSelected(entityType)}
                               stayExpanded={this.state.isFiltered}
                               expanded={this.state.isFiltered}
+                              padded={false}
                               header={ContentPackSelection._toDisplayTitle(entityType)}>
             <ExpandableList>
               {entities}
@@ -250,6 +266,8 @@ class ContentPackSelection extends React.Component {
         <Row>
           <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
+            {this.props.edit && <HelpBlock>You can select between installed entities from the server (<i className="fa fa-server" />) or
+              entities from the former content pack revision (<i className={`fa fa-archive ${style.contentPackEntity}`} />).</HelpBlock>}
           </Col>
         </Row>
         <Row>

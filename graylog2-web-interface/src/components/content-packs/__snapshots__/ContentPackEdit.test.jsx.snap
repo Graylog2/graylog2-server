@@ -830,7 +830,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
               className="list"
             >
               <li
-                className="listItem"
+                className=""
               >
                 <div
                   className="listItemContainer"

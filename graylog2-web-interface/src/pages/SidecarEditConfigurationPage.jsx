@@ -52,6 +52,10 @@ const SidecarEditConfigurationPage = createReactClass({
     return !this.state.configuration || !this.state.configurationSidecars;
   },
 
+  _variableRenameHandler(oldname, newname) {
+    this.configurationForm.replaceConfigurationVariableName(oldname, newname);
+  },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;
@@ -84,11 +88,12 @@ const SidecarEditConfigurationPage = createReactClass({
 
           <Row className="content">
             <Col md={6}>
-              <ConfigurationForm configuration={this.state.configuration}
+              <ConfigurationForm ref={(c) => { this.configurationForm = c; }}
+                                 configuration={this.state.configuration}
                                  configurationSidecars={this.state.configurationSidecars} />
             </Col>
             <Col md={6}>
-              <ConfigurationHelper type="filebeat" />
+              <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
             </Col>
           </Row>
         </span>

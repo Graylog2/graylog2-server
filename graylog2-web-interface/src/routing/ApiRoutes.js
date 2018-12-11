@@ -42,6 +42,7 @@ const ApiRoutes = {
     install: (contentPackId, revision) => { return { url: `/system/content_packs/${contentPackId}/${revision}/installations` }; },
     installList: (contentPackId) => { return { url: `/system/content_packs/${contentPackId}/installations` }; },
     uninstall: (contentPackId, installId) => { return { url: `/system/content_packs/${contentPackId}/installations/${installId}` }; },
+    uninstallDetails: (contentPackId, installId) => { return { url: `/system/content_packs/${contentPackId}/installations/${installId}/uninstall_details` }; },
   },
   CountsApiController: {
     total: () => { return { url: '/count/total' }; },
@@ -178,6 +179,7 @@ const ApiRoutes = {
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     update: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
     sendDummyAlert: (streamId) => { return { url: `/streams/${streamId}/alerts/sendDummyAlert` }; },
+    test: (streamId, conditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}/test` }; },
   },
   StreamsApiController: {
     index: () => { return { url: '/streams' }; },

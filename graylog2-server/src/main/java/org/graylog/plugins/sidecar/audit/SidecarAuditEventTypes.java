@@ -39,6 +39,10 @@ public class SidecarAuditEventTypes implements PluginAuditEventTypes {
     public static final String CONFIGURATION_DELETE = NAMESPACE + "configuration:delete";
     public static final String CONFIGURATION_CLONE = NAMESPACE + "configuration:clone";
 
+    public static final String CONFIGURATION_VARIABLE_CREATE = NAMESPACE + "configuration_variable:create";
+    public static final String CONFIGURATION_VARIABLE_UPDATE = NAMESPACE + "configuration_variable:update";
+    public static final String CONFIGURATION_VARIABLE_DELETE = NAMESPACE + "configuration_variable:delete";
+
     private static final Set<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ACTION_UPDATE)
             .add(SIDECAR_UPDATE)
@@ -51,6 +55,9 @@ public class SidecarAuditEventTypes implements PluginAuditEventTypes {
             .add(CONFIGURATION_UPDATE)
             .add(CONFIGURATION_DELETE)
             .add(CONFIGURATION_CLONE)
+            .add(CONFIGURATION_VARIABLE_CREATE)
+            .add(CONFIGURATION_VARIABLE_UPDATE)
+            .add(CONFIGURATION_VARIABLE_DELETE)
             .build();
 
     @Override

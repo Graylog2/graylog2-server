@@ -38,6 +38,13 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+    it('user has undefined permissions', () => {
+      wrapper = mount((
+        <IfPermitted permissions={['somepermission']} currentUser={{ permissions: undefined }}>
+          {element}
+        </IfPermitted>
+      ));
+    });
     it('user has different permissions', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission']} currentUser={{ permissions: ['someotherpermission'] }}>
@@ -87,6 +94,13 @@ describe('IfPermitted', () => {
       ));
     });
     it('empty permissions were passed and no user is present', () => {
+      wrapper = mount((
+        <IfPermitted permissions={[]}>
+          {element}
+        </IfPermitted>
+      ));
+    });
+    it('undefined permissions were passed and no user is present', () => {
       wrapper = mount((
         <IfPermitted permissions={[]}>
           {element}

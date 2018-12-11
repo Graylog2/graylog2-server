@@ -22,9 +22,11 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.sidecar.database.MongoConnectionRule;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
+import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
+import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -58,6 +60,7 @@ public class ConfigurationServiceTest {
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
     private ConfigurationService configurationService;
+    private ConfigurationVariableService configurationVariableService;
     private Configuration configuration;
 
 
@@ -75,12 +78,13 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider);
+        this.configurationVariableService = new ConfigurationVariableService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider);
+        this.configurationService = new ConfigurationService(mongoRule.getMongoConnection(), mongoJackObjectMapperProvider, configurationVariableService);
     }
 
     @Test
     public void testTemplateRender() throws Exception {
-        final String TEMPLATE = "foo bar\n nodename: ${nodeName}\n";
+        final String TEMPLATE = "foo bar\n nodename: ${sidecar.nodeName}\n";
         final String TEMPLATE_RENDERED = "foo bar\n nodename: mockymock\n";
         configuration = buildTestConfig(TEMPLATE);
         this.configurationService.save(configuration);
@@ -100,4 +104,18 @@ public class ConfigurationServiceTest {
         assertEquals(configWithNewline, result);
     }
 
+    @Test
+    public void testTemplateRenderWithConfigurationVariables() throws Exception {
+        final String TEMPLATE = "foo bar\n myVariable: ${user.myVariable}\n";
+        final String TEMPLATE_RENDERED = "foo bar\n myVariable: content of myVariable\n";
+        configuration = buildTestConfig(TEMPLATE);
+        this.configurationService.save(configuration);
+
+        ConfigurationVariable myVariable = ConfigurationVariable.create("myVariable", "desc", "content of myVariable");
+        this.configurationVariableService.save(myVariable);
+
+        Configuration result = this.configurationService.renderConfigurationForCollector(sidecar, configuration);
+
+        assertEquals(TEMPLATE_RENDERED, result.template());
+    }
 }

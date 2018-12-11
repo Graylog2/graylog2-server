@@ -20,9 +20,11 @@ class ContentPackEdit extends React.Component {
     entityIndex: PropTypes.object,
     selectedEntities: PropTypes.object,
     appliedParameter: PropTypes.object,
+    edit: PropTypes.bool,
   };
 
   static defaultProps = {
+    edit: false,
     contentPack: undefined,
     onGetEntities: () => {},
     onStateChange: () => {},
@@ -55,12 +57,10 @@ class ContentPackEdit extends React.Component {
 
   _prepareForPreview() {
     const typeRegExp = RegExp(/\.type$/);
-    const newContentPack = ObjectUtils.clone(this.props.contentPack);
-    const entities = ObjectUtils.clone(this.props.fetchedEntities);
-    newContentPack.entities = entities.map((entity) => {
+    const newEntities = this.props.fetchedEntities.map((entity) => {
       const parameters = this.props.appliedParameter[entity.id] || [];
-      const newEntity = ObjectUtils.clone(entity);
-      const entityData = newEntity.data;
+      const newEntityBuilder = entity.toBuilder();
+      const entityData = entity.data;
       const configKeys = ObjectUtils.getPaths(entityData)
         .filter(configKey => typeRegExp.test(configKey))
         .map((configKey) => { return configKey.replace(typeRegExp, ''); });
@@ -74,9 +74,12 @@ class ContentPackEdit extends React.Component {
         }
         ObjectUtils.setValue(entityData, path, newValue);
       });
-      newEntity.data = entityData;
-      return newEntity;
+      newEntityBuilder.data(entityData);
+      return newEntityBuilder.build();
     });
+    const newContentPack = this.props.contentPack.toBuilder()
+      .entities(newEntities)
+      .build();
 
     this.props.onStateChange({ contentPack: newContentPack });
   }
@@ -84,8 +87,9 @@ class ContentPackEdit extends React.Component {
   _stepChanged = (selectedStep) => {
     switch (selectedStep) {
       case 'parameters': {
-        const newContentPack = ObjectUtils.clone(this.props.contentPack);
-        newContentPack.entities = this.props.fetchedEntities || [];
+        const newContentPack = this.props.contentPack.toBuilder()
+          .entities(this.props.fetchedEntities || [])
+          .build();
         this.props.onStateChange({ contentPack: newContentPack });
         if (Object.keys(this.props.selectedEntities).length > 0) {
           this.props.onGetEntities(this.props.selectedEntities);
@@ -111,6 +115,7 @@ class ContentPackEdit extends React.Component {
     const selectionComponent = (
       <ContentPackSelection contentPack={this.props.contentPack}
                             selectedEntities={this.props.selectedEntities}
+                            edit={this.props.edit}
                             onStateChange={this.props.onStateChange}
                             entities={this.props.entityIndex} />);
     const parameterComponent = (
