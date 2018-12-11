@@ -159,19 +159,17 @@ public abstract class ProxiedResource extends RestResource {
         public abstract int code();
 
         /**
-         * Returns the typed response object if the request was successful. Otherwise it returns {@code null}.
+         * Returns the typed response object if the request was successful. Otherwise it returns an empty {@link Optional}.
          *
-         * @return typed response object or {@code null}
+         * @return typed response object or empty {@link Optional}
          */
-        @Nullable
-        public abstract ResponseType entity();
+        public abstract Optional<ResponseType> entity();
 
         /**
-         * Returns the error response if the request wasn't successful. Otherwise it returns {@code null}.
-         * @return error response or {@code null}
+         * Returns the error response if the request wasn't successful. Otherwise it returns an empty {@link Optional}.
+         * @return error response or empty {@link Optional}
          */
-        @Nullable
-        public abstract byte[] error();
+        public abstract Optional<byte[]> error();
 
         /**
          * Convenience method that returns either the body of a successful request or if that one is {@code null},
@@ -182,14 +180,14 @@ public abstract class ProxiedResource extends RestResource {
          * @return either the {@link #entity()} or the {@link #error()}
          */
         public Object body() {
-            return entity() != null ? entity() : error();
+            return entity().isPresent() ? entity().get() : error().orElse(null);
         }
 
         public static <ResponseType> MasterResponse<ResponseType> create(boolean isSuccess,
                                                                          int code,
                                                                          @Nullable ResponseType entity,
                                                                          @Nullable byte[] error) {
-            return new AutoValue_ProxiedResource_MasterResponse<>(isSuccess, code, entity, error);
+            return new AutoValue_ProxiedResource_MasterResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
         }
     }
 }
