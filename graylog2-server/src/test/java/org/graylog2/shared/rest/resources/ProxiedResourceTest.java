@@ -30,16 +30,16 @@ public class ProxiedResourceTest {
 
         assertThat(response1.isSuccess()).isTrue();
         assertThat(response1.code()).isEqualTo(200);
-        assertThat(response1.entity()).isEqualTo("hello world");
-        assertThat(response1.error()).isNull();
+        assertThat(response1.entity()).get().isEqualTo("hello world");
+        assertThat(response1.error()).isNotPresent();
         assertThat(response1.body()).isEqualTo("hello world");
 
         final MasterResponse<String> response2 = MasterResponse.create(false, 400, null, "error".getBytes(UTF_8));
 
         assertThat(response2.isSuccess()).isFalse();
         assertThat(response2.code()).isEqualTo(400);
-        assertThat(response2.entity()).isNull();
-        assertThat(response2.error()).isEqualTo("error".getBytes(UTF_8));
+        assertThat(response2.entity()).isNotPresent();
+        assertThat(response2.error()).get().isEqualTo("error".getBytes(UTF_8));
         assertThat(response2.body()).isEqualTo("error".getBytes(UTF_8));
     }
 }
