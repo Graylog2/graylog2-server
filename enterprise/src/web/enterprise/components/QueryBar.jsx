@@ -39,7 +39,7 @@ const onCloseTab = (queryId, currentQuery, queries) => {
 
 const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetadata }) => {
   const { activeQuery } = viewMetadata;
-  const childrenWithQueryId = React.cloneElement(children, { queryId: activeQuery });
+  const childrenWithQueryId = React.Children.map(children, child => React.cloneElement(child, { queryId: activeQuery }));
   const selectQueryAndExecute = queryId => onSelectQuery(queryId, onExecute);
   return (
     <QueryTabs queries={queries}

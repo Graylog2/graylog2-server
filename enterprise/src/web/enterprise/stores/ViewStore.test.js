@@ -1,6 +1,19 @@
 import Immutable from 'immutable';
 
-import { ViewActions } from './ViewStore';
+import ViewState from 'enterprise/logic/views/ViewState';
+import SearchActions from 'enterprise/actions/SearchActions';
+import Search from 'enterprise/logic/search/Search';
+import Query from 'enterprise/logic/queries/Query';
+import View from 'enterprise/logic/views/View';
+import { ViewActions, ViewStore } from './ViewStore';
+
+jest.mock('enterprise/actions/SearchActions');
+jest.mock('enterprise/logic/Widget', () => ({
+  widgetDefinition: () => ({
+    searchTypes: () => [],
+  }),
+  resultHistogram: () => ({}),
+}));
 
 describe('ViewStore', () => {
   it('.load should select first query if activeQuery is not set', () => {
@@ -33,6 +46,56 @@ describe('ViewStore', () => {
     };
     return ViewActions.load(view).then((state) => {
       expect(state.activeQuery).toBe('firstQueryId');
+    });
+  });
+
+  describe('search recreation:', () => {
+    let search: Search;
+    let view: View;
+    beforeEach(() => {
+      SearchActions.create = jest.fn((s) => Promise.resolve({ search: s }));
+
+      search = Search.create()
+        .toBuilder()
+        .queries([Query.builder().id('firstQueryId').build()])
+        .build();
+      view = View.create()
+        .toBuilder()
+        .state(Immutable.fromJS({ firstQueryId: ViewState.create() }))
+        .search(search)
+        .build();
+      return ViewStore.load(view);
+    });
+    it('should create search when view is created', (done) => {
+      ViewActions.create()
+        .then(() => {
+          expect(SearchActions.create).toHaveBeenCalled();
+          done();
+        });
+    });
+    it('should create search when state is updated', (done) => {
+      const newState = Immutable.fromJS({ firstQueryId: ViewState.create().toBuilder().fields(['message']).build() });
+
+      ViewActions.state(newState)
+        .then(() => {
+          expect(SearchActions.create).toHaveBeenCalled();
+          done();
+        });
+    });
+    it('should not recreate search when state is updated to identical state', (done) => {
+      ViewActions.state(view.state)
+        .then(() => {
+          expect(SearchActions.create).not.toHaveBeenCalled();
+          done();
+        });
+    });
+    it('should create search when search is replaced', (done) => {
+      const newSearch = search.toBuilder().newId().build();
+      ViewActions.search(newSearch)
+        .then(() => {
+          expect(SearchActions.create).toHaveBeenCalled();
+          done();
+        });
     });
   });
 });

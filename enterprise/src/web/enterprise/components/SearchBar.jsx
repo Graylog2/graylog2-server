@@ -28,7 +28,6 @@ const SearchBar = createReactClass({
     config: PropTypes.object.isRequired,
     disableSearch: PropTypes.bool,
     onExecute: PropTypes.func.isRequired,
-    results: PropTypes.object,
   },
 
   mixins: [
@@ -40,7 +39,6 @@ const SearchBar = createReactClass({
   getDefaultProps() {
     return {
       disableSearch: false,
-      results: {},
     };
   },
 
@@ -57,7 +55,7 @@ const SearchBar = createReactClass({
   },
 
   render() {
-    if (!this.state.currentQuery) {
+    if (!this.state.currentQuery || !this.props.config) {
       return <Spinner />;
     }
     const { timerange, query, id } = this.state.currentQuery;
@@ -106,8 +104,7 @@ const SearchBar = createReactClass({
                       <QueryInput value={query.query_string}
                                   placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                   onChange={value => QueriesActions.query(id, value)}
-                                  onExecute={this.props.onExecute}
-                                  result={this.props.results} />
+                                  onExecute={this.props.onExecute} />
                     </Col>
                   </Row>
                 </form>

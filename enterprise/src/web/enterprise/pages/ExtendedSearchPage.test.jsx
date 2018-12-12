@@ -22,12 +22,16 @@ jest.mock('enterprise/components/SearchResult', () => mockComponent('SearchResul
 jest.mock('enterprise/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
 jest.mock('enterprise/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
 jest.mock('stores/connect', () => x => x);
-jest.mock('enterprise/components/parameters/Parameters', () => () => null);
+jest.mock('enterprise/components/parameters/ParametersWithParameterBindings', () => () => null);
+jest.mock('enterprise/components/SearchBarWithStatus', () => mockComponent('SearchBar'));
+jest.mock('enterprise/stores/SearchConfigStore', () => ({}));
+jest.mock('enterprise/components/parameters/ParameterBarWithUndeclaredParameters', () => mockComponent('ParameterBarWithUndeclaredParameters'));
 
 describe('ExtendedSearchPage', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
+    // $FlowFixMe: Exact promise type not required for test functionality
     SearchActions.execute = jest.fn(() => ({ then: fn => fn() }));
     StreamsActions.refresh = jest.fn();
   });
@@ -98,8 +102,8 @@ describe('ExtendedSearchPage', () => {
   it('saves newly declared parameter and assigns default value', () => {
     const wrapper = mount(<ExtendedSearchPage route={{}} />);
 
-    const searchResult = wrapper.find('SearchResult');
-    const { onHandleParameterSave } = searchResult.at(0).props();
+    const parameterBar = wrapper.find('ParameterBarWithUndeclaredParameters');
+    const { onParameterSave } = parameterBar.at(0).props();
 
     const parameters = Immutable.fromJS({
       hostname: Parameter.create('hostname', 'Hostname', '', 'string', 'localhost', false, ParameterBinding.empty()),
@@ -117,7 +121,7 @@ describe('ExtendedSearchPage', () => {
       return Promise.resolve(SearchExecutionState.empty());
     });
 
-    onHandleParameterSave(parameters, ['hostname', 'destination']);
+    onParameterSave(parameters, ['hostname', 'destination']);
 
     expect(SearchParameterActions.declare).toHaveBeenCalled();
   });

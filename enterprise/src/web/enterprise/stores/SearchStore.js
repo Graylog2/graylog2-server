@@ -1,8 +1,11 @@
+// @flow strict
 import Reflux from 'reflux';
 import Bluebird from 'bluebird';
 import { debounce, get, isEqual } from 'lodash';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
+// $FlowFixMe: imports from core need to be fixed in flow
 import fetch from 'logic/rest/FetchProvider';
 
 import { SearchExecutionStateStore } from 'enterprise/stores/SearchExecutionStateStore';
@@ -11,6 +14,14 @@ import { SearchJobActions } from 'enterprise/stores/SearchJobStore';
 import { ViewStore, ViewActions } from 'enterprise/stores/ViewStore';
 import SearchResult from 'enterprise/logic/SearchResult';
 import SearchActions from 'enterprise/actions/SearchActions';
+import Search from 'enterprise/logic/search/Search';
+import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'enterprise/actions/SearchActions';
+import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
+import View from 'enterprise/logic/views/View';
+import Parameter from 'enterprise/logic/parameters/Parameter';
+import type { WidgetMapping } from 'enterprise/logic/views/View';
+
+const createSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -22,6 +33,12 @@ Bluebird.config({ cancellation: true });
 const searchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 
 export { SearchActions };
+
+type InternalState = {
+  search: Search,
+  result: SearchResult,
+  widgetMapping: WidgetMapping,
+};
 
 export const SearchStore = Reflux.createStore({
   listenables: [SearchActions],
@@ -40,7 +57,7 @@ export const SearchStore = Reflux.createStore({
     SearchMetadataActions.parseSearch(search);
   }, 500),
 
-  onViewStoreUpdate({ view }) {
+  onViewStoreUpdate({ view }: { view: View }) {
     this.view = view;
     const search = get(view, 'search');
     if (!isEqual(this.search, search)) {
@@ -60,12 +77,23 @@ export const SearchStore = Reflux.createStore({
     }
   },
 
-  get(searchId) {
-    const promise = fetch('GET', `${searchUrl}/${searchId}`);
-    SearchActions.get.promise(promise);
+  create(searchRequest: Search): Promise<CreateSearchResponse> {
+    const promise = fetch('POST', createSearchUrl, JSON.stringify(searchRequest))
+      .then((response) => {
+        const search = Search.fromJSON(response);
+        return { search: search };
+      });
+    SearchActions.create.promise(promise);
+    return promise;
   },
 
-  trackJobStatus(job, search) {
+  get(searchId: SearchId): Promise<Search> {
+    const promise = fetch('GET', `${searchUrl}/${searchId}`);
+    SearchActions.get.promise(promise);
+    return promise;
+  },
+
+  trackJobStatus(job, search: Search) {
     return new Bluebird((resolve) => {
       if (job && job.execution.done) {
         return resolve(new SearchResult(job));
@@ -76,18 +104,17 @@ export const SearchStore = Reflux.createStore({
     });
   },
 
-  trackJob(search, executionState) {
+  trackJob(search: Search, executionState: SearchExecutionState): Promise<SearchResult> {
     return SearchJobActions.run(search, executionState).then(job => this.trackJobStatus(job, search));
   },
 
-  execute(executionState) {
+  execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
     if (this.executePromise) {
       this.executePromise.cancel();
     }
     if (this.search) {
-      const { widgetMapping } = this.view;
-      this.executePromise = SearchJobActions.create(this.search)
-        .then(({ search }) => this.trackJob(search, executionState), displayError)
+      const { widgetMapping, search } = this.view;
+      this.executePromise = this.trackJob(search, executionState)
         .then((result) => {
           this.result = result;
           this.widgetMapping = widgetMapping;
@@ -96,22 +123,24 @@ export const SearchStore = Reflux.createStore({
           return { result, widgetMapping };
         }, displayError);
       SearchActions.execute.promise(this.executePromise);
+      return this.executePromise;
     }
+    throw new Error('Unable to execute search when no search is loaded!');
   },
 
-  executeWithCurrentState() {
+  executeWithCurrentState(): Promise<SearchExecutionResult> {
     const promise = SearchActions.execute(this.executionState);
     SearchActions.executeWithCurrentState.promise(promise);
     return promise;
   },
 
-  parameters(newParameters) {
+  parameters(newParameters: Array<Parameter>): Promise<View> {
     const newSearch = this.search.toBuilder().newId().parameters(newParameters).build();
     const promise = ViewActions.search(newSearch);
     SearchActions.parameters.promise(promise);
     return promise;
   },
-  _state() {
+  _state(): InternalState {
     return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
   },
   _trigger() {

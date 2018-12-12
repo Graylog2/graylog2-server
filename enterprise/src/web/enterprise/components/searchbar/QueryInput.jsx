@@ -47,9 +47,6 @@ class QueryInput extends Component {
     }
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.value !== this.state.value) {
-      this.setState({ value: nextProps.value });
-    }
     if (this.editor) {
       const { editor } = this.editor;
       if (nextProps.value && this._placeholderExists(editor)) {
@@ -118,8 +115,7 @@ class QueryInput extends Component {
   };
 
   _onExecute = () => {
-    this.props.onChange(this.state.value);
-    this.props.onExecute();
+    this.props.onChange(this.state.value).then(this.props.onExecute);
   };
 
   render() {
@@ -166,7 +162,6 @@ QueryInput.propTypes = {
 };
 
 QueryInput.defaultProps = {
-  result: undefined,
   value: '',
   placeholder: '',
 };

@@ -1,6 +1,6 @@
-// @flow
+// @flow strict
 
-import { Map, fromJS, is } from 'immutable';
+import { Map, Collection, fromJS, is } from 'immutable';
 import { fromPairs } from 'lodash';
 
 import Widget from 'enterprise/logic/widgets/Widget';
@@ -8,7 +8,7 @@ import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 
 type FieldNameList = Array<string>;
 type TitlesMap = Map<string, Map<string, string>>;
-type WidgetMapping = Map<string, string>;
+type WidgetMapping = Map<string, Collection<string>>;
 type State = {
   fields: FieldNameList,
   titles: TitlesMap,
@@ -95,13 +95,18 @@ export default class ViewState {
   static fromJSON(value: JsonState): ViewState {
     // eslint-disable-next-line camelcase
     const { selected_fields, titles, widgets, widget_mapping, positions } = value;
-    return new ViewState(
-      selected_fields,
-      fromJS(titles),
-      widgets.map(w => Widget.fromJSON(w)),
-      widget_mapping,
-      fromPairs(Object.entries(positions).map(([k, v]) => ([k, WidgetPosition.fromJSON(v)]))),
-    );
+    return ViewState.builder()
+      .titles(fromJS(titles))
+      .widgets(widgets.map(w => Widget.fromJSON(w)))
+      .widgetMapping(fromJS(widget_mapping))
+      .fields(selected_fields)
+      .widgetPositions(fromPairs(Object.entries(positions).map(([k, v]) => ([k, WidgetPosition.fromJSON(v)]))))
+      .build();
+  }
+
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
   }
 }
 

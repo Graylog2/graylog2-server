@@ -13,6 +13,7 @@ import ViewState from 'enterprise/logic/views/ViewState';
 import type { Properties } from 'enterprise/logic/views/View';
 import type { QuerySet } from 'enterprise/logic/search/Search';
 import Query from 'enterprise/logic/queries/Query';
+import SearchActions from 'enterprise/actions/SearchActions';
 
 type ViewStoreState = {
   activeQuery: string,
@@ -67,16 +68,18 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
   },
 
   create() {
-    const view = this._updateSearch(ViewGenerator());
+    const [view] = this._updateSearch(ViewGenerator());
     this.view = view;
     this.dirty = false;
-
     const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
     const firstQueryId = queries.first().id;
     this.activeQuery = firstQueryId;
 
-    ViewActions.create.promise(Promise.resolve(this._state()));
-    this._trigger();
+    const promise = ViewActions.search(view.search).then(() => this._trigger());
+
+    ViewActions.create.promise(promise.then(() => this._state()));
+
+    return promise;
   },
   createQuery(query: Query, viewState: ViewState) {
     if (query.id === undefined) {
@@ -90,14 +93,16 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     const newSearch = search.toBuilder().queries(newQueries).build();
     const newState = this.view.state.set(query.id, viewState);
     this.dirty = true;
-    this.view = this._updateSearch(this.view.toBuilder()
+    const [view, isModified] = this._updateSearch(this.view.toBuilder()
       .state(newState)
       .search(newSearch)
       .build());
+    this.view = view;
     this.activeQuery = query.id;
-    this._trigger();
 
-    QueriesActions.create.promise(Promise.resolve(this.view));
+    const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
+
+    QueriesActions.create.promise(promise);
   },
   dashboardState(newDashboardState: DashboardState) {
     this.dirty = true;
@@ -109,8 +114,8 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     this.view = this.view.toBuilder().description(newDescription).build();
     this._trigger();
   },
-  load(view: View) {
-    this.view = this._updateSearch(view);
+  load(view: View): Promise<ViewStoreState> {
+    this.view = view;
     this.dirty = false;
 
     /* Select selected query (activeQuery) or first query in view (for now).
@@ -120,7 +125,9 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
     this.selectQuery(selectedQuery);
 
-    ViewActions.load.promise(Promise.resolve(this._state()));
+    const promise = Promise.resolve(this._state());
+    ViewActions.load.promise(promise);
+    return promise;
   },
   properties(newProperties: Properties) {
     this.dirty = true;
@@ -128,10 +135,14 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     this._trigger();
   },
   search(newSearch: Search) {
-    this.dirty = true;
-    this.view = this.view.toBuilder().search(newSearch).build();
-    this._trigger();
-    ViewActions.search.promise(Promise.resolve(this.view));
+    const promise = SearchActions.create(newSearch).then(({ search }) => {
+      this.dirty = true;
+      this.view = this.view.toBuilder().search(search).build();
+      this._trigger();
+      return this.view;
+    });
+    ViewActions.search.promise(promise);
+    return promise;
   },
   selectQuery(queryId) {
     this.activeQuery = queryId;
@@ -139,9 +150,11 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
   },
   state(newState: ViewState) {
     this.dirty = true;
-    this.view = this._updateSearch(this.view.toBuilder().state(newState).build());
-    this._trigger();
-    ViewActions.state.promise(Promise.resolve(this.view));
+    const [view, isModified] = this._updateSearch(this.view.toBuilder().state(newState).build());
+    this.view = view;
+    const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
+    ViewActions.state.promise(promise);
+    return promise;
   },
   summary(newSummary) {
     this.dirty = true;
@@ -153,9 +166,9 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     this.view = this.view.toBuilder().title(newTitle).build();
     this._trigger();
   },
-  _updateSearch(view: View): View {
+  _updateSearch(view: View): [View, boolean] {
     if (!view.search) {
-      return view;
+      return [view, false];
     }
     const oldWidgets = get(this.view, 'state') && this.view.state.map(s => s.widgets);
     const newWidgets = get(view, 'state') && view.state.map(s => s.widgets);
@@ -176,10 +189,10 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
             newView = newView.toBuilder().state(newStates.update(queryId, state => state.toBuilder().widgetMapping(widgetMapping).build())).build();
           }
         });
-      return newView;
+      return [newView, true];
     }
 
-    return view;
+    return [view, false];
   },
   _state(): ViewStoreState {
     return {

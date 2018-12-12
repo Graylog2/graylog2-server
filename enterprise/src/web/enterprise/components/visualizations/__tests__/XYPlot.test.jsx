@@ -7,8 +7,10 @@ import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/Aggrega
 import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
 import Query from 'enterprise/logic/queries/Query';
 import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import { SearchActions } from 'enterprise/stores/SearchStore';
+import SearchActions from 'enterprise/actions/SearchActions';
 
+// eslint-disable-next-line global-require
+jest.mock('enterprise/stores/SearchStore', () => ({ SearchStore: {}, SearchActions: require('enterprise/actions/SearchActions').default }));
 jest.mock('stores/connect', () => x => x);
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('enterprise/stores/QueriesStore');

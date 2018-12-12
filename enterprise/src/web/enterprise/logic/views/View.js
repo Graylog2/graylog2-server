@@ -21,6 +21,7 @@ type InternalState = {
   createdAt: Date,
 };
 
+export type WidgetMapping = Immutable.Map<string, string>;
 export type ViewJson = {
   id: string,
   title: string,
@@ -99,7 +100,7 @@ export default class View {
     return this._value.createdAt;
   }
 
-  get widgetMapping(): Immutable.Map<string, string> {
+  get widgetMapping(): WidgetMapping {
     return (this.state || Immutable.Map()).valueSeq().map(s => s.widgetMapping).reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
   }
 

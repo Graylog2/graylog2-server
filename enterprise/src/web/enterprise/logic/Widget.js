@@ -13,18 +13,21 @@ export function widgetDefinition(type) {
     .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 }
 
-export const resultHistogram = (id = uuid()) => {
-  const config = {
-    rowPivots: [
-      pivotForField('timestamp'),
-    ],
-    series: [
-      Series.forFunction('count()'),
-    ],
-    columnPivots: [],
-    sort: [],
-    visualization: 'bar',
-    rollup: true,
-  };
-  return new AggregationWidget(id, new AggregationWidgetConfig(config.columnPivots, config.rowPivots, config.series, config.sort, config.visualization, config.rollup));
-};
+export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
+  .id(id)
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots([
+        pivotForField('timestamp'),
+      ])
+      .series([
+        Series.forFunction('count()'),
+      ])
+      .sort([])
+      .visualization('bar')
+      .rollup(true)
+      .build(),
+  )
+  .build();
+
