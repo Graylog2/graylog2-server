@@ -282,7 +282,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             // SOFT MIGRATION: does this extractor have an order set? Implemented for issue: #726
             Long order = 0L;
             if (ex.containsField(Extractor.FIELD_ORDER)) {
-                order = (Long) ex.get(Extractor.FIELD_ORDER); // mongodb driver gives us a java.lang.Long
+                Number num = (Number) ex.get(Extractor.FIELD_ORDER);
+                order = num.longValue(); // mongodb driver gives us a java.lang.Long
             }
 
             try {

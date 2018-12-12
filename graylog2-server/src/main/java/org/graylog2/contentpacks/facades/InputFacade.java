@@ -496,7 +496,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         inputWithExtractors.extractors().stream()
                 .filter(e -> e.getType().equals(Extractor.Type.GROK))
                 .map(e -> (String) e.getExtractorConfig().get(GrokExtractor.CONFIG_GROK_PATTERN))
-                .map(namedPattern -> GrokPatternService.extractPatternNames(namedPattern))
+                .map(GrokPatternService::extractPatternNames)
                 .flatMap(Collection::stream)
                 .forEach(patternName -> {
                     grokPatternService.loadByName(patternName).ifPresent(depPattern -> {
@@ -569,7 +569,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .filter(e -> e.type().asString(parameters).equals(Extractor.Type.GROK.toString()))
                 .map(ExtractorEntity::configuration)
                 .map(c -> ((ValueReference) c.get(GrokExtractor.CONFIG_GROK_PATTERN)).asString(parameters))
-                .map(namedPattern -> GrokPatternService.extractPatternNames(namedPattern))
+                .map(GrokPatternService::extractPatternNames)
                 .flatMap(Collection::stream)
                 .forEach(patternName -> {
                     entities.entrySet().stream()

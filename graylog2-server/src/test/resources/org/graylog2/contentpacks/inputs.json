@@ -246,7 +246,7 @@
           "cursor_strategy" : "copy",
           "target_field" : "",
           "extractor_config" : {
-            "grok_pattern" : "%{TIMESTAMP_ISO8601:karl} %{WORD:gott}",
+            "grok_pattern" : "%{GREEDY:gott}",
             "named_captures_only" : true
           },
           "condition_value" : "",
