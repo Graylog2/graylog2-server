@@ -14,6 +14,7 @@ import { SearchParameterActions } from 'enterprise/stores/SearchParameterStore';
 import Parameter from 'enterprise/logic/parameters/Parameter';
 import ParameterBinding from 'enterprise/logic/parameters/ParameterBinding';
 import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
+import { SearchConfigActions } from 'enterprise/stores/SearchConfigStore';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -24,7 +25,7 @@ jest.mock('enterprise/components/common/WindowLeaveMessage', () => mockComponent
 jest.mock('stores/connect', () => x => x);
 jest.mock('enterprise/components/parameters/ParametersWithParameterBindings', () => () => null);
 jest.mock('enterprise/components/SearchBarWithStatus', () => mockComponent('SearchBar'));
-jest.mock('enterprise/stores/SearchConfigStore', () => ({}));
+jest.mock('enterprise/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
 jest.mock('enterprise/components/parameters/ParameterBarWithUndeclaredParameters', () => mockComponent('ParameterBarWithUndeclaredParameters'));
 
 describe('ExtendedSearchPage', () => {
@@ -34,6 +35,7 @@ describe('ExtendedSearchPage', () => {
     // $FlowFixMe: Exact promise type not required for test functionality
     SearchActions.execute = jest.fn(() => ({ then: fn => fn() }));
     StreamsActions.refresh = jest.fn();
+    SearchConfigActions.refresh = jest.fn();
   });
 
   it('register a WindowLeaveMessage', () => {
@@ -55,6 +57,13 @@ describe('ExtendedSearchPage', () => {
 
     expect(SearchActions.execute).toHaveBeenCalled();
   });
+
+  it('refreshes search config upon mount', () => {
+    mount(<ExtendedSearchPage route={{}} />);
+
+    expect(SearchConfigActions.refresh).toHaveBeenCalled();
+  });
+
   it('does not execute search upon mount if parameters are missing values', () => {
     const parameters = Immutable.fromJS({
       foo: Parameter.create('foo', 'FooTitle', '', 'string', undefined, false, ParameterBinding.empty()),
