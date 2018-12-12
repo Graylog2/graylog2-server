@@ -90,6 +90,14 @@ export default class Parameter {
     const { name, title, description, data_type, default_value, optional, binding } = value;
     return Parameter.create(name, title, description, data_type, default_value, optional, binding);
   }
+
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder()
+      .optional(false)
+      .dataType('any')
+      .binding(ParameterBinding.empty());
+  }
 }
 
 class Builder {
