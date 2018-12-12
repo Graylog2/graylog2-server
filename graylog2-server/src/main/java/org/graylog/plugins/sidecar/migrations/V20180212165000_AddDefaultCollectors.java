@@ -104,13 +104,154 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "   - name: Security"
         );
         ensureCollector(
-                "nxlog",
+                "nxlog-linux",
                 "exec",
                 "linux",
-                "/usr/lib/graylog-sidecar/nxlog",
+                "/usr/bin/nxlog",
                 "-f -c %s",
                 "-v -c %s",
-                ""
+                "define ROOT /usr/bin\n" +
+                        "\n" +
+                        "<Extension gelfExt>\n" +
+                        "  Module xm_gelf\n" +
+                        "  # Avoid truncation of the short_message field to 64 characters.\n" +
+                        "  ShortMessageLength 65536\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "<Extension syslogExt>\n" +
+                        "  Module xm_syslog\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "User nxlog\n" +
+                        "Group nxlog\n" +
+                        "\n" +
+                        "Moduledir /usr/lib/nxlog/modules\n" +
+                        "CacheDir /var/spool/collector-sidecar/nxlog\n" +
+                        "PidFile /var/run/graylog-sidecar/nxlog.pid\n" +
+                        "LogFile /var/log/graylog-sidecar/nxlog.log\n" +
+                        "LogLevel INFO\n" +
+                        "\n" +
+                        "\n" +
+                        "<Input file>\n" +
+                        "\tModule im_file\n" +
+                        "\tFile '/var/log/*.log'\n" +
+                        "\tPollInterval 1\n" +
+                        "\tSavePos\tTrue\n" +
+                        "\tReadFromLast True\n" +
+                        "\tRecursive False\n" +
+                        "\tRenameCheck False\n" +
+                        "\tExec $FileName = file_name(); # Send file name with each message\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "<Input syslog-udp>\n" +
+                        "\tModule im_udp\n" +
+                        "\tHost 127.0.0.1\n" +
+                        "\tPort 514\n" +
+                        "\tExec parse_syslog_bsd();\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "<Output gelf>\n" +
+                        "\tModule om_tcp\n" +
+                        "\tHost 192.168.1.1\n" +
+                        "\tPort 12201\n" +
+                        "\tOutputType  GELF_TCP\n" +
+                        "\t<Exec>\n" +
+                        "\t  # These fields are needed for Graylog\n" +
+                        "\t  $gl2_source_collector = '${sidecar.nodeId}';\n" +
+                        "\t  $collector_node_id = '${sidecar.nodeName}';\n" +
+                        "\t</Exec>\n" +
+                        "</Output>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Route route-1>\n" +
+                        "  Path file => gelf\n" +
+                        "</Route>\n" +
+                        "<Route route-2>\n" +
+                        "  Path syslog-udp => gelf\n" +
+                        "</Route>\n" +
+                        "\n" +
+                        "\n"
+        );
+        ensureCollector(
+                "nxlog-windows",
+                "svc",
+                "windows",
+                "C:\\Program Files (x86)\\nxlog\\nxlog.exe",
+                "-c \"%s\"",
+                "-v -f -c \"%s\"",
+                "define ROOT C:\\Program Files (x86)\\nxlog\n" +
+                        "\n" +
+                        "Moduledir %ROOT%\\modules\n" +
+                        "CacheDir %ROOT%\\data\n" +
+                        "Pidfile %ROOT%\\data\\nxlog.pid\n" +
+                        "SpoolDir %ROOT%\\data\n" +
+                        "LogFile %ROOT%\\data\\nxlog.log\n" +
+                        "LogLevel INFO\n" +
+                        "\n" +
+                        "<Extension logrotate>\n" +
+                        "    Module  xm_fileop\n" +
+                        "    <Schedule>\n" +
+                        "        When    @daily\n" +
+                        "        Exec    file_cycle('%ROOT%\\data\\nxlog.log', 7);\n" +
+                        "     </Schedule>\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Extension gelfExt>\n" +
+                        "  Module xm_gelf\n" +
+                        "  # Avoid truncation of the short_message field to 64 characters.\n" +
+                        "  ShortMessageLength 65536\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "<Input eventlog>\n" +
+                        "        Module im_msvistalog\n" +
+                        "        PollInterval 1\n" +
+                        "        SavePos True\n" +
+                        "        ReadFromLast True\n" +
+                        "        \n" +
+                        "        #Channel System\n" +
+                        "        #<QueryXML>\n" +
+                        "        #  <QueryList>\n" +
+                        "        #   <Query Id='1'>\n" +
+                        "        #    <Select Path='Security'>*[System/Level=4]</Select>\n" +
+                        "        #    </Query>\n" +
+                        "        #  </QueryList>\n" +
+                        "        #</QueryXML>\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Input file>\n" +
+                        "\tModule im_file\n" +
+                        "\tFile 'C:\\Windows\\MyLogDir\\\\*.log'\n" +
+                        "\tPollInterval 1\n" +
+                        "\tSavePos\tTrue\n" +
+                        "\tReadFromLast True\n" +
+                        "\tRecursive False\n" +
+                        "\tRenameCheck False\n" +
+                        "\tExec $FileName = file_name(); # Send file name with each message\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Output gelf>\n" +
+                        "\tModule om_tcp\n" +
+                        "\tHost 192.168.1.1\n" +
+                        "\tPort 12201\n" +
+                        "\tOutputType  GELF_TCP\n" +
+                        "\t<Exec>\n" +
+                        "\t  # These fields are needed for Graylog\n" +
+                        "\t  $gl2_source_collector = '${sidecar.nodeId}';\n" +
+                        "\t  $collector_node_id = '${sidecar.nodeName}';\n" +
+                        "\t</Exec>\n" +
+                        "</Output>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Route route-1>\n" +
+                        "  Path eventlog => gelf\n" +
+                        "</Route>\n" +
+                        "<Route route-2>\n" +
+                        "  Path file => gelf\n" +
+                        "</Route>\n" +
+                        "\n"
         );
     }
 
