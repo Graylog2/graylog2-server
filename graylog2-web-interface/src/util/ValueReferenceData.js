@@ -12,6 +12,9 @@ const dataValueIsParameter = (data) => {
   return dataIsValueRef(data) && data.get(VALUE_REF_TYPE_FIELD) === VALUE_REF_PARAMETER_VALUE;
 };
 
+/**
+ * A path object that can be used to obtain information about the data at a path and also modify it.
+ */
 class Path {
   constructor(path, valueIsReference, valueIsParameter, getter, setter, parameterSetter, valueTypeGetter) {
     this.path = path;
@@ -23,35 +26,69 @@ class Path {
     this.valueTypeGetter = valueTypeGetter;
   }
 
+  /**
+   * Get the concatenated value path as a string. (e.g. "stream_rules.0.title")
+   * @returns the path as string
+   */
   getPath() {
     return this.path;
   }
 
+  /**
+   * Get the value for the path.
+   * @returns the value
+   */
   getValue() {
     return this.getter();
   }
 
+  /**
+   * Sets the value for the path.
+   * @param the value to set
+   */
   setValue(value) {
     this.setter(value);
   }
 
+  /**
+   * Set the value for the path to a parameter with the given name.
+   * This will throw an Error if the value at the path is not a value-reference! Consumers should use #isValueParameter
+   * before trying to use this.
+   * @param name the parameter name
+   */
   setParameter(name) {
     this.parameterSetter(name);
   }
 
+  /**
+   * Gets the type of the value.
+   * @returns the type string
+   */
   getValueType() {
     return this.valueTypeGetter();
   }
 
+  /**
+   * Returns true if the path value is a value-reference.
+   * @returns true if value is value-reference, false otherwise
+   */
   isValueRef() {
     return this.valueIsReference;
   }
 
+  /**
+   * Returns true if the path value is a parameter.
+   * @returns true if value is a parameter, false otherwise
+   */
   isValueParameter() {
     return this.valueIsParameter;
   }
 }
 
+/**
+ * Wraps content pack entity data and generates paths into the nested data so we can show a flat list of values for
+ * content pack entities.
+ */
 export default class ValueReferenceData {
   constructor(data) {
     this.data = Map(Immutable.fromJS(data));
@@ -59,14 +96,26 @@ export default class ValueReferenceData {
     this.walkPaths();
   }
 
+  /**
+   * Get the path object which contains the flat paths into the nested data. The value of each path key is a Path
+   * object that can be used to obtain information about the value for the path and also modify it.
+   * @returns the paths object
+   */
   getPaths() {
     return this.paths.toJS();
   }
 
+  /**
+   * Get the actual data back. This can be used to get the updated data after modifying it.
+   * @returns the data
+   */
   getData() {
     return this.data.toJS();
   }
 
+  /**
+   * @private
+   */
   walkPaths(parentPath = []) {
     const data = parentPath.length > 0 ? this.data.getIn(parentPath) : this.data;
 
@@ -84,10 +133,14 @@ export default class ValueReferenceData {
         this.walkPaths(parentPath.concat([idx]));
       });
     } else {
+      // We arrived at the leaf of the tree so create a Path object for the current path
       this.addPath(parentPath);
     }
   }
 
+  /**
+   * @private
+   */
   addPath(path) {
     const stringPath = path.join('.');
     const leaf = new Path(
@@ -101,6 +154,10 @@ export default class ValueReferenceData {
     this.paths = this.paths.set(stringPath, leaf);
   }
 
+  /**
+   * Data getter that knows about value-reference and regular data.
+   * @private
+   */
   pathGetter(path) {
     return () => {
       if (dataIsValueRef(this.data.getIn(path))) {
@@ -111,6 +168,10 @@ export default class ValueReferenceData {
     };
   }
 
+  /**
+   * Data setter that knows about value-reference and regular data.
+   * @private
+   */
   pathSetter(path) {
     return (value) => {
       if (dataIsValueRef(this.data.getIn(path))) {
@@ -121,6 +182,11 @@ export default class ValueReferenceData {
     };
   }
 
+  /**
+   * Converts the value for the path to a parameter. If the value for the path isn't a value-reference, it throws
+   * and error.
+   * @private
+   */
   pathParameterSetter(path) {
     return (name) => {
       if (dataIsValueRef(this.data.getIn(path))) {
@@ -131,6 +197,10 @@ export default class ValueReferenceData {
     };
   }
 
+  /**
+   * Gets the data type for a path value. It can handle value-reference and regular data values.
+   * @private
+   */
   pathType(path) {
     return () => {
       const data = this.data.getIn(path);
