@@ -31,6 +31,7 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -156,6 +157,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     private Set<Constraint> versionConstraints(Input input) {
+        final Set<Constraint> result = EntityFacade.super.versionConstraints();
         // TODO: Find more robust method of identifying the providing plugin
         final MessageInput.Factory<? extends MessageInput> inputFactory = inputFactories.get(input.getType());
         if (inputFactory == null) {
@@ -166,7 +168,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(() -> result));
     }
 
     private ExtractorEntity encodeExtractor(Extractor extractor) {

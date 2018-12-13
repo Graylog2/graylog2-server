@@ -92,6 +92,7 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     private Set<Constraint> versionConstraints(Output output) {
+        Set<Constraint> result = EntityFacade.super.versionConstraints();
         // TODO: Find more robust method of identifying the providing plugin
         final MessageOutput.Factory<? extends MessageOutput> outputFactory = outputFactories.get(output.getType());
         if (outputFactory == null) {
@@ -102,7 +103,7 @@ public class OutputFacade implements EntityFacade<Output> {
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(() -> result));
     }
 
     @Override

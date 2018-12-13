@@ -20,6 +20,8 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -28,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +44,12 @@ public interface EntityFacade<T> {
      * @see Entity
      */
     Entity exportNativeEntity(T nativeEntity);
+
+    default Set<Constraint> versionConstraints() {
+        Set<Constraint> result = new HashSet<>();
+        result.add(GraylogVersionConstraint.currentGraylogVersion());
+        return result;
+    }
 
     /**
      * Create an exportable model of a native entity referenced by an {@link EntityDescriptor}

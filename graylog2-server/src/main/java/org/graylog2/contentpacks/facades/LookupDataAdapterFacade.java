@@ -84,12 +84,13 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
 
 
     private Set<Constraint> versionConstraints(DataAdapterDto dataAdapterDto) {
+        Set<Constraint> result = EntityFacade.super.versionConstraints();
         // TODO: Find more robust method of identifying the providing plugin
         final String packageName = dataAdapterDto.config().getClass().getPackage().getName();
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(() -> result));
     }
 
     @Override
