@@ -62,18 +62,17 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Configuration configuration) {
+    public Entity exportNativeEntity(Configuration configuration) {
         final SidecarCollectorConfigurationEntity configurationEntity = SidecarCollectorConfigurationEntity.create(
                 ValueReference.of(configuration.collectorId()),
                 ValueReference.of(configuration.name()),
                 ValueReference.of(configuration.color()),
                 ValueReference.of(configuration.template()));
         final JsonNode data = objectMapper.convertValue(configurationEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(TYPE_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     @Override
@@ -134,7 +133,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         final Configuration configuration = configurationService.find(modelId.id());
         if (isNull(configuration)) {

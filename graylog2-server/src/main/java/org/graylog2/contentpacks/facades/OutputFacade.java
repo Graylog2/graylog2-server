@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -74,20 +75,20 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Output output) {
+    public Entity exportNativeEntity(Output output) {
         final OutputEntity outputEntity = OutputEntity.create(
                 ValueReference.of(output.getTitle()),
                 ValueReference.of(output.getType()),
                 toReferenceMap(output.getConfiguration())
         );
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        final Set<Constraint> constraints = versionConstraints(output);
+        return EntityV1.builder()
                 .type(ModelTypes.OUTPUT_V1)
+                .constraints(ImmutableSet.copyOf(constraints))
                 .data(data)
                 .build();
-        final Set<Constraint> constraints = versionConstraints(output);
 
-        return EntityWithConstraints.create(entity, constraints);
     }
 
     private Set<Constraint> versionConstraints(Output output) {
@@ -168,7 +169,7 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Output output = outputService.load(modelId.id());

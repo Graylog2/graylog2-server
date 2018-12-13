@@ -83,7 +83,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(PipelineDao pipelineDao) {
+    public Entity exportNativeEntity(PipelineDao pipelineDao) {
         final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id());
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),
@@ -91,11 +91,10 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 ValueReference.of(pipelineDao.source()),
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(ModelTypes.PIPELINE_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     private Set<ValueReference> connectedStreams(String pipelineId) {
@@ -231,7 +230,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());

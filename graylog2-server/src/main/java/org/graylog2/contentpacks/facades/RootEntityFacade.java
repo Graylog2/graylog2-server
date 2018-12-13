@@ -37,7 +37,7 @@ public class RootEntityFacade implements EntityFacade<Void> {
     public static final ModelType TYPE = ModelTypes.ROOT;
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Void nativeEntity) {
+    public Entity exportNativeEntity(Void nativeEntity) {
         throw new UnsupportedOperationException("Unsupported operation for root entity");
     }
 
@@ -69,7 +69,7 @@ public class RootEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         return Optional.empty();
     }
 

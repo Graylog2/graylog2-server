@@ -100,8 +100,7 @@ public class LookupTableFacadeTest {
                 .defaultMultiValue("default-multi")
                 .defaultMultiValueType(LookupDefaultValue.Type.STRING)
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(lookupTableDto);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(lookupTableDto);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -124,8 +123,7 @@ public class LookupTableFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -362,13 +360,12 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);

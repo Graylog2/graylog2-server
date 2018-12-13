@@ -106,7 +106,7 @@ public class ContentPackService {
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
                                                       String user) {
-        ensureConstraints(contentPack.requires());
+        ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
         final ImmutableMap<String, ValueReference> validatedParameters = validateParameters(parameters, contentPack.parameters());
@@ -340,20 +340,17 @@ public class ContentPackService {
         return mutableGraph;
     }
 
-    public EntitiesWithConstraints collectEntities(Collection<EntityDescriptor> resolvedEntities) {
+    public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
         final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
         final ImmutableSet.Builder<Constraint> constraints = ImmutableSet.<Constraint>builder()
                 .add(GraylogVersionConstraint.currentGraylogVersion());
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
             final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
 
-            facade.exportEntity(entityDescriptor).ifPresent(entityWithConstraints -> {
-                entities.add(entityWithConstraints.entity());
-                constraints.addAll(entityWithConstraints.constraints());
-            });
+            facade.exportEntity(entityDescriptor).ifPresent(entities::add);
         }
 
-        return EntitiesWithConstraints.create(entities.build(), constraints.build());
+        return entities.build();
     }
 
     private ImmutableGraph<Entity> buildEntityGraph(Entity rootEntity,
@@ -404,15 +401,22 @@ public class ContentPackService {
         }
     }
 
-    public Set<ConstraintCheckResult> checkConstraints(ContentPack contentPackV1) {
-        Set<Constraint> requiredConstraints = contentPackV1.requires();
+    public Set<ConstraintCheckResult> checkConstraints(ContentPack contentPack) {
+        if (contentPack instanceof ContentPackV1) {
+            return checkConstraintsV1((ContentPackV1) contentPack);
+        } else {
+            throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
+        }
+    }
+
+    private Set<ConstraintCheckResult> checkConstraintsV1(ContentPackV1 contentPackV1) {
+        Set<Constraint> requiredConstraints = contentPackV1.constraints();
         final Set<ConstraintCheckResult> fulfilledConstraints = new HashSet<>();
         for (ConstraintChecker constraintChecker : constraintCheckers) {
             fulfilledConstraints.addAll(constraintChecker.checkConstraints(requiredConstraints));
         }
         return fulfilledConstraints;
     }
-
 
     private ImmutableMap<String, ValueReference> validateParameters(Map<String, ValueReference> parameters,
                                                                     Set<Parameter> contentPackParameters) {

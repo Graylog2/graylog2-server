@@ -12,17 +12,6 @@
       "description": "## Description\\n- Free text description in markdown format",
       "vendor": "Graylog, Inc. <hello@graylog.com>",
       "url": "https://github.com/graylog-labs/awesome-content-pack.git",
-      "requires": [
-        {
-          "type": "server-version",
-          "version": ">=3.0.0"
-        },
-        {
-          "type": "plugin-version",
-          "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
-          "version": ">=3.0.0"
-        }
-      ],
       "parameters": [
         {
           "name": "GELF_PORT",
@@ -61,7 +50,13 @@
             },
             "extractors": [],
             "static_fields": []
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         },
         {
           "v": "1",
@@ -87,7 +82,13 @@
               "type": "string",
               "value": "2562ac46-65f1-454c-89e1-e9be96bfd5e7"
             }
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         },
         {
           "v": "1",
@@ -115,7 +116,13 @@
                 "value": 1000
               }
             }
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         },
         {
           "v": "1",
@@ -147,7 +154,13 @@
                 "value": "OTX_API_KEY"
               }
             }
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         },
         {
           "v": "1",
@@ -165,7 +178,13 @@
               "type": "string",
               "value": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3"
             }
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         },
         {
           "v": "1",
@@ -179,7 +198,13 @@
               "type": "string",
               "value": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3"
             }
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         },
         {
           "v": "1",
@@ -189,7 +214,13 @@
           },
           "id": "3fb82940-fd01-4c64-98f3-4ed2ce2577e3",
           "data": {
-          }
+          },
+          "constraints": [
+            {
+              "type": "server-version",
+              "version": ">=3.0.0"
+            }
+          ]
         }
       ]
     },
@@ -409,7 +440,6 @@
       "description": "## Description\\n- Free text description in markdown format",
       "vendor": "Graylog, Inc. <hello@graylog.com>",
       "url": "https://github.com/graylog-labs/awesome-content-pack.git",
-      "requires": [],
       "parameters": [],
       "entities": []
     },
@@ -425,7 +455,6 @@
       "description": "## Description\\n- Free text description in markdown format",
       "vendor": "Graylog, Inc. <hello@graylog.com>",
       "url": "https://github.com/graylog-labs/awesome-content-pack.git",
-      "requires": [],
       "parameters": [],
       "entities": []
     },
@@ -441,7 +470,6 @@
       "description": "## Description\\n- Free text description in markdown format",
       "vendor": "Graylog, Inc. <hello@graylog.com>",
       "url": "https://github.com/graylog-labs/awesome-content-pack.git",
-      "requires": [],
       "parameters": [],
       "entities": []
     }

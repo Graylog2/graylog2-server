@@ -59,7 +59,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Collector collector) {
+    public Entity exportNativeEntity(Collector collector) {
         final SidecarCollectorEntity collectorEntity = SidecarCollectorEntity.create(
                 ValueReference.of(collector.name()),
                 ValueReference.of(collector.serviceType()),
@@ -71,11 +71,10 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         );
 
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(TYPE_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     @Override
@@ -161,7 +160,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         final Collector collector = collectorService.find(modelId.id());
         if (isNull(collector)) {

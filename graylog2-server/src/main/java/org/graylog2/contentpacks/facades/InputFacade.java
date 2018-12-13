@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -128,7 +129,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(InputWithExtractors inputWithExtractors) {
+    public Entity exportNativeEntity(InputWithExtractors inputWithExtractors) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
@@ -146,13 +147,12 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 ValueReference.of(input.isGlobal()),
                 extractors);
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        final Set<Constraint> constraints = versionConstraints(input);
+        return EntityV1.builder()
                 .type(ModelTypes.INPUT_V1)
                 .data(data)
+                .constraints(ImmutableSet.copyOf(constraints))
                 .build();
-        final Set<Constraint> constraints = versionConstraints(input);
-
-        return EntityWithConstraints.create(entity, constraints);
     }
 
     private Set<Constraint> versionConstraints(Input input) {
@@ -456,7 +456,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
 
         try {

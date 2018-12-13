@@ -106,7 +106,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Stream stream) {
+    public Entity exportNativeEntity(Stream stream) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
@@ -133,11 +133,10 @@ public class StreamFacade implements EntityFacade<Stream> {
                 ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(ModelTypes.STREAM_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity, versionConstraints(streamAlarmCallbacks));
     }
 
     private Set<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks) {
@@ -348,7 +347,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());

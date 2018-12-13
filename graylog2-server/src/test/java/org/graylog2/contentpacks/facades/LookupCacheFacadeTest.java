@@ -93,8 +93,7 @@ public class LookupCacheFacadeTest {
                 .description("Cache Description")
                 .config(new FallbackCacheConfig())
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(cacheDto);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(cacheDto);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -112,8 +111,7 @@ public class LookupCacheFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -274,13 +272,12 @@ public class LookupCacheFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("no-op-cache", ModelTypes.LOOKUP_CACHE_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("no-op-cache", ModelTypes.LOOKUP_CACHE_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_CACHE_V1);
         final LookupCacheEntity lookupCacheEntity = objectMapper.convertValue(entity.data(), LookupCacheEntity.class);

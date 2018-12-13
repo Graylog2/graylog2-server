@@ -30,6 +30,4 @@ import java.util.Set;
 public interface ContentPack extends Identified, Revisioned, Versioned {
     interface ContentPackBuilder<SELF> extends IdBuilder<SELF>, RevisionBuilder<SELF>, VersionBuilder<SELF> {
     }
-
-    Set<Constraint> requires();
 }

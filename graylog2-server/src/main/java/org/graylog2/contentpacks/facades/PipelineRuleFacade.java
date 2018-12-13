@@ -60,17 +60,16 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(RuleDao ruleDao) {
+    public Entity exportNativeEntity(RuleDao ruleDao) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
                 ValueReference.of(ruleDao.title()),
                 ValueReference.of(ruleDao.description()),
                 ValueReference.of(ruleDao.source()));
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(ModelTypes.PIPELINE_RULE_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     @Override
@@ -168,7 +167,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final RuleDao ruleDao = ruleService.loadByName(modelId.id());

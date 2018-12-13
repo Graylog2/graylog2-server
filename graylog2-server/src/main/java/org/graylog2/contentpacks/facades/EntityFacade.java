@@ -38,9 +38,9 @@ public interface EntityFacade<T> {
      *
      * @param nativeEntity the native entity to export
      * @return an exportable (serializable) model of the entity including optional constraints.
-     * @see EntityWithConstraints
+     * @see Entity
      */
-    EntityWithConstraints exportNativeEntity(T nativeEntity);
+    Entity exportNativeEntity(T nativeEntity);
 
     /**
      * Create an exportable model of a native entity referenced by an {@link EntityDescriptor}
@@ -50,7 +50,7 @@ public interface EntityFacade<T> {
      * @return an exportable (serializable) model of the entity including optional constraints,
      * or {@link Optional#empty()} if the entity couldn't be found.
      */
-    Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor);
+    Optional<Entity> exportEntity(EntityDescriptor entityDescriptor);
 
     /**
      * Create a native entity of type {@code T} from an entity model.
