@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import DataTable from 'components/common/DataTable';
-import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
+import naturalSort from 'javascript-natural-sort';
 
 class ContentPackEntityConfig extends React.Component {
   static propTypes = {
@@ -26,25 +27,27 @@ class ContentPackEntityConfig extends React.Component {
     return this.props.parameters[paramIndex];
   };
 
-  _configKeyRowFormatter = (configKey) => {
-    const configMap = ObjectUtils.getValue(this.props.entity.data, configKey);
-    const parameter = this._getParameterForConfigKey(configKey);
-    const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : configMap.type;
-    const value = parameter ? (<b>{parameter.name}</b>) : configMap.value;
-    return (
-      <tr key={configKey}>
-        <td>{configKey}</td>
-        <td>{type}</td>
-        <td>{value}</td>
-      </tr>
-    );
+  _configKeyRowFormatter = (paths) => {
+    return (configKey) => {
+      const path = paths[configKey];
+      const parameter = this._getParameterForConfigKey(configKey);
+      const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : path.getValueType();
+      const value = parameter ? (<b>{parameter.name}</b>) : path.getValue();
+      return (
+        <tr key={configKey}>
+          <td>{configKey}</td>
+          <td>{type}</td>
+          <td>{value}</td>
+        </tr>
+      );
+    }
   };
 
   render() {
-    const typeRegExp = RegExp(/\.type$/);
-    const configKeys = ObjectUtils.getPaths(this.props.entity.data)
-      .filter(configKey => typeRegExp.test(configKey))
-      .map((configKey) => { return configKey.replace(typeRegExp, ''); });
+    const entityData = new ValueReferenceData(this.props.entity.data);
+    const configPaths = entityData.getPaths();
+    const configKeys = Object.keys(configPaths).sort(naturalSort);
+
     return (
       <div>
         <DataTable
@@ -52,7 +55,7 @@ class ContentPackEntityConfig extends React.Component {
           headers={['Config Key', 'Type', 'Value']}
           filterKeys={[]}
           rows={configKeys}
-          dataRowFormatter={this._configKeyRowFormatter}
+          dataRowFormatter={this._configKeyRowFormatter(configPaths)}
         />
       </div>
     );

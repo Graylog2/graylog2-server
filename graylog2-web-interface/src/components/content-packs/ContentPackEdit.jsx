@@ -3,7 +3,7 @@ import React from 'react';
 
 import { AutoAffix } from 'react-overlays';
 import { Spinner, Wizard, ScrollButton } from 'components/common';
-import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
 
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
@@ -56,25 +56,19 @@ class ContentPackEdit extends React.Component {
   }
 
   _prepareForPreview() {
-    const typeRegExp = RegExp(/\.type$/);
     const newEntities = this.props.fetchedEntities.map((entity) => {
       const parameters = this.props.appliedParameter[entity.id] || [];
       const newEntityBuilder = entity.toBuilder();
-      const entityData = entity.data;
-      const configKeys = ObjectUtils.getPaths(entityData)
-        .filter(configKey => typeRegExp.test(configKey))
-        .map((configKey) => { return configKey.replace(typeRegExp, ''); });
-      configKeys.forEach((path) => {
+      const entityData = new ValueReferenceData(entity.data);
+      const configPaths = entityData.getPaths();
+
+      Object.keys(configPaths).forEach((path) => {
         const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path; });
-        let newValue;
         if (index >= 0) {
-          newValue = { type: 'parameter', value: parameters[index].paramName };
-        } else {
-          newValue = ObjectUtils.getValue(entityData, path);
+          configPaths[path].setParameter(parameters[index].paramName);
         }
-        ObjectUtils.setValue(entityData, path, newValue);
       });
-      newEntityBuilder.data(entityData);
+      newEntityBuilder.data(entityData.getData());
       return newEntityBuilder.build();
     });
     const newContentPack = this.props.contentPack.toBuilder()

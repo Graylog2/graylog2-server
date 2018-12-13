@@ -12,7 +12,7 @@ import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
-import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 
 import Entity from 'logic/content-packs/Entity';
@@ -85,15 +85,14 @@ const EditContentPackPage = createReactClass({
   },
 
   _getAppliedParameter() {
-    const typeRegEx = RegExp(/\.type$/);
     const appliedParameter = this.state.contentPack.entities.reduce((result, entity) => {
-      const paramMap = ObjectUtils.getPaths(entity.data).filter((path) => {
-        return typeRegEx.test(path) && ObjectUtils.getValue(entity.data, path) === 'parameter';
-      }).map((typePath) => {
-        const valuePath = typePath.replace(typeRegEx, '.value');
-        const value = ObjectUtils.getValue(entity.data, valuePath);
-        const configKey = typePath.replace(typeRegEx, '');
-        return { configKey: configKey, paramName: value };
+      const entityData = new ValueReferenceData(entity.data);
+      const configPaths = entityData.getPaths();
+
+      const paramMap = Object.keys(configPaths).filter((path) => {
+        return configPaths[path].isValueParameter();
+      }).map((path) => {
+        return { configKey: path, paramName: configPaths[path].getValue() };
       });
       const newResult = result;
       if (paramMap.length > 0) {
