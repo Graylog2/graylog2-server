@@ -40,6 +40,11 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                 Choose Config Key
               </option>
               <option
+                value="configuration.listen_address"
+              >
+                configuration.listen_address
+              </option>
+              <option
                 value="name"
               >
                 name
@@ -48,11 +53,6 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                 value="title"
               >
                 title
-              </option>
-              <option
-                value="configuration.listen_address"
-              >
-                configuration.listen_address
               </option>
             </select>
             
@@ -224,16 +224,6 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                 Choose Config Key
               </option>
               <option
-                value="name"
-              >
-                name
-              </option>
-              <option
-                value="title"
-              >
-                title
-              </option>
-              <option
                 value="configuration.listen_address"
               >
                 configuration.listen_address
@@ -242,6 +232,16 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                 value="configuration.port"
               >
                 configuration.port
+              </option>
+              <option
+                value="name"
+              >
+                name
+              </option>
+              <option
+                value="title"
+              >
+                title
               </option>
             </select>
             
