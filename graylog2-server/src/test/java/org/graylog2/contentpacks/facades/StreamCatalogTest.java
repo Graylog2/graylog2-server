@@ -67,6 +67,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -121,7 +122,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, new HashSet<>(), indexSetService);
     }
 
     @Test

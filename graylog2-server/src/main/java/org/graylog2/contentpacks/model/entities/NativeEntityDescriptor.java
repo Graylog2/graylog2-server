@@ -49,7 +49,7 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
     }
 
     /**
-     * Shortcut for {@link #create(String, String, ModelType)}
+     * Shortcut for {@link #create(String, String, ModelType, String)}
      */
     public static NativeEntityDescriptor create(String contentPackEntityId, String nativeId, ModelType type, String title) {
         return create(ModelId.of(contentPackEntityId), ModelId.of(nativeId), type, title);

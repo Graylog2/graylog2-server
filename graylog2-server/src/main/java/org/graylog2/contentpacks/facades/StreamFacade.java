@@ -23,10 +23,15 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.bson.types.ObjectId;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -34,16 +39,24 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.StreamAlarmCallbackEntity;
+import org.graylog2.contentpacks.model.entities.StreamAlertConditionEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.StreamRuleEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
+import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.streams.StreamRuleService;
@@ -59,6 +72,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.nullToEmpty;
+
 public class StreamFacade implements EntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamFacade.class);
     private static final String DUMMY_STREAM_ID = "ffffffffffffffffffffffff";
@@ -68,16 +83,25 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
+    private final AlertService streamAlertService;
+    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    private final Set<PluginMetaData> pluginMetaData;
     private final IndexSetService indexSetService;
 
     @Inject
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
+                        AlertService streamAlertService,
+                        AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                        Set<PluginMetaData> pluginMetaData,
                         IndexSetService indexSetService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
+        this.streamAlertService = streamAlertService;
+        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
+        this.pluginMetaData = pluginMetaData;
         this.indexSetService = indexSetService;
     }
 
@@ -85,6 +109,12 @@ public class StreamFacade implements EntityFacade<Stream> {
     public EntityWithConstraints exportNativeEntity(Stream stream) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
+                .collect(Collectors.toList());
+        final List<StreamAlertConditionEntity> streamAlertConditions = streamService.getAlertConditions(stream).stream()
+                .map(this::encodeStreamAlertCondition)
+                .collect(Collectors.toList());
+        final List<StreamAlarmCallbackEntity> streamAlarmCallbacks = alarmCallbackConfigurationService.getForStream(stream).stream()
+                .map(this::encodeStreamAlarmCallback)
                 .collect(Collectors.toList());
         final Set<ValueReference> outputIds = stream.getOutputs().stream()
                 .map(Output::getId)
@@ -96,6 +126,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 ValueReference.of(stream.getDisabled()),
                 ValueReference.of(stream.getMatchingType()),
                 streamRules,
+                streamAlertConditions,
+                streamAlarmCallbacks,
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
                 ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
@@ -105,16 +137,42 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .type(ModelTypes.STREAM_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
+        return EntityWithConstraints.create(entity, versionConstraints(streamAlarmCallbacks));
+    }
+
+    private Set<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks) {
+        // Try to collect plugin dependencies by looking that the package names of the alarm callbacks and the loaded
+        // plugins
+        return alarmCallbacks.stream()
+                .map(StreamAlarmCallbackEntity::type)
+                .flatMap(packageName -> pluginMetaData.stream()
+                        .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
+                        .map(PluginVersionConstraint::of))
+                .collect(Collectors.toSet());
     }
 
     private StreamRuleEntity encodeStreamRule(StreamRule streamRule) {
         return StreamRuleEntity.create(
                 ValueReference.of(streamRule.getType()),
                 ValueReference.of(streamRule.getField()),
-                ValueReference.of(streamRule.getValue()),
+                ValueReference.of(nullToEmpty(streamRule.getValue())), // Rule value can be null!
                 ValueReference.of(streamRule.getInverted()),
-                ValueReference.of(streamRule.getDescription()));
+                ValueReference.of(nullToEmpty(streamRule.getDescription()))); // Rule description can be null!
+    }
+
+    private StreamAlertConditionEntity encodeStreamAlertCondition(AlertCondition alertCondition) {
+        return StreamAlertConditionEntity.create(
+                alertCondition.getType(),
+                ValueReference.of(alertCondition.getTitle()),
+                ReferenceMapUtils.toReferenceMap(alertCondition.getParameters()));
+    }
+
+    private StreamAlarmCallbackEntity encodeStreamAlarmCallback(AlarmCallbackConfiguration alarmCallback) {
+        return StreamAlarmCallbackEntity.create(
+                alarmCallback.getType(),
+                ValueReference.of(alarmCallback.getTitle()),
+                alarmCallback.getStreamId(),
+                ReferenceMapUtils.toReferenceMap(alarmCallback.getConfiguration()));
     }
 
     @Override
@@ -147,9 +205,30 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
                 .map(request -> streamRuleService.create(DUMMY_STREAM_ID, request))
                 .collect(Collectors.toList());
+        final List<AlertCondition> alertConditions = streamEntity.alertConditions().stream()
+                .map(alertCondition -> createStreamAlertConditionRequest(alertCondition, parameters))
+                .map(request -> {
+                    try {
+                        return streamAlertService.fromRequest(request, stream, username);
+                    } catch (ConfigurationException e) {
+                        throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
+                    }
+                })
+                .collect(Collectors.toList());
+        final List<AlarmCallbackConfiguration> alarmCallbacks = streamEntity.alarmCallbacks().stream()
+                .map(alarmCallback -> createStreamAlarmCallbackRequest(alarmCallback, parameters))
+                .map(request -> alarmCallbackConfigurationService.create(stream.getId(), request, username))
+                .collect(Collectors.toList());
         final String savedStreamId;
         try {
             savedStreamId = streamService.saveWithRules(stream, streamRules);
+
+            for (final AlertCondition alertCondition : alertConditions) {
+                streamService.addAlertCondition(stream, alertCondition);
+            }
+            for (final AlarmCallbackConfiguration alarmCallback : alarmCallbacks) {
+                alarmCallbackConfigurationService.save(alarmCallback);
+            }
         } catch (ValidationException e) {
             throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
         }
@@ -166,6 +245,24 @@ public class StreamFacade implements EntityFacade<Stream> {
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }
+
+    private CreateConditionRequest createStreamAlertConditionRequest(StreamAlertConditionEntity alertCondition,
+                                                                     Map<String, ValueReference> parameters) {
+        return CreateConditionRequest.builder()
+                .setType(alertCondition.type())
+                .setTitle(alertCondition.title().asString(parameters))
+                .setParameters(ReferenceMapUtils.toValueMap(alertCondition.parameters(), parameters))
+                .build();
+    }
+
+    private CreateAlarmCallbackRequest createStreamAlarmCallbackRequest(StreamAlarmCallbackEntity alarmCallback,
+                                                                        Map<String, ValueReference> parameters) {
+        return CreateAlarmCallbackRequest.create(
+                alarmCallback.type(),
+                alarmCallback.title().asString(parameters),
+                ReferenceMapUtils.toValueMap(alarmCallback.configuration(), parameters));
+    }
+
 
     private CreateStreamRuleRequest createStreamRuleRequest(StreamRuleEntity streamRuleEntity, Map<String, ValueReference> parameters) {
         return CreateStreamRuleRequest.create(
