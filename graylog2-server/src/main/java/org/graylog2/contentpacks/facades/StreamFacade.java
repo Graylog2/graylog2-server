@@ -59,6 +59,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.nullToEmpty;
+
 public class StreamFacade implements EntityFacade<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(StreamFacade.class);
     private static final String DUMMY_STREAM_ID = "ffffffffffffffffffffffff";
@@ -112,9 +114,9 @@ public class StreamFacade implements EntityFacade<Stream> {
         return StreamRuleEntity.create(
                 ValueReference.of(streamRule.getType()),
                 ValueReference.of(streamRule.getField()),
-                ValueReference.of(streamRule.getValue()),
+                ValueReference.of(nullToEmpty(streamRule.getValue())), // Rule value can be null!
                 ValueReference.of(streamRule.getInverted()),
-                ValueReference.of(streamRule.getDescription()));
+                ValueReference.of(nullToEmpty(streamRule.getDescription()))); // Rule description can be null!
     }
 
     @Override
