@@ -162,9 +162,8 @@ export default class ValueReferenceData {
     return () => {
       if (dataIsValueRef(this.data.getIn(path))) {
         return this.data.getIn(path.concat(VALUE_REF_VALUE_FIELD));
-      } else {
-        return this.data.getIn(path);
       }
+      return this.data.getIn(path);
     };
   }
 
@@ -207,9 +206,8 @@ export default class ValueReferenceData {
 
       if (dataIsValueRef(data)) {
         return this.data.getIn(path.concat(VALUE_REF_TYPE_FIELD));
-      } else {
-        return (typeof data);
       }
+      return (typeof data);
     };
   }
 }

@@ -40,7 +40,7 @@ class ContentPackEntityConfig extends React.Component {
           <td>{value}</td>
         </tr>
       );
-    }
+    };
   };
 
   render() {
