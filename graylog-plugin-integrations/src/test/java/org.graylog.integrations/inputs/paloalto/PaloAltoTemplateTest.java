@@ -25,7 +25,7 @@ public class PaloAltoTemplateTest {
         // Verify that the correct number of fields were parsed.
         assertEquals(22, builder.getSystemMessageTemplate().getFields().size());
         assertEquals(74, builder.getThreatMessageTemplate().getFields().size());
-        assertEquals(63, builder.getTrafficMessageTemplate().getFields().size());
+        assertEquals(64, builder.getTrafficMessageTemplate().getFields().size());
     }
 
     @Test
