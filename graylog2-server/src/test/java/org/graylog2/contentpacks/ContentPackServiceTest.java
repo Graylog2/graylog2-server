@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
@@ -76,6 +78,10 @@ public class ContentPackServiceTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Mock
+    private AlertService alertService;
+    @Mock
+    private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    @Mock
     private StreamService streamService;
     @Mock
     private StreamRuleService streamRuleService;
@@ -106,7 +112,7 @@ public class ContentPackServiceTest {
         outputFactories = new HashMap<>();
         final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, new HashSet<>(), indexSetService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories)
         );
 
