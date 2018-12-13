@@ -16,13 +16,10 @@
  */
 package org.graylog.integrations.inputs.paloalto;
 
-import org.graylog.integrations.inputs.paloalto.PaloAltoTemplateDefaults;
-import org.graylog.integrations.inputs.paloalto.PaloAltoTemplates;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Test parsing of raw PAN message templates.
