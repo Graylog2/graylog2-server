@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { Row, Col, Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
-import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
+import naturalSort from 'javascript-natural-sort';
 
 import Style from './ContentPackApplyParameter.css';
 
@@ -73,10 +74,12 @@ class ContentPackApplyParameter extends React.Component {
   };
 
   render() {
-    const typeRegExp = RegExp(/\.type$/);
-    const configKeys = ObjectUtils.getPaths(this.props.entity.data)
-      .filter(configKey => typeRegExp.test(configKey))
-      .map((configKey) => { return configKey.replace(typeRegExp, ''); })
+    const vRefData = new ValueReferenceData(this.props.entity.data);
+    const configPaths = vRefData.getPaths();
+
+    const configKeys = Object.keys(configPaths)
+      .sort(naturalSort)
+      .filter(configKey => configPaths[configKey].isValueRef()) // Only allow value-refs as parameters
       .filter((configKey) => {
         return this.props.appliedParameter.findIndex((paramMap) => {
           return configKey === paramMap.configKey;
@@ -87,7 +90,7 @@ class ContentPackApplyParameter extends React.Component {
     let parameters = this.props.parameters;
     let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';
     if (this.state.config_key !== '' && parameters.length > 0) {
-      const configKeyType = ObjectUtils.getValue(this.props.entity.data, this.state.config_key).type;
+      const configKeyType = configPaths[this.state.config_key].getValueType();
       if (['string', 'integer', 'boolean', 'double'].findIndex(type => type === configKeyType) >= 0) {
         parameters = parameters.filter(parameter => parameter.type === configKeyType);
       }
