@@ -37,7 +37,7 @@ public class IntegrationsMetaData implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "Enterprise Integrations";
+        return "Integrations";
     }
 
     @Override
@@ -47,7 +47,7 @@ public class IntegrationsMetaData implements PluginMetaData {
 
     @Override
     public URI getURL() {
-        return URI.create("https://github.com/git@github.com:Graylog2/graylog-plugin-integrations.git");
+        return URI.create("https://github.com/Graylog2/graylog-plugin-integrations.git");
     }
 
     @Override
