@@ -74,7 +74,7 @@ class Builder {
   }
 
   build() {
-    const {id} = this.value.toObject();
-    return new Constraint(id);
+    const { type, plugin, version } = this.value.toObject();
+    return new Constraint(type, version, plugin);
   }
 }
