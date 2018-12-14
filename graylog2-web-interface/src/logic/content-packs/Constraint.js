@@ -30,6 +30,13 @@ export default class Constraint {
   toJSON() {
     const { type, plugin, version } = this._value;
 
+    if (plugin === 'server') {
+      return {
+        type,
+        version,
+      };
+    }
+
     return {
       type,
       plugin,

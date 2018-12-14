@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Set } from 'immutable';
 
 import { DataTable } from 'components/common';
 import { Badge } from 'react-bootstrap';
@@ -7,12 +8,15 @@ import './ContentPackConstraints.css';
 
 class ContentPackConstraints extends React.Component {
   static propTypes = {
-    constraints: PropTypes.array,
+    constraints: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.array,
+    ]),
     isFulfilled: PropTypes.bool,
   };
 
   static defaultProps = {
-    constraints: [],
+    constraints: Set(),
     isFulfilled: false,
   };
 
@@ -33,11 +37,16 @@ class ContentPackConstraints extends React.Component {
 
   render() {
     const headers = ['Name', 'Type', 'Version', 'Fulfilled'];
-    const constraints = this.props.constraints.map((constraint) => {
+    let constraints = this.props.constraints.map((constraint) => {
       const newConstraint = constraint.constraint || constraint;
       newConstraint.fulfilled = constraint.fulfilled;
       return newConstraint;
     });
+
+    if (constraints instanceof Set) {
+      constraints = constraints.toArray();
+    }
+
     return (
       <div>
         <h2>Constraints</h2>
