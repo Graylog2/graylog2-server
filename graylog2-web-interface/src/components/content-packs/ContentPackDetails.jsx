@@ -46,7 +46,7 @@ const ContentPackDetails = (props) => {
           { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
           <br />
           <br />
-          { contentPack.requires && props.showConstraints &&
+          { contentPack.constraints && props.showConstraints &&
           <div>
             <ContentPackConstraints constraints={constraints} />
             <br />
