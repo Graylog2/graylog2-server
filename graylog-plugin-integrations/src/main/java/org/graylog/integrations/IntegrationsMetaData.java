@@ -28,7 +28,7 @@ import java.util.Set;
  * Implement the PluginMetaData interface here.
  */
 public class IntegrationsMetaData implements PluginMetaData {
-    private static final String PLUGIN_PROPERTIES = "org.graylog.integrations.graylog-plugin-enterprise-integrations/graylog-plugin.properties";
+    private static final String PLUGIN_PROPERTIES = "org.graylog.integrations.graylog-plugin-integrations/graylog-plugin.properties";
 
     @Override
     public String getUniqueId() {
@@ -47,7 +47,7 @@ public class IntegrationsMetaData implements PluginMetaData {
 
     @Override
     public URI getURL() {
-        return URI.create("https://github.com/git@github.com:Graylog2/graylog-plugin-enterprise-integrations.git");
+        return URI.create("https://github.com/git@github.com:Graylog2/graylog-plugin-integrations.git");
     }
 
     @Override
