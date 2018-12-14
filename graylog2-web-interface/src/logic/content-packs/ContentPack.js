@@ -1,11 +1,10 @@
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
 import { concat, remove } from 'lodash';
 import uuid from 'uuid/v4';
 import Entity from './Entity';
 
 export default class ContentPack {
-  constructor(v, id, rev, name, summary, description, vendor, url, requires,
-    parameters, entitieValues) {
+  constructor(v, id, rev, name, summary, description, vendor, url, parameters, entitieValues) {
     const entities = entitieValues.map((e) => {
       if (e instanceof Entity) {
         return e;
@@ -22,7 +21,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     };
@@ -60,8 +58,12 @@ export default class ContentPack {
     return this._value.url;
   }
 
-  get requires() {
-    return this._value.requires;
+  get constraints() {
+    return this._value.entities.reduce((acc, entity) => {
+      return entity.constraints.reduce((result, constraint) => {
+        return acc.add(constraint);
+      }, acc);
+    }, Set());
   }
 
   get parameters() {
@@ -82,7 +84,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     } = this._value;
@@ -96,7 +97,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     }));
@@ -112,7 +112,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     } = this._value;
@@ -127,7 +126,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities: entitiesJSON,
     };
@@ -143,7 +141,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     } = value;
@@ -156,7 +153,6 @@ export default class ContentPack {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     );
@@ -173,7 +169,6 @@ export default class ContentPack {
       .description('')
       .vendor('')
       .url('')
-      .requires([])
       .parameters([])
       .entities([]);
   }
@@ -224,11 +219,6 @@ class Builder {
     return this;
   }
 
-  requires(value) {
-    this.value = this.value.set('requires', value);
-    return this;
-  }
-
   parameters(value) {
     this.value = this.value.set('parameters', value);
     return this;
@@ -263,7 +253,6 @@ class Builder {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     } = this.value.toObject();
@@ -276,7 +265,6 @@ class Builder {
       description,
       vendor,
       url,
-      requires,
       parameters,
       entities,
     );

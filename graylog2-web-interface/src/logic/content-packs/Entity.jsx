@@ -1,18 +1,27 @@
 import { Map } from 'immutable';
+import Constraint from './Constraint';
 
 export default class Entity {
-  constructor(v, type, id, data) {
+  constructor(v, type, id, data, constraintValues = []) {
+    const constraints = constraintValues.map((c) => {
+      if (c instanceof Constraint) {
+        return c;
+      }
+      return Constraint.fromJSON(c);
+    });
+
     this._value = {
       v,
       type,
       id,
       data,
+      constraints,
     };
   }
 
   static fromJSON(value) {
-    const { v, type, id, data } = value;
-    return new Entity(v, type, id, data);
+    const { v, type, id, data, constraints } = value;
+    return new Entity(v, type, id, data, constraints);
   }
 
   get v() {
@@ -31,6 +40,10 @@ export default class Entity {
     return this._value.data;
   }
 
+  get constraints() {
+    return this._value.constraints;
+  }
+
   get title() {
     const { data } = this._value;
     return (data.title || data.name || {}).value || '';
@@ -47,6 +60,7 @@ export default class Entity {
       type,
       id,
       data,
+      constraints,
     } = this._value;
     /* eslint-disable-next-line no-use-before-define */
     return new Builder(Map({
@@ -54,6 +68,7 @@ export default class Entity {
       type,
       id,
       data,
+      constraints,
     }));
   }
 
@@ -69,12 +84,14 @@ export default class Entity {
       type,
       id,
       data,
+      constraints,
     } = this._value;
     return {
       v,
       type,
       id,
       data,
+      constraints,
     };
   }
 }
@@ -104,13 +121,19 @@ class Builder {
     return this;
   }
 
+  constraints(value) {
+    this.value = this.value.set('constraints', value);
+    return this;
+  }
+
   build() {
     const {
       v,
       type,
       id,
       data,
+      constraints,
     } = this.value.toObject();
-    return new Entity(v, type, id, data);
+    return new Entity(v, type, id, data, constraints);
   }
 }
