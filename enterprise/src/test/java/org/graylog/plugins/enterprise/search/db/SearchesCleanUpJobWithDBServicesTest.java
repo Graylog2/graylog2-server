@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class})
 @CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
-public class SearchesCleanUpJobTestWithDBServices {
+public class SearchesCleanUpJobWithDBServicesTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
 
@@ -46,7 +46,7 @@ public class SearchesCleanUpJobTestWithDBServices {
     private SearchesCleanUpJob searchesCleanUpJob;
     private SearchDbService searchDbService;
 
-    class TestViewService extends ViewService {
+    static class TestViewService extends ViewService {
         TestViewService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper, ClusterConfigService clusterConfigService, SearchDbService searchDbService) {
             super(mongoConnection, mapper, clusterConfigService, searchDbService);
         }
@@ -57,7 +57,6 @@ public class SearchesCleanUpJobTestWithDBServices {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
         final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
-        final SearchDbService searchDbService = mock(SearchDbService.class);
         final ViewService viewService = new TestViewService(mongoRule.getMongoConnection(), mapperProvider, clusterConfigService, searchDbService);
         this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider));
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
