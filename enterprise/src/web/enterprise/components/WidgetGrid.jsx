@@ -113,6 +113,14 @@ class WidgetGrid extends React.Component {
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer animate={false}
                           locked={this.props.locked}
+                          columns={{
+                            xxl: 12,
+                            xl: 12,
+                            lg: 12,
+                            md: 12,
+                            sm: 12,
+                            xs: 12,
+                          }}
                           measureBeforeMount
                           onPositionsChange={this.props.onPositionsChange}
                           positions={positions}
