@@ -140,7 +140,6 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     private Set<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks) {
-        Set<Constraint> result = EntityFacade.super.versionConstraints();
         // Try to collect plugin dependencies by looking that the package names of the alarm callbacks and the loaded
         // plugins
         return alarmCallbacks.stream()
@@ -148,7 +147,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .flatMap(packageName -> pluginMetaData.stream()
                         .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                         .map(PluginVersionConstraint::of))
-                .collect(Collectors.toCollection(() -> result));
+                .collect(Collectors.toSet());
     }
 
     private StreamRuleEntity encodeStreamRule(StreamRule streamRule) {

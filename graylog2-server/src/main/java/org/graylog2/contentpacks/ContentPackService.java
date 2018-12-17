@@ -342,8 +342,6 @@ public class ContentPackService {
 
     public ImmutableSet<Entity> collectEntities(Collection<EntityDescriptor> resolvedEntities) {
         final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
-        final ImmutableSet.Builder<Constraint> constraints = ImmutableSet.<Constraint>builder()
-                .add(GraylogVersionConstraint.currentGraylogVersion());
         for (EntityDescriptor entityDescriptor : resolvedEntities) {
             final EntityFacade<?> facade = entityFacades.getOrDefault(entityDescriptor.type(), UnsupportedEntityFacade.INSTANCE);
 

@@ -45,12 +45,6 @@ public interface EntityFacade<T> {
      */
     Entity exportNativeEntity(T nativeEntity);
 
-    default Set<Constraint> versionConstraints() {
-        Set<Constraint> result = new HashSet<>();
-        result.add(GraylogVersionConstraint.currentGraylogVersion());
-        return result;
-    }
-
     /**
      * Create an exportable model of a native entity referenced by an {@link EntityDescriptor}
      * including optional constraints.

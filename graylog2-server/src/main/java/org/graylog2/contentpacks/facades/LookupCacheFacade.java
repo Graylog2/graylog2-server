@@ -83,14 +83,13 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     public Set<Constraint> versionConstraints(CacheDto cacheDto) {
-        Set<Constraint> result = EntityFacade.super.versionConstraints();
         // TODO: Find more robust method of identifying the providing plugin
         final String packageName = cacheDto.config().getClass().getPackage().getName();
 
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)
-                .collect(Collectors.toCollection(() -> result));
+                .collect(Collectors.toSet());
     }
 
     @Override

@@ -55,12 +55,12 @@ public abstract class EntityV1 implements Entity {
                 .build();
     }
 
+    public abstract Builder toBuilder();
+
     public static Builder builder() {
-        final ImmutableSet constraints = ImmutableSet.<Constraint>builder()
-                .add(GraylogVersionConstraint.currentGraylogVersion()).build();
         return new AutoValue_EntityV1.Builder()
-                /* TODO: KM: should be removed at the end */
-                .constraints(constraints)
+                .constraints(ImmutableSet.<Constraint>builder().
+                        add(GraylogVersionConstraint.currentGraylogVersion()).build())
                 .id(ModelId.of(UUID.randomUUID().toString()));
     }
 
@@ -85,7 +85,30 @@ public abstract class EntityV1 implements Entity {
 
         public EntityV1 build() {
             version(ModelVersion.of(VERSION));
-            return autoBuild();
+
+            final EntityV1 entityV1 = autoBuild();
+
+            // Make sure we always include a server version constraint
+            if (missesServerConstraint(entityV1)) {
+                return entityV1.toBuilder()
+                        .constraints(ImmutableSet.<Constraint>builder()
+                                .addAll(entityV1.constraints())
+                                .add(GraylogVersionConstraint.currentGraylogVersion())
+                                .build())
+                        .build();
+            }
+
+            return entityV1;
+        }
+
+        /* Checks if the server constraint is included in the entity already.
+           Two Constraint objects with different versions are not equal so we can't just
+           use the properties of the set and have to check if a constraint with the server type
+           is already included. */
+        private boolean missesServerConstraint(EntityV1 entityV1) {
+            return entityV1.constraints().stream()
+                    .map(Constraint::type)
+                    .noneMatch(GraylogVersionConstraint.TYPE_NAME::equals);
         }
     }
 }
