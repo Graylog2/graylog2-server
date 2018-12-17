@@ -478,21 +478,19 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
             final Input input = inputService.find(modelId.toString());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
 
-            final MutableGraph<EntityDescriptor> lookupGraph = resolveNativeEntityLookupTable(entityDescriptor,
-                    inputWithExtractors, mutableGraph);
-            final MutableGraph<EntityDescriptor> grokGraph = resolveNativeEntityGrokPattern(entityDescriptor,
-                    inputWithExtractors, lookupGraph);
+            resolveNativeEntityLookupTable(entityDescriptor, inputWithExtractors, mutableGraph);
+            resolveNativeEntityGrokPattern(entityDescriptor, inputWithExtractors, mutableGraph);
 
-            return ImmutableGraph.copyOf(grokGraph);
+            return ImmutableGraph.copyOf(mutableGraph);
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find input {}", entityDescriptor, e);
         }
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
-    private MutableGraph<EntityDescriptor> resolveNativeEntityGrokPattern(EntityDescriptor entityDescriptor,
-                                                                          InputWithExtractors inputWithExtractors,
-                                                                          MutableGraph<EntityDescriptor> mutableGraph) {
+    private void resolveNativeEntityGrokPattern(EntityDescriptor entityDescriptor,
+                                                InputWithExtractors inputWithExtractors,
+                                                MutableGraph<EntityDescriptor> mutableGraph) {
         inputWithExtractors.extractors().stream()
                 .filter(e -> e.getType().equals(Extractor.Type.GROK))
                 .map(e -> (String) e.getExtractorConfig().get(GrokExtractor.CONFIG_GROK_PATTERN))
@@ -505,13 +503,11 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                         mutableGraph.putEdge(entityDescriptor, depEntityDescriptor);
                     });
                 });
-
-        return mutableGraph;
     }
 
-    private MutableGraph<EntityDescriptor> resolveNativeEntityLookupTable(EntityDescriptor entityDescriptor,
-                                                                          InputWithExtractors inputWithExtractors,
-                                                                          MutableGraph<EntityDescriptor> mutableGraph) {
+    private void resolveNativeEntityLookupTable(EntityDescriptor entityDescriptor,
+                                                InputWithExtractors inputWithExtractors,
+                                                MutableGraph<EntityDescriptor> mutableGraph) {
 
         final Stream<String> extractorLookupNames = inputWithExtractors.extractors().stream()
                 .filter(e -> e.getType().equals(Extractor.Type.LOOKUP_TABLE))
@@ -530,7 +526,6 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                             ModelId.of(lookupTableDto.id()), ModelTypes.LOOKUP_TABLE_V1);
                     mutableGraph.putEdge(entityDescriptor, lookupTable);
                 });
-        return mutableGraph;
     }
 
     @Override
@@ -552,19 +547,17 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
 
         final InputEntity input = objectMapper.convertValue(entity.data(), InputEntity.class);
 
-        final MutableGraph<Entity> lookupGraph = resolveForInstallationV1LookupTable(entity,
-                input, parameters, entities, graph);
-        final MutableGraph<Entity> grokPatternGraph = resolveForInstallationV1GrokPattern(entity,
-                input, parameters, entities, lookupGraph);
+        resolveForInstallationV1LookupTable(entity, input, parameters, entities, graph);
+        resolveForInstallationV1GrokPattern(entity, input, parameters, entities, graph);
 
-        return ImmutableGraph.copyOf(grokPatternGraph);
+        return ImmutableGraph.copyOf(graph);
     }
 
-    private MutableGraph<Entity> resolveForInstallationV1GrokPattern(EntityV1 entity,
-                                                                     InputEntity input,
-                                                                     Map<String, ValueReference> parameters,
-                                                                     Map<EntityDescriptor, Entity> entities,
-                                                                     MutableGraph<Entity> graph) {
+    private void resolveForInstallationV1GrokPattern(EntityV1 entity,
+                                                InputEntity input,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities,
+                                                MutableGraph<Entity> graph) {
         input.extractors().stream()
                 .filter(e -> e.type().asString(parameters).equals(Extractor.Type.GROK.toString()))
                 .map(ExtractorEntity::configuration)
@@ -581,14 +574,13 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                                 return grokPatternEntity1.name().asString(parameters).equals(patternName);
                             }).forEach(x -> graph.putEdge(entity, x.getValue()));
                 });
-        return graph;
     }
 
-    private MutableGraph<Entity> resolveForInstallationV1LookupTable(EntityV1 entity,
-                                                               InputEntity input,
-                                                               Map<String, ValueReference> parameters,
-                                                               Map<EntityDescriptor, Entity> entities,
-                                                               MutableGraph<Entity> graph) {
+    private void resolveForInstallationV1LookupTable(EntityV1 entity,
+                                                     InputEntity input,
+                                                     Map<String, ValueReference> parameters,
+                                                     Map<EntityDescriptor, Entity> entities,
+                                                     MutableGraph<Entity> graph) {
         final Set<String> lookupTableNames = input.extractors().stream()
                 .filter(e -> e.type().asString(parameters).equals(Extractor.Type.LOOKUP_TABLE.toString()))
                 .map(ExtractorEntity::configuration)
@@ -608,7 +600,5 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                     return  lookupTableNames.contains(lookupTableEntity.name().asString(parameters));
                 })
                 .forEach(x -> graph.putEdge(entity, x.getValue()));
-
-        return graph;
     }
 }
