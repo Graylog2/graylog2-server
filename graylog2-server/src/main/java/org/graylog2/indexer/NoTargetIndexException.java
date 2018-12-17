@@ -17,4 +17,7 @@
 package org.graylog2.indexer;
 
 public class NoTargetIndexException extends ElasticsearchException {
+    public NoTargetIndexException(String message) {
+        super(message);
+    }
 }
