@@ -27,6 +27,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.apache.commons.collections.map.HashedMap;
 import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -35,6 +36,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
+import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
@@ -53,6 +55,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.GrokExtractor;
 import org.graylog2.inputs.extractors.LookupTableExtractor;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
@@ -155,6 +158,7 @@ public class InputFacadeTest {
                 inputService,
                 inputRegistry,
                 dbLookupTableService,
+                grokPatternService,
                 messageInputFactory,
                 extractorFactory,
                 converterFactory,
@@ -278,8 +282,15 @@ public class InputFacadeTest {
                 .title("TEST PLAIN TEXT")
                 .build();
 
+        final EntityExcerpt expectedEntityExcerpt4 = EntityExcerpt.builder()
+                .id(ModelId.of("5ae2ebbeef27464477f0fd8b"))
+                .type(ModelTypes.INPUT_V1)
+                .title("TEST PLAIN TEXT")
+                .build();
+
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
-        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt1, expectedEntityExcerpt2, expectedEntityExcerpt3);
+        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt1,
+                expectedEntityExcerpt2, expectedEntityExcerpt3, expectedEntityExcerpt4);
     }
 
     @Test
@@ -366,17 +377,27 @@ public class InputFacadeTest {
         final Input input = inputService.find("5acc84f84b900a4ff290d9a7");
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
 
-        assertThat(inputService.totalCount()).isEqualTo(3L);
+        assertThat(inputService.totalCount()).isEqualTo(4L);
         facade.delete(inputWithExtractors);
 
-        assertThat(inputService.totalCount()).isEqualTo(2L);
+        assertThat(inputService.totalCount()).isEqualTo(3L);
         assertThatThrownBy(() -> inputService.find("5acc84f84b900a4ff290d9a7"))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void resolveNativeEntity() throws NotFoundException {
+    public void resolveNativeEntityGrokPattern() throws NotFoundException {
+        final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
+        EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
+        EntityDescriptor expectedDescriptor = EntityDescriptor.create(ModelId.of("1"), ModelTypes.GROK_PATTERN_V1);
+        Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
+        assertThat(graph.nodes()).contains(expectedDescriptor);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveNativeEntityLookupTable() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.build()).thenReturn(lookupTable);
@@ -401,7 +422,7 @@ public class InputFacadeTest {
 
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void resolveForInstallation() throws NotFoundException {
+    public void resolveForInstallationLookupTable() throws NotFoundException {
         when(lookupuptableBuilder.lookupTable("whois")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.lookupTable("tor-exit-node-list")).thenReturn(lookupuptableBuilder);
         when(lookupuptableBuilder.build()).thenReturn(lookupTable);
@@ -485,5 +506,50 @@ public class InputFacadeTest {
         Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
         assertThat(graph.nodes()).contains(expectedWhoIsEntity);
         assertThat(graph.nodes()).contains(expectedTorEntity);
+    }
+
+    @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveForInstallationGrokPattern() throws NotFoundException {
+        final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+        final GrokExtractor grokExtractor = (GrokExtractor) inputWithExtractors.extractors().iterator().next();
+        final ExtractorEntity extractorEntity = ExtractorEntity.create(
+                ValueReference.of(grokExtractor.getTitle()),
+                ValueReference.of(grokExtractor.getType()),
+                ValueReference.of(grokExtractor.getCursorStrategy()),
+                ValueReference.of(grokExtractor.getTargetField()),
+                ValueReference.of(grokExtractor.getSourceField()),
+                ReferenceMapUtils.toReferenceMap(grokExtractor.getExtractorConfig()),
+                Collections.emptyList(),
+                ValueReference.of(grokExtractor.getConditionType()),
+                ValueReference.of(grokExtractor.getConditionValue()),
+                ValueReference.of(grokExtractor.getOrder()));
+        List<ExtractorEntity> extractorEntities = new ArrayList<>(1);
+        extractorEntities.add(extractorEntity);
+        InputEntity inputEntity = InputEntity.create(
+                ValueReference.of(input.getTitle()),
+                ReferenceMapUtils.toReferenceMap(input.getConfiguration()),
+                Collections.emptyMap(),
+                ValueReference.of(input.getType()),
+                ValueReference.of(input.isGlobal()),
+                extractorEntities);
+        Entity entity = EntityV1.builder()
+                .id(ModelId.of(input.getId()))
+                .type(ModelTypes.INPUT_V1)
+                .data(objectMapper.convertValue(inputEntity, JsonNode.class))
+                .build();
+        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(ValueReference.of("GREEDY"),
+                ValueReference.of(".*"));
+        final Entity expectedEntity = EntityV1.builder()
+                .id(ModelId.of("dead-feed"))
+                .data(objectMapper.convertValue(grokPatternEntity, JsonNode.class))
+                .type(ModelTypes.GROK_PATTERN_V1)
+                .build();
+        final EntityDescriptor entityDescriptor = expectedEntity.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entities = new HashMap<>(1);
+        entities.put(entityDescriptor, expectedEntity);
+        Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entities);
+        assertThat(graph.nodes()).contains(expectedEntity);
     }
 }
