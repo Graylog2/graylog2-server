@@ -61,7 +61,7 @@ export default class ContentPack {
   get constraints() {
     return this._value.entities.reduce((acc, entity) => {
       return entity.constraints.reduce((result, constraint) => {
-        return acc.add(constraint);
+        return result.add(constraint);
       }, acc);
     }, Set());
   }

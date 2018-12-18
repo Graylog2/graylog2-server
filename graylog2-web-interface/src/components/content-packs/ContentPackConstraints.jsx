@@ -43,7 +43,7 @@ class ContentPackConstraints extends React.Component {
       return newConstraint;
     });
 
-    if (constraints instanceof Set) {
+    if (constraints.constructor.name === 'Set') {
       constraints = constraints.toArray();
     }
 

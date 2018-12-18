@@ -44,6 +44,16 @@ export default class Constraint {
     };
   }
 
+  equals(other) {
+    if (!other.version || !other.plugin || !other.type) {
+      return false;
+    }
+
+    return other.version === this.version &&
+      other.type === this.type &&
+      other.plugin === this.plugin;
+  }
+
   static fromJSON(value) {
     const { type, version, plugin } = value;
     return Constraint.create(type, version, plugin);
