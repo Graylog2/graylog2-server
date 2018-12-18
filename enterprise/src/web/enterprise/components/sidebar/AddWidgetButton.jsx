@@ -60,7 +60,7 @@ class AddWidgetButton extends React.Component<Props, State> {
         });
       };
     }
-    throw new Error(`Invalid binding for creator: ${creator} - has neither 'func' nor 'component'.`);
+    throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
   };
 
   _createMenuItem = (creator: Creator): React.Node => (
