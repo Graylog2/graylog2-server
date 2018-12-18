@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map, is } from 'immutable';
 
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 import Widget from '../widgets/Widget';
@@ -24,6 +24,13 @@ export default class AggregationWidget extends Widget {
   static builder() {
     // eslint-disable-next-line no-use-before-define
     return new Builder();
+  }
+
+  equals(other) {
+    if (other instanceof AggregationWidget) {
+      return ['id', 'config', 'filter'].every(key => is(this[key], other[key]));
+    }
+    return false;
   }
 }
 

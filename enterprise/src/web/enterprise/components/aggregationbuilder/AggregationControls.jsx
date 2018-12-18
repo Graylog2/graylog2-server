@@ -70,13 +70,17 @@ export default class AggregationControls extends React.Component {
     this.setState(state => ({ config: state.config.toBuilder().visualization(visualization).build() }), this._propagateState);
   };
 
+  _onVisualizationConfigChange = (visualizationConfig) => {
+    this.setState(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }), this._propagateState);
+  };
+
   _propagateState() {
     this.props.onChange(this.state.config);
   }
 
   render() {
     const { children, fields } = this.props;
-    const { columnPivots, rowPivots, series, sort, visualization, rollup } = this.state.config.toObject();
+    const { columnPivots, rowPivots, series, sort, visualization, rollup } = this.state.config;
     const formattedFields = fields
       .map(fieldType => fieldType.name)
       .valueSeq()
@@ -87,6 +91,7 @@ export default class AggregationControls extends React.Component {
       .map(v => ({ label: v, value: v }));
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
+    const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     return (
       <span>
         <Row>
@@ -118,7 +123,7 @@ export default class AggregationControls extends React.Component {
             </DescriptionBox>
           </Col>
           <Col md={10} style={{ height: '100%' }}>
-            {children}
+            {childrenWithCallback}
           </Col>
         </Row>
       </span>

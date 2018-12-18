@@ -17,7 +17,9 @@ describe('AggregationControls', () => {
 
   /* eslint-disable-next-line global-require */
   const AggregationControls = require('./AggregationControls').default;
-  const children = (<div>The spice must flow.</div>);
+  // eslint-disable-next-line no-unused-vars, react/prop-types
+  const DummyComponent = ({ onVisualizationConfigChange}) => <div>The spice must flow.</div>;
+  const children = <DummyComponent />;
   const config = new AggregationWidgetConfig([], [], [], [], 'table', true);
 
   it('should render its children', () => {
@@ -52,5 +54,13 @@ describe('AggregationControls', () => {
     wrapper.find('div.description i.fa-wrench').simulate('click');
     expect(wrapper.find('h3.popover-title')).toHaveLength(1);
     expect(wrapper.find('h3.popover-title').text()).toContain('Config options');
+  });
+  it('passes onVisualizationConfigChange to children', () => {
+    const wrapper = mount(<AggregationControls config={config}
+                                               fields={Immutable.List([])}
+                                               onChange={() => {}}>
+      {children}
+    </AggregationControls>);
+    expect(wrapper.find('DummyComponent')).toHaveProp('onVisualizationConfigChange');
   });
 });

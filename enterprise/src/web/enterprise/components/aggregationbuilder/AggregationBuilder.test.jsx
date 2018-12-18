@@ -37,4 +37,14 @@ describe('AggregationBuilder', () => {
     expect(dummyVisualization).toHaveLength(1);
     expect(dummyVisualization).toHaveProp('data', [{ value: 3.1415926 }]);
   });
+  it('passes through onVisualizationConfigChange to visualization', () => {
+    const onVisualizationConfigChange = jest.fn();
+    const wrapper = mount(<AggregationBuilder config={AggregationWidgetConfig.builder().visualization('dummy').build()}
+                                              fields={{}}
+                                              onVisualizationConfigChange={onVisualizationConfigChange}
+                                              data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);
+
+    const dummyVisualization = wrapper.find(mockDummyVisualization);
+    expect(dummyVisualization).toHaveProp('onChange', onVisualizationConfigChange);
+  });
 });

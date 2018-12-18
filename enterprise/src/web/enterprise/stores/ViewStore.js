@@ -50,7 +50,8 @@ export const ViewActions: ViewActionsType = Reflux.createActions({
 type ViewStoreUnsubscribe = () => void;
 
 type ViewStoreType = {
-  listen: ((ViewStoreState) => void) => ViewStoreUnsubscribe;
+  listen: ((ViewStoreState) => void) => ViewStoreUnsubscribe,
+  getInitialState: () => ViewStoreState,
 };
 
 export const ViewStore: ViewStoreType = Reflux.createStore({

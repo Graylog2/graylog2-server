@@ -33,14 +33,16 @@ import {
   ViewManagementPage,
 } from 'enterprise/pages';
 
+import ScatterVisualization from 'enterprise/components/visualizations/scatter/ScatterVisualization';
+import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
+import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
+import CreateParameterDialog from 'enterprise/logic/creatoractions/CreateParameterDialog';
+import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
+import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
+import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import * as Permissions from './Permissions';
-import ScatterVisualization from './components/visualizations/scatter/ScatterVisualization';
-import ViewsLicenseCheck from './components/common/ViewsLicenseCheck';
-import AddMessageCountActionHandler from './logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler from './logic/fieldactions/AddMessageTableActionHandler';
-import CreateParameterDialog from './logic/creatoractions/CreateParameterDialog';
-import CreateCustomAggregation from './logic/creatoractions/CreateCustomAggregation';
-import ExecuteViewWithValue from './components/views/ExecuteViewWithValue';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -48,6 +50,7 @@ const showViewsPath = `${viewsPath}/:viewId`;
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
+VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 
 export default {
   pages: {

@@ -9,6 +9,11 @@ import { flatten } from 'lodash';
 import {} from 'leaflet/dist/leaflet.css';
 import style from 'components/maps/widgets/MapVisualization.css';
 
+const DEFAULT_VIEWPORT = {
+  center: [0, 0],
+  zoom: 1,
+};
+
 const MapVisualization = createReactClass({
   displayName: 'MapVisualization',
 
@@ -22,6 +27,10 @@ const MapVisualization = createReactClass({
     interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
     locked: PropTypes.bool, // Disables zoom and dragging
+    viewport: PropTypes.shape({
+      center: PropTypes.arrayOf(PropTypes.number),
+      zoom: PropTypes.number,
+    }),
   },
 
   getDefaultProps() {
@@ -32,12 +41,13 @@ const MapVisualization = createReactClass({
       interactive: true,
       onRenderComplete: () => {},
       locked: false,
+      viewport: DEFAULT_VIEWPORT,
     };
   },
 
   getInitialState() {
     return {
-      zoomLevel: 1,
+      viewport: this.props.viewport,
     };
   },
 
@@ -54,7 +64,6 @@ const MapVisualization = createReactClass({
   _map: undefined,
   _isMapReady: false,
   _areTilesReady: false,
-  position: [0, 0],
   MARKER_RADIUS_SIZES: 10,
   MARKER_RADIUS_INCREMENT_SIZES: 10,
 
@@ -94,8 +103,8 @@ const MapVisualization = createReactClass({
     );
   },
 
-  _onZoomChange(event) {
-    this.setState({ zoomLevel: event.target.getZoom() });
+  _onViewportChange(viewport) {
+    this.setState({ viewport }, () => this.props.onChange(viewport));
   },
 
   _getBucket(value, bucketCount, minValue, maxValue, increment) {
@@ -143,12 +152,11 @@ const MapVisualization = createReactClass({
         {locked && <div className={style.overlay} style={{ height, width }} />}
         <Map ref={(c) => { this._map = c; }}
              id={`visualization-${id}`}
-             center={this.position}
-             zoom={this.state.zoomLevel}
-             onZoomend={this._onZoomChange}
+             viewport={this.state.viewport}
+             onViewportChanged={this._onViewportChange}
              className={style.map}
              style={{ height, width }}
-             scrollWheelZoom={false}
+             scrollWheelZoom
              animate={interactive}
              zoomAnimation={interactive}
              fadeAnimation={interactive}

@@ -2,11 +2,13 @@ package org.graylog.plugins.enterprise.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.enterprise.search.views.WidgetConfigDTO;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @AutoValue
@@ -19,6 +21,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     static final String FIELD_SERIES = "series";
     static final String FIELD_SORT = "sort";
     static final String FIELD_VISUALIZATION = "visualization";
+    static final String FIELD_VISUALIZATION_CONFIG = "visualization_config";
     static final String FIELD_ROLLUP = "rollup";
 
     @JsonProperty(FIELD_ROW_PIVOTS)
@@ -35,6 +38,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
 
     @JsonProperty(FIELD_VISUALIZATION)
     public abstract String visualization();
+
+    @JsonProperty(FIELD_VISUALIZATION_CONFIG)
+    @Nullable
+    public abstract VisualizationConfigDTO visualizationConfig();
 
     @JsonProperty(FIELD_ROLLUP)
     public abstract boolean rollup();
@@ -55,6 +62,15 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
 
         @JsonProperty(FIELD_VISUALIZATION)
         public abstract Builder visualization(String visualization);
+
+        @JsonProperty(FIELD_VISUALIZATION_CONFIG)
+        @JsonTypeInfo(
+                use = JsonTypeInfo.Id.NAME,
+                include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+                property = AggregationConfigDTO.FIELD_VISUALIZATION,
+                visible = true)
+        @Nullable
+        public abstract Builder visualizationConfig(VisualizationConfigDTO visualizationConfig);
 
         @JsonProperty(FIELD_ROLLUP)
         public abstract Builder rollup(boolean roolup);

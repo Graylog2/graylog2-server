@@ -1,21 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { fromPairs, zip } from 'lodash';
+import { fromPairs, get, zip } from 'lodash';
 
+import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
+import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import Viewport from 'enterprise/logic/aggregationbuilder/visualizations/Viewport';
 import MapVisualization from './MapVisualization';
 import { extractSeries } from '../Series';
 import transformKeys from '../TransformKeys';
-import { AggregationType } from '../../aggregationbuilder/AggregationBuilderPropTypes';
 
-const WorldMapVisualization = ({ config, data, width, ...rest }) => {
+const arrayToMap = ([name, x, y]) => ({ name, x, y });
+const lastKey = keys => keys[keys.length - 1];
+const mergeObject = (prev, last) => Object.assign({}, prev, last);
+
+const WorldMapVisualization = ({ config, data, onChange, width, ...rest }) => {
   const { rowPivots } = config;
   const series = extractSeries(transformKeys(config.rowPivots, config.columnPivots, data))
-    .map(([name, x, y]) => ({ name, x, y }))
+    .map(arrayToMap)
     .map(({ name, x, y }) => {
-      const newX = x.map(keys => keys[keys.length - 1]);
+      const newX = x.map(lastKey);
       const keys = x.map(k => k.slice(0, -1)
         .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-        .reduce((prev, last) => Object.assign({}, prev, last), {}),
+        .reduce(mergeObject, {}),
       );
       return { name, y, x: newX, keys };
     })
@@ -25,7 +31,14 @@ const WorldMapVisualization = ({ config, data, width, ...rest }) => {
       return { keys, name, values };
     });
 
-  return <MapVisualization {...rest} data={series} id={`worldmap-${config.id}`} />;
+  const viewport = get(config, 'visualizationConfig.viewport');
+
+  return <MapVisualization {...rest} data={series} id={`worldmap-${config.id}`} viewport={viewport} onChange={(newViewport) => {
+    const visualizationConfig = (config.visualizationConfig ? config.visualizationConfig.toBuilder() : WorldMapVisualizationConfig.builder())
+      .viewport(Viewport.create(newViewport.center, newViewport.zoom))
+      .build();
+    onChange(visualizationConfig);
+  }} />;
 };
 
 WorldMapVisualization.propTypes = {
