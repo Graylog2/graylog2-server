@@ -31,14 +31,12 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.constraints.Constraint;
-import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
@@ -572,7 +570,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                                 EntityV1 entityV1 = (EntityV1) x.getValue();
                                 GrokPatternEntity grokPatternEntity1 = objectMapper.convertValue(entityV1.data(),
                                         GrokPatternEntity.class);
-                                return grokPatternEntity1.name().asString(parameters).equals(patternName);
+                                return grokPatternEntity1.name().equals(patternName);
                             }).forEach(x -> graph.putEdge(entity, x.getValue()));
                 });
     }

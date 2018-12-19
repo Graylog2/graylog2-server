@@ -17,14 +17,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "USER"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{USERNAME}"
-        }
+        "name": "USER",
+        "pattern": "%{USERNAME}"
       },
       "constraints": [
         {
@@ -41,14 +35,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "TIME"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])"
-        }
+        "name": "TIME",
+        "pattern": "(?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])"
       },
       "constraints": [
         {
@@ -65,14 +53,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATESTAMP"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{DATE}[- ]%{TIME}"
-        }
+        "name": "DATESTAMP",
+        "pattern": "%{DATE}[- ]%{TIME}"
       },
       "constraints": [
         {
@@ -89,14 +71,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HTTPDUSER"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{EMAILADDRESS}|%{USER}"
-        }
+        "name": "HTTPDUSER",
+        "pattern": "%{EMAILADDRESS}|%{USER}"
       },
       "constraints": [
         {
@@ -113,14 +89,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "URI"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{URIPROTO}://(?:%{USER}(?::[^@]*)?@)?(?:%{URIHOST})?(?:%{URIPATHPARAM})?"
-        }
+        "name": "URI",
+        "pattern": "%{URIPROTO}://(?:%{USER}(?::[^@]*)?@)?(?:%{URIHOST})?(?:%{URIPATHPARAM})?"
       },
       "constraints": [
         {
@@ -137,14 +107,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "MONTHDAY"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01])|[1-9])"
-        }
+        "name": "MONTHDAY",
+        "pattern": "(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01])|[1-9])"
       },
       "constraints": [
         {
@@ -161,14 +125,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "WINPATH"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?>[A-Za-z]+:|\\\\)(?:\\\\[^\\\\?*]*)+"
-        }
+        "name": "WINPATH",
+        "pattern": "(?>[A-Za-z]+:|\\\\)(?:\\\\[^\\\\?*]*)+"
       },
       "constraints": [
         {
@@ -185,14 +143,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SYSLOGBASE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource} %{SYSLOGPROG}:"
-        }
+        "name": "SYSLOGBASE",
+        "pattern": "%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource} %{SYSLOGPROG}:"
       },
       "constraints": [
         {
@@ -209,14 +161,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "POSINT"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\b(?:[1-9][0-9]*)\\b"
-        }
+        "name": "POSINT",
+        "pattern": "\\b(?:[1-9][0-9]*)\\b"
       },
       "constraints": [
         {
@@ -233,14 +179,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "NUMBER"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:%{BASE10NUM})"
-        }
+        "name": "NUMBER",
+        "pattern": "(?:%{BASE10NUM})"
       },
       "constraints": [
         {
@@ -257,14 +197,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HTTPD24_ERRORLOG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{WORD:module}:%{LOGLEVEL:loglevel}\\] \\[pid %{POSINT:pid}:tid %{NUMBER:tid}\\]( \\(%{POSINT:proxy_errorcode}\\)%{DATA:proxy_errormessage}:)?( \\[client %{IPORHOST:client}:%{POSINT:clientport}\\])? %{DATA:errorcode}: %{GREEDYDATA:message}"
-        }
+        "name": "HTTPD24_ERRORLOG",
+        "pattern": "\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{WORD:module}:%{LOGLEVEL:loglevel}\\] \\[pid %{POSINT:pid}:tid %{NUMBER:tid}\\]( \\(%{POSINT:proxy_errorcode}\\)%{DATA:proxy_errormessage}:)?( \\[client %{IPORHOST:client}:%{POSINT:clientport}\\])? %{DATA:errorcode}: %{GREEDYDATA:message}"
       },
       "constraints": [
         {
@@ -281,14 +215,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "URIPARAM"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\?[A-Za-z0-9$.+!*'|(){},~@#%&/=:;_?\\-\\[\\]<>]*"
-        }
+        "name": "URIPARAM",
+        "pattern": "\\?[A-Za-z0-9$.+!*'|(){},~@#%&/=:;_?\\-\\[\\]<>]*"
       },
       "constraints": [
         {
@@ -305,14 +233,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATESTAMP_RFC822"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{DAY} %{MONTH} %{MONTHDAY} %{YEAR} %{TIME} %{TZ}"
-        }
+        "name": "DATESTAMP_RFC822",
+        "pattern": "%{DAY} %{MONTH} %{MONTHDAY} %{YEAR} %{TIME} %{TZ}"
       },
       "constraints": [
         {
@@ -329,14 +251,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SYSLOGTIMESTAMP"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{MONTH} +%{MONTHDAY} %{TIME}"
-        }
+        "name": "SYSLOGTIMESTAMP",
+        "pattern": "%{MONTH} +%{MONTHDAY} %{TIME}"
       },
       "constraints": [
         {
@@ -353,14 +269,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "MONTHNUM"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:0?[1-9]|1[0-2])"
-        }
+        "name": "MONTHNUM",
+        "pattern": "(?:0?[1-9]|1[0-2])"
       },
       "constraints": [
         {
@@ -377,14 +287,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "QUOTEDSTRING"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?>(?<!\\\\)(?>\"(?>\\\\.|[^\\\\\"]+)+\"|\"\"|(?>'(?>\\\\.|[^\\\\']+)+')|''|(?>`(?>\\\\.|[^\\\\`]+)+`)|``))"
-        }
+        "name": "QUOTEDSTRING",
+        "pattern": "(?>(?<!\\\\)(?>\"(?>\\\\.|[^\\\\\"]+)+\"|\"\"|(?>'(?>\\\\.|[^\\\\']+)+')|''|(?>`(?>\\\\.|[^\\\\`]+)+`)|``))"
       },
       "constraints": [
         {
@@ -401,14 +305,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "CISCOMAC"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:(?:[A-Fa-f0-9]{4}\\.){2}[A-Fa-f0-9]{4})"
-        }
+        "name": "CISCOMAC",
+        "pattern": "(?:(?:[A-Fa-f0-9]{4}\\.){2}[A-Fa-f0-9]{4})"
       },
       "constraints": [
         {
@@ -425,14 +323,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "WORD"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\b\\w+\\b"
-        }
+        "name": "WORD",
+        "pattern": "\\b\\w+\\b"
       },
       "constraints": [
         {
@@ -449,14 +341,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HTTPDATE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}"
-        }
+        "name": "HTTPDATE",
+        "pattern": "%{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}"
       },
       "constraints": [
         {
@@ -473,14 +359,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATESTAMP_RFC2822"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{DAY}, %{MONTHDAY} %{MONTH} %{YEAR} %{TIME} %{ISO8601_TIMEZONE}"
-        }
+        "name": "DATESTAMP_RFC2822",
+        "pattern": "%{DAY}, %{MONTHDAY} %{MONTH} %{YEAR} %{TIME} %{ISO8601_TIMEZONE}"
       },
       "constraints": [
         {
@@ -497,14 +377,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "YEAR"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?>\\d\\d){1,2}"
-        }
+        "name": "YEAR",
+        "pattern": "(?>\\d\\d){1,2}"
       },
       "constraints": [
         {
@@ -521,14 +395,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HTTPD20_ERRORLOG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{LOGLEVEL:loglevel}\\] (?:\\[client %{IPORHOST:clientip}\\] ){0,1}%{GREEDYDATA:errormsg}"
-        }
+        "name": "HTTPD20_ERRORLOG",
+        "pattern": "\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{LOGLEVEL:loglevel}\\] (?:\\[client %{IPORHOST:clientip}\\] ){0,1}%{GREEDYDATA:errormsg}"
       },
       "constraints": [
         {
@@ -545,14 +413,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "NOTSPACE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\S+"
-        }
+        "name": "NOTSPACE",
+        "pattern": "\\S+"
       },
       "constraints": [
         {
@@ -569,14 +431,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "BASE16NUM"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))"
-        }
+        "name": "BASE16NUM",
+        "pattern": "(?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))"
       },
       "constraints": [
         {
@@ -593,14 +449,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "TZ"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:[PMCE][SD]T|UTC)"
-        }
+        "name": "TZ",
+        "pattern": "(?:[PMCE][SD]T|UTC)"
       },
       "constraints": [
         {
@@ -617,14 +467,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "URIHOST"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{IPORHOST}(?::%{POSINT:port})?"
-        }
+        "name": "URIHOST",
+        "pattern": "%{IPORHOST}(?::%{POSINT:port})?"
       },
       "constraints": [
         {
@@ -641,14 +485,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATA"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": ".*?"
-        }
+        "name": "DATA",
+        "pattern": ".*?"
       },
       "constraints": [
         {
@@ -665,14 +503,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "LOGLEVEL"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|INFO|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)"
-        }
+        "name": "LOGLEVEL",
+        "pattern": "([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|INFO|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)"
       },
       "constraints": [
         {
@@ -689,14 +521,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SPACE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\s*"
-        }
+        "name": "SPACE",
+        "pattern": "\\s*"
       },
       "constraints": [
         {
@@ -713,14 +539,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HOUR"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:2[0123]|[01]?[0-9])"
-        }
+        "name": "HOUR",
+        "pattern": "(?:2[0123]|[01]?[0-9])"
       },
       "constraints": [
         {
@@ -737,14 +557,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "EMAILLOCALPART"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "[a-zA-Z][a-zA-Z0-9_.+-=:]+"
-        }
+        "name": "EMAILLOCALPART",
+        "pattern": "[a-zA-Z][a-zA-Z0-9_.+-=:]+"
       },
       "constraints": [
         {
@@ -761,14 +575,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "URIPATH"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:/[A-Za-z0-9$.+!*'(){},~:;=@#%_\\-]*)+"
-        }
+        "name": "URIPATH",
+        "pattern": "(?:/[A-Za-z0-9$.+!*'(){},~:;=@#%_\\-]*)+"
       },
       "constraints": [
         {
@@ -785,14 +593,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATE_EU"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}"
-        }
+        "name": "DATE_EU",
+        "pattern": "%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}"
       },
       "constraints": [
         {
@@ -809,14 +611,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "COMMONAPACHELOG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)"
-        }
+        "name": "COMMONAPACHELOG",
+        "pattern": "%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)"
       },
       "constraints": [
         {
@@ -833,14 +629,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SYSLOGHOST"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{IPORHOST}"
-        }
+        "name": "SYSLOGHOST",
+        "pattern": "%{IPORHOST}"
       },
       "constraints": [
         {
@@ -857,14 +647,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "TTY"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:/dev/(pts|tty([pq])?)(\\w+)?/?(?:[0-9]+))"
-        }
+        "name": "TTY",
+        "pattern": "(?:/dev/(pts|tty([pq])?)(\\w+)?/?(?:[0-9]+))"
       },
       "constraints": [
         {
@@ -881,14 +665,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "BASE10NUM"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"
-        }
+        "name": "BASE10NUM",
+        "pattern": "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"
       },
       "constraints": [
         {
@@ -905,14 +683,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "GREEDYDATA"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": ".*"
-        }
+        "name": "GREEDYDATA",
+        "pattern": ".*"
       },
       "constraints": [
         {
@@ -929,14 +701,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "IPORHOST"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:%{IP}|%{HOSTNAME})"
-        }
+        "name": "IPORHOST",
+        "pattern": "(?:%{IP}|%{HOSTNAME})"
       },
       "constraints": [
         {
@@ -953,14 +719,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DAY"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)"
-        }
+        "name": "DAY",
+        "pattern": "(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)"
       },
       "constraints": [
         {
@@ -977,14 +737,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "NONNEGINT"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\b(?:[0-9]+)\\b"
-        }
+        "name": "NONNEGINT",
+        "pattern": "\\b(?:[0-9]+)\\b"
       },
       "constraints": [
         {
@@ -1001,14 +755,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "UUID"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}"
-        }
+        "name": "UUID",
+        "pattern": "[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}"
       },
       "constraints": [
         {
@@ -1025,14 +773,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "IP"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:%{IPV6}|%{IPV4})"
-        }
+        "name": "IP",
+        "pattern": "(?:%{IPV6}|%{IPV4})"
       },
       "constraints": [
         {
@@ -1049,14 +791,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATE_US"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{MONTHNUM}[/-]%{MONTHDAY}[/-]%{YEAR}"
-        }
+        "name": "DATE_US",
+        "pattern": "%{MONTHNUM}[/-]%{MONTHDAY}[/-]%{YEAR}"
       },
       "constraints": [
         {
@@ -1073,14 +809,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "WINDOWSMAC"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:(?:[A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2})"
-        }
+        "name": "WINDOWSMAC",
+        "pattern": "(?:(?:[A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2})"
       },
       "constraints": [
         {
@@ -1097,14 +827,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "BASE16FLOAT"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\\.[0-9A-Fa-f]*)?)|(?:\\.[0-9A-Fa-f]+)))\\b"
-        }
+        "name": "BASE16FLOAT",
+        "pattern": "\\b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\\.[0-9A-Fa-f]*)?)|(?:\\.[0-9A-Fa-f]+)))\\b"
       },
       "constraints": [
         {
@@ -1121,14 +845,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "IPV4"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])"
-        }
+        "name": "IPV4",
+        "pattern": "(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])"
       },
       "constraints": [
         {
@@ -1145,14 +863,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "ISO8601_SECOND"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:%{SECOND}|60)"
-        }
+        "name": "ISO8601_SECOND",
+        "pattern": "(?:%{SECOND}|60)"
       },
       "constraints": [
         {
@@ -1169,14 +881,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SYSLOGPROG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{PROG:program}(?:\\[%{POSINT:pid}\\])?"
-        }
+        "name": "SYSLOGPROG",
+        "pattern": "%{PROG:program}(?:\\[%{POSINT:pid}\\])?"
       },
       "constraints": [
         {
@@ -1193,14 +899,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "INT"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:[+-]?(?:[0-9]+))"
-        }
+        "name": "INT",
+        "pattern": "(?:[+-]?(?:[0-9]+))"
       },
       "constraints": [
         {
@@ -1217,14 +917,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HTTPD_ERRORLOG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{HTTPD20_ERRORLOG}|%{HTTPD24_ERRORLOG}"
-        }
+        "name": "HTTPD_ERRORLOG",
+        "pattern": "%{HTTPD20_ERRORLOG}|%{HTTPD24_ERRORLOG}"
       },
       "constraints": [
         {
@@ -1241,14 +935,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "MAC"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:%{CISCOMAC}|%{WINDOWSMAC}|%{COMMONMAC})"
-        }
+        "name": "MAC",
+        "pattern": "(?:%{CISCOMAC}|%{WINDOWSMAC}|%{COMMONMAC})"
       },
       "constraints": [
         {
@@ -1265,14 +953,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{DATE_US}|%{DATE_EU}"
-        }
+        "name": "DATE",
+        "pattern": "%{DATE_US}|%{DATE_EU}"
       },
       "constraints": [
         {
@@ -1289,14 +971,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "IPV6"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?"
-        }
+        "name": "IPV6",
+        "pattern": "((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?"
       },
       "constraints": [
         {
@@ -1313,14 +989,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "MINUTE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:[0-5][0-9])"
-        }
+        "name": "MINUTE",
+        "pattern": "(?:[0-5][0-9])"
       },
       "constraints": [
         {
@@ -1337,14 +1007,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "PATH"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:%{UNIXPATH}|%{WINPATH})"
-        }
+        "name": "PATH",
+        "pattern": "(?:%{UNIXPATH}|%{WINPATH})"
       },
       "constraints": [
         {
@@ -1361,14 +1025,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "COMBINEDAPACHELOG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{COMMONAPACHELOG} %{QS:referrer} %{QS:agent}"
-        }
+        "name": "COMBINEDAPACHELOG",
+        "pattern": "%{COMMONAPACHELOG} %{QS:referrer} %{QS:agent}"
       },
       "constraints": [
         {
@@ -1385,14 +1043,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HOSTNAME"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\\.?|\\b)"
-        }
+        "name": "HOSTNAME",
+        "pattern": "\\b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\\.?|\\b)"
       },
       "constraints": [
         {
@@ -1409,14 +1061,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HOSTPORT"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{IPORHOST}:%{POSINT}"
-        }
+        "name": "HOSTPORT",
+        "pattern": "%{IPORHOST}:%{POSINT}"
       },
       "constraints": [
         {
@@ -1433,14 +1079,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SYSLOGFACILITY"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "<%{NONNEGINT:facility}.%{NONNEGINT:priority}>"
-        }
+        "name": "SYSLOGFACILITY",
+        "pattern": "<%{NONNEGINT:facility}.%{NONNEGINT:priority}>"
       },
       "constraints": [
         {
@@ -1457,14 +1097,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "COMMONMAC"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})"
-        }
+        "name": "COMMONMAC",
+        "pattern": "(?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})"
       },
       "constraints": [
         {
@@ -1481,14 +1115,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "ISO8601_TIMEZONE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:Z|[+-]%{HOUR}(?::?%{MINUTE}))"
-        }
+        "name": "ISO8601_TIMEZONE",
+        "pattern": "(?:Z|[+-]%{HOUR}(?::?%{MINUTE}))"
       },
       "constraints": [
         {
@@ -1505,14 +1133,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATESTAMP_EVENTLOG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{YEAR}%{MONTHNUM2}%{MONTHDAY}%{HOUR}%{MINUTE}%{SECOND}"
-        }
+        "name": "DATESTAMP_EVENTLOG",
+        "pattern": "%{YEAR}%{MONTHNUM2}%{MONTHDAY}%{HOUR}%{MINUTE}%{SECOND}"
       },
       "constraints": [
         {
@@ -1529,14 +1151,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "UNIXPATH"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(/([\\w_%!$@:.,~-]+|\\\\.)*)+"
-        }
+        "name": "UNIXPATH",
+        "pattern": "(/([\\w_%!$@:.,~-]+|\\\\.)*)+"
       },
       "constraints": [
         {
@@ -1553,14 +1169,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "USERNAME"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "[a-zA-Z0-9._-]+"
-        }
+        "name": "USERNAME",
+        "pattern": "[a-zA-Z0-9._-]+"
       },
       "constraints": [
         {
@@ -1577,14 +1187,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "TIMESTAMP_ISO8601"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?"
-        }
+        "name": "TIMESTAMP_ISO8601",
+        "pattern": "%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?"
       },
       "constraints": [
         {
@@ -1601,14 +1205,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "DATESTAMP_OTHER"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{TZ} %{YEAR}"
-        }
+        "name": "DATESTAMP_OTHER",
+        "pattern": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{TZ} %{YEAR}"
       },
       "constraints": [
         {
@@ -1625,14 +1223,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "QS"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{QUOTEDSTRING}"
-        }
+        "name": "QS",
+        "pattern": "%{QUOTEDSTRING}"
       },
       "constraints": [
         {
@@ -1649,14 +1241,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "SECOND"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?)"
-        }
+        "name": "SECOND",
+        "pattern": "(?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?)"
       },
       "constraints": [
         {
@@ -1673,14 +1259,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "URIPROTO"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "[A-Za-z]+(\\+[A-Za-z+]+)?"
-        }
+        "name": "URIPROTO",
+        "pattern": "[A-Za-z]+(\\+[A-Za-z+]+)?"
       },
       "constraints": [
         {
@@ -1697,14 +1277,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "MONTHNUM2"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "(?:0[1-9]|1[0-2])"
-        }
+        "name": "MONTHNUM2",
+        "pattern": "(?:0[1-9]|1[0-2])"
       },
       "constraints": [
         {
@@ -1721,14 +1295,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "MONTH"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "\\b(?:Jan(?:uary|uar)?|Feb(?:ruary|ruar)?|M(?:a|ä)?r(?:ch|z)?|Apr(?:il)?|Ma(?:y|i)?|Jun(?:e|i)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|O(?:c|k)?t(?:ober)?|Nov(?:ember)?|De(?:c|z)(?:ember)?)\\b"
-        }
+        "name": "MONTH",
+        "pattern": "\\b(?:Jan(?:uary|uar)?|Feb(?:ruary|ruar)?|M(?:a|ä)?r(?:ch|z)?|Apr(?:il)?|Ma(?:y|i)?|Jun(?:e|i)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|O(?:c|k)?t(?:ober)?|Nov(?:ember)?|De(?:c|z)(?:ember)?)\\b"
       },
       "constraints": [
         {
@@ -1745,14 +1313,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "PROG"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "[\\x21-\\x5a\\x5c\\x5e-\\x7e]+"
-        }
+        "name": "PROG",
+        "pattern": "[\\x21-\\x5a\\x5c\\x5e-\\x7e]+"
       },
       "constraints": [
         {
@@ -1769,14 +1331,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "EMAILADDRESS"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{EMAILLOCALPART}@%{HOSTNAME}"
-        }
+        "name": "EMAILADDRESS",
+        "pattern": "%{EMAILLOCALPART}@%{HOSTNAME}"
       },
       "constraints": [
         {
@@ -1793,14 +1349,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "URIPATHPARAM"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{URIPATH}(?:%{URIPARAM})?"
-        }
+        "name": "URIPATHPARAM",
+        "pattern": "%{URIPATH}(?:%{URIPARAM})?"
       },
       "constraints": [
         {
@@ -1817,14 +1367,8 @@
       },
       "v": "1",
       "data": {
-        "name": {
-          "@type": "string",
-          "@value": "HTTPDERROR_DATE"
-        },
-        "pattern": {
-          "@type": "string",
-          "@value": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
-        }
+        "name": "HTTPDERROR_DATE",
+        "pattern": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
       },
       "constraints": [
         {

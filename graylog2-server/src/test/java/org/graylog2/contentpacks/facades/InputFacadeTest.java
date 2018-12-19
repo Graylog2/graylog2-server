@@ -27,14 +27,12 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.apache.commons.collections.map.HashedMap;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.ConverterEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.ExtractorEntity;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
@@ -536,8 +534,7 @@ public class InputFacadeTest {
                 .type(ModelTypes.INPUT_V1)
                 .data(objectMapper.convertValue(inputEntity, JsonNode.class))
                 .build();
-        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(ValueReference.of("GREEDY"),
-                ValueReference.of(".*"));
+        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create("GREEDY", ".*");
         final Entity expectedEntity = EntityV1.builder()
                 .id(ModelId.of("dead-feed"))
                 .data(objectMapper.convertValue(grokPatternEntity, JsonNode.class))
