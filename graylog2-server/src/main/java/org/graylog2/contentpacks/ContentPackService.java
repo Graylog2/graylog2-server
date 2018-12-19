@@ -44,8 +44,6 @@ import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
-import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
-import org.graylog2.contentpacks.model.entities.EntitiesWithConstraints;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;

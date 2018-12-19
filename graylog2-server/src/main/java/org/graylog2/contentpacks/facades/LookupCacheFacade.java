@@ -28,7 +28,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupCacheEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
@@ -82,7 +81,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
                 .build();
     }
 
-    public Set<Constraint> versionConstraints(CacheDto cacheDto) {
+    private Set<Constraint> versionConstraints(CacheDto cacheDto) {
         // TODO: Find more robust method of identifying the providing plugin
         final String packageName = cacheDto.config().getClass().getPackage().getName();
 
