@@ -41,6 +41,7 @@ import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackV1;
+import org.graylog2.contentpacks.model.LegacyContentPack;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
@@ -61,6 +62,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -399,6 +401,8 @@ public class ContentPackService {
     public Set<ConstraintCheckResult> checkConstraints(ContentPack contentPack) {
         if (contentPack instanceof ContentPackV1) {
             return checkConstraintsV1((ContentPackV1) contentPack);
+        } else if (contentPack instanceof LegacyContentPack) {
+            return Collections.emptySet();
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
