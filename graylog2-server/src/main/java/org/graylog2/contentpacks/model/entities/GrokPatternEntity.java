@@ -30,14 +30,14 @@ import javax.validation.constraints.NotBlank;
 @WithBeanGetter
 public abstract class GrokPatternEntity {
     @JsonProperty("name")
-    public abstract ValueReference name();
+    public abstract String name();
 
     @JsonProperty("pattern")
-    public abstract ValueReference pattern();
+    public abstract String pattern();
 
     @JsonCreator
-    public static GrokPatternEntity create(@JsonProperty("name") @NotBlank ValueReference name,
-                                           @JsonProperty("pattern") @NotBlank ValueReference pattern) {
+    public static GrokPatternEntity create(@JsonProperty("name") @NotBlank String name,
+                                           @JsonProperty("pattern") @NotBlank String pattern) {
         return new AutoValue_GrokPatternEntity(name, pattern);
     }
 }

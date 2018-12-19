@@ -22,7 +22,6 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
-import io.krakens.grok.api.GrokUtils;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -31,7 +30,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
@@ -45,10 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class GrokPatternFacade implements EntityFacade<GrokPattern> {
@@ -67,9 +63,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
 
     @Override
     public Entity exportNativeEntity(GrokPattern grokPattern) {
-        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(
-                ValueReference.of(grokPattern.name()),
-                ValueReference.of(grokPattern.pattern()));
+        final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(grokPattern.name(), grokPattern.pattern());
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         return EntityV1.builder()
                 .type(ModelTypes.GROK_PATTERN_V1)
@@ -83,18 +77,16 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
                                                         Map<EntityDescriptor, Object> nativeEntities,
                                                         String username) {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters);
+            return decode((EntityV1) entity);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private NativeEntity<GrokPattern> decode(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private NativeEntity<GrokPattern> decode(EntityV1 entity) {
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
-        final String name = grokPatternEntity.name().asString(parameters);
-        final String pattern = grokPatternEntity.pattern().asString(parameters);
 
-        final GrokPattern grokPattern = GrokPattern.create(name, pattern);
+        final GrokPattern grokPattern = GrokPattern.create(grokPatternEntity.name(), grokPatternEntity.pattern());
         try {
             final GrokPattern savedGrokPattern = grokPatternService.save(grokPattern);
             return NativeEntity.create(entity.id(), savedGrokPattern.id(), TYPE_V1, savedGrokPattern.name(), savedGrokPattern);
@@ -121,16 +113,16 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     @Override
     public Optional<NativeEntity<GrokPattern>> findExisting(Entity entity, Map<String, ValueReference> parameters) {
         if (entity instanceof EntityV1) {
-            return findExisting((EntityV1) entity, parameters);
+            return findExisting((EntityV1) entity);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
-    private Optional<NativeEntity<GrokPattern>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
+    private Optional<NativeEntity<GrokPattern>> findExisting(EntityV1 entity) {
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
-        final String name = grokPatternEntity.name().asString(parameters);
-        final String pattern = grokPatternEntity.pattern().asString(parameters);
+        final String name = grokPatternEntity.name();
+        final String pattern = grokPatternEntity.pattern();
 
         final Optional<GrokPattern> grokPattern = grokPatternService.loadByName(name);
         grokPattern.ifPresent(existingPattern -> compareGrokPatterns(name, pattern, existingPattern.pattern()));
@@ -201,20 +193,19 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
         if (entity instanceof EntityV1) {
-            return resolveForInstallationV1((EntityV1) entity, parameters, entities);
+            return resolveForInstallationV1((EntityV1) entity, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
     private Graph<Entity> resolveForInstallationV1(EntityV1 entity,
-                                                   Map<String, ValueReference> parameters,
                                                    Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
 
         final GrokPatternEntity grokPatternEntity = objectMapper.convertValue(entity.data(), GrokPatternEntity.class);
-        final String namedPattern = grokPatternEntity.pattern().asString(parameters);
+        final String namedPattern = grokPatternEntity.pattern();
         final Set<String> patterns = GrokPatternService.extractPatternNames(namedPattern);
         patterns.stream().forEach(patternName -> {
             entities.entrySet().stream()
@@ -222,7 +213,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
                     .filter(x -> {
                         EntityV1 entityV1 = (EntityV1) x.getValue();
                         GrokPatternEntity grokPatternEntity1 = objectMapper.convertValue(entityV1.data(), GrokPatternEntity.class);
-                        return grokPatternEntity1.name().asString(parameters).equals(patternName);
+                        return grokPatternEntity1.name().equals(patternName);
                     }).forEach(x -> mutableGraph.putEdge(entity, x.getValue()));
         });
 

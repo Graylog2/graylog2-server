@@ -118,15 +118,9 @@ public class ContentPackServiceTest {
 
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
 
-        Map<String, Map<String, String>> entityData = new HashMap<>(2);
-        Map<String, String> patternName = new HashMap<>(2);
-        patternName.put("@type", "string");
-        patternName.put("@value", "NAME");
-        Map<String, String> patternPattern = new HashMap<>(2);
-        patternPattern.put("@type", "string");
-        patternPattern.put("@value", "\\w");
-        entityData.put("name", patternName);
-        entityData.put("pattern", patternPattern);
+        Map<String, String> entityData = new HashMap<>(2);
+        entityData.put("name", "NAME");
+        entityData.put("pattern", "\\w");
         grokPattern = GrokPattern.builder()
                 .pattern("\\w")
                 .name("NAME")
