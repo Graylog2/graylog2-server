@@ -76,7 +76,7 @@ public class QueryPlanTest {
                 .queries(of(wildcardQueryBuilder()
                         .build()))
                 .build();
-        SearchJob job = new SearchJob(randomUUID(), search);
+        SearchJob job = new SearchJob(randomUUID(), search, "admin");
         final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
 
         ImmutableList<Query> queries = queryPlan.queries();
@@ -93,7 +93,7 @@ public class QueryPlanTest {
                         .binding(bindToValue("hello parameter"))
                         .build()))
                 .build();
-        SearchJob job = new SearchJob(randomUUID(), search);
+        SearchJob job = new SearchJob(randomUUID(), search, "admin");
         final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
 
         ImmutableList<Query> elements = queryPlan.queries();
@@ -116,7 +116,7 @@ public class QueryPlanTest {
                                 "$.messages[0].message.user_id"))
                         .build()))
                 .build();
-        SearchJob job = new SearchJob(randomUUID(), search);
+        SearchJob job = new SearchJob(randomUUID(), search, "admin");
         final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
 
         ImmutableList<Query> elements = queryPlan.queries();
@@ -143,7 +143,7 @@ public class QueryPlanTest {
                                 "$.messages[0].message.user_id")) // selects the first message's user_id field
                         .build()))
                 .build();
-        SearchJob job = new SearchJob(randomUUID(), search);
+        SearchJob job = new SearchJob(randomUUID(), search, "admin");
 
         final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers =
                 ImmutableMap.of(MessageList.NAME, ESMessageList::new);

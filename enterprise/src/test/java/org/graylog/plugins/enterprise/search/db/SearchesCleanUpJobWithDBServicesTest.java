@@ -48,7 +48,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
     static class TestViewService extends ViewService {
         TestViewService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper, ClusterConfigService clusterConfigService, SearchDbService searchDbService) {
-            super(mongoConnection, mapper, clusterConfigService, searchDbService);
+            super(mongoConnection, mapper, clusterConfigService);
         }
     }
 
@@ -58,7 +58,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
         final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
         final ViewService viewService = new TestViewService(mongoRule.getMongoConnection(), mapperProvider, clusterConfigService, searchDbService);
-        this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider));
+        this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider, viewService));
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
     }
 

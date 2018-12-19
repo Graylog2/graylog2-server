@@ -105,7 +105,7 @@ public class ElasticsearchBackendTest {
                     .id("search1")
                     .queries(ImmutableSet.of(query))
                     .build();
-            final SearchJob job = new SearchJob("job1", search);
+            final SearchJob job = new SearchJob("job1", search, "admin");
 
             backend.generate(job, query, Collections.emptySet());
             fail("Must throw exception");
@@ -132,7 +132,7 @@ public class ElasticsearchBackendTest {
                     .id("search1")
                     .queries(ImmutableSet.of(query))
                     .build();
-            final SearchJob job = new SearchJob("job1", search);
+            final SearchJob job = new SearchJob("job1", search, "admin");
 
             backend.generate(job, query, Collections.emptySet());
             fail("Must throw exception");

@@ -98,7 +98,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_CREATE)
     @AuditEvent(type = EnterpriseAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
-        final Search saved = searchDbService.save(search);
+        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
         }
@@ -110,7 +111,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDbService.get(searchId)
+        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        return searchDbService.getForUser(searchId, username, viewId -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, viewId))
                 .orElseThrow(() -> new NotFoundException("No such search " + searchId));
     }
 
@@ -177,7 +179,9 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.applyExecutionState(objectMapper, executionState);
 
-        final SearchJob searchJob = searchJobService.create(search);
+        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+
+        final SearchJob searchJob = searchJobService.create(search, username);
 
         final SearchJob runningSearchJob = queryEngine.execute(searchJob);
 
@@ -215,7 +219,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     public SearchJob jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId) {
-        final SearchJob searchJob = searchJobService.load(jobId).orElseThrow(NotFoundException::new);
+        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        final SearchJob searchJob = searchJobService.load(jobId, username).orElseThrow(NotFoundException::new);
         try {
             // force a "conditional join", to catch fast responses without having to poll
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(),5, TimeUnit.MILLISECONDS);
@@ -231,7 +236,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public SearchJob executeSyncJob(@ApiParam Search search,
                                     @ApiParam(name = "timeout", defaultValue = "60000")
                                     @QueryParam("timeout") @DefaultValue("60000") long timeout) {
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search));
+        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
 
         try {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);

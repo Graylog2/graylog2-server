@@ -108,7 +108,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 .id("search1")
                 .queries(ImmutableSet.of(query))
                 .build();
-        this.job = new SearchJob("job1", search);
+        this.job = new SearchJob("job1", search, "admin");
     }
 
     @Test
@@ -209,7 +209,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 .filter(StreamFilter.ofId(streamId))
                 .build();
         final Search search = dummySearch(query);
-        final SearchJob job = new SearchJob("job1", search);
+        final SearchJob job = new SearchJob("job1", search, "admin");
         final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
 
         backend.doRun(job, query, context, Collections.emptySet());
@@ -224,7 +224,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
     @Test
     public void queryDoesNotFallBackToAllIndices() throws Exception {
         final Search search = dummySearch(dummyQuery(RelativeRange.create(600)));
-        final SearchJob job = new SearchJob("job1", search);
+        final SearchJob job = new SearchJob("job1", search, "admin");
         final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
 
         backend.doRun(job, query, context, Collections.emptySet());
@@ -275,7 +275,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
                 .filter(AndFilter.and(StreamFilter.ofId(stream1id), StreamFilter.ofId(stream2id), StreamFilter.ofId(stream3id), StreamFilter.ofId(stream4id)))
                 .build();
         final Search search = dummySearch(query);
-        final SearchJob job = new SearchJob("job1", search);
+        final SearchJob job = new SearchJob("job1", search, "admin");
         final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
 
         backend.doRun(job, query, context, Collections.emptySet());

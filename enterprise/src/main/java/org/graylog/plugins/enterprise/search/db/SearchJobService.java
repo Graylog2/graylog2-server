@@ -7,8 +7,6 @@ import java.util.Optional;
 
 public interface SearchJobService {
 
-    SearchJob create(Search query);
-    Optional<SearchJob> load(String id);
-    boolean delete(String id);
-
+    SearchJob create(Search query, String owner);
+    Optional<SearchJob> load(String id, String owner);
 }

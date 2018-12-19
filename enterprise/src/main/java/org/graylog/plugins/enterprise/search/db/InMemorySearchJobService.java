@@ -27,25 +27,19 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public SearchJob create(Search query) {
+    public SearchJob create(Search query, String owner) {
         final String id = new ObjectId().toHexString();
-        final SearchJob searchJob = new SearchJob(id, query);
+        final SearchJob searchJob = new SearchJob(id, query, owner);
         cache.put(id, searchJob);
         return searchJob;
     }
 
     @Override
-    public Optional<SearchJob> load(String id) {
-        return Optional.ofNullable(cache.getIfPresent(id));
-    }
-
-    @Override
-    public boolean delete(String id) {
-        final Optional<SearchJob> load = load(id);
-        if (load.isPresent()) {
-            cache.invalidate(id);
-            return true;
+    public Optional<SearchJob> load(String id, String owner) {
+        final SearchJob searchJob = cache.getIfPresent(id);
+        if (searchJob == null || !searchJob.getOwner().equals(owner)) {
+            return Optional.empty();
         }
-        return false;
+        return Optional.of(searchJob);
     }
 }
