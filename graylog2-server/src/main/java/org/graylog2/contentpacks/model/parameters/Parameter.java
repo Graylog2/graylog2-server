@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.model.parameters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.entities.references.ValueTyped;
 
 import java.util.Optional;
@@ -32,7 +33,8 @@ import java.util.Optional;
         @JsonSubTypes.Type(value = LongParameter.class, name = LongParameter.TYPE_NAME),
         @JsonSubTypes.Type(value = StringParameter.class, name = StringParameter.TYPE_NAME),
 })
-public interface Parameter<T> extends ValueTyped {
+public interface Parameter<T> {
+    String FIELD_TYPE = "type";
     String FIELD_NAME = "name";
     String FIELD_TITLE = "title";
     String FIELD_DESCRIPTION = "description";
@@ -47,10 +49,13 @@ public interface Parameter<T> extends ValueTyped {
     @JsonProperty(FIELD_DESCRIPTION)
     String description();
 
+    @JsonProperty(FIELD_TYPE)
+    ValueType valueType();
+
     @JsonProperty(FIELD_DEFAULT_VALUE)
     Optional<T> defaultValue();
 
-    interface ParameterBuilder<SELF, T> extends TypeBuilder<SELF> {
+    interface ParameterBuilder<SELF, T> {
         @JsonProperty(FIELD_NAME)
         SELF name(String name);
 
@@ -59,6 +64,9 @@ public interface Parameter<T> extends ValueTyped {
 
         @JsonProperty(FIELD_DESCRIPTION)
         SELF description(String description);
+
+        @JsonProperty(FIELD_TYPE)
+        SELF valueType(ValueType type);
 
         // It would be nicer to use
         //     SELF defaultValue(T defaultValue);

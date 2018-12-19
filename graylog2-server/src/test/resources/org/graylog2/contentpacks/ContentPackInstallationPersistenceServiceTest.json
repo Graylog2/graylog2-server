@@ -8,12 +8,12 @@
       "content_pack_revision": 1,
       "parameters": {
         "PARAM": {
-          "type": "string",
-          "value": "default string"
+          "@type": "string",
+          "@value": "default string"
         },
         "INT_PARAM": {
-          "type": "integer",
-          "value": 42
+          "@type": "integer",
+          "@value": 42
         }
       },
       "entities": [
@@ -57,8 +57,8 @@
       "content_pack_revision": 2,
       "parameters": {
         "PARAM": {
-          "type": "string",
-          "value": "default string"
+          "@type": "string",
+          "@value": "default string"
         }
       },
       "entities": [
@@ -120,8 +120,8 @@
       "content_pack_revision": 1,
       "parameters": {
         "PARAM": {
-          "type": "string",
-          "value": "default value"
+          "@type": "string",
+          "@value": "default value"
         }
       },
       "entities": [
@@ -183,12 +183,12 @@
       "content_pack_revision": 1,
       "parameters": {
         "PARAM": {
-          "type": "string",
-          "value": "default strung"
+          "@type": "string",
+          "@value": "default strung"
         },
         "INT_PARAM": {
-          "type": "integer",
-          "value": 23
+          "@type": "integer",
+          "@value": 23
         }
       },
       "entities": [

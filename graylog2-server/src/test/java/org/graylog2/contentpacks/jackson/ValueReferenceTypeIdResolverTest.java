@@ -33,7 +33,7 @@ public class ValueReferenceTypeIdResolverTest {
 
     @Test
     public void testDeserialization() throws IOException {
-        String json = "{\"type\":{\"type\":\"string\",\"value\":\"relative\"},\"range\":{\"type\":\"integer\",\"value\":300}}";
+        String json = "{\"type\":{\"@type\":\"string\",\"@value\":\"relative\"},\"range\":{\"@type\":\"integer\",\"@value\":300}}";
         final TimeRangeEntity timeRangeEntity = objectMapper.readValue(json, TimeRangeEntity.class);
         assertThat(timeRangeEntity).isNotNull();
     }
@@ -42,50 +42,50 @@ public class ValueReferenceTypeIdResolverTest {
     public void testEmbeddedDeserialization() throws IOException {
         String json = "{" +
                 "  \"id\" : {" +
-                "     \"value\" : \"12345\"," +
-                "     \"type\" : \"string\"" +
+                "     \"@value\" : \"12345\"," +
+                "     \"@type\" : \"string\"" +
                 "  }," +
                 "  \"cache_time\" : {" +
-                "     \"value\" : 120," +
-                "     \"type\" : \"integer\"" +
+                "     \"@value\" : 120," +
+                "     \"@type\" : \"integer\"" +
                 "  }," +
                 "  \"position\" : null," +
                 "  \"description\" : {" +
-                "     \"value\" : \"Histogram\"," +
-                "     \"type\" : \"string\"" +
+                "     \"@value\" : \"Histogram\"," +
+                "     \"@type\" : \"string\"" +
                 "  }," +
                 "  \"time_range\" : {" +
                 "     \"type\" : {" +
-                "        \"type\" : \"string\"," +
-                "        \"value\" : \"relative\"" +
+                "        \"@type\" : \"string\"," +
+                "        \"@value\" : \"relative\"" +
                 "     }," +
                 "     \"range\" : {" +
-                "        \"type\" : \"integer\"," +
-                "        \"value\" : 300" +
+                "        \"@type\" : \"integer\"," +
+                "        \"@value\" : 300" +
                 "     }" +
                 "  }," +
                 "  \"type\" : {" +
-                "     \"value\" : \"SEARCH_RESULT_CHART\"," +
-                "     \"type\" : \"string\"" +
+                "     \"@value\" : \"SEARCH_RESULT_CHART\"," +
+                "     \"@type\" : \"string\"" +
                 "  }," +
                 "  \"configuration\" : {" +
                 "     \"timerange\" : {" +
                 "        \"range\" : {" +
-                "           \"value\" : 300," +
-                "           \"type\" : \"integer\"" +
+                "           \"@value\" : 300," +
+                "           \"@type\" : \"integer\"" +
                 "        }," +
                 "        \"type\" : {" +
-                "           \"value\" : \"relative\"," +
-                "           \"type\" : \"string\"" +
+                "           \"@value\" : \"relative\"," +
+                "           \"@type\" : \"string\"" +
                 "        }" +
                 "     }," +
                 "     \"query\" : {" +
-                "        \"value\" : \"\"," +
-                "        \"type\" : \"string\"" +
+                "        \"@value\" : \"\"," +
+                "        \"@type\" : \"string\"" +
                 "     }," +
                 "     \"interval\" : {" +
-                "        \"type\" : \"string\"," +
-                "        \"value\" : \"minute\"" +
+                "        \"@type\" : \"string\"," +
+                "        \"@value\" : \"minute\"" +
                 "     }" +
                 "  }" +
                 "}";

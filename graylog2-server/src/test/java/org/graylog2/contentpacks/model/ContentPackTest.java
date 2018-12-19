@@ -60,11 +60,24 @@ public class ContentPackTest {
     }
 
     private ContentPack createTestContentPack() {
-        final ObjectNode entityData = objectMapper.createObjectNode()
-                .put("bool", true)
-                .put("double", 1234.5678D)
-                .put("long", 1234L)
-                .put("string", "foobar");
+        final ObjectNode boolData = objectMapper.createObjectNode()
+                .put("@type", "boolean")
+                .put("@value", true);
+        final ObjectNode doubleData = objectMapper.createObjectNode()
+                .put("@type", "double")
+                .put("@value", 1234.5678D);
+        final ObjectNode longData = objectMapper.createObjectNode()
+                .put("@type", "long")
+                .put("@value", 1234L);
+        final ObjectNode stringData = objectMapper.createObjectNode()
+                .put("@type", "string")
+                .put("@value", "foobar");
+
+        final ObjectNode entityData = objectMapper.createObjectNode();
+                entityData.set("bool", boolData);
+                entityData.set("double", doubleData);
+                entityData.set("long", longData);
+                entityData.set("string", stringData);
 
         return ContentPackV1.builder()
                 .id(ModelId.of("a7917ee5-3e1a-4f89-951d-aeb604616998"))
@@ -113,10 +126,10 @@ public class ContentPackTest {
         assertThat(entityNode.path("v").asText()).isEqualTo("1");
         final JsonNode entityDataNode = entityNode.path("data");
         assertThat(entityDataNode.isObject()).isTrue();
-        assertThat(entityDataNode.path("bool").asBoolean()).isEqualTo(true);
-        assertThat(entityDataNode.path("double").asDouble()).isEqualTo(1234.5678D);
-        assertThat(entityDataNode.path("long").asLong()).isEqualTo(1234L);
-        assertThat(entityDataNode.path("string").asText()).isEqualTo("foobar");
+        assertThat(entityDataNode.path("bool").path("@value").asBoolean()).isEqualTo(true);
+        assertThat(entityDataNode.path("double").path("@value").asDouble()).isEqualTo(1234.5678D);
+        assertThat(entityDataNode.path("long").path("@value").asLong()).isEqualTo(1234L);
+        assertThat(entityDataNode.path("string").path("@value").asText()).isEqualTo("foobar");
     }
 
     @Test

@@ -30,7 +30,7 @@ import java.util.Map;
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_ValueReference.Builder.class)
 public abstract class ValueReference implements ValueTyped, Reference {
-    public static final String FIELD_VALUE = "value";
+    public static final String FIELD_VALUE = "@value";
 
     @JsonProperty(FIELD_VALUE)
     public abstract Object value();

@@ -424,7 +424,7 @@ public class ContentPackService {
         checkMissingParameters(parameters, contentPackParameterNames);
 
         final Map<String, ValueType> contentPackParameterValueTypes = contentPackParameters.stream()
-                .collect(Collectors.toMap(Parameter::name, ValueTyped::valueType));
+                .collect(Collectors.toMap(Parameter::name, Parameter::valueType));
         final Set<String> invalidParameters = parameters.entrySet().stream()
                 .filter(entry -> entry.getValue().valueType() != contentPackParameterValueTypes.get(entry.getKey()))
                 .map(Map.Entry::getKey)

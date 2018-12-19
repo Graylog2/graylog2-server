@@ -40,24 +40,24 @@ public class ContentPackInstallationRequestTest {
         final ContentPackInstallationRequest request = ContentPackInstallationRequest.create(parameters, "comment");
         final JsonNode node = objectMapper.valueToTree(request);
         assertThat(node.path("comment").asText()).isEqualTo("comment");
-        assertThat(node.path("parameters").path("param1").path("type").asText()).isEqualTo("string");
-        assertThat(node.path("parameters").path("param1").path("value").asText()).isEqualTo("string");
-        assertThat(node.path("parameters").path("param2").path("type").asText()).isEqualTo("integer");
-        assertThat(node.path("parameters").path("param2").path("value").asInt()).isEqualTo(42);
-        assertThat(node.path("parameters").path("param3").path("type").asText()).isEqualTo("double");
-        assertThat(node.path("parameters").path("param3").path("value").asDouble()).isEqualTo(3.14d);
-        assertThat(node.path("parameters").path("param4").path("type").asText()).isEqualTo("boolean");
-        assertThat(node.path("parameters").path("param4").path("value").asBoolean()).isEqualTo(true);
+        assertThat(node.path("parameters").path("param1").path("@type").asText()).isEqualTo("string");
+        assertThat(node.path("parameters").path("param1").path("@value").asText()).isEqualTo("string");
+        assertThat(node.path("parameters").path("param2").path("@type").asText()).isEqualTo("integer");
+        assertThat(node.path("parameters").path("param2").path("@value").asInt()).isEqualTo(42);
+        assertThat(node.path("parameters").path("param3").path("@type").asText()).isEqualTo("double");
+        assertThat(node.path("parameters").path("param3").path("@value").asDouble()).isEqualTo(3.14d);
+        assertThat(node.path("parameters").path("param4").path("@type").asText()).isEqualTo("boolean");
+        assertThat(node.path("parameters").path("param4").path("@value").asBoolean()).isEqualTo(true);
     }
 
     @Test
     public void testDeserialisation() throws IOException {
         final String json = "{"
                 + "\"parameters\":{"
-                + "  \"param1\":{\"type\":\"string\",\"value\":\"string\"},"
-                + "  \"param2\":{\"type\":\"integer\",\"value\":42},"
-                + "  \"param3\":{\"type\":\"double\",\"value\":3.14},"
-                + "  \"param4\":{\"type\":\"boolean\",\"value\":true}"
+                + "  \"param1\":{\"@type\":\"string\",\"@value\":\"string\"},"
+                + "  \"param2\":{\"@type\":\"integer\",\"@value\":42},"
+                + "  \"param3\":{\"@type\":\"double\",\"@value\":3.14},"
+                + "  \"param4\":{\"@type\":\"boolean\",\"@value\":true}"
                 + "},"
                 + "\"comment\":\"comment\"" +
                 "}";

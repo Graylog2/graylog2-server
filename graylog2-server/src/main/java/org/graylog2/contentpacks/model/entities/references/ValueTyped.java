@@ -19,7 +19,7 @@ package org.graylog2.contentpacks.model.entities.references;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface ValueTyped {
-    String FIELD_TYPE = "type";
+    String FIELD_TYPE = "@type";
 
     @JsonProperty(FIELD_TYPE)
     ValueType valueType();
