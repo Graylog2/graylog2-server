@@ -148,8 +148,7 @@ public class StreamCatalogTest {
         final ImmutableSet<Output> outputs = ImmutableSet.of();
         final ObjectId streamId = new ObjectId();
         final StreamImpl stream = new StreamImpl(streamId, streamFields, streamRules, outputs, null);
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(stream);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(stream);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -198,13 +197,12 @@ public class StreamCatalogTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/streams.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);

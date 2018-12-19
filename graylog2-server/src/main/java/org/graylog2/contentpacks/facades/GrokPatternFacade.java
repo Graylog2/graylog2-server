@@ -66,16 +66,15 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(GrokPattern grokPattern) {
+    public Entity exportNativeEntity(GrokPattern grokPattern) {
         final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(
                 ValueReference.of(grokPattern.name()),
                 ValueReference.of(grokPattern.pattern()));
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(ModelTypes.GROK_PATTERN_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     @Override
@@ -162,7 +161,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());

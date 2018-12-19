@@ -137,8 +137,7 @@ public class DashboardFacadeTest {
         final DashboardImpl dashboard = new DashboardImpl(fields);
         dashboard.addWidget(dashboardWidget);
 
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(dashboard);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(dashboard);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -173,8 +172,8 @@ public class DashboardFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1);
-        final Optional<EntityWithConstraints> entityWithConstraints = facade.exportEntity(descriptor);
-        final Entity entity = entityWithConstraints.orElseThrow(AssertionError::new).entity();
+        final Optional<Entity> optionalEntity = facade.exportEntity(descriptor);
+        final Entity entity = optionalEntity.orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -222,13 +221,12 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);

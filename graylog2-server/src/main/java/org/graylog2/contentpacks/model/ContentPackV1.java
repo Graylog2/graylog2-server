@@ -25,10 +25,14 @@ import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.parameters.Parameter;
 
 import javax.annotation.Nullable;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
@@ -40,7 +44,6 @@ public abstract class ContentPackV1 implements ContentPack {
     static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_VENDOR = "vendor";
     static final String FIELD_URL = "url";
-    static final String FIELD_REQUIRES = "requires";
     static final String FIELD_PARAMETERS = "parameters";
     static final String FIELD_ENTITIES = "entities";
     static final String FIELD_DB_ID = "_id";
@@ -71,10 +74,6 @@ public abstract class ContentPackV1 implements ContentPack {
     public abstract URI url();
 
     @JsonView(ContentPackView.HttpView.class)
-    @JsonProperty(FIELD_REQUIRES)
-    public abstract ImmutableSet<Constraint> requires();
-
-    @JsonView(ContentPackView.HttpView.class)
     @JsonProperty(FIELD_PARAMETERS)
     public abstract ImmutableSet<Parameter> parameters();
 
@@ -84,8 +83,16 @@ public abstract class ContentPackV1 implements ContentPack {
 
     public static Builder builder() {
         return new AutoValue_ContentPackV1.Builder()
-                .requires(ImmutableSet.of())
                 .parameters(ImmutableSet.of());
+    }
+
+    public Set<Constraint> constraints() {
+        return entities().asList().stream()
+                .filter(e -> e instanceof EntityV1)
+                .map(e -> (EntityV1) e)
+                .map(EntityV1::constraints)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
     @AutoValue.Builder
@@ -114,10 +121,6 @@ public abstract class ContentPackV1 implements ContentPack {
         @JsonProperty(FIELD_URL)
         @JsonView(ContentPackView.HttpView.class)
         public abstract Builder url(URI url);
-
-        @JsonProperty(FIELD_REQUIRES)
-        @JsonView(ContentPackView.HttpView.class)
-        public abstract Builder requires(ImmutableSet<Constraint> requirements);
 
         @JsonProperty(FIELD_PARAMETERS)
         @JsonView(ContentPackView.HttpView.class)

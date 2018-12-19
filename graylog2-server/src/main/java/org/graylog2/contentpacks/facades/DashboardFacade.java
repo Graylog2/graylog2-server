@@ -93,7 +93,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Dashboard dashboard) {
+    public Entity exportNativeEntity(Dashboard dashboard) {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
@@ -104,11 +104,10 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 ValueReference.of(dashboard.getDescription()),
                 dashboardWidgets);
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
+        return EntityV1.builder()
                 .type(ModelTypes.DASHBOARD_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position) {
@@ -287,7 +286,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Dashboard dashboard = dashboardService.load(modelId.id());

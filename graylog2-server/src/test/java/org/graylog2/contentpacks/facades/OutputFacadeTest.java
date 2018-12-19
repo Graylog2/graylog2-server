@@ -117,8 +117,7 @@ public class OutputFacadeTest {
                 new Date(0L),
                 null
         );
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(output);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(output);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -136,8 +135,7 @@ public class OutputFacadeTest {
     public void exportNativeEntity() throws NotFoundException {
         final Output output = outputService.load("5adf239e4b900a0fdb4e5197");
 
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(output);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(output);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -258,13 +256,12 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);

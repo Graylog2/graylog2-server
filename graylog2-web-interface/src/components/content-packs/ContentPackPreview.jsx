@@ -34,7 +34,7 @@ class ContentPackPreview extends React.Component {
             <ContentPackDetails contentPack={this.props.contentPack} />
           </Col>
           <Col sm={6}>
-            <ContentPackConstraints constraints={this.props.contentPack.requires} isFulfilled />
+            <ContentPackConstraints constraints={this.props.contentPack.constraints} isFulfilled />
             <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
             <ContentPackParameterList contentPack={this.props.contentPack} readOnly />
           </Col>

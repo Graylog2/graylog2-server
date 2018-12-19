@@ -20,6 +20,8 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -28,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -38,9 +41,9 @@ public interface EntityFacade<T> {
      *
      * @param nativeEntity the native entity to export
      * @return an exportable (serializable) model of the entity including optional constraints.
-     * @see EntityWithConstraints
+     * @see Entity
      */
-    EntityWithConstraints exportNativeEntity(T nativeEntity);
+    Entity exportNativeEntity(T nativeEntity);
 
     /**
      * Create an exportable model of a native entity referenced by an {@link EntityDescriptor}
@@ -50,7 +53,7 @@ public interface EntityFacade<T> {
      * @return an exportable (serializable) model of the entity including optional constraints,
      * or {@link Optional#empty()} if the entity couldn't be found.
      */
-    Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor);
+    Optional<Entity> exportEntity(EntityDescriptor entityDescriptor);
 
     /**
      * Create a native entity of type {@code T} from an entity model.

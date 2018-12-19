@@ -89,8 +89,7 @@ public class PipelineRuleFacadeTest {
                 .description("description")
                 .source("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(pipelineRule);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(pipelineRule);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -107,8 +106,7 @@ public class PipelineRuleFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
 
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
@@ -227,13 +225,12 @@ public class PipelineRuleFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
         final PipelineRuleEntity pipelineRuleEntity = objectMapper.convertValue(entity.data(), PipelineRuleEntity.class);

@@ -14,5 +14,11 @@
     },
     "extractors": [],
     "static_fields": []
-  }
+  },
+  "constraints": [
+    {
+      "type": "server-version",
+      "version": ">=3.0.0"
+    }
+  ]
 }

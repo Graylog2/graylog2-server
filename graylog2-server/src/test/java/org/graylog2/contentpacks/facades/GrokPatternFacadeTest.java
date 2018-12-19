@@ -70,8 +70,7 @@ public class GrokPatternFacadeTest {
     @Test
     public void exportNativeEntity() {
         final GrokPattern grokPattern = GrokPattern.create("01234567890", "name", "pattern", null);
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(grokPattern);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(grokPattern);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -125,10 +124,10 @@ public class GrokPatternFacadeTest {
                 "pattern", ValueReference.of("[a-z]+"));
         final JsonNode entityData = objectMapper.convertValue(entity, JsonNode.class);
 
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1));
         assertThat(collectedEntity)
                 .isPresent();
-        final EntityV1 entityV1 = (EntityV1) collectedEntity.get().entity();
+        final EntityV1 entityV1 = (EntityV1) collectedEntity.get();
         assertThat(entityV1.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
         assertThat(entityV1.data()).isEqualTo(entityData);
     }

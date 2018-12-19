@@ -177,8 +177,7 @@ public class InputFacadeTest {
         final InputImpl input = new InputImpl(fields);
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(inputWithExtractors);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportNativeEntity(inputWithExtractors);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -196,8 +195,7 @@ public class InputFacadeTest {
     public void exportEntity() {
         final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT_V1);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        final Entity entity = entityWithConstraints.entity();
+        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -296,13 +294,12 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1));
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
+        final EntityV1 entity = (EntityV1) collectedEntity.get();
         assertThat(entity.id()).isNotNull();
         assertThat(entity.type()).isEqualTo(ModelTypes.INPUT_V1);
         final InputEntity inputEntity = objectMapper.convertValue(entity.data(), InputEntity.class);

@@ -79,7 +79,6 @@ const CreateContentPackPage = createReactClass({
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
       const newContentPack = this.state.contentPack.toBuilder()
         .entities(result.entities)
-        .requires(result.constraints)
         .build();
       const fetchedEntities = result.entities.map(e => Entity.fromJSON(e));
       this.setState({ contentPack: newContentPack, fetchedEntities });

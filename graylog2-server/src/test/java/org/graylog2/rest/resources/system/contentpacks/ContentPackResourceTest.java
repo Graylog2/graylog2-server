@@ -62,7 +62,6 @@ public class ContentPackResourceTest {
             "    \"description\": \"### We do not saw!\\n But we might kill!\",\n" +
             "    \"vendor\": \"Graylog, Inc. <egwene@graylog.com>\",\n" +
             "    \"url\": \"https://github.com/graylog-labs/small-content-pack.git\",\n" +
-            "    \"requires\": [ {\"type\": \"server-version\", \"version\": \">=3.0.0\"} ],\n" +
             "    \"parameters\": [ ],\n" +
             "    \"entities\": [ ]\n" +
             "}";

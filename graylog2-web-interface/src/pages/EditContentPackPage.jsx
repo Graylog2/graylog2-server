@@ -142,8 +142,6 @@ const EditContentPackPage = createReactClass({
       const entities = contentPackEntities.concat(result.entities);
       const contentPack = this.state.contentPack.toBuilder()
         .entities(entities)
-        /* TODO: graylog2-server#5335 */
-        .requires(result.constraints)
         .build();
       this.setState({ contentPack: contentPack, fetchedEntities: contentPack.entities });
     });

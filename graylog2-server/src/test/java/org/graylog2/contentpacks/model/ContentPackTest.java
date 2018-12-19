@@ -74,17 +74,16 @@ public class ContentPackTest {
                 .description("Description")
                 .vendor("Graylog, Inc.")
                 .url(URI.create("https://www.graylog.org"))
-                .requires(ImmutableSet.of(
-                        GraylogVersionConstraint.builder().version("^3.0.0").build(),
-                        PluginVersionConstraint.builder().pluginId("org.example.TestPlugin").version("^1.2.3").build()))
                 .parameters(ImmutableSet.of(
                         BooleanParameter.builder().name("MY_BOOLEAN").title("My Boolean").description("Some description").build(),
                         DoubleParameter.builder().name("MY_DOUBLE").title("My Double").description("Some description").defaultValue(Optional.of(12.34D)).build(),
                         IntegerParameter.builder().name("MY_INTEGER").title("My Integer").description("Some description").defaultValue(Optional.of(23)).build(),
                         LongParameter.builder().name("MY_LONG").title("My Long").description("Some description").defaultValue(Optional.of(42L)).build(),
                         StringParameter.builder().name("MY_STRING").title("My String").description("Some description").defaultValue(Optional.of("Default Value")).build()))
-                .entities(ImmutableSet.of(
-                        EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData).build()))
+                .entities(ImmutableSet.of(EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData)
+                        .constraints(ImmutableSet.of(
+                                GraylogVersionConstraint.builder().version("^3.0.0").build(),
+                                PluginVersionConstraint.builder().pluginId("org.example.TestPlugin").version("^1.2.3").build())).build()))
                 .build();
     }
 
@@ -102,8 +101,6 @@ public class ContentPackTest {
         assertThat(jsonNode.path("description").asText()).isEqualTo("Description");
         assertThat(jsonNode.path("vendor").asText()).isEqualTo("Graylog, Inc.");
         assertThat(jsonNode.path("url").asText()).isEqualTo("https://www.graylog.org");
-        final JsonNode requiresNode = jsonNode.withArray("requires");
-        assertThat(requiresNode).hasSize(2);
         final JsonNode parametersNode = jsonNode.withArray("parameters");
         assertThat(parametersNode).hasSize(5);
         final JsonNode entitiesNode = jsonNode.withArray("entities");
@@ -179,9 +176,6 @@ public class ContentPackTest {
         assertThat(contentPackV1.description()).isEqualTo("## Description\\n- Free text description in markdown format");
         assertThat(contentPackV1.vendor()).isEqualTo("Graylog, Inc. <hello@graylog.com>");
         assertThat(contentPackV1.url()).isEqualTo(URI.create("https://github.com/graylog-labs/awesome-content-pack.git"));
-        assertThat(contentPackV1.requires()).containsExactly(
-                GraylogVersionConstraint.builder().version(">=3.0.0").build(),
-                PluginVersionConstraint.builder().pluginId("org.graylog.plugins.threatintel.ThreatIntelPlugin").version(">=3.0.0").build());
         assertThat(contentPackV1.parameters()).containsExactly(
                 IntegerParameter.builder()
                         .name("GELF_PORT")
@@ -200,12 +194,18 @@ public class ContentPackTest {
                         .id(ModelId.of("311d9e16-e4d9-485d-a916-337fb4ca0e8b"))
                         .type(ModelTypes.LOOKUP_TABLE_V1)
                         .data(objectMapper.convertValue(expectedLookupTable, JsonNode.class))
+                        .constraints(ImmutableSet.of(
+                                GraylogVersionConstraint.builder().version(">=3.0.0").build(),
+                                PluginVersionConstraint.builder().pluginId("org.graylog.plugins.threatintel.ThreatIntelPlugin").version(">=3.0.0").build()))
                         .build(),
                 EntityV1.builder()
                         .version(ModelVersion.of("1"))
                         .id(ModelId.of("2562ac46-65f1-454c-89e1-e9be96bfd5e7"))
                         .type(ModelTypes.LOOKUP_ADAPTER_V1)
                         .data(objectMapper.convertValue(expectedLookupDataAdapter, JsonNode.class))
+                        .constraints(ImmutableSet.of(
+                                GraylogVersionConstraint.builder().version(">=3.0.0").build(),
+                                PluginVersionConstraint.builder().pluginId("org.graylog.plugins.threatintel.ThreatIntelPlugin").version(">=3.0.0").build()))
                         .build()
         );
     }
@@ -426,7 +426,6 @@ public class ContentPackTest {
         assertThat(contentPack.vendor()).isEqualTo("[auto-generated]");
         assertThat(contentPack.url()).isEqualTo(URI.create("https://www.graylog.org/"));
         assertThat(contentPack.parameters()).isEmpty();
-        assertThat(contentPack.requires()).isEmpty();
         assertThat(contentPack.entities()).contains(
                 EntityV1.builder()
                         .id(ModelId.of("53794eebe4b03cdadeadbeef"))

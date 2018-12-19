@@ -108,7 +108,7 @@ public class CatalogResourceTest {
                 .build();
         final EntityWithConstraints entityWithConstraints = EntityWithConstraints.create(entity);
         when(mockEntityFacade.resolveNativeEntity(entityDescriptor)).thenReturn(entityDescriptors);
-        when(mockEntityFacade.exportEntity(entityDescriptor)).thenReturn(Optional.of(entityWithConstraints));
+        when(mockEntityFacade.exportEntity(entityDescriptor)).thenReturn(Optional.of(entity));
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 

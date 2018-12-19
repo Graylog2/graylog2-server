@@ -7,12 +7,6 @@
    "description":"These are the default Grok patterns provided by Graylog.",
    "vendor":"Graylog <hello@graylog.com>",
    "url":"https://github.com/Graylog2/graylog2-server",
-   "requires":[
-      {
-         "type":"server-version",
-         "version":">=3.0.0-alpha.2+07766b9"
-      }
-   ],
    "parameters":[
 
    ],
@@ -32,7 +26,13 @@
                "type":"string",
                "value":"%{USERNAME}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad20",
@@ -49,7 +49,13 @@
                "type":"string",
                "value":"(?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad4b",
@@ -66,7 +72,13 @@
                "type":"string",
                "value":"%{DATE}[- ]%{TIME}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad55",
@@ -83,7 +95,13 @@
                "type":"string",
                "value":"%{EMAILADDRESS}|%{USER}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad13",
@@ -100,7 +118,13 @@
                "type":"string",
                "value":"%{URIPROTO}://(?:%{USER}(?::[^@]*)?@)?(?:%{URIHOST})?(?:%{URIPATHPARAM})?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad23",
@@ -117,7 +141,13 @@
                "type":"string",
                "value":"(?:(?:0[1-9])|(?:[12][0-9])|(?:3[01])|[1-9])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad65",
@@ -134,7 +164,13 @@
                "type":"string",
                "value":"(?>[A-Za-z]+:|\\\\)(?:\\\\[^\\\\?*]*)+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad16",
@@ -151,7 +187,13 @@
                "type":"string",
                "value":"%{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource} %{SYSLOGPROG}:"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad2e",
@@ -168,7 +210,13 @@
                "type":"string",
                "value":"\\b(?:[1-9][0-9]*)\\b"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad45",
@@ -185,7 +233,13 @@
                "type":"string",
                "value":"(?:%{BASE10NUM})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad5e",
@@ -202,7 +256,13 @@
                "type":"string",
                "value":"\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{WORD:module}:%{LOGLEVEL:loglevel}\\] \\[pid %{POSINT:pid}:tid %{NUMBER:tid}\\]( \\(%{POSINT:proxy_errorcode}\\)%{DATA:proxy_errormessage}:)?( \\[client %{IPORHOST:client}:%{POSINT:clientport}\\])? %{DATA:errorcode}: %{GREEDYDATA:message}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad19",
@@ -219,7 +279,13 @@
                "type":"string",
                "value":"\\?[A-Za-z0-9$.+!*'|(){},~@#%&/=:;_?\\-\\[\\]<>]*"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad40",
@@ -236,7 +302,13 @@
                "type":"string",
                "value":"%{DAY} %{MONTH} %{MONTHDAY} %{YEAR} %{TIME} %{TZ}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad30",
@@ -253,7 +325,13 @@
                "type":"string",
                "value":"%{MONTH} +%{MONTHDAY} %{TIME}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad35",
@@ -270,7 +348,13 @@
                "type":"string",
                "value":"(?:0?[1-9]|1[0-2])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad4e",
@@ -287,7 +371,13 @@
                "type":"string",
                "value":"(?>(?<!\\\\)(?>\"(?>\\\\.|[^\\\\\"]+)+\"|\"\"|(?>'(?>\\\\.|[^\\\\']+)+')|''|(?>`(?>\\\\.|[^\\\\`]+)+`)|``))"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad50",
@@ -304,7 +394,13 @@
                "type":"string",
                "value":"(?:(?:[A-Fa-f0-9]{4}\\.){2}[A-Fa-f0-9]{4})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad29",
@@ -321,7 +417,13 @@
                "type":"string",
                "value":"\\b\\w+\\b"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad64",
@@ -338,7 +440,13 @@
                "type":"string",
                "value":"%{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad5d",
@@ -355,7 +463,13 @@
                "type":"string",
                "value":"%{DAY}, %{MONTHDAY} %{MONTH} %{YEAR} %{TIME} %{ISO8601_TIMEZONE}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad25",
@@ -372,7 +486,13 @@
                "type":"string",
                "value":"(?>\\d\\d){1,2}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad2c",
@@ -389,7 +509,13 @@
                "type":"string",
                "value":"\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{LOGLEVEL:loglevel}\\] (?:\\[client %{IPORHOST:clientip}\\] ){0,1}%{GREEDYDATA:errormsg}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad2f",
@@ -406,7 +532,13 @@
                "type":"string",
                "value":"\\S+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad18",
@@ -423,7 +555,13 @@
                "type":"string",
                "value":"(?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad4c",
@@ -440,7 +578,13 @@
                "type":"string",
                "value":"(?:[PMCE][SD]T|UTC)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad1b",
@@ -457,7 +601,13 @@
                "type":"string",
                "value":"%{IPORHOST}(?::%{POSINT:port})?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad36",
@@ -474,7 +624,13 @@
                "type":"string",
                "value":".*?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad42",
@@ -491,7 +647,13 @@
                "type":"string",
                "value":"([Aa]lert|ALERT|[Tt]race|TRACE|[Dd]ebug|DEBUG|[Nn]otice|NOTICE|[Ii]nfo|INFO|[Ww]arn?(?:ing)?|WARN?(?:ING)?|[Ee]rr?(?:or)?|ERR?(?:OR)?|[Cc]rit?(?:ical)?|CRIT?(?:ICAL)?|[Ff]atal|FATAL|[Ss]evere|SEVERE|EMERG(?:ENCY)?|[Ee]merg(?:ency)?)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad3b",
@@ -508,7 +670,13 @@
                "type":"string",
                "value":"\\s*"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad49",
@@ -525,7 +693,13 @@
                "type":"string",
                "value":"(?:2[0123]|[01]?[0-9])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad1e",
@@ -542,7 +716,13 @@
                "type":"string",
                "value":"[a-zA-Z][a-zA-Z0-9_.+-=:]+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad4a",
@@ -559,7 +739,13 @@
                "type":"string",
                "value":"(?:/[A-Za-z0-9$.+!*'(){},~:;=@#%_\\-]*)+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad33",
@@ -576,7 +762,13 @@
                "type":"string",
                "value":"%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad2a",
@@ -593,7 +785,13 @@
                "type":"string",
                "value":"%{IPORHOST:clientip} %{HTTPDUSER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad22",
@@ -610,7 +808,13 @@
                "type":"string",
                "value":"%{IPORHOST}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad53",
@@ -627,7 +831,13 @@
                "type":"string",
                "value":"(?:/dev/(pts|tty([pq])?)(\\w+)?/?(?:[0-9]+))"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad38",
@@ -644,7 +854,13 @@
                "type":"string",
                "value":"(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad5b",
@@ -661,7 +877,13 @@
                "type":"string",
                "value":".*"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad3e",
@@ -678,7 +900,13 @@
                "type":"string",
                "value":"(?:%{IP}|%{HOSTNAME})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad41",
@@ -695,7 +923,13 @@
                "type":"string",
                "value":"(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad37",
@@ -712,7 +946,13 @@
                "type":"string",
                "value":"\\b(?:[0-9]+)\\b"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad27",
@@ -729,7 +969,13 @@
                "type":"string",
                "value":"[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad5f",
@@ -746,7 +992,13 @@
                "type":"string",
                "value":"(?:%{IPV6}|%{IPV4})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad1d",
@@ -763,7 +1015,13 @@
                "type":"string",
                "value":"%{MONTHNUM}[/-]%{MONTHDAY}[/-]%{YEAR}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad34",
@@ -780,7 +1038,13 @@
                "type":"string",
                "value":"(?:(?:[A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad31",
@@ -797,7 +1061,13 @@
                "type":"string",
                "value":"\\b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\\.[0-9A-Fa-f]*)?)|(?:\\.[0-9A-Fa-f]+)))\\b"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad4f",
@@ -814,7 +1084,13 @@
                "type":"string",
                "value":"(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad5c",
@@ -831,7 +1107,13 @@
                "type":"string",
                "value":"(?:%{SECOND}|60)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad44",
@@ -848,7 +1130,13 @@
                "type":"string",
                "value":"%{PROG:program}(?:\\[%{POSINT:pid}\\])?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad24",
@@ -865,7 +1153,13 @@
                "type":"string",
                "value":"(?:[+-]?(?:[0-9]+))"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad3d",
@@ -882,7 +1176,13 @@
                "type":"string",
                "value":"%{HTTPD20_ERRORLOG}|%{HTTPD24_ERRORLOG}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad66",
@@ -899,7 +1199,13 @@
                "type":"string",
                "value":"(?:%{CISCOMAC}|%{WINDOWSMAC}|%{COMMONMAC})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad61",
@@ -916,7 +1222,13 @@
                "type":"string",
                "value":"%{DATE_US}|%{DATE_EU}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad56",
@@ -933,7 +1245,13 @@
                "type":"string",
                "value":"((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad4d",
@@ -950,7 +1268,13 @@
                "type":"string",
                "value":"(?:[0-5][0-9])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad51",
@@ -967,7 +1291,13 @@
                "type":"string",
                "value":"(?:%{UNIXPATH}|%{WINPATH})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad46",
@@ -984,7 +1314,13 @@
                "type":"string",
                "value":"%{COMMONAPACHELOG} %{QS:referrer} %{QS:agent}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad15",
@@ -1001,7 +1337,13 @@
                "type":"string",
                "value":"\\b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\\.?|\\b)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad60",
@@ -1018,7 +1360,13 @@
                "type":"string",
                "value":"%{IPORHOST}:%{POSINT}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad32",
@@ -1035,7 +1383,13 @@
                "type":"string",
                "value":"<%{NONNEGINT:facility}.%{NONNEGINT:priority}>"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad39",
@@ -1052,7 +1406,13 @@
                "type":"string",
                "value":"(?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad26",
@@ -1069,7 +1429,13 @@
                "type":"string",
                "value":"(?:Z|[+-]%{HOUR}(?::?%{MINUTE}))"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad57",
@@ -1086,7 +1452,13 @@
                "type":"string",
                "value":"%{YEAR}%{MONTHNUM2}%{MONTHDAY}%{HOUR}%{MINUTE}%{SECOND}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad5a",
@@ -1103,7 +1475,13 @@
                "type":"string",
                "value":"(/([\\w_%!$@:.,~-]+|\\\\.)*)+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad3c",
@@ -1120,7 +1498,13 @@
                "type":"string",
                "value":"[a-zA-Z0-9._-]+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad59",
@@ -1137,7 +1521,13 @@
                "type":"string",
                "value":"%{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad63",
@@ -1154,7 +1544,13 @@
                "type":"string",
                "value":"%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{TZ} %{YEAR}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad28",
@@ -1171,7 +1567,13 @@
                "type":"string",
                "value":"%{QUOTEDSTRING}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad21",
@@ -1188,7 +1590,13 @@
                "type":"string",
                "value":"(?:(?:[0-5]?[0-9]|60)(?:[:.,][0-9]+)?)"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad2b",
@@ -1205,7 +1613,13 @@
                "type":"string",
                "value":"[A-Za-z]+(\\+[A-Za-z+]+)?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad54",
@@ -1222,7 +1636,13 @@
                "type":"string",
                "value":"(?:0[1-9]|1[0-2])"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad17",
@@ -1239,7 +1659,13 @@
                "type":"string",
                "value":"\\b(?:Jan(?:uary|uar)?|Feb(?:ruary|ruar)?|M(?:a|ä)?r(?:ch|z)?|Apr(?:il)?|Ma(?:y|i)?|Jun(?:e|i)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|O(?:c|k)?t(?:ober)?|Nov(?:ember)?|De(?:c|z)(?:ember)?)\\b"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad1f",
@@ -1256,7 +1682,13 @@
                "type":"string",
                "value":"[\\x21-\\x5a\\x5c\\x5e-\\x7e]+"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7896833ee75eda49ad1a",
@@ -1273,7 +1705,13 @@
                "type":"string",
                "value":"%{EMAILLOCALPART}@%{HOSTNAME}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad3a",
@@ -1290,7 +1728,13 @@
                "type":"string",
                "value":"%{URIPATH}(?:%{URIPARAM})?"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       },
       {
          "id":"595e7897833ee75eda49ad43",
@@ -1307,7 +1751,13 @@
                "type":"string",
                "value":"%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
             }
-         }
+         },
+         "constraints":[
+            {
+               "type":"server-version",
+               "version":">=3.0.0-alpha.2+07766b9"
+            }
+         ]
       }
    ]
 }

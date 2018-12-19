@@ -71,9 +71,8 @@ public class SidecarCollectorFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(collector);
+        final Entity entity = facade.exportNativeEntity(collector);
 
-        assertThat(entityWithConstraints.constraints()).isEmpty();
         final EntityV1 expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.SIDECAR_COLLECTOR_V1)
@@ -86,8 +85,8 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
-        assertThat(entityWithConstraints.entity().type()).isEqualTo(expectedEntity.type());
-        assertThat(((EntityV1) entityWithConstraints.entity()).data()).isEqualTo(expectedEntity.data());
+        assertThat(entity.type()).isEqualTo(expectedEntity.type());
+        assertThat(((EntityV1) entity).data()).isEqualTo(expectedEntity.data());
     }
 
     @Test
@@ -95,8 +94,7 @@ public class SidecarCollectorFacadeTest {
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
 
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        assertThat(entityWithConstraints.constraints()).isEmpty();
+        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
         final EntityV1 expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.SIDECAR_COLLECTOR_V1)
@@ -109,8 +107,8 @@ public class SidecarCollectorFacadeTest {
                         ValueReference.of("test config -c %s"),
                         ValueReference.of("")), JsonNode.class))
                 .build();
-        assertThat(entityWithConstraints.entity().type()).isEqualTo(expectedEntity.type());
-        assertThat(((EntityV1) entityWithConstraints.entity()).data()).isEqualTo(expectedEntity.data());
+        assertThat(entity.type()).isEqualTo(expectedEntity.type());
+        assertThat(((EntityV1) entity).data()).isEqualTo(expectedEntity.data());
     }
 
     @Test

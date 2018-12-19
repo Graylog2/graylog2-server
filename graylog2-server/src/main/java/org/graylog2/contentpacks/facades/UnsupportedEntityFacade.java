@@ -39,7 +39,7 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     public static final UnsupportedEntityFacade INSTANCE = new UnsupportedEntityFacade();
 
     @Override
-    public EntityWithConstraints exportNativeEntity(Void nativeEntity) {
+    public Entity exportNativeEntity(Void nativeEntity) {
         throw new UnsupportedOperationException("Unsupported entity");
     }
 
@@ -72,7 +72,7 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
         LOG.warn("Couldn't collect entity {}", entityDescriptor);
         return Optional.empty();
     }

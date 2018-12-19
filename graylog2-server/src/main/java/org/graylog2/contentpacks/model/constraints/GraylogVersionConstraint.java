@@ -27,8 +27,8 @@ import org.graylog2.plugin.Version;
 @JsonDeserialize(builder = AutoValue_GraylogVersionConstraint.Builder.class)
 public abstract class GraylogVersionConstraint implements Constraint {
     // TODO: Rename to graylog-version
-    static final String TYPE_NAME = "server-version";
-    static final String FIELD_GRAYLOG_VERSION = "version";
+    public static final String TYPE_NAME = "server-version";
+    private static final String FIELD_GRAYLOG_VERSION = "version";
 
     @JsonProperty(FIELD_GRAYLOG_VERSION)
     public abstract Requirement version();
