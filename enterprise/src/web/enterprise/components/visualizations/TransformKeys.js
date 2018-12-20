@@ -5,7 +5,7 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const formatTimestamp = (timestamp, tz = 'UTC') => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
-  return moment(timestamp).tz(tz).toISOString(true);
+  return moment(timestamp).tz(tz || 'UTC').toISOString(true);
 };
 
 const transformKey = (key, indices, tz) => {

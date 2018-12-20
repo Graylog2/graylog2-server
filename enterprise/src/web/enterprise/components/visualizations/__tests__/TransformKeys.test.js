@@ -48,7 +48,7 @@ describe('TransformKeys', () => {
       }, {
         key: ['2017-03-12T18:32:21.283+01:00'],
         source: 'leaf',
-      }
+      },
     ]);
   });
 
@@ -76,7 +76,35 @@ describe('TransformKeys', () => {
       }, {
         key: ['2017-03-12T18:32:21.283+01:00'],
         source: 'leaf',
-      }
+      },
+    ]);
+  });
+
+  it('transforms column keys using UTC if user\'s timezone is null', () => {
+    const transformKeys = loadSUT();
+
+    CurrentUserStore.get.mockImplementationOnce(() => ({ timezone: null }));
+    const input = [
+      {
+        source: 'leaf',
+        key: ['2018-10-01T15:10:55.323Z'],
+      },
+      {
+        source: 'leaf',
+        key: ['2017-03-12T09:32:21.283-08:00'],
+      },
+    ];
+
+    const result = transformKeys([{ type: 'time' }], [], input);
+
+    expect(result).toEqual([
+      {
+        key: ['2018-10-01T15:10:55.323+00:00'],
+        source: 'leaf',
+      }, {
+        key: ['2017-03-12T17:32:21.283+00:00'],
+        source: 'leaf',
+      },
     ]);
   });
 
