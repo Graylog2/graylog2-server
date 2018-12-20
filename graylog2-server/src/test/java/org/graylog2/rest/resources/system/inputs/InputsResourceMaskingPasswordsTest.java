@@ -26,6 +26,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.joda.time.DateTime;
@@ -146,31 +147,18 @@ public class InputsResourceMaskingPasswordsTest {
         final String inputId = "myinput";
         final String inputType = "dummyinput";
 
-        final Input input = mock(Input.class);
-        when(input.getTitle()).thenReturn("My Input");
-        when(input.getType()).thenReturn(inputType);
-        when(input.isGlobal()).thenReturn(false);
-        when(input.getContentPack()).thenReturn(null);
-        when(input.getId()).thenReturn(inputId);
-        when(input.getCreatedAt()).thenReturn(DateTime.parse("2018-12-20T15:36:42.234Z"));
-        when(input.getType()).thenReturn(inputType);
-        when(input.getCreatorUserId()).thenReturn("gary");
-        when(input.getStaticFields()).thenReturn(Collections.emptyMap());
-        when(input.getNodeId()).thenReturn("deadbeef");
+        final Input input = getInput(inputId, inputType);
 
         when(inputService.find(inputId)).thenReturn(input);
 
         final ConfigurationField fooInput = mock(ConfigurationField.class);
-        final TextField passwordInput = mock(TextField.class);
-
         when(fooInput.getName()).thenReturn("foo");
-        when(passwordInput.getName()).thenReturn("password");
-        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase()));
+
+        final TextField passwordInput = getPasswordField("password");
+
         final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(fooInput, passwordInput);
 
-        final InputDescription inputDescription = mock(InputDescription.class);
-        when(inputDescription.getConfigurationRequest()).thenReturn(configurationRequest);
-        when(inputDescription.getName()).thenReturn("Dummy Input");
+        final InputDescription inputDescription = getInputDescription(configurationRequest);
         this.availableInputs.put(inputType, inputDescription);
         when(currentSubject.isPermitted(anyString())).thenReturn(true);
 
@@ -185,5 +173,73 @@ public class InputsResourceMaskingPasswordsTest {
         assertThat(summary.attributes()).hasSize(2);
         assertThat(summary.attributes()).containsEntry("password", "<password set>");
         assertThat(summary.attributes()).containsEntry("foo", 42);
+    }
+
+    @Test
+    public void testRetrievalOfAllInputsWithPasswordField() throws NotFoundException {
+        final String inputId = "myinput";
+        final String inputType = "dummyinput";
+
+        final Input input = getInput(inputId, inputType);
+
+        when(inputService.find(inputId)).thenReturn(input);
+
+        final ConfigurationField fooInput = mock(ConfigurationField.class);
+        when(fooInput.getName()).thenReturn("foo");
+
+        final TextField passwordInput = getPasswordField("password");
+
+        final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(fooInput, passwordInput);
+
+        final InputDescription inputDescription = getInputDescription(configurationRequest);
+        this.availableInputs.put(inputType, inputDescription);
+        when(currentSubject.isPermitted(anyString())).thenReturn(true);
+
+        final Map<String, Object> configuration = ImmutableMap.of(
+                "foo", 42,
+                "password", "verysecret"
+        );
+        when(input.getConfiguration()).thenReturn(configuration);
+        when(inputService.all()).thenReturn(Collections.singletonList(input));
+
+        final InputsList inputsList = this.inputsResource.list();
+
+        assertThat(inputsList.inputs()).isNotEmpty();
+        assertThat(inputsList.inputs()).allMatch(summary -> {
+            assertThat(summary.attributes()).hasSize(2);
+            assertThat(summary.attributes()).containsEntry("password", "<password set>");
+            assertThat(summary.attributes()).containsEntry("foo", 42);
+            return true;
+        });
+    }
+
+    private TextField getPasswordField(String name) {
+        final TextField passwordInput = mock(TextField.class);
+
+        when(passwordInput.getName()).thenReturn(name);
+        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase()));
+        return passwordInput;
+    }
+
+    private InputDescription getInputDescription(ConfigurationRequest configurationRequest) {
+        final InputDescription inputDescription = mock(InputDescription.class);
+        when(inputDescription.getConfigurationRequest()).thenReturn(configurationRequest);
+        when(inputDescription.getName()).thenReturn("Dummy Input");
+        return inputDescription;
+    }
+
+    private Input getInput(String inputId, String inputType) {
+        final Input input = mock(Input.class);
+        when(input.getTitle()).thenReturn("My Input");
+        when(input.getType()).thenReturn(inputType);
+        when(input.isGlobal()).thenReturn(false);
+        when(input.getContentPack()).thenReturn(null);
+        when(input.getId()).thenReturn(inputId);
+        when(input.getCreatedAt()).thenReturn(DateTime.parse("2018-12-20T15:36:42.234Z"));
+        when(input.getType()).thenReturn(inputType);
+        when(input.getCreatorUserId()).thenReturn("gary");
+        when(input.getStaticFields()).thenReturn(Collections.emptyMap());
+        when(input.getNodeId()).thenReturn("deadbeef");
+        return input;
     }
 }
