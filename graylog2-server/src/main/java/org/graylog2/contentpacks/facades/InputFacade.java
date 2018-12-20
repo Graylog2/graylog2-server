@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -127,8 +128,8 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         this.inputFactories = inputFactories;
     }
 
-    @Override
-    public Entity exportNativeEntity(InputWithExtractors inputWithExtractors) {
+    @VisibleForTesting
+    Entity exportNativeEntity(InputWithExtractors inputWithExtractors) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?

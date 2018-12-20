@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -27,14 +28,13 @@ import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +61,8 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
         this.configurationService = configurationService;
     }
 
-    @Override
-    public Entity exportNativeEntity(Configuration configuration) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Configuration configuration) {
         final SidecarCollectorConfigurationEntity configurationEntity = SidecarCollectorConfigurationEntity.create(
                 ValueReference.of(configuration.collectorId()),
                 ValueReference.of(configuration.name()),

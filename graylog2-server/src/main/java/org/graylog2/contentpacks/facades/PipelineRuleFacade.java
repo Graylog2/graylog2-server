@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
@@ -28,7 +29,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
@@ -59,8 +59,8 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
         this.ruleService = ruleService;
     }
 
-    @Override
-    public Entity exportNativeEntity(RuleDao ruleDao) {
+    @VisibleForTesting
+    Entity exportNativeEntity(RuleDao ruleDao) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
                 ValueReference.of(ruleDao.title()),
                 ValueReference.of(ruleDao.description()),

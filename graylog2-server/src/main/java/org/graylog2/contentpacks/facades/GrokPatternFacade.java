@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -61,8 +62,8 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         this.grokPatternService = grokPatternService;
     }
 
-    @Override
-    public Entity exportNativeEntity(GrokPattern grokPattern) {
+    @VisibleForTesting
+    Entity exportNativeEntity(GrokPattern grokPattern) {
         final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(grokPattern.name(), grokPattern.pattern());
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         return EntityV1.builder()

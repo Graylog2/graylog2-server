@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
@@ -38,7 +39,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
@@ -82,8 +82,8 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         this.pipelineRuleParser = pipelineRuleParser;
     }
 
-    @Override
-    public Entity exportNativeEntity(PipelineDao pipelineDao) {
+    @VisibleForTesting
+    Entity exportNativeEntity(PipelineDao pipelineDao) {
         final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id());
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),

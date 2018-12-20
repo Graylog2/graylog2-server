@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -63,8 +64,8 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         this.pluginMetaData = pluginMetaData;
     }
 
-    @Override
-    public Entity exportNativeEntity(CacheDto cacheDto) {
+    @VisibleForTesting
+    Entity exportNativeEntity(CacheDto cacheDto) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(

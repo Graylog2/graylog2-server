@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -32,7 +33,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
@@ -63,8 +63,8 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         this.lookupTableService = lookupTableService;
     }
 
-    @Override
-    public Entity exportNativeEntity(LookupTableDto lookupTableDto) {
+    @VisibleForTesting
+    Entity exportNativeEntity(LookupTableDto lookupTableDto) {
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
                 ValueReference.of(lookupTableDto.name()),
                 ValueReference.of(lookupTableDto.title()),

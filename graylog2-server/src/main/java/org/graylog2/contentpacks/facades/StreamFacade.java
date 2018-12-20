@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -36,7 +37,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.StreamAlarmCallbackEntity;
@@ -105,8 +105,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         this.indexSetService = indexSetService;
     }
 
-    @Override
-    public Entity exportNativeEntity(Stream stream) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Stream stream) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());

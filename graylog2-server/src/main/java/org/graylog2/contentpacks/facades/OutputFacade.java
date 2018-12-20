@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -29,7 +30,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
@@ -74,8 +74,8 @@ public class OutputFacade implements EntityFacade<Output> {
         this.outputFactories = outputFactories;
     }
 
-    @Override
-    public Entity exportNativeEntity(Output output) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Output output) {
         final OutputEntity outputEntity = OutputEntity.create(
                 ValueReference.of(output.getTitle()),
                 ValueReference.of(output.getType()),
