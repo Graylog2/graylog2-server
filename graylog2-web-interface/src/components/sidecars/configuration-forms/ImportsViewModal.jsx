@@ -77,7 +77,7 @@ class ImportsViewModal extends React.Component {
         <td>{upload.collector_name}</td>
         <td><Timestamp dateTime={upload.created} format={'YYYY-MM-DD HH:mm:ss z'} /></td>
         <td>
-          <Button bsStyle="info" bsSize="xsmall" onClick={e => this._onApplyButton(upload.rendered_configuration, e)}>
+          <Button bsStyle="info" bsSize="xsmall" onClick={() => this._onApplyButton(upload.rendered_configuration)}>
             Apply
           </Button>
         </td>
