@@ -1,4 +1,5 @@
 import { Map } from 'immutable';
+import ValueRefHelper from 'util/ValueRefHelper';
 import Constraint from './Constraint';
 
 export default class Entity {
@@ -45,13 +46,27 @@ export default class Entity {
   }
 
   get title() {
-    const { data } = this._value;
-    return (data.title || data.name || {}).value || '';
+    let value = this.getValueFromData('title');
+    if (!value) {
+      value = this.getValueFromData('name');
+    }
+    return value || '';
   }
 
   get description() {
+    return this.getValueFromData('description') || '';
+  }
+
+  getValueFromData(key) {
     const { data } = this._value;
-    return (data.description || {}).value || '';
+    if (!data || !data[key]) {
+      return undefined;
+    }
+
+    if (ValueRefHelper.dataIsValueRef(data[key])) {
+      return (data[key] || {})[ValueRefHelper.VALUE_REF_VALUE_FIELD];
+    }
+    return data[key];
   }
 
   toBuilder() {
