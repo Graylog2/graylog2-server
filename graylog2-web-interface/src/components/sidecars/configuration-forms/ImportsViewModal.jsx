@@ -101,7 +101,7 @@ class ImportsViewModal extends React.Component {
         <Alert bsStyle="info">
           <i className="fa fa-info-circle" />&nbsp;
           There are no configuration uploads available. Please go to<br />
-          <strong>System-&gt;Collectors-&gt;Details-&gt;Import Configuration</strong><br />
+          <strong>System-&gt;Collectors (legacy)-&gt;Details-&gt;Import Configuration</strong><br />
           and import your first configuration.
         </Alert>
       );
