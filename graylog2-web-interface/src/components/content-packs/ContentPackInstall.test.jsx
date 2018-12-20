@@ -46,7 +46,7 @@ describe('<ContentPackInstall />', () => {
     const installFn = jest.fn((id, rev, param) => {
       expect(id).toBe(1);
       expect(rev).toBe(2);
-      expect(param).toEqual({ comment: 'Test', parameters: { PARAM: { type: 'string', value: 'parameter' } } });
+      expect(param).toEqual({ comment: 'Test', parameters: { PARAM: { '@type': 'string', '@value': 'parameter' } } });
     });
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
