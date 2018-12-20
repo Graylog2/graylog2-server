@@ -21,7 +21,6 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
@@ -42,10 +41,9 @@ public class ImportService extends PaginatedDbService<CollectorUpload> {
         super(mongoConnection, mapper, CollectorUpload.class, COLLECTION_NAME);
     }
 
-    public PaginatedList<CollectorUpload> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
+    public PaginatedList<CollectorUpload> findPaginated(int page, int perPage, String sortField, String order) {
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+        return findPaginatedWithQueryAndSort(DBQuery.empty(), sortBuilder, page, perPage);
     }
 
 

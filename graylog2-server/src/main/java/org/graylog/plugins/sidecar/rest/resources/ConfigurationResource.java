@@ -135,22 +135,13 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List all uploaded configurations")
-    public CollectorUploadListResponse listImports(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("10") int perPage,
-                                                   @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                   @ApiParam(name = "sort",
-                                                           value = "The field to sort the result on",
-                                                           required = true,
-                                                           allowableValues = "id,collector_id, created")
-                                                   @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
-                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                   @DefaultValue("asc") @QueryParam("order") String order) {
-        final SearchQuery searchQuery = searchQueryParser.parse(query);
-        final PaginatedList<CollectorUpload> uploads = this.importService.findPaginated(searchQuery, page, perPage, sort, order);
+    public CollectorUploadListResponse listImports(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page) {
+        // sort by creation date, latest on top of the list
+        final PaginatedList<CollectorUpload> uploads = this.importService.findPaginated(page, 10, "created", "desc");
         final long total = this.importService.count();
         final List<CollectorUpload> result = new ArrayList<>(uploads);
 
-        return CollectorUploadListResponse.create(query, uploads.pagination(), total, sort, order, result);
+        return CollectorUploadListResponse.create(uploads.pagination(), total, result);
     }
 
     @GET
