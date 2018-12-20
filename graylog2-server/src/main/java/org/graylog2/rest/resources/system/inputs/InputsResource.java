@@ -222,6 +222,9 @@ public class InputsResource extends RestResource {
 
     @VisibleForTesting
     Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
+        if (configuration == null || configurationRequest == null) {
+            return configuration;
+        }
         return configuration.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
