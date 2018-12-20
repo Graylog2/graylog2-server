@@ -4,7 +4,6 @@ export default class ValueRefHelper {
   static VALUE_REF_PARAMETER_VALUE = 'parameter';
 
   static dataIsValueRef(data) {
-    console.log(data);
     if (typeof data.has === 'function') {
       return data.size === 2 && data.has(ValueRefHelper.VALUE_REF_TYPE_FIELD) && data.has(ValueRefHelper.VALUE_REF_VALUE_FIELD);
     }

@@ -10,11 +10,11 @@ describe('<ContentPackApplyParameter />', () => {
     id: '111-beef',
     v: '1.0',
     data: {
-      name: { type: 'string', value: 'Input' },
-      title: { type: 'string', value: 'A good input' },
+      name: { '@type': 'string', '@value': 'Input' },
+      title: { '@type': 'string', '@value': 'A good input' },
       configuration: {
-        listen_address: { type: 'string', value: '1.2.3.4' },
-        port: { type: 'integer', value: '23' },
+        listen_address: { '@type': 'string', '@value': '1.2.3.4' },
+        port: { '@type': 'integer', '@value': '23' },
       },
     },
   };
