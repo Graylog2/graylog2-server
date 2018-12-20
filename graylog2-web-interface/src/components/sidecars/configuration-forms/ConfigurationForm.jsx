@@ -283,7 +283,7 @@ const ConfigurationForm = createReactClass({
                       bsStyle="link"
                       bsSize="sm"
                       onClick={this._onShowImports}>
-                Import
+                Migrate
               </Button>
               <HelpBlock>
                 {this.state.errors.template ?

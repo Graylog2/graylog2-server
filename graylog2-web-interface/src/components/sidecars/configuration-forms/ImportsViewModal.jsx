@@ -60,6 +60,10 @@ class ImportsViewModal extends React.Component {
     this.props.onApply(selectedUpload);
   };
 
+  _buildVariableName = (name) => {
+    return `\${sidecar.${name}}`;
+  };
+
   _formatUpload(upload) {
     const tooltip = <Tooltip id={`${upload.id}-status-tooltip`}>{upload.collector_id}</Tooltip>;
 
@@ -124,7 +128,8 @@ class ImportsViewModal extends React.Component {
     return (
       <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
         <Modal.Header closeButton>
-          <Modal.Title><span>Configuration Imports</span></Modal.Title>
+          <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
+          Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{this._buildVariableName('nodeId')}</code>
         </Modal.Header>
         <Modal.Body>
           {this._formatModalBody()}
