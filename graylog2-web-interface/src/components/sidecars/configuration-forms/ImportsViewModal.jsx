@@ -81,20 +81,10 @@ class ImportsViewModal extends React.Component {
     );
   }
 
-  render() {
+  _formatModalBody() {
     if (this._isLoading()) {
       return (
-        <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
-          <Modal.Header closeButton>
-            <Modal.Title><span>Configuration Imports</span></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Spinner />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button type="button" onClick={this.hide}>Close</Button>
-          </Modal.Footer>
-        </BootstrapModalWrapper>
+        <Spinner />
       );
     }
 
@@ -104,44 +94,40 @@ class ImportsViewModal extends React.Component {
 
     if (totalUploads === 0) {
       return (
-        <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
-          <Modal.Header closeButton>
-            <Modal.Title><span>Configuration Imports</span></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Alert bsStyle="info">
-              <i className="fa fa-info-circle" />&nbsp;
-              There are no configuration uploads available. Please go to<br />
-              <strong>System-&gt;Collectors-&gt;Details-&gt;Import Configuration</strong><br />
-              and import your first configuration.
-            </Alert>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button type="button" onClick={this.hide}>Close</Button>
-          </Modal.Footer>
-        </BootstrapModalWrapper>
+        <Alert bsStyle="info">
+          <i className="fa fa-info-circle" />&nbsp;
+          There are no configuration uploads available. Please go to<br />
+          <strong>System-&gt;Collectors-&gt;Details-&gt;Import Configuration</strong><br />
+          and import your first configuration.
+        </Alert>
       );
     }
 
+    return (
+      <PaginatedList totalItems={totalUploads}
+                     pageSize={pageSize}
+                     showPageSizeSelect={false}
+                     onChange={this._loadUploads}>
+        <table className="table">
+          <thead>
+            <tr><th>Sidecar</th><th>Collector</th><th>Created</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            {formattedUploads}
+          </tbody>
+        </table>
+      </PaginatedList>
+    );
+  }
+
+  render() {
     return (
       <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
         <Modal.Header closeButton>
           <Modal.Title><span>Configuration Imports</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <PaginatedList totalItems={totalUploads}
-                         pageSize={pageSize}
-                         showPageSizeSelect={false}
-                         onChange={this._loadUploads}>
-            <table className="table">
-              <thead>
-                <tr><th>Sidecar</th><th>Collector</th><th>Created</th><th>Action</th></tr>
-              </thead>
-              <tbody>
-                {formattedUploads}
-              </tbody>
-            </table>
-          </PaginatedList>
+          {this._formatModalBody()}
         </Modal.Body>
         <Modal.Footer>
           <Button type="button" onClick={this.hide}>Close</Button>
