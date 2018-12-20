@@ -294,7 +294,7 @@ public class ContentPackService {
 
     public Set<EntityExcerpt> listAllEntityExcerpts() {
         final ImmutableSet.Builder<EntityExcerpt> entityIndexBuilder = ImmutableSet.builder();
-        entityFacades.values().forEach(catalog -> entityIndexBuilder.addAll(catalog.listEntityExcerpts()));
+        entityFacades.values().forEach(facade -> entityIndexBuilder.addAll(facade.listEntityExcerpts()));
         return entityIndexBuilder.build();
     }
 
