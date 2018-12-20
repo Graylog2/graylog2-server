@@ -15,4 +15,8 @@ export default class ValueRefHelper {
   static dataValueIsParameter(data) {
     return ValueRefHelper.dataIsValueRef(data) && data.get(ValueRefHelper.VALUE_REF_TYPE_FIELD) === ValueRefHelper.VALUE_REF_PARAMETER_VALUE;
   }
+
+  static createValueRef(type, value) {
+    return { [this.VALUE_REF_TYPE_FIELD]: type, [this.VALUE_REF_VALUE_FIELD]: value };
+  }
 }
