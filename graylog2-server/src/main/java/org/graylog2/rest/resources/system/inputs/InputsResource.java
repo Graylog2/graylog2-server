@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.annotations.VisibleForTesting;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,11 +25,15 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.common.Strings;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -200,6 +205,7 @@ public class InputsResource extends RestResource {
     private InputSummary getInputSummary(Input input) {
         final InputDescription inputDescription = this.availableInputs.get(input.getType());
         final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
+        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
                 name,
@@ -208,9 +214,26 @@ public class InputsResource extends RestResource {
                 input.getCreatedAt(),
                 input.getType(),
                 input.getCreatorUserId(),
-                input.getConfiguration(),
+                maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest),
                 input.getStaticFields(),
                 input.getNodeId()
         );
+    }
+
+    @VisibleForTesting
+    Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
+        return configuration.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    final ConfigurationField field = configurationRequest.getField(entry.getKey());
+                    if (field instanceof TextField) {
+                        final TextField textField = (TextField)field;
+                        if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())
+                                && !Strings.isNullOrEmpty((String)entry.getValue())) {
+                            return "<password set>";
+                        }
+                    }
+                    return entry.getValue();
+                }));
     }
 }
