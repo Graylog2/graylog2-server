@@ -1,12 +1,34 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.rest.resources.system.inputs;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.apache.shiro.subject.Subject;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,9 +37,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,11 +55,29 @@ public class InputsResourceMaskingPasswordsTest {
     @Mock
     private MessageInputFactory messageInputFactory;
 
+    @Mock
+    private Subject currentSubject;
+
+    private Map<String, InputDescription> availableInputs;
+
     private InputsResource inputsResource;
+
+    class InputsTestResource extends InputsResource {
+        public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
+            super(inputService, messageInputFactory);
+        }
+
+        @Override
+        protected Subject getSubject() {
+            return currentSubject;
+        }
+    }
 
     @Before
     public void setUp() throws Exception {
-        this.inputsResource = new InputsResource(inputService, messageInputFactory);
+        this.availableInputs = new HashMap<>();
+        when(messageInputFactory.getAvailableInputs()).thenReturn(this.availableInputs);
+        this.inputsResource = new InputsTestResource(inputService, messageInputFactory);
     }
 
     @Test
@@ -54,6 +96,7 @@ public class InputsResourceMaskingPasswordsTest {
 
         final Map<String, Object> resultingAttributes = this.inputsResource.maskPasswordsInConfiguration(configuration, configurationRequest);
 
+        assertThat(resultingAttributes).hasSize(2);
         assertThat(resultingAttributes).containsEntry("password", "<password set>");
         assertThat(resultingAttributes).containsEntry("foo", 42);
     }
@@ -71,6 +114,7 @@ public class InputsResourceMaskingPasswordsTest {
 
         final Map<String, Object> resultingAttributes = this.inputsResource.maskPasswordsInConfiguration(configuration, configurationRequest);
 
+        assertThat(resultingAttributes).hasSize(1);
         assertThat(resultingAttributes).containsEntry("nopassword", "lasers in space");
     }
 
@@ -83,6 +127,7 @@ public class InputsResourceMaskingPasswordsTest {
 
         final Map<String, Object> resultingAttributes = this.inputsResource.maskPasswordsInConfiguration(configuration, configurationRequest);
 
+        assertThat(resultingAttributes).hasSize(1);
         assertThat(resultingAttributes).containsEntry("nopassword", "lasers in space");
     }
 
@@ -94,5 +139,51 @@ public class InputsResourceMaskingPasswordsTest {
         final Map<String, Object> resultingAttributes = this.inputsResource.maskPasswordsInConfiguration(configuration, configurationRequest);
 
         assertThat(resultingAttributes).isEmpty();
+    }
+
+    @Test
+    public void testRetrievalOfInputWithPasswordField() throws NotFoundException {
+        final String inputId = "myinput";
+        final String inputType = "dummyinput";
+
+        final Input input = mock(Input.class);
+        when(input.getTitle()).thenReturn("My Input");
+        when(input.getType()).thenReturn(inputType);
+        when(input.isGlobal()).thenReturn(false);
+        when(input.getContentPack()).thenReturn(null);
+        when(input.getId()).thenReturn(inputId);
+        when(input.getCreatedAt()).thenReturn(DateTime.parse("2018-12-20T15:36:42.234Z"));
+        when(input.getType()).thenReturn(inputType);
+        when(input.getCreatorUserId()).thenReturn("gary");
+        when(input.getStaticFields()).thenReturn(Collections.emptyMap());
+        when(input.getNodeId()).thenReturn("deadbeef");
+
+        when(inputService.find(inputId)).thenReturn(input);
+
+        final ConfigurationField fooInput = mock(ConfigurationField.class);
+        final TextField passwordInput = mock(TextField.class);
+
+        when(fooInput.getName()).thenReturn("foo");
+        when(passwordInput.getName()).thenReturn("password");
+        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase()));
+        final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(fooInput, passwordInput);
+
+        final InputDescription inputDescription = mock(InputDescription.class);
+        when(inputDescription.getConfigurationRequest()).thenReturn(configurationRequest);
+        when(inputDescription.getName()).thenReturn("Dummy Input");
+        this.availableInputs.put(inputType, inputDescription);
+        when(currentSubject.isPermitted(anyString())).thenReturn(true);
+
+        final Map<String, Object> configuration = ImmutableMap.of(
+                "foo", 42,
+                "password", "verysecret"
+        );
+        when(input.getConfiguration()).thenReturn(configuration);
+
+        final InputSummary summary = this.inputsResource.get(inputId);
+
+        assertThat(summary.attributes()).hasSize(2);
+        assertThat(summary.attributes()).containsEntry("password", "<password set>");
+        assertThat(summary.attributes()).containsEntry("foo", 42);
     }
 }
