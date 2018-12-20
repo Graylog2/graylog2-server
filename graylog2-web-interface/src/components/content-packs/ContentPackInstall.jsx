@@ -3,10 +3,10 @@ import React from 'react';
 
 import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
+import ValueRefHelper from 'util/ValueRefHelper';
 import ContentPackUtils from './ContentPackUtils';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
-import ValueRefHelper from 'util/ValueRefHelper';
 
 class ContentPackInstall extends React.Component {
   static propTypes = {
