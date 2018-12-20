@@ -29,8 +29,12 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_ValueReference.Builder.class)
-public abstract class ValueReference implements ValueTyped, Reference {
+public abstract class ValueReference implements Reference {
+    public static final String FIELD_TYPE = "@type";
     public static final String FIELD_VALUE = "@value";
+
+    @JsonProperty(FIELD_TYPE)
+    public abstract ValueType valueType();
 
     @JsonProperty(FIELD_VALUE)
     public abstract Object value();
@@ -221,7 +225,10 @@ public abstract class ValueReference implements ValueTyped, Reference {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements TypeBuilder<Builder> {
+    public abstract static class Builder {
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder valueType(ValueType type);
+
         @JsonProperty(FIELD_VALUE)
         public abstract Builder value(Object value);
 

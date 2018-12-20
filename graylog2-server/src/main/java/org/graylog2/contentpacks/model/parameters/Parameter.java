@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
-import org.graylog2.contentpacks.model.entities.references.ValueTyped;
 
 import java.util.Optional;
 
