@@ -44,6 +44,7 @@ import org.graylog.plugins.sidecar.rest.responses.SidecarListResponse;
 import org.graylog.plugins.sidecar.services.ActionService;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
+import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -90,6 +91,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     private final AdministrationFiltersFactory administrationFiltersFactory;
     private final ActiveSidecarFilter activeSidecarFilter;
     private final SidecarStatusMapper sidecarStatusMapper;
+    private final EtagService etagService;
 
     @Inject
     public AdministrationResource(SidecarService sidecarService,
@@ -98,7 +100,8 @@ public class AdministrationResource extends RestResource implements PluginRestRe
                                   ActionService actionService,
                                   AdministrationFiltersFactory administrationFiltersFactory,
                                   ClusterConfigService clusterConfigService,
-                                  SidecarStatusMapper sidecarStatusMapper) {
+                                  SidecarStatusMapper sidecarStatusMapper,
+                                  EtagService etagService) {
         final SidecarConfiguration sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
         this.sidecarService = sidecarService;
         this.configurationService = configurationService;
@@ -106,6 +109,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
         this.actionService = actionService;
         this.administrationFiltersFactory = administrationFiltersFactory;
         this.sidecarStatusMapper = sidecarStatusMapper;
+        this.etagService = etagService;
         this.activeSidecarFilter = new ActiveSidecarFilter(sidecarConfiguration.sidecarInactiveThreshold());
         this.searchQueryParser = new SearchQueryParser(Sidecar.FIELD_NODE_NAME, SidecarResource.SEARCH_FIELD_MAPPING);
     }
@@ -167,6 +171,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
             final CollectorActions collectorActions = actionService.fromRequest(bulkActionRequest.sidecarId(), actions);
             actionService.saveAction(collectorActions);
         }
+        etagService.invalidateAll();
 
         return Response.accepted().build();
     }

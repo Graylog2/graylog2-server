@@ -17,6 +17,7 @@
 package org.graylog.plugins.sidecar.collectors.rest;
 
 import com.google.common.collect.Lists;
+import okhttp3.Headers;
 import org.graylog.plugins.sidecar.collectors.rest.resources.RestResourceBaseTest;
 import org.graylog.plugins.sidecar.filter.ActiveSidecarFilter;
 import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
@@ -26,6 +27,7 @@ import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
 import org.graylog.plugins.sidecar.rest.resources.SidecarResource;
 import org.graylog.plugins.sidecar.services.ActionService;
+import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -38,13 +40,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
 import static org.graylog.plugins.sidecar.collectors.rest.assertj.ResponseAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,6 +54,7 @@ import static org.mockito.Mockito.when;
 public class SidecarResourceTest extends RestResourceBaseTest {
     private SidecarResource resource;
     private List<Sidecar> sidecars;
+    private Headers httpHeaders;
 
     @Mock
     private SidecarService sidecarService;
@@ -67,7 +69,13 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     private ClusterConfigService clusterConfigService;
 
     @Mock
+    private EtagService etagService;
+
+    @Mock
     private SidecarConfiguration sidecarConfiguration;
+
+    @Mock
+    private HttpHeaders headers;
 
     @Before
     public void setUp() throws Exception {
@@ -78,7 +86,8 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 sidecarService,
                 actionService,
                 clusterConfigService,
-                statusMapper);
+                statusMapper,
+                etagService);
     }
 
     @Test(expected = NotFoundException.class)
@@ -130,7 +139,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("sidecarId", input, "0.0.1");
+        final Response response = this.resource.register("sidecarId", input, headers, "0.0.1");
 
         assertThat(response).isSuccess();
     }
@@ -150,7 +159,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("", invalid, "0.0.1");
+        final Response response = this.resource.register("", invalid, headers, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -171,7 +180,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("sidecarId", invalid, "0.0.1");
+        final Response response = this.resource.register("sidecarId", invalid, headers, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -185,7 +194,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 null
         );
 
-        final Response response = this.resource.register("sidecarId", invalid, "0.0.1");
+        final Response response = this.resource.register("sidecarId", invalid, headers, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -206,7 +215,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 )
         );
 
-        final Response response = this.resource.register("sidecarId", invalid, "0.0.1");
+        final Response response = this.resource.register("sidecarId", invalid, headers, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);

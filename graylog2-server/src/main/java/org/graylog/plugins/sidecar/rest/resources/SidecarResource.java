@@ -19,6 +19,7 @@ package org.graylog.plugins.sidecar.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,6 +43,7 @@ import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
 import org.graylog.plugins.sidecar.rest.responses.RegistrationResponse;
 import org.graylog.plugins.sidecar.rest.responses.SidecarListResponse;
 import org.graylog.plugins.sidecar.services.ActionService;
+import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -71,6 +73,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -99,6 +104,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
 
     private final SidecarService sidecarService;
     private final ActionService actionService;
+    private final EtagService etagService;
     private final ActiveSidecarFilter activeSidecarFilter;
     private final SearchQueryParser searchQueryParser;
     private final SidecarStatusMapper sidecarStatusMapper;
@@ -108,12 +114,14 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     public SidecarResource(SidecarService sidecarService,
                            ActionService actionService,
                            ClusterConfigService clusterConfigService,
-                           SidecarStatusMapper sidecarStatusMapper) {
+                           SidecarStatusMapper sidecarStatusMapper,
+                           EtagService etagService) {
         this.sidecarService = sidecarService;
         this.sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
         this.actionService = actionService;
         this.activeSidecarFilter = new ActiveSidecarFilter(sidecarConfiguration.sidecarInactiveThreshold());
         this.sidecarStatusMapper = sidecarStatusMapper;
+        this.etagService = etagService;
         this.searchQueryParser = new SearchQueryParser(Sidecar.FIELD_NODE_NAME, SEARCH_FIELD_MAPPING);
     }
 
@@ -198,7 +206,11 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                              @PathParam("sidecarId") @NotEmpty String sidecarId,
                              @ApiParam(name = "JSON body", required = true)
                              @Valid @NotNull RegistrationRequest request,
+                             @Context HttpHeaders httpHeaders,
                              @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) {
+
+        String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
+        Boolean etagCached = false;
         final Sidecar newSidecar;
         final Sidecar oldSidecar = sidecarService.findByNodeId(sidecarId);
         List<ConfigurationAssignment> assignments = null;
@@ -215,6 +227,18 @@ public class SidecarResource extends RestResource implements PluginRestResource 
         }
         sidecarService.save(newSidecar);
 
+        Response.ResponseBuilder builder = Response.noContent();
+        // check if client is up to date with a known valid etag
+        if (ifNoneMatch != null) {
+            EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
+            if (etagService.isPresent(etag.toString())) {
+                etagCached = true;
+                builder = Response.notModified();
+                builder.tag(etag);
+                return builder.build();
+            }
+        }
+
         final CollectorActions collectorActions = actionService.findActionBySidecar(sidecarId, true);
         List<CollectorAction> collectorAction = null;
         if (collectorActions != null) {
@@ -227,7 +251,19 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                 this.sidecarConfiguration.sidecarConfigurationOverride(),
                 collectorAction,
                 assignments);
-        return Response.accepted(sidecarRegistrationResponse).build();
+        // add new etag to cache
+        String etagString = registrationResponseToEtag(sidecarRegistrationResponse);
+        EntityTag collectorConfigurationEtag = new EntityTag(etagString);
+        builder = Response.accepted(sidecarRegistrationResponse);
+        builder.tag(collectorConfigurationEtag);
+        etagService.put(collectorConfigurationEtag.toString());
+        return builder.build();
+    }
+
+    private String registrationResponseToEtag(RegistrationResponse registrationResponse) {
+        return Hashing.md5()
+                .hashInt(registrationResponse.hashCode())  // avoid negative values
+                .toString();
     }
 
     @PUT
@@ -251,6 +287,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             try {
                 Sidecar sidecar = sidecarService.assignConfiguration(nodeId, nodeRelations);
                 sidecarService.save(sidecar);
+                etagService.invalidateAll();
             } catch (org.graylog2.database.NotFoundException e) {
                 throw new NotFoundException(e.getMessage());
             }
