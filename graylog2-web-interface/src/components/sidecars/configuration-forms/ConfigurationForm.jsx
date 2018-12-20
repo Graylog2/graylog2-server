@@ -148,8 +148,7 @@ const ConfigurationForm = createReactClass({
     if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
       // Wait for the promise to resolve and then update the whole formData state
       defaultTemplatePromise.then((defaultTemplate) => {
-        nextFormData.template = defaultTemplate;
-        this.setState({ formData: nextFormData });
+        this._onTemplateChange(defaultTemplate);
       });
       return;
     }
@@ -160,8 +159,7 @@ const ConfigurationForm = createReactClass({
   _onTemplateImport(nextTemplate) {
     const nextFormData = lodash.cloneDeep(this.state.formData);
     if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
-      nextFormData.template = nextTemplate;
-      this.setState({ formData: nextFormData });
+      this._onTemplateChange(nextTemplate);
     }
   },
 
