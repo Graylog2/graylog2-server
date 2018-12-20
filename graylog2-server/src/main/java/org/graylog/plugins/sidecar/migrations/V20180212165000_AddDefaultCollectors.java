@@ -143,12 +143,12 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "\tExec $FileName = file_name(); # Send file name with each message\n" +
                         "</Input>\n" +
                         "\n" +
-                        "<Input syslog-udp>\n" +
-                        "\tModule im_udp\n" +
-                        "\tHost 127.0.0.1\n" +
-                        "\tPort 514\n" +
-                        "\tExec parse_syslog_bsd();\n" +
-                        "</Input>\n" +
+                        "#<Input syslog-udp>\n" +
+                        "#\tModule im_udp\n" +
+                        "#\tHost 127.0.0.1\n" +
+                        "#\tPort 514\n" +
+                        "#\tExec parse_syslog_bsd();\n" +
+                        "#</Input>\n" +
                         "\n" +
                         "<Output gelf>\n" +
                         "\tModule om_tcp\n" +
@@ -166,9 +166,9 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "<Route route-1>\n" +
                         "  Path file => gelf\n" +
                         "</Route>\n" +
-                        "<Route route-2>\n" +
-                        "  Path syslog-udp => gelf\n" +
-                        "</Route>\n" +
+                        "#<Route route-2>\n" +
+                        "#  Path syslog-udp => gelf\n" +
+                        "#</Route>\n" +
                         "\n" +
                         "\n"
         );
