@@ -52,7 +52,6 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
-import org.graylog2.contentpacks.model.entities.references.ValueTyped;
 import org.graylog2.contentpacks.model.parameters.Parameter;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
@@ -424,7 +423,7 @@ public class ContentPackService {
         checkMissingParameters(parameters, contentPackParameterNames);
 
         final Map<String, ValueType> contentPackParameterValueTypes = contentPackParameters.stream()
-                .collect(Collectors.toMap(Parameter::name, ValueTyped::valueType));
+                .collect(Collectors.toMap(Parameter::name, Parameter::valueType));
         final Set<String> invalidParameters = parameters.entrySet().stream()
                 .filter(entry -> entry.getValue().valueType() != contentPackParameterValueTypes.get(entry.getKey()))
                 .map(Map.Entry::getKey)

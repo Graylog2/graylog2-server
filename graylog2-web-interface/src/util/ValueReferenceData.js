@@ -1,16 +1,5 @@
 import Immutable, { Map, List } from 'immutable';
-
-const VALUE_REF_VALUE_FIELD = 'value';
-const VALUE_REF_TYPE_FIELD = 'type';
-const VALUE_REF_PARAMETER_VALUE = 'parameter';
-
-const dataIsValueRef = (data) => {
-  return data.size === 2 && data.has(VALUE_REF_TYPE_FIELD) && data.has(VALUE_REF_VALUE_FIELD);
-};
-
-const dataValueIsParameter = (data) => {
-  return dataIsValueRef(data) && data.get(VALUE_REF_TYPE_FIELD) === VALUE_REF_PARAMETER_VALUE;
-};
+import ValueRefHelper from './ValueRefHelper';
 
 /**
  * A path object that can be used to obtain information about the data at a path and also modify it.
@@ -120,7 +109,7 @@ export default class ValueReferenceData {
     const data = parentPath.length > 0 ? this.data.getIn(parentPath) : this.data;
 
     if (Map.isMap(data)) {
-      if (dataIsValueRef(data)) {
+      if (ValueRefHelper.dataIsValueRef(data)) {
         // We handle ValueReference data objects as leaf nodes
         this.addPath(parentPath);
       } else {
@@ -145,8 +134,8 @@ export default class ValueReferenceData {
     const stringPath = path.join('.');
     const leaf = new Path(
       stringPath,
-      dataIsValueRef(this.data.getIn(path)),
-      dataValueIsParameter(this.data.getIn(path)),
+      ValueRefHelper.dataIsValueRef(this.data.getIn(path)),
+      ValueRefHelper.dataValueIsParameter(this.data.getIn(path)),
       this.pathGetter(path),
       this.pathSetter(path),
       this.pathParameterSetter(path),
@@ -160,8 +149,8 @@ export default class ValueReferenceData {
    */
   pathGetter(path) {
     return () => {
-      if (dataIsValueRef(this.data.getIn(path))) {
-        return this.data.getIn(path.concat(VALUE_REF_VALUE_FIELD));
+      if (ValueRefHelper.dataIsValueRef(this.data.getIn(path))) {
+        return this.data.getIn(path.concat(ValueRefHelper.VALUE_REF_VALUE_FIELD));
       }
       return this.data.getIn(path);
     };
@@ -173,8 +162,8 @@ export default class ValueReferenceData {
    */
   pathSetter(path) {
     return (value) => {
-      if (dataIsValueRef(this.data.getIn(path))) {
-        this.data = this.data.setIn(path.concat(VALUE_REF_VALUE_FIELD), value);
+      if (ValueRefHelper.dataIsValueRef(this.data.getIn(path))) {
+        this.data = this.data.setIn(path.concat(ValueRefHelper.VALUE_REF_VALUE_FIELD), value);
       } else {
         this.data = this.data.setIn(path, value);
       }
@@ -188,8 +177,9 @@ export default class ValueReferenceData {
    */
   pathParameterSetter(path) {
     return (name) => {
-      if (dataIsValueRef(this.data.getIn(path))) {
-        this.data = this.data.setIn(path, Map({ [VALUE_REF_VALUE_FIELD]: name, [VALUE_REF_TYPE_FIELD]: VALUE_REF_PARAMETER_VALUE }));
+      if (ValueRefHelper.dataIsValueRef(this.data.getIn(path))) {
+        this.data = this.data.setIn(path, Map({ [ValueRefHelper.VALUE_REF_VALUE_FIELD]: name,
+          [ValueRefHelper.VALUE_REF_TYPE_FIELD]: ValueRefHelper.VALUE_REF_PARAMETER_VALUE }));
       } else {
         throw new Error(`Cannot set parameter on non-value-reference field: ${path.join('.')}`);
       }
@@ -204,8 +194,8 @@ export default class ValueReferenceData {
     return () => {
       const data = this.data.getIn(path);
 
-      if (dataIsValueRef(data)) {
-        return this.data.getIn(path.concat(VALUE_REF_TYPE_FIELD));
+      if (ValueRefHelper.dataIsValueRef(data)) {
+        return this.data.getIn(path.concat(ValueRefHelper.VALUE_REF_TYPE_FIELD));
       }
       return (typeof data);
     };

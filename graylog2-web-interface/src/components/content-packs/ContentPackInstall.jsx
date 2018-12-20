@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
+import ValueRefHelper from 'util/ValueRefHelper';
 import ContentPackUtils from './ContentPackUtils';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
@@ -51,7 +52,7 @@ class ContentPackInstall extends React.Component {
       const newResult = result;
       const paramType = this.props.contentPack.parameters.find(parameter => parameter.name === paramName).type;
       const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
-      newResult[paramName] = { type: paramType, value: value };
+      newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
       return newResult;
     }, {});
   };

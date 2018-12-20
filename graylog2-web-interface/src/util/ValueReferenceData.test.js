@@ -7,40 +7,40 @@ describe('ValueReferenceData', () => {
   beforeEach(() => {
     data = {
       title: {
-        type: 'string',
-        value: 'CP Alert Test',
+        '@type': 'string',
+        '@value': 'CP Alert Test',
       },
       disabled: {
-        type: 'boolean',
-        value: false,
+        '@type': 'boolean',
+        '@value': false,
       },
       matching_type: 'AND',
       test: false,
       testparam: {
-        type: 'parameter',
-        value: 'A_PARAM',
+        '@type': 'parameter',
+        '@value': 'A_PARAM',
       },
       stream_rules: [
         {
           type: {
-            type: 'string',
-            value: 'EXACT',
+            '@type': 'string',
+            '@value': 'EXACT',
           },
           value: {
-            type: 'string',
-            value: '598c2f4a8355e838edb19c88',
+            '@type': 'string',
+            '@value': '598c2f4a8355e838edb19c88',
           },
           inverted: {
-            type: 'boolean',
-            value: true,
+            '@type': 'boolean',
+            '@value': true,
           },
           foo: 'bar',
         },
         {
           hello: 'world',
           test: {
-            type: 'string',
-            value: 'test1',
+            '@type': 'string',
+            '@value': 'test1',
           },
         },
       ],

@@ -8,8 +8,8 @@ describe('<ContentPackEntityConfig />', () => {
   it('should render with a entity', () => {
     const entity = {
       data: {
-        title: { type: 'string', value: 'franz' },
-        descr: { type: 'string', value: 'hans' },
+        title: { '@type': 'string', '@value': 'franz' },
+        descr: { '@type': 'string', '@value': 'hans' },
       },
     };
     const appliedParameter = [{ configKey: 'descr', paramName: 'descrParam' }];

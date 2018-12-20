@@ -107,63 +107,63 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeBoolean() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(true))).isEqualTo("{\"type\":\"boolean\",\"value\":true}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(false))).isEqualTo("{\"type\":\"boolean\",\"value\":false}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(true))).isEqualTo("{\"@type\":\"boolean\",\"@value\":true}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(false))).isEqualTo("{\"@type\":\"boolean\",\"@value\":false}");
     }
 
     @Test
     public void deserializeBoolean() throws IOException {
-        assertThat(objectMapper.readValue("{\"type\":\"boolean\",\"value\":true}", ValueReference.class)).isEqualTo(ValueReference.of(true));
-        assertThat(objectMapper.readValue("{\"type\":\"boolean\",\"value\":false}", ValueReference.class)).isEqualTo(ValueReference.of(false));
+        assertThat(objectMapper.readValue("{\"@type\":\"boolean\",\"@value\":true}", ValueReference.class)).isEqualTo(ValueReference.of(true));
+        assertThat(objectMapper.readValue("{\"@type\":\"boolean\",\"@value\":false}", ValueReference.class)).isEqualTo(ValueReference.of(false));
     }
 
     @Test
     public void serializeEnum() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(TestEnum.A))).isEqualTo("{\"type\":\"string\",\"value\":\"A\"}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(TestEnum.B))).isEqualTo("{\"type\":\"string\",\"value\":\"B\"}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(TestEnum.A))).isEqualTo("{\"@type\":\"string\",\"@value\":\"A\"}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(TestEnum.B))).isEqualTo("{\"@type\":\"string\",\"@value\":\"B\"}");
     }
 
     @Test
     public void deserializeEnum() throws IOException {
-        assertThat(objectMapper.readValue("{\"type\":\"string\",\"value\":\"A\"}", ValueReference.class)).isEqualTo(ValueReference.of(TestEnum.A));
-        assertThat(objectMapper.readValue("{\"type\":\"string\",\"value\":\"B\"}", ValueReference.class)).isEqualTo(ValueReference.of(TestEnum.B));
+        assertThat(objectMapper.readValue("{\"@type\":\"string\",\"@value\":\"A\"}", ValueReference.class)).isEqualTo(ValueReference.of(TestEnum.A));
+        assertThat(objectMapper.readValue("{\"@type\":\"string\",\"@value\":\"B\"}", ValueReference.class)).isEqualTo(ValueReference.of(TestEnum.B));
     }
 
     @Test
     public void serializeFloat() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(1.0f))).isEqualTo("{\"type\":\"float\",\"value\":1.0}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(42.4f))).isEqualTo("{\"type\":\"float\",\"value\":42.4}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(1.0f))).isEqualTo("{\"@type\":\"float\",\"@value\":1.0}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(42.4f))).isEqualTo("{\"@type\":\"float\",\"@value\":42.4}");
     }
 
     @Test
     @Ignore("FIXME: Jackson automatically deserializes floating point numbers as double")
     public void deserializeFloat() throws IOException {
-        assertThat(objectMapper.readValue("{\"type\":\"float\",\"value\":1.0}", ValueReference.class)).isEqualTo(ValueReference.of(1.0f));
-        assertThat(objectMapper.readValue("{\"type\":\"float\",\"value\":42.4}", ValueReference.class)).isEqualTo(ValueReference.of(42.4f));
+        assertThat(objectMapper.readValue("{\"@type\":\"float\",\"@value\":1.0}", ValueReference.class)).isEqualTo(ValueReference.of(1.0f));
+        assertThat(objectMapper.readValue("{\"@type\":\"float\",\"@value\":42.4}", ValueReference.class)).isEqualTo(ValueReference.of(42.4f));
     }
 
     @Test
     public void serializeInteger() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(1))).isEqualTo("{\"type\":\"integer\",\"value\":1}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(42))).isEqualTo("{\"type\":\"integer\",\"value\":42}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(1))).isEqualTo("{\"@type\":\"integer\",\"@value\":1}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(42))).isEqualTo("{\"@type\":\"integer\",\"@value\":42}");
     }
 
     @Test
     public void deserializeInteger() throws IOException {
-        assertThat(objectMapper.readValue("{\"type\":\"integer\",\"value\":1}", ValueReference.class)).isEqualTo(ValueReference.of(1));
-        assertThat(objectMapper.readValue("{\"type\":\"integer\",\"value\":42}", ValueReference.class)).isEqualTo(ValueReference.of(42));
+        assertThat(objectMapper.readValue("{\"@type\":\"integer\",\"@value\":1}", ValueReference.class)).isEqualTo(ValueReference.of(1));
+        assertThat(objectMapper.readValue("{\"@type\":\"integer\",\"@value\":42}", ValueReference.class)).isEqualTo(ValueReference.of(42));
     }
 
     @Test
     public void serializeString() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(""))).isEqualTo("{\"type\":\"string\",\"value\":\"\"}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of("Test"))).isEqualTo("{\"type\":\"string\",\"value\":\"Test\"}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of(""))).isEqualTo("{\"@type\":\"string\",\"@value\":\"\"}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.of("Test"))).isEqualTo("{\"@type\":\"string\",\"@value\":\"Test\"}");
     }
 
     @Test
     public void deserializeString() throws IOException {
-        assertThat(objectMapper.readValue("{\"type\":\"string\",\"value\":\"\"}", ValueReference.class)).isEqualTo(ValueReference.of(""));
-        assertThat(objectMapper.readValue("{\"type\":\"string\",\"value\":\"Test\"}", ValueReference.class)).isEqualTo(ValueReference.of("Test"));
+        assertThat(objectMapper.readValue("{\"@type\":\"string\",\"@value\":\"\"}", ValueReference.class)).isEqualTo(ValueReference.of(""));
+        assertThat(objectMapper.readValue("{\"@type\":\"string\",\"@value\":\"Test\"}", ValueReference.class)).isEqualTo(ValueReference.of("Test"));
     }
 
     @Test
@@ -178,16 +178,16 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeParameter() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.createParameter("Test"))).isEqualTo("{\"type\":\"parameter\",\"value\":\"Test\"}");
+        assertThat(objectMapper.writeValueAsString(ValueReference.createParameter("Test"))).isEqualTo("{\"@type\":\"parameter\",\"@value\":\"Test\"}");
     }
 
     @Test
     public void deserializeParameter() throws IOException {
-        assertThat(objectMapper.readValue("{\"type\":\"parameter\",\"value\":\"Test\"}", ValueReference.class)).isEqualTo(ValueReference.createParameter("Test"));
-        assertThatThrownBy(() -> objectMapper.readValue("{\"type\":\"parameter\",\"value\":\"\"}", ValueReference.class))
+        assertThat(objectMapper.readValue("{\"@type\":\"parameter\",\"@value\":\"Test\"}", ValueReference.class)).isEqualTo(ValueReference.createParameter("Test"));
+        assertThatThrownBy(() -> objectMapper.readValue("{\"@type\":\"parameter\",\"@value\":\"\"}", ValueReference.class))
                 .isInstanceOf(JsonMappingException.class)
                 .hasCauseInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> objectMapper.readValue("{\"type\":\"parameter\",\"value\":\" \"}", ValueReference.class))
+        assertThatThrownBy(() -> objectMapper.readValue("{\"@type\":\"parameter\",\"@value\":\" \"}", ValueReference.class))
                 .isInstanceOf(JsonMappingException.class)
                 .hasCauseInstanceOf(IllegalArgumentException.class);
     }

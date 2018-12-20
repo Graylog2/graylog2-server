@@ -52,7 +52,7 @@ public class AsValueReferenceTypeDeserializer extends AsWrapperTypeDeserializer 
             ctxt.reportWrongTokenException(typeNode.traverse(), JsonToken.START_OBJECT, "expected START_OBJECT before the type information and deserialized value");
         }
 
-        final TreeNode valueNode = typeNode.path("value");
+        final TreeNode valueNode = typeNode.path("@value");
         if (!valueNode.isValueNode()) {
             ctxt.reportWrongTokenException(typeNode.traverse(), JsonToken.VALUE_STRING, "expected VALUE_STRING as type information and deserialized value");
         }
