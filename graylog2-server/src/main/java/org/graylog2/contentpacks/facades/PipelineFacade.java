@@ -93,8 +93,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
         return EntityV1.builder()
-                // TODO: Check if it's really necessary to use the pipeline "title" here instead of the "id"
-                .id(ModelId.of(entityDescriptorIds.getOrThrow(pipelineDao.title(), ModelTypes.PIPELINE_V1)))
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(pipelineDao.id(), ModelTypes.PIPELINE_V1)))
                 .type(ModelTypes.PIPELINE_V1)
                 .data(data)
                 .build();
@@ -219,7 +218,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     @Override
     public EntityExcerpt createExcerpt(PipelineDao pipeline) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(pipeline.title()))
+                .id(ModelId.of(pipeline.id()))
                 .type(ModelTypes.PIPELINE_V1)
                 .title(pipeline.title())
                 .build();
@@ -236,7 +235,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         try {
-            final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());
+            final PipelineDao pipelineDao = pipelineService.load(modelId.id());
             return Optional.of(exportNativeEntity(pipelineDao, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);

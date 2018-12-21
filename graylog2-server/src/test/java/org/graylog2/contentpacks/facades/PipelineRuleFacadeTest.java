@@ -89,7 +89,7 @@ public class PipelineRuleFacadeTest {
                 .description("description")
                 .source("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")
                 .build();
-        final EntityDescriptor descriptor = EntityDescriptor.create("title", ModelTypes.PIPELINE_RULE_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("id", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportNativeEntity(pipelineRule, entityDescriptorIds);
 
@@ -107,7 +107,7 @@ public class PipelineRuleFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
@@ -202,7 +202,7 @@ public class PipelineRuleFacadeTest {
                 .build();
         final EntityExcerpt excerpt = facade.createExcerpt(pipelineRule);
 
-        assertThat(excerpt.id()).isEqualTo(ModelId.of("title"));
+        assertThat(excerpt.id()).isEqualTo(ModelId.of("id"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
         assertThat(excerpt.title()).isEqualTo("title");
     }
@@ -211,12 +211,12 @@ public class PipelineRuleFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
-                .id(ModelId.of("debug"))
+                .id(ModelId.of("5adf25034b900a0fdb4e5338"))
                 .type(ModelTypes.PIPELINE_RULE_V1)
                 .title("debug")
                 .build();
         final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
-                .id(ModelId.of("no-op"))
+                .id(ModelId.of("5adf25034b900a0fdb4e5339"))
                 .type(ModelTypes.PIPELINE_RULE_V1)
                 .title("no-op")
                 .build();
@@ -228,7 +228,7 @@ public class PipelineRuleFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_rules.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf25034b900a0fdb4e5338", ModelTypes.PIPELINE_RULE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)

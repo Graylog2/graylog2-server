@@ -117,7 +117,7 @@ public class PipelineFacadeTest {
         final PipelineConnections connections = PipelineConnections.create("id", "stream-1234", Collections.singleton("pipeline-1234"));
         connectionsService.save(connections);
 
-        final EntityDescriptor descriptor = EntityDescriptor.create(pipeline.title(), ModelTypes.PIPELINE_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create(pipeline.id(), ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("stream-1234", ModelTypes.STREAM_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, streamDescriptor);
         final Entity entity = facade.exportNativeEntity(pipeline, entityDescriptorIds);
@@ -137,7 +137,7 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, streamDescriptor);
         final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
@@ -245,7 +245,7 @@ public class PipelineFacadeTest {
                 .build();
         final EntityExcerpt excerpt = facade.createExcerpt(pipeline);
 
-        assertThat(excerpt.id()).isEqualTo(ModelId.of("title"));
+        assertThat(excerpt.id()).isEqualTo(ModelId.of("id"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.PIPELINE_V1);
         assertThat(excerpt.title()).isEqualTo("title");
     }
@@ -254,7 +254,7 @@ public class PipelineFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
-                .id(ModelId.of("Test"))
+                .id(ModelId.of("5a85c4854b900afd5d662be3"))
                 .type(ModelTypes.PIPELINE_V1)
                 .title("Test")
                 .build();
@@ -266,7 +266,7 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
+        final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor streamDescriptor = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, streamDescriptor);
         final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
