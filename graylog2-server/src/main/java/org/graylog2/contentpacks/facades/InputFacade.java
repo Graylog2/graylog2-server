@@ -130,7 +130,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(InputWithExtractors inputWithExtractors) {
+    Entity exportNativeEntity(InputWithExtractors inputWithExtractors, EntityDescriptorIds entityDescriptorIds) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
@@ -150,6 +150,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
         final Set<Constraint> constraints = versionConstraints(input);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(input.getId(), ModelTypes.INPUT_V1)))
                 .type(ModelTypes.INPUT_V1)
                 .data(data)
                 .constraints(ImmutableSet.copyOf(constraints))
@@ -463,7 +464,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         try {
             final Input input = inputService.find(modelId.id());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            return Optional.of(exportNativeEntity(inputWithExtractors));
+            return Optional.of(exportNativeEntity(inputWithExtractors, entityDescriptorIds));
         } catch (NotFoundException e) {
             return Optional.empty();
         }
