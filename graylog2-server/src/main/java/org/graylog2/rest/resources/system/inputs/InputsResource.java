@@ -64,6 +64,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -97,7 +98,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input.")
     })
     public InputSummary get(@ApiParam(name = "inputId", required = true)
-                                      @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+                            @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
@@ -228,16 +229,21 @@ public class InputsResource extends RestResource {
         }
         return configuration.entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    final ConfigurationField field = configurationRequest.getField(entry.getKey());
-                    if (field instanceof TextField) {
-                        final TextField textField = (TextField)field;
-                        if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
-                                && !Strings.isNullOrEmpty((String)entry.getValue())) {
-                            return "<password set>";
-                        }
-                    }
-                    return entry.getValue();
-                }));
+                .collect(
+                        HashMap::new,
+                        (map, entry) -> {
+                            final ConfigurationField field = configurationRequest.getField(entry.getKey());
+                            if (field instanceof TextField) {
+                                final TextField textField = (TextField) field;
+                                if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
+                                        && !Strings.isNullOrEmpty((String) entry.getValue())) {
+                                    map.put(entry.getKey(), "<password set>");
+                                    return;
+                                }
+                            }
+                            map.put(entry.getKey(), entry.getValue());
+                        },
+                        HashMap::putAll
+                );
     }
 }

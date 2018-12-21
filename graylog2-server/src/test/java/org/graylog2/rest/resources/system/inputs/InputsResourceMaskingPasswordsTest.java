@@ -144,6 +144,21 @@ public class InputsResourceMaskingPasswordsTest {
     }
 
     @Test
+    public void testMaskingOfNullValueInMap() {
+        final TextField passwordInput = mock(TextField.class);
+
+        when(passwordInput.getName()).thenReturn("nopassword");
+        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of());
+        final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(passwordInput);
+        final Map<String, Object> configuration = Collections.singletonMap("nopassword", null);
+
+        final Map<String, Object> resultingAttributes = this.inputsResource.maskPasswordsInConfiguration(configuration, configurationRequest);
+
+        assertThat(resultingAttributes).hasSize(1);
+        assertThat(resultingAttributes).containsEntry("nopassword", null);
+    }
+
+    @Test
     public void testRetrievalOfInputWithPasswordField() throws NotFoundException {
         final String inputId = "myinput";
         final String inputType = "dummyinput";
@@ -182,8 +197,6 @@ public class InputsResourceMaskingPasswordsTest {
         final String inputType = "dummyinput";
 
         final Input input = getInput(inputId, inputType);
-
-        when(inputService.find(inputId)).thenReturn(input);
 
         final ConfigurationField fooInput = mock(ConfigurationField.class);
         when(fooInput.getName()).thenReturn("foo");
