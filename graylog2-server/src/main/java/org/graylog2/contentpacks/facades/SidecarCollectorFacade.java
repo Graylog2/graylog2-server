@@ -60,7 +60,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(Collector collector) {
+    Entity exportNativeEntity(Collector collector, EntityDescriptorIds entityDescriptorIds) {
         final SidecarCollectorEntity collectorEntity = SidecarCollectorEntity.create(
                 ValueReference.of(collector.name()),
                 ValueReference.of(collector.serviceType()),
@@ -73,6 +73,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
 
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1)))
                 .type(TYPE_V1)
                 .data(data)
                 .build();
@@ -169,6 +170,6 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
             return Optional.empty();
         }
 
-        return Optional.of(exportNativeEntity(collector));
+        return Optional.of(exportNativeEntity(collector, entityDescriptorIds));
     }
 }

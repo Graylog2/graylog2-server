@@ -71,44 +71,48 @@ public class SidecarCollectorFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
-        final Entity entity = facade.exportNativeEntity(collector);
+        final EntityDescriptor descriptor = EntityDescriptor.create(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(collector, entityDescriptorIds);
 
-        final EntityV1 expectedEntity = EntityV1.builder()
-                .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
-                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
-                        ValueReference.of("filebeat"),
-                        ValueReference.of("exec"),
-                        ValueReference.of("linux"),
-                        ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("-c %s"),
-                        ValueReference.of("test config -c %s"),
-                        ValueReference.of("")), JsonNode.class))
-                .build();
-        assertThat(entity.type()).isEqualTo(expectedEntity.type());
-        assertThat(((EntityV1) entity).data()).isEqualTo(expectedEntity.data());
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
+        assertThat(entity.type()).isEqualTo(ModelTypes.SIDECAR_COLLECTOR_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entityV1.data(), SidecarCollectorEntity.class);
+
+        assertThat(collectorEntity.name()).isEqualTo(ValueReference.of("filebeat"));
+        assertThat(collectorEntity.serviceType()).isEqualTo(ValueReference.of("exec"));
+        assertThat(collectorEntity.nodeOperatingSystem()).isEqualTo(ValueReference.of("linux"));
+        assertThat(collectorEntity.executablePath()).isEqualTo(ValueReference.of("/usr/lib/graylog-sidecar/filebeat"));
+        assertThat(collectorEntity.executeParameters()).isEqualTo(ValueReference.of("-c %s"));
+        assertThat(collectorEntity.validationParameters()).isEqualTo(ValueReference.of("test config -c %s"));
+        assertThat(collectorEntity.defaultTemplate()).isEqualTo(ValueReference.of(""));
     }
 
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
 
-        final Entity entity = facade.exportEntity(descriptor, EntityDescriptorIds.empty()).orElseThrow(AssertionError::new);
-        final EntityV1 expectedEntity = EntityV1.builder()
-                .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
-                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
-                        ValueReference.of("filebeat"),
-                        ValueReference.of("exec"),
-                        ValueReference.of("linux"),
-                        ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("-c %s"),
-                        ValueReference.of("test config -c %s"),
-                        ValueReference.of("")), JsonNode.class))
-                .build();
-        assertThat(entity.type()).isEqualTo(expectedEntity.type());
-        assertThat(((EntityV1) entity).data()).isEqualTo(expectedEntity.data());
+        final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
+        assertThat(entity.type()).isEqualTo(ModelTypes.SIDECAR_COLLECTOR_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entityV1.data(), SidecarCollectorEntity.class);
+
+        assertThat(collectorEntity.name()).isEqualTo(ValueReference.of("filebeat"));
+        assertThat(collectorEntity.serviceType()).isEqualTo(ValueReference.of("exec"));
+        assertThat(collectorEntity.nodeOperatingSystem()).isEqualTo(ValueReference.of("linux"));
+        assertThat(collectorEntity.executablePath()).isEqualTo(ValueReference.of("/usr/lib/graylog-sidecar/filebeat"));
+        assertThat(collectorEntity.executeParameters()).isEqualTo(ValueReference.of("-c %s"));
+        assertThat(collectorEntity.validationParameters()).isEqualTo(ValueReference.of("test config -c %s"));
+        assertThat(collectorEntity.defaultTemplate()).isEqualTo(ValueReference.of(""));
     }
 
     @Test
