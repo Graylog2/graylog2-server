@@ -63,14 +63,15 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(Configuration configuration) {
+    Entity exportNativeEntity(Configuration configuration, EntityDescriptorIds entityDescriptorIds) {
         final SidecarCollectorConfigurationEntity configurationEntity = SidecarCollectorConfigurationEntity.create(
-                ValueReference.of(configuration.collectorId()),
+                ValueReference.of(entityDescriptorIds.getOrThrow(configuration.collectorId(), ModelTypes.SIDECAR_COLLECTOR_V1)),
                 ValueReference.of(configuration.name()),
                 ValueReference.of(configuration.color()),
                 ValueReference.of(configuration.template()));
         final JsonNode data = objectMapper.convertValue(configurationEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(configuration.id(), ModelTypes.SIDECAR_COLLECTOR_CONFIGURATION_V1)))
                 .type(TYPE_V1)
                 .data(data)
                 .build();
@@ -142,7 +143,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
             return Optional.empty();
         }
 
-        return Optional.of(exportNativeEntity(configuration));
+        return Optional.of(exportNativeEntity(configuration, entityDescriptorIds));
     }
 
     @Override
