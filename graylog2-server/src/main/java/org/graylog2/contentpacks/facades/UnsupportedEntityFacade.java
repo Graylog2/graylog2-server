@@ -17,10 +17,10 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -37,11 +37,6 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(UnsupportedEntityFacade.class);
 
     public static final UnsupportedEntityFacade INSTANCE = new UnsupportedEntityFacade();
-
-    @Override
-    public Entity exportNativeEntity(Void nativeEntity) {
-        throw new UnsupportedOperationException("Unsupported entity");
-    }
 
     @Override
     public NativeEntity<Void> createNativeEntity(Entity entity,
@@ -72,7 +67,7 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         LOG.warn("Couldn't collect entity {}", entityDescriptor);
         return Optional.empty();
     }

@@ -30,8 +30,6 @@ import org.graylog2.contentpacks.model.ModelVersion;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint;
 
-import java.util.UUID;
-
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_EntityV1.Builder.class)
@@ -60,8 +58,7 @@ public abstract class EntityV1 implements Entity {
     public static Builder builder() {
         return new AutoValue_EntityV1.Builder()
                 .constraints(ImmutableSet.<Constraint>builder().
-                        add(GraylogVersionConstraint.currentGraylogVersion()).build())
-                .id(ModelId.of(UUID.randomUUID().toString()));
+                        add(GraylogVersionConstraint.currentGraylogVersion()).build());
     }
 
     public static Entity createRoot(ContentPack contentPack) {

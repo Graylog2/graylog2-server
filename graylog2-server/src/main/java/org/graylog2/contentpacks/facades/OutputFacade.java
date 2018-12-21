@@ -18,7 +18,9 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -29,7 +31,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.OutputEntity;
@@ -74,8 +75,8 @@ public class OutputFacade implements EntityFacade<Output> {
         this.outputFactories = outputFactories;
     }
 
-    @Override
-    public Entity exportNativeEntity(Output output) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Output output, EntityDescriptorIds entityDescriptorIds) {
         final OutputEntity outputEntity = OutputEntity.create(
                 ValueReference.of(output.getTitle()),
                 ValueReference.of(output.getType()),
@@ -84,6 +85,7 @@ public class OutputFacade implements EntityFacade<Output> {
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
         final Set<Constraint> constraints = versionConstraints(output);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1)))
                 .type(ModelTypes.OUTPUT_V1)
                 .constraints(ImmutableSet.copyOf(constraints))
                 .data(data)
@@ -169,11 +171,11 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Output output = outputService.load(modelId.id());
-            return Optional.of(exportNativeEntity(output));
+            return Optional.of(exportNativeEntity(output, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find output {}", entityDescriptor, e);
             return Optional.empty();

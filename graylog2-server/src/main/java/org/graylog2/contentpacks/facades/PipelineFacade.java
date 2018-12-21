@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
@@ -30,6 +31,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.MissingNativeEntityException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -38,7 +40,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
@@ -82,9 +83,9 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         this.pipelineRuleParser = pipelineRuleParser;
     }
 
-    @Override
-    public Entity exportNativeEntity(PipelineDao pipelineDao) {
-        final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id());
+    @VisibleForTesting
+    Entity exportNativeEntity(PipelineDao pipelineDao, EntityDescriptorIds entityDescriptorIds) {
+        final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id(), entityDescriptorIds);
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),
                 ValueReference.of(pipelineDao.description()),
@@ -92,15 +93,16 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(pipelineDao.id(), ModelTypes.PIPELINE_V1)))
                 .type(ModelTypes.PIPELINE_V1)
                 .data(data)
                 .build();
     }
 
-    private Set<ValueReference> connectedStreams(String pipelineId) {
+    private Set<ValueReference> connectedStreams(String pipelineId, EntityDescriptorIds entityDescriptorIds) {
         final Set<PipelineConnections> connections = connectionsService.loadByPipelineId(pipelineId);
         return connections.stream()
-                .map(PipelineConnections::streamId)
+                .map(pipelineConnections -> entityDescriptorIds.getOrThrow(pipelineConnections.streamId(), ModelTypes.STREAM_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
     }
@@ -216,7 +218,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     @Override
     public EntityExcerpt createExcerpt(PipelineDao pipeline) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(pipeline.title()))
+                .id(ModelId.of(pipeline.id()))
                 .type(ModelTypes.PIPELINE_V1)
                 .title(pipeline.title())
                 .build();
@@ -230,11 +232,11 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         try {
-            final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());
-            return Optional.of(exportNativeEntity(pipelineDao));
+            final PipelineDao pipelineDao = pipelineService.load(modelId.id());
+            return Optional.of(exportNativeEntity(pipelineDao, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline {}", entityDescriptor, e);
             return Optional.empty();

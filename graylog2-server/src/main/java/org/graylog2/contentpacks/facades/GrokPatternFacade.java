@@ -18,10 +18,12 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -61,11 +63,12 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         this.grokPatternService = grokPatternService;
     }
 
-    @Override
-    public Entity exportNativeEntity(GrokPattern grokPattern) {
+    @VisibleForTesting
+    Entity exportNativeEntity(GrokPattern grokPattern, EntityDescriptorIds entityDescriptorIds) {
         final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(grokPattern.name(), grokPattern.pattern());
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(grokPattern.id(), ModelTypes.GROK_PATTERN_V1)))
                 .type(ModelTypes.GROK_PATTERN_V1)
                 .data(data)
                 .build();
@@ -153,11 +156,11 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
-            return Optional.of(exportNativeEntity(grokPattern));
+            return Optional.of(exportNativeEntity(grokPattern, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
             return Optional.empty();

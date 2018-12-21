@@ -18,6 +18,7 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +27,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.primitives.Ints;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -127,8 +129,8 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         this.inputFactories = inputFactories;
     }
 
-    @Override
-    public Entity exportNativeEntity(InputWithExtractors inputWithExtractors) {
+    @VisibleForTesting
+    Entity exportNativeEntity(InputWithExtractors inputWithExtractors, EntityDescriptorIds entityDescriptorIds) {
         final Input input = inputWithExtractors.input();
 
         // TODO: Create independent representation of entity?
@@ -148,6 +150,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         final JsonNode data = objectMapper.convertValue(inputEntity, JsonNode.class);
         final Set<Constraint> constraints = versionConstraints(input);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(input.getId(), ModelTypes.INPUT_V1)))
                 .type(ModelTypes.INPUT_V1)
                 .data(data)
                 .constraints(ImmutableSet.copyOf(constraints))
@@ -455,13 +458,13 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
 
         try {
             final Input input = inputService.find(modelId.id());
             final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
-            return Optional.of(exportNativeEntity(inputWithExtractors));
+            return Optional.of(exportNativeEntity(inputWithExtractors, entityDescriptorIds));
         } catch (NotFoundException e) {
             return Optional.empty();
         }

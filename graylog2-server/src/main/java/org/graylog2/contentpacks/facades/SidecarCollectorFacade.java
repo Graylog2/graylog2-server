@@ -18,20 +18,21 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +59,8 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         this.collectorService = collectorService;
     }
 
-    @Override
-    public Entity exportNativeEntity(Collector collector) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Collector collector, EntityDescriptorIds entityDescriptorIds) {
         final SidecarCollectorEntity collectorEntity = SidecarCollectorEntity.create(
                 ValueReference.of(collector.name()),
                 ValueReference.of(collector.serviceType()),
@@ -72,6 +73,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
 
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1)))
                 .type(TYPE_V1)
                 .data(data)
                 .build();
@@ -160,7 +162,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         final Collector collector = collectorService.find(modelId.id());
         if (isNull(collector)) {
@@ -168,6 +170,6 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
             return Optional.empty();
         }
 
-        return Optional.of(exportNativeEntity(collector));
+        return Optional.of(exportNativeEntity(collector, entityDescriptorIds));
     }
 }

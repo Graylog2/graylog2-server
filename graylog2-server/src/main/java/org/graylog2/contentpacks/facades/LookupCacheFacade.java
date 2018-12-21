@@ -18,7 +18,9 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -63,8 +65,8 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         this.pluginMetaData = pluginMetaData;
     }
 
-    @Override
-    public Entity exportNativeEntity(CacheDto cacheDto) {
+    @VisibleForTesting
+    Entity exportNativeEntity(CacheDto cacheDto, EntityDescriptorIds entityDescriptorIds) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(cacheDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupCacheEntity lookupCacheEntity = LookupCacheEntity.create(
@@ -75,6 +77,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
         final JsonNode data = objectMapper.convertValue(lookupCacheEntity, JsonNode.class);
         final Set<Constraint> constraints = versionConstraints(cacheDto);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(cacheDto.id(), ModelTypes.LOOKUP_CACHE_V1)))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .constraints(ImmutableSet.copyOf(constraints))
                 .data(data)
@@ -149,7 +152,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     @Override
     public EntityExcerpt createExcerpt(CacheDto cacheDto) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(cacheDto.name()))
+                .id(ModelId.of(cacheDto.id()))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .title(cacheDto.title())
                 .build();
@@ -163,8 +166,8 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
-        return cacheService.get(modelId.id()).map(this::exportNativeEntity);
+        return cacheService.get(modelId.id()).map(cacheDto -> exportNativeEntity(cacheDto, entityDescriptorIds));
     }
 }
