@@ -66,7 +66,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(DataAdapterDto dataAdapterDto) {
+    Entity exportNativeEntity(DataAdapterDto dataAdapterDto, EntityDescriptorIds entityDescriptorIds) {
         // TODO: Create independent representation of entity?
         final Map<String, Object> configuration = objectMapper.convertValue(dataAdapterDto.config(), TypeReferences.MAP_STRING_OBJECT);
         final LookupDataAdapterEntity lookupDataAdapterEntity = LookupDataAdapterEntity.create(
@@ -77,6 +77,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
         final JsonNode data = objectMapper.convertValue(lookupDataAdapterEntity, JsonNode.class);
         final Set<Constraint> constraints = versionConstraints(dataAdapterDto);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(dataAdapterDto.id(), ModelTypes.LOOKUP_ADAPTER_V1)))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .constraints(ImmutableSet.copyOf(constraints))
                 .data(data)
@@ -167,6 +168,6 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     @Override
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
-        return dataAdapterService.get(modelId.id()).map(this::exportNativeEntity);
+        return dataAdapterService.get(modelId.id()).map(dataAdapterDto -> exportNativeEntity(dataAdapterDto, entityDescriptorIds));
     }
 }
