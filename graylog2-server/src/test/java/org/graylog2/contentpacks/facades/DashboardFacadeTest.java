@@ -137,10 +137,12 @@ public class DashboardFacadeTest {
         final DashboardImpl dashboard = new DashboardImpl(fields);
         dashboard.addWidget(dashboardWidget);
 
-        final Entity entity = facade.exportNativeEntity(dashboard);
+        final EntityDescriptor dashboardDescriptor = EntityDescriptor.create(dashboard.getId(), ModelTypes.DASHBOARD_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(dashboardDescriptor);
+        final Entity entity = facade.exportNativeEntity(dashboard, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(dashboardDescriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -172,11 +174,12 @@ public class DashboardFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1);
-        final Optional<Entity> optionalEntity = facade.exportEntity(descriptor, EntityDescriptorIds.empty());
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Optional<Entity> optionalEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         final Entity entity = optionalEntity.orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -221,13 +224,15 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1), EntityDescriptorIds.empty());
+        final EntityDescriptor dashboardDescriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(dashboardDescriptor);
+        final Optional<Entity> collectedEntity = facade.exportEntity(dashboardDescriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(dashboardDescriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.DASHBOARD_V1);
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         assertThat(dashboardEntity.title()).isEqualTo(ValueReference.of("Test"));

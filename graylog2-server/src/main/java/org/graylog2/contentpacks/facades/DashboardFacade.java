@@ -94,7 +94,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(Dashboard dashboard) {
+    Entity exportNativeEntity(Dashboard dashboard, EntityDescriptorIds entityDescriptorIds) {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
@@ -106,6 +106,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 dashboardWidgets);
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(EntityDescriptor.create(dashboard.getId(), ModelTypes.DASHBOARD_V1))))
                 .type(ModelTypes.DASHBOARD_V1)
                 .data(data)
                 .build();
@@ -291,7 +292,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Dashboard dashboard = dashboardService.load(modelId.id());
-            return Optional.of(exportNativeEntity(dashboard));
+            return Optional.of(exportNativeEntity(dashboard, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
             return Optional.empty();
