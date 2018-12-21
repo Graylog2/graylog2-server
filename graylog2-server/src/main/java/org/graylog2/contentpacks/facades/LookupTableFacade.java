@@ -64,20 +64,37 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         this.lookupTableService = lookupTableService;
     }
 
+    private EntityDescriptor adapterDescriptor(String adapterId) {
+        return EntityDescriptor.create(adapterId, ModelTypes.LOOKUP_ADAPTER_V1);
+    }
+
+    private EntityDescriptor cacheDescriptor(String cacheId) {
+        return EntityDescriptor.create(cacheId, ModelTypes.LOOKUP_CACHE_V1);
+    }
+
     @VisibleForTesting
-    Entity exportNativeEntity(LookupTableDto lookupTableDto) {
+    Entity exportNativeEntity(LookupTableDto lookupTableDto, EntityDescriptorIds entityDescriptorIds) {
+        // TODO: Check if it's really necessary to use the lookup table "name" here instead of the "id"
+        final String tableId = entityDescriptorIds.get(EntityDescriptor.create(lookupTableDto.name(), ModelTypes.LOOKUP_TABLE_V1))
+                .orElseThrow(() -> new ContentPackException("Couldn't find lookup table entity " + lookupTableDto.id()));
+        final String cacheId = entityDescriptorIds.get(cacheDescriptor(lookupTableDto.cacheId()))
+                .orElseThrow(() -> new ContentPackException("Couldn't find lookup cache entity " + lookupTableDto.cacheId()));
+        final String adapterId = entityDescriptorIds.get(adapterDescriptor(lookupTableDto.dataAdapterId()))
+                .orElseThrow(() -> new ContentPackException("Couldn't find lookup data adapter entity " + lookupTableDto.dataAdapterId()));
+
         final LookupTableEntity lookupTableEntity = LookupTableEntity.create(
                 ValueReference.of(lookupTableDto.name()),
                 ValueReference.of(lookupTableDto.title()),
                 ValueReference.of(lookupTableDto.description()),
-                ValueReference.of(lookupTableDto.cacheId()),
-                ValueReference.of(lookupTableDto.dataAdapterId()),
+                ValueReference.of(cacheId),
+                ValueReference.of(adapterId),
                 ValueReference.of(lookupTableDto.defaultSingleValue()),
                 ValueReference.of(lookupTableDto.defaultSingleValueType()),
                 ValueReference.of(lookupTableDto.defaultMultiValue()),
                 ValueReference.of(lookupTableDto.defaultMultiValueType()));
         final JsonNode data = objectMapper.convertValue(lookupTableEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(tableId))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .data(data)
                 .build();
@@ -102,7 +119,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
 
         final String referencedDataAdapterName = lookupTableEntity.dataAdapterName().asString(parameters);
-        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(referencedDataAdapterName, ModelTypes.LOOKUP_ADAPTER_V1);
+        final EntityDescriptor dataAdapterDescriptor = adapterDescriptor(referencedDataAdapterName);
         final Object dataAdapter = nativeEntities.get(dataAdapterDescriptor);
         final String dataAdapterId;
         if (dataAdapter instanceof DataAdapterDto) {
@@ -112,7 +129,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         }
 
         final String referencedCacheName = lookupTableEntity.cacheName().asString(parameters);
-        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(referencedCacheName, ModelTypes.LOOKUP_CACHE_V1);
+        final EntityDescriptor cacheDescriptor = cacheDescriptor(referencedCacheName);
         final Object cache = nativeEntities.get(cacheDescriptor);
         final String cacheId;
         if (cache instanceof CacheDto) {
@@ -191,7 +208,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     @Override
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
-        return lookupTableService.get(modelId.id()).map(this::exportNativeEntity);
+        return lookupTableService.get(modelId.id()).map(lookupTableDto -> exportNativeEntity(lookupTableDto, entityDescriptorIds));
     }
 
     @Override
@@ -203,10 +220,10 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         final Optional<LookupTableDto> lookupTableDto = lookupTableService.get(modelId.id());
 
         lookupTableDto.map(LookupTableDto::dataAdapterId)
-                .map(dataAdapterId -> EntityDescriptor.create(dataAdapterId, ModelTypes.LOOKUP_ADAPTER_V1))
+                .map(this::adapterDescriptor)
                 .ifPresent(dataAdapter -> mutableGraph.putEdge(entityDescriptor, dataAdapter));
         lookupTableDto.map(LookupTableDto::cacheId)
-                .map(cacheId -> EntityDescriptor.create(cacheId, ModelTypes.LOOKUP_CACHE_V1))
+                .map(this::cacheDescriptor)
                 .ifPresent(cache -> mutableGraph.putEdge(entityDescriptor, cache));
 
         return ImmutableGraph.copyOf(mutableGraph);
@@ -232,7 +249,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         final LookupTableEntity lookupTableEntity = objectMapper.convertValue(entity.data(), LookupTableEntity.class);
 
         final String dataAdapterName = lookupTableEntity.dataAdapterName().asString(parameters);
-        final EntityDescriptor dataAdapterDescriptor = EntityDescriptor.create(dataAdapterName, ModelTypes.LOOKUP_ADAPTER_V1);
+        final EntityDescriptor dataAdapterDescriptor = adapterDescriptor(dataAdapterName);
         final Entity dataAdapterEntity = entities.get(dataAdapterDescriptor);
         if (dataAdapterEntity == null) {
             throw new ContentPackException("Missing data adapter \"" + dataAdapterName + "\" for lookup table " + entity.toEntityDescriptor());
@@ -241,7 +258,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
         }
 
         final String cacheName = lookupTableEntity.cacheName().asString(parameters);
-        final EntityDescriptor cacheDescriptor = EntityDescriptor.create(cacheName, ModelTypes.LOOKUP_CACHE_V1);
+        final EntityDescriptor cacheDescriptor = cacheDescriptor(cacheName);
         final Entity cacheEntity = entities.get(cacheDescriptor);
         if (cacheEntity == null) {
             throw new ContentPackException("Missing cache \"" + cacheName + "\" for lookup table " + entity.toEntityDescriptor());
