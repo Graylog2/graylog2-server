@@ -64,6 +64,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -231,7 +232,7 @@ public class InputsResource extends RestResource {
                     final ConfigurationField field = configurationRequest.getField(entry.getKey());
                     if (field instanceof TextField) {
                         final TextField textField = (TextField)field;
-                        if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())
+                        if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
                                 && !Strings.isNullOrEmpty((String)entry.getValue())) {
                             return "<password set>";
                         }

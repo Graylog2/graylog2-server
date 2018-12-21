@@ -39,6 +39,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,7 +89,7 @@ public class InputsResourceMaskingPasswordsTest {
 
         when(fooInput.getName()).thenReturn("foo");
         when(passwordInput.getName()).thenReturn("password");
-        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase()));
+        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH)));
         final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(fooInput, passwordInput);
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -217,7 +218,7 @@ public class InputsResourceMaskingPasswordsTest {
         final TextField passwordInput = mock(TextField.class);
 
         when(passwordInput.getName()).thenReturn(name);
-        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase()));
+        when(passwordInput.getAttributes()).thenReturn(ImmutableList.of(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH)));
         return passwordInput;
     }
 
