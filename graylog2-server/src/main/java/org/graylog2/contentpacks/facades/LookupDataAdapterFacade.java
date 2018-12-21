@@ -152,7 +152,7 @@ public class LookupDataAdapterFacade implements EntityFacade<DataAdapterDto> {
     @Override
     public EntityExcerpt createExcerpt(DataAdapterDto dataAdapterDto) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(dataAdapterDto.name()))
+                .id(ModelId.of(dataAdapterDto.id()))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .title(dataAdapterDto.title())
                 .build();

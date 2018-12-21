@@ -254,7 +254,7 @@ public class LookupCacheFacadeTest {
                 .build();
         final EntityExcerpt excerpt = facade.createExcerpt(cacheDto);
 
-        assertThat(excerpt.id()).isEqualTo(ModelId.of("cache-name"));
+        assertThat(excerpt.id()).isEqualTo(ModelId.of("1234567890"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_CACHE_V1);
         assertThat(excerpt.title()).isEqualTo("Cache Title");
     }
@@ -263,7 +263,7 @@ public class LookupCacheFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_caches.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
-                .id(ModelId.of("no-op-cache"))
+                .id(ModelId.of("5adf24b24b900a0fdb4e52dd"))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .title("No-op cache")
                 .build();

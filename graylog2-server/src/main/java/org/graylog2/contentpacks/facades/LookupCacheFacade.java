@@ -152,7 +152,7 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     @Override
     public EntityExcerpt createExcerpt(CacheDto cacheDto) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(cacheDto.name()))
+                .id(ModelId.of(cacheDto.id()))
                 .type(ModelTypes.LOOKUP_CACHE_V1)
                 .title(cacheDto.title())
                 .build();

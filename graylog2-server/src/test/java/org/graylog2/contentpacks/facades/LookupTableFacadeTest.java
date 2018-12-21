@@ -88,7 +88,7 @@ public class LookupTableFacadeTest {
 
     @Test
     public void exportEntity() {
-        final EntityDescriptor tableDescriptor = EntityDescriptor.create("lookup-table-name", ModelTypes.LOOKUP_TABLE_V1);
+        final EntityDescriptor tableDescriptor = EntityDescriptor.create("1234567890", ModelTypes.LOOKUP_TABLE_V1);
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("data-adapter-1234", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptor cacheDescriptor = EntityDescriptor.create("cache-1234", ModelTypes.LOOKUP_CACHE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(
@@ -130,7 +130,7 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
-        final EntityDescriptor tableDescriptor = EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE_V1);
+        final EntityDescriptor tableDescriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptor cacheDescriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(
@@ -354,7 +354,7 @@ public class LookupTableFacadeTest {
                 .build();
         final EntityExcerpt excerpt = facade.createExcerpt(lookupTableDto);
 
-        assertThat(excerpt.id()).isEqualTo(ModelId.of("lookup-table-name"));
+        assertThat(excerpt.id()).isEqualTo(ModelId.of("1234567890"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_TABLE_V1);
         assertThat(excerpt.title()).isEqualTo("Lookup Table Title");
     }
@@ -363,7 +363,7 @@ public class LookupTableFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
-                .id(ModelId.of("http-dsv-no-cache"))
+                .id(ModelId.of("5adf24dd4b900a0fdb4e530d"))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .title("HTTP DSV without Cache")
                 .build();
@@ -375,7 +375,7 @@ public class LookupTableFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_tables.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final EntityDescriptor tableDescriptor = EntityDescriptor.create("http-dsv-no-cache", ModelTypes.LOOKUP_TABLE_V1);
+        final EntityDescriptor tableDescriptor = EntityDescriptor.create("5adf24dd4b900a0fdb4e530d", ModelTypes.LOOKUP_TABLE_V1);
         final EntityDescriptor adapterDescriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
         final EntityDescriptor cacheDescriptor = EntityDescriptor.create("5adf24b24b900a0fdb4e52dd", ModelTypes.LOOKUP_CACHE_V1);
         final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(

@@ -239,7 +239,7 @@ public class LookupDataAdapterFacadeTest {
                 .build();
         final EntityExcerpt excerpt = facade.createExcerpt(dataAdapterDto);
 
-        assertThat(excerpt.id()).isEqualTo(ModelId.of("data-adapter-name"));
+        assertThat(excerpt.id()).isEqualTo(ModelId.of("1234567890"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
         assertThat(excerpt.title()).isEqualTo("Data Adapter Title");
     }
@@ -248,7 +248,7 @@ public class LookupDataAdapterFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
-                .id(ModelId.of("http-dsv"))
+                .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .title("HTTP DSV")
                 .build();

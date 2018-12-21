@@ -74,8 +74,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     @VisibleForTesting
     Entity exportNativeEntity(LookupTableDto lookupTableDto, EntityDescriptorIds entityDescriptorIds) {
-        // TODO: Check if it's really necessary to use the lookup table "name" here instead of the "id"
-        final String tableId = entityDescriptorIds.get(EntityDescriptor.create(lookupTableDto.name(), ModelTypes.LOOKUP_TABLE_V1))
+        final String tableId = entityDescriptorIds.get(EntityDescriptor.create(lookupTableDto.id(), ModelTypes.LOOKUP_TABLE_V1))
                 .orElseThrow(() -> new ContentPackException("Couldn't find lookup table entity " + lookupTableDto.id()));
         final String cacheId = entityDescriptorIds.get(cacheDescriptor(lookupTableDto.cacheId()))
                 .orElseThrow(() -> new ContentPackException("Couldn't find lookup cache entity " + lookupTableDto.cacheId()));
@@ -192,7 +191,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     @Override
     public EntityExcerpt createExcerpt(LookupTableDto lookupTableDto) {
         return EntityExcerpt.builder()
-                .id(ModelId.of(lookupTableDto.name()))
+                .id(ModelId.of(lookupTableDto.id()))
                 .type(ModelTypes.LOOKUP_TABLE_V1)
                 .title(lookupTableDto.title())
                 .build();
