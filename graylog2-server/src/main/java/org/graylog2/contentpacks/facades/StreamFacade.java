@@ -112,7 +112,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
-        final List<StreamAlertConditionEntity> streamAlertConditions = streamService.getAlertConditions(stream).stream()
+        final List<AlertCondition> alertConditions = streamService.getAlertConditions(stream);
+        final List<StreamAlertConditionEntity> streamAlertConditions = alertConditions.stream()
                 .map(this::encodeStreamAlertCondition)
                 .collect(Collectors.toList());
         final List<StreamAlarmCallbackEntity> streamAlarmCallbacks = alarmCallbackConfigurationService.getForStream(stream).stream()
@@ -138,19 +139,23 @@ public class StreamFacade implements EntityFacade<Stream> {
         return EntityV1.builder()
                 .id(ModelId.of(entityDescriptorIds.getOrThrow(stream.getId(), ModelTypes.STREAM_V1)))
                 .type(ModelTypes.STREAM_V1)
-                .constraints(versionConstraints(streamAlarmCallbacks))
+                .constraints(versionConstraints(streamAlarmCallbacks, alertConditions))
                 .data(data)
                 .build();
     }
 
-    private ImmutableSet<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks) {
-        // Try to collect plugin dependencies by looking that the package names of the alarm callbacks and the loaded
-        // plugins
-        return alarmCallbacks.stream()
-                .map(StreamAlarmCallbackEntity::type)
-                .flatMap(packageName -> pluginMetaData.stream()
-                        .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
-                        .map(PluginVersionConstraint::of))
+    private ImmutableSet<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks,
+                                                        List<AlertCondition> streamAlertConditions) {
+        // Try to collect plugin dependencies by looking that the package names of the alarm callbacks/conditions and
+        // the loaded plugins
+        final java.util.stream.Stream<String> concat = java.util.stream.Stream.concat(
+                alarmCallbacks.stream().map(StreamAlarmCallbackEntity::type),
+                streamAlertConditions.stream().map(condition -> condition.getClass().getCanonicalName())
+
+        );
+        return concat.flatMap(packageName -> pluginMetaData.stream()
+                .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
+                .map(PluginVersionConstraint::of))
                 .collect(ImmutableSet.toImmutableSet());
     }
 
