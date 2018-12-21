@@ -107,7 +107,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(Stream stream) {
+    Entity exportNativeEntity(Stream stream, EntityDescriptorIds entityDescriptorIds) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
@@ -118,7 +118,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(this::encodeStreamAlarmCallback)
                 .collect(Collectors.toList());
         final Set<ValueReference> outputIds = stream.getOutputs().stream()
-                .map(Output::getId)
+                .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
@@ -135,6 +135,7 @@ public class StreamFacade implements EntityFacade<Stream> {
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(stream.getId(), ModelTypes.STREAM_V1)))
                 .type(ModelTypes.STREAM_V1)
                 .data(data)
                 .build();
@@ -352,7 +353,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            return Optional.of(exportNativeEntity(stream));
+            return Optional.of(exportNativeEntity(stream, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();
