@@ -69,10 +69,12 @@ public class GrokPatternFacadeTest {
     @Test
     public void exportNativeEntity() {
         final GrokPattern grokPattern = GrokPattern.create("01234567890", "name", "pattern", null);
-        final Entity entity = facade.exportNativeEntity(grokPattern);
+        final EntityDescriptor descriptor = EntityDescriptor.create(grokPattern.id(), ModelTypes.GROK_PATTERN_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(grokPattern, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -118,15 +120,18 @@ public class GrokPatternFacadeTest {
         grokPatternService.save(GrokPattern.create("Test1", "[a-z]+"));
         grokPatternService.save(GrokPattern.create("Test2", "[a-z]+"));
 
+        final EntityDescriptor descriptor = EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
         final Map<String, Object> entity = ImmutableMap.of(
                 "name", "Test1",
                 "pattern", "[a-z]+");
         final JsonNode entityData = objectMapper.convertValue(entity, JsonNode.class);
 
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1), EntityDescriptorIds.empty());
+        final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent();
         final EntityV1 entityV1 = (EntityV1) collectedEntity.get();
+        assertThat(entityV1.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entityV1.type()).isEqualTo(ModelTypes.GROK_PATTERN_V1);
         assertThat(entityV1.data()).isEqualTo(entityData);
     }

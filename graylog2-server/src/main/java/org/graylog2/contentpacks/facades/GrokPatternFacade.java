@@ -64,10 +64,11 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(GrokPattern grokPattern) {
+    Entity exportNativeEntity(GrokPattern grokPattern, EntityDescriptorIds entityDescriptorIds) {
         final GrokPatternEntity grokPatternEntity = GrokPatternEntity.create(grokPattern.name(), grokPattern.pattern());
         final JsonNode data = objectMapper.convertValue(grokPatternEntity, JsonNode.class);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(grokPattern.id(), ModelTypes.GROK_PATTERN_V1)))
                 .type(ModelTypes.GROK_PATTERN_V1)
                 .data(data)
                 .build();
@@ -159,7 +160,7 @@ public class GrokPatternFacade implements EntityFacade<GrokPattern> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final GrokPattern grokPattern = grokPatternService.load(modelId.id());
-            return Optional.of(exportNativeEntity(grokPattern));
+            return Optional.of(exportNativeEntity(grokPattern, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find grok pattern {}", entityDescriptor, e);
             return Optional.empty();
