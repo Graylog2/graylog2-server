@@ -7,9 +7,10 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
-import View from '../logic/views/View';
-import Parameter from '../logic/parameters/Parameter';
-import type { ViewJson } from '../logic/views/View';
+
+import View from 'enterprise/logic/views/View';
+import Parameter from 'enterprise/logic/parameters/Parameter';
+import type { ViewJson } from 'enterprise/logic/views/View';
 
 type SortOrder = 'asc' | 'desc';
 
@@ -34,19 +35,21 @@ export type ViewSummary = {
 export type ViewSummaries = Array<ViewSummary>;
 
 type ViewManagementActionsType = {
+  create: (View) => Promise<View>,
   delete: (View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
   get: (string) => Promise<ViewJson>,
-  save: (View) => Promise<View>,
   search: (string, number, number, SortField, SortOrder) => Promise<PaginatedViews>,
+  update: (View) => Promise<View>,
 };
 
 const ViewManagementActions: ViewManagementActionsType = Reflux.createActions({
-  get: { asyncResult: true },
-  save: { asyncResult: true },
-  search: { asyncResult: true },
+  create: { asyncResult: true },
   delete: { asyncResult: true },
   forValue: { asyncResult: true },
+  get: { asyncResult: true },
+  search: { asyncResult: true },
+  update: { asyncResult: true },
 });
 
 const viewsUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/views');
@@ -77,9 +80,16 @@ const ViewManagementStore = Reflux.createStore({
     return promise;
   },
 
-  save(view: View): void {
+  create(view: View): Promise<View> {
     const promise = fetch('POST', viewsUrl, JSON.stringify(view));
-    ViewManagementActions.save.promise(promise);
+    ViewManagementActions.create.promise(promise);
+    return promise;
+  },
+
+  update(view: View): Promise<View> {
+    const promise = fetch('PUT', viewsIdUrl(view.id), JSON.stringify(view));
+    ViewManagementActions.update.promise(promise);
+    return promise;
   },
 
   search(query, page = 1, perPage = 10, sortBy = 'title', order = 'asc') {

@@ -11,6 +11,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.enterprise.audit.EnterpriseAuditEventTypes;
 import org.graylog.plugins.enterprise.search.views.ViewDTO;
 import org.graylog.plugins.enterprise.search.views.ViewService;
+import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
+import org.graylog.plugins.enterprise.search.views.sharing.ViewSharing;
+import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
@@ -41,6 +44,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -61,10 +65,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
+    private final ViewSharingService viewSharingService;
+    private final IsViewSharedForUser isViewSharedForUser;
 
     @Inject
-    public ViewsResource(ViewService dbService) {
+    public ViewsResource(ViewService dbService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
         this.dbService = dbService;
+        this.viewSharingService = viewSharingService;
+        this.isViewSharedForUser = isViewSharedForUser;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
@@ -87,7 +95,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    view -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, view.id()), order,
+                    view -> {
+                        final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
+
+                        return isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, view.id())
+                                || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
+                    },
+                    order,
                     sortField,
                     page,
                     perPage);
@@ -108,8 +122,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                     .filter(dto -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, dto.id()))
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
-        checkPermission(EnterpriseSearchRestPermissions.VIEW_READ, id);
-        return loadView(id);
+
+        final Optional<ViewSharing> viewSharing = viewSharingService.forView(id);
+        if (isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, id)
+                || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false)) {
+            return loadView(id);
+        }
+
+        throw viewNotFoundException(id);
     }
 
     @POST
@@ -130,7 +150,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                           @ApiParam @Valid ViewDTO dto) {
         checkPermission(EnterpriseSearchRestPermissions.VIEW_EDIT, id);
         loadView(id);
-        return dbService.save(dto.toBuilder().id(id).build());
+        return dbService.update(dto.toBuilder().id(id).build());
     }
 
     @PUT
@@ -156,7 +176,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     }
 
     private ViewDTO loadView(String id) {
-        return dbService.get(id).orElseThrow(() -> new NotFoundException("View " + id + " doesn't exist"));
+        return dbService.get(id).orElseThrow(() -> viewNotFoundException(id));
+    }
+
+    private NotFoundException viewNotFoundException(String id) {
+        return new NotFoundException("View " + id + " doesn't exist");
     }
 
     private void ensureUserPermissions(ViewDTO dto) throws ValidationException {

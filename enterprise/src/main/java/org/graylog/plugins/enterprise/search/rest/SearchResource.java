@@ -111,8 +111,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
-        return searchDbService.getForUser(searchId, username, viewId -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, viewId))
+        return searchDbService.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, viewId))
                 .orElseThrow(() -> new NotFoundException("No such search " + searchId));
     }
 

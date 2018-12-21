@@ -6,9 +6,12 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.views.ViewService;
+import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
+import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -28,19 +31,25 @@ import java.util.stream.Stream;
  * This class is a helper to implement a basic Mongojack-based database service that allows CRUD operations on a single DTO type.
  *
  * <p>
- *     Subclasses can add more sophisticated search methods by access the protected "db" property.<br/>
- *     Indices can be added in the constructor.
+ * Subclasses can add more sophisticated search methods by access the protected "db" property.<br/>
+ * Indices can be added in the constructor.
  * </p>
  */
 public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
     private final ViewService viewService;
+    private final ViewSharingService viewSharingService;
+    private final IsViewSharedForUser isViewSharedForUser;
 
     @Inject
     protected SearchDbService(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
-                              ViewService viewService) {
+                              ViewService viewService,
+                              ViewSharingService viewSharingService,
+                              IsViewSharedForUser isViewSharedForUser) {
         this.viewService = viewService;
+        this.viewSharingService = viewSharingService;
+        this.isViewSharedForUser = isViewSharedForUser;
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
                 Search.class,
                 ObjectId.class,
@@ -52,14 +61,20 @@ public class SearchDbService {
         return Optional.ofNullable(db.findOneById(new ObjectId(id)));
     }
 
-    public Optional<Search> getForUser(String id, String username, Predicate<String> permissionChecker) {
+    public Optional<Search> getForUser(String id, User user, Predicate<String> permissionChecker) {
         final Search search = db.findOneById(new ObjectId(id));
 
         if (search == null) {
             return Optional.empty();
         }
 
-        if (search.owner().map(owner -> owner.equals(username)).orElse(false)) {
+        if (search.owner().map(owner -> owner.equals(user.getName())).orElse(false)) {
+            return Optional.of(search);
+        }
+
+        if (viewService.forSearch(id).stream()
+                .map(view -> viewSharingService.forView(view.id()))
+                .anyMatch(viewSharing -> viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(user, sharing)).orElse(false))) {
             return Optional.of(search);
         }
 
@@ -78,7 +93,7 @@ public class SearchDbService {
                 throw new IllegalArgumentException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
             }
 
-            final WriteResult<Search, ObjectId> save = db.update(
+            db.update(
                     DBQuery.is("_id", search.id()),
                     search,
                     true,

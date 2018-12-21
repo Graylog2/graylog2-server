@@ -7,6 +7,7 @@ import { TitlesActions } from 'enterprise/stores/TitlesStore';
 import { ViewActions } from 'enterprise/stores/ViewStore';
 import NewQueryActionHandler from 'enterprise/logic/NewQueryActionHandler';
 import onSaveView from 'enterprise/logic/views/OnSaveViewAction';
+import onSaveAsView from 'enterprise/logic/views/OnSaveAsViewAction';
 import { QueriesActions } from 'enterprise/stores/QueriesStore';
 import { QueryIdsStore } from 'enterprise/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'enterprise/stores/QueryTitlesStore';
@@ -48,6 +49,7 @@ const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetad
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
                onSaveView={view => onSaveView(view, router)}
+               onSaveAsView={view => onSaveAsView(view, router)}
                onRemove={queryId => onCloseTab(queryId, activeQuery, queries)}>
       {childrenWithQueryId}
     </QueryTabs>

@@ -76,7 +76,7 @@ public class SearchResourceStreamPermissionsTest {
 
     private SearchResource searchResource;
 
-    class SearchTestResource extends SearchResource {
+    static class SearchTestResource extends SearchResource {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, StreamService streamService) {
@@ -128,7 +128,7 @@ public class SearchResourceStreamPermissionsTest {
 
         final String searchId = "searchId";
         final Search search = Search.Builder.create().id(searchId).queries(ImmutableSet.of(query)).build();
-        when(searchDbService.getForUser(eq(searchId), eq("admin"), any())).thenReturn(Optional.of(search));
+        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJobService.create(any(Search.class), any(String.class))).thenReturn(searchJob);
         when(queryEngine.execute(searchJob)).thenReturn(searchJob);
@@ -159,7 +159,7 @@ public class SearchResourceStreamPermissionsTest {
 
         final String searchId = "searchId";
         final Search search = Search.Builder.create().id(searchId).queries(ImmutableSet.of(query)).build();
-        when(searchDbService.getForUser(eq(searchId), eq("admin"), any())).thenReturn(Optional.of(search));
+        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
 
         when(streamService.loadAll()).thenReturn(Collections.emptyList());
 
@@ -178,7 +178,7 @@ public class SearchResourceStreamPermissionsTest {
     @Test
     public void referencingNonpermittedStreamsFails() {
         final String searchId = "searchId";
-        when(searchDbService.getForUser(eq(searchId), eq("admin"), any())).thenReturn(Optional.of(search));
+        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
         when(search.queries()).thenReturn(ImmutableSet.of(query));
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "disallowedstream"));
 
@@ -196,7 +196,7 @@ public class SearchResourceStreamPermissionsTest {
     @Test
     public void referencingPermittedStreamsSucceeds() {
         final String searchId = "searchId";
-        when(searchDbService.getForUser(eq(searchId), eq("admin"), any())).thenReturn(Optional.of(search));
+        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
         when(search.queries()).thenReturn(ImmutableSet.of(query));
         when(search.applyExecutionState(any(), any())).thenReturn(search);
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "allowedstream3"));

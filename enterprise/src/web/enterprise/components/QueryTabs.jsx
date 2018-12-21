@@ -4,9 +4,8 @@ import { Tab, Tabs } from 'react-bootstrap';
 
 import QueryTabActions from 'enterprise/components/QueryTabActions';
 import QueryTitle from 'enterprise/components/queries/QueryTitle';
-import OverviewTab from './dashboard/OverviewTab';
 
-const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView }) => {
+const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView, onSaveAsView }) => {
   const queryTitles = titles;
   const queryTabs = queries.map((id, index) => {
     const title = queryTitles.get(id, `Query#${index + 1}`);
@@ -28,7 +27,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
   return (
     <span>
       <span className="pull-right">
-        <QueryTabActions onSaveView={onSaveView} />
+        <QueryTabActions onSaveView={onSaveView} onSaveAsView={onSaveAsView} />
       </span>
       <Tabs
         id="QueryTabs"

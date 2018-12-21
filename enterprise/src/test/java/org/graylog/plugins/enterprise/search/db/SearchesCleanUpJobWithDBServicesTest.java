@@ -7,6 +7,8 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.database.MongoConnectionRule;
 import org.graylog.plugins.enterprise.search.views.ViewService;
+import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
+import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -58,7 +60,9 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
         final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
         final ViewService viewService = new TestViewService(mongoRule.getMongoConnection(), mapperProvider, clusterConfigService, searchDbService);
-        this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider, viewService));
+        final ViewSharingService viewSharingService = mock(ViewSharingService.class);
+        final IsViewSharedForUser isViewSharedForUser = mock(IsViewSharedForUser.class);
+        this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider, viewService, viewSharingService, isViewSharedForUser));
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
     }
 

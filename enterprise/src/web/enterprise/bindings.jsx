@@ -42,6 +42,11 @@ import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCusto
 import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
 import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
+import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstance';
+import SpecificRoles from 'enterprise/logic/views/sharing/SpecificRoles';
+import SpecificUsers from 'enterprise/logic/views/sharing/SpecificUsers';
+
 import * as Permissions from './Permissions';
 
 const extendedSearchPath = '/extendedsearch';
@@ -51,6 +56,10 @@ const showViewsPath = `${viewsPath}/:viewId`;
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
+
+ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
+ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
+ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
 export default {
   pages: {

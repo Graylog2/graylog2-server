@@ -8,15 +8,25 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
+// $FlowFixMe: imports from core need to be fixed in flow
+import StoreProvider from 'injection/StoreProvider';
+// $FlowFixMe: imports from core need to be fixed in flow
+import PermissionsMixin from 'util/PermissionsMixin';
 import DebugOverlay from 'enterprise/components/DebugOverlay';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import { SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
 import SearchMetadata from 'enterprise/logic/search/SearchMetadata';
+import * as Permissions from 'enterprise/Permissions';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
+import ShareViewModal from './views/ShareViewModal';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const { isPermitted } = PermissionsMixin;
 
 const QueryTabActions = createReactClass({
   propTypes: {
     onSaveView: PropTypes.func.isRequired,
+    onSaveAsView: PropTypes.func.isRequired,
     metadata: PropTypes.shape({
       undeclared: ImmutablePropTypes.Set,
     }).isRequired,
@@ -30,6 +40,7 @@ const QueryTabActions = createReactClass({
       debugOpen: false,
       editViewOpen: false,
       saveViewOpen: false,
+      shareViewOpen: false,
     };
   },
 
@@ -57,12 +68,29 @@ const QueryTabActions = createReactClass({
     this.setState({ saveAsViewOpen: false });
   },
 
+  handleShareView() {
+    this.setState({ shareViewOpen: true });
+  },
+
+  handleShareViewClose() {
+    this.setState({ shareViewOpen: false });
+  },
+
   handleSaveView(view) {
     this.props.onSaveView(view);
   },
 
+  handleSaveAsView(view) {
+    this.props.onSaveAsView(view);
+  },
+
   _isNewView(view) {
     return !view.title;
+  },
+
+  _isAllowedToEdit(view) {
+    const { currentUser } = this.props.currentUser;
+    return isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
   },
 
   _hasUndeclaredParameters(searchMetadata: SearchMetadata) {
@@ -75,21 +103,24 @@ const QueryTabActions = createReactClass({
     const { metadata } = this.props;
     const hasUndeclaredParameters = this._hasUndeclaredParameters(metadata);
     const isNewView = this._isNewView(view);
+    const allowedToEdit = this._isAllowedToEdit(view);
     return (
       <span>
         <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
-          <MenuItem onSelect={this.handleEdit} disabled={isNewView}>Edit</MenuItem>
-          <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters}>Save</MenuItem>
+          <MenuItem onSelect={this.handleEdit} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
+          <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>Save</MenuItem>
           <MenuItem onSelect={this.handleSaveAs} disabled={hasUndeclaredParameters}>Save as</MenuItem>
+          <MenuItem onSelect={this.handleShareView} disabled={isNewView || !allowedToEdit}>Share</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
         </DropdownButton>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
-        <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
+        <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveAsView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
         <ViewPropertiesModal view={view} title="Editing view" onSave={this.handleSaveView} show={this.state.editViewOpen} onClose={this.handleEditClose} />
+        {this.state.shareViewOpen && <ShareViewModal view={view} show onClose={this.handleShareViewClose} />}
       </span>
     );
   },
 });
 
-export default connect(QueryTabActions, { metadata: SearchMetadataStore, view: ViewStore });
+export default connect(QueryTabActions, { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore });
