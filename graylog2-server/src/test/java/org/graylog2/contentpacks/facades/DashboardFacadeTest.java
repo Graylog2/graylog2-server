@@ -28,6 +28,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.AbsoluteRangeEntity;
@@ -37,7 +38,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.RelativeRangeEntity;
@@ -172,7 +172,7 @@ public class DashboardFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1);
-        final Optional<Entity> optionalEntity = facade.exportEntity(descriptor);
+        final Optional<Entity> optionalEntity = facade.exportEntity(descriptor, EntityDescriptorIds.empty());
         final Entity entity = optionalEntity.orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
@@ -221,7 +221,7 @@ public class DashboardFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/dashboards.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5a82f5974b900a7a97caa1e5", ModelTypes.DASHBOARD_V1), EntityDescriptorIds.empty());
         assertThat(collectedEntity)
                 .isPresent()
                 .containsInstanceOf(EntityV1.class);

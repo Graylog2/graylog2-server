@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.exceptions.MissingNativeEntityException;
@@ -188,7 +189,7 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         return lookupTableService.get(modelId.id()).map(this::exportNativeEntity);
     }

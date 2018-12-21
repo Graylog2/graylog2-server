@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -66,7 +67,7 @@ public class UnsupportedEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         LOG.warn("Couldn't collect entity {}", entityDescriptor);
         return Optional.empty();
     }

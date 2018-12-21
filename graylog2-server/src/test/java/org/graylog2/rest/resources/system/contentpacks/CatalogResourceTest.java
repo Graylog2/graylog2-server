@@ -23,6 +23,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
@@ -108,7 +109,7 @@ public class CatalogResourceTest {
                 .build();
         final EntityWithConstraints entityWithConstraints = EntityWithConstraints.create(entity);
         when(mockEntityFacade.resolveNativeEntity(entityDescriptor)).thenReturn(entityDescriptors);
-        when(mockEntityFacade.exportEntity(entityDescriptor)).thenReturn(Optional.of(entity));
+        when(mockEntityFacade.exportEntity(entityDescriptor, EntityDescriptorIds.empty())).thenReturn(Optional.of(entity));
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 

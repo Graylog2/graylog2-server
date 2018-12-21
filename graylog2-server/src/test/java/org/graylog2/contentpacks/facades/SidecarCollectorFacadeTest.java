@@ -25,16 +25,16 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -94,7 +94,7 @@ public class SidecarCollectorFacadeTest {
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
 
-        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = facade.exportEntity(descriptor, EntityDescriptorIds.empty()).orElseThrow(AssertionError::new);
         final EntityV1 expectedEntity = EntityV1.builder()
                 .id(ModelId.of("5b4c920b4b900a0024af0001"))
                 .type(ModelTypes.SIDECAR_COLLECTOR_V1)

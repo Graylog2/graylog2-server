@@ -17,6 +17,7 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -63,7 +64,7 @@ public class RootEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         return Optional.empty();
     }
 

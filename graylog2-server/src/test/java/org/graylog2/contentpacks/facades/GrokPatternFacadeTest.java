@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -122,7 +123,7 @@ public class GrokPatternFacadeTest {
                 "pattern", "[a-z]+");
         final JsonNode entityData = objectMapper.convertValue(entity, JsonNode.class);
 
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("1", ModelTypes.GROK_PATTERN_V1), EntityDescriptorIds.empty());
         assertThat(collectedEntity)
                 .isPresent();
         final EntityV1 entityV1 = (EntityV1) collectedEntity.get();

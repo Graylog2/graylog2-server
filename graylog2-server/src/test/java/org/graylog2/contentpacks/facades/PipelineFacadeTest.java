@@ -35,13 +35,13 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamCon
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -135,7 +135,7 @@ public class PipelineFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
-        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = facade.exportEntity(descriptor, EntityDescriptorIds.empty()).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -261,7 +261,7 @@ public class PipelineFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1), EntityDescriptorIds.empty());
         assertThat(collectedEntity)
                 .isPresent()
                 .containsInstanceOf(EntityV1.class);

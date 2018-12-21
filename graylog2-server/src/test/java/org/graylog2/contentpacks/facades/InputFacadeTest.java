@@ -26,6 +26,7 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.apache.commons.collections.map.HashedMap;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.ConverterEntity;
@@ -193,7 +194,7 @@ public class InputFacadeTest {
     public void exportEntity() {
         final ModelId id = ModelId.of("5acc84f84b900a4ff290d9a7");
         final EntityDescriptor descriptor = EntityDescriptor.create(id, ModelTypes.INPUT_V1);
-        final Entity entity = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
+        final Entity entity = facade.exportEntity(descriptor, EntityDescriptorIds.empty()).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
         assertThat(entity.id()).isNotNull();
@@ -292,7 +293,7 @@ public class InputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/inputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1));
+        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf25294b900a0fdb4e5365", ModelTypes.INPUT_V1), EntityDescriptorIds.empty());
         assertThat(collectedEntity)
                 .isPresent()
                 .containsInstanceOf(EntityV1.class);
