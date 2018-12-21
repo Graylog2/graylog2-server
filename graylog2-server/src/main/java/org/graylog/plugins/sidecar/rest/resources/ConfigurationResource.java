@@ -25,17 +25,20 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
+import org.graylog.plugins.sidecar.rest.models.CollectorUpload;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationPreviewRequest;
+import org.graylog.plugins.sidecar.rest.responses.CollectorUploadListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
 import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
+import org.graylog.plugins.sidecar.services.ImportService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -83,6 +86,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     private final ConfigurationService configurationService;
     private final SidecarService sidecarService;
     private final EtagService etagService;
+    private final ImportService importService;
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Configuration.FIELD_ID))
@@ -93,10 +97,12 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Inject
     public ConfigurationResource(ConfigurationService configurationService,
                                  SidecarService sidecarService,
-                                 EtagService etagService) {
+                                 EtagService etagService,
+                                 ImportService importService) {
         this.configurationService = configurationService;
         this.sidecarService = sidecarService;
         this.etagService = etagService;
+        this.importService = importService;
         this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);;
     }
 
@@ -122,6 +128,20 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 .collect(Collectors.toList());
 
         return ConfigurationListResponse.create(query, configurations.pagination(), total, sort, order, result);
+    }
+
+    @GET
+    @Path("/uploads")
+    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "List all uploaded configurations")
+    public CollectorUploadListResponse listImports(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page) {
+        // sort by creation date, latest on top of the list
+        final PaginatedList<CollectorUpload> uploads = this.importService.findPaginated(page, 10, "created", "desc");
+        final long total = this.importService.count();
+        final List<CollectorUpload> result = new ArrayList<>(uploads);
+
+        return CollectorUploadListResponse.create(uploads.pagination(), total, result);
     }
 
     @GET

@@ -13,6 +13,7 @@ import ColorLabel from 'components/sidecars/common/ColorLabel';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import SourceViewModal from './SourceViewModal';
+import ImportsViewModal from './ImportsViewModal';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 const { CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
@@ -147,13 +148,19 @@ const ConfigurationForm = createReactClass({
     if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
       // Wait for the promise to resolve and then update the whole formData state
       defaultTemplatePromise.then((defaultTemplate) => {
-        nextFormData.template = defaultTemplate;
-        this.setState({ formData: nextFormData });
+        this._onTemplateChange(defaultTemplate);
       });
       return;
     }
 
     this.setState({ formData: nextFormData });
+  },
+
+  _onTemplateImport(nextTemplate) {
+    const nextFormData = lodash.cloneDeep(this.state.formData);
+    if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
+      this._onTemplateChange(nextTemplate);
+    }
   },
 
   _onTemplateChange(nextTemplate) {
@@ -171,7 +178,11 @@ const ConfigurationForm = createReactClass({
   },
 
   _onShowSource() {
-    this.modal.open();
+    this.previewModal.open();
+  },
+
+  _onShowImports() {
+    this.uploadsModal.open();
   },
 
   _formatCollector(collector) {
@@ -268,6 +279,12 @@ const ConfigurationForm = createReactClass({
                       onClick={this._onShowSource}>
                 Preview
               </Button>
+              <Button className="pull-right"
+                      bsStyle="link"
+                      bsSize="sm"
+                      onClick={this._onShowImports}>
+                Migrate
+              </Button>
               <HelpBlock>
                 {this.state.errors.template ?
                   this.state.errors.template :
@@ -291,8 +308,10 @@ const ConfigurationForm = createReactClass({
             </Col>
           </Row>
         </form>
-        <SourceViewModal ref={(c) => { this.modal = c; }}
+        <SourceViewModal ref={(c) => { this.previewModal = c; }}
                          templateString={this.state.formData.template} />
+        <ImportsViewModal ref={(c) => { this.uploadsModal = c; }}
+                          onApply={this._onTemplateImport} />
       </div>
     );
   },
