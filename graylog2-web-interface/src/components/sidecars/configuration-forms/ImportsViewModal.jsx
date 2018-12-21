@@ -100,9 +100,7 @@ class ImportsViewModal extends React.Component {
       return (
         <Alert bsStyle="info">
           <i className="fa fa-info-circle" />&nbsp;
-          There are no configuration uploads available. Please go to<br />
-          <strong>System-&gt;Collectors (legacy)-&gt;Details-&gt;Import Configuration</strong><br />
-          and import your first configuration.
+          There are no configuration uploads available. Please go to <strong>System -&gt; Collectors (legacy) -&gt; Details -&gt; Import Configuration</strong> and import your first configuration. You need at least Sidecar version 0.1.8 to make this feature available.
         </Alert>
       );
     }
@@ -126,7 +124,7 @@ class ImportsViewModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper ref={(c) => { this.uploadsModal = c; }}>
+      <BootstrapModalWrapper bsSize="large" ref={(c) => { this.uploadsModal = c; }}>
         <Modal.Header closeButton>
           <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
           Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{this._buildVariableName('nodeId')}</code>
