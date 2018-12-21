@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -137,11 +138,12 @@ public class StreamFacade implements EntityFacade<Stream> {
         return EntityV1.builder()
                 .id(ModelId.of(entityDescriptorIds.getOrThrow(stream.getId(), ModelTypes.STREAM_V1)))
                 .type(ModelTypes.STREAM_V1)
+                .constraints(versionConstraints(streamAlarmCallbacks))
                 .data(data)
                 .build();
     }
 
-    private Set<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks) {
+    private ImmutableSet<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks) {
         // Try to collect plugin dependencies by looking that the package names of the alarm callbacks and the loaded
         // plugins
         return alarmCallbacks.stream()
@@ -149,7 +151,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .flatMap(packageName -> pluginMetaData.stream()
                         .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                         .map(PluginVersionConstraint::of))
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     private StreamRuleEntity encodeStreamRule(StreamRule streamRule) {
