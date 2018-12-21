@@ -61,13 +61,15 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(RuleDao ruleDao) {
+    Entity exportNativeEntity(RuleDao ruleDao, EntityDescriptorIds entityDescriptorIds) {
         final PipelineRuleEntity ruleEntity = PipelineRuleEntity.create(
                 ValueReference.of(ruleDao.title()),
                 ValueReference.of(ruleDao.description()),
                 ValueReference.of(ruleDao.source()));
         final JsonNode data = objectMapper.convertValue(ruleEntity, JsonNode.class);
         return EntityV1.builder()
+                // TODO: Check if it's really necessary to use the pipeline rule "title" here instead of the "id"
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(ruleDao.title(), ModelTypes.PIPELINE_RULE_V1)))
                 .type(ModelTypes.PIPELINE_RULE_V1)
                 .data(data)
                 .build();
@@ -172,7 +174,7 @@ public class PipelineRuleFacade implements EntityFacade<RuleDao> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final RuleDao ruleDao = ruleService.loadByName(modelId.id());
-            return Optional.of(exportNativeEntity(ruleDao));
+            return Optional.of(exportNativeEntity(ruleDao, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find pipeline rule {}", entityDescriptor, e);
             return Optional.empty();
