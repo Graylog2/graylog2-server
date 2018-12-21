@@ -117,10 +117,12 @@ public class OutputFacadeTest {
                 new Date(0L),
                 null
         );
-        final Entity entity = facade.exportNativeEntity(output);
+        final EntityDescriptor descriptor = EntityDescriptor.create(output.getId(), ModelTypes.OUTPUT_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(output, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -135,10 +137,12 @@ public class OutputFacadeTest {
     public void exportNativeEntity() throws NotFoundException {
         final Output output = outputService.load("5adf239e4b900a0fdb4e5197");
 
-        final Entity entity = facade.exportNativeEntity(output);
+        final EntityDescriptor descriptor = EntityDescriptor.create(output.getId(), ModelTypes.OUTPUT_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(output, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -256,13 +260,15 @@ public class OutputFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/outputs.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<Entity> collectedEntity = facade.exportEntity(EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1), EntityDescriptorIds.empty());
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf239e4b900a0fdb4e5197", ModelTypes.OUTPUT_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()
                 .containsInstanceOf(EntityV1.class);
 
         final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isNotNull();
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.OUTPUT_V1);
         final OutputEntity outputEntity = objectMapper.convertValue(entity.data(), OutputEntity.class);
         assertThat(outputEntity.title()).isEqualTo(ValueReference.of("STDOUT"));

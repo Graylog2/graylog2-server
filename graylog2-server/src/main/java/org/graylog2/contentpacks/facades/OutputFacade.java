@@ -76,7 +76,7 @@ public class OutputFacade implements EntityFacade<Output> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(Output output) {
+    Entity exportNativeEntity(Output output, EntityDescriptorIds entityDescriptorIds) {
         final OutputEntity outputEntity = OutputEntity.create(
                 ValueReference.of(output.getTitle()),
                 ValueReference.of(output.getType()),
@@ -85,6 +85,7 @@ public class OutputFacade implements EntityFacade<Output> {
         final JsonNode data = objectMapper.convertValue(outputEntity, JsonNode.class);
         final Set<Constraint> constraints = versionConstraints(output);
         return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1)))
                 .type(ModelTypes.OUTPUT_V1)
                 .constraints(ImmutableSet.copyOf(constraints))
                 .data(data)
@@ -174,7 +175,7 @@ public class OutputFacade implements EntityFacade<Output> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Output output = outputService.load(modelId.id());
-            return Optional.of(exportNativeEntity(output));
+            return Optional.of(exportNativeEntity(output, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find output {}", entityDescriptor, e);
             return Optional.empty();
