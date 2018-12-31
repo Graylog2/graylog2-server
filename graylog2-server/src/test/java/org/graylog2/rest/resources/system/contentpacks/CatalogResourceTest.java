@@ -48,6 +48,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -107,7 +109,7 @@ public class CatalogResourceTest {
                 .data(new ObjectNode(JsonNodeFactory.instance).put("test", "1234"))
                 .build();
         when(mockEntityFacade.resolveNativeEntity(entityDescriptor)).thenReturn(entityDescriptors);
-        when(mockEntityFacade.exportEntity(entityDescriptor, EntityDescriptorIds.empty())).thenReturn(Optional.of(entity));
+        when(mockEntityFacade.exportEntity(eq(entityDescriptor), any(EntityDescriptorIds.class))).thenReturn(Optional.of(entity));
 
         final CatalogResolveRequest request = CatalogResolveRequest.create(entityDescriptors.nodes());
 
