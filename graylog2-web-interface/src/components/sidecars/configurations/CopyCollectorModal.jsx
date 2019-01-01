@@ -53,9 +53,9 @@ class CopyCollectorModal extends React.Component {
   _changeName = (event) => {
     const nextName = event.target.value;
     this.setState({ name: nextName });
-    this.props.validateCollector(nextName).then(validation => (
-      this.setState({ error: validation.error, error_message: validation.error_message })
-    ));
+    this.props.validateCollector(nextName).then((validation) => {
+      this.setState({ error: validation.failed, error_message: validation.errors.name });
+    });
   };
 
   render() {

@@ -1,14 +1,19 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import Reflux from 'reflux';
+import CombinedProvider from 'injection/CombinedProvider';
 import PropTypes from 'prop-types';
 import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import lodash from 'lodash';
 
 import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 import CollectorRow from './CollectorRow';
 
 import style from './CollectorList.css';
+
+const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');
 
 const CollectorList = createReactClass({
   propTypes: {
@@ -20,8 +25,9 @@ const CollectorList = createReactClass({
     onDelete: PropTypes.func.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
-    validateCollector: PropTypes.func.isRequired,
   },
+
+  mixins: [Reflux.connect(CollectorsStore, 'collectors')],
 
   headerCellFormatter(header) {
     const className = (header === 'Actions' ? style.actionsColumn : '');
@@ -29,12 +35,21 @@ const CollectorList = createReactClass({
   },
 
   collectorFormatter(collector) {
-    const { onClone, onDelete, validateCollector } = this.props;
+    const { onClone, onDelete } = this.props;
     return (<CollectorRow collector={collector}
                           onClone={onClone}
                           onDelete={onDelete}
-                          validateCollector={validateCollector} />);
+                          validateCollector={this.validateCollector(collector)} />);
   },
+
+  validateCollector(collector) {
+    return (name) => {
+      const nextCollector = lodash.cloneDeep(collector);
+      nextCollector.name = name;
+      return CollectorsActions.validate(nextCollector);
+    };
+  },
+
 
   render() {
     const { collectors, pagination, query, total, onPageChange, onQueryChange } = this.props;

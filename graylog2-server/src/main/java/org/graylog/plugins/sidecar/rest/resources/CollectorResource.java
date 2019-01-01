@@ -29,25 +29,46 @@ import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.CollectorSummary;
 import org.graylog.plugins.sidecar.rest.responses.CollectorListResponse;
 import org.graylog.plugins.sidecar.rest.responses.CollectorSummaryResponse;
-import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Api(value = "Sidecar/Collectors", description = "Manage collectors")
@@ -56,6 +77,11 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorResource.class);
+
+    private static final Pattern VALID_COLLECTOR_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_.-]+$");
+    private static final Pattern VALID_PATH_PATTERN = Pattern.compile("^[^;:*?\"<>|&]+$");
+//everything but ; : * ? " < > | &
     private final CollectorService collectorService;
     private final ConfigurationService configurationService;
     private final EtagService etagService;
@@ -166,12 +192,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
     public Collector createCollector(@ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull Collector request) throws ValidationException {
-        final ValidationResponse validation = validate(request.name(), null);
-        if (validation.error()) {
-            throw new ValidationException(validation.errorMessage());
-        }
-        etagService.invalidateAll();
         Collector collector = collectorService.fromRequest(request);
+        validateFromRequest(collector);
+        etagService.invalidateAll();
         return collectorService.save(collector);
     }
 
@@ -185,12 +208,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                      @PathParam("id") String id,
                                      @ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull Collector request) throws ValidationException {
-        final ValidationResponse validation = validate(request.name(), id);
-        if (validation.error()) {
-            throw new ValidationException(validation.errorMessage());
-        }
-        etagService.invalidateAll();
         Collector collector = collectorService.fromRequest(id, request);
+        validateFromRequest(collector);
+        etagService.invalidateAll();
         return collectorService.save(collector);
     }
 
@@ -203,12 +223,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                   @PathParam("id") String id,
                                   @ApiParam(name = "name", required = true)
                                   @PathParam("name") String name) throws NotFoundException {
-        final ValidationResponse validation = validate(name, null);
-        if (validation.error()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(validation).build();
-        }
         etagService.invalidateAll();
         final Collector collector = collectorService.copy(id, name);
+        final ValidationResult validation = validate(collector);
+        if (validation.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validation).build();
+        }
         collectorService.save(collector);
         return Response.accepted().build();
     }
@@ -236,31 +256,58 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         return Response.accepted().build();
     }
 
-    @GET
+    @POST
     @Path("/validate")
+    @NoAuditEvent("Validation only")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Validates collector name")
-    public ValidationResponse validateCollector(
-            @ApiParam(name = "name", required = true) @QueryParam("name") String name,
-            @ApiParam(name = "id", required = false) @QueryParam("id") String id) {
-        return validate(name, id);
+    @ApiOperation(value = "Validates collector parameters")
+    public ValidationResult validateCollector(
+            @Valid @ApiParam("collector") Collector toValidate) {
+        return validate(toValidate);
     }
 
-    private ValidationResponse validate(String name, String id) {
-        if (!name.matches("^[A-Za-z0-9_.-]+$")) {
-            return ValidationResponse.create(true, "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
-        }
+    private ValidationResult validate(Collector toValidate) {
+        final Optional<Collector> collectorOptional;
         final Collector collector;
-        if (id == null) {
-            collector = collectorService.findByName(name);
+        final ValidationResult validation = new ValidationResult();
+
+        if (!validateCollectorName(toValidate.name())) {
+            validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+        }
+
+        if (!validatePath(toValidate.executablePath())) {
+            validation.addError("executable_path", "Collector binary path can not contain the following characters: ; : * ? \" < > | &");
+        }
+
+        if (toValidate.nodeOperatingSystem() != null) {
+            collectorOptional = Optional.ofNullable(collectorService.findByNameAndOs(toValidate.name(), toValidate.nodeOperatingSystem()));
         } else {
-            collector = collectorService.findByNameExcludeId(name, id);
+            collectorOptional = Optional.ofNullable(collectorService.findByName(toValidate.name()));
         }
-        if (collector == null) {
-            return ValidationResponse.create(false, null);
+        if (collectorOptional.isPresent()) {
+            collector = collectorOptional.get();
+            if (!collector.id().equals(toValidate.id())) {
+                // a collector exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "Collector with name \"" + toValidate.name() + "\" already exists");
+            }
         }
-        return ValidationResponse.create(true, "Collector with name \"" + name + "\" already exists");
+        return validation;
+    }
+
+    private boolean validateCollectorName(String name) {
+        return VALID_COLLECTOR_NAME_PATTERN.matcher(name).matches();
+    }
+
+    private boolean validatePath(String path) {
+        return VALID_PATH_PATTERN.matcher(path).matches();
+    }
+
+    private void validateFromRequest(Collector toValidate) throws ValidationException {
+        final ValidationResult validation = validate(toValidate);
+        if (validation.failed()) {
+            throw new ValidationException(validation.getErrors().toString());
+        }
     }
 
     private String collectorsToEtag(CollectorListResponse collectors) {

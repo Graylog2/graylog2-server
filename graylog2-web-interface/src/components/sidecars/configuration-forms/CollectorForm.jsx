@@ -37,7 +37,7 @@ const CollectorForm = createReactClass({
   getInitialState() {
     return {
       error: false,
-      error_message: '',
+      validation_errors: {},
       formData: {
         id: this.props.collector.id,
         name: this.props.collector.name,
@@ -75,16 +75,24 @@ const CollectorForm = createReactClass({
     return (nextValue) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
+      this._validateFormData(nextFormData);
       this.setState({ formData: nextFormData });
     };
+  },
+
+  _validateFormData(nextFormData) {
+    if (
+      nextFormData.name &&
+      nextFormData.node_operating_system) {
+      CollectorsActions.validate(nextFormData).then(validation => (
+        this.setState({ validation_errors: validation.errors, error: validation.failed })
+      ));
+    }
   },
 
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);
-    CollectorsActions.validate(nextName, this.props.collector.id).then(validation => (
-      this.setState({ error: validation.error, error_message: validation.error_message })
-    ));
   },
 
   _onInputChange(key) {
@@ -118,6 +126,22 @@ const CollectorForm = createReactClass({
     return options;
   },
 
+  _formatValidationMessage(fieldName, defaultText) {
+    if (this.state.validation_errors[fieldName]) {
+      return (<div>
+        <span><b>{this.state.validation_errors[fieldName][0]}</b></span>
+      </div>);
+    }
+    return <span>{defaultText}</span>;
+  },
+
+  _validationState(fieldName) {
+    if (this.state.validation_errors[fieldName]) {
+      return 'error';
+    }
+    return null;
+  },
+
   render() {
     let validationParameters = '';
     let executeParameters = '';
@@ -135,8 +159,8 @@ const CollectorForm = createReactClass({
                    id="name"
                    label="Name"
                    onChange={this._onNameChange}
-                   bsStyle={this.state.error ? 'error' : null}
-                   help={this.state.error ? this.state.error_message : 'Name for this configuration'}
+                   bsStyle={this._validationState('name')}
+                   help={this._formatValidationMessage('name', 'Name for this collector')}
                    value={this.state.formData.name}
                    autoFocus
                    required />
@@ -167,7 +191,8 @@ const CollectorForm = createReactClass({
                    id="executablePath"
                    label="Executable Path"
                    onChange={this._onInputChange('executable_path')}
-                   help="Path to the collector executable"
+                   bsStyle={this._validationState('executable_path')}
+                   help={this._formatValidationMessage('executable_path', 'Path to the collector executable')}
                    value={this.state.formData.executable_path}
                    required />
 
