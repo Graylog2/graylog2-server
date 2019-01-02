@@ -92,6 +92,8 @@ const ViewList = createReactClass({
     const items = list.map(view => (
       <View key={`view-${view.id}`}
             id={view.id}
+            owner={view.owner}
+            createdAt={view.created_at}
             title={view.title}
             summary={view.summary}
             description={view.description}>

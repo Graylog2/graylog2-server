@@ -42,6 +42,7 @@ describe('ShowViewPage', () => {
     state: {},
     dashboard_state: { widgets: [], positions: [] },
     created_at: new Date(),
+    owner: 'admin',
   };
   it('renders Spinner while loading', () => {
     const wrapper = mount(<ShowViewPage location={{ query: {} }} parameters={Immutable.Map()} params={{ viewId: 'foo' }} route={{}} />);

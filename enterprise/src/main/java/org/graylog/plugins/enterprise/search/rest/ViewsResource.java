@@ -137,7 +137,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(EnterpriseSearchRestPermissions.VIEW_CREATE)
     @AuditEvent(type = EnterpriseAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
-        final ViewDTO savedDto = dbService.save(dto);
+        final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
+        final ViewDTO savedDto = dbService.save(dto.toBuilder().owner(username).build());
         ensureUserPermissions(savedDto);
         return savedDto;
     }

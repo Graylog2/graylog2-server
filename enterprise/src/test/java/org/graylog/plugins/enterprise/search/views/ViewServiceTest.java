@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -35,9 +36,20 @@ public class ViewServiceTest {
     private ViewService dbService;
     private ClusterConfigServiceImpl clusterConfigService;
 
+    class MongoJackObjectMapperProviderForTest extends MongoJackObjectMapperProvider {
+        public MongoJackObjectMapperProviderForTest(ObjectMapper objectMapper) {
+            super(objectMapper);
+        }
+
+        @Override
+        public ObjectMapper get() {
+            return super.get().registerModule(new Jdk8Module());
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
+        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongoRule.getMongoConnection(),
@@ -69,11 +81,13 @@ public class ViewServiceTest {
                 .searchId("abc123")
                 .properties(ImmutableSet.of("read-only"))
                 .state(Collections.emptyMap())
+                .owner("peter")
                 .build();
         final ViewDTO dto2 = ViewDTO.builder()
                 .title("View 2")
                 .searchId("abc123")
                 .state(Collections.emptyMap())
+                .owner("paul")
                 .build();
 
         final ViewDTO savedDto1 = dbService.save(dto1);
@@ -109,11 +123,11 @@ public class ViewServiceTest {
                 .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
                 .build();
 
-        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).build());
-        dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).build());
-        dbService.save(ViewDTO.builder().title("View C").searchId("abc123").state(Collections.emptyMap()).build());
-        dbService.save(ViewDTO.builder().title("View D").searchId("abc123").state(Collections.emptyMap()).build());
-        dbService.save(ViewDTO.builder().title("View E").searchId("abc123").state(Collections.emptyMap()).build());
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().title("View C").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().title("View D").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().title("View E").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
@@ -146,8 +160,8 @@ public class ViewServiceTest {
 
     @Test
     public void saveAndGetDefault() {
-        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).build());
-        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).build());
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).owner("hans").build());
+        final ViewDTO savedView2 = dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).owner("hans").build());
 
         dbService.saveDefault(savedView2);
 
