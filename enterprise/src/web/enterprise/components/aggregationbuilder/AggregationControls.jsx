@@ -101,12 +101,14 @@ export default class AggregationControls extends React.Component {
             </DescriptionBox>
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <DescriptionBox description="Row Pivots">
+            <DescriptionBox description="Rows" help="Values from these fields generate new rows.">
               <RowPivotSelect fields={formattedFieldsOptions} rowPivots={rowPivots} onChange={this._onRowPivotChange} />
             </DescriptionBox>
           </Col>
           <Col md={3} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
-            <DescriptionBox description="Column Pivots" configurableOptions={<ColumnPivotConfiguration rollup={rollup} onRollupChange={this._onRollupChange} />}>
+            <DescriptionBox description="Columns"
+                            help="Values from these fields generate new subcolumns."
+                            configurableOptions={<ColumnPivotConfiguration rollup={rollup} onRollupChange={this._onRollupChange} />}>
               <ColumnPivotSelect fields={formattedFieldsOptions} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
             </DescriptionBox>
           </Col>
@@ -118,7 +120,7 @@ export default class AggregationControls extends React.Component {
         </Row>
         <Row style={{ height: 'calc(100% - 110px)' }}>
           <Col md={2}>
-            <DescriptionBox description="Series">
+            <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn.">
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
           </Col>

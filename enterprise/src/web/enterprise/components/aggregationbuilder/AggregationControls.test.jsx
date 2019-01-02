@@ -38,10 +38,10 @@ describe('AggregationControls', () => {
       {children}
     </AggregationControls>);
     expect(wrapper.find('div.description').at(0).text()).toContain('Visualization Type');
-    expect(wrapper.find('div.description').at(1).text()).toContain('Row Pivots');
-    expect(wrapper.find('div.description').at(2).text()).toContain('Column Pivots');
+    expect(wrapper.find('div.description').at(1).text()).toContain('Rows');
+    expect(wrapper.find('div.description').at(2).text()).toContain('Columns');
     expect(wrapper.find('div.description').at(3).text()).toContain('Sorting');
-    expect(wrapper.find('div.description').at(4).text()).toContain('Series');
+    expect(wrapper.find('div.description').at(4).text()).toContain('Metrics');
   });
 
   it('should open additional options for column pivots', () => {

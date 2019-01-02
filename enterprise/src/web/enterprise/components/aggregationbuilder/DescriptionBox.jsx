@@ -5,6 +5,7 @@ import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
 import styles from './DescriptionBox.css';
+import HoverForHelp from './HoverForHelp';
 
 export default class DescriptionBox extends React.Component {
   static propTypes = {
@@ -61,14 +62,15 @@ export default class DescriptionBox extends React.Component {
                  onClick={this.onToggleConfig}
                  className="fa fa-wrench" />);
     }
-    return '';
+    return null;
   };
 
   render() {
+    const { description, children, help } = this.props;
     return (
       <div className={styles.descriptionBox}>
-        <div className={styles.description}>{this.props.description} {this.configCaret()}</div>
-        {this.props.children}
+        <div className={styles.description}>{description} {this.configCaret()} {help && <HoverForHelp title={description}>{help}</HoverForHelp>}</div>
+        {children}
         {this.configPopover()}
       </div>
     );
