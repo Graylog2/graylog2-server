@@ -14,6 +14,7 @@ import InputWrapper from './InputWrapper';
 class Input extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
+    name: PropTypes.string,
     type: PropTypes.string,
     label: PropTypes.oneOfType([
       PropTypes.element,
@@ -48,6 +49,7 @@ class Input extends React.Component {
 
   static defaultProps = {
     type: undefined,
+    name: undefined,
     label: '',
     labelClassName: undefined,
     formGroupClassName: undefined,

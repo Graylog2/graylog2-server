@@ -96,9 +96,9 @@ const LoginPage = createReactClass({
 
                 {alert}
 
-                <Input ref={(username) => { this.username = username; }} id="username" type="text" placeholder="Username" autoFocus />
+                <Input ref={(username) => { this.username = username; }} id="username" name="username" type="text" placeholder="Username" autoFocus />
 
-                <Input ref={(password) => { this.password = password; }} id="password" type="password" placeholder="Password" />
+                <Input ref={(password) => { this.password = password; }} id="password" name="password" type="password" placeholder="Password" />
 
                 <FormGroup>
                   <Button type="submit" bsStyle="info" disabled={this.state.loading}>
