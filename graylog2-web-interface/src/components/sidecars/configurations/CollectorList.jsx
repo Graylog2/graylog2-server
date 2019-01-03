@@ -45,6 +45,7 @@ const CollectorList = createReactClass({
   validateCollector(collector) {
     return (name) => {
       const nextCollector = lodash.cloneDeep(collector);
+      nextCollector.id = ' ';
       nextCollector.name = name;
       return CollectorsActions.validate(nextCollector);
     };
