@@ -165,7 +165,8 @@ const CollectorForm = createReactClass({
                    autoFocus
                    required />
 
-            <FormGroup controlId="service_type">
+            <FormGroup controlId="service_type"
+                       validationState={this._validationState('service_type')}>
               <ControlLabel>Process management</ControlLabel>
               <Select inputProps={{ id: 'service_type' }}
                       options={this._formatServiceTypes()}
@@ -173,10 +174,11 @@ const CollectorForm = createReactClass({
                       onChange={this._formDataUpdate('service_type')}
                       placeholder="Service Type"
                       required />
-              <HelpBlock>Choose the service type this collector is meant for.</HelpBlock>
+              <HelpBlock>{this._formatValidationMessage('service_type', 'Choose the service type this collector is meant for.')}</HelpBlock>
             </FormGroup>
 
-            <FormGroup controlId="operating_system">
+            <FormGroup controlId="operating_system"
+                       validationState={this._validationState('node_operating_system')}>
               <ControlLabel>Operating System</ControlLabel>
               <Select inputProps={{ id: 'node_operating_system' }}
                       options={this._formatOperatingSystems()}
@@ -184,7 +186,7 @@ const CollectorForm = createReactClass({
                       onChange={this._formDataUpdate('node_operating_system')}
                       placeholder="Name"
                       required />
-              <HelpBlock>Choose the operating system this collector is meant for.</HelpBlock>
+              <HelpBlock>{this._formatValidationMessage('node_operating_system', 'Choose the operating system this collector is meant for.')}</HelpBlock>
             </FormGroup>
 
             <Input type="text"

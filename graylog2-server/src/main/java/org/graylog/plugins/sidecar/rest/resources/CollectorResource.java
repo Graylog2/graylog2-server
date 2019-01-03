@@ -42,8 +42,6 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -66,6 +64,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -77,11 +76,13 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(CollectorResource.class);
-
     private static final Pattern VALID_COLLECTOR_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_.-]+$");
+    // exclude special characters from path ; : * ? " < > | &
     private static final Pattern VALID_PATH_PATTERN = Pattern.compile("^[^;:*?\"<>|&]+$");
-//everything but ; : * ? " < > | &
+    private static final List<String> VALID_LINUX_SERVICE_TYPES = Arrays.asList("exec");
+    private static final List<String> VALID_WINDOWS_SERVICE_TYPES = Arrays.asList("exec", "svc");
+    private static final List<String> VALID_OPERATING_SYSTEMS = Arrays.asList("linux", "windows");
+
     private final CollectorService collectorService;
     private final ConfigurationService configurationService;
     private final EtagService etagService;
@@ -281,6 +282,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         }
 
         if (toValidate.nodeOperatingSystem() != null) {
+            if (!validateOperatingSystem(toValidate.nodeOperatingSystem())) {
+                validation.addError("node_operating_system", "Operating system can only be 'linux' or 'windows'.");
+            }
+            if (!validateServiceType(toValidate.serviceType(), toValidate.nodeOperatingSystem())) {
+                validation.addError("service_type", "Linux collectors only support 'Foreground execution' while Windows collectors additionally support 'Windows service'.");
+            }
             collectorOptional = Optional.ofNullable(collectorService.findByNameAndOs(toValidate.name(), toValidate.nodeOperatingSystem()));
         } else {
             collectorOptional = Optional.ofNullable(collectorService.findByName(toValidate.name()));
@@ -297,6 +304,26 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     private boolean validateCollectorName(String name) {
         return VALID_COLLECTOR_NAME_PATTERN.matcher(name).matches();
+    }
+
+    private boolean validateServiceType(String type, String operatingSystem) {
+        switch(operatingSystem) {
+            case "linux":
+                if (VALID_LINUX_SERVICE_TYPES.contains(type)) {
+                    return true;
+                }
+                break;
+            case "windows":
+                if (VALID_WINDOWS_SERVICE_TYPES.contains(type)) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
+    private boolean validateOperatingSystem(String operatingSystem) {
+        return VALID_OPERATING_SYSTEMS.contains(operatingSystem);
     }
 
     private boolean validatePath(String path) {
