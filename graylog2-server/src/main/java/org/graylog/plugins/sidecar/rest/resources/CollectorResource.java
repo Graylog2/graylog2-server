@@ -77,8 +77,8 @@ import java.util.stream.Collectors;
 @RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
     private static final Pattern VALID_COLLECTOR_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_.-]+$");
-    // exclude special characters from path ; : * ? " < > | &
-    private static final Pattern VALID_PATH_PATTERN = Pattern.compile("^[^;:*?\"<>|&]+$");
+    // exclude special characters from path ; * ? " < > | &
+    private static final Pattern VALID_PATH_PATTERN = Pattern.compile("^[^;*?\"<>|&]+$");
     private static final List<String> VALID_LINUX_SERVICE_TYPES = Arrays.asList("exec");
     private static final List<String> VALID_WINDOWS_SERVICE_TYPES = Arrays.asList("exec", "svc");
     private static final List<String> VALID_OPERATING_SYSTEMS = Arrays.asList("linux", "windows");
@@ -278,7 +278,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         }
 
         if (!validatePath(toValidate.executablePath())) {
-            validation.addError("executable_path", "Collector binary path can not contain the following characters: ; : * ? \" < > | &");
+            validation.addError("executable_path", "Collector binary path can not contain the following characters: ; * ? \" < > | &");
         }
 
         if (toValidate.nodeOperatingSystem() != null) {
