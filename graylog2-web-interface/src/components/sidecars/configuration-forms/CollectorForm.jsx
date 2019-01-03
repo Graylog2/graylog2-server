@@ -161,7 +161,7 @@ const CollectorForm = createReactClass({
                    onChange={this._onNameChange}
                    bsStyle={this._validationState('name')}
                    help={this._formatValidationMessage('name', 'Name for this collector')}
-                   value={this.state.formData.name}
+                   value={this.state.formData.name || ''}
                    autoFocus
                    required />
 
@@ -195,7 +195,7 @@ const CollectorForm = createReactClass({
                    onChange={this._onInputChange('executable_path')}
                    bsStyle={this._validationState('executable_path')}
                    help={this._formatValidationMessage('executable_path', 'Path to the collector executable')}
-                   value={this.state.formData.executable_path}
+                   value={this.state.formData.executable_path || ''}
                    required />
 
             <Input type="text"
@@ -203,14 +203,14 @@ const CollectorForm = createReactClass({
                    label="Execute Parameters"
                    onChange={this._onInputChange('execute_parameters')}
                    help={<span>Parameters the collector is started with.<strong> %s will be replaced by the path to the configuration file.</strong></span>}
-                   value={executeParameters} />
+                   value={executeParameters || ''} />
 
             <Input type="text"
                    id="validationParameters"
                    label="Parameters for Configuration Validation"
                    onChange={this._onInputChange('validation_parameters')}
                    help={<span>Parameters that validate the configuration file. <strong> %s will be replaced by the path to the configuration file.</strong></span>}
-                   value={validationParameters} />
+                   value={validationParameters || ''} />
 
             <FormGroup controlId="defaultTemplate">
               <ControlLabel>Default Template</ControlLabel>
