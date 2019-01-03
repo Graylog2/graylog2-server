@@ -104,7 +104,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "   - name: Security"
         );
         ensureCollector(
-                "nxlog-linux",
+                "nxlog",
                 "exec",
                 "linux",
                 "/usr/bin/nxlog",
@@ -173,7 +173,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "\n"
         );
         ensureCollector(
-                "nxlog-windows",
+                "nxlog",
                 "svc",
                 "windows",
                 "C:\\Program Files (x86)\\nxlog\\nxlog.exe",
