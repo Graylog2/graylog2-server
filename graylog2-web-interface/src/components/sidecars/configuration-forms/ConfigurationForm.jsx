@@ -149,8 +149,8 @@ const ConfigurationForm = createReactClass({
       // Wait for the promise to resolve and then update the whole formData state
       defaultTemplatePromise.then((defaultTemplate) => {
         this._onTemplateChange(defaultTemplate);
+        nextFormData.template = defaultTemplate;
       });
-      return;
     }
 
     this.setState({ formData: nextFormData });
