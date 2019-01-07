@@ -16,7 +16,6 @@ class MessageDetail extends React.Component {
   static propTypes = {
     allStreams: PropTypes.object,
     allStreamsLoaded: PropTypes.bool,
-    customFieldActions: PropTypes.node,
     disableFieldActions: PropTypes.bool,
     disableMessageActions: PropTypes.bool,
     disableSurroundingSearch: PropTypes.bool,
@@ -35,7 +34,6 @@ class MessageDetail extends React.Component {
   static defaultProps = {
     allStreams: {},
     allStreamsLoaded: true,
-    customFieldActions: null,
     disableFieldActions: false,
     disableMessageActions: false,
     disableSurroundingSearch: false,
@@ -266,9 +264,7 @@ class MessageDetail extends React.Component {
                              fields={this.props.fields}
                              possiblyHighlight={this.props.possiblyHighlight}
                              disableFieldActions={this.props.disableFieldActions}
-                             customFieldActions={this.props.customFieldActions}
-                             showDecoration={this.state.showOriginal}
-              />
+                             showDecoration={this.state.showOriginal} />
             </div>
           </Col>
         </Row>

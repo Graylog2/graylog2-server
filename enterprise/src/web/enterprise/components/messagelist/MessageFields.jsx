@@ -9,7 +9,6 @@ import styles from './MessageFields.css';
 
 class MessageFields extends React.Component {
   static propTypes = {
-    customFieldActions: PropTypes.node.isRequired,
     disableFieldActions: PropTypes.bool.isRequired,
     fields: PropTypes.object.isRequired,
     message: PropTypes.object.isRequired,
@@ -32,8 +31,8 @@ class MessageFields extends React.Component {
           const fieldTypeMapping = this.props.fields.find(type => type.name === key);
           const fieldType = fieldTypeMapping ? fieldTypeMapping.type : FieldType.Unknown;
           return (
-            <MessageField key={key}
-                          {...this.props}
+            <MessageField {...this.props}
+                          key={key}
                           fieldName={key}
                           value={fields[key]}
                           fieldType={fieldType}
@@ -62,7 +61,12 @@ class MessageFields extends React.Component {
                                      originalValue={decorationStats.removed_fields[key]} />);
       }
 
-      return <MessageField key={key} {...this.props} fieldName={key} fieldType={fieldType.type} value={fields[key]} disableFieldActions />;
+      return (<MessageField {...this.props}
+                           key={key}
+                           fieldName={key}
+                           fieldType={fieldType.type}
+                           value={fields[key]}
+                           disableFieldActions />);
     });
   };
 
