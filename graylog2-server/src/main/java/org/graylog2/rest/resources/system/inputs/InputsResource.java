@@ -208,6 +208,8 @@ public class InputsResource extends RestResource {
         final InputDescription inputDescription = this.availableInputs.get(input.getType());
         final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
         final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
+        final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) ?
+                input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
                 name,
@@ -216,7 +218,7 @@ public class InputsResource extends RestResource {
                 input.getCreatedAt(),
                 input.getType(),
                 input.getCreatorUserId(),
-                maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest),
+                configuration,
                 input.getStaticFields(),
                 input.getNodeId()
         );
