@@ -18,9 +18,7 @@ const PluginList = createReactClass({
   style: require('!style/useable!css!./PluginList.css'),
 
   ENTERPRISE_PLUGINS: {
-    ArchivePlugin: 'Archive plugin',
-    LicensePlugin: 'License plugin',
-    'graylog-plugin-auditlog': 'Audit log plugin',
+    'graylog-plugin-enterprise': 'Graylog Plugin Enterprise',
   },
 
   _formatPlugin(pluginName) {
