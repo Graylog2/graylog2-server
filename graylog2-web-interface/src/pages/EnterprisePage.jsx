@@ -41,7 +41,7 @@ const EnterprisePage = createReactClass({
           </PageHeader>
 
           <GraylogClusterOverview />
-          <PluginList/>
+          <PluginList />
         </div>
       </DocumentTitle>
     );
