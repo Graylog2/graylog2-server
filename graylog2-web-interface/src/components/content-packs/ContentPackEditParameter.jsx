@@ -144,6 +144,7 @@ class ContentPackEditParameter extends React.Component {
 
   render() {
     const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
+    const disableType = !!this.props.parameterToEdit;
     return (
       <div>
         <h2>{header}</h2>
@@ -187,6 +188,7 @@ class ContentPackEditParameter extends React.Component {
             <Input name="type"
                    id="type"
                    type="select"
+                   disabled={disableType}
                    value={this.state.newParameter.type}
                    onChange={this._bindValue}
                    label="Value Type"
