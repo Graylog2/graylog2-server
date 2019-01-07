@@ -2,11 +2,11 @@
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import ViewState from 'enterprise/logic/views/ViewState';
 import { CurrentViewStateStore } from './CurrentViewStateStore';
-import ViewState from '../logic/views/ViewState';
 import { ViewStatesActions } from './ViewStatesStore';
-import WidgetPosition from '../logic/widgets/WidgetPosition';
-import MessagesWidget from '../logic/widgets/MessagesWidget';
 
 describe('CurrentViewStateStore', () => {
   const viewState = ViewState.create();
@@ -22,6 +22,7 @@ describe('CurrentViewStateStore', () => {
     const updateFn = jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(viewState);
+      return Promise.resolve();
     });
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
@@ -45,6 +46,7 @@ describe('CurrentViewStateStore', () => {
     const updateFn = jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(newView);
+      return Promise.resolve();
     });
 
     ViewStatesActions.update = updateFn;
@@ -77,6 +79,7 @@ describe('CurrentViewStateStore', () => {
     const updateFn = jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(newView);
+      return Promise.resolve();
     });
 
     ViewStatesActions.update = updateFn;

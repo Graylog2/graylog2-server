@@ -8,12 +8,12 @@ import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import WidgetPosition from '../logic/widgets/WidgetPosition';
 
-export const CurrentViewStateActions = Reflux.createActions([
-  'fields',
-  'titles',
-  'widgets',
-  'widgetPositions',
-]);
+export const CurrentViewStateActions = Reflux.createActions({
+  fields: { asyncResult: true },
+  titles: { asyncResult: true },
+  widgets: { asyncResult: true },
+  widgetPositions: { asyncResult: true },
+});
 
 export const CurrentViewStateStore = Reflux.createStore({
   listenables: [CurrentViewStateActions],
@@ -80,7 +80,8 @@ export const CurrentViewStateStore = Reflux.createStore({
       .widgets(newWidgets)
       .widgetPositions(positionsMap)
       .build();
-    ViewStatesActions.update(this.activeQuery, newActiveState);
+    const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+    CurrentViewStateActions.widgets.promise(promise);
   },
 
   widgetPositions(newPositions) {

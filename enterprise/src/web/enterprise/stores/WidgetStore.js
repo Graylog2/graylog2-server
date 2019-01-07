@@ -57,9 +57,9 @@ export const WidgetStore = Reflux.createStore({
       throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
     }
     const duplicatedWidget = widget.duplicate(uuid());
-    const newWidgets = this.widgets.set(duplicatedWidget, duplicatedWidget);
-    this._updateWidgets(newWidgets);
-    WidgetActions.duplicate.promise(Promise.resolve(duplicatedWidget));
+    const newWidgets = this.widgets.set(duplicatedWidget.id, duplicatedWidget);
+    const promise = this._updateWidgets(newWidgets);
+    WidgetActions.duplicate.promise(promise.then(() => duplicatedWidget));
     return duplicatedWidget;
   },
   filter(widgetId, filter) {
@@ -80,7 +80,7 @@ export const WidgetStore = Reflux.createStore({
   },
   _updateWidgets(newWidgets) {
     const widgets = newWidgets.valueSeq().toList();
-    CurrentViewStateActions.widgets(widgets);
+    return CurrentViewStateActions.widgets(widgets);
   },
   _trigger() {
     this.trigger(this.widgets);

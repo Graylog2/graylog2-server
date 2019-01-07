@@ -3,11 +3,9 @@ import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 
 import connect from 'stores/connect';
-import UserNotification from 'util/UserNotification';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
-import { DashboardWidgetsActions } from 'enterprise/stores/DashboardWidgetsStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -40,9 +38,6 @@ class Widget extends React.Component {
     onPositionsChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     position: PropTypes.object.isRequired,
-    view: PropTypes.shape({
-      activeQuery: PropTypes.string,
-    }).isRequired,
   };
 
   static defaultProps = {
@@ -142,7 +137,6 @@ class Widget extends React.Component {
     const { id, widget, fields, onSizeChange, title } = this.props;
     const { editing } = this.state;
     const { config, filter } = widget;
-    const { activeQuery } = this.props.view;
     const visualization = this.visualize();
     const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
     if (editing) {

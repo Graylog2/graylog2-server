@@ -33,7 +33,7 @@ const FilterProps = ({ children, style }) => React.Children.map(children,
   child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }),
 );
 
-  class WidgetActionDropdown extends React.Component {
+class WidgetActionDropdown extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -51,6 +51,10 @@ const FilterProps = ({ children, style }) => React.Children.map(children,
       minWidth: 'max-content',
       color: '#666666',
     };
+
+    const mappedChildren = React.Children.map(children,
+      child => React.cloneElement(child, Object.assign({}, child.props, child.props.onSelect ? { onSelect: () => { child.props.onSelect(); this._onToggle(); }} : {})),
+    );
     return (
       <span>
         <WidgetActionToggle bsRole="toggle" onClick={this._onToggle}>
@@ -66,7 +70,7 @@ const FilterProps = ({ children, style }) => React.Children.map(children,
           <FilterProps>
             <ul className="dropdown-menu" style={Object.assign({}, listStyle, displayMenu)}>
               <MenuItem header>Actions</MenuItem>
-              {children}
+              {mappedChildren}
             </ul>
           </FilterProps>
         </Overlay>

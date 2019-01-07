@@ -5,11 +5,11 @@ import { get, isEqualWith } from 'lodash';
 import { ViewActions, ViewStore } from './ViewStore';
 import { QueriesActions } from './QueriesStore';
 
-export const ViewStatesActions = Reflux.createActions([
-  'add',
-  'remove',
-  'update',
-]);
+export const ViewStatesActions = Reflux.createActions({
+  add: { asyncResult: true },
+  remove: { asyncResult: true },
+  update: { asyncResult: true },
+});
 
 export const ViewStatesStore = Reflux.createStore({
   listenables: [ViewStatesActions],
@@ -45,7 +45,8 @@ export const ViewStatesStore = Reflux.createStore({
   },
   update(queryId, viewState) {
     const newState = this.states.set(queryId, viewState);
-    ViewActions.state(newState);
+    const promise = ViewActions.state(newState);
+    ViewStatesActions.update.promise(promise);
   },
   _state() {
     return this.states;
