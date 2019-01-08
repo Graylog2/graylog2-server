@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.annotations.VisibleForTesting;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,11 +25,15 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.common.Strings;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -59,6 +64,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,7 +98,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input.")
     })
     public InputSummary get(@ApiParam(name = "inputId", required = true)
-                                      @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+                            @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
@@ -200,6 +207,9 @@ public class InputsResource extends RestResource {
     private InputSummary getInputSummary(Input input) {
         final InputDescription inputDescription = this.availableInputs.get(input.getType());
         final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
+        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
+        final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) ?
+                input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
                 name,
@@ -208,9 +218,34 @@ public class InputsResource extends RestResource {
                 input.getCreatedAt(),
                 input.getType(),
                 input.getCreatorUserId(),
-                input.getConfiguration(),
+                configuration,
                 input.getStaticFields(),
                 input.getNodeId()
         );
+    }
+
+    @VisibleForTesting
+    Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
+        if (configuration == null || configurationRequest == null) {
+            return configuration;
+        }
+        return configuration.entrySet()
+                .stream()
+                .collect(
+                        HashMap::new,
+                        (map, entry) -> {
+                            final ConfigurationField field = configurationRequest.getField(entry.getKey());
+                            if (field instanceof TextField) {
+                                final TextField textField = (TextField) field;
+                                if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
+                                        && !Strings.isNullOrEmpty((String) entry.getValue())) {
+                                    map.put(entry.getKey(), "<password set>");
+                                    return;
+                                }
+                            }
+                            map.put(entry.getKey(), entry.getValue());
+                        },
+                        HashMap::putAll
+                );
     }
 }
