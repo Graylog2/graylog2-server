@@ -1,6 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import lodash from 'lodash';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
@@ -40,6 +41,10 @@ const CollectorListContainer = createReactClass({
     CollectorsActions.list({ query: query, pageSize: pageSize }).finally(callback);
   },
 
+  validateCollector(collector) {
+    return CollectorsActions.validate(collector);
+  },
+
   render() {
     const { collectors } = this.state;
     if (!collectors || !collectors.paginatedCollectors) {
@@ -54,7 +59,8 @@ const CollectorListContainer = createReactClass({
                      onPageChange={this.handlePageChange}
                      onQueryChange={this.handleQueryChange}
                      onClone={this.handleClone}
-                     onDelete={this.handleDelete} />
+                     onDelete={this.handleDelete}
+                     validateCollector={this.validateCollector} />
     );
   },
 });
