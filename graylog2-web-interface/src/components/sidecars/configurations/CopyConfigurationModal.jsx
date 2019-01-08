@@ -8,7 +8,7 @@ import style from './CopyModal.css';
 
 class CopyConfigurationModal extends React.Component {
   static propTypes = {
-    id: PropTypes.string,
+    configuration: PropTypes.object.isRequired,
     copyConfiguration: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
   };
@@ -19,7 +19,7 @@ class CopyConfigurationModal extends React.Component {
   };
 
   state = {
-    id: this.props.id,
+    id: this.props.configuration.id,
     name: '',
     error: false,
     error_message: '',
@@ -30,7 +30,7 @@ class CopyConfigurationModal extends React.Component {
   };
 
   _getId = (prefixIdName) => {
-    return `${prefixIdName}-${this.props.id}`;
+    return `${prefixIdName}-${this.state.id}`;
   };
 
   _closeModal = () => {
@@ -46,7 +46,7 @@ class CopyConfigurationModal extends React.Component {
     const configuration = this.state;
 
     if (!configuration.error) {
-      this.props.copyConfiguration(this.props.id, this.state.name, this._saved);
+      this.props.copyConfiguration(this.state.id, this.state.name, this._saved);
     }
   };
 
