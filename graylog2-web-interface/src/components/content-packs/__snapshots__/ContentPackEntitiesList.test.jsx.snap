@@ -191,7 +191,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   Description
                 </th>
                 <th>
-                  Applied Parameter
+                  Used Parameters
                 </th>
                 <th>
                   Action
@@ -227,7 +227,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       onClick={[Function]}
                       type="button"
                     >
-                      Apply Parameter
+                      Edit
                     </button>
                     <button
                       className="btn btn-xs btn-info"
@@ -268,7 +268,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       onClick={[Function]}
                       type="button"
                     >
-                      Apply Parameter
+                      Edit
                     </button>
                     <button
                       className="btn btn-xs btn-info"

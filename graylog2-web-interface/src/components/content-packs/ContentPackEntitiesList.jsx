@@ -73,7 +73,7 @@ class ContentPackEntitiesList extends React.Component {
     const applyModal = (
       <BootstrapModalWrapper ref={(node) => { applyModalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Apply Parameter</Modal.Title>
+          <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {applyParamComponent}
@@ -130,7 +130,7 @@ class ContentPackEntitiesList extends React.Component {
                     onClick={() => {
                       open();
                     }}>
-              Apply Parameter
+              Edit
             </Button>
             }
             <Button bsStyle="info"
@@ -149,7 +149,7 @@ class ContentPackEntitiesList extends React.Component {
   render() {
     const headers = this.props.readOnly ?
       ['Title', 'Type', 'Description', 'Action'] :
-      ['Title', 'Type', 'Description', 'Applied Parameter', 'Action'];
+      ['Title', 'Type', 'Description', 'Used Parameters', 'Action'];
 
     return (
       <div>

@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
+import { Button, Modal, ButtonToolbar, Badge } from 'react-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { DataTable, SearchForm } from 'components/common';
 
 import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';
@@ -38,7 +39,29 @@ class ContentPackParameterList extends React.Component {
     this._filterParameters(this.state.filter, newProps.contentPack.parameters);
   }
 
+  _parameterApplied = (paramName) => {
+    const { contentPack } = this.props;
+    if (!contentPack || !contentPack.entities) {
+      return false;
+    }
+    return contentPack.entities.reduce((result, entity) => {
+      const entityData = new ValueReferenceData(entity.data);
+      const configPaths = entityData.getPaths();
+
+      const parameterNames = Object.keys(configPaths).filter((path) => {
+        return configPaths[path].isValueParameter();
+      }).map((path) => {
+        return configPaths[path].getValue();
+      });
+      return result.concat(parameterNames);
+    }, []).includes(paramName);
+  };
+
   _parameterRowFormatter = (parameter) => {
+    const parameterApplied = this._parameterApplied(parameter.name);
+    const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
+    const icon = parameterApplied ? 'fa fa-check' : 'fa fa-times';
+    const bsStyle = parameterApplied ? 'success' : 'failure';
     return (
       <tr key={parameter.title}>
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.title}</td>
@@ -46,10 +69,15 @@ class ContentPackParameterList extends React.Component {
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
+        <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
         {!this.props.readOnly &&
         <td>
           <ButtonToolbar>
-            <Button bsStyle="primary" bsSize="xs" onClick={() => { this.props.onDeleteParameter(parameter); }}>
+            <Button bsStyle="primary"
+                    bsSize="xs"
+                    title={buttonTitle}
+                    disabled={parameterApplied}
+                    onClick={() => { this.props.onDeleteParameter(parameter); }}>
               Delete
             </Button>{this._parameterModal(parameter)}
           </ButtonToolbar>
@@ -107,6 +135,7 @@ class ContentPackParameterList extends React.Component {
       <React.Fragment>
         <Button bsStyle="info"
                 bsSize={size}
+                title="Edit Modal"
                 onClick={openModal}>
           {name}
         </Button>
@@ -131,8 +160,8 @@ class ContentPackParameterList extends React.Component {
 
   render() {
     const headers = this.props.readOnly ?
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value'] :
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Action'];
+      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used'] :
+      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
     return (
       <div>
         <h2>Parameters list</h2>
