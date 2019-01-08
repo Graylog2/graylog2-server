@@ -42,8 +42,8 @@ const ConfigurationForm = createReactClass({
 
   getInitialState() {
     return {
-      parseErrors: [],
-      errors: {},
+      error: false,
+      validation_errors: {},
       formData: {
         id: this.props.configuration.id,
         name: this.props.configuration.name,
@@ -65,24 +65,25 @@ const ConfigurationForm = createReactClass({
   },
 
   _hasErrors() {
-    return Object.keys(this.state.errors).length !== 0 ||
-      this.state.parseErrors.length !== 0 ||
+    return this.state.error ||
       !this._isTemplateSet(this.state.formData.template);
   },
 
-  _validateTemplate(template) {
-    const validation = { key: 'template' };
-    if (!this._isTemplateSet(template)) {
-      validation.hasError = true;
-      validation.message = 'Please fill out the configuration field.';
-    }
-    this._updateValidationError(validation);
+  _validateFormData(nextFormData, checkForRequiredFields) {
+    CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
+      const nextValidation = lodash.clone(validation);
+      if (checkForRequiredFields && !this._isTemplateSet(nextFormData.template)) {
+        nextValidation.errors.template = ['Please fill out the configuration field.'];
+        nextValidation.failed = true;
+      }
+      this.setState({ validation_errors: nextValidation.errors, error: nextValidation.failed });
+    });
   },
 
   _save() {
     if (this._hasErrors()) {
       // Ensure we display an error on the template field, as this is not validated by the browser
-      this._validateTemplate(this.state.formData.template);
+      this._validateFormData(this.state.formData, true);
       return;
     }
 
@@ -98,16 +99,9 @@ const ConfigurationForm = createReactClass({
     return (nextValue, _, hideCallback) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
+      this._validateFormData(nextFormData, false);
       this.setState({ formData: nextFormData }, hideCallback);
     };
-  },
-
-  _updateValidationError({ key, hasError, message }) {
-    const nextErrors = lodash.omit(this.state.errors, key);
-    if (hasError) {
-      nextErrors[key] = message;
-    }
-    this.setState({ errors: nextErrors });
   },
 
   replaceConfigurationVariableName(oldname, newname) {
@@ -122,9 +116,6 @@ const ConfigurationForm = createReactClass({
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);
-    CollectorConfigurationsActions.validate(nextName).then(validation => (
-      this._updateValidationError({ key: 'name', hasError: validation.error, message: validation.error_message })
-    ));
   },
 
   _getCollectorDefaultTemplate(collectorId) {
@@ -165,7 +156,6 @@ const ConfigurationForm = createReactClass({
 
   _onTemplateChange(nextTemplate) {
     this._formDataUpdate('template')(nextTemplate);
-    this._validateTemplate(nextTemplate);
   },
 
   _onSubmit(event) {
@@ -201,6 +191,22 @@ const ConfigurationForm = createReactClass({
     }
 
     return options;
+  },
+
+  _formatValidationMessage(fieldName, defaultText) {
+    if (this.state.validation_errors[fieldName]) {
+      return (<div>
+        <span><b>{this.state.validation_errors[fieldName][0]}</b></span>
+      </div>);
+    }
+    return <span>{defaultText}</span>;
+  },
+
+  _validationState(fieldName) {
+    if (this.state.validation_errors[fieldName]) {
+      return 'error';
+    }
+    return null;
   },
 
   _renderCollectorTypeField(collectorId, collectors, configurationSidecars) {
@@ -241,9 +247,9 @@ const ConfigurationForm = createReactClass({
                    id="name"
                    label="Name"
                    onChange={this._onNameChange}
-                   bsStyle={this.state.errors.name ? 'error' : null}
-                   help={this.state.errors.name ? this.state.errors.name : 'Required. Name for this configuration'}
-                   value={this.state.formData.name}
+                   bsStyle={this._validationState('name')}
+                   help={this._formatValidationMessage('name', 'Required. Name for this configuration')}
+                   value={this.state.formData.name || ''}
                    autoFocus
                    required />
 
@@ -267,7 +273,8 @@ const ConfigurationForm = createReactClass({
               {this._renderCollectorTypeField(this.state.formData.collector_id, this.state.collectors, this.props.configurationSidecars)}
             </FormGroup>
 
-            <FormGroup controlId="template" validationState={this.state.errors.template ? 'error' : null}>
+            <FormGroup controlId="template"
+                       validationState={this._validationState('template')}>
               <ControlLabel>Configuration</ControlLabel>
               <SourceCodeEditor id="template"
                                 height={400}
@@ -286,9 +293,7 @@ const ConfigurationForm = createReactClass({
                 Migrate
               </Button>
               <HelpBlock>
-                {this.state.errors.template ?
-                  this.state.errors.template :
-                  'Required. Collector configuration, see quick reference for more information.'}
+                {this._formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
               </HelpBlock>
             </FormGroup>
           </fieldset>

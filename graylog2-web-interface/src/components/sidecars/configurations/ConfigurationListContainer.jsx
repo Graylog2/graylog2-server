@@ -21,8 +21,8 @@ const ConfigurationListContainer = createReactClass({
     CollectorsActions.all();
   },
 
-  validateConfiguration(name) {
-    return CollectorConfigurationsActions.validate(name);
+  validateConfiguration(configuration) {
+    return CollectorConfigurationsActions.validate(configuration);
   },
 
   handlePageChange(page, pageSize) {

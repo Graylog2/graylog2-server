@@ -35,7 +35,6 @@ import org.graylog.plugins.sidecar.rest.responses.CollectorUploadListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
-import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.ImportService;
@@ -45,6 +44,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -73,6 +73,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -176,17 +177,26 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         return ConfigurationSidecarsResponse.create(configuration.id(), sidecarsWithConfiguration);
     }
 
-    @GET
+    @POST
     @Path("/validate")
+    @NoAuditEvent("Validation only")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Validates configuration name")
-    public ValidationResponse validateConfiguration(@ApiParam(name = "name", required = true) @QueryParam("name") String name) {
-        final Configuration configuration = this.configurationService.findByName(name);
-        if (configuration == null) {
-            return ValidationResponse.create(false, null);
+    @ApiOperation(value = "Validates configuration parameters")
+    public ValidationResult validateConfiguration(@Valid @ApiParam("configuration") Configuration toValidate) {
+        final Optional<Configuration> configurationOptional;
+        final Configuration configuration;
+        final ValidationResult validation = new ValidationResult();
+
+        configurationOptional = Optional.ofNullable(configurationService.findByName(toValidate.name()));
+        if (configurationOptional.isPresent()) {
+            configuration = configurationOptional.get();
+            if (!configuration.id().equals(toValidate.id())) {
+                // a configuration exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
+            }
         }
-        return ValidationResponse.create(true, "Configuration with name \"" + name + "\" already exists");
+        return validation;
     }
 
     @GET
