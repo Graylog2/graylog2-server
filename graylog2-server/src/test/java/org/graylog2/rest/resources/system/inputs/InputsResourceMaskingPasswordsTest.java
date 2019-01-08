@@ -29,6 +29,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,7 +44,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -159,7 +159,7 @@ public class InputsResourceMaskingPasswordsTest {
     }
 
     @Test
-    public void testRetrievalOfInputWithPasswordField() throws NotFoundException {
+    public void testRetrievalOfInputWithPasswordFieldIfUserIsNotAllowedToEditInput() throws NotFoundException {
         final String inputId = "myinput";
         final String inputType = "dummyinput";
 
@@ -176,7 +176,8 @@ public class InputsResourceMaskingPasswordsTest {
 
         final InputDescription inputDescription = getInputDescription(configurationRequest);
         this.availableInputs.put(inputType, inputDescription);
-        when(currentSubject.isPermitted(anyString())).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(false);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -192,7 +193,41 @@ public class InputsResourceMaskingPasswordsTest {
     }
 
     @Test
-    public void testRetrievalOfAllInputsWithPasswordField() throws NotFoundException {
+    public void testRetrievalOfInputWithPasswordFieldIfUserIsAllowedToEditInput() throws NotFoundException {
+        final String inputId = "myinput";
+        final String inputType = "dummyinput";
+
+        final Input input = getInput(inputId, inputType);
+
+        when(inputService.find(inputId)).thenReturn(input);
+
+        final ConfigurationField fooInput = mock(ConfigurationField.class);
+        when(fooInput.getName()).thenReturn("foo");
+
+        final TextField passwordInput = getPasswordField("password");
+
+        final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(fooInput, passwordInput);
+
+        final InputDescription inputDescription = getInputDescription(configurationRequest);
+        this.availableInputs.put(inputType, inputDescription);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(true);
+
+        final Map<String, Object> configuration = ImmutableMap.of(
+                "foo", 42,
+                "password", "verysecret"
+        );
+        when(input.getConfiguration()).thenReturn(configuration);
+
+        final InputSummary summary = this.inputsResource.get(inputId);
+
+        assertThat(summary.attributes()).hasSize(2);
+        assertThat(summary.attributes()).containsEntry("password", "verysecret");
+        assertThat(summary.attributes()).containsEntry("foo", 42);
+    }
+
+    @Test
+    public void testRetrievalOfAllInputsWithPasswordFieldForUserNotAllowedToEditInput() throws NotFoundException {
         final String inputId = "myinput";
         final String inputType = "dummyinput";
 
@@ -207,7 +242,8 @@ public class InputsResourceMaskingPasswordsTest {
 
         final InputDescription inputDescription = getInputDescription(configurationRequest);
         this.availableInputs.put(inputType, inputDescription);
-        when(currentSubject.isPermitted(anyString())).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(false);
 
         final Map<String, Object> configuration = ImmutableMap.of(
                 "foo", 42,
@@ -222,6 +258,43 @@ public class InputsResourceMaskingPasswordsTest {
         assertThat(inputsList.inputs()).allMatch(summary -> {
             assertThat(summary.attributes()).hasSize(2);
             assertThat(summary.attributes()).containsEntry("password", "<password set>");
+            assertThat(summary.attributes()).containsEntry("foo", 42);
+            return true;
+        });
+    }
+
+    @Test
+    public void testRetrievalOfAllInputsWithPasswordFieldForUserAllowedToEditInput() throws NotFoundException {
+        final String inputId = "myinput";
+        final String inputType = "dummyinput";
+
+        final Input input = getInput(inputId, inputType);
+
+        final ConfigurationField fooInput = mock(ConfigurationField.class);
+        when(fooInput.getName()).thenReturn("foo");
+
+        final TextField passwordInput = getPasswordField("password");
+
+        final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(fooInput, passwordInput);
+
+        final InputDescription inputDescription = getInputDescription(configurationRequest);
+        this.availableInputs.put(inputType, inputDescription);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_READ + ":" + inputId)).thenReturn(true);
+        when(currentSubject.isPermitted(RestPermissions.INPUTS_EDIT + ":" + inputId)).thenReturn(true);
+
+        final Map<String, Object> configuration = ImmutableMap.of(
+                "foo", 42,
+                "password", "verysecret"
+        );
+        when(input.getConfiguration()).thenReturn(configuration);
+        when(inputService.all()).thenReturn(Collections.singletonList(input));
+
+        final InputsList inputsList = this.inputsResource.list();
+
+        assertThat(inputsList.inputs()).isNotEmpty();
+        assertThat(inputsList.inputs()).allMatch(summary -> {
+            assertThat(summary.attributes()).hasSize(2);
+            assertThat(summary.attributes()).containsEntry("password", "verysecret");
             assertThat(summary.attributes()).containsEntry("foo", 42);
             return true;
         });
