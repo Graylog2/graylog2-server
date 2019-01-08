@@ -33,9 +33,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
     public static final String BUFFERS_READ = "buffers:read";
-    public static final String BUNDLE_EXPORT = "bundle:export";
-    public static final String BUNDLE_IMPORT = "bundle:import";
-    public static final String BUNDLE_UPDATE = "bundle:update";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
     public static final String CLUSTER_CONFIG_ENTRY_CREATE = "clusterconfigentry:create";
@@ -144,10 +141,7 @@ public class RestPermissions implements PluginPermissions {
         .add(create(BUFFERS_READ, ""))
         .add(create(CONTENT_PACK_CREATE, ""))
         .add(create(CONTENT_PACK_DELETE, ""))
-        .add(create(BUNDLE_EXPORT, ""))
-        .add(create(BUNDLE_IMPORT, ""))
         .add(create(CONTENT_PACK_READ, ""))
-        .add(create(BUNDLE_UPDATE, ""))
         .add(create(CATALOG_LIST, ""))
         .add(create(CATALOG_RESOLVE, ""))
         .add(create(CLUSTER_CONFIG_ENTRY_CREATE, ""))
