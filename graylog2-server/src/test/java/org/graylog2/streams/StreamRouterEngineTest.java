@@ -177,6 +177,9 @@ public class StreamRouterEngineTest {
         final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
         final Message message = getMessage();
 
+        // Without the field
+        assertTrue(engine.match(message).isEmpty());
+
         // With wrong value for field.
         message.addField("testfield", "no-foobar");
 
