@@ -3,31 +3,20 @@ import createReactClass from 'create-react-class';
 import { Row, Col } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import style from './PluginList.css';
 
 const PluginList = createReactClass({
   displayName: 'PluginList',
 
-  componentDidMount() {
-    this.style.use();
-  },
-
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!./PluginList.css'),
-
   ENTERPRISE_PLUGINS: {
-    ArchivePlugin: 'Archive plugin',
-    LicensePlugin: 'License plugin',
-    'graylog-plugin-auditlog': 'Audit log plugin',
+    'graylog-plugin-enterprise': 'Graylog Plugin Enterprise',
   },
 
   _formatPlugin(pluginName) {
     const plugin = PluginStore.get().filter(p => p.metadata.name === pluginName)[0];
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <i className={`fa fa-${plugin ? 'check-circle' : 'minus-circle'}`}/>&nbsp;
+        <i className={`fa fa-${plugin ? 'check-circle' : 'minus-circle'}`} />&nbsp;
         {this.ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
     );
@@ -40,7 +29,7 @@ const PluginList = createReactClass({
       <Row className="content">
         <Col md={12}>
           <p>This is the status of Graylog Enterprise modules in this cluster:</p>
-          <ul className="enterprise-plugins">
+          <ul className={style.enterprisePlugins}>
             {enterprisePluginList}
           </ul>
         </Col>
