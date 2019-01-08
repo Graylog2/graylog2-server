@@ -138,7 +138,6 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     public ValidationResult validateConfigurationVariable(@ApiParam(name = "JSON body", required = true)
                                                      @Valid @NotNull ConfigurationVariable toValidate) {
-        final ValidationResult validation = new ValidationResult();
         return validateConfigurationVariableHelper(toValidate);
     }
 
