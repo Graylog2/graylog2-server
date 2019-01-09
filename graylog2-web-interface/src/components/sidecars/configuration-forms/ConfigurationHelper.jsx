@@ -24,7 +24,13 @@ class ConfigurationHelper extends React.Component {
         <Row className="row-sm">
           <Col md={12}>
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
-              <Tab eventKey={1} title="Variables">
+              <Tab eventKey={1} title="Runtime Variables">
+                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                  These variables will be filled with the runtime information from each Sidecar
+                </p>
+                <TemplatesHelper />
+              </Tab>
+              <Tab eventKey={2} title="Variables">
                 <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
                   Use variables to share text snippets across multiple configurations.
                   <br />
@@ -33,12 +39,6 @@ class ConfigurationHelper extends React.Component {
                   <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
                 </p>
                 <ConfigurationVariablesHelper onVariableRename={this.props.onVariableRename} />
-              </Tab>
-              <Tab eventKey={2} title="Runtime Variables">
-                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-                  These variables will be filled with the runtime information from each Sidecar
-                </p>
-                <TemplatesHelper />
               </Tab>
               <Tab eventKey={3} title="Reference">
                 <Row className="row-sm">
