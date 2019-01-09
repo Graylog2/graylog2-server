@@ -11,7 +11,7 @@ describe('<ContentPackEditParameters />', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-  it('should render a parameter', () => {
+  it('should render a form for creation', () => {
     const parameters = [{
       name: 'A parameter name',
       title: 'A parameter title',
@@ -20,6 +20,27 @@ describe('<ContentPackEditParameters />', () => {
       default_value: 'test',
     }];
     const wrapper = renderer.create(<ContentPackEditParameter parameters={parameters} />);
+    expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('should render a form for edition', () => {
+    const parameters = [{
+      name: 'A parameter name',
+      title: 'A parameter title',
+      description: 'A parameter descriptions',
+      type: 'string',
+      default_value: 'test',
+    }];
+
+    const parameterToEdit = {
+      name: 'A parameter name',
+      title: 'A parameter title',
+      description: 'A parameter descriptions',
+      type: 'string',
+      default_value: 'test',
+    };
+    const wrapper = renderer.create(<ContentPackEditParameter parameters={parameters}
+                                                              parameterToEdit={parameterToEdit} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
