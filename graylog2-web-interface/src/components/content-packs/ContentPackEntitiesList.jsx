@@ -4,6 +4,7 @@ import React from 'react';
 import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
 import { SearchForm, DataTable } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import Entity from 'logic/content-packs/Entity';
 
 import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
@@ -50,6 +51,13 @@ class ContentPackEntitiesList extends React.Component {
       return regexp.test(entity.title) || regexp.test(entity.description);
     });
     this.setState({ filteredEntities: filteredEntities, filter: filter });
+  };
+
+  _entityIcon = (entity) => {
+    if (!entity.fromServer) {
+      return <span><i title="Content Pack" className={`fa fa-archive ${ContentPackEntitiesListStyle.contentPackEntity}`} /></span>;
+    }
+    return <span><i title="Server" className="fa fa-server" /></span>;
   };
 
   _entityRowFormatter = (entity) => {
@@ -120,6 +128,7 @@ class ContentPackEntitiesList extends React.Component {
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
+        <td>{this._entityIcon(entity)}</td>
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
@@ -148,8 +157,8 @@ class ContentPackEntitiesList extends React.Component {
 
   render() {
     const headers = this.props.readOnly ?
-      ['Title', 'Type', 'Description', 'Action'] :
-      ['Title', 'Type', 'Description', 'Used Parameters', 'Action'];
+      ['Title', 'Type', 'Description', 'Origin', 'Action'] :
+      ['Title', 'Type', 'Description', 'Origin', 'Used Parameters', 'Action'];
 
     return (
       <div>

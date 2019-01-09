@@ -191,6 +191,9 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   Description
                 </th>
                 <th>
+                  Origin
+                </th>
+                <th>
                   Used Parameters
                 </th>
                 <th>
@@ -212,6 +215,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   className="bigColumns"
                 >
                   
+                </td>
+                <td>
+                  <span>
+                    <i
+                      className="fa fa-archive contentPackEntity"
+                      title="Content Pack"
+                    />
+                  </span>
                 </td>
                 <td>
                   1
@@ -253,6 +264,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   className="bigColumns"
                 >
                   
+                </td>
+                <td>
+                  <span>
+                    <i
+                      className="fa fa-server"
+                      title="Server"
+                    />
+                  </span>
                 </td>
                 <td>
                   0

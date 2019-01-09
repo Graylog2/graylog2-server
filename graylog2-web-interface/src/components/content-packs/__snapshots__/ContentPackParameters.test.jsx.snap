@@ -299,6 +299,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         Description
                       </th>
                       <th>
+                        Origin
+                      </th>
+                      <th>
                         Used Parameters
                       </th>
                       <th>
@@ -320,6 +323,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         className="bigColumns"
                       >
                         
+                      </td>
+                      <td>
+                        <span>
+                          <i
+                            className="fa fa-archive contentPackEntity"
+                            title="Content Pack"
+                          />
+                        </span>
                       </td>
                       <td>
                         0

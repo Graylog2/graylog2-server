@@ -78,7 +78,8 @@ const CreateContentPackPage = createReactClass({
   _getEntities(selectedEntities) {
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
       const newContentPack = this.state.contentPack.toBuilder()
-        .entities(result.entities)
+        /* Mark entities from server */
+        .entities(result.entities.map(e => Entity.fromJSON(e, true)))
         .build();
       const fetchedEntities = result.entities.map(e => Entity.fromJSON(e));
       this.setState({ contentPack: newContentPack, fetchedEntities });
