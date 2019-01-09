@@ -67,7 +67,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "filebeat",
                 "exec",
                 "linux",
-                "/usr/lib/graylog-sidecar/filebeat",
+                "/usr/share/filebeat/bin/filebeat",
                 "-c  %s",
                 "test config -c %s",
                 beatsPreambel +
