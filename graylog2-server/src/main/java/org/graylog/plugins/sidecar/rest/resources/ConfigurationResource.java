@@ -74,6 +74,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -84,6 +85,9 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ConfigurationResource extends RestResource implements PluginRestResource {
+    // a file is created by the Sidecar based on the configuration name so we basically check for invalid paths here
+    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[^;*?\"<>|&]+$");
+
     private final ConfigurationService configurationService;
     private final SidecarService sidecarService;
     private final EtagService etagService;
@@ -196,6 +200,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
             }
         }
+        if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
+            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &" );
+        }
+
         return validation;
     }
 
