@@ -6,10 +6,10 @@ import Entity from './Entity';
 export default class ContentPack {
   constructor(v, id, rev, name, summary, description, vendor, url, parameters, entitieValues) {
     const entities = entitieValues.map((e) => {
-      if (e instanceof Entity) {
+      if (e.constructor.name === Entity.name) {
         return e;
       }
-      return Entity.fromJSON(e);
+      return Entity.fromJSON(e, false);
     });
 
     this._value = {

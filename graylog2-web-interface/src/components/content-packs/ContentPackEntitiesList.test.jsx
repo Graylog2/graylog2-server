@@ -5,40 +5,37 @@ import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
+import Entity from 'logic/content-packs/Entity';
 
 describe('<ContentPackEntitiesList />', () => {
-  const entity1 = {
-    id: '111-beef',
-    type: {
-      name: 'Input',
-      version: '1',
-    },
-    v: '1.0',
-    data: {
+  const entity1 = Entity.builder()
+    .id('111-beef')
+    .type({ name: 'Input', version: '1'})
+    .v('1.0')
+    .data({
       name: { '@type': 'string', '@value': 'Input' },
       title: { '@type': 'string', '@value': 'A good input' },
       configuration: {
         listen_address: { '@type': 'string', '@value': '1.2.3.4' },
         port: { '@type': 'integer', '@value': '23' },
       },
-    },
-  };
-  const entity2 = {
-    id: '121-beef',
-    type: {
-      name: 'Input',
-      version: '1',
-    },
-    v: '1.0',
-    data: {
+    })
+    .build();
+
+  const entity2 = Entity.builder()
+    .id('121-beef')
+    .type({ name: 'Input', version: '1' })
+    .v('1.0')
+    .data({
       name: { '@type': 'string', '@value': 'BadInput' },
       title: { '@type': 'string', '@value': 'A bad input' },
       configuration: {
         listen_address: { '@type': 'string', '@value': '1.2.3.4' },
         port: { '@type': 'integer', '@value': '22' },
       },
-    },
-  };
+    })
+    .fromServer(true)
+    .build();
 
   const parameter = {
     name: 'A parameter name',
