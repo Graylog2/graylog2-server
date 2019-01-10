@@ -191,7 +191,10 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   Description
                 </th>
                 <th>
-                  Applied Parameter
+                  Origin
+                </th>
+                <th>
+                  Used Parameters
                 </th>
                 <th>
                   Action
@@ -214,6 +217,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   
                 </td>
                 <td>
+                  <span>
+                    <i
+                      className="fa fa-archive contentPackEntity"
+                      title="Content Pack"
+                    />
+                  </span>
+                </td>
+                <td>
                   1
                 </td>
                 <td>
@@ -227,7 +238,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       onClick={[Function]}
                       type="button"
                     >
-                      Apply Parameter
+                      Edit
                     </button>
                     <button
                       className="btn btn-xs btn-info"
@@ -255,6 +266,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   
                 </td>
                 <td>
+                  <span>
+                    <i
+                      className="fa fa-server"
+                      title="Server"
+                    />
+                  </span>
+                </td>
+                <td>
                   0
                 </td>
                 <td>
@@ -268,7 +287,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       onClick={[Function]}
                       type="button"
                     >
-                      Apply Parameter
+                      Edit
                     </button>
                     <button
                       className="btn btn-xs btn-info"

@@ -92,7 +92,7 @@ const EditContentPackPage = createReactClass({
       const paramMap = Object.keys(configPaths).filter((path) => {
         return configPaths[path].isValueParameter();
       }).map((path) => {
-        return { configKey: path, paramName: configPaths[path].getValue() };
+        return { configKey: path, paramName: configPaths[path].getValue(), readOnly: true };
       });
       const newResult = result;
       if (paramMap.length > 0) {
@@ -139,7 +139,8 @@ const EditContentPackPage = createReactClass({
         .reduce((acc, entityType) => {
           return acc.concat(selectedEntities[entityType]);
         }, []).filter(e => e.constructor.name === Entity.name);
-      const entities = contentPackEntities.concat(result.entities);
+      /* Mark entities from server */
+      const entities = contentPackEntities.concat(result.entities.map(e => Entity.fromJSON(e, true)));
       const contentPack = this.state.contentPack.toBuilder()
         .entities(entities)
         .build();

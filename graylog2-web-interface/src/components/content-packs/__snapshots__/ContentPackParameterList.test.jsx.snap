@@ -103,6 +103,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
     className="btn btn-sm btn-info"
     disabled={false}
     onClick={[Function]}
+    title="Edit Modal"
     type="button"
   >
     Create parameter
@@ -301,6 +302,9 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                 <th>
                   Default Value
                 </th>
+                <th>
+                  Used
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -311,7 +315,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                   A parameter title
                 </td>
                 <td>
-                  A parameter name
+                  PARAM
                 </td>
                 <td
                   className="bigColumns"
@@ -323,6 +327,15 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                 </td>
                 <td>
                   test
+                </td>
+                <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -344,6 +357,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
     className="btn btn-sm btn-info"
     disabled={false}
     onClick={[Function]}
+    title="Edit Modal"
     type="button"
   >
     Create parameter
@@ -450,6 +464,9 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   Default Value
                 </th>
                 <th>
+                  Used
+                </th>
+                <th>
                   Action
                 </th>
               </tr>
@@ -462,7 +479,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   A parameter title
                 </td>
                 <td>
-                  A parameter name
+                  PARAM
                 </td>
                 <td
                   className="bigColumns"
@@ -476,6 +493,15 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   test
                 </td>
                 <td>
+                  <span
+                    className="failure badge"
+                  >
+                    <i
+                      className="fa fa-times"
+                    />
+                  </span>
+                </td>
+                <td>
                   <div
                     className="btn-toolbar"
                     role="toolbar"
@@ -484,6 +510,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       className="btn btn-xs btn-primary"
                       disabled={false}
                       onClick={[Function]}
+                      title="Delete Parameter"
                       type="button"
                     >
                       Delete
@@ -492,6 +519,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       className="btn btn-xs btn-info"
                       disabled={false}
                       onClick={[Function]}
+                      title="Edit Modal"
                       type="button"
                     >
                       Edit

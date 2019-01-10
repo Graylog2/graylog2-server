@@ -52,6 +52,13 @@ class ContentPackEntitiesList extends React.Component {
     this.setState({ filteredEntities: filteredEntities, filter: filter });
   };
 
+  _entityIcon = (entity) => {
+    if (!entity.fromServer) {
+      return <span><i title="Content Pack" className={`fa fa-archive ${ContentPackEntitiesListStyle.contentPackEntity}`} /></span>;
+    }
+    return <span><i title="Server" className="fa fa-server" /></span>;
+  };
+
   _entityRowFormatter = (entity) => {
     let applyModalRef;
     const applyParamComponent = (<ContentPackApplyParameter
@@ -73,7 +80,7 @@ class ContentPackEntitiesList extends React.Component {
     const applyModal = (
       <BootstrapModalWrapper ref={(node) => { applyModalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Apply Parameter</Modal.Title>
+          <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {applyParamComponent}
@@ -120,6 +127,7 @@ class ContentPackEntitiesList extends React.Component {
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
+        <td>{this._entityIcon(entity)}</td>
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
@@ -130,7 +138,7 @@ class ContentPackEntitiesList extends React.Component {
                     onClick={() => {
                       open();
                     }}>
-              Apply Parameter
+              Edit
             </Button>
             }
             <Button bsStyle="info"
@@ -148,8 +156,8 @@ class ContentPackEntitiesList extends React.Component {
 
   render() {
     const headers = this.props.readOnly ?
-      ['Title', 'Type', 'Description', 'Action'] :
-      ['Title', 'Type', 'Description', 'Applied Parameter', 'Action'];
+      ['Title', 'Type', 'Description', 'Origin', 'Action'] :
+      ['Title', 'Type', 'Description', 'Origin', 'Used Parameters', 'Action'];
 
     return (
       <div>
