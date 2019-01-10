@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
+import { get } from 'lodash';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -72,5 +73,5 @@ export default connect(XYPlot, {
 }, ({ currentQuery, currentUser, searches }) => ({
   currentQuery,
   currentUser: currentUser.currentUser,
-  effectiveTimerange: searches.result.forId(currentQuery.id).effectiveTimerange,
+  effectiveTimerange: get(searches.result.forId(currentQuery.id), ['effectiveTimerange'], {}),
 }));
