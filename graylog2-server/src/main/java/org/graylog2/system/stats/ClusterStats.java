@@ -73,9 +73,6 @@ public abstract class ClusterStats {
     public abstract Map<Extractor.Type, Long> extractorCountByType();
 
     @JsonProperty
-    public abstract long contentPackCount();
-
-    @JsonProperty
     public abstract LdapStats ldapStats();
 
     @JsonProperty
@@ -95,7 +92,6 @@ public abstract class ClusterStats {
                                       Map<String, Long> inputCountByType,
                                       long extractorCount,
                                       Map<Extractor.Type, Long> extractorCountByType,
-                                      long contentPackCount,
                                       LdapStats ldapStats,
                                       AlarmStats alarmStats) {
         return new AutoValue_ClusterStats(
@@ -113,7 +109,6 @@ public abstract class ClusterStats {
                 inputCountByType,
                 extractorCount,
                 extractorCountByType,
-                contentPackCount,
                 ldapStats,
                 alarmStats);
     }
