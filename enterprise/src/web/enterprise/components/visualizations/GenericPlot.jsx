@@ -5,6 +5,8 @@ import { merge } from 'lodash';
 import Plotly from 'enterprise/custom-plotly';
 import createPlotlyComponent from 'react-plotly.js/factory';
 
+import styles from '!style/useable!css!./GenericPlot.css';
+
 const Plot = createPlotlyComponent(Plotly);
 
 class GenericPlot extends React.Component {
@@ -19,8 +21,16 @@ class GenericPlot extends React.Component {
     onZoom: () => {},
   };
 
+  componentDidMount() {
+    styles.use();
+  }
+
+  componentWillUnmount() {
+    styles.unuse();
+  }
+
   _onRelayout = (axis) => {
-    if (!axis.autosize) {
+    if (!axis.autosize && axis['xaxis.range[0]'] && axis['xaxis.range[1]']) {
       const { onZoom } = this.props;
       const from = axis['xaxis.range[0]'];
       const to = axis['xaxis.range[1]'];
@@ -53,7 +63,7 @@ class GenericPlot extends React.Component {
 
     const style = { height: 'calc(100% - 10px)', width: '100%' };
 
-    const config = { displayModeBar: false };
+    const config = { displayModeBar: false, doubleClick: false };
 
     return (<Plot data={chartData}
                   useResizeHandler
