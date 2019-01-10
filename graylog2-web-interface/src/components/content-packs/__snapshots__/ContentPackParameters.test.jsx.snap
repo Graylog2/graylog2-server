@@ -17,6 +17,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
           className="btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
+          title="Edit Modal"
           type="button"
         >
           Create parameter
@@ -123,6 +124,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         Default Value
                       </th>
                       <th>
+                        Used
+                      </th>
+                      <th>
                         Action
                       </th>
                     </tr>
@@ -149,6 +153,15 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         test
                       </td>
                       <td>
+                        <span
+                          className="failure badge"
+                        >
+                          <i
+                            className="fa fa-times"
+                          />
+                        </span>
+                      </td>
+                      <td>
                         <div
                           className="btn-toolbar"
                           role="toolbar"
@@ -157,6 +170,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             className="btn btn-xs btn-primary"
                             disabled={false}
                             onClick={[Function]}
+                            title="Delete Parameter"
                             type="button"
                           >
                             Delete
@@ -165,6 +179,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             className="btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
+                            title="Edit Modal"
                             type="button"
                           >
                             Edit
@@ -284,7 +299,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         Description
                       </th>
                       <th>
-                        Applied Parameter
+                        Origin
+                      </th>
+                      <th>
+                        Used Parameters
                       </th>
                       <th>
                         Action
@@ -307,6 +325,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         
                       </td>
                       <td>
+                        <span>
+                          <i
+                            className="fa fa-archive contentPackEntity"
+                            title="Content Pack"
+                          />
+                        </span>
+                      </td>
+                      <td>
                         0
                       </td>
                       <td>
@@ -320,7 +346,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             onClick={[Function]}
                             type="button"
                           >
-                            Apply Parameter
+                            Edit
                           </button>
                           <button
                             className="btn btn-xs btn-info"
@@ -362,6 +388,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
           className="btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
+          title="Edit Modal"
           type="button"
         >
           Create parameter

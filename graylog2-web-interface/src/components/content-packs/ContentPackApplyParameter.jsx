@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { findIndex } from 'lodash';
 
 import { Row, Col, Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -35,11 +36,16 @@ class ContentPackApplyParameter extends React.Component {
   }
 
   _configKeyRowFormatter = (paramMap) => {
+    const enableClear = findIndex(this.props.appliedParameter,
+      { paramName: paramMap.paramName, configKey: paramMap.configKey, readOnly: true }) < 0;
+    const lastCol = enableClear ?
+      <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td> :
+      <td />;
     return (
       <tr key={paramMap.configKey}>
         <td>{paramMap.configKey}</td>
         <td>{paramMap.paramName}</td>
-        <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td>
+        { lastCol }
       </tr>
     );
   };

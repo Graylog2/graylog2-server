@@ -2,30 +2,42 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
+import Entity from 'logic/content-packs/Entity';
 
 import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 
 describe('<ContentPackApplyParameter />', () => {
-  const entity = {
-    id: '111-beef',
-    v: '1.0',
-    data: {
+  const entity = Entity.builder()
+    .id('111-beef')
+    .v('1.0')
+    .data({
       name: { '@type': 'string', '@value': 'Input' },
       title: { '@type': 'string', '@value': 'A good input' },
       configuration: {
         listen_address: { '@type': 'string', '@value': '1.2.3.4' },
         port: { '@type': 'integer', '@value': '23' },
       },
-    },
-  };
+    })
+    .build();
+
   const parameter = { title: 'Port', name: 'PORT', type: 'integer', default_value: '23' };
   const appliedParameter = { configKey: 'configuration.port', paramName: parameter.name };
+  const appliedParameterReadOnly = { configKey: 'configuration.port', paramName: parameter.name, readOnly: true };
 
   it('should render with full props', () => {
     const wrapper = renderer.create(<ContentPackApplyParameter
       entity={entity}
       parameters={[parameter]}
       appliedParameter={[appliedParameter]}
+    />);
+    expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('should render with readOnly', () => {
+    const wrapper = renderer.create(<ContentPackApplyParameter
+      entity={entity}
+      parameters={[parameter]}
+      appliedParameter={[appliedParameterReadOnly]}
     />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });

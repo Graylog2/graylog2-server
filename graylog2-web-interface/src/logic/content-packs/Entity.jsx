@@ -3,7 +3,7 @@ import ValueRefHelper from 'util/ValueRefHelper';
 import Constraint from './Constraint';
 
 export default class Entity {
-  constructor(v, type, id, data, constraintValues = []) {
+  constructor(v, type, id, data, fromServer = false, constraintValues = []) {
     const constraints = constraintValues.map((c) => {
       if (c instanceof Constraint) {
         return c;
@@ -17,12 +17,13 @@ export default class Entity {
       id,
       data,
       constraints,
+      fromServer,
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value, fromServer = true) {
     const { v, type, id, data, constraints } = value;
-    return new Entity(v, type, id, data, constraints);
+    return new Entity(v, type, id, data, fromServer, constraints);
   }
 
   get v() {
@@ -39,6 +40,10 @@ export default class Entity {
 
   get data() {
     return this._value.data;
+  }
+
+  get fromServer() {
+    return this._value.fromServer;
   }
 
   get constraints() {
@@ -76,6 +81,7 @@ export default class Entity {
       id,
       data,
       constraints,
+      fromServer,
     } = this._value;
     /* eslint-disable-next-line no-use-before-define */
     return new Builder(Map({
@@ -84,6 +90,7 @@ export default class Entity {
       id,
       data,
       constraints,
+      fromServer,
     }));
   }
 
@@ -136,6 +143,11 @@ class Builder {
     return this;
   }
 
+  fromServer(value) {
+    this.value = this.value.set('fromServer', value);
+    return this;
+  }
+
   constraints(value) {
     this.value = this.value.set('constraints', value);
     return this;
@@ -148,7 +160,8 @@ class Builder {
       id,
       data,
       constraints,
+      fromServer,
     } = this.value.toObject();
-    return new Entity(v, type, id, data, constraints);
+    return new Entity(v, type, id, data, fromServer, constraints);
   }
 }
