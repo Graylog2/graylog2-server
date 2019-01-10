@@ -5,6 +5,10 @@ import { Overlay } from 'react-overlays';
 
 import styles from './OverlayDropdown.css';
 
+const FilterProps = ({ children, style }) => React.Children.map(children,
+  child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }),
+);
+
 export default class OverlayDropdown extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
@@ -47,9 +51,11 @@ export default class OverlayDropdown extends React.Component {
                  rootClose
                  onHide={onToggle}
                  target={() => this.target}>
-          <ul className="dropdown-menu" style={Object.assign({}, listStyle, displayMenu)}>
-            {children}
-          </ul>
+          <FilterProps>
+            <ul className="dropdown-menu" style={Object.assign({}, listStyle, displayMenu)}>
+              {children}
+            </ul>
+          </FilterProps>
         </Overlay>
       </span>
     );

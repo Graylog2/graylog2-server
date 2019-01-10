@@ -79,6 +79,7 @@ class ValueActions extends React.Component {
       <React.Fragment>
         <OverlayDropdown show={this.state.open}
                          toggle={element}
+                         placement="right"
                          onToggle={this._onMenuToggle}
                          menuContainer={menuContainer}>
           <div className={style.bottomSpacer}>
