@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
+exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
 <div>
   <h2>
     Create parameter
@@ -111,6 +111,7 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
         <span>
           <select
             className="form-control"
+            disabled={false}
             id="type"
             label="Value Type"
             name="type"
@@ -168,6 +169,188 @@ exports[`<ContentPackEditParameters /> should render a parameter 1`] = `
             placeholder=""
             type="text"
             value=""
+          />
+          <span
+            className="help-block"
+          >
+            Give a default value if the parameter is not optional.
+          </span>
+        </span>
+      </div>
+    </fieldset>
+  </form>
+</div>
+`;
+
+exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
+<div>
+  <h2>
+    Edit parameter
+  </h2>
+  <br />
+  <form
+    className="parameter-form"
+    id="parameter-form"
+    onSubmit={[Function]}
+  >
+    <fieldset>
+      <div
+        className="form-group"
+      >
+        <label
+          className="control-label"
+          htmlFor="title"
+        >
+          Title
+        </label>
+        <span>
+          <input
+            className="form-control"
+            id="title"
+            label="Title"
+            maxLength={250}
+            name="title"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            type="text"
+            value="A parameter title"
+          />
+          <span
+            className="help-block"
+          >
+            Give a descriptive title for this content pack.
+          </span>
+        </span>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="control-label"
+          htmlFor="name"
+        >
+          Name
+        </label>
+        <span>
+          <input
+            className="form-control"
+            id="name"
+            label="Name"
+            maxLength={250}
+            name="name"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            type="text"
+            value="A parameter name"
+          />
+          <span
+            className="help-block"
+          >
+            This is used as the parameter reference and must not contain a space.
+          </span>
+        </span>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="control-label"
+          htmlFor="description"
+        >
+          Description
+        </label>
+        <span>
+          <input
+            className="form-control"
+            id="description"
+            label="Description"
+            maxLength={250}
+            name="description"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            type="text"
+            value="A parameter descriptions"
+          />
+          <span
+            className="help-block"
+          >
+            Give a description explaining what will be done with this parameter.
+          </span>
+        </span>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="control-label"
+          htmlFor="type"
+        >
+          Value Type
+        </label>
+        <span>
+          <select
+            className="form-control"
+            disabled={true}
+            id="type"
+            label="Value Type"
+            name="type"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            type="select"
+            value="string"
+          >
+            <option
+              value="string"
+            >
+              String
+            </option>
+            <option
+              value="integer"
+            >
+              Integer
+            </option>
+            <option
+              value="double"
+            >
+              Double
+            </option>
+            <option
+              value="boolean"
+            >
+              Boolean
+            </option>
+          </select>
+          <span
+            className="help-block"
+          >
+            Give the type of the parameter.
+          </span>
+        </span>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label
+          className="control-label"
+          htmlFor="default_value"
+        >
+          Default value
+        </label>
+        <span>
+          <input
+            className="form-control"
+            id="default_value"
+            label="Default value"
+            maxLength={250}
+            name="default_value"
+            onChange={[Function]}
+            placeholder=""
+            type="text"
+            value="test"
           />
           <span
             className="help-block"
@@ -292,6 +475,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         <span>
           <select
             className="form-control"
+            disabled={false}
             id="type"
             label="Value Type"
             name="type"
