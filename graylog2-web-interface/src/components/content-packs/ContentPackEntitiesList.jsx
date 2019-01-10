@@ -127,7 +127,7 @@ class ContentPackEntitiesList extends React.Component {
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
-        <td>{this._entityIcon(entity)}</td>
+        {!this.props.readOnly && <td>{this._entityIcon(entity)}</td>}
         {!this.props.readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
@@ -156,7 +156,7 @@ class ContentPackEntitiesList extends React.Component {
 
   render() {
     const headers = this.props.readOnly ?
-      ['Title', 'Type', 'Description', 'Origin', 'Action'] :
+      ['Title', 'Type', 'Description', 'Action'] :
       ['Title', 'Type', 'Description', 'Origin', 'Used Parameters', 'Action'];
 
     return (

@@ -184,9 +184,6 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         Description
                       </th>
                       <th>
-                        Origin
-                      </th>
-                      <th>
                         Action
                       </th>
                     </tr>
@@ -205,14 +202,6 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         className="bigColumns"
                       >
                         
-                      </td>
-                      <td>
-                        <span>
-                          <i
-                            className="fa fa-archive contentPackEntity"
-                            title="Content Pack"
-                          />
-                        </span>
                       </td>
                       <td>
                         <div
