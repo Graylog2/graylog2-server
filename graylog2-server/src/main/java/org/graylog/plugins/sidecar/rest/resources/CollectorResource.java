@@ -35,13 +35,14 @@ import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -76,6 +77,8 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CollectorResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorResource.class);
+
     private static final Pattern VALID_COLLECTOR_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_.-]+$");
     // exclude special characters from path ; * ? " < > | &
     private static final Pattern VALID_PATH_PATTERN = Pattern.compile("^[^;*?\"<>|&]+$");
@@ -192,9 +195,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @ApiOperation(value = "Create a new collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
     public Collector createCollector(@ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull Collector request) throws ValidationException {
+                                     @Valid @NotNull Collector request) throws BadRequestException {
         Collector collector = collectorService.fromRequest(request);
-        validateFromRequest(collector);
+        validateFromRequest(collector, "Cannot create new collector.");
         etagService.invalidateAll();
         return collectorService.save(collector);
     }
@@ -208,9 +211,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     public Collector updateCollector(@ApiParam(name = "id", required = true)
                                      @PathParam("id") String id,
                                      @ApiParam(name = "JSON body", required = true)
-                                     @Valid @NotNull Collector request) throws ValidationException {
+                                     @Valid @NotNull Collector request) throws BadRequestException {
         Collector collector = collectorService.fromRequest(id, request);
-        validateFromRequest(collector);
+        validateFromRequest(collector, "Cannot update existing collector.");
         etagService.invalidateAll();
         return collectorService.save(collector);
     }
@@ -223,13 +226,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     public Response copyCollector(@ApiParam(name = "id", required = true)
                                   @PathParam("id") String id,
                                   @ApiParam(name = "name", required = true)
-                                  @PathParam("name") String name) throws NotFoundException {
+                                  @PathParam("name") String name) throws NotFoundException, BadRequestException {
         etagService.invalidateAll();
         final Collector collector = collectorService.copy(id, name);
-        final ValidationResult validation = validate(collector);
-        if (validation.failed()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(validation).build();
-        }
+        validateFromRequest(collector, "Cannot copy collector.");
         collectorService.save(collector);
         return Response.accepted().build();
     }
@@ -330,10 +330,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         return VALID_PATH_PATTERN.matcher(path).matches();
     }
 
-    private void validateFromRequest(Collector toValidate) throws ValidationException {
+    private void validateFromRequest(Collector toValidate, String message) throws BadRequestException {
         final ValidationResult validation = validate(toValidate);
         if (validation.failed()) {
-            throw new ValidationException(validation.getErrors().toString());
+            final String errorMessage = message + " " + validation.getErrors().toString();
+            LOG.error(errorMessage);
+            throw new BadRequestException(errorMessage);
         }
     }
 
