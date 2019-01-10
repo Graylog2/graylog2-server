@@ -49,6 +49,8 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -85,6 +87,8 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ConfigurationResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationResource.class);
+
     // a file is created by the Sidecar based on the configuration name so we basically check for invalid paths here
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[^;*?\"<>|&]+$");
 
@@ -188,23 +192,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates configuration parameters")
     public ValidationResult validateConfiguration(@Valid @ApiParam("configuration") Configuration toValidate) {
-        final Optional<Configuration> configurationOptional;
-        final Configuration configuration;
-        final ValidationResult validation = new ValidationResult();
-
-        configurationOptional = Optional.ofNullable(configurationService.findByName(toValidate.name()));
-        if (configurationOptional.isPresent()) {
-            configuration = configurationOptional.get();
-            if (!configuration.id().equals(toValidate.id())) {
-                // a configuration exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
-            }
-        }
-        if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
-            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &" );
-        }
-
-        return validation;
+        return validate(toValidate);
     }
 
     @GET
@@ -298,6 +286,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                       @PathParam("id") String id,
                                       @PathParam("name") String name) throws NotFoundException {
         final Configuration configuration = configurationService.copyConfiguration(id, name);
+        validateFromRequest(configuration, "Cannot copy configuration.");
         configurationService.save(configuration);
         return Response.accepted().build();
     }
@@ -350,6 +339,35 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         return Response.accepted().build();
     }
 
+    private ValidationResult validate(Configuration toValidate) {
+        final Optional<Configuration> configurationOptional;
+        final Configuration configuration;
+        final ValidationResult validation = new ValidationResult();
+
+        configurationOptional = Optional.ofNullable(configurationService.findByName(toValidate.name()));
+        if (configurationOptional.isPresent()) {
+            configuration = configurationOptional.get();
+            if (!configuration.id().equals(toValidate.id())) {
+                // a configuration exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
+            }
+        }
+        if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
+            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &" );
+        }
+
+        return validation;
+    }
+
+    private void validateFromRequest(Configuration toValidate, String message) throws BadRequestException {
+        final ValidationResult validation = validate(toValidate);
+        if (validation.failed()) {
+            final String errorMessage = message + " " + validation.getErrors().toString();
+            LOG.error(errorMessage);
+            throw new BadRequestException(errorMessage);
+        }
+    }
+
     private boolean isConfigurationInUse(String configurationId) {
         return sidecarService.all().stream().anyMatch(sidecar -> isConfigurationAssignedToSidecar(configurationId, sidecar));
     }
@@ -378,6 +396,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         } else {
             configuration = configurationService.fromRequest(id, request);
         }
+        validateFromRequest(configuration, "Configuration validation failed:");
         return configurationService.save(configuration);
     }
 }
