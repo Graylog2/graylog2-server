@@ -4,7 +4,6 @@ import React from 'react';
 import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
 import { SearchForm, DataTable } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import Entity from 'logic/content-packs/Entity';
 
 import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
