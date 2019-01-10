@@ -92,7 +92,7 @@ const EditContentPackPage = createReactClass({
       const paramMap = Object.keys(configPaths).filter((path) => {
         return configPaths[path].isValueParameter();
       }).map((path) => {
-        return { configKey: path, paramName: configPaths[path].getValue() };
+        return { configKey: path, paramName: configPaths[path].getValue(), readOnly: true };
       });
       const newResult = result;
       if (paramMap.length > 0) {

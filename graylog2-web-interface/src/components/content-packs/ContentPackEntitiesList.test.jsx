@@ -10,7 +10,7 @@ import Entity from 'logic/content-packs/Entity';
 describe('<ContentPackEntitiesList />', () => {
   const entity1 = Entity.builder()
     .id('111-beef')
-    .type({ name: 'Input', version: '1'})
+    .type({ name: 'Input', version: '1' })
     .v('1.0')
     .data({
       name: { '@type': 'string', '@value': 'Input' },
