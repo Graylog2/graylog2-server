@@ -31,17 +31,17 @@ import java.util.List;
 @AutoValue
 @JsonAutoDetect
 public abstract class RegistrationResponse {
-    @JsonProperty
-    public abstract SidecarRegistrationConfiguration collectorRegistrationConfiguration();
+    @JsonProperty("configuration")
+    public abstract SidecarRegistrationConfiguration sidecarRegistrationConfiguration();
 
-    @JsonProperty
+    @JsonProperty("configuration_override")
     public abstract boolean configurationOverride();
 
-    @JsonProperty
+    @JsonProperty("actions")
     @Nullable
     public abstract List<CollectorAction> actions();
 
-    @JsonProperty
+    @JsonProperty("assignments")
     @Nullable
     public abstract List<ConfigurationAssignment> assignments();
 
