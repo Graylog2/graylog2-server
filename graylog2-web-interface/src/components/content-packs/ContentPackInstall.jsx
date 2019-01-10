@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import ContentPack from 'logic/content-packs/ContentPack';
+
 import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
@@ -104,6 +106,8 @@ class ContentPackInstall extends React.Component {
     const parameterInput = this.props.contentPack.parameters.map((parameter) => {
       return this.renderParameter(parameter);
     });
+    const contentPack = ContentPack.fromJSON(this.props.contentPack);
+
     return (<div>
       <Row>
         <Col smOffset={1} sm={10}>
@@ -133,7 +137,7 @@ class ContentPackInstall extends React.Component {
       </Row>}
       <Row>
         <Col smOffset={1} sm={10}>
-          <ContentPackEntitiesList contentPack={this.props.contentPack} readOnly />
+          <ContentPackEntitiesList contentPack={contentPack} readOnly />
         </Col>
       </Row>
     </div>);
