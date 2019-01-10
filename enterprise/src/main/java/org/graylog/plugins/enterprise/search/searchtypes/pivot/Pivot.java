@@ -11,6 +11,7 @@ import org.graylog.plugins.enterprise.search.Filter;
 import org.graylog.plugins.enterprise.search.SearchType;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -39,6 +40,9 @@ public abstract class Pivot implements SearchType {
     public abstract List<SeriesSpec> series();
 
     @JsonProperty
+    public abstract List<SortSpec> sort();
+
+    @JsonProperty
     public abstract boolean rollup();
 
     @Nullable
@@ -54,7 +58,8 @@ public abstract class Pivot implements SearchType {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
                 .rowGroups(of())
-                .columnGroups(of());
+                .columnGroups(of())
+                .sort(of());
     }
 
     @AutoValue.Builder
@@ -62,7 +67,8 @@ public abstract class Pivot implements SearchType {
 
         @JsonCreator
         public static Builder createDefault() {
-            return builder();
+            return builder()
+                    .sort(Collections.emptyList());
         }
 
         @JsonProperty
@@ -79,6 +85,9 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder series(List<SeriesSpec> series);
+
+        @JsonProperty
+        public abstract Builder sort(List<SortSpec> sort);
 
         @JsonProperty
         public abstract Builder rollup(boolean rollup);

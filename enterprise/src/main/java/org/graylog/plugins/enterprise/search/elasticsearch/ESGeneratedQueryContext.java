@@ -16,6 +16,8 @@ import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.errors.SearchError;
 import org.graylog.plugins.enterprise.search.searchtypes.aggregation.AggregationSpec;
+import org.graylog.plugins.enterprise.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.enterprise.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.enterprise.search.util.UniqueNamer;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
@@ -89,8 +91,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         return elasticsearchBackend.generateFilterClause(filter, job, query, results);
     }
 
-    public String filterName(SearchType searchType) {
-        return "filtered-" + searchType.id();
+    public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {
+        return pivot.id() + "-series-" + seriesSpec.literal();
     }
 
     public void addAggregation(AggregationBuilder builder, SearchType searchType) {

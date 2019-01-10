@@ -22,7 +22,7 @@ const formatPivot = (pivot) => {
   };
 };
 
-export default ({ columnPivots, rowPivots, series, rollup }) => [{
+export default ({ columnPivots, rowPivots, series, rollup, sort }) => [{
   type: 'pivot',
   config: {
     id: 'vals',
@@ -30,5 +30,6 @@ export default ({ columnPivots, rowPivots, series, rollup }) => [{
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
     series: series.map(s => Object.assign({ id: s.effectiveName }, Series.parseSeries(s.function))),
+    sort: sort,
   },
 }];

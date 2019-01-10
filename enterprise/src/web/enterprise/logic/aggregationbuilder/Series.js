@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+ import { get } from 'lodash';
 import * as Immutable from 'immutable';
 
 import SeriesConfig from './SeriesConfig';

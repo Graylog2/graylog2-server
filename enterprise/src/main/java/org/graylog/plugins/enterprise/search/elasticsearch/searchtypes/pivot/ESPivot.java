@@ -128,7 +128,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
         return EntryStream.of(pivot.series())
                 .mapKeyValue((integer, seriesSpec) -> {
-                    final String seriesName = pivot.id() + "-" + "series-" + integer;
+                    final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     return seriesHandlers.get(seriesSpec.type()).createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
                 })

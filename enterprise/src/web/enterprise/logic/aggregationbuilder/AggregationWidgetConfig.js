@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import Pivot from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
+import SortConfig from './SortConfig';
 
 export default class AggregationWidgetConfig {
   constructor(columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig) {
@@ -86,7 +87,7 @@ export default class AggregationWidgetConfig {
       .columnPivots(column_pivots.map(Pivot.fromJSON))
       .rowPivots(row_pivots.map(Pivot.fromJSON))
       .series(series.map(Series.fromJSON))
-      .sort(sort)
+      .sort(sort.map(SortConfig.fromJSON))
       .visualization(visualization)
       .rollup(rollup)
       // eslint-disable-next-line camelcase
@@ -130,6 +131,9 @@ class Builder {
 
   build() {
     const { rowPivots, columnPivots, series, sort, visualization, rollup, visualizationConfig } = this.value.toObject();
-    return new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig);
+
+    const availableSorts = [].concat(rowPivots, columnPivots, series);
+    const filteredSorts = sort.filter(s => availableSorts.find(availableSort => (s.field === availableSort.function || s.field === availableSort.field)));
+    return new AggregationWidgetConfig(columnPivots, rowPivots, series, filteredSorts, visualization, rollup, visualizationConfig);
   }
 }

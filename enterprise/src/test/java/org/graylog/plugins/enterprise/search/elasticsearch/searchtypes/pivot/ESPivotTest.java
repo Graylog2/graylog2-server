@@ -232,6 +232,7 @@ public class ESPivotTest {
         when(pivot.columnGroups()).thenReturn(ImmutableList.of(columnPivot1, columnPivot2));
         when(pivot.series()).thenReturn(Collections.singletonList(count));
         when(pivot.rollup()).thenReturn(false);
+        when(queryContext.seriesName(any(), any())).thenCallRealMethod();
 
         this.esPivot.doGenerateQueryPart(job, query, pivot, queryContext);
 
@@ -249,14 +250,14 @@ public class ESPivotTest {
                 .isEqualTo("Values{type=values, field=controller, limit=10}");
         extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1.columnPivot2")
                 .isEqualTo("Values{type=values, field=action, limit=10}");
-        extractAggregation(context, "rowPivot1.rowPivot2.dummypivot-series-0")
+        extractAggregation(context, "rowPivot1.rowPivot2.dummypivot-series-count()")
                 .isEqualTo("Count{type=count, id=count(), field=null}");
-        extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1.columnPivot2.dummypivot-series-0")
+        extractAggregation(context, "rowPivot1.rowPivot2.columnPivot1.columnPivot2.dummypivot-series-count()")
                 .isEqualTo("Count{type=count, id=count(), field=null}");
     }
 
     private AbstractCharSequenceAssert<?, String> extractAggregation(DocumentContext context, String path) {
-        final String fullPath = Stream.of(path.split("\\.")).map(s -> ".aggregations." + s).reduce("$", (s1, s2) -> s1 + s2) + ".filter.exists.field";
+        final String fullPath = Stream.of(path.split("\\.")).map(s -> "['aggregations']['" + s + "']").reduce("$", (s1, s2) -> s1 + s2) + "['filter']['exists']['field']";
         return JsonPathAssert.assertThat(context).jsonPathAsString(fullPath);
     }
 }

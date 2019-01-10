@@ -1,14 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
+import * as Immutable from 'immutable';
 
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import { defaultCompare } from 'enterprise/logic/DefaultCompare';
+
+import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
+import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
+
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
 import ColumnPivotSelect from './ColumnPivotSelect';
+import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import { PivotList } from './AggregationBuilderPropTypes';
@@ -47,32 +53,38 @@ export default class AggregationControls extends React.Component {
   }
 
   _onColumnPivotChange = (columnPivots) => {
-    this.setState(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }));
   };
 
   _onRowPivotChange = (rowPivots) => {
-    this.setState(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }));
   };
 
   _onSeriesChange = (series) => {
-    this.setState(state => ({ config: state.config.toBuilder().series(series).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().series(series).build() }));
   };
 
   _onSortChange = (sort) => {
-    this.setState(state => ({ config: state.config.toBuilder().sort(sort.split(',')).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(sort).build() }));
+  };
+
+  _onSortDirectionChange = (direction) => {
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(state.config.sort.map(sort => sort.toBuilder().direction(direction).build())).build() }));
   };
 
   _onRollupChange = (checked) => {
-    this.setState(state => ({ config: state.config.toBuilder().rollup(checked).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(checked).build() }));
   };
 
   _onVisualizationChange = (visualization) => {
-    this.setState(state => ({ config: state.config.toBuilder().visualization(visualization).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).build() }));
   };
 
   _onVisualizationConfigChange = (visualizationConfig) => {
-    this.setState(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }), this._propagateState);
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
   };
+
+  _setAndPropagate = fn => this.setState(fn, this._propagateState);
 
   _propagateState() {
     this.props.onChange(this.state.config);
@@ -81,21 +93,22 @@ export default class AggregationControls extends React.Component {
   render() {
     const { children, fields } = this.props;
     const { columnPivots, rowPivots, series, sort, visualization, rollup } = this.state.config;
+
+    const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
+
     const formattedFields = fields
       .map(fieldType => fieldType.name)
       .valueSeq()
       .toJS()
       .sort(defaultCompare);
-    const currentlyUsedFields = [].concat(rowPivots, columnPivots, series)
-      .sort(defaultCompare)
-      .map(v => ({ label: v, value: v }));
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
+
     const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     return (
       <span>
         <Row>
-          <Col md={3} style={{ paddingRight: '2px' }}>
+          <Col md={2} style={{ paddingRight: '2px' }}>
             <DescriptionBox description="Visualization Type">
               <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
             </DescriptionBox>
@@ -112,9 +125,16 @@ export default class AggregationControls extends React.Component {
               <ColumnPivotSelect fields={formattedFieldsOptions} columnPivots={columnPivots} onChange={this._onColumnPivotChange} />
             </DescriptionBox>
           </Col>
-          <Col md={2} style={{ paddingLeft: '2px' }}>
+          <Col md={2} style={{ paddingLeft: '2px', paddingRight: '2px' }}>
             <DescriptionBox description="Sorting">
-              <SortSelect fields={currentlyUsedFields} sort={sort} onChange={this._onSortChange} />
+              <SortSelect pivots={rowPivots} series={series} sort={sort} onChange={this._onSortChange} />
+            </DescriptionBox>
+          </Col>
+          <Col md={2} style={{ paddingLeft: '2px' }}>
+            <DescriptionBox description="Direction">
+              <SortDirectionSelect disabled={!sort || sort.length === 0}
+                                   direction={sortDirection && sortDirection.direction}
+                                   onChange={this._onSortDirectionChange} />
             </DescriptionBox>
           </Col>
         </Row>

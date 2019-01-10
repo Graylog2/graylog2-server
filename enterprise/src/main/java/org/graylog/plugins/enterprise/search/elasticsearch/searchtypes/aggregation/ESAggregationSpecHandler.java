@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.aggregat
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
+import one.util.streamex.StreamEx;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.searchtypes.aggregation.AggregationSpec;
@@ -10,6 +11,7 @@ import org.graylog.plugins.enterprise.search.searchtypes.aggregation.Aggregation
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Convenience interface to default to common types.
@@ -26,4 +28,15 @@ public interface ESAggregationSpecHandler<SPEC_TYPE extends AggregationSpec, AGG
 
     // TODO this is a bit ugly and with a bit work could possibly be done generically
     Aggregation extractAggregationFromResult(AggregationSpec spec, MetricAggregation aggregations, ESGeneratedQueryContext queryContext);
+
+    default Stream<AggregationBuilder> resolveAggregationHandlers(SPEC_TYPE aggregationSpec,
+                                                                            ESAggregation searchTypeHandler,
+                                                                            ESGeneratedQueryContext queryContext) {
+        return StreamEx.of(aggregationSpec.subAggregations().iterator())
+                .map(spec -> searchTypeHandler
+                        .handlerForType(spec.type())
+                        .createAggregation(queryContext.nextName(), spec, searchTypeHandler, queryContext))
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
 }

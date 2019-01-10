@@ -4,7 +4,6 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
-import one.util.streamex.StreamEx;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
@@ -44,12 +43,7 @@ public class ESTimeHistogramHandler implements ESAggregationSpecHandler<TimeHist
 
         queryContext.recordAggregationType(aggregationSpec, name, DateHistogramAggregation.class);
         // for each sub-spec, simply add it to the elasticsearch representation, collect the generated aggregations and return the builder
-        return Optional.of(StreamEx.of(aggregationSpec.subAggregations().iterator())
-                .map(spec -> searchTypeHandler
-                        .handlerForType(spec.type())
-                        .createAggregation(queryContext.nextName(), spec, searchTypeHandler, queryContext))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return Optional.of(resolveAggregationHandlers(aggregationSpec, searchTypeHandler, queryContext)
                 .reduce(dateHistogram, AggregationBuilder::subAggregation)
         );
     }

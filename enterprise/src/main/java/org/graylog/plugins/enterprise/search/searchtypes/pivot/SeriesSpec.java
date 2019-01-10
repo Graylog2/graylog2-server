@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
@@ -27,6 +28,13 @@ public interface SeriesSpec extends PivotSpec {
     @Nullable
     String id();
 
+    @JsonProperty
+    String field();
+
+    default String literal() {
+        return type() + "(" + Strings.nullToEmpty(field()) + ")";
+    }
+
     @JsonAutoDetect
     class Fallback implements SeriesSpec {
         @JsonProperty
@@ -34,6 +42,10 @@ public interface SeriesSpec extends PivotSpec {
 
         @JsonProperty
         private String id;
+
+        @JsonProperty
+        private String field;
+
         private Map<String, Object> props = Maps.newHashMap();
 
         @Override
@@ -46,6 +58,9 @@ public interface SeriesSpec extends PivotSpec {
         public String id() {
             return id;
         }
+
+        @Override
+        public String field() { return field; }
 
         @JsonAnySetter
         public void setProperties(String key, Object value) {

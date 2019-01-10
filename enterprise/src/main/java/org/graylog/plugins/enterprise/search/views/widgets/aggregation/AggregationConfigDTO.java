@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.enterprise.search.views.WidgetConfigDTO;
+import org.graylog.plugins.enterprise.search.views.widgets.aggregation.sort.SortConfigDTO;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -34,7 +35,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     public abstract List<SeriesDTO> series();
 
     @JsonProperty(FIELD_SORT)
-    public abstract List<String> sort();
+    public abstract List<SortConfigDTO> sort();
 
     @JsonProperty(FIELD_VISUALIZATION)
     public abstract String visualization();
@@ -58,7 +59,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         public abstract Builder series(List<SeriesDTO> series);
 
         @JsonProperty(FIELD_SORT)
-        public abstract Builder sort(List<String> sort);
+        public abstract Builder sort(List<SortConfigDTO> sort);
 
         @JsonProperty(FIELD_VISUALIZATION)
         public abstract Builder visualization(String visualization);

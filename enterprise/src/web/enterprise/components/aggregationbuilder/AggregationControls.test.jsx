@@ -41,7 +41,8 @@ describe('AggregationControls', () => {
     expect(wrapper.find('div.description').at(1).text()).toContain('Rows');
     expect(wrapper.find('div.description').at(2).text()).toContain('Columns');
     expect(wrapper.find('div.description').at(3).text()).toContain('Sorting');
-    expect(wrapper.find('div.description').at(4).text()).toContain('Metrics');
+    expect(wrapper.find('div.description').at(4).text()).toContain('Direction');
+    expect(wrapper.find('div.description').at(5).text()).toContain('Metrics');
   });
 
   it('should open additional options for column pivots', () => {

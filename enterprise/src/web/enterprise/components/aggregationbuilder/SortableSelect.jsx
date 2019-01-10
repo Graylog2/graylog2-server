@@ -14,7 +14,9 @@ const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
   onChange(newItems.join(','));
 };
 
-const SortableSelect = ({ onChange, value, valueComponent, sortableValueList, ...remainingProps }) => {
+const defaultValueTransformer = values => values.map(({ field }) => field).join(',');
+
+const SortableSelect = ({ onChange, value, valueComponent, sortableValueList, valueTransformer, ...remainingProps }) => {
   const ValueListComponent = sortableValueList;
   // eslint-disable-next-line react/prop-types
   const valueList = ({ children, ...rest }) => (
@@ -26,7 +28,7 @@ const SortableSelect = ({ onChange, value, valueComponent, sortableValueList, ..
       {children}
     </ValueListComponent>
   );
-  const values = value.map(({ field }) => field).join(',');
+  const values = valueTransformer(value);
   return (
     <Select
       multi
@@ -44,10 +46,12 @@ SortableSelect.propTypes = {
   sortableValueList: PropTypes.func,
   value: PropTypes.any.isRequired,
   valueComponent: PropTypes.func.isRequired,
+  valueTransformer: PropTypes.func,
 };
 
 SortableSelect.defaultProps = {
   sortableValueList: SortableValueList,
+  valueTransformer: defaultValueTransformer,
 };
 
 export default SortableSelect;

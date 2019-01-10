@@ -9,7 +9,10 @@ import AggregationBuilder from 'enterprise/components/aggregationbuilder/Aggrega
 
 import BarVisualization from 'enterprise/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'enterprise/components/visualizations/line/LineVisualization';
+import NumberVisualization from 'enterprise/components/visualizations/number/NumberVisualization';
 import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
+import ScatterVisualization from 'enterprise/components/visualizations/scatter/ScatterVisualization';
+import WorldMapVisualization from 'enterprise/components/visualizations/worldmap/WorldMapVisualization';
 
 import PivotConfigGenerator from 'enterprise/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'enterprise/logic/searchtypes/pivot/PivotHandler';
@@ -20,9 +23,7 @@ import Widget from 'enterprise/logic/widgets/Widget';
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
 import DataTable from 'enterprise/components/datatable/DataTable';
-import WorldMapVisualization from 'enterprise/components/visualizations/worldmap/WorldMapVisualization';
 import FieldStatisticsHandler from 'enterprise/logic/fieldactions/FieldStatisticsHandler';
-import NumberVisualization from 'enterprise/components/visualizations/number/NumberVisualization';
 import ExcludeFromQueryHandler from 'enterprise/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'enterprise/components/visualizations/Series';
 import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
@@ -33,19 +34,26 @@ import {
   ViewManagementPage,
 } from 'enterprise/pages';
 
-import ScatterVisualization from 'enterprise/components/visualizations/scatter/ScatterVisualization';
+
 import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
+
 import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
 import CreateParameterDialog from 'enterprise/logic/creatoractions/CreateParameterDialog';
 import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
 import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
+
 import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+
 import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
 import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'enterprise/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'enterprise/logic/views/sharing/SpecificUsers';
+
+import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
+import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
+import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
 
 import * as Permissions from './Permissions';
 
@@ -60,6 +68,9 @@ VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualiz
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
 ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
+
+SortConfig.registerSubtype(PivotSortConfig.type, PivotSortConfig);
+SortConfig.registerSubtype(SeriesSortConfig.type, SeriesSortConfig);
 
 export default {
   pages: {

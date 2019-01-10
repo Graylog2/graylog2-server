@@ -4,7 +4,6 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
-import one.util.streamex.StreamEx;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
@@ -38,12 +37,7 @@ public class ESValuesHandler implements ESAggregationSpecHandler<ValuesGroup, Te
 
         queryContext.recordAggregationType(aggregationSpec, name, TermsAggregation.class);
 
-        return Optional.of(StreamEx.of(aggregationSpec.subAggregations().iterator())
-                .map(spec -> searchTypeHandler
-                        .handlerForType(spec.type())
-                        .createAggregation(queryContext.nextName(), spec, searchTypeHandler, queryContext))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return Optional.of(resolveAggregationHandlers(aggregationSpec, searchTypeHandler, queryContext)
                 .reduce(terms, AggregationBuilder::subAggregation)
         );
     }
@@ -57,13 +51,11 @@ public class ESValuesHandler implements ESAggregationSpecHandler<ValuesGroup, Te
     @Override
     public ValuesGroup.Result doHandleResult(ValuesGroup aggregationSpec, SearchResult queryResult, TermsAggregation termsAggregation, ESAggregation searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext) {
         final List<ValuesGroup.Bucket> buckets = termsAggregation.getBuckets().stream()
-                .map(bucket -> {
-                    return ValuesGroup.Bucket.builder()
-                            .key(bucket.getKey())
-                            .metrics(subAggregationConverter.convert(aggregationSpec.metrics(), searchTypeHandler, esGeneratedQueryContext, queryResult, bucket))
-                            .groups(subAggregationConverter.convert(aggregationSpec.groups(), searchTypeHandler, esGeneratedQueryContext, queryResult, bucket))
-                            .build();
-                })
+                .map(bucket -> ValuesGroup.Bucket.builder()
+                        .key(bucket.getKey())
+                        .metrics(subAggregationConverter.convert(aggregationSpec.metrics(), searchTypeHandler, esGeneratedQueryContext, queryResult, bucket))
+                        .groups(subAggregationConverter.convert(aggregationSpec.groups(), searchTypeHandler, esGeneratedQueryContext, queryResult, bucket))
+                        .build())
                 .collect(Collectors.toList());
         return ValuesGroup.Result.create(buckets);
     }
