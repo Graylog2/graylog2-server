@@ -161,7 +161,6 @@ export default {
     {
       type: 'execute-view-with-value',
       title: 'Insert into view',
-      condition: ({ field }) => !isFunction(field),
       component: ExecuteViewWithValue,
     }
   ],
