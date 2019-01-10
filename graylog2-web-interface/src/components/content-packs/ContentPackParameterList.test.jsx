@@ -88,13 +88,17 @@ describe('<ContentPackParameterList />', () => {
       type: 'string',
       default_value: 'test',
     }];
+    const appliedParameter = {
+      'dead-beef': [{ paramName: 'PARAM', configKey: 'title' }],
+    };
     const contentPack = ContentPack.builder()
       .parameters(parameters)
       .entities([entity])
       .build();
 
     const wrapper = mount(<ContentPackParameterList contentPack={contentPack}
-                                                    onDeleteParameter={deleteFn} />);
+                                                    onDeleteParameter={deleteFn}
+                                                    appliedParameter={appliedParameter} />);
     wrapper.find('button[children="Delete"]').simulate('click');
     expect(deleteFn.mock.calls.length).toBe(0);
   });

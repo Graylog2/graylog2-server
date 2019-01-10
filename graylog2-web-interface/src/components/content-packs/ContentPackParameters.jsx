@@ -115,7 +115,7 @@ class ContentPackParameters extends React.Component {
             <ContentPackParameterList contentPack={this.props.contentPack}
                                       onAddParameter={this._addNewParameter}
                                       onDeleteParameter={this._openConfirmModal}
-            />
+                                      appliedParameter={this.props.appliedParameter} />
             {this._confirmationModal()}
           </Col>
         </Row>
