@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { findIndex } from 'lodash';
 
 import { Button, Modal, ButtonToolbar, Badge } from 'react-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { DataTable, SearchForm } from 'components/common';
 
 import ObjectUtils from 'util/ObjectUtils';
-import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';
@@ -18,12 +18,14 @@ class ContentPackParameterList extends React.Component {
     readOnly: PropTypes.bool,
     onDeleteParameter: PropTypes.func,
     onAddParameter: PropTypes.func,
+    appliedParameter: PropTypes.object,
   };
 
   static defaultProps = {
     readOnly: false,
     onDeleteParameter: () => {},
     onAddParameter: () => {},
+    appliedParameter: {},
   };
 
   constructor(props) {
@@ -40,21 +42,15 @@ class ContentPackParameterList extends React.Component {
   }
 
   _parameterApplied = (paramName) => {
-    const { contentPack } = this.props;
-    if (!contentPack || !contentPack.entities) {
-      return false;
+    const entityIds = Object.keys(this.props.appliedParameter);
+    /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
+    for (const i in entityIds) {
+      const params = this.props.appliedParameter[entityIds[i]];
+      if (findIndex(params, { paramName: paramName }) >= 0) {
+        return true;
+      }
     }
-    return contentPack.entities.reduce((result, entity) => {
-      const entityData = new ValueReferenceData(entity.data);
-      const configPaths = entityData.getPaths();
-
-      const parameterNames = Object.keys(configPaths).filter((path) => {
-        return configPaths[path].isValueParameter();
-      }).map((path) => {
-        return configPaths[path].getValue();
-      });
-      return result.concat(parameterNames);
-    }, []).includes(paramName);
+    return false;
   };
 
   _parameterRowFormatter = (parameter) => {
