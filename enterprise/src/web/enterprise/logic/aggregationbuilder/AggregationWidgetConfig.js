@@ -134,6 +134,7 @@ class Builder {
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
     const filteredSorts = sort.filter(s => availableSorts.find(availableSort => (s.field === availableSort.function || s.field === availableSort.field)));
-    return new AggregationWidgetConfig(columnPivots, rowPivots, series, filteredSorts, visualization, rollup, visualizationConfig);
+    const computedRollup = columnPivots.length > 0 ? rollup : true;
+    return new AggregationWidgetConfig(columnPivots, rowPivots, series, filteredSorts, visualization, computedRollup, visualizationConfig);
   }
 }
