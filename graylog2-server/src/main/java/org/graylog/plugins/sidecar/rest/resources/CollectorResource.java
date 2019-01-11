@@ -273,12 +273,25 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         final Collector collector;
         final ValidationResult validation = new ValidationResult();
 
-        if (!validateCollectorName(toValidate.name())) {
-            validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+        if (toValidate.name().isEmpty()) {
+            validation.addError("name", "Collector name cannot be empty.");
+        } else {
+
+            if (!validateCollectorName(toValidate.name())) {
+                validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+            }
         }
 
-        if (!validatePath(toValidate.executablePath())) {
-            validation.addError("executable_path", "Collector binary path can not contain the following characters: ; * ? \" < > | &");
+        if (toValidate.executablePath().isEmpty()) {
+            validation.addError("executable_path", "Collector binary path cannot be empty.");
+        } else {
+            if (!validatePath(toValidate.executablePath())) {
+                validation.addError("executable_path", "Collector binary path cannot contain the following characters: ; * ? \" < > | &");
+            }
+        }
+
+        if (toValidate.defaultTemplate().isEmpty()) {
+            validation.addError("default_template", "Collector default template cannot be empty.");
         }
 
         if (toValidate.nodeOperatingSystem() != null) {
