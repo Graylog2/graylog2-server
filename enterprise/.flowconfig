@@ -12,4 +12,5 @@ flow-typed
 [options]
 emoji=true
 module.name_mapper='^enterprise' -> '<PROJECT_ROOT>/src/web/enterprise'
-
+module.name_mapper='^!style/useable!.*\.css$' -> '<PROJECT_ROOT>/src/web/flow/css-useable-modules.js'
+module.name_mapper='.*\.css$' -> '<PROJECT_ROOT>/src/web/flow/css-modules.js'
