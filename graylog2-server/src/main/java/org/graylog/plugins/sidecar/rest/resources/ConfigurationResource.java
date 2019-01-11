@@ -352,8 +352,26 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
             }
         }
-        if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
-            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &" );
+
+        if (toValidate.name().isEmpty()) {
+            validation.addError("name", "Configuration name cannot be empty.");
+        } else {
+
+            if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
+                validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
+            }
+        }
+
+        if (toValidate.collectorId().isEmpty()) {
+            validation.addError("collector_id", "Associated collector ID cannot be empty.");
+        }
+
+        if (toValidate.color().isEmpty()) {
+            validation.addError("color", "Collector color cannot be empty.");
+        }
+
+        if (toValidate.template().isEmpty()) {
+            validation.addError("template", "Collector template cannot be empty.");
         }
 
         return validation;
