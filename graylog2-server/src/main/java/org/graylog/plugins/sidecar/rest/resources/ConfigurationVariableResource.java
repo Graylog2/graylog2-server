@@ -186,6 +186,11 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         if (configurationVariableService.hasConflict(confVar)) {
             validationResult.addError("name", "A variable with that name already exists.");
         }
+
+        if (confVar.content().isEmpty()) {
+            validationResult.addError("content", "Variable content can not be empty.");
+        }
+
         return validationResult;
     }
 
