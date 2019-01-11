@@ -355,11 +355,8 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
         if (toValidate.name().isEmpty()) {
             validation.addError("name", "Configuration name cannot be empty.");
-        } else {
-
-            if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
+        } else if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
                 validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
-            }
         }
 
         if (toValidate.collectorId().isEmpty()) {
