@@ -195,9 +195,7 @@ const ConfigurationForm = createReactClass({
 
   _formatValidationMessage(fieldName, defaultText) {
     if (this.state.validation_errors[fieldName]) {
-      return (<div>
-        <span><b>{this.state.validation_errors[fieldName][0]}</b></span>
-      </div>);
+      return <span>{this.state.validation_errors[fieldName][0]}</span>;
     }
     return <span>{defaultText}</span>;
   },

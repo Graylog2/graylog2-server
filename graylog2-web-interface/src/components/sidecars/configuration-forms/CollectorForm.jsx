@@ -81,9 +81,7 @@ const CollectorForm = createReactClass({
   },
 
   _validateFormData(nextFormData) {
-    if (
-      nextFormData.name &&
-      nextFormData.node_operating_system) {
+    if (nextFormData.name && nextFormData.node_operating_system) {
       CollectorsActions.validate(nextFormData).then(validation => (
         this.setState({ validation_errors: validation.errors, error: validation.failed })
       ));
@@ -128,9 +126,7 @@ const CollectorForm = createReactClass({
 
   _formatValidationMessage(fieldName, defaultText) {
     if (this.state.validation_errors[fieldName]) {
-      return (<div>
-        <span><b>{this.state.validation_errors[fieldName][0]}</b></span>
-      </div>);
+      return <span>{this.state.validation_errors[fieldName][0]}</span>;
     }
     return <span>{defaultText}</span>;
   },
