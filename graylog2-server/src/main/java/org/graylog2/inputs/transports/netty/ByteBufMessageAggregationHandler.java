@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.netflow.transport;
+package org.graylog2.inputs.transports.netty;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -22,39 +22,33 @@ import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.socket.DatagramPacket;
-import org.graylog.plugins.netflow.codecs.RemoteAddressCodecAggregator;
-import org.graylog2.inputs.transports.netty.SenderEnvelope;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
+public class ByteBufMessageAggregationHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private static final Logger LOG = LoggerFactory.getLogger(ByteBufMessageAggregationHandler.class);
 
-public class NetflowMessageAggregationHandler extends SimpleChannelInboundHandler<DatagramPacket> {
-    private static final Logger LOG = LoggerFactory.getLogger(NetflowMessageAggregationHandler.class);
-
-    private final RemoteAddressCodecAggregator aggregator;
+    private final CodecAggregator aggregator;
     private final Timer aggregationTimer;
     private final Meter invalidChunksMeter;
 
-    public NetflowMessageAggregationHandler(RemoteAddressCodecAggregator aggregator, MetricRegistry metricRegistry) {
+    public ByteBufMessageAggregationHandler(CodecAggregator aggregator, MetricRegistry metricRegistry) {
         this.aggregator = aggregator;
         aggregationTimer = metricRegistry.timer("aggregationTime");
         invalidChunksMeter = metricRegistry.meter("invalidMessages");
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-        final InetSocketAddress remoteAddress = msg.sender();
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         final CodecAggregator.Result result;
         try (Timer.Context ignored = aggregationTimer.time()) {
-            result = aggregator.addChunk(msg.content(), remoteAddress);
+            result = aggregator.addChunk(msg);
         }
         final ByteBuf completeMessage = result.getMessage();
         if (completeMessage != null) {
             LOG.debug("Message aggregation completion, forwarding {}", completeMessage);
-            ctx.fireChannelRead(SenderEnvelope.of(completeMessage, remoteAddress));
+            ctx.fireChannelRead(completeMessage);
         } else if (result.isValid()) {
             LOG.debug("More chunks necessary to complete this message");
         } else {
