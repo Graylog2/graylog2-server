@@ -360,6 +360,9 @@
 367:
 - :mac_addr
 - :wtpMacAddress
+372:
+- :string
+- :application_category_name
 8192:
 - :uint32
 - :streamcore_wan_rtt

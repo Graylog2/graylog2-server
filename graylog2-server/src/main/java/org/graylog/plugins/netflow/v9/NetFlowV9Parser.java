@@ -236,6 +236,9 @@ public class NetFlowV9Parser {
             int optType = bb.readUnsignedShort();
             int optLength = bb.readUnsignedShort();
             NetFlowV9FieldType t = typeRegistry.get(optType);
+            if (t == null) {
+                t = NetFlowV9FieldType.create(optType, NetFlowV9FieldType.ValueType.byLength(optLength), "option_" + optType);
+            }
             optionDefs.add(NetFlowV9FieldDef.create(t, optLength));
         }
 
