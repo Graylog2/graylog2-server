@@ -158,12 +158,6 @@ public class NetFlowV9FieldTypeRegistry {
             // HACK: http://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html#wp9000935
             case ":forwarding_status":
                 return NetFlowV9FieldType.ValueType.UINT8;
-            // HACK: http://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html#wp9000991
-            case ":application_id":
-                return NetFlowV9FieldType.ValueType.VARINT;
-            // HACK: http://www.cisco.com/c/en/us/td/docs/security/asa/special/netflow/guide/asa_netflow.html#pgfId-1331620
-            case ":acl_id_asa":
-                return NetFlowV9FieldType.ValueType.VARINT;
             // HACK: https://www.iana.org/assignments/ipfix/ipfix.xml
             case "mpls_label_stack_octets":
                 return NetFlowV9FieldType.ValueType.UINT32;
