@@ -127,7 +127,7 @@ public class NetflowV9CodecAggregatorTest {
                         ).build()
                 )
         );
-        assertThat(allRecords).hasSize(19)
+        assertThat(allRecords).hasSize(22)
                 .contains(
                         NetFlowV9Record.create(
                                 ImmutableMap.<String, Object>builder()
@@ -402,6 +402,50 @@ public class NetflowV9CodecAggregatorTest {
                 )
         );
         assertThat(allRecords).hasSize(16);
+    }
+
+    @Test
+    public void pcap_fortinet_NetFlowV9() throws Exception {
+        final List<NetFlowV9BaseRecord> allRecords = new ArrayList<>();
+        final List<NetFlowV9Template> allTemplates = new ArrayList<>();
+
+        final Collection<NetFlowV9Packet> packets = parseNetflowPcapStream("netflow-data/fgt300d-netflow9.pcap");
+        packets.forEach(packet -> {
+            List<NetFlowV9BaseRecord> recs = packet.records();
+            allRecords.addAll(packet.records());
+            allTemplates.addAll(packet.templates());
+        });
+        assertThat(allRecords).hasSize(146);
+        assertThat(allTemplates).hasSize(12);
+
+        NetFlowV9BaseRecord foo = allRecords.iterator().next();
+        assertThat(allRecords)
+                .contains(
+                NetFlowV9Record.create(
+                        ImmutableMap.<String, Object>builder()
+                                .put("in_bytes", 371L)
+                                .put("out_bytes", 371L)
+                                .put("in_pkts", 2L)
+                                .put("out_pkts", 2L)
+                                .put("ipv4_src_addr", "98.158.128.103")
+                                .put("ipv4_dst_addr", "172.30.1.154")
+                                .put("l4_src_port", 32161)
+                                .put("l4_dst_port", 38461)
+                                .put("protocol", (short) 17)
+                                .put("field_65", 3141)
+                                .put("forwarding_status", (short) 64)
+                                .put("flow_end_reason", (short) 2)
+                                .put("input_snmp", 5)
+                                .put("output_snmp", 15)
+                                .put("first_switched", 2056606986L)
+                                .put("last_switched", 2056787066L)
+                                .put("xlate_src_addr_ipv4", "0.0.0.0")
+                                .put("xlate_dst_addr_ipv4", "139.60.168.65")
+                                .put("xlate_src_port", 0)
+                                .put("xlate_dst_port", 38461)
+                                .build())
+                );
+
     }
 
     @Test
