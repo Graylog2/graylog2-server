@@ -1,4 +1,5 @@
-import Immutable from 'immutable';
+// @flow strict
+import * as Immutable from 'immutable';
 
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -6,10 +7,17 @@ import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWi
 import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
+import type { ValueActionHandler } from '../valueactions/ValueActionHandler';
 
 class FieldTypeSpecificSeries {
   static NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card'];
   static NONNUMERIC_FIELD_SERIES = ['count', 'card'];
+
+  activeQuery: string;
+  state: {
+    all: Immutable.List<any>,
+    queryFields: Immutable.List<any>,
+  };
 
   constructor() {
     this.state = FieldTypesStore.getInitialState();
@@ -38,7 +46,7 @@ class FieldTypeSpecificSeries {
   }
 }
 
-export default function (queryId, field) {
+const handler: ValueActionHandler = (queryId: string, field: string) => {
   const fieldTypeSpecificSeries = new FieldTypeSpecificSeries();
   const series = fieldTypeSpecificSeries.seriesFor(field).map(f => `${f}(${field})`).map(Series.forFunction);
   const config = AggregationWidgetConfig.builder()
@@ -51,4 +59,6 @@ export default function (queryId, field) {
     .config(config)
     .build();
   WidgetActions.create(widget);
-}
+};
+
+export default handler;

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MenuItem, Well } from 'react-bootstrap';
+import { MenuItem } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -8,6 +8,7 @@ import OverlayDropdown from './OverlayDropdown';
 
 import style from './Field.css';
 import CustomPropTypes from './CustomPropTypes';
+import ActionContextProvider from '../logic/providers/ActionContextProvider';
 
 export default class Field extends React.Component {
   static propTypes = {
@@ -27,6 +28,8 @@ export default class Field extends React.Component {
     menuContainer: document.body,
   };
 
+  static contextType = ActionContextProvider;
+
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -45,7 +48,7 @@ export default class Field extends React.Component {
     const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
       const onSelect = ({ field }) => {
         this._onMenuToggle();
-        fieldAction.handler(queryId, field);
+        fieldAction.handler(queryId, field, this.context);
       };
       const condition = fieldAction.condition || (() => true);
       const actionDisabled = !condition({ name, type });

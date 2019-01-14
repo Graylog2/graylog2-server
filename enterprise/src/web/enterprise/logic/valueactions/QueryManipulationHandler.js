@@ -1,20 +1,24 @@
+// @flow strict
+import * as Immutable from 'immutable';
 import { trim } from 'lodash';
 import { QueriesStore } from 'enterprise/stores/QueriesStore';
+import Query from '../queries/Query';
 
 export default class QueryManipulationHandler {
+  queries: Immutable.Set<Query>;
   constructor() {
     QueriesStore.listen((queries) => { this.queries = queries; });
   }
 
-  queryContainsTerm = (query, termInQuestion) => {
+  queryContainsTerm = (query: string, termInQuestion: string) => {
     return query.indexOf(termInQuestion) !== -1;
   };
 
-  isPhrase = (searchTerm) => {
+  isPhrase = (searchTerm: ?string) => {
     return String(searchTerm).indexOf(' ') !== -1;
   };
 
-  escape = (searchTerm) => {
+  escape = (searchTerm: ?string) => {
     let escapedTerm = String(searchTerm);
 
     // Replace newlines.
@@ -33,7 +37,7 @@ export default class QueryManipulationHandler {
     return escapedTerm;
   };
 
-  addToQuery = (oldQuery, newTerm, operator = 'AND') => {
+  addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND') => {
     if (this.queryContainsTerm(oldQuery, newTerm)) {
       return oldQuery;
     }

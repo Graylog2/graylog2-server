@@ -5,12 +5,14 @@ import { Row } from 'react-bootstrap';
 import _ from 'lodash';
 
 import connect from 'stores/connect';
+import ActionContextProvider from 'enterprise/logic/providers/ActionContextProvider';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { TitlesStore } from 'enterprise/stores/TitlesStore';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import { WidgetContext } from 'enterprise/logic/ActionContext';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 
@@ -87,19 +89,21 @@ class WidgetGrid extends React.Component {
 
       returnedWidgets.widgets.push(
         <div key={widget.id} className={style.widgetContainer}>
-          <Widget key={widgetId}
-                  id={widgetId}
-                  widget={widget}
-                  data={widgetData}
-                  errors={widgetErrors}
-                  height={height}
-                  position={returnedWidgets.positions[widgetId]}
-                  width={width}
-                  allFields={this.props.allFields}
-                  fields={this.props.fields}
-                  onPositionsChange={onPositionsChange}
-                  onSizeChange={this._onWidgetSizeChange}
-                  title={widgetTitle} />
+          <ActionContextProvider.Provider value={WidgetContext.create(widget)}>
+            <Widget key={widgetId}
+                    id={widgetId}
+                    widget={widget}
+                    data={widgetData}
+                    errors={widgetErrors}
+                    height={height}
+                    position={returnedWidgets.positions[widgetId]}
+                    width={width}
+                    allFields={this.props.allFields}
+                    fields={this.props.fields}
+                    onPositionsChange={onPositionsChange}
+                    onSizeChange={this._onWidgetSizeChange}
+                    title={widgetTitle} />
+          </ActionContextProvider.Provider>
         </div>,
       );
     });
