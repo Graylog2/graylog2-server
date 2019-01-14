@@ -57,7 +57,9 @@ const Widget = createReactClass({
   },
 
   componentDidUpdate() {
-    this._calculateWidgetSize();
+    if (!this.state.deleted) {
+      this._calculateWidgetSize();
+    }
   },
 
   componentWillUnmount() {
