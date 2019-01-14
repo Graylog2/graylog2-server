@@ -89,7 +89,6 @@ public class Beats2Codec extends AbstractCodec {
 
         final Message gelfMessage = new Message(message, hostname, timestamp);
         gelfMessage.addField("beats_type", beatsType);
-        gelfMessage.addField("facility", "beats");
 
         addFlattened(gelfMessage, rootPath, event);
         return gelfMessage;
