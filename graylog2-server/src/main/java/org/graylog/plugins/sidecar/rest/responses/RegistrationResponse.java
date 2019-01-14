@@ -32,7 +32,7 @@ import java.util.List;
 @JsonAutoDetect
 public abstract class RegistrationResponse {
     @JsonProperty("configuration")
-    public abstract SidecarRegistrationConfiguration sidecarRegistrationConfiguration();
+    public abstract SidecarRegistrationConfiguration configuration();
 
     @JsonProperty("configuration_override")
     public abstract boolean configurationOverride();
@@ -47,12 +47,12 @@ public abstract class RegistrationResponse {
 
     @JsonCreator
     public static RegistrationResponse create(
-            @JsonProperty("configuration") SidecarRegistrationConfiguration sidecarRegistrationConfiguration,
+            @JsonProperty("configuration") SidecarRegistrationConfiguration configuration,
             @JsonProperty("configuration_override") boolean configurationOverride,
             @JsonProperty("actions") @Nullable List<CollectorAction> actions,
             @JsonProperty("assignments") @Nullable List<ConfigurationAssignment> assignments) {
         return new AutoValue_RegistrationResponse(
-                sidecarRegistrationConfiguration,
+                configuration,
                 configurationOverride,
                 actions,
                 assignments);
