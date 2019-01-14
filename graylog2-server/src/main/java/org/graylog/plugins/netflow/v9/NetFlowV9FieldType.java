@@ -43,7 +43,7 @@ public abstract class NetFlowV9FieldType {
     public enum ValueType {
         UINT8(1), INT8(1), UINT16(2), INT16(2), UINT24(3), INT24(3),
         UINT32(4), INT32(4), UINT64(8), INT64(8), IPV4(4), IPV6(16),
-        MAC(6), STRING(0), VARINT(0);
+        MAC(6), STRING(0), SKIP(0);
 
         private final int defaultLength;
 
@@ -64,7 +64,7 @@ public abstract class NetFlowV9FieldType {
                 case 6: return MAC;
                 case 8: return UINT64;
                 case 16: return IPV6;
-                default: return VARINT;
+                default: return SKIP;
             }
         }
     }
