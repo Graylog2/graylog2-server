@@ -15,9 +15,10 @@ import Parameter from 'enterprise/logic/parameters/Parameter';
 import ParameterBinding from 'enterprise/logic/parameters/ParameterBinding';
 import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
 import { SearchConfigActions } from 'enterprise/stores/SearchConfigStore';
+import { ViewActions } from 'enterprise/stores/ViewStore';
+import { FieldTypesActions } from 'enterprise/stores/FieldTypesStore';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
-import { ViewActions } from '../stores/ViewStore';
 
 jest.mock('enterprise/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('enterprise/components/SearchResult', () => mockComponent('SearchResult'));
@@ -28,6 +29,7 @@ jest.mock('enterprise/components/parameters/ParametersWithParameterBindings', ()
 jest.mock('enterprise/components/SearchBarWithStatus', () => mockComponent('SearchBar'));
 jest.mock('enterprise/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
 jest.mock('enterprise/components/parameters/ParameterBarWithUndeclaredParameters', () => mockComponent('ParameterBarWithUndeclaredParameters'));
+jest.mock('enterprise/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
 
 describe('ExtendedSearchPage', () => {
   beforeEach(() => {
@@ -40,6 +42,7 @@ describe('ExtendedSearchPage', () => {
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     SearchParameterStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
+    FieldTypesActions.all = jest.fn();
   });
 
   it('register a WindowLeaveMessage', () => {
@@ -211,5 +214,18 @@ describe('ExtendedSearchPage', () => {
     cb();
 
     expect(SearchActions.execute).not.toHaveBeenCalled();
+  });
+  it('refreshes field types store upon mount', () => {
+    expect(FieldTypesActions.all).not.toHaveBeenCalled();
+    mount(<ExtendedSearchPage route={{}} />);
+    expect(FieldTypesActions.all).toHaveBeenCalled();
+  });
+  it('refreshes field types upon every search execution', () => {
+    mount(<ExtendedSearchPage route={{}} />);
+
+    FieldTypesActions.all.mockClear();
+    const cb = ViewActions.search.completed.listen.mock.calls[0][0];
+    cb();
+    expect(FieldTypesActions.all).toHaveBeenCalled();
   });
 });
