@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import Reflux from 'reflux';
 
 // $FlowFixMe: imports from core need to be fixed in flow

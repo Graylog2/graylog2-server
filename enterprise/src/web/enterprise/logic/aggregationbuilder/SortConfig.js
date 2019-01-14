@@ -1,5 +1,4 @@
 // @flow strict
-import Immutable from 'immutable';
 import type { DirectionJson } from './Direction';
 import Direction from './Direction';
 

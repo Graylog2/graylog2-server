@@ -1,5 +1,22 @@
+// @flow strict
+
+type ConfigType = {};
+
+export type PivotJson = {
+  field: string,
+  type: string,
+  config: ConfigType,
+};
+
+type InternalState = {
+  field: string,
+  type: string,
+  config: ConfigType,
+};
+
 export default class Pivot {
-  constructor(field, type, config = {}) {
+  _value: InternalState;
+  constructor(field: string, type: string, config: ConfigType = {}) {
     this._value = { field, type, config };
   }
   get field() {
@@ -14,12 +31,12 @@ export default class Pivot {
     return this._value.config;
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: PivotJson) {
     const { field, type, config = {} } = value;
     return new Pivot(field, type, config);
   }
 
-  toJSON() {
+  toJSON(): PivotJson {
     const { field, type, config } = this._value;
     return { field, type, config };
   }

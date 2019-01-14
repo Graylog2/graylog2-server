@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import * as Immutable from 'immutable';
 import ObjectID from 'bson-objectid';
 

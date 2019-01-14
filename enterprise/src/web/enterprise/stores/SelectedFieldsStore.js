@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import Reflux from 'reflux';
 import { Set } from 'immutable';

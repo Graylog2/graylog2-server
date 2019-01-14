@@ -1,7 +1,17 @@
+// @flow strict
 import * as Immutable from 'immutable';
 
+export type SeriesConfigJson = {
+  name: string
+};
+
+type InternalState = {
+  name: ?string,
+};
+
 export default class SeriesConfig {
-  constructor(name) {
+  _value: InternalState;
+  constructor(name: ?string) {
     this._value = { name };
   }
 
@@ -15,13 +25,13 @@ export default class SeriesConfig {
     return { name };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: SeriesConfigJson) {
     const { name } = value;
     return new SeriesConfig(name);
   }
 
   static empty() {
-    return new SeriesConfig(null, null);
+    return new SeriesConfig(null);
   }
 
   toBuilder() {
@@ -30,12 +40,14 @@ export default class SeriesConfig {
   }
 }
 
+type BuilderState = Immutable.Map<string, any>;
 class Builder {
-  constructor(value = Immutable.Map()) {
+  value: BuilderState;
+  constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }
 
-  name(newName) {
+  name(newName: string) {
     return new Builder(this.value.set('name', newName));
   }
 

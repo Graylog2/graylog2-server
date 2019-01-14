@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import Immutable from 'immutable';
 import type { QueryMetadataJson } from './QueryMetadata';
 import type { ParameterJson } from '../parameters/Parameter';

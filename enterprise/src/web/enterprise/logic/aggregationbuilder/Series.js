@@ -1,10 +1,23 @@
- import { get } from 'lodash';
+// @flow strict
+import { get } from 'lodash';
 import * as Immutable from 'immutable';
 
 import SeriesConfig from './SeriesConfig';
+import type { SeriesConfigJson } from './SeriesConfig';
+
+export type SeriesJson = {
+  config: SeriesConfigJson,
+  function: string,
+};
+
+type InternalState = {
+  config: SeriesConfig,
+  function: string,
+};
 
 export default class Series {
-  constructor(func, config = SeriesConfig.empty()) {
+  _value: InternalState;
+  constructor(func: string, config: SeriesConfig = SeriesConfig.empty()) {
     this._value = { function: func, config };
   }
 
@@ -22,7 +35,7 @@ export default class Series {
   }
 
   toString() {
-    return `Series: ${this.effectiveName}, config={${this.config.toJSON()}}`;
+    return `Series: ${this.effectiveName}, config={${JSON.stringify(this.config)}}`;
   }
 
   toJSON() {
@@ -32,11 +45,11 @@ export default class Series {
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: SeriesJson) {
     return new Series(value.function, SeriesConfig.fromJSON(value.config));
   }
 
-  static forFunction(func) {
+  static forFunction(func: string) {
     // eslint-disable-next-line no-use-before-define
     return new Builder().function(func).config(SeriesConfig.empty()).build();
   }
@@ -47,16 +60,18 @@ export default class Series {
   }
 }
 
+type BuilderState = Immutable.Map<string, any>;
 class Builder {
-  constructor(value = Immutable.Map()) {
+  value: BuilderState;
+  constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }
 
-  function(newFunction) {
+  function(newFunction: string) {
     return new Builder(this.value.set('function', newFunction));
   }
 
-  config(newConfig) {
+  config(newConfig: SeriesConfig) {
     return new Builder(this.value.set('config', newConfig));
   }
 

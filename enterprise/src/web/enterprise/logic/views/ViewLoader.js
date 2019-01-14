@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import * as Immutable from 'immutable';
 import { SearchParameterActions } from 'enterprise/stores/SearchParameterStore';
 import { SearchExecutionStateActions } from 'enterprise/stores/SearchExecutionStateStore';

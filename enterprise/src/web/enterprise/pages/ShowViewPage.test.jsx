@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import * as React from 'react';
 import { mount } from 'enzyme';
 import * as Immutable from 'immutable';

@@ -1,12 +1,45 @@
+// @flow strict
 import * as Immutable from 'immutable';
 
 import Pivot from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
 import SortConfig from './SortConfig';
+import type { SeriesJson } from './Series';
+import type { SortConfigJson } from './SortConfig';
+import type { VisualizationConfigJson } from './visualizations/VisualizationConfig';
+import type { PivotJson } from './Pivot';
+
+type InternalState = {
+  columnPivots: Array<Pivot>,
+  rowPivots: Array<Pivot>,
+  series: Array<Series>,
+  sort: Array<SortConfig>,
+  visualization: string,
+  rollup: boolean,
+  visualizationConfig: ?VisualizationConfig,
+};
+
+type AggregationWidgetConfigJson = {
+  row_pivots: Array<PivotJson>,
+  column_pivots: Array<PivotJson>,
+  series: Array<SeriesJson>,
+  sort: Array<SortConfigJson>,
+  visualization: string,
+  rollup: boolean,
+  visualization_config: VisualizationConfigJson,
+};
 
 export default class AggregationWidgetConfig {
-  constructor(columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig) {
+  _value: InternalState;
+
+  constructor(columnPivots: Array<Pivot>,
+    rowPivots: Array<Pivot>,
+    series: Array<Series>,
+    sort: Array<SortConfig>,
+    visualization: string,
+    rollup: boolean,
+    visualizationConfig: VisualizationConfig) {
     this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig };
   }
 
@@ -70,15 +103,17 @@ export default class AggregationWidgetConfig {
     };
   }
 
-  equals(other) {
+  equals(other: any) {
     const { is } = Immutable;
     if (other instanceof AggregationWidgetConfig) {
-      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup'].every(key => is(this[key], other[key]));
+      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup']
+        // $FlowFixMe: No typings for indexed access.
+        .every(key => is(this[key], other[key]));
     }
     return false;
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: AggregationWidgetConfigJson) {
     // eslint-disable-next-line camelcase
     const { row_pivots, column_pivots, series, sort, visualization, rollup, visualization_config } = value;
 
@@ -96,36 +131,38 @@ export default class AggregationWidgetConfig {
   }
 }
 
+type BuilderState = Immutable.Map<string, any>;
 class Builder {
-  constructor(value = Immutable.Map()) {
+  value: BuilderState;
+  constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }
 
-  columnPivots(pivots) {
+  columnPivots(pivots: Array<Pivot>) {
     return new Builder(this.value.set('columnPivots', pivots));
   }
 
-  rowPivots(pivots) {
+  rowPivots(pivots: Array<Pivot>) {
     return new Builder(this.value.set('rowPivots', pivots));
   }
 
-  series(series) {
+  series(series: Array<Series>) {
     return new Builder(this.value.set('series', series));
   }
 
-  sort(sorts) {
+  sort(sorts: Array<SortConfig>) {
     return new Builder(this.value.set('sort', sorts));
   }
 
-  visualization(type) {
+  visualization(type: string) {
     return new Builder(this.value.set('visualization', type));
   }
 
-  visualizationConfig(config) {
+  visualizationConfig(config: ?VisualizationConfig) {
     return new Builder(this.value.set('visualizationConfig', config));
   }
 
-  rollup(rollup) {
+  rollup(rollup: boolean) {
     return new Builder(this.value.set('rollup', rollup));
   }
 

@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';

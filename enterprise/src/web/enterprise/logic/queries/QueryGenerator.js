@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import uuid from 'uuid/v4';
 import Query from './Query';
 import type { QueryId } from './Query';

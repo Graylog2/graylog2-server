@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { trim } from 'lodash';

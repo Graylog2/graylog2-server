@@ -1,4 +1,8 @@
-// @flow
+// @flow strict
+
+export type VisualizationConfigJson = {
+  type: string,
+};
 
 export default class VisualizationConfig {
   static fromJSON(type: string, value: any): VisualizationConfig {
