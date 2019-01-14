@@ -14,6 +14,10 @@ public class EnterpriseAuditEventTypes implements PluginAuditEventTypes {
     public static final String VIEW_UPDATE = PREFIX + VIEW + ":update";
     public static final String VIEW_DELETE = PREFIX + VIEW + ":delete";
 
+    private static final String VIEW_SHARING = "view_sharing";
+    public static final String VIEW_SHARING_CREATE = PREFIX + VIEW_SHARING + ":create";
+    public static final String VIEW_SHARING_DELETE = PREFIX + VIEW_SHARING + ":delete";
+    
     private static final String DEFAULT_VIEW = "default_view";
     public static final String DEFAULT_VIEW_SET = PREFIX + DEFAULT_VIEW + ":set";
 

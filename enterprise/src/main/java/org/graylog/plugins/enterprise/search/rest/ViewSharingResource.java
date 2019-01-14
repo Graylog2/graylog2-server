@@ -5,10 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.enterprise.audit.EnterpriseAuditEventTypes;
 import org.graylog.plugins.enterprise.search.views.ViewService;
 import org.graylog.plugins.enterprise.search.views.sharing.UserShortSummary;
 import org.graylog.plugins.enterprise.search.views.sharing.ViewSharing;
 import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -54,6 +56,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
 
     @POST
     @ApiOperation("Configure sharing for a view")
+    @AuditEvent(type = EnterpriseAuditEventTypes.VIEW_SHARING_CREATE)
     public ViewSharing create(@ApiParam @PathParam("id") @NotEmpty String id, ViewSharing viewSharing) {
         ensureUserIsPermittedForView(id);
         checkPermission(EnterpriseSearchRestPermissions.VIEW_EDIT, id);
@@ -62,6 +65,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
 
     @DELETE
     @ApiOperation("Delete sharing of a view")
+    @AuditEvent(type = EnterpriseAuditEventTypes.VIEW_SHARING_DELETE)
     public ViewSharing delete(@ApiParam @PathParam("id") @NotEmpty String id) {
         ensureUserIsPermittedForView(id);
         checkPermission(EnterpriseSearchRestPermissions.VIEW_EDIT, id);
