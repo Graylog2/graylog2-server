@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
@@ -37,6 +36,8 @@ import io.netty.channel.unix.UnixChannelOption;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.graylog2.inputs.transports.netty.DatagramChannelFactory;
 import org.graylog2.inputs.transports.netty.DatagramPacketHandler;
+import org.graylog2.inputs.transports.netty.EnvelopeMessageAggregationHandler;
+import org.graylog2.inputs.transports.netty.EnvelopeMessageHandler;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.NettyTransportType;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -46,6 +47,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
+import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -101,6 +103,19 @@ public class UdpTransport extends NettyTransport {
         handlers.putAll(getChildChannelHandlers(input));
 
         return handlers;
+    }
+
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(final MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>(getCustomChildChannelHandlers(input));
+
+        final CodecAggregator aggregator = getAggregator();
+        if (aggregator != null) {
+            LOG.debug("Adding codec aggregator {} to channel pipeline", aggregator);
+            handlerList.put("codec-aggregator", () -> new EnvelopeMessageAggregationHandler(aggregator, localRegistry));
+        }
+        handlerList.put("envelope-message-handler", () -> new EnvelopeMessageHandler(input));
+
+        return handlerList;
     }
 
     @Override
