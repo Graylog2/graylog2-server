@@ -285,10 +285,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                 validation.addError("executable_path", "Collector binary path cannot contain the following characters: ; * ? \" < > | &");
         }
 
-        if (toValidate.defaultTemplate().isEmpty()) {
-            validation.addError("default_template", "Collector default template cannot be empty.");
-        }
-
         if (toValidate.nodeOperatingSystem() != null) {
             if (!validateOperatingSystem(toValidate.nodeOperatingSystem())) {
                 validation.addError("node_operating_system", "Operating system can only be 'linux' or 'windows'.");
