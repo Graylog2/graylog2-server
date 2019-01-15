@@ -228,10 +228,10 @@ const CollectorConfigurationsStore = Reflux.createStore({
   validate(configuration) {
     // set minimum api defaults for faster validation feedback
     const payload = {
-      name: '',
-      collector_id: '',
-      color: '',
-      template: '',
+      name: ' ',
+      collector_id: ' ',
+      color: ' ',
+      template: ' ',
     };
     lodash.merge(payload, configuration);
 
