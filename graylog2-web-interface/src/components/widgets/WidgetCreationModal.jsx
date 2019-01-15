@@ -112,19 +112,9 @@ const WidgetCreationModal = createReactClass({
     return (widgetPlugin.displayName ? StringUtils.capitalizeFirstLetter(widgetPlugin.displayName) : '');
   },
 
-  _getSpecificWidgetInputs() {
-    if (this.widgetPlugin.configurationCreateComponent) {
-      return React.createElement(this.widgetPlugin.configurationCreateComponent, {
-        ref: (elem) => { this.pluginConfiguration = elem; },
-        config: this.state.config,
-        fields: this.props.fields,
-        onChange: this._onConfigurationValueChange,
-      });
-    }
-  },
-
   render() {
     const loading = this.props.loading;
+    const CustomCreateDialog = this.widgetPlugin.configurationCreateComponent;
     return (
       <BootstrapModalForm ref={(createModal) => { this.createModal = createModal; }}
                           title="Create Dashboard Widget"
@@ -143,7 +133,12 @@ const WidgetCreationModal = createReactClass({
                  onChange={this._bindValue}
                  help="Type a name that describes your widget."
                  autoFocus />
-          {this._getSpecificWidgetInputs()}
+          {CustomCreateDialog && (
+            <CustomCreateDialog ref={(elem) => { this.pluginConfiguration = elem; }}
+                                config={this.state.config}
+                                fields={this.props.fields}
+                                onChange={this._onConfigurationValueChange} />
+          )}
         </fieldset>
       </BootstrapModalForm>
     );
