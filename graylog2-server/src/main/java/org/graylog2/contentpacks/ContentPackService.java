@@ -202,7 +202,7 @@ public class ContentPackService {
             if (nativeEntityDescriptorOptional.isPresent()) {
                 NativeEntityDescriptor nativeEntityDescriptor = nativeEntityDescriptorOptional.get();
                 if (contentPackInstallationPersistenceService
-                        .countInstallationOfEntityById(nativeEntityDescriptor.contentPackEntityId()) <= 1) {
+                        .countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 1) {
                     nativeEntityDescriptors.add(nativeEntityDescriptor);
                 }
             }
@@ -257,7 +257,7 @@ public class ContentPackService {
                     final Optional nativeEntityOptional = facade.loadNativeEntity(nativeEntityDescriptor);
 
                     if (contentPackInstallationPersistenceService
-                            .countInstallationOfEntityById(nativeEntityDescriptor.contentPackEntityId()) > 1) {
+                            .countInstallationOfEntityById(nativeEntityDescriptor.id()) > 1) {
                        skippedEntities.add(nativeEntityDescriptor);
                        LOG.debug("Did not remove entity since other content pack installations still use them: {}",
                                nativeEntityDescriptor);
