@@ -86,6 +86,9 @@ public abstract class NetFlowV9FieldDef {
                 byte[] b4 = new byte[len];
                 bb.readBytes(b4);
                 return Optional.of(new String(b4, StandardCharsets.UTF_8));
+            case SKIP:
+                bb.skipBytes(len);
+                return Optional.empty();
             default:
                 return Optional.empty();
         }

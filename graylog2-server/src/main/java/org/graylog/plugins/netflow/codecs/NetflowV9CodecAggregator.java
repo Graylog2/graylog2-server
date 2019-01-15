@@ -135,6 +135,7 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
             // this list of flows to return in the result
             // Using ByteBuf here to enable de-duplication with the hash set.
             final Set<ByteBuf> packetsToSend = new HashSet<>();
+            final Set<Integer> bufferedTemplateIds = new HashSet<>();
 
             // if we have new templates, figure out which buffered packets template requirements are now satisfied
             if (!rawNetFlowV9Packet.templates().isEmpty() || rawNetFlowV9Packet.optionTemplate() != null) {
@@ -155,6 +156,7 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
                         // are all templates the packet references there?
                         if (knownTemplateIds.containsAll(previousPacket.getUsedTemplates())) {
                             packetsToSend.add(Unpooled.wrappedBuffer(previousPacket.getBytes()));
+                            bufferedTemplateIds.addAll(previousPacket.getUsedTemplates());
                             addedPackets++;
                         } else {
                             tempQueue.add(previousPacket);
@@ -173,8 +175,9 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
             // the list of template keys to return in the result
             final Set<TemplateKey> templates = new HashSet<>();
 
-            // find out which templates we need to include for the current packet
-            for (int templateId : rawNetFlowV9Packet.usedTemplates()) {
+            // find out which templates we need to include for the buffered and current packets
+            bufferedTemplateIds.addAll(rawNetFlowV9Packet.usedTemplates());
+            for (int templateId : bufferedTemplateIds) {
                 final TemplateKey templateKey = new TemplateKey(remoteAddress, sourceId, templateId);
                 final TemplateBytes template = templateCache.getIfPresent(templateKey);
 
