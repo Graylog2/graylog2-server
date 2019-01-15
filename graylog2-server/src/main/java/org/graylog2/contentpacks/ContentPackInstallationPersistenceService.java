@@ -131,12 +131,12 @@ public class ContentPackInstallationPersistenceService {
 
     /**
      * Returns the number of installations the given content pack entity ID is used in.
-     * @param contentPackEntityId the content pack entity ID
+     * @param entityId the native entity ID
      * @return number of installations
      */
-    public long countInstallationOfEntityById(ModelId contentPackEntityId) {
-        final String field = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_ENTITY_ID);
+    public long countInstallationOfEntityById(ModelId entityId) {
+        final String field = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_META_ID);
 
-        return dbCollection.getCount(DBQuery.is(field, contentPackEntityId));
+        return dbCollection.getCount(DBQuery.is(field, entityId));
     }
 }
