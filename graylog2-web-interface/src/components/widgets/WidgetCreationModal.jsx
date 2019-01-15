@@ -23,7 +23,9 @@ const WidgetCreationModal = createReactClass({
 
   getDefaultProps() {
     return {
+      fields: [],
       loading: false,
+      onModalHidden: () => {},
     };
   },
 

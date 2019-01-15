@@ -6,7 +6,16 @@ import naturalSort from 'javascript-natural-sort';
 import { CountWidgetCreateConfiguration } from 'components/widgets/configurations';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
+
+const sortFields = (fields) => {
+  return fields.sort((a, b) => naturalSort(a.toLowerCase(), b.toLowerCase()));
+};
+
+const sortStatisticalFunctions = (statisticalFunctions) => {
+  return statisticalFunctions.sort();
+};
 
 class StatisticalCountWidgetCreateConfiguration extends React.Component {
   static propTypes = {
@@ -15,19 +24,16 @@ class StatisticalCountWidgetCreateConfiguration extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
+  state = {
+    sortedFields: sortFields(this.props.fields),
+    sortedStatisticalFunctions: sortStatisticalFunctions(FieldStatisticsStore.FUNCTIONS.keySeq().toJS()),
+  };
+
   componentWillReceiveProps(nextProps) {
     if (this.props.fields !== nextProps.fields) {
-      this.setState({ sortedFields: this._sortFields(nextProps.fields) });
+      this.setState({ sortedFields: sortFields(nextProps.fields) });
     }
   }
-
-  _sortFields = (fields) => {
-    return fields.sort((a, b) => naturalSort(a.toLowerCase(), b.toLowerCase()));
-  };
-
-  _sortStatisticalFunctions = (statisticalFunctions) => {
-    return statisticalFunctions.sort();
-  };
 
   getInitialConfiguration = () => {
     const countConfiguration = this.countConfiguration.getInitialConfiguration();
@@ -38,11 +44,6 @@ class StatisticalCountWidgetCreateConfiguration extends React.Component {
     initialConfiguration.stats_function = this.state.sortedStatisticalFunctions[0];
 
     return initialConfiguration;
-  };
-
-  state = {
-    sortedFields: this._sortFields(this.props.fields),
-    sortedStatisticalFunctions: this._sortStatisticalFunctions(FieldStatisticsStore.FUNCTIONS.keySeq().toJS()),
   };
 
   render() {
