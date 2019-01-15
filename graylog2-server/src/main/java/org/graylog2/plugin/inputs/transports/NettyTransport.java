@@ -25,7 +25,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.ExceptionLoggingChannelHandler;
-import org.graylog2.inputs.transports.netty.MessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.PromiseFailureHandler;
 import org.graylog2.inputs.transports.netty.RawMessageHandler;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -176,17 +175,7 @@ public abstract class NettyTransport implements Transport {
      * @return list of custom {@link ChannelHandler channel handlers} to add to the Netty {@link ChannelPipeline channel pipeline} for child channels
      * @see #getCustomChildChannelHandlers(MessageInput)
      */
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(final MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>(getCustomChildChannelHandlers(input));
-
-        if (aggregator != null) {
-            log.debug("Adding codec aggregator {} to channel pipeline", aggregator);
-            handlerList.put("codec-aggregator", () -> new MessageAggregationHandler(aggregator, localRegistry));
-        }
-        handlerList.put("rawmessage-handler", () -> new RawMessageHandler(input));
-
-        return handlerList;
-    }
+    protected abstract LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(final MessageInput input);
 
     protected int getRecvBufferSize() {
         return recvBufferSize;
