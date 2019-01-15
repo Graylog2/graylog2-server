@@ -196,20 +196,20 @@ const CollectorForm = createReactClass({
 
             <Input type="text"
                    id="executeParameters"
-                   label="Execute Parameters"
+                   label={<span>Execute Parameters <small className="text-muted">(Optional)</small></span>}
                    onChange={this._onInputChange('execute_parameters')}
                    help={<span>Parameters the collector is started with.<strong> %s will be replaced by the path to the configuration file.</strong></span>}
                    value={executeParameters || ''} />
 
             <Input type="text"
                    id="validationParameters"
-                   label="Parameters for Configuration Validation"
+                   label={<span>Parameters for Configuration Validation <small className="text-muted">(Optional)</small></span>}
                    onChange={this._onInputChange('validation_parameters')}
                    help={<span>Parameters that validate the configuration file. <strong> %s will be replaced by the path to the configuration file.</strong></span>}
                    value={validationParameters || ''} />
 
             <FormGroup controlId="defaultTemplate">
-              <ControlLabel>Default Template</ControlLabel>
+              <ControlLabel><span>Default Template <small className="text-muted">(Optional)</small></span></ControlLabel>
               <SourceCodeEditor id="template"
                                 value={this.state.formData.default_template}
                                 onChange={this._formDataUpdate('default_template')} />
