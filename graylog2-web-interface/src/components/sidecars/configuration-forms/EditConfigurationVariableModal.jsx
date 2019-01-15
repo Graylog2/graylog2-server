@@ -80,15 +80,11 @@ class EditConfigurationVariableModal extends React.Component {
   _save = () => {
     if (this._hasErrors()) {
       // Ensure we display an error on the content field, as this is not validated by the browser
-      this._validateFormData(this.state.formData, true);
+      this._validateFormData(this.state.formData);
       return;
     }
 
-    const configuration = this.state.formData;
-
-    if (!configuration.error) {
-      this.props.saveConfigurationVariable(configuration, this._saved);
-    }
+    this.props.saveConfigurationVariable(this.state.formData, this.state.savedName, this._saved);
   };
 
   _changeName = (event) => {
