@@ -300,7 +300,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
             collector = collectorOptional.get();
             if (!collector.id().equals(toValidate.id())) {
                 // a collector exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "Collector with name \"" + toValidate.name() + "\" already exists");
+                validation.addError("name", "Collector \"" + toValidate.name() + "\" already exists for the \"" + collector.nodeOperatingSystem() + "\" operating system.");
             }
         }
         return validation;
