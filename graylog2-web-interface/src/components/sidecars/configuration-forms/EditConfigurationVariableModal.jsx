@@ -33,17 +33,20 @@ class EditConfigurationVariableModal extends React.Component {
 
   _cleanState = () => {
     return {
-      id: this.props.id,
-      name: this.props.name,
+      error: false,
+      validation_errors: {},
       savedName: this.props.name,
-      description: this.props.description,
-      content: this.props.content,
-      errors: {},
+      formData: {
+        id: this.props.id,
+        name: this.props.name,
+        description: this.props.description,
+        content: this.props.content,
+      },
     };
   };
 
   _hasErrors = () => {
-    return !lodash.isEmpty(this.state.errors);
+    return this.state.error;
   };
 
   openModal = () => {
@@ -59,16 +62,29 @@ class EditConfigurationVariableModal extends React.Component {
     this.modal.close();
   };
 
-  _validate = () => {
-    ConfigurationVariableActions.validate(this.state).then((validation) => {
-      this.setState({ errors: validation.errors });
+  _validateFormData = (nextFormData) => {
+    ConfigurationVariableActions.validate(nextFormData).then((validation) => {
+      this.setState({ validation_errors: validation.errors, error: validation.failed });
     });
   };
 
-  _debouncedValidate = lodash.debounce(this._validate, 200);
+  _formDataUpdate = (key) => {
+    return (nextValue) => {
+      const nextFormData = lodash.cloneDeep(this.state.formData);
+      nextFormData[key] = nextValue;
+      this._validateFormData(nextFormData);
+      this.setState({ formData: nextFormData });
+    };
+  };
 
   _save = () => {
-    const configuration = this.state;
+    if (this._hasErrors()) {
+      // Ensure we display an error on the content field, as this is not validated by the browser
+      this._validateFormData(this.state.formData, true);
+      return;
+    }
+
+    const configuration = this.state.formData;
 
     if (!configuration.error) {
       this.props.saveConfigurationVariable(configuration, this._saved);
@@ -76,15 +92,32 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _changeName = (event) => {
-    this.setState({ name: event.target.value }, this._debouncedValidate);
+    const nextName = event.target.value;
+    this._formDataUpdate('name')(nextName);
   };
 
   _changeDescription = (event) => {
-    this.setState({ description: event.target.value });
+    const nextName = event.target.value;
+    this._formDataUpdate('description')(nextName);
   };
 
   _changeContent = (event) => {
-    this.setState({ content: event.target.value });
+    const nextName = event.target.value;
+    this._formDataUpdate('content')(nextName);
+  };
+
+  _formatValidationMessage = (fieldName, defaultText) => {
+    if (this.state.validation_errors[fieldName]) {
+      return <span>{this.state.validation_errors[fieldName][0]}</span>;
+    }
+    return <span>{defaultText}</span>;
+  };
+
+  _validationState = (fieldName) => {
+    if (this.state.validation_errors[fieldName]) {
+      return 'error';
+    }
+    return null;
   };
 
   render() {
@@ -104,7 +137,7 @@ class EditConfigurationVariableModal extends React.Component {
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
-                            title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;user.{this.state.name}&#125;</React.Fragment>}
+                            title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;user.{this.state.formData.name}&#125;</React.Fragment>}
                             onSubmitForm={this._save}
                             onModalClose={this._cleanState}
                             submitButtonDisabled={this._hasErrors()}
@@ -113,19 +146,18 @@ class EditConfigurationVariableModal extends React.Component {
             <Input type="text"
                    id={this._getId('variable-name')}
                    label="Name"
-                   defaultValue={this.state.name}
+                   defaultValue={this.state.formData.name}
                    onChange={this._changeName}
-                   bsStyle={this.state.errors.name ? 'error' : null}
-                   help={this.state.errors.name ? this.state.errors.name.join(' ') : 'Type a name for this variable'}
+                   bsStyle={this._validationState('name')}
+                   help={this._formatValidationMessage('name', 'Type a name for this variable')}
                    autoFocus
                    spellCheck={false}
                    required />
             <Input type="text"
                    id={this._getId('variable-description')}
                    label={<span>Description <small className="text-muted">(Optional)</small></span>}
-                   defaultValue={this.state.description}
+                   defaultValue={this.state.formData.description}
                    onChange={this._changeDescription}
-                   bsStyle={this.state.error ? 'error' : null}
                    help="Type a description for this variable"
                    spellCheck={false} />
             <Input type="textarea"
@@ -133,10 +165,10 @@ class EditConfigurationVariableModal extends React.Component {
                    label="Content"
                    rows="10"
                    className={ConfigurationHelperStyle.monoSpaceFont}
-                   defaultValue={this.state.content}
+                   defaultValue={this.state.formData.content}
                    onChange={this._changeContent}
-                   bsStyle={this.state.error ? 'error' : null}
-                   help="Write your variable content"
+                   bsStyle={this._validationState('content')}
+                   help={this._formatValidationMessage('content', 'Write your variable content')}
                    spellCheck={false}
                    required />
           </fieldset>
