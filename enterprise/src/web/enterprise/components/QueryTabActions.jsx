@@ -12,6 +12,9 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import PermissionsMixin from 'util/PermissionsMixin';
+// $FlowFixMe: imports from core need to be fixed in flow
+import AppConfig from 'util/AppConfig';
+
 import DebugOverlay from 'enterprise/components/DebugOverlay';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import { SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
@@ -25,6 +28,11 @@ const { isPermitted } = PermissionsMixin;
 
 const QueryTabActions = createReactClass({
   propTypes: {
+    currentUser: PropTypes.shape({
+      currentUser: PropTypes.shape({
+        permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+      }).isRequired,
+    }).isRequired,
     onSaveView: PropTypes.func.isRequired,
     onSaveAsView: PropTypes.func.isRequired,
     metadata: PropTypes.shape({
@@ -104,6 +112,12 @@ const QueryTabActions = createReactClass({
     const hasUndeclaredParameters = this._hasUndeclaredParameters(metadata);
     const isNewView = this._isNewView(view);
     const allowedToEdit = this._isAllowedToEdit(view);
+    const debugOverlay = AppConfig.gl2DevMode() && (
+      <React.Fragment>
+        <MenuItem divider />
+        <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
+      </React.Fragment>
+    );
     return (
       <span>
         <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
@@ -111,8 +125,8 @@ const QueryTabActions = createReactClass({
           <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>Save</MenuItem>
           <MenuItem onSelect={this.handleSaveAs} disabled={hasUndeclaredParameters}>Save as</MenuItem>
           <MenuItem onSelect={this.handleShareView} disabled={isNewView || !allowedToEdit}>Share</MenuItem>
-          <MenuItem divider />
-          <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
+
+          {debugOverlay}
         </DropdownButton>
         <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
         <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveAsView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
