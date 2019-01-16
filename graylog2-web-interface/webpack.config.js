@@ -156,9 +156,8 @@ if (TARGET === 'build') {
     mode: 'production',
     optimization: {
       minimizer: [new UglifyJsPlugin({
+        sourceMap: true,
         uglifyOptions: {
-          minimize: true,
-          sourceMap: true,
           compress: {
             warnings: false,
           },
@@ -172,6 +171,8 @@ if (TARGET === 'build') {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
+      // Looking at https://webpack.js.org/plugins/loader-options-plugin, this plugin seems to not
+      // be needed any longer. We should try deleting it next time we clean up this configuration.
       new webpack.LoaderOptionsPlugin({
         minimize: true,
       }),
