@@ -87,19 +87,8 @@ class EditConfigurationVariableModal extends React.Component {
     this.props.saveConfigurationVariable(this.state.formData, this.state.savedName, this._saved);
   };
 
-  _changeName = (event) => {
-    const nextName = event.target.value;
-    this._formDataUpdate('name')(nextName);
-  };
-
-  _changeDescription = (event) => {
-    const nextName = event.target.value;
-    this._formDataUpdate('description')(nextName);
-  };
-
-  _changeContent = (event) => {
-    const nextName = event.target.value;
-    this._formDataUpdate('content')(nextName);
+  _handleInputChange = (event) => {
+    this._formDataUpdate(event.target.name)(event.target.value);
   };
 
   _formatValidationMessage = (fieldName, defaultText) => {
@@ -142,8 +131,9 @@ class EditConfigurationVariableModal extends React.Component {
             <Input type="text"
                    id={this._getId('variable-name')}
                    label="Name"
+                   name="name"
                    defaultValue={this.state.formData.name}
-                   onChange={this._changeName}
+                   onChange={this._handleInputChange}
                    bsStyle={this._validationState('name')}
                    help={this._formatValidationMessage('name', 'Type a name for this variable')}
                    autoFocus
@@ -152,17 +142,19 @@ class EditConfigurationVariableModal extends React.Component {
             <Input type="text"
                    id={this._getId('variable-description')}
                    label={<span>Description <small className="text-muted">(Optional)</small></span>}
+                   name="description"
                    defaultValue={this.state.formData.description}
-                   onChange={this._changeDescription}
+                   onChange={this._handleInputChange}
                    help="Type a description for this variable"
                    spellCheck={false} />
             <Input type="textarea"
                    id={this._getId('variable-content')}
                    label="Content"
+                   name="content"
                    rows="10"
                    className={ConfigurationHelperStyle.monoSpaceFont}
                    defaultValue={this.state.formData.content}
-                   onChange={this._changeContent}
+                   onChange={this._handleInputChange}
                    bsStyle={this._validationState('content')}
                    help={this._formatValidationMessage('content', 'Write your variable content')}
                    spellCheck={false}
