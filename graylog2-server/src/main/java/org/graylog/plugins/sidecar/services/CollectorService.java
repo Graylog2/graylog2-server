@@ -54,6 +54,15 @@ public class CollectorService extends PaginatedDbService<Collector> {
     }
 
     @Nullable
+    public Collector findByNameAndOs(String name, String operatingSystem) {
+        return db.findOne(
+                DBQuery.and(
+                        DBQuery.is("name", name),
+                        DBQuery.is("node_operating_system", operatingSystem))
+        );
+    }
+
+    @Nullable
     public Collector findByNameExcludeId(String name, String id) {
         return db.findOne(
                 DBQuery.and(

@@ -8,7 +8,7 @@ import style from './CopyModal.css';
 
 class CopyConfigurationModal extends React.Component {
   static propTypes = {
-    id: PropTypes.string,
+    configuration: PropTypes.object.isRequired,
     copyConfiguration: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
   };
@@ -19,7 +19,7 @@ class CopyConfigurationModal extends React.Component {
   };
 
   state = {
-    id: this.props.id,
+    id: this.props.configuration.id,
     name: '',
     error: false,
     error_message: '',
@@ -30,7 +30,7 @@ class CopyConfigurationModal extends React.Component {
   };
 
   _getId = (prefixIdName) => {
-    return `${prefixIdName}-${this.props.id}`;
+    return `${prefixIdName}-${this.state.id}`;
   };
 
   _closeModal = () => {
@@ -46,16 +46,20 @@ class CopyConfigurationModal extends React.Component {
     const configuration = this.state;
 
     if (!configuration.error) {
-      this.props.copyConfiguration(this.props.id, this.state.name, this._saved);
+      this.props.copyConfiguration(this.state.id, this.state.name, this._saved);
     }
   };
 
   _changeName = (event) => {
     const nextName = event.target.value;
     this.setState({ name: nextName });
-    this.props.validateConfiguration(nextName).then(validation => (
-      this.setState({ error: validation.error, error_message: validation.error_message })
-    ));
+    this.props.validateConfiguration({ name: nextName }).then((validation) => {
+      let errorMessage = '';
+      if (validation.errors.name) {
+        errorMessage = validation.errors.name[0];
+      }
+      this.setState({ error: validation.failed, error_message: errorMessage });
+    });
   };
 
   render() {

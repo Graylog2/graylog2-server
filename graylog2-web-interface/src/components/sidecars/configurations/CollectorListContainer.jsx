@@ -40,8 +40,8 @@ const CollectorListContainer = createReactClass({
     CollectorsActions.list({ query: query, pageSize: pageSize }).finally(callback);
   },
 
-  validateCollector(name) {
-    return CollectorsActions.validate(name);
+  validateCollector(collector) {
+    return CollectorsActions.validate(collector);
   },
 
   render() {

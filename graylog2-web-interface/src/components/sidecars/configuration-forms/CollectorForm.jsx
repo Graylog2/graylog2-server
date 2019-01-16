@@ -37,7 +37,7 @@ const CollectorForm = createReactClass({
   getInitialState() {
     return {
       error: false,
-      error_message: '',
+      validation_errors: {},
       formData: {
         id: this.props.collector.id,
         name: this.props.collector.name,
@@ -49,6 +49,10 @@ const CollectorForm = createReactClass({
         default_template: String(this.props.collector.default_template),
       },
     };
+  },
+
+  componentWillMount() {
+    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
   },
 
   componentDidMount() {
@@ -75,16 +79,22 @@ const CollectorForm = createReactClass({
     return (nextValue) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
+      this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
     };
+  },
+
+  _validateFormData(nextFormData) {
+    if (nextFormData.name && nextFormData.node_operating_system) {
+      CollectorsActions.validate(nextFormData).then(validation => (
+        this.setState({ validation_errors: validation.errors, error: validation.failed })
+      ));
+    }
   },
 
   _onNameChange(event) {
     const nextName = event.target.value;
     this._formDataUpdate('name')(nextName);
-    CollectorsActions.validate(nextName, this.props.collector.id).then(validation => (
-      this.setState({ error: validation.error, error_message: validation.error_message })
-    ));
   },
 
   _onInputChange(key) {
@@ -118,6 +128,20 @@ const CollectorForm = createReactClass({
     return options;
   },
 
+  _formatValidationMessage(fieldName, defaultText) {
+    if (this.state.validation_errors[fieldName]) {
+      return <span>{this.state.validation_errors[fieldName][0]}</span>;
+    }
+    return <span>{defaultText}</span>;
+  },
+
+  _validationState(fieldName) {
+    if (this.state.validation_errors[fieldName]) {
+      return 'error';
+    }
+    return null;
+  },
+
   render() {
     let validationParameters = '';
     let executeParameters = '';
@@ -135,13 +159,14 @@ const CollectorForm = createReactClass({
                    id="name"
                    label="Name"
                    onChange={this._onNameChange}
-                   bsStyle={this.state.error ? 'error' : null}
-                   help={this.state.error ? this.state.error_message : 'Name for this configuration'}
-                   value={this.state.formData.name}
+                   bsStyle={this._validationState('name')}
+                   help={this._formatValidationMessage('name', 'Name for this collector')}
+                   value={this.state.formData.name || ''}
                    autoFocus
                    required />
 
-            <FormGroup controlId="service_type">
+            <FormGroup controlId="service_type"
+                       validationState={this._validationState('service_type')}>
               <ControlLabel>Process management</ControlLabel>
               <Select inputProps={{ id: 'service_type' }}
                       options={this._formatServiceTypes()}
@@ -149,10 +174,11 @@ const CollectorForm = createReactClass({
                       onChange={this._formDataUpdate('service_type')}
                       placeholder="Service Type"
                       required />
-              <HelpBlock>Choose the service type this collector is meant for.</HelpBlock>
+              <HelpBlock>{this._formatValidationMessage('service_type', 'Choose the service type this collector is meant for.')}</HelpBlock>
             </FormGroup>
 
-            <FormGroup controlId="operating_system">
+            <FormGroup controlId="operating_system"
+                       validationState={this._validationState('node_operating_system')}>
               <ControlLabel>Operating System</ControlLabel>
               <Select inputProps={{ id: 'node_operating_system' }}
                       options={this._formatOperatingSystems()}
@@ -160,33 +186,34 @@ const CollectorForm = createReactClass({
                       onChange={this._formDataUpdate('node_operating_system')}
                       placeholder="Name"
                       required />
-              <HelpBlock>Choose the operating system this collector is meant for.</HelpBlock>
+              <HelpBlock>{this._formatValidationMessage('node_operating_system', 'Choose the operating system this collector is meant for.')}</HelpBlock>
             </FormGroup>
 
             <Input type="text"
                    id="executablePath"
                    label="Executable Path"
                    onChange={this._onInputChange('executable_path')}
-                   help="Path to the collector executable"
-                   value={this.state.formData.executable_path}
+                   bsStyle={this._validationState('executable_path')}
+                   help={this._formatValidationMessage('executable_path', 'Path to the collector executable')}
+                   value={this.state.formData.executable_path || ''}
                    required />
 
             <Input type="text"
                    id="executeParameters"
-                   label="Execute Parameters"
+                   label={<span>Execute Parameters <small className="text-muted">(Optional)</small></span>}
                    onChange={this._onInputChange('execute_parameters')}
                    help={<span>Parameters the collector is started with.<strong> %s will be replaced by the path to the configuration file.</strong></span>}
-                   value={executeParameters} />
+                   value={executeParameters || ''} />
 
             <Input type="text"
                    id="validationParameters"
-                   label="Parameters for Configuration Validation"
+                   label={<span>Parameters for Configuration Validation <small className="text-muted">(Optional)</small></span>}
                    onChange={this._onInputChange('validation_parameters')}
                    help={<span>Parameters that validate the configuration file. <strong> %s will be replaced by the path to the configuration file.</strong></span>}
-                   value={validationParameters} />
+                   value={validationParameters || ''} />
 
             <FormGroup controlId="defaultTemplate">
-              <ControlLabel>Default Template</ControlLabel>
+              <ControlLabel><span>Default Template <small className="text-muted">(Optional)</small></span></ControlLabel>
               <SourceCodeEditor id="template"
                                 value={this.state.formData.default_template}
                                 onChange={this._formDataUpdate('default_template')} />
