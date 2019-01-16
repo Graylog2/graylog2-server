@@ -1,6 +1,6 @@
 import Immutable from 'immutable';
 import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 
 const _fieldResult = (field, score = 1) => {
   const { name, type } = field;

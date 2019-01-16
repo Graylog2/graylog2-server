@@ -25,7 +25,8 @@ class QueryInput extends Component {
     this.state = {
       value: props.value,
     };
-    this.completer = new SearchBarAutoCompletions();
+    const CompleterClass = props.completerClass;
+    this.completer = new CompleterClass();
   }
 
   componentDidMount() {
@@ -46,7 +47,11 @@ class QueryInput extends Component {
       }
     }
   }
+
   componentWillReceiveProps(nextProps) {
+    if (nextProps.value !== this.state.value) {
+      this.setState({ value: nextProps.value });
+    }
     if (this.editor) {
       const { editor } = this.editor;
       if (nextProps.value && this._placeholderExists(editor)) {
@@ -89,7 +94,7 @@ class QueryInput extends Component {
     }
   }
 
-  _debouncedOnChange = debounce(value => this.props.onChange(value), 100);
+  _debouncedOnChange = debounce(value => this.props.onChange(value), 700);
 
   _onChange = (newValue) => {
     this.setState({ value: newValue }, () => this._debouncedOnChange(this.state.value));
@@ -155,6 +160,7 @@ class QueryInput extends Component {
 }
 
 QueryInput.propTypes = {
+  completerClass: PropTypes.any,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
@@ -162,6 +168,7 @@ QueryInput.propTypes = {
 };
 
 QueryInput.defaultProps = {
+  completerClass: SearchBarAutoCompletions,
   value: '',
   placeholder: '',
 };
