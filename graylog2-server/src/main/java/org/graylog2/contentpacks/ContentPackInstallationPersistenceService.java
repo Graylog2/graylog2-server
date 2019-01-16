@@ -34,6 +34,7 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -131,6 +132,7 @@ public class ContentPackInstallationPersistenceService {
 
     /**
      * Returns the number of installations the given content pack entity ID is used in.
+     *
      * @param entityId the native entity ID
      * @return number of installations
      */
@@ -138,5 +140,17 @@ public class ContentPackInstallationPersistenceService {
         final String field = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_META_ID);
 
         return dbCollection.getCount(DBQuery.is(field, entityId));
+    }
+
+    public long countInstallationOfEntityByIdAndFoundOnSystem(ModelId entityId) {
+        final String foundOnSystemField = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_ENTITY_FOUND_ON_SYSTEM);
+
+        DBCursor<ContentPackInstallation> dbInstallations = dbCollection.find(DBQuery.is(foundOnSystemField, true));
+        ImmutableSet<ContentPackInstallation> installations =  ImmutableSet.copyOf((Iterator<ContentPackInstallation>) dbInstallations);
+        return installations.stream().map(ContentPackInstallation::entities)
+                .flatMap(Collection::stream)
+                .filter(nativeEntityDescriptor -> nativeEntityDescriptor.id().toString().matches(entityId.toString()) &&
+                        nativeEntityDescriptor.foundOnSystem() != null && nativeEntityDescriptor.foundOnSystem())
+                .count();
     }
 }
