@@ -20,36 +20,38 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.AddressedEnvelope;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MessageAggregationHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    private static final Logger LOG = LoggerFactory.getLogger(NettyTransport.class);
+import java.net.InetSocketAddress;
+
+public class EnvelopeMessageAggregationHandler extends SimpleChannelInboundHandler<AddressedEnvelope<ByteBuf, InetSocketAddress>> {
+    private static final Logger LOG = LoggerFactory.getLogger(EnvelopeMessageAggregationHandler.class);
 
     private final CodecAggregator aggregator;
     private final Timer aggregationTimer;
     private final Meter invalidChunksMeter;
 
-    public MessageAggregationHandler(CodecAggregator aggregator, MetricRegistry metricRegistry) {
+    public EnvelopeMessageAggregationHandler(CodecAggregator aggregator, MetricRegistry metricRegistry) {
         this.aggregator = aggregator;
         aggregationTimer = metricRegistry.timer("aggregationTime");
         invalidChunksMeter = metricRegistry.meter("invalidMessages");
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, AddressedEnvelope<ByteBuf, InetSocketAddress> envelope) throws Exception {
         final CodecAggregator.Result result;
         try (Timer.Context ignored = aggregationTimer.time()) {
-            result = aggregator.addChunk(msg);
+            result = aggregator.addChunk(envelope.content());
         }
         final ByteBuf completeMessage = result.getMessage();
         if (completeMessage != null) {
             LOG.debug("Message aggregation completion, forwarding {}", completeMessage);
-            ctx.fireChannelRead(completeMessage);
+            ctx.fireChannelRead(SenderEnvelope.of(completeMessage, envelope.sender()));
         } else if (result.isValid()) {
             LOG.debug("More chunks necessary to complete this message");
         } else {
