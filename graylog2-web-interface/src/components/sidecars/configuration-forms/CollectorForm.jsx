@@ -51,6 +51,10 @@ const CollectorForm = createReactClass({
     };
   },
 
+  componentWillMount() {
+    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+  },
+
   componentDidMount() {
     CollectorsActions.all();
     CollectorConfigurationsActions.all();
@@ -75,7 +79,7 @@ const CollectorForm = createReactClass({
     return (nextValue) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
-      this._validateFormData(nextFormData);
+      this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
     };
   },

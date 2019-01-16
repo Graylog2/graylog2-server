@@ -54,6 +54,10 @@ const ConfigurationForm = createReactClass({
     };
   },
 
+  componentWillMount() {
+    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+  },
+
   componentDidMount() {
     CollectorsActions.all();
   },
@@ -99,7 +103,7 @@ const ConfigurationForm = createReactClass({
     return (nextValue, _, hideCallback) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
-      this._validateFormData(nextFormData, false);
+      this._debouncedValidateFormData(nextFormData, false);
       this.setState({ formData: nextFormData }, hideCallback);
     };
   },

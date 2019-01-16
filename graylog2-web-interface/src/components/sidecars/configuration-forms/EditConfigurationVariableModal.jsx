@@ -68,11 +68,13 @@ class EditConfigurationVariableModal extends React.Component {
     });
   };
 
+  _debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+
   _formDataUpdate = (key) => {
     return (nextValue) => {
       const nextFormData = lodash.cloneDeep(this.state.formData);
       nextFormData[key] = nextValue;
-      this._validateFormData(nextFormData);
+      this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
     };
   };
