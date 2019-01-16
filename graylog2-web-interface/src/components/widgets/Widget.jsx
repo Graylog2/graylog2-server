@@ -57,7 +57,9 @@ const Widget = createReactClass({
   },
 
   componentDidUpdate() {
-    this._calculateWidgetSize();
+    if (!this.state.deleted) {
+      this._calculateWidgetSize();
+    }
   },
 
   componentWillUnmount() {
@@ -122,8 +124,9 @@ const Widget = createReactClass({
   },
 
   _calculateWidgetSize() {
-    const $widgetNode = $(this._getWidgetNode());
-    if (!$widgetNode) { return; }
+    const widgetNode = this._getWidgetNode();
+    if (!widgetNode) { return; }
+    const $widgetNode = $(widgetNode);
     // .height() give us the height of the whole widget without counting paddings, we need to remove the size
     // of the header and footer from that.
     const availableHeight = $widgetNode.height() - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
