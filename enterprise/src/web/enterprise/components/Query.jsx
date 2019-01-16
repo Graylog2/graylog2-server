@@ -12,8 +12,10 @@ import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore
 import StaticMessageList from './messagelist/StaticMessageList';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 
+const MAXIMUM_GRID_SIZE = 12;
+
 const _onPositionsChange = (positions) => {
-  const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width)])).toJS();
+  const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)])).toJS();
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
