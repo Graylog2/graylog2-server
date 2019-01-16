@@ -49,6 +49,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Api(value = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables")
@@ -57,6 +58,9 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ConfigurationVariableResource extends RestResource implements PluginRestResource {
+    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]+$");
+    private static final Pattern INVALID_NAME_PREFIX = Pattern.compile("^[0-9].*");
+
     private final ConfigurationVariableService configurationVariableService;
     private final ConfigurationService configurationService;
     private final EtagService etagService;
@@ -138,7 +142,6 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     public ValidationResult validateConfigurationVariable(@ApiParam(name = "JSON body", required = true)
                                                      @Valid @NotNull ConfigurationVariable toValidate) {
-        final ValidationResult validation = new ValidationResult();
         return validateConfigurationVariableHelper(toValidate);
     }
 
@@ -171,15 +174,20 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         final ValidationResult validationResult = new ValidationResult();
         if (confVar.name().isEmpty()) {
             validationResult.addError("name", "Variable name can not be empty.");
-        } else if (!confVar.name().matches("^[A-Za-z0-9_]+$")) {
+        } else if (!VALID_NAME_PATTERN.matcher(confVar.name()).matches()) {
             validationResult.addError("name", "Variable name can only contain the following characters: A-Z,a-z,0-9,_");
-        } else if (confVar.name().matches("^[0-9].*")) {
+        } else if (INVALID_NAME_PREFIX.matcher(confVar.name()).matches()) {
             validationResult.addError("name", "Variable name can not start with numbers.");
         }
 
         if (configurationVariableService.hasConflict(confVar)) {
             validationResult.addError("name", "A variable with that name already exists.");
         }
+
+        if (confVar.content().isEmpty()) {
+            validationResult.addError("content", "Variable content can not be empty.");
+        }
+
         return validationResult;
     }
 

@@ -63,6 +63,7 @@ public abstract class Collector {
     public abstract String validationParameters();
 
     @JsonProperty(FIELD_DEFAULT_TEMPLATE)
+    @Nullable
     public abstract String defaultTemplate();
 
     public static Builder builder() {
@@ -92,7 +93,7 @@ public abstract class Collector {
                                    @JsonProperty(FIELD_EXECUTABLE_PATH) String executablePath,
                                    @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable String executeParameters,
                                    @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable String validationParameters,
-                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE) String defaultTemplate) {
+                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE) @Nullable String defaultTemplate) {
         return builder()
                 .id(id)
                 .name(name)
