@@ -302,3 +302,40 @@ The defaults of the configuration settings for the email alarm callback with reg
 Furthermore, it's not possible anymore to enable both settings (SMTP with STARTTLS and SMTP over SSL) at the same time because this led to errors at runtime when Graylog tried to upgrade the connection to TLS with STARTTLS in an already existing SMTPS connection.
 
 Most SMTP services prefer SMTP with STARTTLS to provide an encrypted connection.
+
+
+Setting initial configuration on widget's configurationCreateComponent
+======================================================================
+
+Widget plugins that want to customize the create modal by adding some custom inputs need to additionally set the
+initial configuration for them. Before, we accessed the component's ``getInitialConfiguration()`` when opening the
+creation modal form, but this is now not possible due to performance improvements.
+
+In 3.0, setting the initial widget configuration on the create component can be achieved in two different ways:
+
+Setting ``initialConfiguration`` class property
+---------------------------------------------
+This is the preferred method, and it should be used every time configuration does not depend on any external state
+or props. Example::
+
+    static initialConfiguration = { shouldShowChart: true, description: 'Initial description' };
+
+
+Calling the ``setInitialConfiguration`` prop
+--------------------------------------------
+``WidgetCreationModal`` passes a function called ``setInitialConfiguration`` to the ``configurationCreateComponent``
+defined for the widget. That function can be called on the ``constructor`` or ``componentDidMount`` of the custom
+component to set the initial configuration values if any of them is derived from state or other props.
+Note that any configuration key set through ``setInitialConfiguration`` will have precedence over configuration keys
+set by ``initialConfiguration`` and will override existing configuration keys.
+Example::
+
+   static initialConfiguration = { key: value, test: false };
+
+   constructor(props) {
+     super(props);
+     props.setInitialConfiguration({ field: props.fields[0], test: true });
+   }
+
+   /* The effective initial configuration would be: { key: value, field: props.fields[0], test: true } */
+
