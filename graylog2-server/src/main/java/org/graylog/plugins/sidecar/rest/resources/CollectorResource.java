@@ -194,12 +194,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create a new collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
-    public Collector createCollector(@ApiParam(name = "JSON body", required = true)
+    public Response createCollector(@ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull Collector request) throws BadRequestException {
         Collector collector = collectorService.fromRequest(request);
-        validateFromRequest(collector, "Cannot create new collector.");
+        final ValidationResult validationResult = validate(collector);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
         etagService.invalidateAll();
-        return collectorService.save(collector);
+        return Response.ok().entity(collectorService.save(collector)).build();
     }
 
     @PUT
@@ -208,14 +211,17 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_UPDATE)
-    public Collector updateCollector(@ApiParam(name = "id", required = true)
+    public Response updateCollector(@ApiParam(name = "id", required = true)
                                      @PathParam("id") String id,
                                      @ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull Collector request) throws BadRequestException {
         Collector collector = collectorService.fromRequest(id, request);
-        validateFromRequest(collector, "Cannot update existing collector.");
+        final ValidationResult validationResult = validate(collector);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
         etagService.invalidateAll();
-        return collectorService.save(collector);
+        return Response.ok().entity(collectorService.save(collector)).build();
     }
 
     @POST
@@ -227,9 +233,12 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                   @PathParam("id") String id,
                                   @ApiParam(name = "name", required = true)
                                   @PathParam("name") String name) throws NotFoundException, BadRequestException {
-        etagService.invalidateAll();
         final Collector collector = collectorService.copy(id, name);
-        validateFromRequest(collector, "Cannot copy collector.");
+        final ValidationResult validationResult = validate(collector);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+        etagService.invalidateAll();
         collectorService.save(collector);
         return Response.accepted().build();
     }
@@ -332,15 +341,6 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     private boolean validatePath(String path) {
         return VALID_PATH_PATTERN.matcher(path).matches();
-    }
-
-    private void validateFromRequest(Collector toValidate, String message) throws BadRequestException {
-        final ValidationResult validation = validate(toValidate);
-        if (validation.failed()) {
-            final String errorMessage = message + " " + validation.getErrors().toString();
-            LOG.error(errorMessage);
-            throw new BadRequestException(errorMessage);
-        }
     }
 
     private String collectorsToEtag(CollectorListResponse collectors) {

@@ -272,9 +272,15 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create new configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
-    public Configuration createConfiguration(@ApiParam(name = "JSON body", required = true)
+    public Response createConfiguration(@ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
-        return persistConfiguration(null, request);
+        final Configuration configuration = configurationFromRequest(null, request);
+        final ValidationResult validationResult = validate(configuration);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
+        return Response.ok().entity(configurationService.save(configuration)).build();
     }
 
     @POST
@@ -286,7 +292,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                       @PathParam("id") String id,
                                       @PathParam("name") String name) throws NotFoundException {
         final Configuration configuration = configurationService.copyConfiguration(id, name);
-        validateFromRequest(configuration, "Cannot copy configuration.");
+        final ValidationResult validationResult = validate(configuration);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
         configurationService.save(configuration);
         return Response.accepted().build();
     }
@@ -297,7 +306,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
-    public Configuration updateConfiguration(@ApiParam(name = "id", required = true)
+    public Response updateConfiguration(@ApiParam(name = "id", required = true)
                                              @PathParam("id") String id,
                                              @ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
@@ -313,10 +322,14 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             }
         }
 
-        final Configuration updatedConfiguration = persistConfiguration(id, request);
+        final Configuration updatedConfiguration = configurationFromRequest(id, request);
+        final ValidationResult validationResult = validate(updatedConfiguration);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
         etagService.invalidateAll();
 
-        return updatedConfiguration;
+        return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
     }
 
     @DELETE
@@ -371,16 +384,13 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             validation.addError("template", "Collector template cannot be empty.");
         }
 
-        return validation;
-    }
-
-    private void validateFromRequest(Configuration toValidate, String message) throws BadRequestException {
-        final ValidationResult validation = validate(toValidate);
-        if (validation.failed()) {
-            final String errorMessage = message + " " + validation.getErrors().toString();
-            LOG.error(errorMessage);
-            throw new BadRequestException(errorMessage);
+        try {
+            this.configurationService.renderPreview(toValidate.template());
+        } catch (RenderTemplateException e) {
+            validation.addError("template", "Template error: " + e.getMessage());
         }
+
+        return validation;
     }
 
     private boolean isConfigurationInUse(String configurationId) {
@@ -398,20 +408,13 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 .toString();
     }
 
-    private Configuration persistConfiguration(String id, Configuration request) {
-        try {
-            this.configurationService.renderPreview(request.template());
-        } catch (RenderTemplateException e) {
-            throw new BadRequestException("Configuration template validation failed: " + e.getMessage());
-        }
-
+    private Configuration configurationFromRequest(String id, Configuration request) {
         Configuration configuration;
         if (id == null) {
             configuration = configurationService.fromRequest(request);
         } else {
             configuration = configurationService.fromRequest(id, request);
         }
-        validateFromRequest(configuration, "Configuration validation failed:");
-        return configurationService.save(configuration);
+        return configuration;
     }
 }

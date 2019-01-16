@@ -37,7 +37,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -105,8 +104,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
                                              @Valid @NotNull ConfigurationVariable request) {
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
-            final String errorMessage = "Cannot create variable. " + validationResult.getErrors().toString();
-            throw new BadRequestException(errorMessage);
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
         final ConfigurationVariable configurationVariable = persistConfigurationVariable(null, request);
         return Response.ok().entity(configurationVariable).build();
@@ -126,8 +124,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
 
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
-            final String errorMessage = "Cannot update variable. " + validationResult.getErrors().toString();
-            throw new BadRequestException(errorMessage);
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
         if (!previousConfigurationVariable.name().equals(request.name())) {
             configurationService.replaceVariableNames(previousConfigurationVariable.fullName(), request.fullName());
