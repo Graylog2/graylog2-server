@@ -160,6 +160,10 @@ if (TARGET === 'build') {
           minimize: true,
           sourceMap: true,
           compress: {
+            // Conditionals compression caused issue #5450 so they should be disabled for now.
+            // Looking at uglify-js issues, it seems that the latest changes in version 3.4.9 broke conditionals
+            // compression. For example: https://github.com/mishoo/UglifyJS2/issues/3269
+            conditionals: false,
             warnings: false,
           },
           mangle: {
