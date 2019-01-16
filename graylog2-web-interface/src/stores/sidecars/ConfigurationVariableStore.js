@@ -4,6 +4,7 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
+import lodash from "lodash";
 
 const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
 
@@ -80,16 +81,15 @@ const ConfigurationVariableStore = Reflux.createStore({
   },
 
   validate(configurationVariable) {
-    const request = {
-      id: configurationVariable.id,
-      name: configurationVariable.name,
-      description: configurationVariable.description,
-      content: configurationVariable.content,
+    // set minimum api defaults for faster validation feedback
+    const payload = {
+      id: ' ',
+      name: ' ',
+      content: ' ',
     };
-    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/validate`);
-    const method = 'POST';
+    lodash.merge(payload, configurationVariable);
 
-    const promise = fetch(method, url, request);
+    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/validate`), payload);
     promise.catch(
       (error) => {
         UserNotification.error(`Validating variable "${configurationVariable.name}" failed with status: ${error.message}`,

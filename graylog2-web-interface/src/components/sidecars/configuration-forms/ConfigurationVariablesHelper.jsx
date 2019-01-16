@@ -96,10 +96,10 @@ class ConfigurationVariablesHelper extends React.Component {
     return !(this.state.configurationVariables);
   };
 
-  _saveConfigurationVariable = (configurationVariable, callback) => {
+  _saveConfigurationVariable = (configurationVariable, oldName, callback) => {
     ConfigurationVariableActions.save.triggerPromise(configurationVariable)
       .then(() => this._onSuccessfulUpdate(() => {
-        this.props.onVariableRename(configurationVariable.savedName, configurationVariable.name);
+        this.props.onVariableRename(oldName, configurationVariable.name);
         callback();
       }));
   };

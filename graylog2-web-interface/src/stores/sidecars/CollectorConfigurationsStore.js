@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
+import lodash from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -224,13 +225,22 @@ const CollectorConfigurationsStore = Reflux.createStore({
     CollectorConfigurationsActions.delete.promise(promise);
   },
 
-  validate(name) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate/?name=${name}`));
+  validate(configuration) {
+    // set minimum api defaults for faster validation feedback
+    const payload = {
+      name: ' ',
+      collector_id: ' ',
+      color: ' ',
+      template: ' ',
+    };
+    lodash.merge(payload, configuration);
+
+    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
     promise
       .then(
         response => response,
         error => (
-          UserNotification.error(`Validating configuration with name "${name}" failed with status: ${error.message}`,
+          UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
             'Could not validate configuration')
         ));
 
