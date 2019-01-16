@@ -4,11 +4,11 @@ import { MenuItem } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import OverlayDropdown from './OverlayDropdown';
+import ActionContextProvider from 'enterprise/logic/providers/ActionContextProvider';
 
+import OverlayDropdown from './OverlayDropdown';
 import style from './Field.css';
 import CustomPropTypes from './CustomPropTypes';
-import ActionContextProvider from '../logic/providers/ActionContextProvider';
 
 export default class Field extends React.Component {
   static propTypes = {
@@ -51,7 +51,7 @@ export default class Field extends React.Component {
         fieldAction.handler(queryId, field, this.context);
       };
       const condition = fieldAction.condition || (() => true);
-      const actionDisabled = !condition({ name, type });
+      const actionDisabled = !condition({ name, type, context: this.context });
       return (<MenuItem key={`${name}-action-${fieldAction.type}`}
                         disabled={actionDisabled}
                         eventKey={{ action: fieldAction.type, field: name }}

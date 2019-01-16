@@ -39,6 +39,7 @@ import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
 
 import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
+import RemoveFromTableActionHandler from 'enterprise/logic/fieldactions/RemoveFromTableActionHandler';
 import CreateParameterDialog from 'enterprise/logic/creatoractions/CreateParameterDialog';
 import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
 import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
@@ -150,6 +151,12 @@ export default {
       type: 'add-to-table',
       title: 'Add to table',
       handler: AddToTableActionHandler,
+    },
+    {
+      type: 'remove-to-table',
+      title: 'Remove from table',
+      handler: RemoveFromTableActionHandler,
+      condition: RemoveFromTableActionHandler.condition,
     },
     {
       type: 'new-query',
