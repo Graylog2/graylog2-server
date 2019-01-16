@@ -147,7 +147,7 @@ public class LookupCacheFacadeTest {
         final NativeEntityDescriptor descriptor = nativeEntity.descriptor();
         final CacheDto cacheDto = nativeEntity.entity();
 
-        assertThat(descriptor.id()).isEqualTo(ModelId.of("no-op-cache"));
+        assertThat(nativeEntity.descriptor().id()).isNotNull();
         assertThat(descriptor.type()).isEqualTo(ModelTypes.LOOKUP_CACHE_V1);
         assertThat(cacheDto.name()).isEqualTo("no-op-cache");
         assertThat(cacheDto.title()).isEqualTo("No-op cache");
