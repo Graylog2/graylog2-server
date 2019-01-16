@@ -4,6 +4,11 @@ import { mount } from 'enzyme';
 import * as Immutable from 'immutable';
 import { startCase } from 'lodash';
 
+// $FlowFixMe: imports from core need to be fixed in flow
+import Routes from 'routing/Routes';
+// $FlowFixMe: imports from core need to be fixed in flow
+import history from 'util/History';
+
 import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
 import ViewDeserializer from 'enterprise/logic/views/ViewDeserializer';
 import ViewLoader from 'enterprise/logic/views/ViewLoader';
@@ -23,6 +28,7 @@ jest.mock('enterprise/logic/views/ViewDeserializer', () => jest.fn(x => Promise.
 jest.mock('enterprise/logic/views/ViewLoader', () => jest.fn(x => Promise.resolve(x)));
 jest.mock('enterprise/stores/SearchExecutionStateStore', () => ({ SearchExecutionStateActions: {} }));
 jest.mock('enterprise/components/RequiredParametersForViewForm', () => 'required-parameters-for-view-form');
+jest.mock('util/History', () => ({}));
 jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
 
 const dummyParameter = (name: string, defaultValue = undefined) => Parameter.create(name, startCase(name), `${startCase(name)} Value`, 'any', defaultValue, false, ParameterBinding.empty());
@@ -66,6 +72,17 @@ describe('ShowViewPage', () => {
     ViewManagementActions.get = jest.fn(() => Promise.reject());
     mount(<ShowViewPage location={{ query: {} }} parameters={Immutable.Map()} params={{ viewId: 'foo' }} route={{}} />);
     expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
+  });
+  it('redirects to "Not Found" page if loading view returns 404', (done) => {
+    ViewManagementActions.get = jest.fn(() => Promise.reject({ status: 404 }));
+    history.replace = jest.fn();
+
+    mount(<ShowViewPage location={{ query: {} }} parameters={Immutable.Map()} params={{ viewId: 'foo' }} route={{}} />);
+
+    setImmediate(() => {
+      expect(history.replace).toHaveBeenCalledWith(Routes.NOTFOUND);
+      done();
+    });
   });
   it('passes loaded view to ViewDeserializer and ViewLoader', (done) => {
     ViewManagementActions.get = jest.fn(() => Promise.resolve(viewJson));
