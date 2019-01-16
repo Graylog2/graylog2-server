@@ -8,11 +8,9 @@ class CountWidgetCreateConfiguration extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  getInitialConfiguration = () => {
-    return {
-      trend: false,
-      lower_is_better: false,
-    };
+  static initialConfiguration = {
+    trend: false,
+    lower_is_better: false,
   };
 
   render() {
