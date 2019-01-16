@@ -300,7 +300,7 @@ const ConfigurationForm = createReactClass({
             <Col md={12}>
               <FormGroup>
                 <ButtonToolbar>
-                  <Button type="submit" bsStyle="primary">
+                  <Button type="submit" bsStyle="primary" disabled={this._hasErrors()}>
                     {this.props.action === 'create' ? 'Create' : 'Update'}
                   </Button>
                   <Button type="button" onClick={this._onCancel}>
