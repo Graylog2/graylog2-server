@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -24,13 +25,11 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.Typed;
 
-import javax.annotation.Nullable;
-
 /**
  * The unique description of a native entity by ID and type.
  */
 @AutoValue
-@JsonDeserialize(builder = AutoValue_NativeEntityDescriptor.Builder.class)
+@JsonDeserialize(builder = NativeEntityDescriptor.Builder.class)
 public abstract class NativeEntityDescriptor implements Identified, Typed {
     public static final String FIELD_ENTITY_ID = "content_pack_entity_id";
     public static final String FIELD_ENTITY_FOUND_ON_SYSTEM = "found_on_system";
@@ -89,11 +88,15 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
     }
 
     public static Builder builder() {
-        return new AutoValue_NativeEntityDescriptor.Builder();
+        return NativeEntityDescriptor.Builder.create();
     }
 
     @AutoValue.Builder
     public abstract static class Builder implements IdBuilder<Builder>, TypeBuilder<Builder> {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_NativeEntityDescriptor.Builder().foundOnSystem(false);
+        }
 
         @JsonProperty(FIELD_ENTITY_ID)
         abstract Builder contentPackEntityId(ModelId contentPackEntityId);
