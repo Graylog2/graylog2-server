@@ -163,7 +163,7 @@ public class GrokPatternFacadeTest {
                 .data(objectMapper.convertValue(GrokPatternEntity.create("Test","[a-z]+"), JsonNode.class))
                 .build();
         final Optional<NativeEntity<GrokPattern>> existingGrokPattern = facade.findExisting(grokPatternEntity, Collections.emptyMap());
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(grokPatternEntity.id(), "1", ModelTypes.GROK_PATTERN_V1, grokPattern.name());
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(grokPatternEntity.id(), "1", ModelTypes.GROK_PATTERN_V1, grokPattern.name(), false);
         assertThat(existingGrokPattern)
                 .isPresent()
                 .get()

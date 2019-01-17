@@ -42,6 +42,7 @@ import org.graylog2.contentpacks.model.ContentPackUninstallDetails;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.LegacyContentPack;
+import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
@@ -131,7 +132,17 @@ public class ContentPackService {
                 if (existingEntity.isPresent()) {
                     LOG.trace("Found existing entity for {}", entityDescriptor);
                     final NativeEntity<?> nativeEntity = existingEntity.get();
-                    allEntityDescriptors.add(nativeEntity.descriptor());
+                    final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
+                    /* Found entity on the system or we found a other installation which stated that */
+                    if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
+                        contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
+                          final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
+                                  .foundOnSystem(true)
+                                  .build();
+                        allEntityDescriptors.add(serverDescriptor);
+                    } else {
+                        allEntityDescriptors.add(nativeEntity.descriptor());
+                    }
                     allEntities.put(entityDescriptor, nativeEntity.entity());
                 } else {
                     LOG.trace("Creating new entity for {}", entityDescriptor);
@@ -202,7 +213,7 @@ public class ContentPackService {
             if (nativeEntityDescriptorOptional.isPresent()) {
                 NativeEntityDescriptor nativeEntityDescriptor = nativeEntityDescriptorOptional.get();
                 if (contentPackInstallationPersistenceService
-                        .countInstallationOfEntityById(nativeEntityDescriptor.contentPackEntityId()) <= 1) {
+                        .countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 1) {
                     nativeEntityDescriptors.add(nativeEntityDescriptor);
                 }
             }
@@ -255,9 +266,13 @@ public class ContentPackService {
                 if (nativeEntityDescriptorOptional.isPresent()) {
                     final NativeEntityDescriptor nativeEntityDescriptor = nativeEntityDescriptorOptional.get();
                     final Optional nativeEntityOptional = facade.loadNativeEntity(nativeEntityDescriptor);
+                    final ModelId entityId = nativeEntityDescriptor.id();
+                    final long installCount = contentPackInstallationPersistenceService
+                            .countInstallationOfEntityById(entityId);
+                    final long systemFoundCount = contentPackInstallationPersistenceService.
+                            countInstallationOfEntityByIdAndFoundOnSystem(entityId);
 
-                    if (contentPackInstallationPersistenceService
-                            .countInstallationOfEntityById(nativeEntityDescriptor.contentPackEntityId()) > 1) {
+                    if (installCount > 1 || (installCount == 1 && systemFoundCount >= 1)) {
                        skippedEntities.add(nativeEntityDescriptor);
                        LOG.debug("Did not remove entity since other content pack installations still use them: {}",
                                nativeEntityDescriptor);

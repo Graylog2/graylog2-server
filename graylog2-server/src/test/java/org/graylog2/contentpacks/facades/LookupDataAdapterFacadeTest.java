@@ -142,7 +142,7 @@ public class LookupDataAdapterFacadeTest {
 
         final NativeEntity<DataAdapterDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
 
-        assertThat(nativeEntity.descriptor().id()).isEqualTo(ModelId.of("http-dsv"));
+        assertThat(nativeEntity.descriptor().id()).isNotNull();
         assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
         assertThat(nativeEntity.entity().name()).isEqualTo("http-dsv");
         assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");

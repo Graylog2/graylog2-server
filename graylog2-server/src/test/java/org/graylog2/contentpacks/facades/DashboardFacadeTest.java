@@ -358,7 +358,7 @@ public class DashboardFacadeTest {
         assertThat(dashboard.getWidgets().size()).isEqualTo(1);
         assertThat(dashboard.getWidgets()).containsKeys("12345");
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(dashboardEntity.id(), savedDashboard.getId(), ModelTypes.DASHBOARD_V1, savedDashboard.getTitle());
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(dashboardEntity.id(), savedDashboard.getId(), ModelTypes.DASHBOARD_V1, savedDashboard.getTitle(), false);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
     }
 }

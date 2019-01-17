@@ -139,7 +139,7 @@ public class SidecarCollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name());
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name(), false);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(collector);
     }
@@ -166,7 +166,7 @@ public class SidecarCollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name());
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name(), false);
         assertThat(existingCollector.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(existingCollector.entity()).isEqualTo(collector);
     }

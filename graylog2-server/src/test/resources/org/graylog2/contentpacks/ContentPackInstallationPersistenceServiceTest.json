@@ -24,6 +24,7 @@
             "version": "1"
           },
           "title": "A Collector",
+          "found_on_system": false,
           "content_pack_entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
@@ -33,6 +34,7 @@
             "version": "1"
           },
           "title": "Another Collector",
+          "found_on_system": false,
           "content_pack_entity_id": "5b1a49eb3d274631fe07beff"
         },
         {
@@ -42,6 +44,7 @@
             "version": "1"
           },
           "title": "And another Collector",
+          "found_on_system": false,
           "content_pack_entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
@@ -69,6 +72,7 @@
             "version": "1"
           },
           "title": "A dashboard",
+          "found_on_system": false,
           "content_pack_entity_id": "beef49eb3d274631fe07abfe"
         },
         {
@@ -78,6 +82,7 @@
             "version": "1"
           },
           "title": "A grok pattern",
+          "found_on_system": false,
           "content_pack_entity_id": "bee149eb3d274631fe07abfe"
         },
         {
@@ -87,6 +92,7 @@
             "version": "1"
           },
           "title": "An input",
+          "found_on_system": false,
           "content_pack_entity_id": "bee249eb3d274631fe07abfe"
         },
         {
@@ -96,6 +102,7 @@
             "version": "1"
           },
           "title": "An output",
+          "found_on_system": false,
           "content_pack_entity_id": "bee349eb3d274631fe07abfe"
         },
         {
@@ -105,6 +112,7 @@
             "version": "1"
           },
           "title": "A stream",
+          "found_on_system": false,
           "content_pack_entity_id": "bee449eb3d274631fe07abfe"
         }
       ],
@@ -132,6 +140,7 @@
             "version": "1"
           },
           "title": "A pipeline rule",
+          "found_on_system": false,
           "content_pack_entity_id": "bee549eb3d274631fe07abfe"
         },
         {
@@ -141,6 +150,7 @@
             "version": "1"
           },
           "title": "A pipeline",
+          "found_on_system": false,
           "content_pack_entity_id": "bee649eb3d274631fe07abfe"
         },
         {
@@ -150,6 +160,7 @@
             "version": "1"
           },
           "title": "A lookup adapter",
+          "found_on_system": false,
           "content_pack_entity_id": "bee749eb3d274631fe07abfe"
         },
         {
@@ -159,6 +170,7 @@
             "version": "1"
           },
           "title": "A lookup cache",
+          "found_on_system": false,
           "content_pack_entity_id": "bee849eb3d274631fe07abfe"
         },
         {
@@ -168,6 +180,7 @@
             "version": "1"
           },
           "title": "A lookup table",
+          "found_on_system": false,
           "content_pack_entity_id": "bee949eb3d274631fe07abfe"
         }
       ],
@@ -199,6 +212,7 @@
             "version": "1"
           },
           "title": "A Collector",
+          "found_on_system": false,
           "content_pack_entity_id": "5b1a49eb3d274631fe07c86a"
         },
         {
@@ -208,6 +222,7 @@
             "version": "1"
           },
           "title": "Another Collector",
+          "found_on_system": false,
           "content_pack_entity_id": "5b1a49eb3d274631fe07befa"
         },
         {
@@ -217,12 +232,13 @@
             "version": "1"
           },
           "title": "And another Collector",
+          "found_on_system": false,
           "content_pack_entity_id": "5b1a49eb3d274631fe07abfe"
         }
       ],
       "comment": "comment1",
       "created_at": "2018-07-16T12:00:00.000Z",
       "created_by": "admin"
-    },
+    }
   ]
 }
