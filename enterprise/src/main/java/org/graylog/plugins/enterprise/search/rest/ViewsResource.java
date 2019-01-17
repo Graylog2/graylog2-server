@@ -177,7 +177,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     }
 
     private ViewDTO loadView(String id) {
-        return dbService.get(id).orElseThrow(() -> viewNotFoundException(id));
+        try {
+            return dbService.get(id).orElseThrow(() -> viewNotFoundException(id));
+        } catch (IllegalArgumentException ignored) {
+            throw viewNotFoundException(id);
+        }
     }
 
     private NotFoundException viewNotFoundException(String id) {

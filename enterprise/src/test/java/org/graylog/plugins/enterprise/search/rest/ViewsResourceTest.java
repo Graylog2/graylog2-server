@@ -6,15 +6,19 @@ import org.graylog.plugins.enterprise.search.views.ViewService;
 import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.NotFoundException;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +30,9 @@ import static org.mockito.Mockito.when;
 public class ViewsResourceTest {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private Subject subject;
@@ -85,5 +92,12 @@ public class ViewsResourceTest {
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
         assertThat(ownerCaptor.getValue()).isEqualTo("basti");
+    }
+
+    @Test
+    public void invalidObjectIdReturnsViewNotFoundException() {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+        expectedException.expect(NotFoundException.class);
+        this.viewsResource.get("invalid");
     }
 }
