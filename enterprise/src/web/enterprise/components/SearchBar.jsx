@@ -17,6 +17,7 @@ import { QueriesActions } from 'enterprise/stores/QueriesStore';
 import { CurrentQueryStore } from 'enterprise/stores/CurrentQueryStore';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { QueryFiltersActions, QueryFiltersStore } from 'enterprise/stores/QueryFiltersStore';
+import { ViewStore } from 'enterprise/stores/ViewStore';
 
 import StreamsFilter from './searchbar/StreamsFilter';
 import ScrollToHint from './common/ScrollToHint';
@@ -51,7 +52,8 @@ const SearchBar = createReactClass({
 
   _performSearch(event) {
     event.preventDefault();
-    this.props.onExecute();
+    const { view } = ViewStore.getInitialState();
+    this.props.onExecute(view);
   },
 
   render() {
@@ -104,6 +106,7 @@ const SearchBar = createReactClass({
                       <QueryInput value={query.query_string}
                                   placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                   onChange={value => QueriesActions.query(id, value)}
+                                  onBlur={this.props.onExecute}
                                   onExecute={this.props.onExecute} />
                     </Col>
                   </Row>

@@ -97,7 +97,7 @@ class QueryInput extends Component {
   _debouncedOnChange = debounce(value => this.props.onChange(value), 700);
 
   _onChange = (newValue) => {
-    this.setState({ value: newValue }, () => this._debouncedOnChange(this.state.value));
+    this.setState({ value: newValue });
   };
 
   _onBlur = () => {
@@ -109,6 +109,7 @@ class QueryInput extends Component {
         this._addPlaceholder(editor);
       }
     }
+    this.props.onChange(this.state.value).then(this.props.onBlur)
   };
 
   _onFocus = () => {
@@ -124,7 +125,7 @@ class QueryInput extends Component {
   };
 
   render() {
-    const { onChange, onExecute, placeholder, value, ...rest } = this.props;
+    const { onBlur, onChange, onExecute, placeholder, value, ...rest } = this.props;
     return (
       <div className="query" style={{ display: 'flex' }}>
         <AceEditor mode="lucene"

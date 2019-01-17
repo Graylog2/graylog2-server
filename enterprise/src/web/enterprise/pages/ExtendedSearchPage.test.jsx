@@ -17,6 +17,7 @@ import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
 import { SearchConfigActions } from 'enterprise/stores/SearchConfigStore';
 import { ViewActions } from 'enterprise/stores/ViewStore';
 import { FieldTypesActions } from 'enterprise/stores/FieldTypesStore';
+import { SearchMetadataActions, SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -30,6 +31,7 @@ jest.mock('enterprise/components/SearchBarWithStatus', () => mockComponent('Sear
 jest.mock('enterprise/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
 jest.mock('enterprise/components/parameters/ParameterBarWithUndeclaredParameters', () => mockComponent('ParameterBarWithUndeclaredParameters'));
 jest.mock('enterprise/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
+jest.mock('enterprise/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 
 describe('ExtendedSearchPage', () => {
   beforeEach(() => {
@@ -43,6 +45,8 @@ describe('ExtendedSearchPage', () => {
     SearchParameterStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
     FieldTypesActions.all = jest.fn();
+    SearchMetadataActions.parseSearch = jest.fn();
+    SearchMetadataStore.listen = jest.fn(() => jest.fn());
   });
 
   it('register a WindowLeaveMessage', () => {
@@ -183,15 +187,18 @@ describe('ExtendedSearchPage', () => {
     expect(SearchParameterActions.declare).toHaveBeenCalled();
   });
   it('updating search in view triggers search execution', () => {
+    const searchMetadata = { undeclared: Immutable.Set() };
+    SearchMetadataActions.parseSearch.mockReturnValue(Promise.resolve(searchMetadata));
     mount(<ExtendedSearchPage route={{}} />);
 
     const cb = ViewActions.search.completed.listen.mock.calls[0][0];
     SearchActions.execute.mockClear();
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
-    cb();
-
-    expect(SearchActions.execute).toHaveBeenCalled();
+    return cb({ search: {} })
+      .then(() => {
+        expect(SearchActions.execute).toHaveBeenCalled();
+      });
   });
   it('updating search parameters triggers search execution', () => {
     mount(<ExtendedSearchPage route={{}} />);
@@ -221,11 +228,54 @@ describe('ExtendedSearchPage', () => {
     expect(FieldTypesActions.all).toHaveBeenCalled();
   });
   it('refreshes field types upon every search execution', () => {
+    const searchMetadata = { undeclared: Immutable.Set() };
+    SearchMetadataActions.parseSearch.mockReturnValue(Promise.resolve(searchMetadata));
     mount(<ExtendedSearchPage route={{}} />);
 
     FieldTypesActions.all.mockClear();
     const cb = ViewActions.search.completed.listen.mock.calls[0][0];
-    cb();
-    expect(FieldTypesActions.all).toHaveBeenCalled();
+    return cb({ search: {} })
+      .then(() => {
+        expect(FieldTypesActions.all).toHaveBeenCalled();
+      });
+  });
+
+  it('refreshing after query change parses search metadata first', (done) => {
+    const searchMetadata = { undeclared: Immutable.Set() };
+    SearchMetadataActions.parseSearch.mockReturnValue(Promise.resolve(searchMetadata));
+    const wrapper = mount(<ExtendedSearchPage route={{}} />);
+
+    const searchBar = wrapper.find('SearchBar');
+    const cb = searchBar.at(0).props().onExecute;
+
+    const view = { search: {} };
+
+    const promise = cb(view);
+
+    promise.then(() => {
+      expect(SearchMetadataActions.parseSearch).toHaveBeenCalled();
+      expect(SearchActions.execute).toHaveBeenCalled();
+      done();
+    });
+  });
+
+  it('not refreshing after query change if undeclared parameters are present', (done) => {
+    const searchMetadata = { undeclared: Immutable.Set(['foo']) };
+    SearchMetadataActions.parseSearch.mockReturnValue(Promise.resolve(searchMetadata));
+    const wrapper = mount(<ExtendedSearchPage route={{}} />);
+
+    SearchActions.execute.mockClear();
+    const searchBar = wrapper.find('SearchBar');
+    const cb = searchBar.at(0).props().onExecute;
+
+    const view = { search: {} };
+
+    const promise = cb(view);
+
+    promise.catch(() => {
+      expect(SearchMetadataActions.parseSearch).toHaveBeenCalled();
+      expect(SearchActions.execute).not.toHaveBeenCalled();
+      done();
+    });
   });
 });
