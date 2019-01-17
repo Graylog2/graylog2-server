@@ -143,14 +143,11 @@ public class ContentPackInstallationPersistenceService {
     }
 
     public long countInstallationOfEntityByIdAndFoundOnSystem(ModelId entityId) {
-        final String foundOnSystemField = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_ENTITY_FOUND_ON_SYSTEM);
+        final DBQuery.Query query = DBQuery.elemMatch(ContentPackInstallation.FIELD_ENTITIES,
+                DBQuery.and(
+                        DBQuery.is(NativeEntityDescriptor.FIELD_ENTITY_FOUND_ON_SYSTEM, true),
+                        DBQuery.is(NativeEntityDescriptor.FIELD_META_ID, entityId.id())));
 
-        DBCursor<ContentPackInstallation> dbInstallations = dbCollection.find(DBQuery.is(foundOnSystemField, true));
-        ImmutableSet<ContentPackInstallation> installations =  ImmutableSet.copyOf((Iterator<ContentPackInstallation>) dbInstallations);
-        return installations.stream().map(ContentPackInstallation::entities)
-                .flatMap(Collection::stream)
-                .filter(nativeEntityDescriptor -> nativeEntityDescriptor.id().toString().matches(entityId.toString()) &&
-                        nativeEntityDescriptor.foundOnSystem() != null && nativeEntityDescriptor.foundOnSystem())
-                .count();
+        return dbCollection.getCount(query);
     }
 }
