@@ -34,6 +34,12 @@ export default class MessagesWidgetConfig {
     };
   }
 
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder()
+      .fields([]);
+  }
+
   static fromJSON(value) {
     // eslint-disable-next-line camelcase
     const { show_message_row, fields } = value;
