@@ -116,8 +116,7 @@ const CollectorsAdministrationFilters = createReactClass({
   },
 
   getStatusFilter() {
-    // 0: running, 1: unknown, 2: failing
-    const status = ['0', '1', '2'];
+    const status = Object.keys(SidecarStatusEnum.properties).map(key => String(key));
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 
     const statusFilter = this.props.filters.status;
