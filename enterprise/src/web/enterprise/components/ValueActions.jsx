@@ -66,7 +66,7 @@ class ValueActions extends React.Component {
       const handler = this._createHandlerFor(valueAction);
       const onSelect = (event) => {
         this._onMenuToggle();
-        handler(queryId, event.field, event.value);
+        handler(queryId, event.field, event.value, type);
       };
       const condition = valueAction.condition || (() => true);
       const actionDisabled = !condition({ field, type, value });

@@ -58,7 +58,7 @@ const handler: ValueActionHandler = (queryId: string, field: string) => {
     .newId()
     .config(config)
     .build();
-  WidgetActions.create(widget);
+  return WidgetActions.create(widget);
 };
 
 export default handler;
