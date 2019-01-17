@@ -1,27 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
 
-import UserTimezoneTimestamp from 'enterprise/components/common/UserTimezoneTimestamp';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
 import CustomPropTypes from './CustomPropTypes';
 import ValueActions from './ValueActions';
-
-const _renderTypeSpecific = (value, { type }) => {
-  switch (type) {
-    case 'date': return <UserTimezoneTimestamp dateTime={value} />;
-    case 'boolean': return String(value);
-    default: return value;
-  }
-};
+import TypeSpecificValue from './TypeSpecificValue';
 
 const Value = ({ children, field, value, queryId, type }) => {
-  const element = children || _renderTypeSpecific(value, type);
+  const caption = <TypeSpecificValue value={value} type={type} />;
+  const element = children || caption;
 
   return (
     <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
-      {field} = {_renderTypeSpecific(truncate(value), type)}
+      {field} = <TypeSpecificValue value={value} type={type} truncate />
     </ValueActions>
   );
 };
@@ -31,7 +23,7 @@ Value.propTypes = {
   field: PropTypes.string.isRequired,
   queryId: PropTypes.string.isRequired,
   type: CustomPropTypes.FieldType,
-  value: PropTypes.node.isRequired,
+  value: PropTypes.any.isRequired,
 };
 
 Value.defaultProps = {

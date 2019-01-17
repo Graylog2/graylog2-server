@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import MessageDetail from './MessageDetail';
+import TypeSpecificValue from '../TypeSpecificValue';
 
 class MessageTableEntry extends React.Component {
   static propTypes = {
@@ -122,7 +123,7 @@ class MessageTableEntry extends React.Component {
             <Timestamp dateTime={this.props.message.fields.timestamp} />
           </strong></td>
           { this.props.selectedFields.toSeq().map(selectedFieldName => (
-            <td key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName, true)}</td>
+            <td key={selectedFieldName}><TypeSpecificValue value={this.props.message.fields[selectedFieldName]} /></td>
           )) }
         </tr>
 
