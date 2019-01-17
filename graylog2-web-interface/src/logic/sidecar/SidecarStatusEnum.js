@@ -31,7 +31,7 @@ const SidecarStatusEnum = {
   },
 
   toString(statusCode) {
-    switch (statusCode) {
+    switch (lodash.toNumber(statusCode)) {
       case this.RUNNING:
         return 'running';
       case this.FAILING:
