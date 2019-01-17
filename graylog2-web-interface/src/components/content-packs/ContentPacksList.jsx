@@ -121,11 +121,15 @@ class ContentPacksList extends React.Component {
               {installModal}
               &nbsp;
               <DropdownButton id={`more-actions-${item.id}`} title="More Actions" bsSize="small" pullRight>
-                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Delete All Versions</MenuItem>
+                <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(item.id)}>
+                  <MenuItem>Show</MenuItem>
+                </LinkContainer>
                 <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(item.id), encodeURIComponent(item.rev))}>
                   <MenuItem>Create New Version</MenuItem>
                 </LinkContainer>
                 <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
+                <MenuItem divider />
+                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Delete All Versions</MenuItem>
               </DropdownButton>
               {downloadModal}
             </Col>
