@@ -88,6 +88,20 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         role="presentation"
                       >
                         <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                      >
+                        <a
                           action="push"
                           href="#"
                           onClick={[Function]}
@@ -96,20 +110,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Create New From Revision
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Install
                         </a>
                       </li>
                       <li
@@ -193,6 +193,20 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         role="presentation"
                       >
                         <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                      >
+                        <a
                           action="push"
                           href="#"
                           onClick={[Function]}
@@ -201,20 +215,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Create New From Revision
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Install
                         </a>
                       </li>
                       <li
@@ -298,6 +298,20 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         role="presentation"
                       >
                         <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                      >
+                        <a
                           action="push"
                           href="#"
                           onClick={[Function]}
@@ -306,20 +320,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Create New From Revision
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Install
                         </a>
                       </li>
                       <li
@@ -403,6 +403,20 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                         role="presentation"
                       >
                         <a
+                          href="#"
+                          onClick={[Function]}
+                          onKeyDown={[Function]}
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Install
+                        </a>
+                      </li>
+                      <li
+                        className=""
+                        role="presentation"
+                      >
+                        <a
                           action="push"
                           href="#"
                           onClick={[Function]}
@@ -411,20 +425,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                           tabIndex="-1"
                         >
                           Create New From Revision
-                        </a>
-                      </li>
-                      <li
-                        className=""
-                        role="presentation"
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="menuitem"
-                          tabIndex="-1"
-                        >
-                          Install
                         </a>
                       </li>
                       <li
