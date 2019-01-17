@@ -43,7 +43,6 @@ public abstract class NativeEntityDescriptor implements Identified, Typed {
     public abstract String title();
 
     @JsonProperty(FIELD_ENTITY_FOUND_ON_SYSTEM)
-    @Nullable
     public abstract Boolean foundOnSystem();
 
     public abstract Builder toBuilder();

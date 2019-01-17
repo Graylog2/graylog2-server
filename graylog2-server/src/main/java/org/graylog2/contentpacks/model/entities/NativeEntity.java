@@ -42,6 +42,6 @@ public abstract class NativeEntity<T> {
     }
 
     public static <T> NativeEntity<T> create(ModelId entityId, String nativeId, ModelType type, String title, T entity) {
-        return create(NativeEntityDescriptor.create(entityId, nativeId, type, title, null), entity);
+        return create(NativeEntityDescriptor.create(entityId, nativeId, type, title, false), entity);
     }
 }

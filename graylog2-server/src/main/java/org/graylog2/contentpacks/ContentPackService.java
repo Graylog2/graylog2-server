@@ -133,7 +133,7 @@ public class ContentPackService {
                     LOG.trace("Found existing entity for {}", entityDescriptor);
                     final NativeEntity<?> nativeEntity = existingEntity.get();
                     final NativeEntityDescriptor nativeEntityDescriptor = nativeEntity.descriptor();
-                    /* Found entity but no installation */
+                    /* Found entity on the system or we found a other installation which stated that */
                     if (contentPackInstallationPersistenceService.countInstallationOfEntityById(nativeEntityDescriptor.id()) <= 0 ||
                         contentPackInstallationPersistenceService.countInstallationOfEntityByIdAndFoundOnSystem(nativeEntityDescriptor.id()) > 0) {
                           final NativeEntityDescriptor serverDescriptor = nativeEntityDescriptor.toBuilder()
