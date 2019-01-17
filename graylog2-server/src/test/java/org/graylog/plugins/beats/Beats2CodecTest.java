@@ -47,7 +47,7 @@ public class Beats2CodecTest {
 
     @Before
     public void setUp() throws Exception {
-        configuration = new Configuration(Collections.singletonMap("beats_prefix", true));
+        configuration = new Configuration(Collections.singletonMap("no_beats_prefix", false));
         codec = new Beats2Codec(configuration, objectMapper);
     }
 
@@ -58,7 +58,7 @@ public class Beats2CodecTest {
 
     @Test
     public void decodeMessagesHandlesFilebeatMessagesWithoutPrefix() throws Exception {
-        configuration = new Configuration(Collections.singletonMap("beats_prefix", false));
+        configuration = new Configuration(Collections.singletonMap("no_beats_prefix", true));
         codec = new Beats2Codec(configuration, objectMapper);
 
         final Message message = codec.decode(messageFromJson("filebeat.json"));
