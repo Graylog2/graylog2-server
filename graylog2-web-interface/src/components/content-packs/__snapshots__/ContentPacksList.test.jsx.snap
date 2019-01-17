@@ -298,13 +298,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -334,6 +335,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -430,13 +450,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -466,6 +487,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -551,13 +591,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -587,6 +628,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -672,13 +732,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -708,6 +769,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -793,13 +873,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -829,6 +910,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -914,13 +1014,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -950,6 +1051,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -1035,13 +1155,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -1071,6 +1192,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -1156,13 +1296,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -1192,6 +1333,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -1277,13 +1437,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -1313,6 +1474,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
@@ -1398,13 +1578,14 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   role="presentation"
                 >
                   <a
+                    action="push"
                     href="#"
                     onClick={[Function]}
                     onKeyDown={[Function]}
                     role="menuitem"
                     tabIndex="-1"
                   >
-                    Delete All Versions
+                    Show
                   </a>
                 </li>
                 <li
@@ -1434,6 +1615,25 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     tabIndex="-1"
                   >
                     Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
                   </a>
                 </li>
               </ul>
