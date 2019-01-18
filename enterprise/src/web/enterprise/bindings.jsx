@@ -151,6 +151,7 @@ export default {
       type: 'add-to-table',
       title: 'Add to table',
       handler: AddToTableActionHandler,
+      condition: AddToTableActionHandler.condition,
     },
     {
       type: 'remove-to-table',
