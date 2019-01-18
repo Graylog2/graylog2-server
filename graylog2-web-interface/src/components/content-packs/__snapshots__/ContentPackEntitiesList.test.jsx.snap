@@ -206,7 +206,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                 <td
                   className="bigColumns"
                 >
-                  A good input
+                  test
                 </td>
                 <td>
                   Input
