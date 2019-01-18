@@ -29,6 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Optional;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class NetFlowV9FieldDef {
@@ -85,7 +87,7 @@ public abstract class NetFlowV9FieldDef {
             case STRING:
                 byte[] b4 = new byte[len];
                 bb.readBytes(b4);
-                return Optional.of(new String(b4, StandardCharsets.UTF_8));
+                return Optional.ofNullable(emptyToNull(new String(b4, StandardCharsets.UTF_8).trim()));
             case SKIP:
                 bb.skipBytes(len);
                 return Optional.empty();
