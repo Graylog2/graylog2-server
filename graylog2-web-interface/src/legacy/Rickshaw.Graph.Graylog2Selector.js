@@ -116,7 +116,6 @@ const Graylog2Selector = Rickshaw.Class.create({
     }, false);
 
         // Stop at chart boundaries.
-    console.log('running', graph.series);
     if (this._validateSeries(graph.series)) {
       if (graph.dataDomain()[0] === position.xMin) {
         graph.window.xMin = undefined;
