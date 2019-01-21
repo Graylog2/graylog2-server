@@ -29,6 +29,7 @@ const QuickValuesHistogramVisualization = createReactClass({
     width: PropTypes.number,
     height: PropTypes.number,
     interactive: PropTypes.bool,
+    onRenderComplete: PropTypes.func,
   },
 
   getDefaultProps() {
@@ -38,6 +39,7 @@ const QuickValuesHistogramVisualization = createReactClass({
       height: this.DEFAULT_HEIGHT,
       data: undefined,
       interactive: true,
+      onRenderComplete: () => {},
     };
   },
 
@@ -242,6 +244,8 @@ const QuickValuesHistogramVisualization = createReactClass({
       .tickFormat((value) => {
         return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format('.2s')(value);
       });
+
+    this._chart.on('postRender', this.props.onRenderComplete());
 
     this._chart.render();
   },
