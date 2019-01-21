@@ -92,7 +92,7 @@ const QuickValuesHistogramVisualization = createReactClass({
   DEFAULT_HEIGHT: 220,
 
   // dc.js is modifying the margins passed into the graph so make sure this is immutable
-  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 45 }),
+  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 35 }),
 
   _chartRef: undefined,
   _chart: undefined,
@@ -184,7 +184,7 @@ const QuickValuesHistogramVisualization = createReactClass({
       .y(height - 15)
       .itemHeight(12)
       .autoItemWidth(true)
-      .gap(5)
+      .gap(10)
       .legendWidth(width - padding)
       .legendText(d => d.name);
 
@@ -221,7 +221,7 @@ const QuickValuesHistogramVisualization = createReactClass({
       .xUnits(d3.time[interval].utc.range)
       .renderHorizontalGridLines(true)
       .brushOn(false)
-      .xAxisLabel('Time')
+      .xAxisLabel('Time', 25)
       .yAxisLabel(this.props.config.field)
       .colors(D3Utils.glColourPalette())
       .title(function getTitle(d) {
