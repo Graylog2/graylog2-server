@@ -32,18 +32,27 @@ const WorldMapVisualization = ({ config, data, onChange, width, ...rest }) => {
     });
 
   const viewport = get(config, 'visualizationConfig.viewport');
-
-  return <MapVisualization {...rest} data={series} id={`worldmap-${config.id}`} viewport={viewport} onChange={(newViewport) => {
+  const _onChange = (newViewport) => {
     const visualizationConfig = (config.visualizationConfig ? config.visualizationConfig.toBuilder() : WorldMapVisualizationConfig.builder())
       .viewport(Viewport.create(newViewport.center, newViewport.zoom))
       .build();
     onChange(visualizationConfig);
-  }} />;
+  };
+
+  return (
+    <MapVisualization {...rest}
+                      data={series}
+                      id={`worldmap-${config.id}`}
+                      viewport={viewport}
+                      width={width}
+                      onChange={_onChange} />
+  );
 };
 
 WorldMapVisualization.propTypes = {
   config: AggregationType.isRequired,
   data: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
   width: PropTypes.number.isRequired,
 };
 

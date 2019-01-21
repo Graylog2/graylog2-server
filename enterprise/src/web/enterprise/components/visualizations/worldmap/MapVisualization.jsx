@@ -19,7 +19,7 @@ const MapVisualization = createReactClass({
 
   propTypes: {
     id: PropTypes.string.isRequired,
-    data: PropTypes.object,
+    data: PropTypes.arrayOf(PropTypes.object),
     height: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     url: PropTypes.string,
@@ -77,7 +77,10 @@ const MapVisualization = createReactClass({
 
   // Coordinates are given as "lat,long"
   _formatMarker(coordinates, value, min, max, increment, color, name, keys) {
-    const formattedCoordinates = coordinates.split(',').map(component => Number(component));
+    const formattedCoordinates = coordinates.split(',').map(component => Number(component)).filter(n => !isNaN(n));
+    if (formattedCoordinates.length !== 2) {
+      return null;
+    }
     const radius = this._getBucket(value, this.MARKER_RADIUS_SIZES, min, max, increment);
     const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
     return (
