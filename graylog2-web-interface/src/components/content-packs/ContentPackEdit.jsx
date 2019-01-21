@@ -68,7 +68,7 @@ class ContentPackEdit extends React.Component {
           configPaths[path].setParameter(parameters[index].paramName);
         }
       });
-      newEntityBuilder.data(entityData.getData());
+      newEntityBuilder.data(entityData.getData()).parameters(this.props.contentPack.parameters);
       return newEntityBuilder.build();
     });
     const newContentPack = this.props.contentPack.toBuilder()
