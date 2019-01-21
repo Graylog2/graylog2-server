@@ -5,6 +5,7 @@ import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';
 import Series from './aggregationbuilder/Series';
+import FieldType from './fieldtypes/FieldType';
 
 const widgetsKey = 'enterpriseWidgets';
 
@@ -19,7 +20,7 @@ export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
     AggregationWidgetConfig.builder()
       .columnPivots([])
       .rowPivots([
-        pivotForField('timestamp'),
+        pivotForField('timestamp', new FieldType('date', [], [])),
       ])
       .series([
         Series.forFunction('count()'),

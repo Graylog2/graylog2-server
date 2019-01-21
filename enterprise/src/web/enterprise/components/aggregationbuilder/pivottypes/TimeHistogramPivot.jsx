@@ -17,8 +17,11 @@ export default class TimeHistogramPivot extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     value: PropTypes.shape({
-      value: PropTypes.number.isRequired,
-      unit: PropTypes.string.isRequired,
+      interval: PropTypes.shape({
+        type: PropTypes.string,
+        value: PropTypes.number,
+        unit: PropTypes.string,
+      }),
     }).isRequired,
   };
 
@@ -35,7 +38,7 @@ export default class TimeHistogramPivot extends React.Component {
     super(props, context);
 
     const { interval } = props.value;
-    this.state = interval;
+    this.state = interval || {};
   }
 
   _toggleAuto = () => {
@@ -47,7 +50,7 @@ export default class TimeHistogramPivot extends React.Component {
     }, this._propagateState);
   };
 
-  _isAuto = () => this.state.type === 'auto';
+  _isAuto = () => this.state && this.state.type === 'auto';
   _propagateState = () => this.props.onChange({ interval: this.state });
 
   _changeUnit = unit => this.setState({ unit }, this._propagateState);
@@ -63,7 +66,7 @@ export default class TimeHistogramPivot extends React.Component {
           <DropdownButton
             componentClass={InputGroup.Button}
             id="input-dropdown-addon"
-            title={units[this.state.unit]}
+            title={units[this.state.unit] || ''}
             disabled={this._isAuto()}
             onChange={this._changeUnit}
           >

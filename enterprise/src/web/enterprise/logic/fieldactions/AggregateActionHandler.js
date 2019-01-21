@@ -6,8 +6,10 @@ import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/Aggrega
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import DataTable from 'enterprise/components/datatable/DataTable';
 import { ActionContext, WidgetContext } from '../ActionContext';
+import FieldType from '../fieldtypes/FieldType';
+import type { FieldActionHandlerWithContext } from './FieldActionHandler';
 
-export default function (queryId: string, field: string, context: ActionContext) {
+const AggregateActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContext) => {
   let filter = null;
   if (context instanceof WidgetContext) {
     filter = context.widget.filter;
@@ -16,10 +18,12 @@ export default function (queryId: string, field: string, context: ActionContext)
     .newId()
     .filter(filter)
     .config(AggregationWidgetConfig.builder()
-      .rowPivots([pivotForField(field)])
+      .rowPivots([pivotForField(field, type)])
       .series([Series.forFunction('count()')])
       .visualization(DataTable.type)
       .build())
     .build();
-  WidgetActions.create(newWidget);
-}
+  return WidgetActions.create(newWidget);
+};
+
+export default AggregateActionHandler;

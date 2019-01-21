@@ -7,7 +7,7 @@ import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWi
 import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
-import type { ValueActionHandler } from '../valueactions/ValueActionHandler';
+import type { FieldActionHandler } from './FieldActionHandler';
 
 class FieldTypeSpecificSeries {
   static NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card'];
@@ -46,7 +46,7 @@ class FieldTypeSpecificSeries {
   }
 }
 
-const handler: ValueActionHandler = (queryId: string, field: string) => {
+const handler: FieldActionHandler = (queryId: string, field: string) => {
   const fieldTypeSpecificSeries = new FieldTypeSpecificSeries();
   const series = fieldTypeSpecificSeries.seriesFor(field).map(f => `${f}(${field})`).map(Series.forFunction);
   const config = AggregationWidgetConfig.builder()

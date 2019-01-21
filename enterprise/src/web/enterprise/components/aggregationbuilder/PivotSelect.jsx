@@ -11,13 +11,15 @@ import ConfigurableElement from './ConfigurableElement';
 import SortableSelect from './SortableSelect';
 import PivotConfiguration from './PivotConfiguration';
 import CustomPropTypes from '../CustomPropTypes';
+import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
 
-const _onChange = (fields, newValue, onChange) => {
+const _onChange = (fields, newValue, onChange, fieldTypes) => {
   const newFields = newValue.map(v => v.value);
 
   return onChange(newFields.map((field) => {
     const existingField = fields.find(f => f.field === field);
-    return existingField || pivotForField(field);
+    const mapping = fieldTypes.find(fieldType => fieldType.name === field) || new FieldTypeMapping(field, FieldType.Unknown);
+    return existingField || pivotForField(field, mapping.type);
   }));
 };
 
@@ -48,12 +50,14 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
     );
   };
 
-  return <SortableSelect {...props} onChange={newValue => _onChange(value, newValue, onChange)} value={value} valueComponent={valueComponent} />;
+  return <SortableSelect {...props} onChange={newValue => _onChange(value, newValue, onChange, fields.all)} value={value} valueComponent={valueComponent} />;
 };
 
 PivotSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
-  fields: CustomPropTypes.FieldListType.isRequired,
+  fields: PropTypes.shape({
+    all: CustomPropTypes.FieldListType,
+  }).isRequired,
   value: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 

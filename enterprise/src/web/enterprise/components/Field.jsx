@@ -48,7 +48,7 @@ export default class Field extends React.Component {
     const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
       const onSelect = ({ field }) => {
         this._onMenuToggle();
-        fieldAction.handler(queryId, field, this.context);
+        fieldAction.handler(queryId, field, type, this.context);
       };
       const condition = fieldAction.condition || (() => true);
       const actionDisabled = !condition({ name, type, context: this.context });
