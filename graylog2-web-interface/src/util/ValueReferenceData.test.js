@@ -35,6 +35,7 @@ describe('ValueReferenceData', () => {
             '@value': true,
           },
           foo: 'bar',
+          null_value: null,
         },
         {
           hello: 'world',
@@ -97,6 +98,11 @@ describe('ValueReferenceData', () => {
     expect(paths['stream_rules.0.foo'].getPath()).toEqual('stream_rules.0.foo');
     expect(paths['stream_rules.0.foo'].isValueRef()).toEqual(false);
     expect(paths['stream_rules.0.foo'].isValueParameter()).toEqual(false);
+    expect(paths['stream_rules.0.null_value'].getValue()).toEqual(null);
+    expect(paths['stream_rules.0.null_value'].getValueType()).toEqual('object');
+    expect(paths['stream_rules.0.null_value'].getPath()).toEqual('stream_rules.0.null_value');
+    expect(paths['stream_rules.0.null_value'].isValueRef()).toEqual(false);
+    expect(paths['stream_rules.0.null_value'].isValueParameter()).toEqual(false);
     expect(paths['stream_rules.1.hello'].getValue()).toEqual('world');
     expect(paths['stream_rules.1.hello'].getValueType()).toEqual('string');
     expect(paths['stream_rules.1.hello'].getPath()).toEqual('stream_rules.1.hello');
