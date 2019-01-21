@@ -16,6 +16,9 @@ export default class ValueRefHelper {
   }
 
   static dataValueIsParameter(data) {
+    if (!data) {
+      return false;
+    }
     if (typeof data.get === 'function') {
       return ValueRefHelper.dataIsValueRef(data) && data.get(ValueRefHelper.VALUE_REF_TYPE_FIELD) === ValueRefHelper.VALUE_REF_PARAMETER_VALUE;
     }
