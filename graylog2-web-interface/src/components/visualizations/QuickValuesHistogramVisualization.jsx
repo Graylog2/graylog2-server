@@ -28,6 +28,7 @@ const QuickValuesHistogramVisualization = createReactClass({
     data: PropTypes.object,
     width: PropTypes.number,
     height: PropTypes.number,
+    interactive: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -36,6 +37,7 @@ const QuickValuesHistogramVisualization = createReactClass({
       width: undefined,
       height: this.DEFAULT_HEIGHT,
       data: undefined,
+      interactive: true,
     };
   },
 
@@ -55,6 +57,8 @@ const QuickValuesHistogramVisualization = createReactClass({
   },
 
   componentDidMount() {
+    this.disableTransitions = dc.disableTransitions;
+    dc.disableTransitions = !this.props.interactive;
     this._renderChart();
     // Resize the chart after rendering it to get the actual width and height of the container
     this._resizeChart(this._chartRef.clientWidth, this._chartRef.clientHeight);
@@ -72,6 +76,10 @@ const QuickValuesHistogramVisualization = createReactClass({
     if (nextProps.data) {
       this._updateData(nextProps);
     }
+  },
+
+  componentWillUnmount() {
+    dc.disableTransitions = this.disableTransitions;
   },
 
   DEFAULT_CONFIG: {
@@ -214,8 +222,6 @@ const QuickValuesHistogramVisualization = createReactClass({
       .xAxisLabel('Time')
       .yAxisLabel(this.props.config.field)
       .colors(D3Utils.glColourPalette())
-      .transitionDelay(0)
-      .transitionDuration(0)
       .title(function getTitle(d) {
         const entry = _.find(d.terms, t => t.term === this.layer);
         if (entry) {
