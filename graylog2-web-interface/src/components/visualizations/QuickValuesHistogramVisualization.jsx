@@ -8,7 +8,6 @@ import d3 from 'd3';
 import _ from 'lodash';
 import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
-import naturalSort from 'javascript-natural-sort';
 import graphHelper from 'legacy/graphHelper';
 
 import D3Utils from 'util/D3Utils';
@@ -18,16 +17,6 @@ import D3Utils from 'util/D3Utils';
  */
 const QuickValuesHistogramVisualization = createReactClass({
   displayName: 'QuickValuesHistogramVisualization',
-
-  DEFAULT_CONFIG: {
-    limit: 5,
-    sort_order: 'desc',
-  },
-
-  DEFAULT_HEIGHT: 220,
-
-  // dc.js is modifying the margins passed into the graph so make sure this is immutable
-  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 45 }),
 
   propTypes: {
     id: PropTypes.string.isRequired,
@@ -40,10 +29,6 @@ const QuickValuesHistogramVisualization = createReactClass({
     width: PropTypes.number,
     height: PropTypes.number,
   },
-
-  _chartRef: undefined,
-  _chart: undefined,
-  _crossfilter: undefined,
 
   getDefaultProps() {
     return {
@@ -88,6 +73,20 @@ const QuickValuesHistogramVisualization = createReactClass({
       this._updateData(nextProps);
     }
   },
+
+  DEFAULT_CONFIG: {
+    limit: 5,
+    sort_order: 'desc',
+  },
+
+  DEFAULT_HEIGHT: 220,
+
+  // dc.js is modifying the margins passed into the graph so make sure this is immutable
+  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 45 }),
+
+  _chartRef: undefined,
+  _chart: undefined,
+  _crossfilter: undefined,
 
   _updateData({ data, config, width, height }) {
     this.setState({
