@@ -82,6 +82,15 @@ public class InMemoryGrokPatternService implements GrokPatternService {
 
     @Override
     public GrokPattern save(GrokPattern pattern) throws ValidationException {
+        return save(pattern, false);
+    }
+
+    @Override
+    public GrokPattern update(GrokPattern pattern) throws ValidationException {
+        return save(pattern, true);
+    }
+
+    private GrokPattern save(GrokPattern pattern, boolean update) throws ValidationException {
         try {
             if (!validate(pattern)) {
                 throw new ValidationException("Pattern " + pattern.name() + " invalid.");
@@ -89,6 +98,10 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         } catch (GrokException | PatternSyntaxException e) {
             throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
         }
+        if (!update && loadByName(pattern.name()).isPresent()) {
+            throw new ValidationException("Grok pattern " + pattern.name() + " already exists");
+        }
+
         GrokPattern toSave;
         if (pattern.id() == null) {
             toSave = pattern.toBuilder().id(createId()).build();

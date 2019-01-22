@@ -46,6 +46,7 @@ import java.util.concurrent.Executors;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 public class MongoDbGrokPatternServiceTest {
     @ClassRule
@@ -306,5 +307,59 @@ public class MongoDbGrokPatternServiceTest {
         assertThat(service.validate(GrokPattern.create("Test", "%{"))).isFalse();
         assertThat(service.validate(GrokPattern.create("Test", ""))).isFalse();
         assertThat(service.validate(GrokPattern.create("", "[a-z]+"))).isFalse();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void update() throws ValidationException {
+        assertThat(collection.count()).isEqualTo(3);
+
+        GrokPattern toUpdate1 = GrokPattern.builder()
+                .id("56250da2d400000000000001")
+                .name("Test1")
+                .pattern("123")
+                .build();
+        final GrokPattern updatedPattern1 = service.update(toUpdate1);
+        assertThat(updatedPattern1.name()).matches(toUpdate1.name());
+        assertThat(updatedPattern1.pattern()).matches(toUpdate1.pattern());
+        assertThat(collection.count()).isEqualTo(3);
+
+        GrokPattern toUpdate2 = GrokPattern.builder()
+                .id("56250da2d400000000000001")
+                .name("Testxxx")
+                .pattern("123")
+                .build();
+        final GrokPattern updatedPattern2 = service.update(toUpdate2);
+        assertThat(updatedPattern2.name()).matches(toUpdate2.name());
+        assertThat(updatedPattern2.pattern()).matches(toUpdate2.pattern());
+        assertThat(collection.count()).isEqualTo(3);
+
+        GrokPattern toUpdate3 = GrokPattern.builder()
+                .name("Testxxx")
+                .pattern("123")
+                .build();
+        boolean thrown = false;
+        try {
+            service.update(toUpdate3);
+        } catch (ValidationException e) {
+            thrown = true;
+        }
+        assertThat(thrown).isTrue();
+        assertThat(collection.count()).isEqualTo(3);
+
+        GrokPattern toUpdate4 = GrokPattern.builder()
+                .id("56250da2d400000000000321")
+                .name("Testxxx")
+                .pattern("123")
+                .build();
+        thrown = false;
+        try {
+            service.update(toUpdate4);
+        } catch (ValidationException e) {
+            thrown = true;
+        }
+        assertThat(thrown).isTrue();
+        assertThat(collection.count()).isEqualTo(3);
+
     }
 }
