@@ -147,6 +147,7 @@ class Widget extends React.Component {
           <span ref={(elem) => { editWidgetFrameContent = elem; }}>
             <MeasureDimensions>
               <WidgetHeader title={title}
+                            hideDragHandle
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
                 <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>

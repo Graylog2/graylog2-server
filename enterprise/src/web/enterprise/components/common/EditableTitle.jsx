@@ -57,6 +57,6 @@ export default class EditableTitle extends React.Component {
                  onChange={this._onChange} />
         </form>
       </span>
-    ) : <span onDoubleClick={this._toggleEditing}>{value}</span>;
+    ) : <span onDoubleClick={this._toggleEditing} title="Double click the title to edit it.">{value}</span>;
   }
 }
