@@ -80,26 +80,20 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         return Sets.newHashSet(store.values());
     }
 
-    @Override
-    public GrokPattern save(GrokPattern pattern) throws ValidationException {
-        return save(pattern, false);
-    }
 
     @Override
     public GrokPattern update(GrokPattern pattern) throws ValidationException {
-        return save(pattern, true);
+        return save(pattern);
     }
 
-    private GrokPattern save(GrokPattern pattern, boolean update) throws ValidationException {
+    @Override
+    public GrokPattern save(GrokPattern pattern) throws ValidationException {
         try {
             if (!validate(pattern)) {
                 throw new ValidationException("Pattern " + pattern.name() + " invalid.");
             }
         } catch (GrokException | PatternSyntaxException e) {
             throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
-        }
-        if (!update && loadByName(pattern.name()).isPresent()) {
-            throw new ValidationException("Grok pattern " + pattern.name() + " already exists");
         }
 
         GrokPattern toSave;
@@ -124,6 +118,7 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         try {
             return save(pattern);
         } catch (ValidationException e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
