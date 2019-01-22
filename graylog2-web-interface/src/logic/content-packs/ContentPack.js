@@ -9,7 +9,7 @@ export default class ContentPack {
       if (e.constructor.name === Entity.name) {
         return e;
       }
-      return Entity.fromJSON(e, false);
+      return Entity.fromJSON(e, false, parameters);
     });
 
     this._value = {
