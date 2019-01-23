@@ -118,7 +118,6 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         try {
             return save(pattern);
         } catch (ValidationException e) {
-            System.out.println(e.getMessage());
             return null;
         }
     }
