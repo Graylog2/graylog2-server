@@ -8,7 +8,6 @@ import d3 from 'd3';
 import _ from 'lodash';
 import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
-import naturalSort from 'javascript-natural-sort';
 import graphHelper from 'legacy/graphHelper';
 
 import D3Utils from 'util/D3Utils';
@@ -18,16 +17,6 @@ import D3Utils from 'util/D3Utils';
  */
 const QuickValuesHistogramVisualization = createReactClass({
   displayName: 'QuickValuesHistogramVisualization',
-
-  DEFAULT_CONFIG: {
-    limit: 5,
-    sort_order: 'desc',
-  },
-
-  DEFAULT_HEIGHT: 220,
-
-  // dc.js is modifying the margins passed into the graph so make sure this is immutable
-  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 45 }),
 
   propTypes: {
     id: PropTypes.string.isRequired,
@@ -39,11 +28,9 @@ const QuickValuesHistogramVisualization = createReactClass({
     data: PropTypes.object,
     width: PropTypes.number,
     height: PropTypes.number,
+    interactive: PropTypes.bool,
+    onRenderComplete: PropTypes.func,
   },
-
-  _chartRef: undefined,
-  _chart: undefined,
-  _crossfilter: undefined,
 
   getDefaultProps() {
     return {
@@ -51,6 +38,8 @@ const QuickValuesHistogramVisualization = createReactClass({
       width: undefined,
       height: this.DEFAULT_HEIGHT,
       data: undefined,
+      interactive: true,
+      onRenderComplete: () => {},
     };
   },
 
@@ -70,6 +59,8 @@ const QuickValuesHistogramVisualization = createReactClass({
   },
 
   componentDidMount() {
+    this.disableTransitions = dc.disableTransitions;
+    dc.disableTransitions = !this.props.interactive;
     this._renderChart();
     // Resize the chart after rendering it to get the actual width and height of the container
     this._resizeChart(this._chartRef.clientWidth, this._chartRef.clientHeight);
@@ -88,6 +79,24 @@ const QuickValuesHistogramVisualization = createReactClass({
       this._updateData(nextProps);
     }
   },
+
+  componentWillUnmount() {
+    dc.disableTransitions = this.disableTransitions;
+  },
+
+  DEFAULT_CONFIG: {
+    limit: 5,
+    sort_order: 'desc',
+  },
+
+  DEFAULT_HEIGHT: 220,
+
+  // dc.js is modifying the margins passed into the graph so make sure this is immutable
+  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 35 }),
+
+  _chartRef: undefined,
+  _chart: undefined,
+  _crossfilter: undefined,
 
   _updateData({ data, config, width, height }) {
     this.setState({
@@ -175,7 +184,7 @@ const QuickValuesHistogramVisualization = createReactClass({
       .y(height - 15)
       .itemHeight(12)
       .autoItemWidth(true)
-      .gap(5)
+      .gap(10)
       .legendWidth(width - padding)
       .legendText(d => d.name);
 
@@ -212,11 +221,9 @@ const QuickValuesHistogramVisualization = createReactClass({
       .xUnits(d3.time[interval].utc.range)
       .renderHorizontalGridLines(true)
       .brushOn(false)
-      .xAxisLabel('Time')
+      .xAxisLabel('Time', 25)
       .yAxisLabel(this.props.config.field)
       .colors(D3Utils.glColourPalette())
-      .transitionDelay(0)
-      .transitionDuration(0)
       .title(function getTitle(d) {
         const entry = _.find(d.terms, t => t.term === this.layer);
         if (entry) {
@@ -237,6 +244,8 @@ const QuickValuesHistogramVisualization = createReactClass({
       .tickFormat((value) => {
         return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format('.2s')(value);
       });
+
+    this._chart.on('postRender', this.props.onRenderComplete());
 
     this._chart.render();
   },
