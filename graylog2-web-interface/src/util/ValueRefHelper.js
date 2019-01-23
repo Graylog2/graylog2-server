@@ -16,7 +16,13 @@ export default class ValueRefHelper {
   }
 
   static dataValueIsParameter(data) {
-    return ValueRefHelper.dataIsValueRef(data) && data.get(ValueRefHelper.VALUE_REF_TYPE_FIELD) === ValueRefHelper.VALUE_REF_PARAMETER_VALUE;
+    if (!data) {
+      return false;
+    }
+    if (typeof data.get === 'function') {
+      return ValueRefHelper.dataIsValueRef(data) && data.get(ValueRefHelper.VALUE_REF_TYPE_FIELD) === ValueRefHelper.VALUE_REF_PARAMETER_VALUE;
+    }
+    return ValueRefHelper.dataIsValueRef(data) && data[ValueRefHelper.VALUE_REF_TYPE_FIELD] === ValueRefHelper.VALUE_REF_PARAMETER_VALUE;
   }
 
   static createValueRef(type, value) {
