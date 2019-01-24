@@ -35,7 +35,6 @@
 }
 
 #QueryTabs .nav-tabs li a:hover {
-    background-color: #ededed;
     border: 1px solid transparent;
     color: #000;
 }
@@ -47,3 +46,4 @@
 .xtick text, .ytick text {
     fill: #757575 !important;
 }
+

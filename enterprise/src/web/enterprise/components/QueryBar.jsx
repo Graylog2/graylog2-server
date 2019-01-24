@@ -14,6 +14,7 @@ import { QueryTitlesStore } from 'enterprise/stores/QueryTitlesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import QueryTabs from './QueryTabs';
 import CustomPropTypes from './CustomPropTypes';
+import { ViewStatesActions } from '../stores/ViewStatesStore';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
@@ -29,13 +30,16 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   if (queries.size === 1) {
     return;
   }
-  QueriesActions.remove(queryId);
+  let promise;
   if (queryId === currentQuery) {
     const currentQueryIdIndex = queries.indexOf(queryId);
     const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
     const newQuery = queries.remove(queryId).get(newQueryIdIndex);
-    ViewActions.selectQuery(newQuery);
+    promise = ViewActions.selectQuery(newQuery);
+  } else {
+    promise = Promise.resolve();
   }
+  return promise.then(() => QueriesActions.remove(queryId)).then(() => ViewStatesActions.remove(queryId));
 };
 
 const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetadata }) => {

@@ -3,7 +3,6 @@ import Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
 import { ViewActions, ViewStore } from './ViewStore';
-import { QueriesActions } from './QueriesStore';
 
 export const ViewStatesActions = Reflux.createActions({
   add: { asyncResult: true },
@@ -17,8 +16,6 @@ export const ViewStatesStore = Reflux.createStore({
 
   init() {
     this.listenTo(ViewStore, this.onViewStoreChange, this.onViewStoreChange);
-    // Remove View State when Query is removed.
-    QueriesActions.remove.listen(this.remove);
   },
   getInitialState() {
     return this._state();
