@@ -18,6 +18,7 @@ package org.graylog.plugins.beats;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -90,6 +91,18 @@ public class Beats2Codec extends AbstractCodec {
         final Message gelfMessage = new Message(message, hostname, timestamp);
         gelfMessage.addField("beats_type", beatsType);
 
+        // This field should be stored without a prefix
+        final String gl2SourceCollector = event.path(Message.FIELD_GL2_SOURCE_COLLECTOR).asText();
+        if (!gl2SourceCollector.isEmpty()) {
+            gelfMessage.addField(Message.FIELD_GL2_SOURCE_COLLECTOR, gl2SourceCollector);
+        }
+
+        // Remove fields that should not be duplicated with a prefix
+        if (event.isObject()) {
+            ObjectNode onode = (ObjectNode) event;
+            onode.remove("message");
+            onode.remove(Message.FIELD_GL2_SOURCE_COLLECTOR);
+        }
         addFlattened(gelfMessage, rootPath, event);
         return gelfMessage;
     }
