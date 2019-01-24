@@ -74,8 +74,6 @@ const ViewList = createReactClass({
     return (
       <ButtonToolbar>
         <DropdownButton title="Actions" id={`view-actions-dropdown-${view.id}`} bsSize="small" pullRight>
-          <MenuItem disabled>Edit</MenuItem>
-          <MenuItem divider />
           <MenuItem onSelect={this.handleViewDelete(view)}>Delete</MenuItem>
         </DropdownButton>
       </ButtonToolbar>
