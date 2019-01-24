@@ -75,6 +75,7 @@ public class Message implements Messages {
     public static final String FIELD_TIMESTAMP = "timestamp";
     public static final String FIELD_LEVEL = "level";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_GL2_SOURCE_COLLECTOR = "gl2_source_collector";
 
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
     private static final char KEY_REPLACEMENT_CHAR = '_';
@@ -86,7 +87,7 @@ public class Message implements Messages {
         "gl2_source_radio",
         "gl2_source_radio_input",
 
-        "gl2_source_collector",
+        FIELD_GL2_SOURCE_COLLECTOR,
         "gl2_source_collector_input",
         "gl2_remote_ip",
         "gl2_remote_port",
