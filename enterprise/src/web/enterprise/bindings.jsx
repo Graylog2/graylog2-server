@@ -57,6 +57,7 @@ import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig
 import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
 
 import * as Permissions from './Permissions';
+import UseInNewQueryHandler from './logic/valueactions/UseInNewQueryHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -159,10 +160,6 @@ export default {
       handler: RemoveFromTableActionHandler,
       condition: RemoveFromTableActionHandler.condition,
     },
-    {
-      type: 'new-query',
-      title: 'Use in new query',
-    },
   ],
   valueActions: [
     {
@@ -181,7 +178,12 @@ export default {
       type: 'execute-view-with-value',
       title: 'Insert into view',
       component: ExecuteViewWithValue,
-    }
+    },
+    {
+      type: 'new-query',
+      title: 'Use in new query',
+      handler: UseInNewQueryHandler,
+    },
   ],
   visualizationTypes: [
     {
