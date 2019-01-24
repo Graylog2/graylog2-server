@@ -30,8 +30,10 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -90,6 +92,7 @@ public class PipelineFacadeTest {
     private PipelineRuleParser pipelineRuleParser;
     private PipelineService pipelineService;
     private PipelineStreamConnectionsService connectionsService;
+    private RuleService ruleService;
 
     private PipelineFacade facade;
 
@@ -102,8 +105,9 @@ public class PipelineFacadeTest {
 
         pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
+        ruleService = new MongoDbRuleService(mongoConnection, mapperProvider, clusterEventBus);
 
-        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser);
+        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService);
     }
 
     @Test
