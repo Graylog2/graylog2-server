@@ -44,6 +44,7 @@ describe('ExtendedSearchPage', () => {
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     SearchParameterStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
+    ViewActions.selectQuery.completed.listen = jest.fn(() => jest.fn());
     FieldTypesActions.all = jest.fn();
     SearchMetadataActions.parseSearch = jest.fn();
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
@@ -277,5 +278,19 @@ describe('ExtendedSearchPage', () => {
       expect(SearchActions.execute).not.toHaveBeenCalled();
       done();
     });
+  });
+  it('changing current query in view triggers search execution', () => {
+    const searchMetadata = { undeclared: Immutable.Set() };
+    SearchMetadataActions.parseSearch.mockReturnValue(Promise.resolve(searchMetadata));
+    mount(<ExtendedSearchPage route={{}} />);
+
+    const cb = ViewActions.selectQuery.completed.listen.mock.calls[0][0];
+    SearchActions.execute.mockClear();
+    expect(SearchActions.execute).not.toHaveBeenCalled();
+
+    return cb({ search: {} })
+      .then(() => {
+        expect(SearchActions.execute).toHaveBeenCalled();
+      });
   });
 });

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Row } from 'react-bootstrap';
 import _ from 'lodash';
@@ -85,7 +86,9 @@ class WidgetGrid extends React.Component {
 
       const { height, width } = (this.state && this.state.widgetDimensions[widgetId]) || {};
 
-      const widgetTitle = this.props.titles.getIn(['widget', widget.id], WidgetGrid._defaultTitle(widget));
+      const titles = this.props.titles || Immutable.Map();
+
+      const widgetTitle = titles.getIn(['widget', widget.id], WidgetGrid._defaultTitle(widget));
 
       returnedWidgets.widgets.push(
         <div key={widget.id} className={style.widgetContainer}>

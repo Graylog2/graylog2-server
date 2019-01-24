@@ -28,7 +28,7 @@ type ViewActionsType = {
   load: (View) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
   search: (Search) => Promise<View>,
-  selectQuery: (string) => Promise<void>,
+  selectQuery: (string) => Promise<string>,
   state: (ViewState) => Promise<View>,
   summary: (string) => Promise<void>,
   title: (string) => Promise<void>,
@@ -148,6 +148,9 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
   selectQuery(queryId) {
     this.activeQuery = queryId;
     this._trigger();
+    const promise = Promise.resolve(this.view);
+    ViewActions.selectQuery.promise(promise);
+    return promise;
   },
   state(newState: ViewState) {
     this.dirty = true;
