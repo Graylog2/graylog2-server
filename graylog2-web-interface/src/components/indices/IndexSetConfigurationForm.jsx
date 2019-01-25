@@ -21,6 +21,10 @@ class IndexSetConfigurationForm extends React.Component {
     cancelLink: PropTypes.string.isRequired,
   };
 
+  static defaultProps = {
+    create: false,
+  };
+
   state = {
     indexSet: this.props.indexSet,
     validationErrors: {},
@@ -164,7 +168,7 @@ class IndexSetConfigurationForm extends React.Component {
       const indexPrefixHelp = (
         <span>
           A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set.
-          The prefix must start with a letter or number, and can only contain letters, numbers, '_', '-' and '+'.
+          The prefix must start with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
         </span>
       );
       readOnlyconfig = (
