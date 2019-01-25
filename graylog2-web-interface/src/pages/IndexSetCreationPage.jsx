@@ -43,6 +43,7 @@ const IndexSetCreationPage = createReactClass({
         index_analyzer: 'standard',
         index_optimization_max_num_segments: 1,
         index_optimization_disabled: false,
+        field_type_refresh_interval: 5 * 1000, // 5 seconds
       },
     };
   },
