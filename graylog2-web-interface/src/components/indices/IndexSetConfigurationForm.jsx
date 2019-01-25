@@ -125,7 +125,7 @@ class IndexSetConfigurationForm extends React.Component {
   };
 
   render() {
-    const indexSet = this.props.indexSet;
+    const indexSet = this.state.indexSet;
     const validationErrors = this.state.validationErrors;
 
     let rotationConfig;
