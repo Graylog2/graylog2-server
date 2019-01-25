@@ -698,7 +698,14 @@ public class Searches {
 
         if (failedShards > 0) {
             final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
-                .map(failure -> failure.path("reason").path("reason").asText())
+                .map(failure -> {
+                    final String error = failure.path("reason").path("reason").asText();
+                    final String caused_by = failure.path("reason").path("caused_by").toString();
+                    if (!caused_by.isEmpty()) {
+                        return error + " caused_by: " + caused_by;
+                    }
+                    return error;
+                })
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
 
