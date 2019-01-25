@@ -18,11 +18,13 @@ package org.graylog2.indexer;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.joda.time.Duration;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
 public class IndexSetValidator {
+    private final static Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
@@ -45,6 +47,11 @@ public class IndexSetValidator {
             if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix()) || indexSet.getIndexPrefix().startsWith(newConfig.indexPrefix())) {
                 return Optional.of(Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with existing index set prefix \"" + indexSet.getIndexPrefix() + "\""));
             }
+        }
+
+        // Ensure fieldTypeRefreshInterval is not shorter than a second, as that may impact performance
+        if (newConfig.fieldTypeRefreshInterval().isShorterThan(MINIMUM_FIELD_TYPE_REFRESH_INTERVAL)) {
+            return Optional.of(Violation.create("Index field_type_refresh_interval \"" + newConfig.fieldTypeRefreshInterval().toString() + "\" is too short. It must be 1 second or longer."));
         }
 
         return Optional.empty();

@@ -9,6 +9,17 @@ import lodash from 'lodash';
 import { InputWrapper } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
 
+const unitValues = [
+  'NANOSECONDS',
+  'MICROSECONDS',
+  'MILLISECONDS',
+  'SECONDS',
+  'MINUTES',
+  'HOURS',
+  'DAYS',
+];
+const unitType = PropTypes.oneOf(unitValues);
+
 /**
  * Component that renders a form field for a time unit value. The field has
  * a checkbox that enables/disables the input, a input for the time value,
@@ -39,7 +50,9 @@ const TimeUnitInput = createReactClass({
     /** Indicates the default value to use, in case value is not provided or set. */
     defaultValue: PropTypes.number,
     /** Indicates which unit is used for the value. */
-    unit: PropTypes.oneOf(['NANOSECONDS', 'MICROSECONDS', 'MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']),
+    unit: unitType,
+    /** Specifies which units should be available in the form. */
+    units: PropTypes.arrayOf(unitType),
     /** Add an additional class to the label. */
     labelClassName: PropTypes.string,
     /** Add an additional class to the input wrapper. */
@@ -51,6 +64,7 @@ const TimeUnitInput = createReactClass({
       defaultValue: 1,
       value: undefined,
       unit: 'SECONDS',
+      units: unitValues,
       label: '',
       help: '',
       required: false,
@@ -60,18 +74,26 @@ const TimeUnitInput = createReactClass({
     };
   },
 
-  OPTIONS: [
-    { value: 'NANOSECONDS', label: 'nanoseconds' },
-    { value: 'MICROSECONDS', label: 'microseconds' },
-    { value: 'MILLISECONDS', label: 'milliseconds' },
-    { value: 'SECONDS', label: 'seconds' },
-    { value: 'MINUTES', label: 'minutes' },
-    { value: 'HOURS', label: 'hours' },
-    { value: 'DAYS', label: 'days' },
-  ],
+  getInitialState() {
+    return {
+      unitOptions: this._getUnitOptions(this.props.units),
+    };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!lodash.isEqual(this.props.units, nextProps.units)) {
+      this.setState({ unitOptions: this._getUnitOptions(nextProps.units) });
+    }
+  },
 
   _getEffectiveValue() {
     return lodash.defaultTo(this.props.value, this.props.defaultValue);
+  },
+
+  _getUnitOptions(units) {
+    return unitValues
+      .filter(value => units.includes(value))
+      .map(value => ({ value: value, label: value.toLowerCase() }));
   },
 
   _isChecked() {
@@ -102,7 +124,7 @@ const TimeUnitInput = createReactClass({
   },
 
   render() {
-    const options = this.OPTIONS.map((o) => {
+    const options = this.state.unitOptions.map((o) => {
       return <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)}>{o.label}</MenuItem>;
     });
 
@@ -119,7 +141,7 @@ const TimeUnitInput = createReactClass({
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
-                            title={this.OPTIONS.filter(o => o.value === this.props.unit)[0].label}>
+                            title={this.state.unitOptions.filter(o => o.value === this.props.unit)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>
