@@ -1,4 +1,4 @@
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import ViewState from 'enterprise/logic/views/ViewState';
 import SearchActions from 'enterprise/actions/SearchActions';
@@ -6,6 +6,7 @@ import Search from 'enterprise/logic/search/Search';
 import Query from 'enterprise/logic/queries/Query';
 import View from 'enterprise/logic/views/View';
 import { ViewActions, ViewStore } from './ViewStore';
+import { ViewManagementActions } from './ViewManagementStore';
 
 jest.mock('enterprise/actions/SearchActions');
 jest.mock('enterprise/logic/Widget', () => ({
@@ -14,6 +15,7 @@ jest.mock('enterprise/logic/Widget', () => ({
   }),
   resultHistogram: () => ({}),
 }));
+jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 describe('ViewStore', () => {
   it('.load should select first query if activeQuery is not set', () => {
@@ -48,12 +50,27 @@ describe('ViewStore', () => {
       expect(state.activeQuery).toBe('firstQueryId');
     });
   });
+  it('resets dirty flag when an existing view is updated', () => {
+    const search = Search.create();
+    const newView = View.builder().newId().search(search).build();
+    return ViewActions.load(newView)
+      .then(() => ViewActions.description('My view!'))
+      .then(({ view }) => {
+        const state = ViewStore.getInitialState();
+        expect(state.dirty).toEqual(true);
+        return ViewManagementActions.update(view);
+      })
+      .then(() => {
+        const state = ViewStore.getInitialState();
+        expect(state.dirty).toEqual(false);
+      });
+  });
 
   describe('search recreation:', () => {
     let search: Search;
     let view: View;
     beforeEach(() => {
-      SearchActions.create = jest.fn((s) => Promise.resolve({ search: s }));
+      SearchActions.create = jest.fn(s => Promise.resolve({ search: s }));
 
       search = Search.create()
         .toBuilder()

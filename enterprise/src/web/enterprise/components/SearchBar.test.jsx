@@ -4,6 +4,17 @@ import { mount } from 'enzyme';
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
 import { QueriesActions } from 'enterprise/stores/QueriesStore';
 
+jest.mock('enterprise/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    get: jest.fn(() => Promise.reject()),
+    update: {
+      completed: {
+        listen: jest.fn(),
+      },
+    },
+  },
+}));
+
 describe('SearchBar', () => {
   const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');
   const CurrentUserStore = StoreMock('listen', 'get');

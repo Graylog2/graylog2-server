@@ -14,6 +14,7 @@ import type { Properties } from 'enterprise/logic/views/View';
 import type { QuerySet } from 'enterprise/logic/search/Search';
 import Query from 'enterprise/logic/queries/Query';
 import SearchActions from 'enterprise/actions/SearchActions';
+import { ViewManagementActions } from './ViewManagementStore';
 
 type ViewStoreState = {
   activeQuery: string,
@@ -24,7 +25,7 @@ type ViewStoreState = {
 type ViewActionsType = {
   create: () => Promise<ViewStoreState>,
   dashboardState: (DashboardState) => Promise<void>,
-  description: (string) => Promise<void>,
+  description: (string) => Promise<ViewStoreState>,
   load: (View) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
   search: (Search) => Promise<View>,
@@ -62,6 +63,10 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
 
   init() {
     QueriesActions.create.listen(this.createQuery);
+    ViewManagementActions.update.completed.listen(() => {
+      this.dirty = false;
+      this._trigger();
+    });
   },
 
   getInitialState(): ViewStoreState {
@@ -114,6 +119,9 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     this.dirty = true;
     this.view = this.view.toBuilder().description(newDescription).build();
     this._trigger();
+    const promise = Promise.resolve(this._state());
+    ViewActions.description.promise(promise);
+    return promise;
   },
   load(view: View): Promise<ViewStoreState> {
     this.view = view;
@@ -122,7 +130,7 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     /* Select selected query (activeQuery) or first query in view (for now).
        Selected query might become a property on the view later. */
     const queries = get(view, 'search.queries', Immutable.List());
-    const firstQueryId = queries.first().id;
+    const firstQueryId = get(queries.first(), 'id');
     const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
     this.selectQuery(selectedQuery);
 

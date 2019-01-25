@@ -23,7 +23,16 @@ import { ViewStore } from 'enterprise/stores/ViewStore';
 import ShowViewPage from './ShowViewPage';
 
 jest.mock('stores/connect', () => x => x);
-jest.mock('enterprise/stores/ViewManagementStore', () => ({ ViewManagementActions: { get: jest.fn(() => Promise.reject()) } }));
+jest.mock('enterprise/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    get: jest.fn(() => Promise.reject()),
+    update: {
+      completed: {
+        listen: jest.fn(),
+      },
+    },
+  },
+}));
 jest.mock('enterprise/logic/views/ViewDeserializer', () => jest.fn(x => Promise.resolve(x)));
 jest.mock('enterprise/logic/views/ViewLoader', () => jest.fn(x => Promise.resolve(x)));
 jest.mock('enterprise/stores/SearchExecutionStateStore', () => ({ SearchExecutionStateActions: {} }));

@@ -163,6 +163,11 @@ export default class View {
       .owner(owner)
       .build();
   }
+
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
+  }
 }
 
 class Builder {
