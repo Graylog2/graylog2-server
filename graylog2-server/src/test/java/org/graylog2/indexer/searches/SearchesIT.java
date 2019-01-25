@@ -72,6 +72,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -114,7 +115,7 @@ public class SearchesIT extends ElasticsearchBase {
                 }
 
                 @Override
-                public List<String> streamIds() {
+                public Set<String> streamIds() {
                     return Collections.singletonList(STREAM_ID);
                 }
 

@@ -23,7 +23,7 @@ import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
@@ -35,9 +35,10 @@ public abstract class IndexRangeStats {
     public abstract DateTime max();
 
     @Nullable
-    public abstract List<String> streamIds();
+    public abstract Set<String> streamIds();
 
-    public static IndexRangeStats create(DateTime min, DateTime max, @Nullable List<String> streamIds) {
+    public static IndexRangeStat
+    s create(DateTime min, DateTime max, @Nullable Set<String> streamIds) {
         return new AutoValue_IndexRangeStats(min, max, streamIds);
     }
 
