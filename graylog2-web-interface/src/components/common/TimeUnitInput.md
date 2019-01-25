@@ -21,6 +21,7 @@ const TimeUnitInputExample = createReactClass({
         <p>{enabled ? `${value} ${unit}` : 'Disabled'}</p>
         <TimeUnitInput value={value}
                        unit={unit}
+                       units={['SECONDS', 'MINUTES', 'DAYS']}
                        enabled={enabled}
                        update={this.onChange}
                        defaultValue={7} />
