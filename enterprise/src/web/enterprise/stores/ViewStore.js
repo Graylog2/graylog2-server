@@ -185,14 +185,13 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
     const oldWidgets = get(this.view, 'state') && this.view.state.map(s => s.widgets);
     const newWidgets = get(view, 'state') && view.state.map(s => s.widgets);
     if (!isEqualWith(oldWidgets, newWidgets, Immutable.is)) {
-      let newView = view;
-      const states = newView.state;
+      const states = view.state;
       const searchTypes = states.map(state => SearchTypesGenerator(state.widgets));
 
-      const search = get(newView, 'search');
+      const search = get(view, 'search');
       const newQueries = search.queries.map(q => q.toBuilder().searchTypes(searchTypes.get(q.id, {}).searchTypes).build());
       const newSearch = search.toBuilder().queries(newQueries).build();
-      newView = newView.toBuilder().search(newSearch).build();
+      let newView = view.toBuilder().search(newSearch).build();
 
       searchTypes.map(({ widgetMapping }) => widgetMapping)
         .forEach((widgetMapping, queryId) => {

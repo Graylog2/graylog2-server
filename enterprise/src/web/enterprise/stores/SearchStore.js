@@ -78,7 +78,8 @@ export const SearchStore = Reflux.createStore({
   },
 
   create(searchRequest: Search): Promise<CreateSearchResponse> {
-    const promise = fetch('POST', createSearchUrl, JSON.stringify(searchRequest))
+    const newSearch = searchRequest.toBuilder().newId().build();
+    const promise = fetch('POST', createSearchUrl, JSON.stringify(newSearch))
       .then((response) => {
         const search = Search.fromJSON(response);
         return { search: search };
@@ -135,7 +136,7 @@ export const SearchStore = Reflux.createStore({
   },
 
   parameters(newParameters: Array<Parameter>): Promise<View> {
-    const newSearch = this.search.toBuilder().newId().parameters(newParameters).build();
+    const newSearch = this.search.toBuilder().parameters(newParameters).build();
     const promise = ViewActions.search(newSearch);
     SearchActions.parameters.promise(promise);
     return promise;
