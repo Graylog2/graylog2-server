@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Col, Row } from 'react-bootstrap';
+import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
@@ -31,7 +32,7 @@ class IndexSetConfigurationForm extends React.Component {
   };
 
   _updateConfig = (fieldName, value) => {
-    const config = this.state.indexSet;
+    const config = lodash.cloneDeep(this.state.indexSet);
     config[fieldName] = value;
     this.setState({ indexSet: config });
   };
