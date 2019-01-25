@@ -17,6 +17,7 @@
 package org.graylog2.indexer;
 
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,12 +52,14 @@ public class IndexSetValidatorTest {
     @Test
     public void validate() throws Exception {
         final String prefix = "graylog_index";
+        final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
+        when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
@@ -105,6 +108,23 @@ public class IndexSetValidatorTest {
         // Existing index prefix starts with new index prefix
         when(indexSet.getIndexPrefix()).thenReturn("graylog");
         when(newConfig.indexPrefix()).thenReturn("gray");
+
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
+
+        assertThat(violation).isPresent();
+    }
+
+    @Test
+    public void validateWithInvalidFieldTypeRefreshInterval() throws Exception {
+        final Duration fieldTypeRefreshInterval = Duration.millis(999);
+        final IndexSetConfig newConfig = mock(IndexSetConfig.class);
+        final IndexSet indexSet = mock(IndexSet.class);
+
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(newConfig.indexPrefix()).thenReturn("graylog_index");
+
+        when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 

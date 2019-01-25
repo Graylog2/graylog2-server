@@ -8,15 +8,14 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm } from 'components/indices';
 import { DocumentationLink } from 'components/support';
 import DateTime from 'logic/datetimes/DateTime';
+import history from 'util/History';
+import DocsHelper from 'util/DocsHelper';
+import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesConfigurationStore, IndicesConfigurationActions } = CombinedProvider.get('IndicesConfiguration');
-
-import history from 'util/History';
-import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
 
 const IndexSetCreationPage = createReactClass({
   displayName: 'IndexSetCreationPage',
@@ -44,6 +43,7 @@ const IndexSetCreationPage = createReactClass({
         index_analyzer: 'standard',
         index_optimization_max_num_segments: 1,
         index_optimization_disabled: false,
+        field_type_refresh_interval: 5 * 1000, // 5 seconds
       },
     };
   },

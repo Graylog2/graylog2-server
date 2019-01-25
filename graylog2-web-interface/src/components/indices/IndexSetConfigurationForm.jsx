@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Col, Row } from 'react-bootstrap';
+import moment from 'moment';
+import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
@@ -21,13 +23,18 @@ class IndexSetConfigurationForm extends React.Component {
     cancelLink: PropTypes.string.isRequired,
   };
 
+  static defaultProps = {
+    create: false,
+  };
+
   state = {
     indexSet: this.props.indexSet,
+    fieldTypeRefreshIntervalUnit: 'SECONDS',
     validationErrors: {},
   };
 
   _updateConfig = (fieldName, value) => {
-    const config = this.state.indexSet;
+    const config = lodash.cloneDeep(this.state.indexSet);
     config[fieldName] = value;
     this.setState({ indexSet: config });
   };
@@ -89,38 +96,12 @@ class IndexSetConfigurationForm extends React.Component {
   };
 
   _onFieldTypeRefreshIntervalChange = (value, unit) => {
-    let interval;
-    switch (unit) {
-      case 'NANOSECONDS':
-        interval = value / 1000.0 / 1000.0;
-        break;
-      case 'MICROSECONDS':
-        interval = value / 1000.0;
-        break;
-      case 'MILLISECONDS':
-        interval = value;
-        break;
-      case 'SECONDS':
-        interval = value * 1000;
-        break;
-      case 'MINUTES':
-        interval = value * 1000 * 60;
-        break;
-      case 'HOURS':
-        interval = value * 1000 * 60 * 60;
-        break;
-      case 'DAYS':
-        interval = value * 1000 * 60 * 60 * 24;
-        break;
-      default:
-        throw new Error(`Invalid field type refresh interval unit: ${unit}`);
-    }
-
-    this._updateConfig('field_type_refresh_interval', interval);
+    this._updateConfig('field_type_refresh_interval', moment.duration(value, unit).asMilliseconds());
+    this.setState({ fieldTypeRefreshIntervalUnit: unit });
   };
 
   render() {
-    const indexSet = this.props.indexSet;
+    const { indexSet, fieldTypeRefreshIntervalUnit } = this.state;
     const validationErrors = this.state.validationErrors;
 
     let rotationConfig;
@@ -164,7 +145,7 @@ class IndexSetConfigurationForm extends React.Component {
       const indexPrefixHelp = (
         <span>
           A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set.
-          The prefix must start with a letter or number, and can only contain letters, numbers, '_', '-' and '+'.
+          The prefix must start with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
         </span>
       );
       readOnlyconfig = (
@@ -249,8 +230,9 @@ class IndexSetConfigurationForm extends React.Component {
                 <TimeUnitInput id="field-type-refresh-interval"
                                label="Field type refresh interval"
                                help="How often the field type information for the active write index will be updated."
-                               value={indexSet.field_type_refresh_interval / 1000.0}
-                               unit="SECONDS"
+                               value={moment.duration(indexSet.field_type_refresh_interval, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                               unit={fieldTypeRefreshIntervalUnit}
+                               units={['SECONDS', 'MINUTES']}
                                required
                                update={this._onFieldTypeRefreshIntervalChange} />
               </Col>
