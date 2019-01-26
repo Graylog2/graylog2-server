@@ -37,8 +37,7 @@ public abstract class IndexRangeStats {
     @Nullable
     public abstract Set<String> streamIds();
 
-    public static IndexRangeStat
-    s create(DateTime min, DateTime max, @Nullable Set<String> streamIds) {
+    public static IndexRangeStats create(DateTime min, DateTime max, @Nullable Set<String> streamIds) {
         return new AutoValue_IndexRangeStats(min, max, streamIds);
     }
 
