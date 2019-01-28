@@ -22,7 +22,6 @@ import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -121,17 +120,10 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), SidecarCollectorEntity.class);
 
         final String name = collectorEntity.name().asString(parameters);
-        final String serviceType = collectorEntity.serviceType().asString(parameters);
-        final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByName(name));
-        existingCollector.ifPresent(collector -> compareCollectors(name, serviceType, collector));
+        final String os = collectorEntity.nodeOperatingSystem().asString(parameters);
+        final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByNameAndOs(name, os));
 
         return existingCollector.map(collector -> NativeEntity.create(entity.id(), collector.id(), TYPE_V1, collector.name(), collector));
-    }
-
-    private void compareCollectors(String name, String serviceType, Collector existingCollector) {
-        if (!name.equals(existingCollector.name()) || !serviceType.equals(existingCollector.serviceType())) {
-            throw new DivergingEntityConfigurationException("Expected service type for Collector with name \"" + name + "\": <" + serviceType + ">; actual service type: <" + existingCollector.serviceType() + ">");
-        }
     }
 
     @Override
