@@ -302,9 +302,6 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                 <th>
                   Default Value
                 </th>
-                <th>
-                  Used
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -327,15 +324,6 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                 </td>
                 <td>
                   test
-                </td>
-                <td>
-                  <span
-                    className="failure badge"
-                  >
-                    <i
-                      className="fa fa-times"
-                    />
-                  </span>
                 </td>
               </tr>
             </tbody>
@@ -464,9 +452,6 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   Default Value
                 </th>
                 <th>
-                  Used
-                </th>
-                <th>
                   Action
                 </th>
               </tr>
@@ -491,15 +476,6 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                 </td>
                 <td>
                   test
-                </td>
-                <td>
-                  <span
-                    className="failure badge"
-                  >
-                    <i
-                      className="fa fa-times"
-                    />
-                  </span>
                 </td>
                 <td>
                   <div
