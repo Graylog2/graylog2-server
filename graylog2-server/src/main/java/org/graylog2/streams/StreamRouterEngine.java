@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 public class StreamRouterEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterEngine.class);
 
-    private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX, StreamRuleType.ALWAYS_MATCH);
+    private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX, StreamRuleType.ALWAYS_MATCH, StreamRuleType.CONTAINS);
     private final List<Stream> streams;
     private final StreamFaultManager streamFaultManager;
     private final StreamMetrics streamMetrics;
