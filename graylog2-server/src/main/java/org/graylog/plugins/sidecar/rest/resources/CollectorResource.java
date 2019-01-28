@@ -226,7 +226,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
     @POST
     @Path("/{id}/{name}")
-    @RequiresPermissions(SidecarRestPermissions.COLLECTORS_CREATE)
+    @RequiresPermissions({SidecarRestPermissions.COLLECTORS_READ, SidecarRestPermissions.COLLECTORS_CREATE})
     @ApiOperation(value = "Copy a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CLONE)
     public Response copyCollector(@ApiParam(name = "id", required = true)
@@ -269,7 +269,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @POST
     @Path("/validate")
     @NoAuditEvent("Validation only")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
+    @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates collector parameters")
     public ValidationResult validateCollector(

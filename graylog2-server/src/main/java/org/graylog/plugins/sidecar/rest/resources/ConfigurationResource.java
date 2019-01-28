@@ -285,7 +285,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     @POST
     @Path("/{id}/{name}")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
+    @RequiresPermissions({SidecarRestPermissions.CONFIGURATIONS_READ, SidecarRestPermissions.CONFIGURATIONS_CREATE})
     @ApiOperation(value = "Copy a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CLONE)
     public Response copyConfiguration(@ApiParam(name = "id", required = true)
@@ -334,7 +334,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
 
     @DELETE
     @Path("/{id}")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
+    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Delete a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_DELETE)
