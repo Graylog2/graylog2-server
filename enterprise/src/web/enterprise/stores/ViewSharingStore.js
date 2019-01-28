@@ -53,8 +53,7 @@ export const ViewSharingStore = Reflux.createStore({
   },
 
   remove(viewId: string): Promise<ViewSharing> {
-    const promise = fetch('DELETE', viewSharingUrl(viewId))
-      .then(ViewSharing.fromJSON);
+    const promise = fetch('DELETE', viewSharingUrl(viewId));
     ViewSharingActions.remove.promise(promise);
     return promise;
   },
