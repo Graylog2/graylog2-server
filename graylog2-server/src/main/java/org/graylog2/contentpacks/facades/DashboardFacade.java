@@ -98,7 +98,7 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
-                .map(widget -> encodeWidget(widget.getValue(), positionsById.get(widget.getKey())))
+                .map(widget -> encodeWidget(widget.getValue(), positionsById.get(widget.getKey()), entityDescriptorIds))
                 .collect(Collectors.toList());
         final DashboardEntity dashboardEntity = DashboardEntity.create(
                 ValueReference.of(dashboard.getTitle()),
@@ -112,14 +112,22 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
                 .build();
     }
 
-    private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position) {
+    private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position,
+                                               EntityDescriptorIds entityDescriptorIds) {
+        final Map<String, Object> config = widget.getConfig();
+        final String streamId = (String) config.getOrDefault("stream_id", "");
+
+        if (!streamId.isEmpty()) {
+            entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1).ifPresent(e -> config.put("stream_id", e));
+        }
+
         return DashboardWidgetEntity.create(
                 ValueReference.of(widget.getId()),
                 ValueReference.of(widget.getDescription()),
                 ValueReference.of(widget.getType()),
                 ValueReference.of(widget.getCacheTime()),
                 TimeRangeEntity.of(widget.getTimeRange()),
-                toReferenceMap(widget.getConfig()),
+                toReferenceMap(config),
                 encodePosition(position));
     }
 
