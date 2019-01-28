@@ -152,7 +152,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @PUT
     @Timed
     @Path("/action")
-    @RequiresPermissions(SidecarRestPermissions.COLLECTORS_UPDATE)
+    @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @ApiOperation(value = "Set collector actions in bulk")
     @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)
