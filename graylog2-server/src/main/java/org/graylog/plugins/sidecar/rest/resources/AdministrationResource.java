@@ -111,7 +111,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @POST
     @Timed
     @ApiOperation(value = "Lists existing Sidecar registrations including compatible sidecars using pagination")
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
+    @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.COLLECTORS_READ, SidecarRestPermissions.CONFIGURATIONS_READ})
     @NoAuditEvent("this is not changing any data")
     public SidecarListResponse administration(@ApiParam(name = "JSON body", required = true)
                                                 @Valid @NotNull AdministrationRequest request) {

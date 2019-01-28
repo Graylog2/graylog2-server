@@ -269,7 +269,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @POST
     @Path("/validate")
     @NoAuditEvent("Validation only")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
+    @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Validates collector parameters")
     public ValidationResult validateCollector(
