@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -93,12 +94,25 @@ public class SearchResource extends RestResource implements PluginRestResource {
         this.streamService = streamService;
     }
 
+    @VisibleForTesting
+    boolean isOwnerOfSearch(Search search, String username) {
+        return search.owner()
+                .map(owner -> owner.equals(username))
+                .orElse(true);
+    }
+
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     @RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_CREATE)
     @AuditEvent(type = EnterpriseAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
         final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        final boolean isAdmin = getCurrentUser() != null && (getCurrentUser().isLocalAdmin() || isPermitted("*"));
+        final Optional<Search> previous = searchDbService.get(search.id());
+        if (!isAdmin && !previous.map(existingSearch -> isOwnerOfSearch(existingSearch, username)).orElse(true)) {
+            throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
+        }
+
         final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();

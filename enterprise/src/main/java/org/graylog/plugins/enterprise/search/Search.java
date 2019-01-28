@@ -77,7 +77,7 @@ public abstract class Search {
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return Builder.create().parameters(of());
+        return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
     }
 
     @JsonIgnore
@@ -104,7 +104,6 @@ public abstract class Search {
         public abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
         @JsonProperty(FIELD_OWNER)
-        @Nullable
         public abstract Builder owner(String owner);
 
         @JsonProperty(FIELD_CREATED_AT)

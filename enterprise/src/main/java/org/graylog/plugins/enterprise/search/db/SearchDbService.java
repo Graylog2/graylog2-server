@@ -88,11 +88,6 @@ public class SearchDbService {
 
     public Search save(Search search) {
         if (search.id() != null) {
-            final Search previous = db.findOneById(new ObjectId(search.id()));
-            if (previous != null && previous.owner().map(owner -> !owner.equals(search.owner().orElse(null))).orElse(false)) {
-                throw new IllegalArgumentException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
-            }
-
             db.update(
                     DBQuery.is("_id", search.id()),
                     search,
