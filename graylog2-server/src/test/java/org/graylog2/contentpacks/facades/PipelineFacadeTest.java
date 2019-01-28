@@ -30,8 +30,11 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -90,6 +93,8 @@ public class PipelineFacadeTest {
     private PipelineRuleParser pipelineRuleParser;
     private PipelineService pipelineService;
     private PipelineStreamConnectionsService connectionsService;
+    @Mock
+    private RuleService ruleService;
 
     private PipelineFacade facade;
 
@@ -103,7 +108,7 @@ public class PipelineFacadeTest {
         pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
 
-        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser);
+        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService);
     }
 
     @Test
@@ -221,18 +226,25 @@ public class PipelineFacadeTest {
                 .ruleReferences(Collections.singletonList("no-op"))
                 .build();
         final Pipeline pipeline = Pipeline.builder()
-                .id("id")
+                .id("5a85c4854b900afd5d662be3")
                 .name("Test")
                 .stages(ImmutableSortedSet.of(stage))
                 .build();
         when(pipelineRuleParser.parsePipeline("dummy", "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"))
                 .thenReturn(pipeline);
-        final EntityDescriptor descriptor = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
+        RuleDao ruleDao = RuleDao.builder()
+                .id("2342353045938450345")
+                .title("no-op")
+                .source("rule \\\"debug\\\"\\nrule \\\"no-op\\\"\\nend\"")
+                .build();
+
+        when(ruleService.findByName("no-op")).thenReturn(Optional.of(ruleDao));
+        final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(descriptor);
         assertThat(graph.nodes()).containsOnly(
                 descriptor,
                 EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1),
-                EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE_V1));
+                EntityDescriptor.create("2342353045938450345", ModelTypes.PIPELINE_RULE_V1));
     }
 
     @Test
@@ -291,11 +303,23 @@ public class PipelineFacadeTest {
                 .matchAll(false)
                 .ruleReferences(ImmutableList.of("debug", "no-op"))
                 .build();
+
+        RuleDao ruleDao1 = RuleDao.builder()
+                .id("2342353045938450345")
+                .title("debug")
+                .source("rule \\\"debug\\\"\\nrule \\\"no-op\\\"\\nend\"")
+                .build();
         org.graylog.plugins.pipelineprocessor.ast.Rule rule1 = org.graylog.plugins.pipelineprocessor.ast.Rule.builder()
                 .id("1")
                 .name("debug")
                 .when(mock(LogicalExpression.class))
                 .then(Collections.emptyList())
+                .build();
+
+        RuleDao ruleDao2 = RuleDao.builder()
+                .id("2342353045938450346")
+                .title("no-op")
+                .source("rule \\\"debug\\\"\\nrule \\\"no-op\\\"\\nend\"")
                 .build();
         org.graylog.plugins.pipelineprocessor.ast.Rule rule2 = org.graylog.plugins.pipelineprocessor.ast.Rule.builder()
                 .id("2")
@@ -305,17 +329,20 @@ public class PipelineFacadeTest {
                 .build();
         stage.setRules(ImmutableList.of(rule1, rule2));
         final Pipeline pipeline = Pipeline.builder()
+                .id("5a85c4854b900afd5d662be3")
                 .name("Test")
                 .stages(ImmutableSortedSet.of(stage))
                 .build();
         when(pipelineRuleParser.parsePipeline(eq("dummy"), anyString())).thenReturn(pipeline);
-        final EntityDescriptor pipelineEntity = EntityDescriptor.create("Test", ModelTypes.PIPELINE_V1);
+        when(ruleService.findByName("no-op")).thenReturn(Optional.of(ruleDao1));
+        when(ruleService.findByName("debug")).thenReturn(Optional.of(ruleDao2));
+        final EntityDescriptor pipelineEntity = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
 
         final Graph<EntityDescriptor> graph = facade.resolveNativeEntity(pipelineEntity);
 
         final EntityDescriptor streamEntity = EntityDescriptor.create("5adf23894b900a0fdb4e517d", ModelTypes.STREAM_V1);
-        final EntityDescriptor ruleEntity1 = EntityDescriptor.create("debug", ModelTypes.PIPELINE_RULE_V1);
-        final EntityDescriptor ruleEntity2 = EntityDescriptor.create("no-op", ModelTypes.PIPELINE_RULE_V1);
+        final EntityDescriptor ruleEntity1 = EntityDescriptor.create("2342353045938450345", ModelTypes.PIPELINE_RULE_V1);
+        final EntityDescriptor ruleEntity2 = EntityDescriptor.create("2342353045938450346", ModelTypes.PIPELINE_RULE_V1);
         assertThat(graph.nodes())
                 .containsOnly(pipelineEntity, streamEntity, ruleEntity1, ruleEntity2);
     }

@@ -29,6 +29,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -71,16 +73,20 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
     private final PipelineService pipelineService;
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineRuleParser pipelineRuleParser;
+    private final RuleService ruleService;
 
     @Inject
     public PipelineFacade(ObjectMapper objectMapper,
                           PipelineService pipelineService,
                           PipelineStreamConnectionsService connectionsService,
-                          PipelineRuleParser pipelineRuleParser) {
+                          PipelineRuleParser pipelineRuleParser,
+                          RuleService rulesService
+    ) {
         this.objectMapper = objectMapper;
         this.pipelineService = pipelineService;
         this.connectionsService = connectionsService;
         this.pipelineRuleParser = pipelineRuleParser;
+        this.ruleService = rulesService;
     }
 
     @VisibleForTesting
@@ -250,7 +256,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
 
         final ModelId modelId = entityDescriptor.id();
         try {
-            final PipelineDao pipelineDao = pipelineService.loadByName(modelId.id());
+            final PipelineDao pipelineDao = pipelineService.load(modelId.id());
             final String pipelineSource = pipelineDao.source();
             final Collection<String> referencedRules = referencedRules(pipelineSource);
             referencedRules.stream()
@@ -314,6 +320,10 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         return pipeline.stages().stream()
                 .map(Stage::ruleReferences)
                 .flatMap(Collection::stream)
+                .map(ruleService::findByName)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(RuleDao::id)
                 .collect(Collectors.toSet());
     }
 }
