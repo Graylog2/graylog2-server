@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -81,7 +82,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public List<Alert> loadRecentOfStreams(List<String> streamIds, DateTime since, int limit) {
+    public List<Alert> loadRecentOfStreams(Set<String> streamIds, DateTime since, int limit) {
         if (streamIds == null || streamIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -149,7 +150,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public long totalCountForStreams(List<String> streamIds, AlertState state) {
+    public long totalCountForStreams(Set<String> streamIds, AlertState state) {
         if (streamIds == null || streamIds.isEmpty()) {
             return 0;
         }
@@ -242,7 +243,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public List<Alert> listForStreamIds(List<String> streamIds, AlertState state, int skip, int limit) {
+    public List<Alert> listForStreamIds(Set<String> streamIds, AlertState state, int skip, int limit) {
         if (streamIds == null || streamIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -294,7 +295,7 @@ public class AlertServiceImpl implements AlertService {
         return !alert.isInterval() || alert.getResolvedAt() != null;
     }
 
-    private DBQuery.Query getFindAnyStreamQuery(List<String> streamIds) {
+    private DBQuery.Query getFindAnyStreamQuery(Set<String> streamIds) {
         final List<DBQuery.Query> streamQueries = streamIds.stream()
                 .map(streamId -> DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
                 .collect(Collectors.toList());

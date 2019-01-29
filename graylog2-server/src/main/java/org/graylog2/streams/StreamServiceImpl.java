@@ -188,7 +188,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     private List<Stream> loadAll(DBObject query) {
         final List<DBObject> results = query(StreamImpl.class, query);
-        final List<String> streamIds = results.stream()
+        final Set<String> streamIds = results.stream()
                 .map(o -> o.get("_id").toString())
                 .collect(Collectors.toList());
         final Map<String, List<StreamRule>> allStreamRules = streamRuleService.loadForStreamIds(streamIds);

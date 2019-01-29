@@ -755,7 +755,7 @@ public class Indices {
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
         final TermsAggregation streams = f.getTermsAggregation("streams");
-        final List<String> streamIds = streams.getBuckets().stream()
+        final Set<String> streamIds = streams.getBuckets().stream()
                 .map(TermsAggregation.Entry::getKeyAsString)
                 .collect(toList());
 

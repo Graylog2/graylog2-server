@@ -28,18 +28,19 @@ import org.joda.time.DateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface AlertService {
     Alert factory(AlertCondition.CheckResult checkResult);
 
-    List<Alert> loadRecentOfStreams(List<String> streamIds, DateTime since, int limit);
+    List<Alert> loadRecentOfStreams(Set<String> streamIds, DateTime since, int limit);
     List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
 
     Optional<Alert> getLastTriggeredAlert(String streamId, String conditionId);
 
     long totalCount();
     long totalCountForStream(String streamId);
-    long totalCountForStreams(List<String> streamIds, AlertState state);
+    long totalCountForStreams(Set<String> streamIds, AlertState state);
 
     AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream) throws ConfigurationException;
     AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws ConfigurationException;
@@ -50,7 +51,7 @@ public interface AlertService {
     boolean shouldRepeatNotifications(AlertCondition alertCondition, Alert alert);
 
     List<Alert> listForStreamId(String streamId, int skip, int limit);
-    List<Alert> listForStreamIds(List<String> streamIds, AlertState state, int skip, int limit);
+    List<Alert> listForStreamIds(Set<String> streamIds, AlertState state, int skip, int limit);
     Alert load(String alertId, String streamId) throws NotFoundException;
     String save(Alert alert) throws ValidationException;
 
