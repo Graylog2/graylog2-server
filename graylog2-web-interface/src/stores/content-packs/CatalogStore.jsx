@@ -29,7 +29,7 @@ const CatalogStore = Reflux.createStore({
   getSelectedEntities(requestedEntities) {
     const payload = Object.keys(requestedEntities).reduce((result, key) => {
       return result.concat(requestedEntities[key]
-        .filter(entitiy => entitiy.constructor.name === EntityIndex.name)
+        .filter(entitiy => entitiy instanceof EntityIndex)
         .map(entity => entity.toJSON()));
     }, []);
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
