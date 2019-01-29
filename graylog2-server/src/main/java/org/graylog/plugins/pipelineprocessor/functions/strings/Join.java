@@ -29,6 +29,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class Join extends AbstractFunction<String> {
     public static final String NAME = "join";
@@ -57,6 +58,14 @@ public class Join extends AbstractFunction<String> {
     }
 
     private static List toList(Object obj) {
+        if (obj instanceof Collection) {
+            return ImmutableList.copyOf((Collection) obj);
+        } else {
+            throw new IllegalArgumentException("Unsupported data type for parameter 'elements': " + obj.getClass().getCanonicalName());
+        }
+    }
+
+    private static Set toSet(Object obj) {
         if (obj instanceof Collection) {
             return ImmutableList.copyOf((Collection) obj);
         } else {

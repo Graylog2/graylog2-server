@@ -757,7 +757,7 @@ public class Indices {
         final TermsAggregation streams = f.getTermsAggregation("streams");
         final Set<String> streamIds = streams.getBuckets().stream()
                 .map(TermsAggregation.Entry::getKeyAsString)
-                .collect(toList());
+                .collect(toSet());
 
 
         return IndexRangeStats.create(min, max, streamIds);
