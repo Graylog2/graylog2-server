@@ -6,7 +6,7 @@ import Entity from './Entity';
 export default class ContentPack {
   constructor(v, id, rev, name, summary, description, vendor, url, parameters, entitieValues) {
     const entities = entitieValues.map((e) => {
-      if (e.constructor.name === Entity.name) {
+      if (e instanceof Entity) {
         return e;
       }
       return Entity.fromJSON(e, false, parameters);

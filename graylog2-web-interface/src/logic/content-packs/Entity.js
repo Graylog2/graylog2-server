@@ -64,6 +64,19 @@ export default class Entity {
     return this.getValueFromData('description') || '';
   }
 
+  /* eslint-disable-next-line class-methods-use-this */
+  get isEntity() {
+    return true;
+  }
+
+  /* implement custom instanceof */
+  static [Symbol.hasInstance](obj) {
+    if (obj.isEntity) {
+      return true;
+    }
+    return false;
+  }
+
   getValueFromData(key) {
     const { data } = this._value;
     if (!data || !data[key]) {

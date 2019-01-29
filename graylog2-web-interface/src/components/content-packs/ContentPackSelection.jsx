@@ -163,7 +163,7 @@ class ContentPackSelection extends React.Component {
   };
 
   _entityItemHeader = (entity) => {
-    if (entity.constructor.name === Entity.name) {
+    if (entity instanceof Entity) {
       return <span><i className={`fa fa-archive ${style.contentPackEntity}`} />{' '}<span>{entity.title}</span></span>;
     }
     return <span><i className="fa fa-server" />{' '}<span>{entity.title}</span></span>;

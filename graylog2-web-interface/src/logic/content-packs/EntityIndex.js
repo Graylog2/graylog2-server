@@ -36,6 +36,19 @@ export default class EntityIndex {
     };
   }
 
+  /* eslint-disable-next-line class-methods-use-this */
+  get isEntityIndex() {
+    return true;
+  }
+
+  /* implement custom instanceof */
+  static [Symbol.hasInstance](obj) {
+    if (obj.isEntityIndex) {
+      return true;
+    }
+    return false;
+  }
+
   static fromJSON(value) {
     const { id, title, type } = value;
     return EntityIndex.create(id, title, type);
