@@ -190,7 +190,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         final List<DBObject> results = query(StreamImpl.class, query);
         final Set<String> streamIds = results.stream()
                 .map(o -> o.get("_id").toString())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         final Map<String, List<StreamRule>> allStreamRules = streamRuleService.loadForStreamIds(streamIds);
 
         final ImmutableList.Builder<Stream> streams = ImmutableList.builder();

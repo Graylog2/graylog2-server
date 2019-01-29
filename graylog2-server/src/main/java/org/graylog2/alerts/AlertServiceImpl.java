@@ -298,7 +298,7 @@ public class AlertServiceImpl implements AlertService {
     private DBQuery.Query getFindAnyStreamQuery(Set<String> streamIds) {
         final List<DBQuery.Query> streamQueries = streamIds.stream()
                 .map(streamId -> DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         return DBQuery.or(streamQueries.toArray(new DBQuery.Query[streamQueries.size()]));
     }
 
