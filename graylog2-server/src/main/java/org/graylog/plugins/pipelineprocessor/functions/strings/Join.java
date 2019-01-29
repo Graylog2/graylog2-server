@@ -67,7 +67,7 @@ public class Join extends AbstractFunction<String> {
 
     private static Set toSet(Object obj) {
         if (obj instanceof Collection) {
-            return ImmutableList.copyOf((Collection) obj);
+            return ImmutableSet.copyOf((Collection) obj);
         } else {
             throw new IllegalArgumentException("Unsupported data type for parameter 'elements': " + obj.getClass().getCanonicalName());
         }

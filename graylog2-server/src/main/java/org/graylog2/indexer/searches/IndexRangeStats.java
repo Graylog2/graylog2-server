@@ -28,7 +28,7 @@ import java.util.Set;
 @AutoValue
 @WithBeanGetter
 public abstract class IndexRangeStats {
-    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), Collections.emptyList());
+    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), Collections.emptySet());
 
     public abstract DateTime min();
 
