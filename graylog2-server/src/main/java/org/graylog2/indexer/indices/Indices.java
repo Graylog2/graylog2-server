@@ -107,7 +107,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static java.util.stream.Collectors.toList;
 import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
 
@@ -757,7 +756,7 @@ public class Indices {
         final TermsAggregation streams = f.getTermsAggregation("streams");
         final Set<String> streamIds = streams.getBuckets().stream()
                 .map(TermsAggregation.Entry::getKeyAsString)
-                .collect(toSet());
+                .collect(Collectors.toSet());
 
 
         return IndexRangeStats.create(min, max, streamIds);
