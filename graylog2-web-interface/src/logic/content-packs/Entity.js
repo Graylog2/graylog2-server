@@ -69,6 +69,7 @@ export default class Entity {
     return true;
   }
 
+  /* implement custom instanceof */
   static [Symbol.hasInstance](obj) {
     if (obj.isEntity) {
       return true;
