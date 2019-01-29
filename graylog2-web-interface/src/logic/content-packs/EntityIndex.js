@@ -41,6 +41,7 @@ export default class EntityIndex {
     return true;
   }
 
+  /* implement custom instanceof */
   static [Symbol.hasInstance](obj) {
     if (obj.isEntityIndex) {
       return true;
