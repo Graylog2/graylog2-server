@@ -34,9 +34,13 @@ class IndexSetConfigurationForm extends React.Component {
   };
 
   _updateConfig = (fieldName, value) => {
-    const config = lodash.cloneDeep(this.state.indexSet);
-    config[fieldName] = value;
-    this.setState({ indexSet: config });
+    // Use `setState()` with updater function so consecutive calls to `_updateConfig()` always refer to the state
+    // at the time the change is applied, resulting in all different keys of the object being updated.
+    this.setState((state) => {
+      const config = lodash.cloneDeep(state.indexSet);
+      config[fieldName] = value;
+      return { indexSet: config };
+    });
   };
 
   _validateIndexPrefix = (event) => {
