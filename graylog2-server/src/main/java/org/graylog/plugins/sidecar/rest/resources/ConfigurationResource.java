@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.sidecar.rest.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
@@ -196,6 +197,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     }
 
     @GET
+    @Timed
     @Path("/render/{sidecarId}/{configurationId}")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
