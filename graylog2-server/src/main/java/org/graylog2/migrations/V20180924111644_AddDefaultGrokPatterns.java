@@ -81,8 +81,8 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
                 contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", "admin");
             } catch(ContentPackException e) {
                 LOG.warn("Could not install default grok patterns: the installation found some modified default grok" +
-                        "patterns in your setup and did not update them. If you wish to use to the default grok" +
-                        "patterns we provide, please delete the grok pattern and install the 'Default grok" +
+                        "patterns in your setup and did not update them. If you wish to use the default grok" +
+                        "patterns we provide, please delete the modified grok pattern and install the 'Default grok" +
                         "patterns' content pack manually.");
             }
 
