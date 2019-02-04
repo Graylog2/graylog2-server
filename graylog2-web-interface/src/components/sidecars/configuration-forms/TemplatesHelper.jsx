@@ -33,18 +33,6 @@ class TemplatesHelper extends React.Component {
               <td><code>{this._buildVariableName('sidecarVersion')}</code></td>
               <td>Version string of the running sidecar.</td>
             </tr>
-            <tr>
-              <td><code>{this._buildVariableName('ip')}</code></td>
-              <td>First public IP address of the machine the sidecar is running on.</td>
-            </tr>
-            <tr>
-              <td><code>{this._buildVariableName('cpuIdle')}</code></td>
-              <td>Current CPU idle value.</td>
-            </tr>
-            <tr>
-              <td><code>{this._buildVariableName('load1')}</code></td>
-              <td>Current system load.</td>
-            </tr>
           </tbody>
         </Table>
       </div>
