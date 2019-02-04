@@ -25,7 +25,6 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationVariable;
-import org.graylog.plugins.sidecar.rest.models.NodeMetrics;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog.plugins.sidecar.template.directives.IndentTemplateDirective;
@@ -162,16 +161,6 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("nodeName", sidecar.nodeName());
         context.put("sidecarVersion", sidecar.sidecarVersion());
         context.put("operatingSystem", sidecar.nodeDetails().operatingSystem());
-        context.put("ip", sidecar.nodeDetails().ip());
-        final NodeMetrics metrics = sidecar.nodeDetails().metrics();
-        if (metrics != null) {
-            if (metrics.cpuIdle() != null) {
-                context.put("cpuIdle", metrics.cpuIdle());
-            }
-            if (metrics.load1() != null) {
-                context.put("load1", metrics.load1());
-            }
-        }
 
         return Configuration.create(
                 configuration.id(),
@@ -188,9 +177,6 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("nodeName", "<node name>");
         context.put("sidecarVersion", "<version>");
         context.put("operatingSystem", "<operating system>");
-        context.put("ip", "<ip>");
-        context.put("cpuIdle", "<cpu idle>");
-        context.put("load1", "<load 1>");
 
         String previewName = UUID.randomUUID().toString();
         stringTemplateLoader.putTemplate(previewName, template);
