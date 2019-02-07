@@ -156,10 +156,15 @@ class SearchResult extends React.Component {
     this.setState({ shouldHighlight: !this.state.shouldHighlight });
   };
 
+  _toggleShouldTruncate = () => {
+    this.setState({ shouldTruncate: !this.state.shouldTruncate });
+  };
+
   state = {
     selectedFields: this.sortFields(SearchStore.fields),
     showAllFields: false,
     shouldHighlight: true,
+    shouldTruncate: true,
     savedSearch: SearchStore.savedSearch,
   };
 
@@ -197,7 +202,9 @@ class SearchResult extends React.Component {
                          predefinedFieldSelection={this.predefinedFieldSelection}
                          showHighlightToggle={anyHighlightRanges}
                          shouldHighlight={this.state.shouldHighlight}
+                         shouldTruncate={this.state.shouldTruncate}
                          toggleShouldHighlight={this._toggleShouldHighlight}
+                         toggleShouldTruncate={this._toggleShouldTruncate}
                          currentSavedSearch={SearchStore.savedSearch}
                          searchInStream={this.props.searchInStream}
                          permissions={this.props.permissions}
@@ -225,6 +232,7 @@ class SearchResult extends React.Component {
                        streams={this.props.streams}
                        nodes={this.props.nodes}
                        highlight={this.state.shouldHighlight}
+                       truncate={this.state.shouldTruncate}
                        searchConfig={this.props.searchConfig} />
 
           {loadingIndicator}

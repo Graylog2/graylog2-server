@@ -16,6 +16,7 @@ class ResultTable extends React.Component {
   static propTypes = {
     disableSurroundingSearch: PropTypes.bool,
     highlight: PropTypes.bool.isRequired,
+    truncate: PropTypes.bool.isRequired,
     inputs: PropTypes.object.isRequired,
     messages: PropTypes.array.isRequired,
     nodes: PropTypes.object.isRequired,
@@ -192,6 +193,7 @@ class ResultTable extends React.Component {
                                        allStreams={this.state.allStreams}
                                        allStreamsLoaded={this.state.allStreamsLoaded}
                                        nodes={this.props.nodes}
+                                       truncate={this.props.truncate}
                                        highlight={this.props.highlight}
                                        highlightMessage={SearchStore.highlightMessage}
                                        expandAllRenderAsync={this.state.expandAllRenderAsync}

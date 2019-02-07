@@ -43,10 +43,12 @@ const SearchSidebar = createReactClass({
     searchInStream: PropTypes.object,
     selectedFields: PropTypes.object,
     shouldHighlight: PropTypes.bool,
+    shouldTruncate: PropTypes.bool,
     showAllFields: PropTypes.bool,
     showHighlightToggle: PropTypes.bool,
     togglePageFields: PropTypes.func,
     toggleShouldHighlight: PropTypes.func,
+    toggleShouldTruncate: PropTypes.func,
     loadingSearch: PropTypes.bool,
     searchConfig: PropTypes.object.isRequired,
   },
@@ -262,10 +264,12 @@ const SearchSidebar = createReactClass({
                                      searchConfig={this.props.searchConfig}
                                      selectedFields={this.props.selectedFields}
                                      shouldHighlight={this.props.shouldHighlight}
+                                     shouldTruncate={this.props.shouldTruncate}
                                      showAllFields={this.props.showAllFields}
                                      showHighlightToggle={this.props.showHighlightToggle}
                                      togglePageFields={this.props.togglePageFields}
-                                     toggleShouldHighlight={this.props.toggleShouldHighlight} />
+                                     toggleShouldHighlight={this.props.toggleShouldHighlight} 
+                                     toggleShouldTruncate={this.props.toggleShouldTruncate} />
             </Tab>
 
             <Tab eventKey={2} title={<h4>Decorators</h4>}>

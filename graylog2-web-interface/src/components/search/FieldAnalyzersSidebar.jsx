@@ -17,10 +17,12 @@ class FieldAnalyzersSidebar extends React.Component {
     searchConfig: PropTypes.object.isRequired,
     selectedFields: PropTypes.object,
     shouldHighlight: PropTypes.bool,
+    shouldTruncate: PropTypes.bool,
     showAllFields: PropTypes.bool,
     showHighlightToggle: PropTypes.bool,
     togglePageFields: PropTypes.func,
     toggleShouldHighlight: PropTypes.func,
+    toggleShouldTruncate: PropTypes.func,
   };
 
   state = {
@@ -179,6 +181,13 @@ class FieldAnalyzersSidebar extends React.Component {
                onClick={this._showAllFields}>all fields</a>.
           </span>
           <br />
+          <Input id="truncate-results-checkbox"
+                 type="checkbox"
+                 bsSize="small"
+                 checked={this.props.shouldTruncate}
+                 onChange={this.props.toggleShouldTruncate}
+                 label="Truncate results"
+                 wrapperClassName="result-truncate-control" />
           {shouldHighlightToggle}
         </div>
       </div>

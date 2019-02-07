@@ -33,6 +33,7 @@ class MessageTableEntry extends React.Component {
     showMessageRow: PropTypes.bool,
     streams: ImmutablePropTypes.map.isRequired,
     toggleDetail: PropTypes.func.isRequired,
+    truncate: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -42,6 +43,7 @@ class MessageTableEntry extends React.Component {
     searchConfig: undefined,
     selectedFields: Immutable.OrderedSet(),
     showMessageRow: false,
+    truncate: true,
   };
 
   shouldComponentUpdate(newProps) {
@@ -63,16 +65,22 @@ class MessageTableEntry extends React.Component {
     if (this.props.showMessageRow !== newProps.showMessageRow) {
       return true;
     }
+    if (this.props.truncate !== newProps.truncate) {
+      return true;
+    }
     return false;
   }
 
-  possiblyHighlight = (fieldName, fullOrigValue, truncate) => {
-    // Ensure the field is a string for later processing
-    const fullStringOrigValue = StringUtils.stringify(fullOrigValue);
-
+  possiblyTruncate = (string) => {
     // Truncate the field to 2048 characters if requested. This is for performance reasons to avoid hogging the CPU.
     // It's not optimal, more like a workaround to at least being able to show the page...
-    const origValue = truncate ? fullStringOrigValue.slice(0, 2048) : fullStringOrigValue;
+    console.log("HI", this.props.truncate);
+    return this.props.truncate ? string.slice(0, 2048) : string;
+  }
+
+  possiblyHighlight = (fieldName, fullOrigValue) => {
+    // Ensure the field is a string for later processing
+    const value = StringUtils.stringify(fullOrigValue);
 
     if (this.props.highlight && this.props.message.highlight_ranges) {
       if (this.props.message.highlight_ranges.hasOwnProperty(fieldName)) {
@@ -82,23 +90,23 @@ class MessageTableEntry extends React.Component {
         let key = 0;
         highlights.forEach((range, idx) => {
           if (position !== range.get('start')) {
-            chunks.push(<span key={key++}>{origValue.substring(position, range.get('start'))}</span>);
+            chunks.push(<span key={key++}>{value.substring(position, range.get('start'))}</span>);
           }
-          chunks.push(<span key={key++} className="result-highlight-colored">{origValue.substring(range.get('start'), range.get('start') + range.get('length'))}</span>);
+          chunks.push(<span key={key++} className="result-highlight-colored">{value.substring(range.get('start'), range.get('start') + range.get('length'))}</span>);
           if ((idx + 1) < highlights.size) {
             const nextRange = highlights.get(idx + 1);
-            chunks.push(<span key={key++}>{origValue.substring(range.get('start') + range.get('length'), nextRange.get('start'))}</span>);
+            chunks.push(<span key={key++}>{value.substring(range.get('start') + range.get('length'), nextRange.get('start'))}</span>);
             position = nextRange.get('start');
           } else {
-            chunks.push(<span key={key++}>{origValue.substring(range.get('start') + range.get('length'))}</span>);
+            chunks.push(<span key={key++}>{value.substring(range.get('start') + range.get('length'))}</span>);
             position = range.get('start') + range.get('length');
           }
         });
         return <span>{chunks}</span>;
       }
-      return String(origValue);
+      return String(this.possiblyTruncate(value));
     }
-    return String(origValue);
+    return String(this.possiblyTruncate(value));
   };
 
   _toggleDetail = () => {
@@ -122,7 +130,7 @@ class MessageTableEntry extends React.Component {
     );
   };
 
-  renderForDisplay = (fieldName, truncate) => {
+  renderForDisplay = (fieldName) => {
     const fullOrigValue = this.props.message.fields[fieldName];
     const isDecorated = DecorationStats.isFieldDecorated(this.props.message, fieldName);
 
@@ -140,7 +148,7 @@ class MessageTableEntry extends React.Component {
     if (fieldName === 'timestamp') {
       return this._toTimestamp(fullOrigValue);
     } else {
-      return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
+      return this.possiblyHighlight(fieldName, fullOrigValue);
     }
   };
 
@@ -162,7 +170,7 @@ class MessageTableEntry extends React.Component {
             <Timestamp dateTime={this.props.message.fields.timestamp} />
           </strong></td>
           { this.props.selectedFields.toSeq().map(selectedFieldName => (<td
-            key={selectedFieldName}>{this.renderForDisplay(selectedFieldName, true)} </td>)) }
+            key={selectedFieldName}>{this.renderForDisplay(selectedFieldName)} </td>)) }
         </tr>
 
         {this.props.showMessageRow &&
