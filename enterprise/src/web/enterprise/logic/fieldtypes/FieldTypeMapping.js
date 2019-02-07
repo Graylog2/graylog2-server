@@ -1,7 +1,19 @@
+// @flow strict
 import FieldType from './FieldType';
+import type { FieldTypeJSON } from './FieldType';
+
+export type FieldTypeMappingJSON = {
+  name: string,
+  type: FieldTypeJSON,
+}
 
 class FieldTypeMapping {
-  constructor(name, type) {
+  value: {
+    name: string,
+    type: FieldType
+  };
+
+  constructor(name: string, type: FieldType) {
     this.value = { name, type };
   }
 
@@ -13,7 +25,7 @@ class FieldTypeMapping {
     return this.value.type;
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: FieldTypeMappingJSON) {
     const { name, type } = value;
     return new FieldTypeMapping(name, FieldType.fromJSON(type));
   }

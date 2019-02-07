@@ -3,8 +3,9 @@ import Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
+
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import { QueryFiltersStore } from './QueryFiltersStore';
-import FieldTypeMapping from '../logic/fieldtypes/FieldTypeMapping';
 
 const fieldTypesUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/fields');
 

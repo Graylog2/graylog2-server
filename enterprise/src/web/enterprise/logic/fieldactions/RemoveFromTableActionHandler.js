@@ -5,8 +5,9 @@ import { ActionContext, WidgetContext } from 'enterprise/logic/ActionContext';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 import type { FieldActionHandlerCondition, FieldActionHandlerWithContext } from './FieldActionHandler';
+import FieldType from '../fieldtypes/FieldType';
 
-const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, context: ActionContext) => {
+const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContext) => {
   if (context instanceof WidgetContext) {
     const { widget } = context;
     const newFields = widget.config.fields.filter(f => (f !== field));

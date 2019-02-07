@@ -5,8 +5,9 @@ import { ActionContext, WidgetContext } from 'enterprise/logic/ActionContext';
 import type { FieldActionHandlerWithContext } from './FieldActionHandler';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
+import FieldType from '../fieldtypes/FieldType';
 
-const AddToTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, context: ActionContext) => {
+const AddToTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContext) => {
   if (context instanceof WidgetContext) {
     const { widget } = context;
     const newFields = [].concat(widget.config.fields, [field]);

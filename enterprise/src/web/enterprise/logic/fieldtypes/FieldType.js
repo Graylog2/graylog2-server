@@ -1,4 +1,5 @@
-import Immutable from 'immutable';
+// @flow strict
+import * as Immutable from 'immutable';
 
 const Properties = {
   Compound: 'compound',
@@ -7,34 +8,41 @@ const Properties = {
   Numeric: 'numeric',
 };
 
+export type FieldTypeJSON = {
+  type: string,
+  properties: Array<string>,
+  index_names: Array<string>
+};
+
 class FieldType {
-  constructor(type, properties, indexNames) {
+  value: Immutable.Map<string, *>;
+  constructor(type: string, properties: Array<string>, indexNames: Array<string>) {
     this.value = Immutable.Map({ type, properties: Immutable.Set(properties), indexNames: Immutable.Set(indexNames) });
   }
 
   static Unknown = new FieldType('unknown', [], []);
 
-  get type() {
+  get type(): string {
     return this.value.get('type');
   }
 
-  get properties() {
+  get properties(): Immutable.Set<string> {
     return this.value.get('properties');
   }
 
-  get indexNames() {
+  get indexNames(): Immutable.Set<string> {
     return this.value.get('indexNames');
   }
 
-  isNumeric() {
+  isNumeric(): boolean {
     return this.properties.has(Properties.Numeric);
   }
 
-  isCompound() {
+  isCompound(): boolean {
     return this.properties.has(Properties.Compound);
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: FieldTypeJSON) {
     // eslint-disable-next-line camelcase
     const { type, properties, index_names } = value;
     return new FieldType(type, properties, index_names);
