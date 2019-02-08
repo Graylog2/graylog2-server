@@ -42,7 +42,7 @@ class DataAdapterPicker extends React.Component {
           <Select placeholder="Select a data adapter"
                   clearable={false}
                   options={sortedAdapters}
-                  matchProp="value"
+                  matchProp="label"
                   onChange={this.props.onSelect}
                   value={this.props.selectedId} />
         </Input>

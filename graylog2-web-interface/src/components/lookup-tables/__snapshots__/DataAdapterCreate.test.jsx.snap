@@ -23,7 +23,7 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
         >
           <select-mock
             clearable={false}
-            matchProp="value"
+            matchProp="label"
             onChange={[Function]}
             options={
               Array [
@@ -66,7 +66,7 @@ exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
         >
           <select-mock
             clearable={false}
-            matchProp="value"
+            matchProp="label"
             onChange={[Function]}
             options={Array []}
             placeholder="Select Data Adapter Type"
@@ -102,7 +102,7 @@ exports[`<DataAdapterCreate /> with mocked console.error should render for types
         >
           <select-mock
             clearable={false}
-            matchProp="value"
+            matchProp="label"
             onChange={[Function]}
             options={
               Array [

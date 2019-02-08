@@ -66,7 +66,7 @@ class DnsAdapterFieldSet extends React.Component {
           <Select placeholder="Select the type of DNS lookup"
                   clearable={false}
                   options={lookupTypes}
-                  matchProp="value"
+                  matchProp="label"
                   onChange={this._onLookupTypeSelect}
                   value={config.lookup_type} />
         </Input>

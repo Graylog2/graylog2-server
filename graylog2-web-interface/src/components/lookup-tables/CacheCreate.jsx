@@ -66,7 +66,7 @@ class CacheCreate extends React.Component {
                 <Select placeholder="Select Cache Type"
                         clearable={false}
                         options={sortedCaches}
-                        matchProp="value"
+                        matchProp="label"
                         onChange={this._onTypeSelect}
                         value={null} />
               </Input>

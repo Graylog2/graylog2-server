@@ -111,7 +111,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
         <Input id="strategy-select" label={this.props.selectPlaceholder}>
           <Select placeholder={this.props.selectPlaceholder}
                   options={this._availableSelectOptions()}
-                  matchProp="value"
+                  matchProp="label"
                   value={this._activeSelection()}
                   onChange={this._onSelect} />
         </Input>
