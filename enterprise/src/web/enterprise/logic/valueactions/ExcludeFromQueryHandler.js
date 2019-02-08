@@ -1,11 +1,12 @@
+import { escape, addToQuery } from 'enterprise/logic/queries/QueryHelper';
 import { QueriesActions } from '../../stores/QueriesStore';
 import QueryManipulationHandler from './QueryManipulationHandler';
 
 export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
   formatNewQuery = (oldQuery, field, value) => {
-    const fieldPredicate = `NOT ${field}:${this.escape(value)}`;
+    const fieldPredicate = `NOT ${field}:${escape(value)}`;
 
-    return this.addToQuery(oldQuery, fieldPredicate);
+    return addToQuery(oldQuery, fieldPredicate);
   };
 
   handle = (queryId, field, value) => {
