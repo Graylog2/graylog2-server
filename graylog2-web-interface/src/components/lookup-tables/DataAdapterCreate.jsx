@@ -69,7 +69,7 @@ class DataAdapterCreate extends React.Component {
               <Select placeholder="Select Data Adapter Type"
                       clearable={false}
                       options={sortedAdapters}
-                      matchProp="value"
+                      matchProp="label"
                       onChange={this._onTypeSelect}
                       value={null} />
             </Input>
