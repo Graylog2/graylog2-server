@@ -8,7 +8,6 @@ import { Select, TimeUnitInput } from 'components/common';
 class MaxmindAdapterFieldSet extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-// eslint-disable-next-line react/no-unused-prop-types
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
     validationState: PropTypes.func.isRequired,
@@ -70,7 +69,7 @@ class MaxmindAdapterFieldSet extends React.Component {
                      update={this.updateCheckInterval}
                      value={config.check_interval}
                      unit={config.check_interval_unit || 'MINUTES'}
-                     enabled={config.check_interval > 0}
+                     defaultEnabled={config.check_interval > 0}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
     </fieldset>);
