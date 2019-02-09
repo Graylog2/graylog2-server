@@ -45,6 +45,8 @@ const TimeUnitInput = createReactClass({
     required: PropTypes.bool,
     /** Specifies if the input is enabled or disabled. */
     enabled: PropTypes.bool,
+    /** Indicates the default enabled state, in case the consumer does not want to handle the enabled state. */
+    defaultEnabled: PropTypes.bool,
     /** Specifies the value of the input. */
     value: PropTypes.number,
     /** Indicates the default value to use, in case value is not provided or set. */
@@ -68,7 +70,8 @@ const TimeUnitInput = createReactClass({
       label: '',
       help: '',
       required: false,
-      enabled: false,
+      enabled: undefined,
+      defaultEnabled: false,
       labelClassName: undefined,
       wrapperClassName: undefined,
     };
@@ -76,6 +79,7 @@ const TimeUnitInput = createReactClass({
 
   getInitialState() {
     return {
+      enabled: lodash.defaultTo(this.props.enabled, this.props.defaultEnabled),
       unitOptions: this._getUnitOptions(this.props.units),
     };
   },
@@ -97,7 +101,10 @@ const TimeUnitInput = createReactClass({
   },
 
   _isChecked() {
-    return this.props.required || this.props.enabled;
+    if (this.props.required) {
+      return this.props.required;
+    }
+    return lodash.defaultTo(this.props.enabled, this.state.enabled);
   },
 
   _propagateInput(update) {
@@ -111,7 +118,9 @@ const TimeUnitInput = createReactClass({
   },
 
   _onToggleEnable(e) {
-    this._propagateInput({ checked: e.target.checked });
+    const isChecked = e.target.checked;
+    this.setState({ enabled: isChecked });
+    this._propagateInput({ checked: isChecked });
   },
 
   _onUpdate(e) {
