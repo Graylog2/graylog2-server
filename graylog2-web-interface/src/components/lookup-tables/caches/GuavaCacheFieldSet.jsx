@@ -10,9 +10,9 @@ class GuavaCacheFieldSet extends React.Component {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
-// eslint-disable-next-line react/no-unused-prop-types
+    // eslint-disable-next-line react/no-unused-prop-types
     validationState: PropTypes.func.isRequired,
-// eslint-disable-next-line react/no-unused-prop-types
+    // eslint-disable-next-line react/no-unused-prop-types
     validationMessage: PropTypes.func.isRequired,
   };
 
@@ -29,10 +29,6 @@ class GuavaCacheFieldSet extends React.Component {
 
   updateAfterWrite = (value, unit, enabled) => {
     this._update(value, unit, enabled, 'expire_after_write');
-  };
-
-  updateRefresh = (value, unit, enabled) => {
-    this._update(value, unit, enabled, 'refresh_after_write');
   };
 
   render() {
@@ -55,7 +51,7 @@ class GuavaCacheFieldSet extends React.Component {
                      update={this.updateAfterAccess}
                      value={config.expire_after_access}
                      unit={config.expire_after_access_unit || 'SECONDS'}
-                     enabled={config.expire_after_access > 0}
+                     defaultEnabled={config.expire_after_access > 0}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
       <TimeUnitInput label="Expire after write"
@@ -63,7 +59,7 @@ class GuavaCacheFieldSet extends React.Component {
                      update={this.updateAfterWrite}
                      value={config.expire_after_write}
                      unit={config.expire_after_write_unit || 'SECONDS'}
-                     enabled={config.expire_after_write > 0}
+                     defaultEnabled={config.expire_after_write > 0}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
     </fieldset>);
