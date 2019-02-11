@@ -342,14 +342,16 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     private void setupKafkaLogMetrics(final MetricRegistry metricRegistry) {
-        metricRegistry.register(name(KafkaJournal.class, "size"), (Gauge<Long>) kafkaLog::size);
-        metricRegistry.register(name(KafkaJournal.class, "logEndOffset"), (Gauge<Long>) kafkaLog::logEndOffset);
-        metricRegistry.register(name(KafkaJournal.class, "numberOfSegments"), (Gauge<Integer>) kafkaLog::numberOfSegments);
-        metricRegistry.register(name(KafkaJournal.class, "unflushedMessages"), (Gauge<Long>) kafkaLog::unflushedMessages);
-        metricRegistry.register(name(KafkaJournal.class, "recoveryPoint"), (Gauge<Long>) kafkaLog::recoveryPoint);
-        metricRegistry.register(name(KafkaJournal.class, "lastFlushTime"), (Gauge<Long>) kafkaLog::lastFlushTime);
+        metricRegistry.register(name(this.getClass(), "size"), (Gauge<Long>) kafkaLog::size);
+        metricRegistry.register(name(this.getClass(), "logEndOffset"), (Gauge<Long>) kafkaLog::logEndOffset);
+        metricRegistry.register(name(this.getClass(), "numberOfSegments"), (Gauge<Integer>) kafkaLog::numberOfSegments);
+        metricRegistry.register(name(this.getClass(), "unflushedMessages"), (Gauge<Long>) kafkaLog::unflushedMessages);
+        metricRegistry.register(name(this.getClass(), "recoveryPoint"), (Gauge<Long>) kafkaLog::recoveryPoint);
+        metricRegistry.register(name(this.getClass(), "lastFlushTime"), (Gauge<Long>) kafkaLog::lastFlushTime);
         // must not be a lambda, because the serialization cannot determine the proper Metric type :(
-        metricRegistry.register(GlobalMetricNames.JOURNAL_OLDEST_SEGMENT, (Gauge<Date>) new Gauge<Date>() {
+
+        // TODO Dan: Verify that it's ok to change this metric name in order to support subclass instances of KafkaJournal
+        metricRegistry.register(name(this.getClass(), "oldest-segment"), (Gauge<Date>) new Gauge<Date>() {
             @Override
             public Date getValue() {
                 long oldestSegment = Long.MAX_VALUE;
