@@ -29,6 +29,10 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
+// Attention!
+// Don't register Providers such as ContainerRequestFilter in DynamicFeature.
+// This will get Jersey to create a ServiceLocator for every existing Resource.
+// Each ServiceLocator will have its own Guice/HK2 Bridge, which is very very inefficient!
 public class ShiroSecurityBinding implements DynamicFeature {
     private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityBinding.class);
 
@@ -36,8 +40,6 @@ public class ShiroSecurityBinding implements DynamicFeature {
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         final Method resourceMethod = resourceInfo.getResourceMethod();
-
-        context.register(ShiroSecurityContextFilter.class);
 
         if (resourceMethod.isAnnotationPresent(RequiresAuthentication.class) || resourceClass.isAnnotationPresent(RequiresAuthentication.class)) {
             if (resourceMethod.isAnnotationPresent(RequiresGuest.class)) {

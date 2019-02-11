@@ -54,6 +54,7 @@ import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.WebApplicationExceptionMapper;
+import org.graylog2.shared.security.ShiroSecurityContextFilter;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.graylog2.shared.security.tls.PemKeyStore;
 import org.slf4j.Logger;
@@ -240,6 +241,7 @@ public class JerseyService extends AbstractIdleService {
                 .register(new PrefixAddingModelProcessor(packagePrefixes))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
+                        ShiroSecurityContextFilter.class,
                         VerboseCsrfProtectionFilter.class,
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,

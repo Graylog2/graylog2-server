@@ -43,7 +43,8 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-@Priority(Priorities.AUTHENTICATION)
+// Give this a higher priority so it's run before the authentication filter
+@Priority(Priorities.AUTHENTICATION - 10)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
     public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
     private final DefaultSecurityManager securityManager;
