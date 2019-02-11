@@ -350,7 +350,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         metricRegistry.register(name(this.getClass(), "lastFlushTime"), (Gauge<Long>) kafkaLog::lastFlushTime);
         // must not be a lambda, because the serialization cannot determine the proper Metric type :(
 
-        // TODO Dan: Verify that it's ok to change this metric name in order to support subclass instances of KafkaJournal
+        // TODO Dan: Verify that it's ok to change this metric name in order to support multiple instances of KafkaJournal)
         metricRegistry.register(name(this.getClass(), "oldest-segment"), (Gauge<Date>) new Gauge<Date>() {
             @Override
             public Date getValue() {
