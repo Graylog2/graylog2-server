@@ -127,7 +127,7 @@ exports[`AppErrorBoundary displays error after catching 1`] = `
                                 text="documentation"
                               >
                                 <a
-                                  href="http://docs.graylog.org/en/3.0"
+                                  href="http://docs.graylog.org/en/3.1"
                                   target="_blank"
                                 >
                                   documentation
