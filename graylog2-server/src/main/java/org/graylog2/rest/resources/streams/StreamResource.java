@@ -211,7 +211,7 @@ public class StreamResource extends RestResource {
     @GET
     @Timed
     @Path("/page")
-    @ApiOperation(value = "Get a list of all streams")
+    @ApiOperation(value = "Get a paginated list of streams")
     @Produces(MediaType.APPLICATION_JSON)
     public StreamPageListResponse getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -230,10 +230,16 @@ public class StreamResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final PaginatedList<StreamDTO> streams = paginatedStreamService
+        final PaginatedList<StreamDTO> result = paginatedStreamService
                 .findPaginated(searchQuery, page, perPage, sort, order);
+        final List<StreamDTO> streams = result.stream().map(streamDTO -> {
+            List<StreamRule> rules = streamRuleService.loadForStreamId(streamDTO.id());
+            return streamDTO.toBuilder().rules(rules).build();
+        }).collect(Collectors.toList());
         final long total = paginatedStreamService.count();
-        return StreamPageListResponse.create(query, streams.pagination(), total, sort, order, streams);
+        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(streams,
+                result.pagination().total(), result.pagination().page(), result.pagination().perPage());
+        return StreamPageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams);
     }
 
     @GET
