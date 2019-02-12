@@ -21,6 +21,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Stoppable;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
@@ -28,6 +29,12 @@ import java.util.List;
 public interface MessageOutput extends Stoppable {
     interface Factory<T> {
         T create(Stream stream, Configuration configuration);
+
+        // Backwards compatible.
+        default T create(Output output, Stream stream, Configuration configuration) {
+
+            return create(stream, configuration);
+        }
         Config getConfig();
         Descriptor getDescriptor();
     }
