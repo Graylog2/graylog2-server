@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.dashboards;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.PaginatedDashboardService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -63,6 +64,8 @@ public class DashboardsResourceTest {
     private UserService userService;
     @Mock
     private User user;
+    @Mock
+    private PaginatedDashboardService paginatedDashboardService;
 
     private DashboardsTestResource dashboardsResource;
 
@@ -70,10 +73,11 @@ public class DashboardsResourceTest {
         private final Subject subject;
 
         DashboardsTestResource(DashboardService dashboardService,
+                               PaginatedDashboardService paginatedDashboardService,
                                ActivityWriter activityWriter,
                                Subject subject,
                                UserService userService) {
-            super(dashboardService, activityWriter);
+            super(dashboardService, paginatedDashboardService, activityWriter);
             this.subject = subject;
             this.userService = userService;
         }
@@ -113,7 +117,7 @@ public class DashboardsResourceTest {
         when(userService.load(eq(testuserName))).thenReturn(user);
         when(user.getName()).thenReturn(testuserName);
 
-        this.dashboardsResource = new DashboardsTestResource(dashboardService, activityWriter, subject, userService);
+        this.dashboardsResource = new DashboardsTestResource(dashboardService, paginatedDashboardService, activityWriter, subject, userService);
     }
 
     @Test

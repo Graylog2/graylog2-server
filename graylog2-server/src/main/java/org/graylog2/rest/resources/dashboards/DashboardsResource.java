@@ -30,8 +30,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.Dashboard;
+import org.graylog2.dashboards.DashboardDTO;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.PaginatedDashboardService;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -39,6 +42,10 @@ import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.rest.models.dashboards.responses.DashboardList;
+import org.graylog2.rest.models.dashboards.responses.DashboardPageList;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.system.activities.Activity;
@@ -48,14 +55,17 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -68,14 +78,24 @@ import java.util.Map;
 public class DashboardsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardsResource.class);
 
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(DashboardDTO.FIELD_TITLE, SearchQueryField.create(DashboardDTO.FIELD_TITLE))
+            .put(DashboardDTO.FIELD_DESCRIPTION, SearchQueryField.create(DashboardDTO.FIELD_DESCRIPTION))
+            .build();
+
     private final DashboardService dashboardService;
     private final ActivityWriter activityWriter;
+    private final PaginatedDashboardService paginatedDashboardService;
+    private final SearchQueryParser searchQueryParser;
 
     @Inject
     public DashboardsResource(DashboardService dashboardService,
+                              PaginatedDashboardService paginatedDashboardService,
                               ActivityWriter activityWriter) {
         this.dashboardService = dashboardService;
         this.activityWriter = activityWriter;
+        this.paginatedDashboardService = paginatedDashboardService;
+        this.searchQueryParser = new SearchQueryParser(DashboardDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
     @POST
@@ -121,6 +141,34 @@ public class DashboardsResource extends RestResource {
         }
 
         return DashboardList.create(dashboards.size(), dashboards);
+    }
+
+    @GET
+    @Timed
+    @Path("/page")
+    @ApiOperation(value = "Get a paginated list of streams")
+    @Produces(MediaType.APPLICATION_JSON)
+    public DashboardPageList getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                     @ApiParam(name = "sort",
+                                             value = "The field to sort the result on",
+                                             required = true,
+                                             allowableValues = "title,description,id")
+                                     @DefaultValue(DashboardDTO.FIELD_TITLE) @QueryParam("sort") String sort,
+                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                     @DefaultValue("asc") @QueryParam("order") String order) {
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        final PaginatedList<DashboardDTO> result = paginatedDashboardService
+                .findPaginated(searchQuery, page, perPage, sort, order);
+        final long total = paginatedDashboardService.count();
+        return DashboardPageList.create(query, result.pagination(), total, sort, order, result);
     }
 
     @GET
