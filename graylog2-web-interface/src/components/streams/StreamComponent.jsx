@@ -2,14 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Row, Col, Alert } from 'components/graylog';
-import { IfPermitted, TypeAheadDataFilter, Icon } from 'components/common';
+import { IfPermitted, TypeAheadDataFilter, Icon, PaginatedList, SearchForm } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import Spinner from 'components/common/Spinner';
 import StreamList from './StreamList';
-
-import CreateStreamButton from './CreateStreamButton';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
@@ -21,7 +18,15 @@ class StreamComponent extends React.Component {
     indexSets: PropTypes.array.isRequired,
   };
 
-  state = {};
+  state = {
+    pagination: {
+      page: 1,
+      perPage: 10,
+      count: 0,
+      total: 0,
+      query: '',
+    },
+  };
 
   componentDidMount() {
     this.loadData();
@@ -32,38 +37,50 @@ class StreamComponent extends React.Component {
     StreamRulesStore.onChange(this.loadData);
   }
 
-  componentDidUpdate() {
-    if (this.state.filteredStreams === null) {
-      this._filterStreams();
-    }
-  }
-
   componentWillUnmount() {
     StreamsStore.unregister(this.loadData);
     StreamRulesStore.unregister(this.loadData);
   }
 
-  loadData = () => {
-    StreamsStore.load((streams) => {
-      this.setState({
-        streams: streams,
-        filteredStreams: null,
+  loadData = (callback) => {
+    const { page, perPage, query } = this.state.pagination;
+    StreamsStore.searchPaginated(page, perPage, query)
+      .then(({ streams, pagination }) => {
+        this.setState({
+          streams: streams,
+          pagination: pagination,
+        });
+      })
+      .then(() => {
+        if (callback) {
+          callback();
+        }
       });
-    });
-  };
-
-  _filterStreams = () => {
-    if (this.streamFilter) {
-      this.streamFilter.filterData();
-    }
-  };
-
-  _updateFilteredStreams = (filteredStreams) => {
-    this.setState({ filteredStreams: filteredStreams });
   };
 
   _isLoading = () => {
     return !(this.state.streams && this.state.streamRuleTypes);
+  };
+
+  _onPageChange = (newPage, newPerPage) => {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, {
+      page: newPage,
+      perPage: newPerPage,
+    });
+    this.setState({ pagination, newPagination }, this.loadData);
+  };
+
+  _onSearch = (query, resetLoadingCallback) => {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, { query: query });
+    this.setState({ pagination, newPagination }, () => this.loadData(resetLoadingCallback));
+  };
+
+  _onReset = () => {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, { query: '' });
+    this.setState({ pagination, newPagination }, this.loadData);
   };
 
   render() {
@@ -107,19 +124,17 @@ class StreamComponent extends React.Component {
       <div>
         <Row className="row-sm">
           <Col md={8}>
-            <TypeAheadDataFilter id="stream-data-filter"
-                                 ref={(streamFilter) => { this.streamFilter = streamFilter; }}
-                                 label="Filter streams"
-                                 data={this.state.streams}
-                                 displayKey="title"
-                                 filterSuggestions={[]}
-                                 searchInKeys={['title', 'description']}
-                                 onDataFiltered={this._updateFilteredStreams} />
+            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
           </Col>
         </Row>
         <Row>
           <Col md={12}>
-            {streamsList}
+            <PaginatedList onChange={this._onPageChange}
+                           totalItems={this.state.pagination.total}>
+              <br />
+              <br />
+              <div>{streamsList}</div>
+            </PaginatedList>
           </Col>
         </Row>
       </div>

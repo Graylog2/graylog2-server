@@ -7,6 +7,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
+import PaginationHelper from 'util/PaginationHelper';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -34,9 +35,42 @@ type StreamSummaryResponse = {
   streams: Array<Stream>,
 };
 
+type PaginatedResponse = {
+  pagination: {
+    count: number,
+    total: number,
+    page: number,
+    per_page: number,
+    query: string,
+  },
+  streams: Array<any>,
+}
+
 const StreamsStore = Reflux.createStore({
   callbacks: [],
 
+  searchPaginated(page, perPage, query) {
+    const url = PaginationHelper.urlGenerator(ApiRoutes.StreamsApiController.paginated().url, page, perPage, query);
+    const promise = fetch('GET', URLUtils.qualifyUrl(url))
+      .then((response: PaginatedResponse) => {
+        const pagination = {
+          count: response.pagination.count,
+          total: response.pagination.total,
+          page: response.pagination.page,
+          perPage: response.pagination.per_page,
+          query: response.pagination.query,
+        };
+        return {
+          streams: response.streams,
+          pagination,
+        };
+      })
+      .catch((errorThrown) => {
+        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
+          'Could not load streams');
+      });
+    return promise;
+  },
   listStreams() {
     const url = '/streams';
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
