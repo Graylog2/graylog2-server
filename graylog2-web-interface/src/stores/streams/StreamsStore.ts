@@ -1,5 +1,6 @@
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
+const PaginationHelper = require('util/PaginationHelper');
 import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 const lodash = require('lodash');
@@ -42,6 +43,28 @@ class StreamsStore {
           UserNotification.error("Loading streams failed with status: " + errorThrown,
               "Could not load streams");
         });
+    return promise;
+  }
+  searchPaginated(page, perPage, query) {
+    const url = PaginationHelper.urlGenerator("/streams/page", page, perPage, query);
+    const promise = fetch('GET', URLUtils.qualifyUrl(url))
+      .then(response => {
+        const pagination = {
+          count: response.pagination.count,
+          total: response.pagination.total,
+          page: response.pagination.page,
+          perPage: response.pagination.per_page,
+          query: response.pagination.query,
+        };
+        return {
+          streams: response.streams,
+          pagination: pagination,
+        };
+      })
+      .catch((errorThrown) => {
+        UserNotification.error("Loading streams failed with status: " + errorThrown,
+          "Could not load streams");
+      });
     return promise;
   }
   load(callback: ((streams: Array<Stream>) => void)) {
