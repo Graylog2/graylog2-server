@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
+import PaginationHelper from 'util/PaginationHelper';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
@@ -62,15 +63,8 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  searchPaginated(page, perPage, query, resolve = true) {
-    let url;
-    if (query) {
-      url = this._url(
-        `tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=${resolve}`,
-      );
-    } else {
-      url = this._url(`tables?page=${page}&per_page=${perPage}&resolve=${resolve}`);
-    }
+  searchPaginated(page, perPage, query, resolve) {
+    const url = this._url(PaginationHelper.urlGenerator('tables', page, perPage, query, resolve));
     const promise = fetch('GET', url);
 
     promise.then((response) => {
