@@ -1,6 +1,8 @@
 import uuid from 'uuid/v4';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import { TIMESTAMP_FIELD } from 'enterprise/Constants';
 import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';
@@ -20,7 +22,7 @@ export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
     AggregationWidgetConfig.builder()
       .columnPivots([])
       .rowPivots([
-        pivotForField('timestamp', new FieldType('date', [], [])),
+        pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], [])),
       ])
       .series([
         Series.forFunction('count()'),

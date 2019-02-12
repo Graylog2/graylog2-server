@@ -18,6 +18,7 @@ import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 
 import styles from './MessageList.css';
+import { TIMESTAMP_FIELD } from '../../Constants';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 const { RefreshActions } = CombinedProvider.get('Refresh');
@@ -154,7 +155,7 @@ const MessageList = createReactClass({
                     <th style={{ width: 180 }}><Field interactive
                                                       name="Timestamp"
                                                       queryId={activeQuery}
-                                                      type={this._fieldTypeFor('timestamp', fields)} /></th>
+                                                      type={this._fieldTypeFor(TIMESTAMP_FIELD, fields)} /></th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}

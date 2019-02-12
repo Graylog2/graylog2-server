@@ -1,6 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import { TIMESTAMP_FIELD } from 'enterprise/Constants';
 import Pivot from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
@@ -72,7 +73,7 @@ export default class AggregationWidgetConfig {
   }
 
   get isTimeline() {
-    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === 'timestamp';
+    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
   }
 
   static builder() {
