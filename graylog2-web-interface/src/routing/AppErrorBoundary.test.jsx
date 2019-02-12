@@ -85,7 +85,13 @@ describe('AppErrorBoundary', () => {
         </AppErrorBoundary>
       ));
 
-      expect(wrapper).toMatchSnapshot();
+      const errorPage = wrapper.find('ErrorPage');
+      expect(errorPage).toExist();
+      expect(errorPage).toHaveProp('error', {
+        message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
+        stack: 'This the stack trace.',
+      });
+      expect(errorPage).toHaveProp('info', { componentStack: '\n    in ErroneusComponent\n    in AppErrorBoundary (created by WrapperComponent)\n    in WrapperComponent' });
     });
   });
 
