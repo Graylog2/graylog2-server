@@ -77,7 +77,7 @@
     "react-grid-layout": "^0.14.3",
     "react-isolated-scroll": "^0.1.1",
     "react-leaflet": "^1.9.1",
-    "react-overlays": "^0.7.0",
+    "react-overlays": "^1.1.1",
     "react-resizable": "^1.7.5",
     "react-select": "^v1.0.0-rc.10",
     "rickshaw": "^1.5.1",
