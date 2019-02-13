@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 import Immutable from 'immutable';
 
 import ActionsProvider from 'injection/ActionsProvider';
+import PaginationHelper from 'util/PaginationHelper';
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
@@ -20,13 +21,19 @@ export default Reflux.createStore({
 
   init() {
     this.listenTo(CurrentUserStore, this.currentUserUpdated, this.currentUserUpdated);
-    DashboardsActions.list();
+    this.pagination = {
+      page: 1,
+      perPage: 10,
+      total: 0,
+      count: 0,
+      query: '',
+    };
+    DashboardsActions.listPage(this.pagination.page, this.pagination.perPage, this.pagination.query);
   },
 
   currentUserUpdated(state) {
     if (state && state.currentUser) {
       this.permissions = state.currentUser.permissions;
-      DashboardsActions.list();
     }
   },
 
@@ -34,6 +41,7 @@ export default Reflux.createStore({
     return {
       dashboards: this.dashboards,
       writableDashboards: this.writableDashboards,
+      pagination: this.pagination,
     };
   },
 
@@ -54,7 +62,8 @@ export default Reflux.createStore({
 
   createCompleted() {
     CurrentUserStore.reload();
-    DashboardsActions.list();
+    const { page, perPage, query } = this.pagination;
+    DashboardsActions.listPage(page, perPage, query);
   },
 
   delete(dashboard) {
@@ -73,7 +82,8 @@ export default Reflux.createStore({
   },
 
   deleteCompleted() {
-    DashboardsActions.list();
+    const { page, perPage, query } = this.pagination;
+    DashboardsActions.listPage(page, perPage, query);
   },
 
   get(id) {
@@ -114,6 +124,31 @@ export default Reflux.createStore({
     return promise;
   },
 
+  listPage(page, perPage, query) {
+    const url = PaginationHelper.urlGenerator(ApiRoutes.DashboardsApiController.pageIndex().url, page, perPage, query);
+    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+
+    promise.then((response) => {
+      this.pagination = {
+        count: response.pagination.count,
+        total: response.pagination.total,
+        page: response.pagination.page,
+        perPage: response.pagination.per_page,
+        query: response.query,
+      };
+      this.trigger({
+        dashboards: Immutable.List(response.dashboards),
+        pagination: this.pagination,
+      });
+    }, (error) => {
+      if (!error.additional || error.additional.status !== 404) {
+        UserNotification.error(`Loading dashboard list failed with status: ${error}`, 'Could not load dashboards');
+      }
+    });
+    DashboardsActions.listPage.promise(promise);
+    return promise;
+  },
+
   getWritableDashboardList(dashboards, permissions) {
     return dashboards.filter(dashboard => PermissionsMixin.isPermitted(permissions, `dashboards:edit:${dashboard.id}`));
   },
@@ -134,7 +169,8 @@ export default Reflux.createStore({
   },
 
   updateCompleted() {
-    DashboardsActions.list();
+    const { page, perPage, query } = this.pagination;
+    DashboardsActions.listPage(page, perPage, query);
   },
 
   updatePositions(dashboard, positions) {

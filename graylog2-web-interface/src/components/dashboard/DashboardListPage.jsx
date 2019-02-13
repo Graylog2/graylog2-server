@@ -2,30 +2,29 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
-
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
-
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 
+import { PaginatedList, SearchForm } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Spinner from 'components/common/Spinner';
 import PageHeader from 'components/common/PageHeader';
 import DashboardList from './DashboardList';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+
 const DashboardListPage = createReactClass({
   displayName: 'DashboardListPage',
 
   propTypes: {
-    permissions: PropTypes.arrayOf(PropTypes.string),
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
 
-  mixins: [Reflux.connect(DashboardsStore, 'dashboards'), PermissionsMixin],
+  mixins: [Reflux.connect(DashboardsStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -34,12 +33,41 @@ const DashboardListPage = createReactClass({
   },
 
   componentDidMount() {
-    DashboardsActions.list();
+    this.loadData();
+  },
+
+  loadData(callback) {
+    const { page, perPage, query } = this.state.pagination;
+    DashboardsActions.listPage(page, perPage, query).then(() => {
+      if (callback) {
+        callback();
+      }
+    });
+  },
+
+  _onPageChange(newPage, newPerPage) {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, {
+      page: newPage,
+      perPage: newPerPage,
+    });
+    this.setState({ pagination, newPagination }, this.loadData);
+  },
+
+  _onSearch(query, resetLoadingCallback) {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, { query: query });
+    this.setState({ pagination, newPagination }, () => this.loadData(resetLoadingCallback));
+  },
+
+  _onReset() {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, { query: '' });
+    this.setState({ pagination, newPagination }, this.loadData);
   },
 
   render() {
-    const { dashboards } = this.state.dashboards;
-    const filteredDashboards = dashboards;
+    const { dashboards } = this.state;
     const createDashboardButton = this.isPermitted(this.props.permissions, ['dashboards:create']) ?
       <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg" /> : null;
 
@@ -61,18 +89,13 @@ const DashboardListPage = createReactClass({
     );
 
     let dashboardList;
-
     if (!dashboards) {
       dashboardList = <Spinner />;
     } else {
-      if (dashboards && dashboards.count() > 0 && filteredDashboards.isEmpty()) {
-        dashboardList = <div>No dashboards matched your filter criteria.</div>;
-      } else {
-        dashboardList = (
-          <DashboardList dashboards={filteredDashboards}
-                         permissions={this.props.permissions}/>
-        );
-      }
+      dashboardList = (
+        <DashboardList dashboards={this.state.dashboards}
+                       permissions={this.props.permissions} />
+      );
     }
 
     return (
@@ -81,7 +104,20 @@ const DashboardListPage = createReactClass({
 
         <Row className="content">
           <Col md={12}>
-            {dashboardList}
+            <Row className="row-sm">
+              <Col md={8}>
+                <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
+                  <br />
+                  <br />
+                  {dashboardList}
+                </PaginatedList>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </div>

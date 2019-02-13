@@ -59,6 +59,7 @@ const ApiRoutes = {
   DashboardsApiController: {
     create: () => { return { url: '/dashboards' }; },
     index: () => { return { url: '/dashboards' }; },
+    pageIndex: () => { return { url: '/dashboards/page' }; },
     get: (id) => { return { url: `/dashboards/${id}` }; },
     delete: (id) => { return { url: `/dashboards/${id}` }; },
     update: (id) => { return { url: `/dashboards/${id}` }; },
