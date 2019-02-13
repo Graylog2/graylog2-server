@@ -3,7 +3,7 @@ import Routes from 'routing/Routes';
 import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
 import { ViewActions } from 'enterprise/stores/ViewStore';
 
-export default async (view, router) => {
+export default (view, router) => {
   return ViewManagementActions.create(view)
     .then(() => ViewActions.load(view))
     .then(state => router.push(Routes.pluginRoute('VIEWS_VIEWID')(state.view.id)))
