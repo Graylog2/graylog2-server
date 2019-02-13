@@ -46,7 +46,7 @@ class StreamsStore {
     return promise;
   }
   searchPaginated(page, perPage, query) {
-    const url = PaginationHelper.urlGenerator("/streams/page", page, perPage, query);
+    const url = PaginationHelper.urlGenerator(ApiRoutes.StreamsApiController.indexPage().url, page, perPage, query);
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(response => {
         const pagination = {
