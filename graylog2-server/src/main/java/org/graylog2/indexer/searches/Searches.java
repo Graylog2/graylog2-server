@@ -710,7 +710,8 @@ public class Searches {
                 .collect(Collectors.toList());
 
             final List<String> nonNumericFieldErrors = errors.stream()
-                .filter(error -> error.startsWith("Expected numeric type on field"))
+                .filter(error -> error.startsWith("Expected numeric type on field") ||
+                        error.contains("\"type\":\"number_format_exception"))
                 .collect(Collectors.toList());
             if (!nonNumericFieldErrors.isEmpty()) {
                 throw new FieldTypeException("Unable to perform search query", nonNumericFieldErrors);
