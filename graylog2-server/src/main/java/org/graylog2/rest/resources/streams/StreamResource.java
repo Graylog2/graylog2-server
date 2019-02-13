@@ -121,8 +121,8 @@ public class StreamResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("title", SearchQueryField.create(StreamImpl.FIELD_TITLE))
-            .put("description", SearchQueryField.create(StreamImpl.FIELD_DESCRIPTION))
+            .put(StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE))
+            .put(StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION))
             .build();
 
     private final PaginatedStreamService paginatedStreamService;
@@ -219,7 +219,7 @@ public class StreamResource extends RestResource {
         @ApiParam(name = "sort",
                 value = "The field to sort the result on",
                 required = true,
-                allowableValues = "title,description,id")
+                allowableValues = "title,description")
         @DefaultValue(StreamImpl.FIELD_TITLE) @QueryParam("sort") String sort,
         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
         @DefaultValue("asc") @QueryParam("order") String order) {

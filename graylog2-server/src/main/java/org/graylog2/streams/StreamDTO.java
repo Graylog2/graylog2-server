@@ -36,45 +36,61 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class StreamDTO {
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_RULES = "rules";
+    public static final String FIELD_OUTPUTS = "outputs";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
+    public static final String FIELD_ALERT_RECEIVERS = "alert_receivers";
+    public static final String FIELD_DISABLED = "disabled";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    public static final String FIELD_MATCHING_TYPE = "matching_type";
+    public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
+    public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
+    public static final String FIELD_INDEX_SET_ID = "index_set_id";
+    public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
+
     @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty("creator_user_id")
+    @JsonProperty(FIELD_CREATOR_USER_ID)
     public abstract String creatorUserId();
 
-    @JsonProperty("outputs")
+    @JsonProperty(FIELD_OUTPUTS)
     @Nullable
     public abstract Collection<OutputSummary> outputs();
 
-    @JsonProperty("matching_type")
+    @JsonProperty(FIELD_MATCHING_TYPE)
     public abstract String matchingType();
 
-    @JsonProperty("description")
+    @JsonProperty(FIELD_DESCRIPTION)
     @Nullable
     public abstract String description();
 
-    @JsonProperty("created_at")
+    @JsonProperty(FIELD_CREATED_AT)
     public abstract String createdAt();
 
-    @JsonProperty("rules")
+    @JsonProperty(FIELD_RULES)
     @Nullable
     public abstract Collection<StreamRule> rules();
 
-    @JsonProperty("disabled")
+    @JsonProperty(FIELD_DISABLED)
     public abstract boolean disabled();
 
-    @JsonProperty("alert_conditions")
+    @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
     @Nullable
     public abstract Collection<AlertConditionSummary> alertConditions();
 
-    @JsonProperty("alert_receivers")
+    @JsonProperty(FIELD_ALERT_RECEIVERS)
     @Nullable
     public abstract AlertReceivers alertReceivers();
 
-    @JsonProperty("title")
+    @JsonProperty(FIELD_TITLE)
     public abstract String title();
 
-    @JsonProperty("content_pack")
+    @JsonProperty(FIELD_CONTENT_PACK)
     @Nullable
     public abstract String contentPack();
 
@@ -82,31 +98,31 @@ public abstract class StreamDTO {
     @Nullable
     public abstract Boolean isDefault();
 
-    @JsonProperty("remove_matches_from_default_stream")
+    @JsonProperty(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM)
     @Nullable
     public abstract Boolean removeMatchesFromDefaultStream();
 
-    @JsonProperty("index_set_id")
+    @JsonProperty(FIELD_INDEX_SET_ID)
     public abstract String indexSetId();
 
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static StreamDTO create(@JsonProperty("_id") String id,
-                                   @JsonProperty("creator_user_id") String creatorUserId,
-                                   @JsonProperty("outputs") @Nullable Collection<OutputSummary> outputs,
-                                   @JsonProperty("matching_type") String matchingType,
-                                   @JsonProperty("description") @Nullable String description,
-                                   @JsonProperty("created_at") String createdAt,
-                                   @JsonProperty("disabled") boolean disabled,
-                                   @JsonProperty("rules") @Nullable Collection<StreamRule> rules,
-                                   @JsonProperty("alert_conditions") @Nullable Collection<AlertConditionSummary> alertConditions,
-                                   @JsonProperty("alert_receivers") @Nullable AlertReceivers alertReceivers,
-                                   @JsonProperty("title") String title,
-                                   @JsonProperty("content_pack") @Nullable String contentPack,
-                                   @JsonProperty("is_default_stream") @Nullable Boolean isDefault,
-                                   @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
-                                   @JsonProperty("index_set_id") String indexSetId) {
+    public static StreamDTO create(@JsonProperty(FIELD_ID) String id,
+                                   @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
+                                   @JsonProperty(FIELD_OUTPUTS) @Nullable Collection<OutputSummary> outputs,
+                                   @JsonProperty(FIELD_MATCHING_TYPE) String matchingType,
+                                   @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                   @JsonProperty(FIELD_CREATED_AT) String createdAt,
+                                   @JsonProperty(FIELD_DISABLED) boolean disabled,
+                                   @JsonProperty(FIELD_RULES) @Nullable Collection<StreamRule> rules,
+                                   @JsonProperty(EMBEDDED_ALERT_CONDITIONS) @Nullable Collection<AlertConditionSummary> alertConditions,
+                                   @JsonProperty(FIELD_ALERT_RECEIVERS) @Nullable AlertReceivers alertReceivers,
+                                   @JsonProperty(FIELD_TITLE) String title,
+                                   @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack,
+                                   @JsonProperty(FIELD_DEFAULT_STREAM) @Nullable Boolean isDefault,
+                                   @JsonProperty(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM) @Nullable Boolean removeMatchesFromDefaultStream,
+                                   @JsonProperty(FIELD_INDEX_SET_ID) String indexSetId) {
         return new AutoValue_StreamDTO(
                 id,
                 creatorUserId,
@@ -132,49 +148,49 @@ public abstract class StreamDTO {
             return new AutoValue_StreamDTO.Builder();
         }
 
-        @JsonProperty("id")
+        @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
 
-        @JsonProperty("creator_user_id")
+        @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
 
-        @JsonProperty("outputs")
+        @JsonProperty(FIELD_OUTPUTS)
         public abstract Builder outputs(Collection<OutputSummary> outputs);
 
-        @JsonProperty("matching_type")
+        @JsonProperty(FIELD_MATCHING_TYPE)
         public abstract Builder matchingType(String matchingType);
 
-        @JsonProperty("description")
+        @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
-        @JsonProperty("created_at")
+        @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(String createdAt);
 
-        @JsonProperty("content_pack")
+        @JsonProperty(FIELD_CONTENT_PACK)
         public abstract Builder contentPack(String contentPack);
 
-        @JsonProperty("disabled")
+        @JsonProperty(FIELD_DISABLED)
         public abstract Builder disabled(boolean disabled);
 
-        @JsonProperty("alert_conditions")
+        @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
         public abstract Builder alertConditions(Collection<AlertConditionSummary> alertConditions);
 
-        @JsonProperty("rules")
+        @JsonProperty(FIELD_RULES)
         public abstract Builder rules(Collection<StreamRule> rules);
 
-        @JsonProperty("alert_receivers")
+        @JsonProperty(FIELD_ALERT_RECEIVERS)
         public abstract Builder alertReceivers(AlertReceivers receivers);
 
-        @JsonProperty("title")
+        @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
 
-        @JsonProperty("is_default_stream")
+        @JsonProperty(FIELD_DEFAULT_STREAM)
         public abstract Builder isDefault(Boolean isDefault);
 
-        @JsonProperty("remove_matches_from_default_stream")
+        @JsonProperty(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM)
         public abstract Builder removeMatchesFromDefaultStream(Boolean removeMatchesFromDefaultStream);
 
-        @JsonProperty("index_set_id")
+        @JsonProperty(FIELD_INDEX_SET_ID)
         public abstract Builder indexSetId(String indexSetId);
 
         public abstract StreamDTO build();
