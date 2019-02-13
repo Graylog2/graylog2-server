@@ -1,18 +1,24 @@
+// @flow strict
 import moment from 'moment-timezone';
+
+// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
+
+import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
+import type { Key, Result } from './Result';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const formatTimestamp = (timestamp, tz = 'UTC') => {
+const formatTimestamp = (timestamp, tz = 'UTC'): string => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
   return moment(timestamp).tz(tz || 'UTC').toISOString(true);
 };
 
-const transformKey = (key, indices, tz) => {
+const transformKey = (key: Key, indices: Array<number>, tz: string) => {
   if (indices.length === 0) {
     return key;
   }
-  const newKey = key.slice();
+  const newKey: Key = key.slice();
   indices.forEach((idx) => {
     if (newKey[idx]) {
       newKey[idx] = formatTimestamp(newKey[idx], tz);
@@ -21,8 +27,9 @@ const transformKey = (key, indices, tz) => {
   return newKey;
 };
 
-const findIndices = (ary, predicate) => ary.map((value, idx) => ({ value, idx })).filter(({ value }) => predicate(value)).map(({ idx }) => idx);
-export default (rowPivots, columnPivots, result) => {
+const findIndices = <T>(ary: Array<T>, predicate: (T) => boolean): Array<number> => ary.map((value, idx) => ({ value, idx })).filter(({ value }) => predicate(value)).map(({ idx }) => idx);
+
+export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, result: Result): Result => {
   const rowIndices = findIndices(rowPivots, pivot => (pivot.type === 'time'));
   const columnIndices = findIndices(columnPivots, pivot => (pivot.type === 'time'));
 

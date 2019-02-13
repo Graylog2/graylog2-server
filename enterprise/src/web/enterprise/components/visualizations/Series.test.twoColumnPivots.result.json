@@ -1,6 +1,7 @@
 [
   {
     "name": "index-PostsController-count()",
+    "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
       "2018-05-28T11:21:00.000Z",
@@ -20,6 +21,7 @@
   },
   {
     "name": "index-UsersController-count()",
+    "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
       "2018-05-28T11:21:00.000Z",
@@ -39,6 +41,7 @@
   },
   {
     "name": "show-PostsController-count()",
+    "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
       "2018-05-28T11:21:00.000Z",
@@ -58,6 +61,7 @@
   },
   {
     "name": "login-LoginController-count()",
+    "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
       "2018-05-28T11:21:00.000Z",
@@ -77,6 +81,7 @@
   },
   {
     "name": "edit-PostsController-count()",
+    "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
       "2018-05-28T11:21:00.000Z",
@@ -96,6 +101,7 @@
   },
   {
     "name": "count()",
+    "type": "dummy",
     "x": [
       "2018-05-28T11:20:00.000Z",
       "2018-05-28T11:21:00.000Z",

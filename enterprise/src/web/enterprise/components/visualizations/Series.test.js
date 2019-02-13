@@ -1,3 +1,4 @@
+// @flow strict
 import { readFileSync } from 'fs';
 import { dirname } from 'path';
 import md5 from 'md5';
@@ -5,19 +6,19 @@ import md5 from 'md5';
 import { generateSeries } from './Series';
 
 const cwd = dirname(__filename);
-const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`));
+const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
 
 describe('Series helper functions', () => {
   it('generateSeries should not fail for empty data', () => {
-    const result = generateSeries([]);
+    const result = generateSeries([], 'dummy');
     expect(result).toHaveLength(0);
   });
   it('generateSeries should properly extract series from simplest fixture with one series and one row pivot', () => {
     const input = readFixture('Series.test.simplest.json');
-    const result = generateSeries(input);
+    const result = generateSeries(input, 'dummy');
     const expectedResult = [{
       name: 'count()',
-      type: undefined,
+      type: 'dummy',
       x: ['index', 'show', 'login', 'edit'],
       y: [27142, 7826, 6626, 1246],
     }];
@@ -63,7 +64,7 @@ describe('Series helper functions', () => {
   });
   it('generateSeries should properly extract series from fixture with two column pivots', () => {
     const input = readFixture('Series.test.twoColumnPivots.json');
-    const result = generateSeries(input);
+    const result = generateSeries(input, 'dummy');
     const expectedResult = readFixture('Series.test.twoColumnPivots.result.json');
     expect(result).toHaveLength(6);
     expect(result).toEqual(expectedResult);
@@ -78,6 +79,7 @@ describe('Series helper functions', () => {
   it('generateSeries should allow passing a generator function modelling the chart config', () => {
     const input = readFixture('Series.test.simple.json');
     const generatorFunction = (type, name, labels, values) => md5(JSON.stringify({ type, name, labels, values }));
+    // $FlowFixMe: Returning different result type on purpose
     const result = generateSeries(input, 'scatter', generatorFunction);
     const expectedResult = [
       '99fff4aaa8e33abf060756997b07172c',
