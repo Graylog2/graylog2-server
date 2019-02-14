@@ -22,6 +22,7 @@ class DocsHelper {
     PIPELINE_FUNCTIONS: 'pipelines/functions.html',
     PIPELINE_RULES: 'pipelines/rules.html',
     PIPELINES: 'pipelines.html',
+    REPORTING: 'reporting.html',
     SEARCH_QUERY_LANGUAGE: 'queries.html',
     STREAMS: 'streams.html',
     STREAM_PROCESSING_RUNTIME_LIMITS: 'streams.html#stream-processing-runtime-limits',
