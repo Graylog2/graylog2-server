@@ -23,7 +23,6 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.dashboards.DashboardDTO;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.streams.StreamDTO;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
