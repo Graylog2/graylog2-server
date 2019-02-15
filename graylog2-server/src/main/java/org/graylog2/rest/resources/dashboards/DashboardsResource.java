@@ -71,6 +71,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 @RequiresAuthentication
 @Api(value = "Dashboards", description = "Manage dashboards")
@@ -165,8 +166,9 @@ public class DashboardsResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
+        final Predicate<DashboardDTO> permissionFilter = dashboardDTO -> isPermitted(RestPermissions.DASHBOARDS_READ, dashboardDTO.id());
         final PaginatedList<DashboardDTO> result = paginatedDashboardService
-                .findPaginated(searchQuery, page, perPage, sort, order);
+                .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
         final long total = paginatedDashboardService.count();
         return DashboardPageList.create(query, result.pagination(), total, sort, order, result);
     }
