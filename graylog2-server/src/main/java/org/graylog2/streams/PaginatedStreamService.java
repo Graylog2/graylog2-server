@@ -25,6 +25,7 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
+import java.util.function.Predicate;
 
 public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
     private static final String COLLECTION_NAME = "streams";
@@ -40,9 +41,10 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
         return db.count();
     }
 
-    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order) {
+    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery, Predicate<StreamDTO> filter, int page,
+                                                  int perPage, String sortField, String order) {
         final DBQuery.Query dbQuery = searchQuery.toDBQuery();
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+        return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, page, perPage);
     }
 }

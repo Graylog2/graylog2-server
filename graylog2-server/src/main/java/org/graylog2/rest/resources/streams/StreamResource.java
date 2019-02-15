@@ -110,6 +110,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -230,8 +231,9 @@ public class StreamResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
+        final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
-                .findPaginated(searchQuery, page, perPage, sort, order);
+                .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
         final List<StreamDTO> streams = result.stream().map(streamDTO -> {
             List<StreamRule> rules = streamRuleService.loadForStreamId(streamDTO.id());
             return streamDTO.toBuilder().rules(rules).build();
