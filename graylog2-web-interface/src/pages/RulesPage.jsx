@@ -20,12 +20,14 @@ import Reflux from 'reflux';
 
 import { LinkContainer } from 'components/graylog/router';
 import { Row, Col, Button } from 'components/graylog';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { SearchForm, PaginatedList, DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import RulesComponent from 'components/rules/RulesComponent';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+
+import RulesPageStyle from './RulesPage.css';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 
@@ -37,10 +39,59 @@ const RulesPage = createReactClass({
   ],
 
   componentDidMount() {
-    RulesActions.list();
+    this.loadData();
+  },
+
+  loadData(callback) {
+    const { page, perPage, query } = this.state.pagination;
+
+    RulesActions.listPage(page, perPage, query).then(() => {
+      if (callback) {
+        callback();
+      }
+    });
+  },
+
+  _onPageChange(newPage, newPerPage) {
+    const { pagination } = this.state;
+    const newPagination = Object.assign(pagination, {
+      page: newPage,
+      perPage: newPerPage,
+    });
+    this.setState({ pagination, newPagination }, this.loadData);
+  },
+
+  _onSearch(query, resetLoadingCallback) {
+    const { pagination } = this.state;
+    const newPagination = Object.assign(pagination, { query: query });
+    this.setState({ pagination, newPagination }, () => this.loadData(resetLoadingCallback));
+  },
+
+  _onReset() {
+    const { pagination } = this.state;
+    const newPagination = Object.assign(pagination, { query: '' });
+    this.setState({ pagination, newPagination }, this.loadData);
+  },
+
+  _delete(rule) {
+    return () => {
+      if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
+        RulesActions.delete(rule).then(() => {
+          this.loadData();
+        });
+      }
+    };
   },
 
   render() {
+    const addRuleButton = (
+      <div className={RulesPageStyle.addButton}>
+        <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
+          <Button bsStyle="success">Create Rule</Button>
+        </LinkContainer>
+      </div>
+    );
+
     return (
       <DocumentTitle title="Pipeline rules">
         <span>
@@ -72,7 +123,25 @@ const RulesPage = createReactClass({
 
           <Row className="content">
             <Col md={12}>
-              <RulesComponent rules={this.state.rules} />
+              <div>
+                <Row className="row-sm">
+                  <Col md={2}>
+                    <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+                  </Col>
+                  <Col>
+                    {addRuleButton}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
+                      <br />
+                      <br />
+                      <RulesComponent rules={this.state.rules} onDelete={this._delete} />
+                    </PaginatedList>
+                  </Col>
+                </Row>
+              </div>
             </Col>
           </Row>
         </span>

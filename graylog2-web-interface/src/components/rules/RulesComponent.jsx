@@ -24,6 +24,12 @@ import RuleList from './RuleList';
 class RulesComponent extends React.Component {
   static propTypes = {
     rules: PropTypes.array,
+    onDelete: PropTypes.func,
+  };
+
+  static defaultProps = {
+    rules: [],
+    onDelete: () => {},
   };
 
   render() {
@@ -33,7 +39,7 @@ class RulesComponent extends React.Component {
 
     return (
       <div>
-        <RuleList rules={this.props.rules} />
+        <RuleList rules={this.props.rules} onDelete={this.props.onDelete} />
       </div>
     );
   }

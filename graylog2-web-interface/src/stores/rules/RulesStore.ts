@@ -19,6 +19,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -42,7 +43,18 @@ const RulesStore = Reflux.createStore({
   metricsConfig: undefined,
 
   getInitialState() {
-    return { rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig };
+    return {
+      rules: this.rules,
+      functionDescriptors: this.functionDescriptors,
+      metricsConfig: this.metricsConfig,
+      pagination: {
+        page: 1,
+        perPage: 10,
+        total: 0,
+        count: 0,
+        query: '',
+      },
+    };
   },
 
   _updateRulesState(rule) {
@@ -81,6 +93,34 @@ const RulesStore = Reflux.createStore({
       this.rules = response;
       this.trigger({ rules: response, functionDescriptors: this.functionDescriptors });
     }, failCallback);
+  },
+
+  listPage(page, perPage, query) {
+    const url = PaginationURL(ApiRoutes.RulesController.listPage().url, page, perPage, query);
+    const promise = fetch('GET', qualifyUrl(url));
+
+    promise.then((response) => {
+      this.pagination = {
+        count: response.pagination.count,
+        total: response.pagination.total,
+        page: response.pagination.page,
+        perPage: response.pagination.per_page,
+        query: response.query,
+      };
+
+      this.trigger({
+        rules: response.rules,
+        pagination: this.pagination,
+      });
+    }, (error) => {
+      if (!error.additional || error.additional.status !== 404) {
+        UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
+      }
+    });
+
+    RulesActions.listPage.promise(promise);
+
+    return promise;
   },
 
   get(ruleId) {
@@ -157,11 +197,15 @@ const RulesStore = Reflux.createStore({
 
     const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
-    return fetch('DELETE', url).then(() => {
+    const promise = fetch('DELETE', url).then(() => {
       this.rules = this.rules.filter((el) => el.id !== rule.id);
       this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
       UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
     }, failCallback);
+
+    RulesActions.delete.promise(promise);
+
+    return promise;
   },
   parse(ruleSource, callback) {
     const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
