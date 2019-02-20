@@ -22,6 +22,8 @@ jest.mock('util/AppConfig', () => ({
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
+jest.mock('./HeaderBadge', () => () => <span />);
+
 describe('Navigation', () => {
   let currentUser;
   let Navigation;
@@ -32,10 +34,12 @@ describe('Navigation', () => {
       listen: jest.fn(),
       get: jest.fn(),
     };
+
     jest.doMock('injection/StoreProvider', () => ({ getStore: () => CurrentUserStore }));
     // eslint-disable-next-line global-require
     Navigation = require('./Navigation');
   });
+
   describe('has common elements', () => {
     let wrapper;
     beforeEach(() => {
@@ -151,8 +155,8 @@ describe('Navigation', () => {
     };
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${3}  | ${['Streams', 'Alerts', 'Dashboards']}
-    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${4}  | ${['Search']}
+    ${[]}                          | ${4}  | ${['Streams', 'Alerts', 'Dashboards']}
+    ${['searches:absolute', 'searches:relative', 'searches:keyword']} | ${5}  | ${['Search']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
 });
