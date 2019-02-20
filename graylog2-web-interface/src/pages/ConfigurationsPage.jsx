@@ -1,18 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { isPermitted } from 'util/PermissionsMixin';
+
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
+import CustomizationConfig from 'components/configurations/CustomizationConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
+import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
 import {} from 'components/maps/configurations';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -26,6 +28,7 @@ const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcess
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
+const CUSTOMIZATION_CONFIG = 'org.graylog2.configuration.Customization';
 
 class ConfigurationsPage extends React.Component {
   state = {
@@ -43,9 +46,12 @@ class ConfigurationsPage extends React.Component {
     ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG);
     ConfigurationsActions.list(SIDECAR_CONFIG);
     ConfigurationsActions.list(EVENTS_CONFIG);
+    ConfigurationsActions.list(this.CUSTOMIZATION_CONFIG);
+
     if (isPermitted(permissions, ['urlwhitelist:read'])) {
       ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
     }
+
     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
       ConfigurationsActions.list(systemConfig.configType);
     });
@@ -144,6 +150,7 @@ class ConfigurationsPage extends React.Component {
       const sidecarConfig = this._getConfig(SIDECAR_CONFIG);
       const eventsConfig = this._getConfig(EVENTS_CONFIG);
       const urlWhiteListConfig = this._getConfig(URL_WHITELIST_CONFIG);
+      const customizationConfig = this._getConfig(CUSTOMIZATION_CONFIG);
 
       Output = (
         <>
@@ -158,6 +165,10 @@ class ConfigurationsPage extends React.Component {
           <Col md={6}>
             <SidecarConfig config={sidecarConfig}
                            updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
+          </Col>
+          <Col md={6}>
+            <CustomizationConfig config={customizationConfig}
+                                 updateConfig={this._onUpdate(CUSTOMIZATION_CONFIG)} />
           </Col>
           <Col md={6}>
             <EventsConfig config={eventsConfig}

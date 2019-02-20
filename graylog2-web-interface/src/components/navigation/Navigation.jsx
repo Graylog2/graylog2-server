@@ -12,7 +12,6 @@ import PermissionsMixin from 'util/PermissionsMixin';
 
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
-import AppConfig from 'util/AppConfig';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -24,6 +23,7 @@ import { IfPermitted } from 'components/common';
 import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
+import HeaderBadge from './HeaderBadge';
 import SystemMenu from './SystemMenu';
 import styles from './Navigation.css';
 import InactiveNavItem from './InactiveNavItem';
@@ -66,6 +66,8 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(pluginRoute => formatPluginRoute(pluginRoute, permissions, location));
 
+  const headerBadge = <HeaderBadge />;
+
   return (
     <Navbar inverse fluid fixedTop>
       <Navbar.Header>
@@ -75,11 +77,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
         </Navbar.Brand>
         <Navbar.Toggle />
-
-        {
-        AppConfig.gl2DevMode()
-          && <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
-        }
+        <HeaderBadge />
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav navbar>
@@ -110,10 +108,10 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         <Nav navbar pullRight className={styles['header-meta-nav']}>
           {
-          AppConfig.gl2DevMode()
+            headerBadge
             && (
               <InactiveNavItem className={styles['dev-badge-wrap']}>
-                <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
+                {headerBadge}
               </InactiveNavItem>
             )
           }
