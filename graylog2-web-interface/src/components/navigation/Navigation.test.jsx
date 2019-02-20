@@ -9,11 +9,17 @@ import AppConfig from 'util/AppConfig';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
+
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
+
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
+
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
+
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
+
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
+
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
 
 jest.mock('util/AppConfig', () => ({
@@ -60,7 +66,9 @@ describe('Navigation', () => {
       const brand = wrapper.find('NavbarBrand');
 
       expect(brand).toExist();
+
       expect(brand.find('LinkContainer')).toHaveProp('to', Routes.STARTPAGE);
+
       expect(brand.find('NavigationBrand')).toExist();
     });
 
@@ -104,6 +112,7 @@ describe('Navigation', () => {
 
     beforeEach(() => {
       AppConfig.gl2AppPathPrefix = jest.fn(() => '');
+
       PluginStore.register(plugin);
     });
 
