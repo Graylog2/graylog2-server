@@ -46,7 +46,7 @@ class ConfigurationsPage extends React.Component {
     ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG);
     ConfigurationsActions.list(SIDECAR_CONFIG);
     ConfigurationsActions.list(EVENTS_CONFIG);
-    ConfigurationsActions.list(this.CUSTOMIZATION_CONFIG);
+    ConfigurationsActions.list(CUSTOMIZATION_CONFIG);
 
     if (isPermitted(permissions, ['urlwhitelist:read'])) {
       ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
@@ -84,10 +84,10 @@ class ConfigurationsPage extends React.Component {
   };
 
   _pluginConfigs = () => {
-    return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
+    return PluginStore.exports('systemConfigurations').map((systemConfig) => {
       return React.createElement(systemConfig.component, {
         // eslint-disable-next-line react/no-array-index-key
-        key: `system-configuration-${idx}`,
+        key: `system-configuration-${systemConfig.configType}`,
         config: this._getConfig(systemConfig.configType) || undefined,
         updateConfig: this._onUpdate(systemConfig.configType),
       });

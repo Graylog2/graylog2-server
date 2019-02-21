@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import CombinedProvider from "injection/CombinedProvider";
+import CombinedProvider from 'injection/CombinedProvider';
 import { Badge } from 'react-bootstrap';
 import AppConfig from 'util/AppConfig';
 import badgeStyles from 'components/bootstrap/Badge.css';
