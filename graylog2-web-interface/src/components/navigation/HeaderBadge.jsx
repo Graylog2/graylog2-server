@@ -21,8 +21,9 @@ const HeaderBadge = ({ configuration }) => {
 
   if (badgeEnabled) {
     const StyledBadge = styled(Badge)`
-      background-color: ${config.badge_color}
+      background-color: ${config.badge_color};
     `;
+
     return (<StyledBadge className="dev-badge">{config.badge_text}</StyledBadge>);
   }
 
