@@ -1,7 +1,8 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import { mount } from 'enzyme';
-import { isFunction } from 'lodash';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import AppConfig from 'util/AppConfig';
 import WindowLeaveMessage from './WindowLeaveMessage';
 
@@ -20,13 +21,16 @@ const lastCall = (fn) => {
 
 describe('WindowLeaveMessage', () => {
   const addEventListener = window.addEventListener;
+  const removeEventListener = window.removeEventListener;
 
   beforeEach(() => {
     window.addEventListener = jest.fn(addEventListener);
+    window.removeEventListener = jest.fn(removeEventListener);
   });
 
   afterEach(() => {
     window.addEventListener = addEventListener;
+    window.removeEventListener = removeEventListener;
     jest.resetAllMocks();
   });
 
@@ -35,9 +39,19 @@ describe('WindowLeaveMessage', () => {
 
     mount(<WindowLeaveMessage dirty={false} route={{}} router={router} />);
 
-    const [event, fn] = lastCall(window.addEventListener);
-    expect(event).toEqual('beforeunload');
-    expect(isFunction(fn)).toBeTruthy();
+    expect(window.addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+  });
+
+  it('unregisters window beforeunload handler upon unmount', () => {
+    const router = mockRouter();
+    const unsubscribe = jest.fn();
+    router.setRouteLeaveHook.mockReturnValue(unsubscribe);
+
+    const wrapper = mount(<WindowLeaveMessage dirty={false} route={{}} router={router} />);
+
+    wrapper.unmount();
+
+    expect(window.removeEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });
 
   it('registers route leave handler', () => {
@@ -46,16 +60,25 @@ describe('WindowLeaveMessage', () => {
     mount(<WindowLeaveMessage dirty={false} route={{ __id__: 42 }} router={router} />);
 
     expect(router.setRouteLeaveHook).toHaveBeenCalledTimes(1);
-    const [route, func] = lastCall(router.setRouteLeaveHook);
-    expect(route).toEqual({ __id__: 42 });
-    expect(isFunction(func)).toBeTruthy();
+    expect(router.setRouteLeaveHook).toHaveBeenCalledWith({ __id__: 42 }, expect.any(Function));
+  });
+
+  it('unregisters route leave handler upon unmount', () => {
+    const router = mockRouter();
+    const unsubscribe = jest.fn();
+    router.setRouteLeaveHook.mockReturnValue(unsubscribe);
+
+    const wrapper = mount(<WindowLeaveMessage dirty={false} route={{ __id__: 42 }} router={router} />);
+
+    wrapper.unmount();
+    expect(unsubscribe).toHaveBeenCalled();
   });
 
   it('returns prompt if window is closed and view is dirty', () => {
     const router = mockRouter();
 
     mount(<WindowLeaveMessage dirty route={{}} router={router} />);
-    const [_, fn] = lastCall(window.addEventListener);
+    const [, fn] = lastCall(window.addEventListener);
     const e = {};
 
     const result = fn(e);
@@ -68,7 +91,7 @@ describe('WindowLeaveMessage', () => {
     const router = mockRouter();
 
     mount(<WindowLeaveMessage dirty={false} route={{}} router={router} />);
-    const [_, fn] = lastCall(window.addEventListener);
+    const [, fn] = lastCall(window.addEventListener);
     const e = {};
 
     const result = fn(e);
@@ -82,7 +105,7 @@ describe('WindowLeaveMessage', () => {
     AppConfig.gl2DevMode = jest.fn(() => true);
 
     mount(<WindowLeaveMessage dirty route={{}} router={router} />);
-    const [_, fn] = lastCall(window.addEventListener);
+    const [, fn] = lastCall(window.addEventListener);
     const e = {};
 
     const result = fn(e);
@@ -95,7 +118,7 @@ describe('WindowLeaveMessage', () => {
     const router = mockRouter();
 
     mount(<WindowLeaveMessage dirty route={{}} router={router} />);
-    const [_, fn] = lastCall(router.setRouteLeaveHook);
+    const [, fn] = lastCall(router.setRouteLeaveHook);
 
     const result = fn();
 
@@ -106,7 +129,7 @@ describe('WindowLeaveMessage', () => {
     const router = mockRouter();
 
     mount(<WindowLeaveMessage dirty={false} route={{}} router={router} />);
-    const [_, fn] = lastCall(router.setRouteLeaveHook);
+    const [, fn] = lastCall(router.setRouteLeaveHook);
 
     const result = fn();
 
@@ -118,7 +141,7 @@ describe('WindowLeaveMessage', () => {
     AppConfig.gl2DevMode = jest.fn(() => true);
 
     mount(<WindowLeaveMessage dirty route={{}} router={router} />);
-    const [_, fn] = lastCall(router.setRouteLeaveHook);
+    const [, fn] = lastCall(router.setRouteLeaveHook);
 
     const result = fn();
 

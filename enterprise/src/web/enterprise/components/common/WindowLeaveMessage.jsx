@@ -1,20 +1,38 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { withRouter } from 'react-router';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
+// $FlowFixMe: imports from core need to be fixed in flow
 import AppConfig from 'util/AppConfig';
+
 import { ViewStore } from 'enterprise/stores/ViewStore';
 
-class WindowLeaveMessage extends React.PureComponent {
+type Router = {
+  setRouteLeaveHook: (any, () => ?string) => () => void,
+};
+
+type Props = {
+  dirty: boolean,
+  route: any,
+  router: Router,
+};
+
+class WindowLeaveMessage extends React.PureComponent<Props> {
   componentDidMount() {
     window.addEventListener('beforeunload', this.handleLeavePage);
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unsubscribe = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   componentWillUnmount() {
     window.removeEventListener('beforeunload', this.handleLeavePage);
+    this.unsubscribe();
   }
+
+  unsubscribe: () => void;
 
   routerWillLeave = () => {
     return this.handleLeavePage({});
@@ -37,6 +55,7 @@ class WindowLeaveMessage extends React.PureComponent {
     return null;
   }
 }
+
 WindowLeaveMessage.propTypes = {
   dirty: PropTypes.bool.isRequired,
   route: PropTypes.object.isRequired,
