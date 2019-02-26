@@ -3,10 +3,8 @@ import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import URLUtils from 'util/URLUtils';
-
 const NavigationLink = ({ description, path, ...rest }) => (
-  <LinkContainer key={path} to={URLUtils.appPrefixed(path)} {...rest}>
+  <LinkContainer key={path} to={path} {...rest}>
     <MenuItem>{description}</MenuItem>
   </LinkContainer>
 );
