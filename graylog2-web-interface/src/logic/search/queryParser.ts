@@ -401,7 +401,7 @@ export class QueryParser {
         return skippedTokens;
     }
 
-    private syncTo(syncTo: TokenType[]): Array<Token> {
+    private syncTo(syncTo: TokenType[] = []): Array<Token> {
         var skippedTokens = [];
         while (this.lookAhead().type !== TokenType.EOF && syncTo.every((type) => type !== this.lookAhead().type)) {
             skippedTokens.push(this.lookAhead());
