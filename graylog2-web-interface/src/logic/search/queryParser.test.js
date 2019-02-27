@@ -264,6 +264,11 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
+  it('can parse wildcards inside term', function () {
+    var query = 'st?rt *middle* end?"';
+    expectIdentityDump(query);
+  });
+
   it('can parse a unary NOT expression', function () {
     var query = "NOT submit";
     var parser = new QueryParser(query);
@@ -524,6 +529,20 @@ describe('Query Parser', function () {
     expect(ast.isInclusiveRange()).toBeTruthy();
     expect(ast.isExclusiveRange()).toBeFalsy();
     expectIdentityDump(query);
+  });
+
+
+  it('can parse pure wildcard', function () {
+    var query = 'http_response_code:*"';
+    expectIdentityDump(query);
+  });
+
+  it('reports an error when using question mark as pure wildcard', function () {
+    var query = 'http_response_code:?"';
+    var parser = new QueryParser(query);
+    parser.parse();
+    expect(parser.errors.length).toBe(1);
+    expectIdentityDump(query, true);
   });
 
   it('can parse an exclusive range search', function () {

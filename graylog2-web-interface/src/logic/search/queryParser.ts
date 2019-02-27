@@ -296,12 +296,20 @@ class QueryLexer {
         return char === '}';
     }
 
+    isWildcard(char) {
+        return char === '?' || this.isPureWildcard(char);
+    }
+
+    isPureWildcard(char) {
+        return char === '*';
+    }
+
     isTermStart(char) {
-        return char !== null && !this.isWhitespace(char) && (!this.isSpecial(char) || this.isRangeStart(char));
+        return char !== null && !this.isWhitespace(char) && (!this.isSpecial(char) || this.isRangeStart(char) || this.isPureWildcard(char));
     }
 
     isTerm(char) {
-        return this.isTermStart(char) || this.isOneOf('+-', char);
+        return this.isTermStart(char) || this.isOneOf('+-', char) || this.isWildcard(char);
     }
 
     isEscaped(char) {
