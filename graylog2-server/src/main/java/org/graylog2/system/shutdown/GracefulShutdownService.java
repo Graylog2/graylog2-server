@@ -16,6 +16,7 @@
  */
 package org.graylog2.system.shutdown;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
@@ -70,7 +71,9 @@ public class GracefulShutdownService extends AbstractIdleService {
                 for (final GracefulShutdownHook shutdownHook : shutdownHooks) {
                     executor.submit(() -> {
                         try {
+                            final Stopwatch stopwatch = Stopwatch.createStarted();
                             shutdownHook.doGracefulShutdown();
+                            LOG.debug("Finished shutdown of <{}> (took {} ms)", shutdownHook, stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
                         } catch (Exception e) {
                             LOG.error("Problem shutting down <{}>", shutdownHook, e);
                         } finally {
