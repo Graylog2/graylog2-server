@@ -72,13 +72,14 @@ public class GracefulShutdownService extends AbstractIdleService {
             LOG.info("Running graceful shutdown for <{}> shutdown hooks", shutdownHooks.size());
             for (final GracefulShutdownHook shutdownHook : shutdownHooks) {
                 executor.submit(() -> {
+                    final String hookName = shutdownHook.getClass().getSimpleName();
                     try {
-                        LOG.info("Initiate shutdown for <{}>", shutdownHook);
+                        LOG.info("Initiate shutdown for <{}>", hookName);
                         final Stopwatch stopwatch = Stopwatch.createStarted();
                         shutdownHook.doGracefulShutdown();
-                        LOG.info("Finished shutdown for <{}>, took {} ms", shutdownHook, stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
+                        LOG.info("Finished shutdown for <{}>, took {} ms", hookName, stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
                     } catch (Exception e) {
-                        LOG.error("Problem shutting down <{}>", shutdownHook, e);
+                        LOG.error("Problem shutting down <{}>", hookName, e);
                     } finally {
                         latch.countDown();
                     }
