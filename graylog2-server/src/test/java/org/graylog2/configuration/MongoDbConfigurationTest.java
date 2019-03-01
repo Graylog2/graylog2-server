@@ -68,6 +68,36 @@ public class MongoDbConfigurationTest {
         assertEquals("mongodb://localhost/graylog", configuration.getUri());
     }
 
+    @Test
+    public void testUriEscapeHostOnly() throws ValidationException, RepositoryException {
+        MongoDbConfiguration configuration = new MongoDbConfiguration();
+        final Map<String, String> properties = singletonMap(
+                "mongodb_uri", "mongodb://rs.example.com/TEST"
+        );
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        assertEquals("mongodb://rs.example.com/TEST", configuration.getMongoClientURI().toString());
+    }
+
+    @Test
+    public void testUriEscapeHostUserPassword() throws ValidationException, RepositoryException {
+        MongoDbConfiguration configuration = new MongoDbConfiguration();
+        final Map<String, String> properties = singletonMap(
+                "mongodb_uri", "mongodb://user+:secret+@example.com/TEST"
+        );
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        assertEquals("mongodb://user%2B:secret%2B@example.com/TEST", configuration.getMongoClientURI().toString());
+    }
+
+    @Test
+    public void testUriEscapeMultipleHostsUserPassword() throws ValidationException, RepositoryException {
+        MongoDbConfiguration configuration = new MongoDbConfiguration();
+        final Map<String, String> properties = singletonMap(
+                "mongodb_uri", "mongodb://user+:secret+@example1.com,example2.com:27018,example3.com:27019/TEST"
+        );
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        assertEquals("mongodb://user%2B:secret%2B@example1.com,example2.com:27018,example3.com:27019/TEST", configuration.getMongoClientURI().toString());
+    }
+
     @Test(expected = ValidationException.class)
     public void validateFailsIfUriIsEmpty() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
