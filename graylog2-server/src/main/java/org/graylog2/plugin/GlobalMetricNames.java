@@ -22,6 +22,7 @@ public final class GlobalMetricNames {
 
     private GlobalMetricNames() {}
 
+    public static final String OLDEST_SEGMENT_SUFFIX = "oldest-segment";
     public static final String RATE_SUFFIX = "1-sec-rate";
 
     public static final String INPUT_THROUGHPUT = "org.graylog2.throughput.input";
@@ -50,5 +51,5 @@ public final class GlobalMetricNames {
     public static final String JOURNAL_SIZE = "org.graylog2.journal.size";
     public static final String JOURNAL_SIZE_LIMIT = "org.graylog2.journal.size-limit";
     public static final String JOURNAL_UTILIZATION_RATIO = "org.graylog2.journal.utilization-ratio";
-    public static final String JOURNAL_OLDEST_SEGMENT = "org.graylog2.journal.oldest-segment";
+    public static final String JOURNAL_OLDEST_SEGMENT = name("org.graylog2.journal", OLDEST_SEGMENT_SUFFIX);
 }
