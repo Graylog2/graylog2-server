@@ -50,4 +50,5 @@ public final class GlobalMetricNames {
     public static final String JOURNAL_SIZE = "org.graylog2.journal.size";
     public static final String JOURNAL_SIZE_LIMIT = "org.graylog2.journal.size-limit";
     public static final String JOURNAL_UTILIZATION_RATIO = "org.graylog2.journal.utilization-ratio";
+    public static final String JOURNAL_OLDEST_SEGMENT = "org.graylog2.journal.oldest-segment";
 }
