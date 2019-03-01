@@ -19,11 +19,13 @@ package org.graylog2.system.shutdown;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class GracefulShutdownServiceTest {
     private GracefulShutdownService shutdownService;
@@ -106,5 +108,26 @@ public class GracefulShutdownServiceTest {
         stop(shutdownService);
 
         assertThat(value.get()).isEqualTo(1);
+    }
+
+    @Test
+    public void failRegisterAndUnregisterDuringShutdown() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final GracefulShutdownHook hook = latch::await;
+
+        shutdownService.register(hook);
+
+        shutdownService.stopAsync();
+
+        assertThatThrownBy(() -> shutdownService.register(hook), "register during shutdown should not work")
+                .hasMessageContaining("register")
+                .isInstanceOf(IllegalStateException.class);
+
+        assertThatThrownBy(() -> shutdownService.unregister(hook), "unregister during shutdown should not work")
+                .hasMessageContaining("unregister")
+                .isInstanceOf(IllegalStateException.class);
+
+        latch.countDown();
+        shutdownService.awaitTerminated();
     }
 }

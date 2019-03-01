@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A service that participates in the Graylog server graceful shutdown.
@@ -47,55 +48,59 @@ public class GracefulShutdownService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(GracefulShutdownService.class);
 
     private final Set<GracefulShutdownHook> shutdownHooks = ConcurrentHashMap.newKeySet();
+    private final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
 
     @Override
-    protected void startUp() throws Exception {
+    protected void startUp() {
         // Nothing to do
     }
 
     @Override
-    protected void shutDown() throws Exception {
-        if (shutdownHooks.isEmpty()) {
+    protected void shutDown() {
+        // Don't do anything if the shutdown is already in progress or if there are no hooks registered
+        if (isShuttingDown.getAndSet(true) || shutdownHooks.isEmpty()) {
             return;
         }
 
-        // Make sure we don't run this in parallel
-        synchronized (shutdownHooks) {
-            try {
-                // Use an executor to run the shutdown hooks in parallel but don't start too many threads
-                // TODO: Make max number of threads user configurable
-                final ExecutorService executor = executorService(Math.min(shutdownHooks.size(), 10));
-                final CountDownLatch latch = new CountDownLatch(shutdownHooks.size());
+        try {
+            // Use an executor to run the shutdown hooks in parallel but don't start too many threads
+            // TODO: Make max number of threads user configurable
+            final ExecutorService executor = executorService(Math.min(shutdownHooks.size(), 10));
+            final CountDownLatch latch = new CountDownLatch(shutdownHooks.size());
 
-                LOG.info("Running graceful shutdown for <{}> shutdown hooks", shutdownHooks.size());
-                for (final GracefulShutdownHook shutdownHook : shutdownHooks) {
-                    executor.submit(() -> {
-                        try {
-                            final Stopwatch stopwatch = Stopwatch.createStarted();
-                            shutdownHook.doGracefulShutdown();
-                            LOG.debug("Finished shutdown of <{}> (took {} ms)", shutdownHook, stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
-                        } catch (Exception e) {
-                            LOG.error("Problem shutting down <{}>", shutdownHook, e);
-                        } finally {
-                            latch.countDown();
-                        }
-                    });
-                }
-
-                latch.await();
-                executor.shutdown();
-                executor.awaitTermination(1, TimeUnit.MINUTES);
-            } catch (Exception e) {
-                LOG.error("Problem shutting down registered hooks", e);
+            LOG.info("Running graceful shutdown for <{}> shutdown hooks", shutdownHooks.size());
+            for (final GracefulShutdownHook shutdownHook : shutdownHooks) {
+                executor.submit(() -> {
+                    try {
+                        final Stopwatch stopwatch = Stopwatch.createStarted();
+                        shutdownHook.doGracefulShutdown();
+                        LOG.debug("Finished shutdown of <{}> (took {} ms)", shutdownHook, stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
+                    } catch (Exception e) {
+                        LOG.error("Problem shutting down <{}>", shutdownHook, e);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
             }
+
+            latch.await();
+            executor.shutdown();
+            executor.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            LOG.error("Problem shutting down registered hooks", e);
         }
     }
 
     /**
      * Register a shutdown hook with the service.
      * @param shutdownHook a class that implements {@link GracefulShutdownHook}
+     * @throws IllegalStateException if the server shutdown is already in progress and the hook cannot be registered
      */
     public void register(GracefulShutdownHook shutdownHook) {
+        if (isShuttingDown.get()) {
+            // Avoid any changes to the shutdown hooks set when the shutdown is already in progress
+            throw new IllegalStateException("Couldn't register shutdown hook because shutdown is already in progress");
+        }
         shutdownHooks.add(shutdownHook);
     }
 
@@ -104,8 +109,13 @@ public class GracefulShutdownService extends AbstractIdleService {
      * <p>
      * This needs to be called if a registered service will be stopped before the server shuts down.
      * @param shutdownHook a class that implements {@link GracefulShutdownHook}
+     * @throws IllegalStateException if the server shutdown is already in progress and the hook cannot be unregistered
      */
     public void unregister(GracefulShutdownHook shutdownHook) {
+        if (isShuttingDown.get()) {
+            // Avoid any changes to the shutdown hooks set when the shutdown is already in progress
+            throw new IllegalStateException("Couldn't unregister shutdown hook because shutdown is already in progress");
+        }
         shutdownHooks.remove(shutdownHook);
     }
 
@@ -116,6 +126,7 @@ public class GracefulShutdownService extends AbstractIdleService {
                 new SynchronousQueue<>(),
                 new ThreadFactoryBuilder()
                         .setNameFormat("graceful-shutdown-service-%d")
+                        .setUncaughtExceptionHandler((t, e) -> LOG.error("Uncaught exception in <{}>", t, e))
                         .build());
     }
 }
