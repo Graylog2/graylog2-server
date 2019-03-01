@@ -90,7 +90,6 @@ public class GracefulShutdownService extends AbstractIdleService {
 
             latch.await();
             executor.shutdown();
-            executor.awaitTermination(1, TimeUnit.MINUTES);
         } catch (Exception e) {
             LOG.error("Problem shutting down registered hooks", e);
         }
