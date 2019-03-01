@@ -94,6 +94,19 @@ public class GracefulShutdownServiceTest {
     }
 
     @Test
+    public void registerAndUnregisterNull() throws Exception {
+        assertThatThrownBy(() -> shutdownService.register(null))
+                .hasMessageContaining("shutdownHook")
+                .isInstanceOf(NullPointerException.class);
+
+        assertThatThrownBy(() -> shutdownService.unregister(null))
+                .hasMessageContaining("shutdownHook")
+                .isInstanceOf(NullPointerException.class);
+
+        stop(shutdownService);
+    }
+
+    @Test
     public void registerMoreThanOnce() throws Exception {
         final AtomicInteger value = new AtomicInteger(0);
 

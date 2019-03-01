@@ -32,6 +32,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A service that participates in the Graylog server graceful shutdown.
  * <p>
@@ -98,13 +100,14 @@ public class GracefulShutdownService extends AbstractIdleService {
      * Register a shutdown hook with the service.
      * @param shutdownHook a class that implements {@link GracefulShutdownHook}
      * @throws IllegalStateException if the server shutdown is already in progress and the hook cannot be registered
+     * @throws NullPointerException if the shutdown hook argument is null
      */
     public void register(GracefulShutdownHook shutdownHook) {
         if (isShuttingDown.get()) {
             // Avoid any changes to the shutdown hooks set when the shutdown is already in progress
             throw new IllegalStateException("Couldn't register shutdown hook because shutdown is already in progress");
         }
-        shutdownHooks.add(shutdownHook);
+        shutdownHooks.add(requireNonNull(shutdownHook, "shutdownHook cannot be null"));
     }
 
     /**
@@ -113,13 +116,14 @@ public class GracefulShutdownService extends AbstractIdleService {
      * This needs to be called if a registered service will be stopped before the server shuts down.
      * @param shutdownHook a class that implements {@link GracefulShutdownHook}
      * @throws IllegalStateException if the server shutdown is already in progress and the hook cannot be unregistered
+     * @throws NullPointerException if the shutdown hook argument is null
      */
     public void unregister(GracefulShutdownHook shutdownHook) {
         if (isShuttingDown.get()) {
             // Avoid any changes to the shutdown hooks set when the shutdown is already in progress
             throw new IllegalStateException("Couldn't unregister shutdown hook because shutdown is already in progress");
         }
-        shutdownHooks.remove(shutdownHook);
+        shutdownHooks.remove(requireNonNull(shutdownHook, "shutdownHook cannot be null"));
     }
 
     private ExecutorService executorService(final int maxThreads) {
