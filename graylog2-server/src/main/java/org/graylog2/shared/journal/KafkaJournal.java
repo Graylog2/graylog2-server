@@ -373,7 +373,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
          * of KafkaJournal. This is an override to provide the old metric name for the input journal, and unique names
          * for instances. */
         String journalOldestSegmentMetricName = GlobalMetricNames.JOURNAL_OLDEST_SEGMENT;
-        if (!KafkaJournal.class.getName().equals(journalOldestSegmentMetricName)) {
+        if (!KafkaJournal.class.getName().equals(metricPrefix)) {
             journalOldestSegmentMetricName = name(metricPrefix, GlobalMetricNames.OLDEST_SEGMENT_SUFFIX);
         }
 
