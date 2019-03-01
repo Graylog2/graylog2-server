@@ -36,7 +36,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * A service that participates in the Graylog server graceful shutdown.
  * <p>
  * Services can implement {@link GracefulShutdownHook} and register themselves with this service to make sure they
- * get shut down properly on server shutdown.
+ * get shut down properly on server shutdown. During shutdown the registered hooks will be called in no particular
+ * order.
  * <p>
  * Make sure to use {@link #unregister(GracefulShutdownHook)} if a registered service is shutting down before the
  * server shutdown to avoid leaking service instances in the {@link GracefulShutdownService}.
