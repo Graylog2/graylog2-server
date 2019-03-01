@@ -114,8 +114,7 @@ public class KafkaJournalTest {
                                                  Duration.standardMinutes(1),
                                                  100,
                                                  new MetricRegistry(),
-                                                 serverStatus,
-                                                 null);
+                                                 serverStatus);
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message".getBytes(UTF_8);
@@ -140,8 +139,7 @@ public class KafkaJournalTest {
                                                  Duration.standardMinutes(1),
                                                  100,
                                                  new MetricRegistry(),
-                                                 serverStatus,
-                                                 null);
+                                                 serverStatus);
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message1".getBytes(UTF_8);
@@ -197,8 +195,7 @@ public class KafkaJournalTest {
                                                       Duration.standardMinutes(1),
                                                       100,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
 
         long size = 0L;
         long maxSize = segmentSize.toBytes();
@@ -230,8 +227,7 @@ public class KafkaJournalTest {
                                                       Duration.standardMinutes(1),
                                                       100,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
 
         long size = 0L;
         long maxSize = segmentSize.toBytes();
@@ -271,8 +267,7 @@ public class KafkaJournalTest {
                                                       Duration.standardMinutes(1),
                                                       100,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
 
         createBulkChunks(journal, segmentSize, 3);
 
@@ -301,8 +296,7 @@ public class KafkaJournalTest {
                                                       Duration.standardMinutes(1),
                                                       100,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -338,8 +332,7 @@ public class KafkaJournalTest {
                                                           Duration.standardMinutes(1),
                                                           100,
                                                           new MetricRegistry(),
-                                                          serverStatus,
-                                                          null);
+                                                          serverStatus);
             final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
             assertTrue(messageJournalDir.exists());
 
@@ -393,8 +386,7 @@ public class KafkaJournalTest {
                                                       Duration.standardMinutes(1),
                                                       100,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -445,8 +437,7 @@ public class KafkaJournalTest {
                              Duration.standardMinutes(1),
                              100,
                              new MetricRegistry(),
-                             serverStatus,
-                             null);
+                             serverStatus);
             fail("Expected exception");
         } catch (Exception e) {
             assertThat(e)
@@ -472,8 +463,7 @@ public class KafkaJournalTest {
                                                       Duration.standardSeconds(1L),
                                                       90,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
 
         createBulkChunks(journal, segmentSize, 4);
         journal.flushDirtyLogs();
@@ -496,8 +486,7 @@ public class KafkaJournalTest {
                                                       Duration.standardSeconds(1L),
                                                       90,
                                                       new MetricRegistry(),
-                                                      serverStatus,
-                                                      null);
+                                                      serverStatus);
 
         journal.flushDirtyLogs();
         journal.cleanupLogs();
