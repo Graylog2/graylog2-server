@@ -374,7 +374,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
          * for instances. */
         String journalOldestSegmentMetricName = GlobalMetricNames.JOURNAL_OLDEST_SEGMENT;
         if (!KafkaJournal.class.getName().equals(journalOldestSegmentMetricName)) {
-            journalOldestSegmentMetricName = metricPrefix;
+            journalOldestSegmentMetricName = name(metricPrefix, "oldest-segment");
         }
 
         // must not be a lambda, because the serialization cannot determine the proper Metric type :(
