@@ -29,11 +29,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MessageOutputFactory {
+    // We have two output lists for backwards compatibility.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs;
+    private final Map<String, MessageOutput.Factory2<? extends MessageOutput>> availableOutputs2;
 
     @Inject
-    public MessageOutputFactory(Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs) {
+    public MessageOutputFactory(Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs,
+                                Map<String, MessageOutput.Factory2<? extends MessageOutput>> availableOutputs2) {
         this.availableOutputs = availableOutputs;
+        this.availableOutputs2 = availableOutputs2;
     }
 
     public MessageOutput fromStreamOutput(Output output, final Stream stream, Configuration configuration) throws MessageOutputConfigurationException {
@@ -44,27 +49,40 @@ public class MessageOutputFactory {
         final String outputType = output.getType();
         Preconditions.checkArgument(outputType != null);
 
+        // We have two output lists for backwards compatibility.
+        // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
+        final MessageOutput.Factory2<? extends MessageOutput> factory2 = this.availableOutputs2.get(outputType);
         final MessageOutput.Factory<? extends MessageOutput> factory = this.availableOutputs.get(outputType);
 
-        Preconditions.checkArgument(factory != null, "Output type is not supported: %s!", outputType);
-
-        return factory.create(output, stream, configuration);
+        if (factory2 != null) {
+            return factory2.create(output, stream, configuration);
+        } else if (factory != null) {
+            return factory.create(stream, configuration);
+        } else {
+            throw new IllegalArgumentException("Output type is not supported: " + outputType);
+        }
     }
 
 
     public Map<String, AvailableOutputSummary> getAvailableOutputs() {
+        // We have two output lists for backwards compatibility.
+        // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
         final Map<String, AvailableOutputSummary> result = new HashMap<>(availableOutputs.size());
         for (Map.Entry<String, MessageOutput.Factory<? extends MessageOutput>> messageOutputEntry : this.availableOutputs.entrySet()) {
             final MessageOutput.Factory messageOutputFactoryClass = messageOutputEntry.getValue();
             final MessageOutput.Descriptor descriptor = messageOutputFactoryClass.getDescriptor();
 
-            final AvailableOutputSummary availableOutputSummary = AvailableOutputSummary.create(
-                    descriptor.getName(),
-                    messageOutputEntry.getKey(),
-                    descriptor.getHumanName(),
-                    descriptor.getLinkToDocs(),
-                    messageOutputFactoryClass.getConfig().getRequestedConfiguration()
-            );
+            final AvailableOutputSummary availableOutputSummary = createOutputSummary(messageOutputEntry.getKey(),
+                    descriptor, messageOutputFactoryClass.getConfig());
+
+            result.put(messageOutputEntry.getKey(), availableOutputSummary);
+        }
+        for (Map.Entry<String, MessageOutput.Factory2<? extends MessageOutput>> messageOutputEntry : this.availableOutputs2.entrySet()) {
+            final MessageOutput.Factory2 messageOutputFactoryClass = messageOutputEntry.getValue();
+            final MessageOutput.Descriptor descriptor = messageOutputFactoryClass.getDescriptor();
+
+            final AvailableOutputSummary availableOutputSummary = createOutputSummary(messageOutputEntry.getKey(),
+                    descriptor, messageOutputFactoryClass.getConfig());
 
             result.put(messageOutputEntry.getKey(), availableOutputSummary);
         }
@@ -72,7 +90,15 @@ public class MessageOutputFactory {
         return result;
     }
 
-    public MessageOutput.Factory<? extends MessageOutput> get(String type) {
-        return this.availableOutputs.get(type);
+    private AvailableOutputSummary createOutputSummary(String outputType,
+                                                       MessageOutput.Descriptor descriptor,
+                                                       MessageOutput.Config config) {
+        return AvailableOutputSummary.create(
+                descriptor.getName(),
+                outputType,
+                descriptor.getHumanName(),
+                descriptor.getLinkToDocs(),
+                config.getRequestedConfiguration()
+        );
     }
 }
