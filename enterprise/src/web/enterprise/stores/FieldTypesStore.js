@@ -1,7 +1,10 @@
+// @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import fetch from 'logic/rest/FetchProvider';
+// $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
 
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
@@ -9,9 +12,18 @@ import { QueryFiltersStore } from './QueryFiltersStore';
 
 const fieldTypesUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/fields');
 
-export const FieldTypesActions = Reflux.createActions({
+type FieldTypesActionsType = {
+  all: () => Promise<void>,
+};
+
+export const FieldTypesActions: FieldTypesActionsType = Reflux.createActions({
   all: { asyncResult: true },
 });
+
+export type FieldTypesStoreState = {
+  all: Immutable.List<FieldTypeMapping>,
+  queryFields: Immutable.Map<String, Immutable.List<FieldTypeMapping>>,
+};
 
 export const FieldTypesStore = Reflux.createStore({
   listenables: [FieldTypesActions],
@@ -70,7 +82,7 @@ export const FieldTypesStore = Reflux.createStore({
       .map(fieldTypeMapping => FieldTypeMapping.fromJSON(fieldTypeMapping));
   },
 
-  _state() {
+  _state(): FieldTypesStoreState {
     return {
       all: this.all,
       queryFields: this.queryFields,

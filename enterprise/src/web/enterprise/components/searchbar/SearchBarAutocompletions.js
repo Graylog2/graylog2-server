@@ -1,47 +1,40 @@
-import Immutable from 'immutable';
-import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+// @flow strict
+import { sortBy, uniqBy } from 'lodash';
+import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
 
-const _fieldResult = (field, score = 1) => {
-  const { name, type } = field;
-  return {
-    name: name,
-    value: name,
-    score,
-    meta: type.type,
-  };
-};
+export interface Completer {
+  getCompletions(currentToken: ?Token, lastToken: ?Token, prefix: string, tokens: Array<Token>): Array<CompletionResult>;
+}
 
-const _matchesFieldName = (prefix) => {
-  return field => (field.name.indexOf(prefix) >= 0);
-};
+export default class SearchBarAutoCompletions implements AutoCompleter {
+  completers: Array<Completer>;
 
-export default class SearchBarAutoCompletions {
-  constructor() {
-    this.state = FieldTypesStore.getInitialState();
-    FieldTypesStore.listen((newState) => {
-      this.state = newState;
-    });
-
-    this.onViewMetadataStoreUpdate(ViewMetadataStore.getInitialState());
-    ViewMetadataStore.listen(this.onViewMetadataStoreUpdate);
+  constructor(completers: Array<Completer> = []) {
+    this.completers = completers;
   }
 
-  onViewMetadataStoreUpdate = (newState) => {
-    const { activeQuery } = newState;
-    this.activeQuery = activeQuery;
-  };
+  getCompletions = (editor: Editor, session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
+    // eslint-disable-next-line no-param-reassign
+    editor.completer.autoSelect = false;
+    const tokens = editor.session.getTokens(pos.row);
+    const currentToken = editor.session.getTokenAt(pos.row, pos.column);
+    const currentTokenIdx = tokens.findIndex(t => (t === currentToken));
 
-  getCompletions = (editor, session, pos, prefix, callback) => {
-    const { all, queryFields } = this.state;
-    const matchesFieldName = _matchesFieldName(prefix);
-    const currentQueryFields = queryFields.get(this.activeQuery, Immutable.Set());
-    const results = Immutable.List([
-      currentQueryFields.filter(matchesFieldName)
-        .map(field => _fieldResult(field, 2)),
-      all.filter(matchesFieldName)
-        .map(field => _fieldResult(field, 1)),
-    ]).flatten().toJS();
-    callback(null, results);
+    const lastToken: ?Token = currentTokenIdx > 0 ? tokens[currentTokenIdx - 1] : null;
+
+    const results = this.completers
+      .map((completer) => {
+        try {
+          return completer.getCompletions(currentToken, lastToken, prefix, tokens);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn('Exception thrown in completer: ', e);
+        }
+        return [];
+      })
+      .reduce((acc, cur) => [...acc, ...cur], []);
+
+    const uniqResults = uniqBy(sortBy(results, ['score', 'name']), 'name');
+    callback(null, uniqResults);
   }
 }

@@ -12,5 +12,7 @@ flow-typed
 [options]
 emoji=true
 module.name_mapper='^enterprise' -> '<PROJECT_ROOT>/src/web/enterprise'
+module.name_mapper='^logic' -> '<PROJECT_ROOT>/../../graylog2-server/graylog2-web-interface/src/web/logic'
+module.name_mapper='^util' -> '<PROJECT_ROOT>/../../graylog2-server/graylog2-web-interface/src/web/util'
 module.name_mapper='^!style/useable!.*\.css$' -> '<PROJECT_ROOT>/src/web/flow/css-useable-modules.js'
 module.name_mapper='.*\.css$' -> '<PROJECT_ROOT>/src/web/flow/css-modules.js'

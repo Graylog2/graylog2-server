@@ -1,14 +1,13 @@
+// @flow strict
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { debounce } from 'lodash';
 
-import 'brace';
-import 'brace/mode/lucene';
-import 'enterprise/components/searchbar/queryinput/ace-queryinput';
-import 'brace/ext/language_tools';
-
-import AceEditor from 'react-ace';
+import AceEditor from './queryinput/ace';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
+import FieldNameCompletion from './completions/FieldNameCompletion';
+import OperatorCompletion from './completions/OperatorCompletion';
+import type { AutoCompleter, Editor } from './ace-types';
+import ParameterCompletion from './completions/ParameterCompletion';
 
 const _placeholderNode = (placeholder) => {
   const node = document.createElement('div');
@@ -19,18 +18,44 @@ const _placeholderNode = (placeholder) => {
   return node;
 };
 
-class QueryInput extends Component {
-  constructor(props) {
+type Props = {
+  value: string,
+  // eslint-disable-next-line no-undef
+  completerClass?: Class<AutoCompleter>,
+  onBlur?: (string) => void,
+  onChange: (string) => Promise<string>,
+  onExecute: (string) => void,
+  placeholder: string,
+};
+
+type State = {
+  value: string,
+};
+
+class QueryInput extends Component<Props, State> {
+  static defaultProps = {
+    onBlur: () => {},
+    completerClass: SearchBarAutoCompletions,
+    value: '',
+    placeholder: '',
+  };
+
+  constructor(props: Props) {
     super(props);
     this.state = {
       value: props.value,
     };
     const CompleterClass = props.completerClass;
-    this.completer = new CompleterClass();
+    // $FlowFixMe: tailored for this specific one for now
+    this.completer = new CompleterClass([
+      new FieldNameCompletion(),
+      new OperatorCompletion(),
+      new ParameterCompletion(),
+    ]);
   }
 
   componentDidMount() {
-    const { editor } = this.editor;
+    const editor = this.editor && this.editor.editor;
     if (editor) {
       editor.commands.addCommand({
         name: 'Execute',
@@ -40,7 +65,7 @@ class QueryInput extends Component {
 
       editor.setFontSize(16);
 
-      editor.completers.push(this.completer);
+      editor.completers = [this.completer];
 
       if (!this.props.value && !this._placeholderExists(editor)) {
         this._addPlaceholder(editor);
@@ -48,7 +73,7 @@ class QueryInput extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     if (nextProps.value !== this.state.value) {
       this.setState({ value: nextProps.value });
     }
@@ -64,7 +89,13 @@ class QueryInput extends Component {
     }
   }
 
-  _addPlaceholder = (editor) => {
+  completer: AutoCompleter;
+  isFocussed: boolean;
+  editor: {
+    editor: Editor,
+  } | typeof undefined;
+
+  _addPlaceholder = (editor: Editor) => {
     if (!editor.renderer.emptyMessageNode) {
       const node = _placeholderNode(this.props.placeholder);
       // eslint-disable-next-line no-param-reassign
@@ -73,7 +104,7 @@ class QueryInput extends Component {
     }
   };
 
-  _removePlaceholder = (editor) => {
+  _removePlaceholder = (editor: Editor) => {
     if (editor.renderer.emptyMessageNode) {
       editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
       // eslint-disable-next-line no-param-reassign
@@ -81,46 +112,45 @@ class QueryInput extends Component {
     }
   };
 
-  _placeholderExists = (editor) => {
+  _placeholderExists = (editor: Editor) => {
     const { emptyMessageNode } = editor.renderer;
     return emptyMessageNode !== undefined && emptyMessageNode !== null;
   };
 
   editor = undefined;
 
-  _bindEditor(editor) {
+  _bindEditor(editor: { editor: Editor }) {
     if (editor) {
       this.editor = editor;
     }
   }
 
-  _debouncedOnChange = debounce(value => this.props.onChange(value), 700);
-
-  _onChange = (newValue) => {
+  _onChange = (newValue: string) => {
     this.setState({ value: newValue });
   };
 
   _onBlur = () => {
     this.isFocussed = false;
-    const editor = this.editor.editor;
+    const editor = this.editor && this.editor.editor;
     if (editor) {
       const shouldShow = !editor.session.getValue().length;
       if (shouldShow && !this._placeholderExists(editor)) {
         this._addPlaceholder(editor);
       }
     }
-    this.props.onChange(this.state.value).then(this.props.onBlur)
+    this.props.onChange(this.state.value).then(this.props.onBlur);
   };
 
   _onFocus = () => {
     this.isFocussed = true;
-    const editor = this.editor.editor;
+    const editor = this.editor && this.editor.editor;
     if (editor && this._placeholderExists(editor)) {
       this._removePlaceholder(editor);
     }
   };
 
-  _onExecute = () => {
+  _onExecute = (editor: Editor) => {
+    editor.completer.popup.hide();
     this.props.onChange(this.state.value).then(this.props.onExecute);
   };
 
@@ -129,7 +159,7 @@ class QueryInput extends Component {
     return (
       <div className="query" style={{ display: 'flex' }}>
         <AceEditor mode="lucene"
-                   ref={editor => this._bindEditor(editor)}
+                   ref={editor => editor && this._bindEditor(editor)}
                    theme="ace-queryinput"
                    onBlur={this._onBlur}
                    onChange={this._onChange}
@@ -162,16 +192,11 @@ class QueryInput extends Component {
 
 QueryInput.propTypes = {
   completerClass: PropTypes.any,
+  onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   value: PropTypes.string,
-};
-
-QueryInput.defaultProps = {
-  completerClass: SearchBarAutoCompletions,
-  value: '',
-  placeholder: '',
 };
 
 export default QueryInput;

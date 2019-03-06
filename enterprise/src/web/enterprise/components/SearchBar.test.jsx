@@ -1,7 +1,11 @@
+// @flow strict
 import React from 'react';
 import { mount } from 'enzyme';
+import * as mockImmutable from 'immutable';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
+
 import { QueriesActions } from 'enterprise/stores/QueriesStore';
 
 jest.mock('enterprise/stores/ViewManagementStore', () => ({
@@ -14,6 +18,7 @@ jest.mock('enterprise/stores/ViewManagementStore', () => ({
     },
   },
 }));
+jest.mock('enterprise/components/searchbar/QueryInput', () => 'query-input');
 
 describe('SearchBar', () => {
   const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');
