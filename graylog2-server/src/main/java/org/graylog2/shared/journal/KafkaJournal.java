@@ -108,12 +108,18 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     public static final int NOTIFY_ON_UTILIZATION_PERCENTAGE = 95;
 
     // Metric names, which should be used twice (once in metric startup and once in metric teardown).
+    private static final String METER_WRITTEN_MESSAGES = "writtenMessages";
+    private static final String METER_READ_MESSAGES = "readMessages";
+    private static final String METER_WRITE_DISCARDED_MESSAGES = "writeDiscardedMessages";
+    private static final String GAUGE_UNCOMMITTED_MESSAGES = "uncommittedMessages";
+    private static final String TIMER_WRITE_TIME = "writeTime";
+    private static final String TIMER_READ_TIME = "readTime";
     private static final String METRIC_NAME_SIZE = "size";
     private static final String METRIC_NAME_LOG_END_OFFSET = "logEndOffset";
     private static final String METRIC_NAME_NUMBER_OF_SEGMENTS = "numberOfSegments";
+    private static final String METRIC_NAME_UNFLUSHED_MESSAGES = "unflushedMessages";
     private static final String METRIC_NAME_RECOVERY_POINT = "recoveryPoint";
     private static final String METRIC_NAME_LAST_FLUSH_TIME = "lastFlushTime";
-    private static final String METRIC_NAME_UNFLUSHED_MESSAGES = "unflushedMessages";
 
     // This exists so we can use JodaTime's millis provider in tests.
     // Kafka really only cares about the milliseconds() method in here.
@@ -206,15 +212,13 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.metricPrefix = metricPrefix;
         this.metricRegistry = metricRegistry;
 
-        this.writtenMessages = metricRegistry.meter(name(this.metricPrefix, "writtenMessages"));
-        this.readMessages = metricRegistry.meter(name(this.metricPrefix, "readMessages"));
-        this.writeDiscardedMessages = metricRegistry.meter(name(this.metricPrefix, "writeDiscardedMessages"));
-
-        registerUncommittedGauge(metricRegistry, name(this.metricPrefix, "uncommittedMessages"));
-
-        // the registerHdrTimer helper doesn't throw on existing metrics
-        this.writeTime = registerHdrTimer(metricRegistry, name(this.metricPrefix, "writeTime"));
-        this.readTime = registerHdrTimer(metricRegistry, name(this.metricPrefix, "readTime"));
+        // Set up metrics
+        this.writtenMessages = metricRegistry.meter(name(this.metricPrefix, METER_WRITTEN_MESSAGES));
+        this.readMessages = metricRegistry.meter(name(this.metricPrefix, METER_READ_MESSAGES));
+        this.writeDiscardedMessages = metricRegistry.meter(name(this.metricPrefix, METER_WRITE_DISCARDED_MESSAGES));
+        registerUncommittedGauge(metricRegistry, name(this.metricPrefix, GAUGE_UNCOMMITTED_MESSAGES));
+        this.writeTime = registerHdrTimer(metricRegistry, name(this.metricPrefix, TIMER_WRITE_TIME)); // the registerHdrTimer helper doesn't throw on existing metrics
+        this.readTime = registerHdrTimer(metricRegistry, name(this.metricPrefix, TIMER_READ_TIME)); // the registerHdrTimer helper doesn't throw on existing metrics
 
         final Map<String, Object> config = ImmutableMap.<String, Object>builder()
                 // segmentSize: The soft maximum for the size of a segment file in the log
@@ -320,7 +324,26 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 kafkaLog = messageLog.get();
             }
 
-            setupLogMetrics();
+            // Set up more metrics
+            this.metricRegistry.register(name(metricPrefix, METRIC_NAME_SIZE), (Gauge<Long>) kafkaLog::size);
+            this.metricRegistry.register(name(metricPrefix, METRIC_NAME_LOG_END_OFFSET), (Gauge<Long>) kafkaLog::logEndOffset);
+            this.metricRegistry.register(name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS), (Gauge<Integer>) kafkaLog::numberOfSegments);
+            this.metricRegistry.register(name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES), (Gauge<Long>) kafkaLog::unflushedMessages);
+            this.metricRegistry.register(name(metricPrefix, METRIC_NAME_RECOVERY_POINT), (Gauge<Long>) kafkaLog::recoveryPoint);
+            this.metricRegistry.register(name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME), (Gauge<Long>) kafkaLog::lastFlushTime);
+
+            // must not be a lambda, because the serialization cannot determine the proper Metric type :(
+            this.metricRegistry.register(getOldestSegmentMetricName(), (Gauge<Date>) new Gauge<Date>() {
+                @Override
+                public Date getValue() {
+                    long oldestSegment = Long.MAX_VALUE;
+                    for (final LogSegment segment : KafkaJournal.this.getSegments()) {
+                        oldestSegment = Math.min(oldestSegment, segment.created());
+                    }
+
+                    return new Date(oldestSegment);
+                }
+            });
 
             LOG.info("Initialized Kafka based journal at {}", journalDirectory);
 
@@ -375,38 +398,18 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     /**
-     * Registers all metrics.
-     */
-    private void setupLogMetrics() {
-
-        this.metricRegistry.register(name(metricPrefix, METRIC_NAME_SIZE), (Gauge<Long>) kafkaLog::size);
-        this.metricRegistry.register(name(metricPrefix, METRIC_NAME_LOG_END_OFFSET), (Gauge<Long>) kafkaLog::logEndOffset);
-        this.metricRegistry.register(name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS), (Gauge<Integer>) kafkaLog::numberOfSegments);
-        this.metricRegistry.register(name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES), (Gauge<Long>) kafkaLog::unflushedMessages);
-        this.metricRegistry.register(name(metricPrefix, METRIC_NAME_RECOVERY_POINT), (Gauge<Long>) kafkaLog::recoveryPoint);
-        this.metricRegistry.register(name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME), (Gauge<Long>) kafkaLog::lastFlushTime);
-
-        // must not be a lambda, because the serialization cannot determine the proper Metric type :(
-        this.metricRegistry.register(getOldestSegmentMetricName(), (Gauge<Date>) new Gauge<Date>() {
-            @Override
-            public Date getValue() {
-                long oldestSegment = Long.MAX_VALUE;
-                for (final LogSegment segment : KafkaJournal.this.getSegments()) {
-                    oldestSegment = Math.min(oldestSegment, segment.created());
-                }
-
-                return new Date(oldestSegment);
-            }
-        });
-    }
-
-    /**
      * Call this at journal shutdown time. This removes all metrics, so they can be re-registered when startup occurs
      * again in the future. This is particularly used for code that creates multiple journal instances that can be
      * restarted independently (eg. the Forwarder).
      */
     private void teardownLogMetrics() {
 
+        this.metricRegistry.remove(name(metricPrefix, METER_WRITTEN_MESSAGES));
+        this.metricRegistry.remove(name(metricPrefix, METER_READ_MESSAGES));
+        this.metricRegistry.remove(name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES));
+        this.metricRegistry.remove(name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES));
+        this.metricRegistry.remove(name(metricPrefix, TIMER_WRITE_TIME));
+        this.metricRegistry.remove(name(metricPrefix, TIMER_READ_TIME));
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_SIZE));
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LOG_END_OFFSET));
         this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS));
