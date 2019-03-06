@@ -7,6 +7,8 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
+// $FlowFixMe: imports from core need to be fixed in flow
+import StoreProvider from 'injection/StoreProvider';
 
 import View from 'enterprise/logic/views/View';
 import Parameter from 'enterprise/logic/parameters/Parameter';
@@ -84,6 +86,11 @@ const ViewManagementStore = Reflux.createStore({
     const promise = fetch('POST', viewsUrl, JSON.stringify(view));
     ViewManagementActions.create.promise(promise);
     return promise;
+  },
+
+  createCompleted(): Promise<void> {
+    const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+    return CurrentUserStore.reload();
   },
 
   update(view: View): Promise<View> {
