@@ -54,6 +54,8 @@ public class MessageOutputFactory {
         final MessageOutput.Factory2<? extends MessageOutput> factory2 = this.availableOutputs2.get(outputType);
         final MessageOutput.Factory<? extends MessageOutput> factory = this.availableOutputs.get(outputType);
 
+        // If the same outputType value exists in both output factory maps for some reason, we want to prefer the
+        // one that is using the more recent interface.
         if (factory2 != null) {
             return factory2.create(output, stream, configuration);
         } else if (factory != null) {
