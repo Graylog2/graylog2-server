@@ -3,7 +3,7 @@ import { sortBy, uniqBy } from 'lodash';
 import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
 
 export interface Completer {
-  getCompletions(currentToken: ?Token, lastToken: ?Token, prefix: string, tokens: Array<Token>): Array<CompletionResult>;
+  getCompletions(currentToken: ?Token, lastToken: ?Token, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult>;
 }
 
 export default class SearchBarAutoCompletions implements AutoCompleter {
@@ -25,7 +25,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     const results = this.completers
       .map((completer) => {
         try {
-          return completer.getCompletions(currentToken, lastToken, prefix, tokens);
+          return completer.getCompletions(currentToken, lastToken, prefix, tokens, currentTokenIdx);
         } catch (e) {
           // eslint-disable-next-line no-console
           console.warn('Exception thrown in completer: ', e);
