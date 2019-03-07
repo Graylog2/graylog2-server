@@ -16,6 +16,7 @@
  */
 package org.graylog2.migrations;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.WidgetPosition;
@@ -34,7 +35,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,44 +84,41 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     @Test
     public void doMigrateOneDashboardsPositions() throws Exception {
         /* Dashboard 1 */
-        final List<WidgetPosition> oldPositions1 = new ArrayList<>(1);
-        oldPositions1.add(WidgetPosition.builder().id("my-position-id").width(5).height(4).col(2).row(2).build());
+        final List<WidgetPosition> oldPositions1 = Collections.singletonList(
+                WidgetPosition.builder().id("my-position-id").width(5).height(4).col(2).row(2).build());
 
-        final List<WidgetPosition> newPositions1 = new ArrayList<>(1);
-        newPositions1.add(WidgetPosition.builder().id("my-position-id").width(10).height(8).col(3).row(3).build());
+        final List<WidgetPosition> newPositions1 = Collections.singletonList(
+                WidgetPosition.builder().id("my-position-id").width(10).height(8).col(3).row(3).build());
 
         final Dashboard dashboard1 = mock(Dashboard.class);
         when(dashboard1.getPositions()).thenReturn(oldPositions1);
         when(dashboard1.getId()).thenReturn("uuu-iii-ddd");
 
         /* Dashboard 2 */
-        final List<WidgetPosition> oldPositions2 = new ArrayList<>(1);
-        oldPositions2.add(WidgetPosition.builder().id("your-position-id").width(1).height(1).col(1).row(1).build());
+        final List<WidgetPosition> oldPositions2 = Collections.singletonList(
+                WidgetPosition.builder().id("your-position-id").width(1).height(1).col(1).row(1).build());
 
-        final List<WidgetPosition> newPositions2 = new ArrayList<>(1);
-        newPositions2.add(WidgetPosition.builder().id("your-position-id").width(2).height(2).col(1).row(1).build());
+        final List<WidgetPosition> newPositions2 = Collections.singletonList(
+                WidgetPosition.builder().id("your-position-id").width(2).height(2).col(1).row(1).build());
 
         final Dashboard dashboard2 = mock(Dashboard.class);
         when(dashboard2.getPositions()).thenReturn(oldPositions2);
         when(dashboard2.getId()).thenReturn("uuu-iii-eee");
 
         /* Dashboard 3 */
-        final List<WidgetPosition> oldPositions3 = new ArrayList<>(1);
-        oldPositions3.add(WidgetPosition.builder().id("his-position-id").width(1).height(1).col(1).row(1).build());
-        oldPositions3.add(WidgetPosition.builder().id("her-position-id").width(2).height(2).col(2).row(2).build());
+        final List<WidgetPosition> oldPositions3 = ImmutableList.of(
+                WidgetPosition.builder().id("his-position-id").width(1).height(1).col(1).row(1).build(),
+                WidgetPosition.builder().id("her-position-id").width(2).height(2).col(2).row(2).build());
 
-        final List<WidgetPosition> newPositions3 = new ArrayList<>(1);
-        newPositions3.add(WidgetPosition.builder().id("his-position-id").width(2).height(2).col(1).row(1).build());
-        newPositions3.add(WidgetPosition.builder().id("her-position-id").width(4).height(4).col(3).row(3).build());
+        final List<WidgetPosition> newPositions3 = ImmutableList.of(
+                WidgetPosition.builder().id("his-position-id").width(2).height(2).col(1).row(1).build(),
+                WidgetPosition.builder().id("her-position-id").width(4).height(4).col(3).row(3).build());
 
         final Dashboard dashboard3 = mock(Dashboard.class);
         when(dashboard3.getPositions()).thenReturn(oldPositions3);
         when(dashboard3.getId()).thenReturn("uuu-iii-eee");
 
-        List<Dashboard> dashboards = new ArrayList<>(2);
-        dashboards.add(dashboard1);
-        dashboards.add(dashboard2);
-        dashboards.add(dashboard3);
+        List<Dashboard> dashboards = ImmutableList.of(dashboard1, dashboard2, dashboard3);
         when(this.dashboardService.all()).thenReturn(dashboards);
 
         this.adjustDashboardResolutionMigration.upgrade();
