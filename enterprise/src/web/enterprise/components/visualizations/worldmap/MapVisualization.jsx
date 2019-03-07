@@ -45,12 +45,6 @@ const MapVisualization = createReactClass({
     };
   },
 
-  getInitialState() {
-    return {
-      viewport: this.props.viewport,
-    };
-  },
-
   componentDidMount() {
     this._forceMapUpdate();
   },
@@ -106,10 +100,6 @@ const MapVisualization = createReactClass({
     );
   },
 
-  _onViewportChange(viewport) {
-    this.setState({ viewport }, () => this.props.onChange(viewport));
-  },
-
   _getBucket(value, bucketCount, minValue, maxValue, increment) {
     // Calculate bucket size based on min/max value and the number of buckets.
     const bucketSize = (maxValue - minValue) / bucketCount;
@@ -136,7 +126,7 @@ const MapVisualization = createReactClass({
   },
 
   render() {
-    const { data, id, height, width, url, attribution, interactive, locked } = this.props;
+    const { data, id, height, width, url, attribution, interactive, locked, viewport, onChange } = this.props;
 
     const noOfKeys = data.length;
     const chromaScale = chroma.scale('Spectral');
@@ -145,9 +135,10 @@ const MapVisualization = createReactClass({
       const y = Object.values(values);
       const min = y.reduce((prev, next) => Math.min(prev, next));
       const max = y.reduce((prev, next) => Math.max(prev, next));
-      const increment = this._getBucket(this.state.zoomLevel, this.MARKER_RADIUS_INCREMENT_SIZES, 1, 10, 1);
       const color = chromaScale(idx * (1 / noOfKeys));
-      Object.entries(values).forEach(([coord, value], valueIdx) => markers.push(this._formatMarker(coord, value, min, max, increment, color, name, keys[valueIdx])));
+      Object.entries(values)
+        .forEach(([coord, value], valueIdx) => markers
+          .push(this._formatMarker(coord, value, min, max, this.MARKER_RADIUS_INCREMENT_SIZES, color, name, keys[valueIdx])));
     });
 
     return (
@@ -155,8 +146,8 @@ const MapVisualization = createReactClass({
         {locked && <div className={style.overlay} style={{ height, width }} />}
         <Map ref={(c) => { this._map = c; }}
              id={`visualization-${id}`}
-             viewport={this.state.viewport}
-             onViewportChanged={this._onViewportChange}
+             viewport={viewport}
+             onViewportChanged={onChange}
              className={style.map}
              style={{ height, width }}
              scrollWheelZoom
