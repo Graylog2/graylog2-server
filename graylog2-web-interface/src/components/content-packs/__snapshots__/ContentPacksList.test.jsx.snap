@@ -238,6 +238,147 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Latest Version: 
                 1
                  
+                <span />
+                 
+              </small>
+            </h3>
+          </div>
+          <div
+            className="text-right col-md-3"
+          >
+            
+             
+            <button
+              className="btn btn-sm btn-info"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Install
+            </button>
+             
+            <div
+              className="dropdown btn-group btn-group-sm"
+            >
+              <button
+                aria-expanded={false}
+                aria-haspopup={true}
+                className="dropdown-toggle btn btn-sm btn-default"
+                disabled={false}
+                id="more-actions-8"
+                onClick={[Function]}
+                onKeyDown={[Function]}
+                role="button"
+                type="button"
+              >
+                More Actions
+                 
+                <span
+                  className="caret"
+                />
+              </button>
+              <ul
+                aria-labelledby="more-actions-8"
+                className="dropdown-menu dropdown-menu-right"
+                role="menu"
+              >
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Show
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    action="push"
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Create New Version
+                  </a>
+                </li>
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Download
+                  </a>
+                </li>
+                <li
+                  className="divider"
+                  onKeyDown={[Function]}
+                  role="separator"
+                />
+                <li
+                  className=""
+                  role="presentation"
+                >
+                  <a
+                    href="#"
+                    onClick={[Function]}
+                    onKeyDown={[Function]}
+                    role="menuitem"
+                    tabIndex="-1"
+                  >
+                    Delete All Versions
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row-sm content-packs-summary row"
+        >
+          <div
+            className="col-md-12"
+          >
+            
+             
+          </div>
+        </div>
+      </span>
+      <span
+        className="list-group-item"
+      >
+        <div
+          className="row-sm row"
+        >
+          <div
+            className="col-md-9"
+          >
+            <h3>
+              <a
+                onClick={[Function]}
+                style={Object {}}
+              />
+               
+              <small>
+                Latest Version: 
+                1
+                 
                 <span>
                   <a
                     onClick={[Function]}
@@ -367,158 +508,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="col-md-12"
           >
             Grok Patterns to extract informations from UFW logfiles
-             
-          </div>
-        </div>
-      </span>
-      <span
-        className="list-group-item"
-      >
-        <div
-          className="row-sm row"
-        >
-          <div
-            className="col-md-9"
-          >
-            <h3>
-              <a
-                onClick={[Function]}
-                style={Object {}}
-              />
-               
-              <small>
-                Latest Version: 
-                1
-                 
-                <span>
-                  <a
-                    onClick={[Function]}
-                    style={Object {}}
-                  >
-                    <span
-                      className="badge installed"
-                    >
-                      installed
-                    </span>
-                  </a>
-                </span>
-                 
-              </small>
-            </h3>
-          </div>
-          <div
-            className="text-right col-md-3"
-          >
-            
-             
-            <button
-              className="btn btn-sm btn-info"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              Install
-            </button>
-             
-            <div
-              className="dropdown btn-group btn-group-sm"
-            >
-              <button
-                aria-expanded={false}
-                aria-haspopup={true}
-                className="dropdown-toggle btn btn-sm btn-default"
-                disabled={false}
-                id="more-actions-2"
-                onClick={[Function]}
-                onKeyDown={[Function]}
-                role="button"
-                type="button"
-              >
-                More Actions
-                 
-                <span
-                  className="caret"
-                />
-              </button>
-              <ul
-                aria-labelledby="more-actions-2"
-                className="dropdown-menu dropdown-menu-right"
-                role="menu"
-              >
-                <li
-                  className=""
-                  role="presentation"
-                >
-                  <a
-                    action="push"
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Show
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                >
-                  <a
-                    action="push"
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Create New Version
-                  </a>
-                </li>
-                <li
-                  className=""
-                  role="presentation"
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Download
-                  </a>
-                </li>
-                <li
-                  className="divider"
-                  onKeyDown={[Function]}
-                  role="separator"
-                />
-                <li
-                  className=""
-                  role="presentation"
-                >
-                  <a
-                    href="#"
-                    onClick={[Function]}
-                    onKeyDown={[Function]}
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Delete All Versions
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div
-          className="row-sm content-packs-summary row"
-        >
-          <div
-            className="col-md-12"
-          >
-            Patterns to retreive rails production logs
              
           </div>
         </div>
@@ -1247,7 +1236,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 Latest Version: 
                 1
                  
-                <span />
+                <span>
+                  <a
+                    onClick={[Function]}
+                    style={Object {}}
+                  >
+                    <span
+                      className="badge installed"
+                    >
+                      installed
+                    </span>
+                  </a>
+                </span>
                  
               </small>
             </h3>
@@ -1274,7 +1274,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 aria-haspopup={true}
                 className="dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
-                id="more-actions-8"
+                id="more-actions-2"
                 onClick={[Function]}
                 onKeyDown={[Function]}
                 role="button"
@@ -1287,7 +1287,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 />
               </button>
               <ul
-                aria-labelledby="more-actions-8"
+                aria-labelledby="more-actions-2"
                 className="dropdown-menu dropdown-menu-right"
                 role="menu"
               >
@@ -1364,7 +1364,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
           <div
             className="col-md-12"
           >
-            
+            Patterns to retreive rails production logs
              
           </div>
         </div>

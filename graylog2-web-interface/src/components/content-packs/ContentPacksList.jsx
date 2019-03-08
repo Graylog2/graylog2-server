@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import naturalSort from 'javascript-natural-sort';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
@@ -31,9 +32,10 @@ class ContentPacksList extends React.Component {
 
   constructor(props) {
     super(props);
+    const contentPacks = props.contentPacks.sort((a, b) => naturalSort(a.name, b.name));
 
     this.state = {
-      filteredContentPacks: this.props.contentPacks,
+      filteredContentPacks: contentPacks,
       pageSize: 10,
       currentPage: 1,
     };
@@ -44,7 +46,8 @@ class ContentPacksList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ filteredContentPacks: nextProps.contentPacks });
+    const contentPacks = nextProps.contentPacks.sort((a, b) => naturalSort(a.name, b.name));
+    this.setState({ filteredContentPacks: contentPacks });
   }
 
   _installModal(item) {
