@@ -178,6 +178,14 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </span>
       </div>
     </fieldset>
+    <button
+      style={
+        Object {
+          "display": "none",
+        }
+      }
+      type="submit"
+    />
   </form>
 </div>
 `;
@@ -360,6 +368,14 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </span>
       </div>
     </fieldset>
+    <button
+      style={
+        Object {
+          "display": "none",
+        }
+      }
+      type="submit"
+    />
   </form>
 </div>
 `;
@@ -542,6 +558,14 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </span>
       </div>
     </fieldset>
+    <button
+      style={
+        Object {
+          "display": "none",
+        }
+      }
+      type="submit"
+    />
   </form>
 </div>
 `;

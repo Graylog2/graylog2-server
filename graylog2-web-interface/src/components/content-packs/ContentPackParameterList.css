@@ -14,3 +14,12 @@
 :local(.bigColumns) {
     word-wrap: break-word;
 }
+
+:local(.createButton) {
+    margin-top: 15px;
+    margin-left: 10px;
+}
+
+:local(.searchField) {
+    float: left;
+}

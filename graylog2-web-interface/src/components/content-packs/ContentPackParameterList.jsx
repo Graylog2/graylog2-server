@@ -101,8 +101,9 @@ class ContentPackParameterList extends React.Component {
       editParameter.addNewParameter();
     };
 
-    const size = parameter ? 'xsmall' : 'small';
+    const size = parameter ? 'xsmall' : undefined;
     const name = parameter ? 'Edit' : 'Create parameter';
+    const createClassName = parameter ? '' : ContentPackParameterListStyle.createButton;
 
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
@@ -134,6 +135,7 @@ class ContentPackParameterList extends React.Component {
         <Button bsStyle="info"
                 bsSize={size}
                 title="Edit Modal"
+                className={createClassName}
                 onClick={openModal}>
           {name}
         </Button>
@@ -164,11 +166,14 @@ class ContentPackParameterList extends React.Component {
       <div>
         <h2>Parameters list</h2>
         <br />
+        <span className={ContentPackParameterListStyle.searchField}>
+          <SearchForm
+            onSearch={this._filterParameters}
+            onReset={() => { this._filterParameters(''); }}
+            searchButtonLabel="Filter"
+          />
+        </span>
         { !this.props.readOnly && this._parameterModal() }
-        { !this.props.readOnly && (<span><br /><br /></span>) }
-        <SearchForm onSearch={this._filterParameters}
-                    onReset={() => { this._filterParameters(''); }}
-                    searchButtonLabel="Filter" />
         <DataTable id="parameter-list"
                    headers={headers}
                    className={ContentPackParameterListStyle.scrollable}

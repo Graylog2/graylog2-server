@@ -13,8 +13,78 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
           Parameters list
         </h2>
         <br />
+        <span
+          className="searchField"
+        >
+          <div
+            className="search"
+            style={
+              Object {
+                "marginTop": 15,
+              }
+            }
+          >
+            <form
+              className="form-inline"
+              onSubmit={[Function]}
+            >
+              <div
+                className="form-group has-feedback"
+              >
+                <input
+                  autoComplete="off"
+                  className="query form-control"
+                  id="common-search-form-query-input"
+                  onChange={[Function]}
+                  placeholder="Enter search query..."
+                  spellCheck="false"
+                  style={
+                    Object {
+                      "width": "auto",
+                    }
+                  }
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                className="form-group"
+                style={
+                  Object {
+                    "marginLeft": 5,
+                  }
+                }
+              >
+                <button
+                  className="submit-button btn btn-default"
+                  disabled={false}
+                  type="submit"
+                >
+                  Filter
+                </button>
+              </div>
+              <div
+                className="form-group"
+                style={
+                  Object {
+                    "marginLeft": 5,
+                  }
+                }
+              >
+                <button
+                  className="reset-button btn btn-default"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="reset"
+                >
+                  Reset
+                </button>
+              </div>
+            </form>
+          </div>
+        </span>
         <button
-          className="btn btn-sm btn-info"
+          className="createButton btn btn-info"
           disabled={false}
           onClick={[Function]}
           title="Edit Modal"
@@ -22,76 +92,6 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
         >
           Create parameter
         </button>
-        <span>
-          <br />
-          <br />
-        </span>
-        <div
-          className="search"
-          style={
-            Object {
-              "marginTop": 15,
-            }
-          }
-        >
-          <form
-            className="form-inline"
-            onSubmit={[Function]}
-          >
-            <div
-              className="form-group has-feedback"
-            >
-              <input
-                autoComplete="off"
-                className="query form-control"
-                id="common-search-form-query-input"
-                onChange={[Function]}
-                placeholder="Enter search query..."
-                spellCheck="false"
-                style={
-                  Object {
-                    "width": "auto",
-                  }
-                }
-                type="text"
-                value=""
-              />
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="submit-button btn btn-default"
-                disabled={false}
-                type="submit"
-              >
-                Filter
-              </button>
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="reset-button btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="reset"
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
         <div>
           <div
             className="row "
@@ -384,8 +384,78 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
           Parameters list
         </h2>
         <br />
+        <span
+          className="searchField"
+        >
+          <div
+            className="search"
+            style={
+              Object {
+                "marginTop": 15,
+              }
+            }
+          >
+            <form
+              className="form-inline"
+              onSubmit={[Function]}
+            >
+              <div
+                className="form-group has-feedback"
+              >
+                <input
+                  autoComplete="off"
+                  className="query form-control"
+                  id="common-search-form-query-input"
+                  onChange={[Function]}
+                  placeholder="Enter search query..."
+                  spellCheck="false"
+                  style={
+                    Object {
+                      "width": "auto",
+                    }
+                  }
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                className="form-group"
+                style={
+                  Object {
+                    "marginLeft": 5,
+                  }
+                }
+              >
+                <button
+                  className="submit-button btn btn-default"
+                  disabled={false}
+                  type="submit"
+                >
+                  Filter
+                </button>
+              </div>
+              <div
+                className="form-group"
+                style={
+                  Object {
+                    "marginLeft": 5,
+                  }
+                }
+              >
+                <button
+                  className="reset-button btn btn-default"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="reset"
+                >
+                  Reset
+                </button>
+              </div>
+            </form>
+          </div>
+        </span>
         <button
-          className="btn btn-sm btn-info"
+          className="createButton btn btn-info"
           disabled={false}
           onClick={[Function]}
           title="Edit Modal"
@@ -393,76 +463,6 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
         >
           Create parameter
         </button>
-        <span>
-          <br />
-          <br />
-        </span>
-        <div
-          className="search"
-          style={
-            Object {
-              "marginTop": 15,
-            }
-          }
-        >
-          <form
-            className="form-inline"
-            onSubmit={[Function]}
-          >
-            <div
-              className="form-group has-feedback"
-            >
-              <input
-                autoComplete="off"
-                className="query form-control"
-                id="common-search-form-query-input"
-                onChange={[Function]}
-                placeholder="Enter search query..."
-                spellCheck="false"
-                style={
-                  Object {
-                    "width": "auto",
-                  }
-                }
-                type="text"
-                value=""
-              />
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="submit-button btn btn-default"
-                disabled={false}
-                type="submit"
-              >
-                Filter
-              </button>
-            </div>
-            <div
-              className="form-group"
-              style={
-                Object {
-                  "marginLeft": 5,
-                }
-              }
-            >
-              <button
-                className="reset-button btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="reset"
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
         <div>
           <div
             className="row "

@@ -99,8 +99,8 @@ class ContentPackEditParameter extends React.Component {
       return false;
     }
 
-    if ((this.props.parameterToEdit || {}).name !== value
-      && this.props.parameters.findIndex((parameter) => { return parameter.name === value; }) >= 0) {
+    if ((this.props.parameterToEdit || {}).name !== value &&
+      this.props.parameters.findIndex((parameter) => { return parameter.name === value; }) >= 0) {
       this.setState({ nameError: 'The parameter name must be unique.' });
       return false;
     }
@@ -160,8 +160,8 @@ class ContentPackEditParameter extends React.Component {
                    onChange={this._bindValue}
                    bsStyle={this.state.titleError ? 'error' : null}
                    label="Title"
-                   help={this.state.titleError ? this.state.titleError
-                     : 'Give a descriptive title for this content pack.'}
+                   help={this.state.titleError ? this.state.titleError :
+                     'Give a descriptive title for this content pack.'}
                    required />
             <Input name="name"
                    id="name"
@@ -171,8 +171,8 @@ class ContentPackEditParameter extends React.Component {
                    value={this.state.newParameter.name}
                    onChange={this._bindValue}
                    label="Name"
-                   help={this.state.nameError ? this.state.nameError
-                     : 'This is used as the parameter reference and must not contain a space.'}
+                   help={this.state.nameError ? this.state.nameError :
+                     'This is used as the parameter reference and must not contain a space.'}
                    required />
             <Input name="description"
                    id="description"
@@ -182,8 +182,8 @@ class ContentPackEditParameter extends React.Component {
                    value={this.state.newParameter.description}
                    onChange={this._bindValue}
                    label="Description"
-                   help={this.state.descrError ? this.state.descrError
-                     : 'Give a description explaining what will be done with this parameter.'}
+                   help={this.state.descrError ? this.state.descrError :
+                     'Give a description explaining what will be done with this parameter.'}
                    required />
             <Input name="type"
                    id="type"
@@ -207,13 +207,10 @@ class ContentPackEditParameter extends React.Component {
                    value={this.state.newParameter.default_value}
                    onChange={this._bindValue}
                    label="Default value"
-                   help={this.state.defaultValueError ? this.state.defaultValueError
-                     : 'Give a default value if the parameter is not optional.'} />
+                   help={this.state.defaultValueError ? this.state.defaultValueError :
+                     'Give a default value if the parameter is not optional.'} />
           </fieldset>
-          <button style={{ display: 'none' }} type="submit" />
-        </form>
-      </div>
-    );
+        </form></div>);
   }
 }
 
