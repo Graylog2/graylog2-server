@@ -126,10 +126,11 @@ const ShowContentPackPage = createReactClass({
     }
 
     const { contentPackRevisions, selectedVersion, constraints } = this.state;
+    const contentPackName = contentPackRevisions.contentPack(selectedVersion).name;
     return (
       <DocumentTitle title="Content packs">
         <span>
-          <PageHeader title="Content packs">
+          <PageHeader title={`Content pack - ${contentPackName}`}>
             <span>
               Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
             </span>

@@ -22,6 +22,9 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
             </h2>
             <br />
             <div>
+              <h3>
+                
+              </h3>
               <dl
                 className="deflist"
               >
@@ -374,6 +377,9 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
             </h2>
             <br />
             <div>
+              <h3>
+                name
+              </h3>
               <dl
                 className="deflist"
               >

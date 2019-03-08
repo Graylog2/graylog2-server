@@ -22,6 +22,7 @@ const ContentPackDetails = (props) => {
           <h2>Details</h2>
           <br />
           <div>
+            <h3>{contentPack.name}</h3>
             <dl className="deflist">
               <dt>Version:</dt> <dd>{contentPack.rev}</dd>
               <dt>Name:</dt> <dd>{contentPack.name}&nbsp;</dd>

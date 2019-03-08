@@ -378,6 +378,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                 </h2>
                 <br />
                 <div>
+                  <h3>
+                    
+                  </h3>
                   <dl
                     className="deflist"
                   >
@@ -903,6 +906,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                 </h2>
                 <br />
                 <div>
+                  <h3>
+                    Content Pack the movie
+                  </h3>
                   <dl
                     className="deflist"
                   >
