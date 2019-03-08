@@ -210,6 +210,7 @@ class ContentPackEditParameter extends React.Component {
                    help={this.state.defaultValueError ? this.state.defaultValueError
                      : 'Give a default value if the parameter is not optional.'} />
           </fieldset>
+          <button style={{ display: 'none' }} type="submit" />
         </form>
       </div>
     );
