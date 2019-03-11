@@ -1,3 +1,8 @@
 :local(.applyParameter) {
     margin-top: 8px;
 }
+
+:local(.applyTable) {
+    padding-left: 17px;
+    padding-right: 17px;
+}

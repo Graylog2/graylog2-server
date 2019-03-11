@@ -16,6 +16,8 @@ class DataTable extends React.Component {
     className: PropTypes.string,
     /** Adds a custom class to the row element. */
     rowClassName: PropTypes.string,
+    /** Adds a custom class to the wrapper element */
+    wrapperClassName: PropTypes.string,
     /** Object key that should be used to display data in the data filter input. */
     displayKey: PropTypes.string,
     /**
@@ -68,6 +70,7 @@ class DataTable extends React.Component {
     headerCellFormatter: (header) => { return (<th>{header}</th>); },
     sortByKey: undefined,
     sortBy: undefined,
+    wrapperClassName: undefined,
   };
 
   state = {
@@ -161,7 +164,7 @@ class DataTable extends React.Component {
     }
 
     return (
-      <div>
+      <div className={this.props.wrapperClassName}>
         {filter}
         <div className={`row ${this.props.rowClassName}`}>
           <div className="col-md-12">

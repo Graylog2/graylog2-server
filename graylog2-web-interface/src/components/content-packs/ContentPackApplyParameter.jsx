@@ -108,7 +108,7 @@ class ContentPackApplyParameter extends React.Component {
       <div>
         <form className="apply-parameter-form" id="apply-parameter-form" onSubmit={this._applyParameter}>
           <Row className={Style.applyParameter}>
-            <Col smOffset={1} sm={5}>
+            <Col sm={6}>
               <Input name="config_key"
                      id="config_key"
                      type="select"
@@ -119,7 +119,7 @@ class ContentPackApplyParameter extends React.Component {
                 {configOptions}
               </Input>
             </Col>
-            <Col sm={5}>
+            <Col sm={6}>
               <Input name="parameter"
                      id="parameter"
                      type="select"
@@ -134,17 +134,20 @@ class ContentPackApplyParameter extends React.Component {
           </Row>
           <Row>
             <Col smOffset={10} sm={2}>
-              <Button bsStyle="primary" disabled={!this._valuesSelected()} type="submit">Apply</Button>
+              <Button className="pull-right" bsStyle="primary" disabled={!this._valuesSelected()} type="submit">Apply</Button>
             </Col>
           </Row>
         </form>
         <Row>
-          <Col smOffset={1} sm={10}>
-            <DataTable id="config-key-list"
-                       headers={['Config Key', 'Parameter', 'Action']}
-                       filterKeys={[]}
-                       rows={this.props.appliedParameter}
-                       dataRowFormatter={this._configKeyRowFormatter} />
+          <Col>
+            <DataTable
+              wrapperClassName={Style.applyTable}
+              id="config-key-list"
+              headers={['Config Key', 'Parameter', 'Action']}
+              filterKeys={[]}
+              rows={this.props.appliedParameter}
+              dataRowFormatter={this._configKeyRowFormatter}
+            />
           </Col>
         </Row>
       </div>
