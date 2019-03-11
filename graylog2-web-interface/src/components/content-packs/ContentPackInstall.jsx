@@ -39,7 +39,11 @@ class ContentPackInstall extends React.Component {
     };
   }
 
-  onInstall = () => {
+  onInstall = (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+
     if (this._validateInput()) {
       const contentPackId = this.props.contentPack.id;
       const contentPackRev = this.props.contentPack.rev;
@@ -110,6 +114,7 @@ class ContentPackInstall extends React.Component {
 
     return (
       <div>
+        <form onSubmit={this.onInstall}>
         <Row>
           <Col smOffset={1} sm={10}>
             <h2>Install comment</h2>
@@ -123,25 +128,26 @@ class ContentPackInstall extends React.Component {
                    onChange={this._getComment}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-7"
-                   label="Comment" />
+                   label="Comment"/>
+
           </Col>
         </Row>
         {parameterInput.length > 0
-      && (
-      <Row>
-        <Col smOffset={1} sm={10}>
-          <h2>Configure Parameter</h2>
-          <br />
-          <br />
-          {parameterInput}
-        </Col>
-      </Row>
-      )}
-        <Row>
+        && (<Row>
+          <Col smOffset={1} sm={10}>
+            <h2>Configure Parameter</h2>
+            <br />
+            <br />
+            {parameterInput}
+          </Col>
+        </Row>
+        )}<Row>
           <Col smOffset={1} sm={10}>
             <ContentPackEntitiesList contentPack={contentPack} readOnly />
           </Col>
         </Row>
+        <button style={{ display: 'none' }} type="submit" />
+      </form>
       </div>
     );
   }
