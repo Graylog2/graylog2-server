@@ -18,6 +18,7 @@ package org.graylog.integrations.inputs.paloalto;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -62,6 +63,8 @@ public class PaloAltoParser {
          *  Note the ' - - - - ' delimiter for panorama.
          */
 
+        // Trim off line breaks from the end of the message payload.
+        raw = StringUtils.trim(raw);
         if (PANORAMA_SYSLOG_PARSER.matcher(raw).matches()) {
             LOG.trace("Message is in Panorama format [{}]", raw);
             final Matcher matcher = PANORAMA_SYSLOG_PARSER.matcher(raw);

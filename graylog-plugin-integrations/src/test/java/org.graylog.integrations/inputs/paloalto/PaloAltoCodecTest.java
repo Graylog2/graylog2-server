@@ -18,7 +18,6 @@ package org.graylog.integrations.inputs.paloalto;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
@@ -44,6 +43,7 @@ public class PaloAltoCodecTest {
     private final static String PANORAMA_TRAFFIC_MESSAGE = "<14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19 11:50:32,007255000045717,TRAFFIC,end,2049,2018/09/19 11:50:32,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,incomplete,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:32,205742,1,64575,443,41304,443,0x400070,tcp,allow,412,272,140,6,2018/09/19 11:50:15,0,any,0,54196730,0x8000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,4,2,tcp-fin,13,16,0,0,,Prod--2,from-policy,,,0,,0,,N/A,0,0,0,0";
     private final static String PANORAMA_SYSTEM_MESSAGE = "<14>1 2018-09-19T11:50:35-05:00 Panorama-1 - - - - 1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\"Deviating device: Prod--2, Serial: 007255000045717, Object: N/A, Metric: mp-cpu, Value: 34\",1163103,0x0,0,0,0,0,,Panorama-1";
     private final static String PANORAMA_THREAT_MESSAGE = "<14>1 2018-09-19T11:50:33-05:00 Panorama--1 - - - - 1,2018/09/19 11:50:33,007255000045716,THREAT,spyware,2049,2018/09/19 11:50:33,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,ssl,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:33,201360,1,21131,443,56756,443,0x80403000,tcp,alert,\"test.com/\",Suspicious TLS Evasion Found(14978),online_test.com,informational,client-to-server,1007133,0xa000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,,1204440535977427988,,,0,,,,,,,,0,13,16,0,0,,Prod--1,,,,,0,,0,,N/A,spyware,AppThreat-8065-5006,0x0,0,4294967295";
+    private final static String PANORAMA_WITH_LINE_BREAK = "<14>1 2018-09-19T11:50:35-05:00 Panorama-1 - - - - 1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\\\"Deviating device: Prod--2, Serial: 007255000045717, Object: N/A, Metric: mp-cpu, Value: 34\\\",1163103,0x0,0,0,0,0,,Panorama-1\n";
 
     // Raw PAN device messages.
     // These help to test the various combinations that we might see.
@@ -51,6 +51,7 @@ public class PaloAltoCodecTest {
     private final static String SYSLOG_THREAT_MESSAGE_DOUBLE_SPACE_DATE = "<14>Aug  2 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22 11:21:04,013201001141,THREAT,vulnerability,0,2018/08/22 11:21:02,10.0.190.116,10.0.2.225,0.0.0.0,0.0.0.0,DMZ-to-LAN_hq-direct-access,dart\\abluitt,dart\\kmendoza_admin,msrpc,vsys1,DMZ-2_L3,LAN_L3,ethernet1/3,ethernet1/6,Panorama,2018/08/22 11:21:02,398906,1,26475,135,0,0,0x2000,tcp,alert,\"\",Microsoft RPC Endpoint Mapper Detection(30845),any,informational,client-to-server,6585310726021616818,0x8000000000000000,10.0.0.0-10.255.255.255,10.0.0.0-10.255.255.255,0,,0,,,0,,,,,,,,0,346,12,0,0,,pa5220-hq-mdf-1,,,,,0,,0,,N/A,info-leak,AppThreat-8054-4933,0x0";
     private final static String SYSLOG_THREAT_MESSAGE_NO_HOST = "<14>Apr  8 01:47:32 1,2012/04/08 01:47:32,001606001116,THREAT,file,1,2012/04/08 01:47:27,217.31.49.10,192.168.0.2,0.0.0.0,0.0.0.0,rule1,,tng\\crusher,web-browsing,vsys1,untrust,trust,ethernet1/2,ethernet1/1,forwardAll,2012/04/08 01:47:32,1628,1,80,51060,0,0,0x200000,tcp,block-continue,\"imer.up\",Windows Executable (EXE)(52020),any,low,server-to-client,0,0x0,Czech Republic,192.168.0.0-192.168.255.255,0,";
     private final static String SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE = "<14>Apr  8 01:47:32 1,2012/04/08 01:47:32,001606001116,THREAT,file,1,2012/04/08 01:47:27,217.31.49.10,192.168.0.2,0.0.0.0,0.0.0.0,rule1,,tng\\crusher,web-browsing,vsys1,untrust,trust,ethernet1/2,ethernet1/1,forwardAll,2012/04/08 01:47:32,1628,1,80,51060,0,0,0x200000,tcp,block-continue,\"imer.up\",Windows Executable (EXE)(52020),any,low,server-to-client,0,0x0,Czech Republic,192.168.0.0-192.168.255.255,0,";
+    private final static String SYSLOG_WITH_LINE_BREAK = "<14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22 11:21:04,013201001141,THREAT,vulnerability,0,2018/08/22 11:21:02,10.0.190.116,10.0.2.225,0.0.0.0,0.0.0.0,DMZ-to-LAN_hq-direct-access,dart\\abluitt,dart\\kmendoza_admin,msrpc,vsys1,DMZ-2_L3,LAN_L3,ethernet1/3,ethernet1/6,Panorama,2018/08/22 11:21:02,398906,1,26475,135,0,0,0x2000,tcp,alert,\"\",Microsoft RPC Endpoint Mapper Detection(30845),any,informational,client-to-server,6585310726021616818,0x8000000000000000,10.0.0.0-10.255.255.255,10.0.0.0-10.255.255.255,0,,0,,,0,,,,,,,,0,346,12,0,0,,pa5220-hq-mdf-1,,,,,0,,0,,N/A,info-leak,AppThreat-8054-4933,0x0\n";
 
     private final static String[] MORE_SYSLOG_THREAT_MESSAGES =
             {"<14>Aug  8 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22 11:21:04,013201001141,THREAT,vulnerability,0,2018/08/22 11:21:02,10.0.190.116,10.0.2.225,0.0.0.0,0.0.0.0,DMZ-to-LAN_hq-direct-access,dart\\abluitt,dart\\kmendoza_admin,msrpc,vsys1,DMZ-2_L3,LAN_L3,ethernet1/3,ethernet1/6,Panorama,2018/08/22 11:21:02,398906,1,26475,135,0,0,0x2000,tcp,alert,\"\",Microsoft RPC Endpoint Mapper Detection(30845),any,informational,client-to-server,6585310726021616818,0x8000000000000000,10.0.0.0-10.255.255.255,10.0.0.0-10.255.255.255,0,,0,,,0,,,,,,,,0,346,12,0,0,,pa5220-hq-mdf-1,,,,,0,,0,,N/A,info-leak,AppThreat-8054-4933,0x0",
@@ -83,6 +84,19 @@ public class PaloAltoCodecTest {
     }
 
     @Test
+    public void testMessageWithLineBreak() {
+
+        // Verify that a messages with a line break at the end does not break parsing.
+        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        Message message = codec.decode(new RawMessage(PANORAMA_WITH_LINE_BREAK.getBytes()));
+        assertEquals("SYSTEM", message.getField("type"));
+
+        codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        message = codec.decode(new RawMessage(SYSLOG_WITH_LINE_BREAK.getBytes()));
+        assertEquals("THREAT", message.getField("type"));
+    }
+
+    @Test
     public void testMoreSyslogFormats() {
 
         // Test an extra list of messages.
@@ -95,6 +109,7 @@ public class PaloAltoCodecTest {
 
     @Test
     public void syslogValuesTest() {
+
         // Test System message results
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
         Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes()));
