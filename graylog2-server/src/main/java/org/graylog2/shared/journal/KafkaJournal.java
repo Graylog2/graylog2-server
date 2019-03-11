@@ -172,7 +172,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final AtomicReference<ThrottleState> throttleState = new AtomicReference<>();
     private final AtomicInteger purgedSegmentsInLastRetention = new AtomicInteger();
 
-    private final int throttleThresholdPercentage;
+    private Integer throttleThresholdPercentage = null;
 
     @Inject
     public KafkaJournal(@Named("message_journal_dir") Path journalDirectory,
@@ -199,12 +199,17 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         Duration retentionAge,
                         long flushInterval,
                         Duration flushAge,
-                        int throttleThresholdPercentage,
+                        Integer throttleThresholdPercentage,
                         MetricRegistry metricRegistry,
                         ServerStatus serverStatus,
                         String metricPrefix) {
+
+        // Only check throttleThresholdPercentage range if non-null. A null value means throttling is disabled.
+        if (throttleThresholdPercentage != null) {
+            this.throttleThresholdPercentage = intRange(throttleThresholdPercentage, 0, 100);
+        }
+
         this.scheduler = scheduler;
-        this.throttleThresholdPercentage = intRange(throttleThresholdPercentage, 0, 100);
         this.serverStatus = serverStatus;
         this.maxSegmentSize = segmentSize.toBytes();
         // Max message size should not be bigger than max segment size.
@@ -942,7 +947,11 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 LOG.warn("Journal utilization ({}%) has gone over {}%.", utilizationPercentage,
                         KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);
             }
-            updateLoadBalancerStatus(utilizationPercentage);
+
+            // Don't update the load balancer state if throttling is disabled.
+            if (throttleThresholdPercentage != null) {
+                updateLoadBalancerStatus(utilizationPercentage);
+            }
 
             if (retentionSize < 0 || currentSize < retentionSize) {
                 KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
