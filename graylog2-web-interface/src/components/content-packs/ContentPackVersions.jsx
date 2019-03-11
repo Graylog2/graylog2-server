@@ -73,8 +73,8 @@ class ContentPackVersions extends React.Component {
         <Modal.Footer>
           <div className="pull-right">
             <ButtonToolbar>
+              <Button onClick={closeModal}>Cancel</Button>
               <Button bsStyle="primary" onClick={onInstall}>Install</Button>
-              <Button onClick={closeModal}>Close</Button>
             </ButtonToolbar>
           </div>
         </Modal.Footer>
