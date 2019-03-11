@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 import { Popover } from 'react-bootstrap';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
 import CustomPropTypes from '../CustomPropTypes';
+
+import styles from './ConfigurableElement.css';
 
 export default class ConfigurableElement extends React.Component {
   static propTypes = {
@@ -53,9 +54,9 @@ export default class ConfigurableElement extends React.Component {
     );
     return (
       <span onMouseDown={this._stopEvent} onKeyDown={this._stopEvent}>
-        <Select.Value ref={(elem) => { this.target = elem; }} {...this.props} onClick={this._onClick}>
+        <span ref={(elem) => { this.target = elem; }} onClick={this._onClick} className={styles.labelAsLink}>
           {this.props.children}
-        </Select.Value>
+        </span>
         {popover}
       </span>
     );

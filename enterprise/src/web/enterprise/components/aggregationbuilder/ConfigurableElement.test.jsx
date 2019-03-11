@@ -40,7 +40,7 @@ describe('ConfigurableElement', () => {
         42
       </ConfigurableElement>,
     );
-    const link = wrapper.find('a');
+    const link = wrapper.find('.labelAsLink');
     expect(link).toIncludeText('42');
   });
 
@@ -58,7 +58,7 @@ describe('ConfigurableElement', () => {
     expect(wrapper).not.toContain('Popover');
     expect(wrapper).not.toContainReact(<span>A configuration dialog</span>);
 
-    const link = wrapper.find('Value');
+    const link = wrapper.find('.labelAsLink');
     link.simulate('click');
 
     const popover = wrapper.find('Popover');
@@ -84,7 +84,7 @@ describe('ConfigurableElement', () => {
     expect(wrapper).not.toContain('Popover');
     expect(wrapper).not.toContainReact(<span>A configuration dialog</span>);
 
-    const link = wrapper.find('Value');
+    const link = wrapper.find('.labelAsLink');
     link.simulate('click');
 
     const configuration = wrapper.find('configuration');

@@ -2,8 +2,9 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
+import Series from 'enterprise/logic/aggregationbuilder/Series';
+
 import SeriesSelect from './SeriesSelect';
-import Series from '../../logic/aggregationbuilder/Series';
 
 jest.mock('enterprise/stores/AggregationFunctionsStore', () => ({ getInitialState: jest.fn(), listen: jest.fn() }));
 
@@ -17,8 +18,8 @@ describe('SeriesSelect', () => {
     const series = [Series.forFunction('count()'), Series.forFunction('avg(took_ms)')];
     const wrapper = mount(<SeriesSelect series={series} onChange={() => {}} />);
 
-    expect(wrapper.find('Value')).toHaveLength(2);
-    const values = wrapper.find('Value');
+    expect(wrapper.find('ConfigurableElement')).toHaveLength(2);
+    const values = wrapper.find('ConfigurableElement');
     expect(values.at(0)).toIncludeText('count()');
     expect(values.at(1)).toIncludeText('avg(took_ms)');
   });
@@ -26,22 +27,22 @@ describe('SeriesSelect', () => {
   it('opens menu when focussed, returning no results without suggester', () => {
     const wrapper = mount(<SeriesSelect series={[]} onChange={() => {}} />);
     const input = wrapper.find('input');
-    expect(wrapper).not.toIncludeText('No results found');
+    expect(wrapper).not.toIncludeText('0 results available.');
 
     input.simulate('focus');
 
-    expect(wrapper).toIncludeText('No results found');
+    expect(wrapper).toIncludeText('0 results available.');
   });
 
   it('opens menu when focussed, returning no results for empty suggester defaults', () => {
     const suggester = { defaults: [] };
     const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => {}} />);
     const input = wrapper.find('input');
-    expect(wrapper).not.toIncludeText('No results found');
+    expect(wrapper).not.toIncludeText('0 results available.');
 
     input.simulate('focus');
 
-    expect(wrapper).toIncludeText('No results found');
+    expect(wrapper).toIncludeText('0 results available.');
   });
 
   it('opens menu when focussed, returning suggester defaults', () => {
@@ -53,9 +54,8 @@ describe('SeriesSelect', () => {
 
     input.simulate('focus');
 
-    expect(wrapper).not.toIncludeText('No results found');
-    expect(wrapper).toIncludeText('Something');
-    expect(wrapper).toIncludeText('Anything');
+    expect(wrapper).not.toIncludeText('0 results available.');
+    expect(wrapper).toIncludeText('2 results available.');
   });
 
   it('shows next suggestions when selecting incomplete suggestion', () => {
@@ -71,7 +71,7 @@ describe('SeriesSelect', () => {
     const input = wrapper.find('input');
     input.simulate('focus');
 
-    const select = wrapper.find('Select');
+    const select = wrapper.find('Select').at(0);
     select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true }]);
 
     expect(suggester.for).toHaveBeenCalledTimes(1);
@@ -86,7 +86,7 @@ describe('SeriesSelect', () => {
 
     expect(onChange).not.toHaveBeenCalled();
 
-    const select = wrapper.find('Select');
+    const select = wrapper.find('Select').at(0);
     select.prop('onChange')([{ label: 'func1(foo)', value: 'func1(foo)' }]);
 
     expect(onChange).toHaveBeenCalled();

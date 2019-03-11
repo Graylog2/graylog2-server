@@ -5,16 +5,11 @@ exports[`ConfigurableElement renders something for minimal props 1`] = `
   onKeyDown={[Function]}
   onMouseDown={[Function]}
 >
-  <div
-    className="Select-value"
+  <span
+    className="labelAsLink"
+    onClick={[Function]}
   >
-    <a
-      className="Select-value-label"
-      onMouseDown={[Function]}
-      onTouchEnd={[Function]}
-    >
-      Hello World!
-    </a>
-  </div>
+    Hello World!
+  </span>
 </span>
 `;

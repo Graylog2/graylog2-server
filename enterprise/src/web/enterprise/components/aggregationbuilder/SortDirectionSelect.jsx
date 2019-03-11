@@ -1,21 +1,28 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
-import Direction from '../../logic/aggregationbuilder/Direction';
 
-const SortDirectionSelect = ({ direction, disabled, onChange }) => (
+import Direction from 'enterprise/logic/aggregationbuilder/Direction';
+
+type Props = {
+  direction: string,
+  disabled: boolean,
+  onChange: (Direction) => any,
+};
+
+const SortDirectionSelect = ({ direction, disabled, onChange }: Props): Select => (
   <Select
-    disabled={disabled}
+    isDisabled={disabled}
+    isClearable={false}
+    isSearchable={false}
     options={[
       { label: 'Ascending', value: 'Ascending' },
       { label: 'Descending', value: 'Descending' },
     ]}
-    onChange={newValue => onChange(Direction.fromString(newValue))}
-    placeholder="None: Click to select sort direction"
-    simpleValue
-    value={direction}
-    clearable={false}
-    searchable={false}
+    onChange={({ value }) => onChange(Direction.fromString(value))}
+    placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
+    value={direction && { label: direction, value: direction }}
   />
 );
 

@@ -2,7 +2,8 @@
 import * as React from 'react';
 import { Button, FormGroup, HelpBlock, Modal, Radio } from 'react-bootstrap';
 import { get } from 'lodash';
-import Select from 'react-select';
+
+import Select from 'enterprise/components/Select';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import Spinner from 'components/common/Spinner';
@@ -39,7 +40,7 @@ type User = {
 };
 
 type State = {
-  viewSharing: ViewSharing,
+  viewSharing: ViewSharing | null,
   loaded: boolean,
   users?: Array<UserShortSummary>,
   roles?: Array<string>,
@@ -116,7 +117,9 @@ class ShareViewModal extends React.Component<Props, State> {
     const userOptions = users ? users
       // eslint-disable-next-line camelcase
       .map(({ username, fullname }) => ({ value: username, label: fullname })) : null;
+    const userValue = get(viewSharing, 'users', []).map(user => (userOptions || []).find(option => option.value === user));
     const rolesOptions = roles ? roles.map(rolename => ({ value: rolename, label: rolename })) : null;
+    const rolesValue = get(viewSharing, 'roles', []).map(role => ({ label: role, value: role }));
     const content = !loaded ? <Spinner /> : (
       <FormGroup style={formStyle}>
         <Radio name={AllUsersOfInstance.Type} checked={type === AllUsersOfInstance.Type} onChange={this._onChange}>
@@ -130,9 +133,9 @@ class ShareViewModal extends React.Component<Props, State> {
           Specific roles:{' '}
         </Radio>{' '}
         <Additional>
-          <Select multi
-                  disabled={type !== SpecificRoles.Type}
-                  value={get(viewSharing, 'roles', [])}
+          <Select isMulti
+                  isDisabled={type !== SpecificRoles.Type}
+                  value={rolesValue}
                   placeholder="Select roles"
                   onChange={this._onRolesChange}
                   options={rolesOptions} />
@@ -143,12 +146,12 @@ class ShareViewModal extends React.Component<Props, State> {
           Specific users:
         </Radio>
         <Additional>
-          <Select multi
-                  disabled={type !== SpecificUsers.Type}
-                  value={get(viewSharing, 'users', [])}
+          <Select isMulti
+                  isDisabled={type !== SpecificUsers.Type}
+                  value={userValue}
                   placeholder="Select users"
                   onChange={this._onUsersChange}
-                  options={userOptions} />
+                  options={userOptions || []} />
           <HelpBlock>Only these users can access the view.</HelpBlock>
         </Additional>
 

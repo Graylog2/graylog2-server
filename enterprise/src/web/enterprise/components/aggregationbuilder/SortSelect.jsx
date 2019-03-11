@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import * as Immutable from 'immutable';
@@ -8,6 +9,7 @@ import Series from 'enterprise/logic/aggregationbuilder/Series';
 import { defaultCompare } from 'enterprise/logic/DefaultCompare';
 import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
 import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
+import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
 
 const mapFields = fields => fields.sort(defaultCompare)
   .map((v, idx) => ({ label: v.label, value: idx }));
@@ -18,14 +20,32 @@ const findIdxInFields = (fields, sort) => Immutable.List(fields)
 
 const mapNewValue = (fields, idx) => (fields[idx] ? [fields[idx].value] : []);
 
-const SortSelect = ({ pivots, series, onChange, sort }) => {
+type Props = {
+  pivots: Array<Pivot>,
+  series: Array<Series>,
+  onChange: (Array<*>) => any,
+  sort: Array<SortConfig>,
+};
+
+const currentValue = (sort, fields) => {
+  const currentIdx = sort && findIdxInFields(fields, sort[0]);
+  if (currentIdx === undefined) {
+    return undefined;
+  }
+  return fields[currentIdx];
+};
+
+const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
   const pivotOptions = pivots.map(pivot => ({ label: pivot.field, value: PivotSortConfig.fromPivot(pivot) }));
   const seriesOptions = series.map(s => ({ label: s.effectiveName, value: SeriesSortConfig.fromSeries(s) }));
   const fields = [].concat(pivotOptions, seriesOptions);
-  const value = sort && findIdxInFields(fields, sort[0]);
   const options = mapFields(fields);
-  const _onChange = (newValue) => {
-    const mappedValue = mapNewValue(fields, newValue);
+  const _onChange = (newValue, reason) => {
+    if (reason.action === 'clear') {
+      return onChange([]);
+    }
+    const { value } = newValue;
+    const mappedValue = mapNewValue(fields, value);
     return onChange(mappedValue);
   };
   return (
@@ -33,8 +53,8 @@ const SortSelect = ({ pivots, series, onChange, sort }) => {
       placeholder="None: click to add fields"
       onChange={_onChange}
       options={options}
-      simpleValue
-      value={value}
+      isClearable
+      value={currentValue(sort, fields)}
     />
   );
 };
@@ -43,7 +63,7 @@ SortSelect.propTypes = {
   pivots: PropTypes.arrayOf(Pivot).isRequired,
   series: PropTypes.arrayOf(Series).isRequired,
   onChange: PropTypes.func.isRequired,
-  sort: PropTypes.arrayOf(PropTypes.string).isRequired,
+  sort: PropTypes.arrayOf(PropTypes.instanceOf(SortConfig)).isRequired,
 };
 
 export default SortSelect;

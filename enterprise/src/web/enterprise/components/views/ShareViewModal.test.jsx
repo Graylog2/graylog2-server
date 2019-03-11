@@ -69,7 +69,7 @@ describe('ShareViewModal', () => {
     const wrapper = mount(<ShareViewModal show view={view} currentUser={currentUser} onClose={onClose} />);
     setImmediate(() => {
       wrapper.update();
-      expect(wrapper.find('input')).toHaveLength(4);
+      expect(wrapper.find('input[type="radio"]')).toHaveLength(4);
       done();
     });
   });
