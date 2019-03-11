@@ -150,8 +150,11 @@ class QueryInput extends Component<Props, State> {
   };
 
   _onExecute = (editor: Editor) => {
-    editor.completer.popup.hide();
-    this.props.onChange(this.state.value).then(this.props.onExecute);
+    const { onChange, onExecute } = this.props;
+    if (editor.completer && editor.completer.popup) {
+      editor.completer.popup.hide();
+    }
+    onChange(this.state.value).then(onExecute);
   };
 
   render() {

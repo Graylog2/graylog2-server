@@ -37,4 +37,15 @@ describe('QueryInput', () => {
     const updatedReactAce = wrapper.find('ReactAce');
     expect(updatedReactAce).toHaveProp('value', 'updated');
   });
+  it('does not try to close popup if it does not exist while executing query', (done) => {
+    const onExecute = jest.fn();
+    const wrapper = mount(<QueryInput value="*" onChange={s => Promise.resolve(s)} onExecute={onExecute} completerClass={Completer} />);
+
+    wrapper.instance()._onExecute({});
+
+    setImmediate(() => {
+      expect(onExecute).toHaveBeenCalledWith('*');
+      done();
+    });
+  });
 });
