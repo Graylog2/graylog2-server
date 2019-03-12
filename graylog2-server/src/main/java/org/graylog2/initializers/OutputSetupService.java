@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,12 @@ public class OutputSetupService extends AbstractIdleService {
 
     private void shutDownRunningOutputs() {
         for (MessageOutput output : outputRegistry.getMessageOutputs()) {
+
+            // Do not execute the stop() method for Outputs that implement the GracefulShutdown mechanism.
+            if (output instanceof GracefulShutdownHook) {
+                continue;
+            }
+
             try {
                 // TODO: change to debug
                 LOG.info("Stopping output {}", output.getClass().getName());
