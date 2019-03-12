@@ -106,6 +106,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     public static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
     public static final int NOTIFY_ON_UTILIZATION_PERCENTAGE = 95;
+    public static final int THRESHOLD_THROTTLING_DISABLED = -1;
 
     // Metric names, which should be used twice (once in metric startup and once in metric teardown).
     private static final String METER_WRITTEN_MESSAGES = "writtenMessages";
@@ -172,7 +173,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final AtomicReference<ThrottleState> throttleState = new AtomicReference<>();
     private final AtomicInteger purgedSegmentsInLastRetention = new AtomicInteger();
 
-    private Integer throttleThresholdPercentage = null;
+    private final int throttleThresholdPercentage;
 
     @Inject
     public KafkaJournal(@Named("message_journal_dir") Path journalDirectory,
@@ -191,6 +192,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
              throttleThresholdPercentage, metricRegistry, serverStatus, KafkaJournal.class.getName());
     }
 
+    /**
+     * @param throttleThresholdPercentage The journal utilization percent at which throttling will be triggered.
+     *                                    Expressed as an integer between 1 and 100. The value -1 disables throttling.
+     */
     public KafkaJournal(Path journalDirectory,
                         ScheduledExecutorService scheduler,
                         Size segmentSize,
@@ -199,13 +204,15 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         Duration retentionAge,
                         long flushInterval,
                         Duration flushAge,
-                        Integer throttleThresholdPercentage,
+                        int throttleThresholdPercentage,
                         MetricRegistry metricRegistry,
                         ServerStatus serverStatus,
                         String metricPrefix) {
 
-        // Only check throttleThresholdPercentage range if non-null. A null value means throttling is disabled.
-        if (throttleThresholdPercentage != null) {
+        // Only check throttleThresholdPercentage range if throttling is not disabled;
+        if (throttleThresholdPercentage == THRESHOLD_THROTTLING_DISABLED) {
+            this.throttleThresholdPercentage = throttleThresholdPercentage;
+        } else {
             this.throttleThresholdPercentage = intRange(throttleThresholdPercentage, 0, 100);
         }
 
@@ -949,7 +956,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             }
 
             // Don't update the load balancer state if throttling is disabled.
-            if (throttleThresholdPercentage != null) {
+            if (throttleThresholdPercentage != THRESHOLD_THROTTLING_DISABLED) {
                 updateLoadBalancerStatus(utilizationPercentage);
             }
 
