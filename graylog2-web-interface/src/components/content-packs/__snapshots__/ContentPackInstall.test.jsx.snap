@@ -2,85 +2,89 @@
 
 exports[`<ContentPackInstall /> should render a install 1`] = `
 <div>
-  <div
-    className="row"
+  <form
+    onSubmit={[Function]}
   >
     <div
-      className="col-sm-10 col-sm-offset-1"
+      className="row"
     >
-      <h2>
-        Install comment
-      </h2>
-      <br />
-      <br />
       <div
-        className="form-group"
+        className="col-sm-10 col-sm-offset-1"
       >
-        <label
-          className="col-sm-3 control-label"
-          htmlFor="comment"
-        >
-          Comment
-        </label>
+        <h2>
+          Install comment
+        </h2>
+        <br />
+        <br />
         <div
-          className="col-sm-7"
+          className="form-group"
         >
-          <input
-            className="form-control"
-            id="comment"
-            label="Comment"
-            maxLength={512}
-            name="comment"
-            onChange={[Function]}
-            placeholder=""
-            type="text"
-            value=""
-          />
-          
+          <label
+            className="col-sm-3 control-label"
+            htmlFor="comment"
+          >
+            Comment
+          </label>
+          <div
+            className="col-sm-7"
+          >
+            <input
+              className="form-control"
+              id="comment"
+              label="Comment"
+              maxLength={512}
+              name="comment"
+              onChange={[Function]}
+              placeholder=""
+              type="text"
+              value=""
+            />
+            
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div
-    className="row"
-  >
     <div
-      className="col-sm-10 col-sm-offset-1"
+      className="row"
     >
-      <h2>
-        Configure Parameter
-      </h2>
-      <br />
-      <br />
       <div
-        className="form-group"
+        className="col-sm-10 col-sm-offset-1"
       >
-        <label
-          className="col-sm-3 control-label"
-          htmlFor="PARAM"
-        >
-          A parameter
-        </label>
+        <h2>
+          Configure Parameter
+        </h2>
+        <br />
+        <br />
         <div
-          className="col-sm-7"
+          className="form-group"
         >
-          <input
-            className="form-control"
-            id="PARAM"
-            label="A parameter"
-            maxLength={250}
-            name="PARAM"
-            onChange={[Function]}
-            placeholder=""
-            required={true}
-            type="text"
-            value="parameter"
-          />
-          
+          <label
+            className="col-sm-3 control-label"
+            htmlFor="PARAM"
+          >
+            A parameter
+          </label>
+          <div
+            className="col-sm-7"
+          >
+            <input
+              className="form-control"
+              id="PARAM"
+              label="A parameter"
+              maxLength={250}
+              name="PARAM"
+              onChange={[Function]}
+              placeholder=""
+              required={true}
+              type="text"
+              value="parameter"
+            />
+            
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </form>
   <div
     className="row"
   >
@@ -228,5 +232,13 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
       </div>
     </div>
   </div>
+  <button
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+    type="submit"
+  />
 </div>
 `;

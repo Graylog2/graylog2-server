@@ -13,7 +13,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
         id="content-packs-versions"
       >
         <table
-          className="table undefined"
+          className="table "
         >
           <thead>
             <tr>

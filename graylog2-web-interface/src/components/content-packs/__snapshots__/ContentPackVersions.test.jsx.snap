@@ -13,7 +13,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
         id="content-packs-versions"
       >
         <table
-          className="table undefined"
+          className="table "
         >
           <thead>
             <tr>

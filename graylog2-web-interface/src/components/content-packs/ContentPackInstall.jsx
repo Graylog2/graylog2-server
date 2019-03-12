@@ -141,13 +141,13 @@ class ContentPackInstall extends React.Component {
             {parameterInput}
           </Col>
         </Row>
-        )}<Row>
-          <Col smOffset={1} sm={10}>
-            <ContentPackEntitiesList contentPack={contentPack} readOnly />
-          </Col>
-        </Row>
-        <button style={{ display: 'none' }} type="submit" />
-      </form>
+      )}</form>
+      <Row>
+        <Col smOffset={1} sm={10}>
+          <ContentPackEntitiesList contentPack={contentPack} readOnly />
+        </Col>
+      </Row>
+      <button style={{ display: 'none' }} type="submit" />
       </div>
     );
   }
