@@ -61,6 +61,9 @@ class DataTable extends React.Component {
   };
 
   static defaultProps = {
+    children: [],
+    className: '',
+    filterBy: '',
     filterSuggestions: [],
     filterLabel: 'Filter',
     displayKey: 'value',
@@ -91,7 +94,7 @@ class DataTable extends React.Component {
     let i = 0;
     const formattedHeaders = this.state.headers.map((header) => {
       const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={this.props.headerCellFormatter} />;
-      i++;
+      i += 1;
       return el;
     });
 
@@ -112,7 +115,7 @@ class DataTable extends React.Component {
     }
     const formattedDataRows = sortedDataRows.map((row) => {
       const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={this.props.dataRowFormatter} />;
-      i++;
+      i += 1;
       return el;
     });
 

@@ -125,7 +125,7 @@ class Wizard extends React.Component {
 
   render() {
     const rightComponentCols = this.props.horizontal ? 5 : 3; // If horizontal, use more space for this component
-    const middleComponentCols = this.props.children || this.props.horizontal ? 7 : 9
+    const middleComponentCols = this.props.children || this.props.horizontal ? 7 : 9;
     return (
       <Row className={this.props.containerClassName}>
         {this.props.horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}

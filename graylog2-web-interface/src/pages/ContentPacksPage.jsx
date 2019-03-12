@@ -23,6 +23,7 @@ const ContentPacksPage = createReactClass({
   },
 
   _deleteContentPack(contentPackId) {
+    /* eslint-disable-next-line no-alert */
     if (window.confirm('You are about to delete this content pack, are you sure?')) {
       ContentPacksActions.delete(contentPackId).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
