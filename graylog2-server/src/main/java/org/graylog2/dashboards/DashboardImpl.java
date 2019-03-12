@@ -91,10 +91,10 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         final List<WidgetPosition> result = new ArrayList<>(positions.size());
         for ( String positionId : positions.keySet() ) {
             final BasicDBObject position = (BasicDBObject) positions.get(positionId);
-            final int width = parseInt(position.get("width").toString());
-            final int height = parseInt(position.get("height").toString());
-            final int col = parseInt(position.get("col").toString());
-            final int row = parseInt(position.get("row").toString());
+            final int width = parseInt(position.getString("width", "1"));
+            final int height = parseInt(position.getString("height", "1"));
+            final int col = parseInt(position.getString("col", "1"));
+            final int row = parseInt(position.getString("row","1"));
             final WidgetPosition widgetPosition = WidgetPosition.builder()
                     .id(positionId)
                     .width(width)
@@ -112,7 +112,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         checkNotNull(widgetPositions, "widgetPositions must be given");
         final Map<String, Map<String, Integer>> positions = new HashMap<>(widgetPositions.size());
         for (WidgetPosition widgetPosition : widgetPositions) {
-            Map<String, Integer> position = new HashMap(4);
+            Map<String, Integer> position = new HashMap<>(4);
             position.put("width", widgetPosition.width());
             position.put("height", widgetPosition.height());
             position.put("col", widgetPosition.col());
