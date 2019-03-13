@@ -38,16 +38,18 @@ public class MessageOutputFactoryTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs;
+    private final Map<String, MessageOutput.Factory2<? extends MessageOutput>> availableOutputs2;
 
     private MessageOutputFactory messageOutputFactory;
 
     public MessageOutputFactoryTest() {
         this.availableOutputs = Maps.newHashMap();
+        this.availableOutputs2 = Maps.newHashMap();
     }
 
     @Before
     public void setUp() throws Exception {
-        this.messageOutputFactory = new MessageOutputFactory(availableOutputs);
+        this.messageOutputFactory = new MessageOutputFactory(availableOutputs, availableOutputs2);
     }
 
     @Test(expected = IllegalArgumentException.class)
