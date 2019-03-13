@@ -116,6 +116,10 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule());
         install(new FieldTypesModule());
+
+        // Just to create the binders so they are present in the injector. Prevents a server startup error when no
+        // outputs are bound that implement MessageOutput.Factory2.
+        outputsMapBinder2();
     }
 
     private void bindProviders() {
