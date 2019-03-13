@@ -89,18 +89,20 @@ public class OutputFacadeTest {
     private OutputService outputService;
     private OutputFacade facade;
     private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
+    private Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2;
 
     @Before
     public void setUp() throws Exception {
         outputService = new OutputServiceImpl(mongoRule.getMongoConnection(), new MongoJackObjectMapperProvider(objectMapper), streamService, outputRegistry);
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
+        outputFactories2 = new HashMap<>();
         final LoggingOutput.Factory factory = mock(LoggingOutput.Factory.class);
         final LoggingOutput.Descriptor descriptor = mock(LoggingOutput.Descriptor.class);
         when(factory.getDescriptor()).thenReturn(descriptor);
         outputFactories.put("org.graylog2.outputs.LoggingOutput", factory);
 
-        facade = new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories);
+        facade = new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2);
     }
 
     @Test

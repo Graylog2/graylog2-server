@@ -241,6 +241,8 @@ public abstract class Graylog2Module extends AbstractModule {
         installInput(inputMapBinder, target, factoryClass);
     }
 
+    // This should only be used by plugins that have been built before Graylog 3.0.1.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputsMapBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
@@ -248,9 +250,29 @@ public abstract class Graylog2Module extends AbstractModule {
                 });
     }
 
+    // This should only be used by plugins that have been built before Graylog 3.0.1.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected <T extends MessageOutput> void installOutput(MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder,
                                                            Class<T> target,
                                                            Class<? extends MessageOutput.Factory<T>> targetFactory) {
+        install(new FactoryModuleBuilder().implement(MessageOutput.class, target).build(targetFactory));
+        outputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
+    }
+
+    // This should be used by plugins that have been built for 3.0.1 or later.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
+    protected MapBinder<String, MessageOutput.Factory2<? extends MessageOutput>> outputsMapBinder2() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<MessageOutput.Factory2<? extends MessageOutput>>() {
+                });
+    }
+
+    // This should be used by plugins that have been built for 3.0.1 or later.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
+    protected <T extends MessageOutput> void installOutput2(MapBinder<String, MessageOutput.Factory2<? extends MessageOutput>> outputMapBinder,
+                                                           Class<T> target,
+                                                           Class<? extends MessageOutput.Factory2<T>> targetFactory) {
         install(new FactoryModuleBuilder().implement(MessageOutput.class, target).build(targetFactory));
         outputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }

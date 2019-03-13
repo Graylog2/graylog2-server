@@ -97,6 +97,7 @@ public class ContentPackServiceTest {
     private ContentPackService contentPackService;
     private Set<PluginMetaData> pluginMetaData;
     private Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
+    private Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2;
 
     private ContentPackV1 contentPack;
     private ContentPackInstallation contentPackInstallation;
@@ -110,10 +111,11 @@ public class ContentPackServiceTest {
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         pluginMetaData = new HashSet<>();
         outputFactories = new HashMap<>();
+        outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityFacade<?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
                 ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, new HashSet<>(), indexSetService),
-                ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories)
+                ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2)
         );
 
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
