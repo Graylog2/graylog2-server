@@ -52,7 +52,7 @@
     "classnames": "^2.2.0",
     "clipboard": "^2.0.0",
     "crossfilter": "1.3.x",
-    "d3": "3.5.17",
+    "d3": "5.9.1",
     "dc": "2.0.5",
     "deep-equal": "^1.0.1",
     "font-awesome": "^4.7.0",
