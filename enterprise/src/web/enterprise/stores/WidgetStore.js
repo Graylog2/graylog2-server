@@ -47,8 +47,8 @@ export const WidgetStore = Reflux.createStore({
       throw new Error('Unable to add widget without id to query.');
     }
     const newWidgets = this.widgets.set(widget.id, widget);
-    this._updateWidgets(newWidgets);
-    WidgetActions.create.promise(Promise.resolve(widget));
+    const promise = this._updateWidgets(newWidgets).then(() => widget);
+    WidgetActions.create.promise(promise);
     return widget;
   },
   duplicate(widgetId) {

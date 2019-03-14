@@ -53,12 +53,15 @@ export const CurrentViewStateStore = Reflux.createStore({
 
   fields(newFields) {
     const newActiveState = this._activeState().toBuilder().fields(newFields).build();
-    ViewStatesActions.update(this.activeQuery, newActiveState);
+    const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+    CurrentViewStateActions.fields.promise(promise);
+
   },
 
   titles(newTitles) {
     const newActiveState = this._activeState().toBuilder().titles(newTitles).build();
-    ViewStatesActions.update(this.activeQuery, newActiveState);
+    const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+    CurrentViewStateActions.titles.promise(promise);
   },
 
   widgets(newWidgets) {
@@ -86,7 +89,8 @@ export const CurrentViewStateStore = Reflux.createStore({
 
   widgetPositions(newPositions) {
     const newActiveState = this._activeState().toBuilder().widgetPositions(newPositions).build();
-    ViewStatesActions.update(this.activeQuery, newActiveState);
+    const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+    CurrentViewStateActions.widgetPositions.promise(promise);
   },
 
   _activeState() {

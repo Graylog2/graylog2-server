@@ -4,9 +4,9 @@ import { get, isEqual } from 'lodash';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
-export const TitlesActions = Reflux.createActions([
-  'set',
-]);
+export const TitlesActions = Reflux.createActions({
+  set: { asyncResult: true },
+});
 
 export const TitleTypes = {
   Tab: 'tab',
@@ -34,8 +34,10 @@ export const TitlesStore = Reflux.createStore({
 
   set(type, id, title) {
     this.titles = this.titles.setIn([type, id], title);
-    CurrentViewStateActions.titles(this.titles);
+    const promise = CurrentViewStateActions.titles(this.titles);
     this._trigger();
+    TitlesActions.set.promise(promise);
+    return promise;
   },
 
   _trigger() {
