@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual } from 'lodash';
 import { Button } from 'react-bootstrap';
+import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
@@ -77,12 +78,12 @@ const FieldList = createReactClass({
     this.setState({ maxFieldsHeight: Math.max(isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   },
 
-  _renderField({ fields, fieldType, selectedQuery, selectedView }) {
+  _renderField({ fields, fieldType, selectedQuery, selectedView, style }) {
     const { name, type } = fieldType;
     const disabled = !fields.find(f => f.name === name);
 
     return (
-      <li key={`field-${name}`} className={styles.fieldListItem} >
+      <li key={`field-${name}`} className={styles.fieldListItem} style={style} >
         <FieldTypeIcon type={type} />
         {' '}
         <Field queryId={selectedQuery}
@@ -119,18 +120,20 @@ const FieldList = createReactClass({
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
       .filter(filter)
-      .sortBy(field => field.name.toLocaleUpperCase())
-      .map(fieldType => this._renderField({ fieldType, selectedQuery, selectedView, fields }));
+      .sortBy(field => field.name.toLocaleUpperCase());
 
     if (fieldList.isEmpty()) {
       return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
     }
+    const Row = ({ index, style }) => this._renderField({ fieldType: fieldList.get(index), selectedQuery, selectedView, fields, style });
     return (
-      <ul ref={(elem) => { this.fieldList = elem; }}
-          style={{ maxHeight: this.state.maxFieldsHeight }}
-          className={styles.fieldList}>
-        {fieldList}
-      </ul>
+      <div ref={(elem) => { this.fieldList = elem; }}>
+        <List height={this.state.maxFieldsHeight || 0}
+              itemCount={fieldList.size}
+              itemSize={17}>
+          {Row}
+        </List>
+      </div>
     );
   },
   handleSearch(e) {

@@ -5,6 +5,7 @@
 
 :local(.fieldListItem) {
     font-size: 12px;
+    display: table-row;
 }
 
 :local(.filterContainer) {
