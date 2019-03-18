@@ -420,11 +420,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     </dt>
                      
                     <dd>
-                      <a
-                        href=""
-                      >
-                        
-                      </a>
+                      
                        
                     </dd>
                     <span>
@@ -948,11 +944,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     </dt>
                      
                     <dd>
-                      <a
-                        href="http://beinstein.com"
-                      >
-                        http://beinstein.com
-                      </a>
+                      http://beinstein.com
                        
                     </dd>
                     <span>
