@@ -1,14 +1,14 @@
 // @flow strict
 import { SelectedFieldsActions, SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { ActionContext, WidgetContext } from 'enterprise/logic/ActionContext';
+import type { ActionContexts } from 'enterprise/logic/ActionContext';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 import type { FieldActionHandlerCondition, FieldActionHandlerWithContext } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 
-const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContext) => {
-  if (context instanceof WidgetContext) {
+const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
+  if (context.widget) {
     const { widget } = context;
     const newFields = widget.config.fields.filter(f => (f !== field));
     const newConfig = widget.config.toBuilder()
@@ -20,8 +20,8 @@ const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: st
   }
 };
 
-const condition: FieldActionHandlerCondition = ({ context, name }: { context: ActionContext, name: string }) => {
-  if (context instanceof WidgetContext) {
+const condition: FieldActionHandlerCondition = ({ context, name }: { context: ActionContexts, name: string }) => {
+  if (context.widget) {
     const { widget } = context;
     if (widget instanceof MessagesWidget && widget.config instanceof MessagesWidgetConfig) {
       const fields = widget.config.fields || [];

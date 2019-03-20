@@ -12,6 +12,10 @@ const CurrentView = PropTypes.shape({
   activeQuery: PropTypes.string.isRequired,
 });
 
+export type CurrentViewType = {
+  activeQuery: string,
+};
+
 const ValidElements = PropTypes.oneOfType([
   PropTypes.element,
   PropTypes.func,

@@ -1,4 +1,3 @@
-import { WidgetContext } from '../ActionContext';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import RemoveFromTableActionHandler from './RemoveFromTableActionHandler';
 import MessagesWidget from '../widgets/MessagesWidget';
@@ -9,7 +8,7 @@ describe('RemoveFromTableActionHandler.condition', () => {
     const widget = MessagesWidget.builder()
       .config(MessagesWidgetConfig.builder().fields(['foo']).build())
       .build();
-    const context = new WidgetContext(widget);
+    const context = { widget };
 
     const result = RemoveFromTableActionHandler.condition({ context, name: 'foo' });
     expect(result).toEqual(true);
@@ -18,14 +17,14 @@ describe('RemoveFromTableActionHandler.condition', () => {
     const widget = MessagesWidget.builder()
       .config(MessagesWidgetConfig.builder().build())
       .build();
-    const context = new WidgetContext(widget);
+    const context = { widget };
 
     const result = RemoveFromTableActionHandler.condition({ context, name: 'foo' });
     expect(result).toEqual(false);
   });
   it('checks properly for non message tables', () => {
     const widget = AggregationWidget.builder().build();
-    const context = new WidgetContext(widget);
+    const context = { widget };
 
     const result = RemoveFromTableActionHandler.condition({ context, name: 'foo' });
     expect(result).toEqual(false);

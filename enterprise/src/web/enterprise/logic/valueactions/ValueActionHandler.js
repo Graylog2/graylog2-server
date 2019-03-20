@@ -1,6 +1,7 @@
 // @flow strict
-import { ActionContext } from '../ActionContext';
+import type { ActionContexts } from '../ActionContext';
 import FieldType from '../fieldtypes/FieldType';
 
+export type ValuePath = Array<{[string]: any}>;
 export type ValueActionHandler = (string, string, any, FieldType) => Promise<*>;
-export type ValueActionHandlerWithContext = (string, string, any, FieldType, ActionContext) => Promise<*>;
+export type ValueActionHandlerWithContext = (string, string, any, FieldType, ActionContexts) => Promise<*>;

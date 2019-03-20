@@ -1,10 +1,11 @@
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { MenuItem } from 'react-bootstrap';
 import uuid from 'uuid/v4';
 
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import { ActionContext } from 'enterprise/logic/ActionContext';
 import OverlayDropdown from './OverlayDropdown';
 import style from './Value.css';
 import CustomPropTypes from './CustomPropTypes';
@@ -24,6 +25,8 @@ class ValueActions extends React.Component {
     menuContainer: document.body,
     type: FieldType.Unknown,
   };
+
+  static contextType = ActionContext;
 
   constructor(props, context) {
     super(props, context);
@@ -66,10 +69,10 @@ class ValueActions extends React.Component {
       const handler = this._createHandlerFor(valueAction);
       const onSelect = (event) => {
         this._onMenuToggle();
-        handler(queryId, event.field, event.value, type);
+        handler(queryId, event.field, event.value, type, this.context);
       };
       const condition = valueAction.condition || (() => true);
-      const actionDisabled = !condition({ field, type, value });
+      const actionDisabled = !condition({ field, type, value, context: this.context });
       return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
                         disabled={actionDisabled}
                         eventKey={{ field, value }}

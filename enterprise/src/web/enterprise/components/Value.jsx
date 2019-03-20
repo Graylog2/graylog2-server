@@ -1,13 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+// @flow strict
+import * as React from 'react';
 
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
-import CustomPropTypes from './CustomPropTypes';
 import ValueActions from './ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 
-const Value = ({ children, field, value, queryId, type }) => {
+type Props = {
+  children?: React.Node,
+  field: string,
+  value: *,
+  queryId: string,
+  type: FieldType,
+}
+
+const Value = ({ children, field, value, queryId, type = FieldType.Unknown }: Props) => {
   const caption = <TypeSpecificValue value={value} type={type} />;
   const element = children || caption;
 
@@ -16,21 +23,6 @@ const Value = ({ children, field, value, queryId, type }) => {
       {field} = <TypeSpecificValue value={value} type={type} truncate />
     </ValueActions>
   );
-};
-
-Value.propTypes = {
-  children: PropTypes.node,
-  field: PropTypes.string.isRequired,
-  queryId: PropTypes.string.isRequired,
-  type: CustomPropTypes.FieldType,
-  value: PropTypes.any.isRequired,
-};
-
-Value.defaultProps = {
-  children: null,
-  interactive: false,
-  type: FieldType.Unknown,
-  viewId: null,
 };
 
 export default Value;

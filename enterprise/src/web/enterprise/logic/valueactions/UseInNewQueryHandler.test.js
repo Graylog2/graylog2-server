@@ -2,13 +2,14 @@
 import { QueriesActions } from 'enterprise/actions/QueriesActions';
 import UseInNewQueryHandler from './UseInNewQueryHandler';
 import Query from '../queries/Query';
+import FieldType from '../fieldtypes/FieldType';
 
 jest.mock('enterprise/actions/QueriesActions', () => ({ QueriesActions: {} }));
 describe('UseInNewQueryHandler', () => {
   it('creates new query with generated query string', () => {
     QueriesActions.create = jest.fn(() => Promise.resolve());
 
-    const promise = UseInNewQueryHandler('queryId', 'foo', 'bar');
+    const promise = UseInNewQueryHandler('queryId', 'foo', 'bar', FieldType.Unknown, {});
 
     return promise.then(() => {
       expect(QueriesActions.create).toHaveBeenCalled();

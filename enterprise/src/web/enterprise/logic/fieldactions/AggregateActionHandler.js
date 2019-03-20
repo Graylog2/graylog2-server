@@ -5,13 +5,13 @@ import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWi
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import DataTable from 'enterprise/components/datatable/DataTable';
-import { ActionContext, WidgetContext } from '../ActionContext';
+import type { ActionContexts } from '../ActionContext';
 import FieldType from '../fieldtypes/FieldType';
 import type { FieldActionHandlerWithContext } from './FieldActionHandler';
 
-const AggregateActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContext) => {
+const AggregateActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
   let filter = null;
-  if (context instanceof WidgetContext) {
+  if (context.widget) {
     filter = context.widget.filter;
   }
   const newWidget = AggregationWidget.builder()

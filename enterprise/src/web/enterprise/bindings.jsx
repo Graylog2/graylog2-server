@@ -58,6 +58,7 @@ import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConf
 
 import * as Permissions from './Permissions';
 import UseInNewQueryHandler from './logic/valueactions/UseInNewQueryHandler';
+import ShowDocumentsHandler from './logic/valueactions/ShowDocumentsHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -183,6 +184,11 @@ export default {
       type: 'new-query',
       title: 'Use in new query',
       handler: UseInNewQueryHandler,
+    },
+    {
+      type: 'show-bucket',
+      title: 'Show documents for value',
+      handler: ShowDocumentsHandler,
     },
   ],
   visualizationTypes: [

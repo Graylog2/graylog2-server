@@ -1,3 +1,4 @@
+// @flow strict
 import { QueriesActions } from 'enterprise/actions/QueriesActions';
 import QueryGenerator from 'enterprise/logic/queries/QueryGenerator';
 import ViewStateGenerator from 'enterprise/logic/views/ViewStateGenerator';

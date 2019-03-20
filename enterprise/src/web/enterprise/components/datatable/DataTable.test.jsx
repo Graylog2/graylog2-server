@@ -1,10 +1,13 @@
+// @flow strict
 import React from 'react';
 import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
+// $FlowFixMe: imports from core need to be fixed in flow
 import 'helpers/mocking/react-dom_mock';
 
 describe('DataTable', () => {

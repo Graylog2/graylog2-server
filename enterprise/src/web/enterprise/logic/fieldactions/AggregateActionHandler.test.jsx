@@ -1,6 +1,5 @@
 // @flow strict
 import AggregateActionHandler from './AggregateActionHandler';
-import { ActionContext } from '../ActionContext';
 import FieldType from '../fieldtypes/FieldType';
 import { WidgetActions } from '../../stores/WidgetStore';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
@@ -13,7 +12,7 @@ jest.mock('enterprise/components/datatable/DataTable', () => ({ type: 'table' })
 describe('AggregateActionHandler', () => {
   it('uses field type when generating widget', () => {
     WidgetActions.create = jest.fn(() => Promise.resolve());
-    AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), new ActionContext());
+    AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), {});
 
     expect(WidgetActions.create).toHaveBeenCalled();
     const widget: AggregationWidget = WidgetActions.create.mock.calls[0][0];

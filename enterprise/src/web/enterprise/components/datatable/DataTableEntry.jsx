@@ -1,62 +1,66 @@
+// @flow strict
 import React from 'react';
-import PropTypes from 'prop-types';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import { flatten, get } from 'lodash';
 
-import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import Value from 'enterprise/components/Value';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import * as AggregationBuilderPropTypes from '../aggregationbuilder/AggregationBuilderPropTypes';
+import { AdditionalContext } from 'enterprise/logic/ActionContext';
+import type { ValuePath } from 'enterprise/logic/valueactions/ValueActionHandler';
+import Series from 'enterprise/logic/aggregationbuilder/Series';
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import type { CurrentViewType } from '../CustomPropTypes';
 
-const _c = (field, value) => ({ field, value });
+type Props = {
+  columnPivots: Array<string>,
+  columnPivotValues: Array<Array<string>>,
+  currentView: CurrentViewType,
+  fields: Immutable.Set<string>,
+  item: { [string]: * },
+  series: Array<Series>,
+  types: Immutable.List<FieldTypeMapping>,
+  valuePath: ValuePath,
+};
 
-class DataTableEntry extends React.Component {
-  static propTypes = {
-    columnPivots: PropTypes.arrayOf(PropTypes.string).isRequired,
-    columnPivotValues: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
-    currentView: CustomPropTypes.CurrentView.isRequired,
-    fields: PropTypes.instanceOf(Immutable.OrderedSet).isRequired,
-    item: PropTypes.object.isRequired,
-    series: AggregationBuilderPropTypes.SeriesList.isRequired,
-    types: CustomPropTypes.FieldListType.isRequired,
-  };
+const _c = (field, value, path) => ({ field, value, path });
 
-  _column = (field, value, selectedQuery, idx, type) => (
-    <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
+const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath) => (
+  <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
+    <AdditionalContext.Provider value={{ valuePath }}>
       <Value field={field} type={type} value={value} queryId={selectedQuery} />
-    </td>
+    </AdditionalContext.Provider>
+  </td>
+);
+
+const _fieldTypeFor = (field: string, types: Immutable.List<FieldTypeMapping>) => {
+  const fieldType = types.find(f => f.name === field);
+  return fieldType ? fieldType.type : FieldType.Unknown;
+};
+
+const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
+  const classes = 'message-group';
+  const { activeQuery } = currentView;
+
+  const fieldColumns = fields.toSeq().toJS().map((fieldName, i) => _c(fieldName, item[fieldName], valuePath.slice(0, i + 1)));
+  const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
+    const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
+    const [k, v] = translatedPath;
+    const parentValuePath = [...valuePath, { [k]: v }];
+    return series.map(({ effectiveName }) => {
+      const fullPath = [].concat(translatedPath, [effectiveName]);
+      const value = get(item, fullPath);
+      return _c(effectiveName, value, parentValuePath);
+    });
+  }));
+
+  const columns = flatten([fieldColumns, columnPivotFields]);
+  return (
+    <tbody className={classes}>
+      <tr className="fields-row">
+        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, _fieldTypeFor(field, types), path.slice()))}
+      </tr>
+    </tbody>
   );
-
-  _fieldTypeFor = (field) => {
-    const fieldType = this.props.types.find(f => f.name === field);
-    return fieldType ? fieldType.type : FieldType.Unknown;
-  };
-
-  render() {
-    const classes = 'message-group';
-    const item = this.props.item;
-    const { columnPivots, fields, series, columnPivotValues } = this.props;
-    const { activeQuery } = this.props.currentView;
-
-    const fieldColumns = fields.toSeq().map(fieldName => _c(fieldName, item[fieldName])).toJS();
-    const columnPivotFields = flatten(columnPivotValues.map((columnPivotValueKeys) => {
-      const translatedPath = flatten(columnPivotValueKeys.map((value, idx) => [columnPivots[idx], value]));
-      return series.map(({ effectiveName }) => {
-        const fullPath = [].concat(translatedPath, [effectiveName]);
-        const value = get(item, fullPath);
-        return _c(effectiveName, value);
-      });
-    }));
-
-    const columns = flatten([fieldColumns, columnPivotFields]);
-    return (
-      <tbody className={classes}>
-        <tr className="fields-row">
-          {columns.map(({ field, value }, idx) => this._column(field, value, activeQuery, idx, this._fieldTypeFor(field)))}
-        </tr>
-      </tbody>
-    );
-  }
-}
+};
 
 export default DataTableEntry;

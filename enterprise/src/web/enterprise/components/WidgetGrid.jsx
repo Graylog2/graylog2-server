@@ -6,16 +6,16 @@ import { Row } from 'react-bootstrap';
 import _ from 'lodash';
 
 import connect from 'stores/connect';
-import ActionContextProvider from 'enterprise/logic/providers/ActionContextProvider';
+import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { TitlesStore } from 'enterprise/stores/TitlesStore';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import { WidgetContext } from 'enterprise/logic/ActionContext';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
+import { TitleTypes } from '../stores/TitlesStore';
 
 const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -88,11 +88,11 @@ class WidgetGrid extends React.Component {
 
       const titles = this.props.titles || Immutable.Map();
 
-      const widgetTitle = titles.getIn(['widget', widget.id], WidgetGrid._defaultTitle(widget));
+      const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], WidgetGrid._defaultTitle(widget));
 
       returnedWidgets.widgets.push(
         <div key={widget.id} className={style.widgetContainer}>
-          <ActionContextProvider.Provider value={WidgetContext.create(widget)}>
+          <AdditionalContext.Provider value={{ widget }}>
             <Widget key={widgetId}
                     id={widgetId}
                     widget={widget}
@@ -106,7 +106,7 @@ class WidgetGrid extends React.Component {
                     onPositionsChange={onPositionsChange}
                     onSizeChange={this._onWidgetSizeChange}
                     title={widgetTitle} />
-          </ActionContextProvider.Provider>
+          </AdditionalContext.Provider>
         </div>,
       );
     });

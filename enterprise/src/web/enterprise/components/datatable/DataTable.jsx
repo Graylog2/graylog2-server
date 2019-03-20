@@ -115,10 +115,12 @@ class DataTable extends React.Component {
     const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
     const columnPivotFieldsHeaders = this._columnPivotHeaders(columnFieldNames, actualColumnPivotFields, series, offset);
     const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
+      const valuePath = rowFieldNames.map(pivotField => ({ [pivotField]: expandedRows[idx][pivotField] }));
       // eslint-disable-next-line react/no-array-index-key
       return (<DataTableEntry key={`datatableentry-${idx}`}
                               fields={fields}
                               item={reducedItem}
+                              valuePath={valuePath}
                               currentView={this.props.currentView}
                               columnPivots={columnFieldNames}
                               columnPivotValues={actualColumnPivotFields}
