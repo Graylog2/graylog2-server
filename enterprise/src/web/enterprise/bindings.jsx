@@ -34,7 +34,6 @@ import {
   ViewManagementPage,
 } from 'enterprise/pages';
 
-
 import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
 
 import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
@@ -56,9 +55,10 @@ import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
 import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
 import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
 
+import UseInNewQueryHandler from 'enterprise/logic/valueactions/UseInNewQueryHandler';
+import ShowDocumentsHandler from 'enterprise/logic/valueactions/ShowDocumentsHandler';
+
 import * as Permissions from './Permissions';
-import UseInNewQueryHandler from './logic/valueactions/UseInNewQueryHandler';
-import ShowDocumentsHandler from './logic/valueactions/ShowDocumentsHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -189,6 +189,7 @@ export default {
       type: 'show-bucket',
       title: 'Show documents for value',
       handler: ShowDocumentsHandler,
+      condition: ShowDocumentsHandler.isEnabled,
     },
   ],
   visualizationTypes: [

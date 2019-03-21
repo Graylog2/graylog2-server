@@ -27,4 +27,6 @@ const ShowDocumentsHandler: ValueActionHandlerWithContext =
     return WidgetActions.create(widget);
   };
 
+ShowDocumentsHandler.isEnabled = ({ context }) => (context.valuePath !== undefined);
+
 export default ShowDocumentsHandler;
