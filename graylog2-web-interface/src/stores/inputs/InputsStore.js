@@ -5,9 +5,9 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';
-const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
-
 import ActionsProvider from 'injection/ActionsProvider';
+
+const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 const InputsActions = ActionsProvider.getActions('Inputs');
 
 const InputsStore = Reflux.createStore({
