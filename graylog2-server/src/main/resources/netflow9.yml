@@ -450,8 +450,7 @@
 33000: # TODO: Parse ASA ACL http://www.cisco.com/c/en/us/td/docs/security/asa/special/netflow/guide/asa_netflow.html#pgfId-1331620
 - :skip
 33001:
-- :acl_id_asa
-- egress_acl_id
+- :skip
 33002:
 - :uint16
 - :fw_ext_event
