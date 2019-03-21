@@ -5,7 +5,7 @@ import moment from 'moment-timezone';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import type { Key, Result } from './Result';
+import type { ColLeaf, Leaf, Key, Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -29,7 +29,7 @@ const transformKey = (key: Key, indices: Array<number>, tz: string) => {
 
 const findIndices = <T>(ary: Array<T>, predicate: (T) => boolean): Array<number> => ary.map((value, idx) => ({ value, idx })).filter(({ value }) => predicate(value)).map(({ idx }) => idx);
 
-export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, result: Result): Result => {
+export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, result: Rows): Rows => {
   const rowIndices = findIndices(rowPivots, pivot => (pivot.type === 'time'));
   const columnIndices = findIndices(columnPivots, pivot => (pivot.type === 'time'));
 
@@ -43,7 +43,7 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, result: Res
     if (row.source !== 'leaf') {
       return row;
     }
-    const newRow = Object.assign({}, row);
+    const newRow: Leaf = { ...row };
     newRow.key = transformKey(row.key, rowIndices, tz);
 
     if (columnIndices.length > 0) {
@@ -51,7 +51,7 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, result: Res
         if (values.source !== 'col-leaf') {
           return values;
         }
-        const newValues = Object.assign({}, values);
+        const newValues: ColLeaf = { ...values };
         newValues.key = transformKey(values.key, columnIndices, tz);
         return newValues;
       });

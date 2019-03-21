@@ -1,3 +1,4 @@
+// @flow strict
 /*
  * Default (string) comparison function used for sorting lists/arrays.
  *
@@ -20,11 +21,12 @@
  * The `undefined` parameter when instantiating triggers using the runtime's default locales (i.e. the locales supplied
  * by the browser).
  */
-export const compare = (options = {}) => new Intl.Collator(undefined, options).compare;
+
+export const compare = (options: * = {}) => new Intl.Collator(undefined, options).compare;
 
 /*
  * This is the default comparison function. It compares non-numerically and case-insensitive. It can be used as a drop-in
  * replacement for `naturalSort` and is shared across its consumers. If the default options do not match, `compare` must
  * be used instead.
  */
-export const defaultCompare = compare();
+export const defaultCompare: (any, any) => number = compare();

@@ -1,6 +1,7 @@
 // @flow strict
 import { flatten, isEqual, set } from 'lodash';
-import type { Key, Result } from './Result';
+
+import type { Key, Leaf, Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
 
 export const seriesRegex = /^(\w+)\((\w*)\)$/;
 
@@ -39,8 +40,9 @@ const _defaultSeriesGenerator = (type, name, labels, values): ChartDefinition =>
 type Series = [any, Array<Key>, Array<any>]
 type ExtractedSeries = Array<Series>;
 
-export const extractSeries = (results: Result): ExtractedSeries => {
-  const leafs = results.filter(row => (row.source === 'leaf'));
+export const extractSeries = (results: Rows): ExtractedSeries => {
+  // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
+  const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
 
   const x = leafs.map(({ key }) => key);
 
@@ -50,7 +52,9 @@ export const extractSeries = (results: Result): ExtractedSeries => {
   y.forEach(([key, value]) => {
     const joinedKey = value.key.join('-');
     const targetIdx = x.findIndex(l => isEqual(l, key));
-    set(valuesBySeries, [joinedKey, targetIdx], value.value);
+    if (value.value) {
+      set(valuesBySeries, [joinedKey, targetIdx], value.value);
+    }
   });
 
   return Object.keys(valuesBySeries).map(value => [
@@ -62,7 +66,7 @@ export const extractSeries = (results: Result): ExtractedSeries => {
 
 export type Generator = (string, string, Array<string>, Array<any>, number, number) => ChartDefinition;
 
-export const generateSeries = (results: Result, chartType: string, generator: Generator = _defaultSeriesGenerator): Array<ChartDefinition> => {
+export const generateSeries = (results: Rows, chartType: string, generator: Generator = _defaultSeriesGenerator): Array<ChartDefinition> => {
   const allCharts: Array<[string, string, Array<string>, Array<any>]> = extractSeries(results).map(([value, x, values]) => [
     chartType,
     value,
