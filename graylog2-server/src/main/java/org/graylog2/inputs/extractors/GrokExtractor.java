@@ -91,7 +91,7 @@ public class GrokExtractor extends Extractor {
 
         // the extractor instance is rebuilt every second anyway
         final Match match = grok.match(value);
-        final Map<String, Object> matches = match.capture();
+        final Map<String, Object> matches = match.captureFlattened();
         final List<Result> results = new ArrayList<>(matches.size());
 
         for (final Map.Entry<String, Object> entry : matches.entrySet()) {

@@ -240,6 +240,23 @@ public class GrokExtractorTest {
                 );
     }
 
+    @Test
+    public void testIssue4773() throws Exception {
+        // See: https://github.com/Graylog2/graylog2-server/issues/4773
+        final Map<String, Object> config = new HashMap<>();
+
+        config.put("named_captures_only", true);
+
+        // Using an OR with the same named capture should only return one value "2015" instead of "[2015, null]"
+        final GrokExtractor extractor = makeExtractor("(%{BASE10NUM:num}|%{BASE10NUM:num})", config);
+
+        assertThat(extractor.run("2015"))
+                .hasSize(1)
+                .containsOnly(
+                        new Extractor.Result("2015", "num", -1, -1)
+                );
+    }
+
     private GrokExtractor makeExtractor(String pattern) {
         return makeExtractor(pattern, new HashMap<>());
     }
