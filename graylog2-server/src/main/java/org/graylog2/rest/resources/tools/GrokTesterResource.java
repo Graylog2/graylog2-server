@@ -92,7 +92,7 @@ public class GrokTesterResource extends RestResource {
         }
 
         final Match match = grok.match(string);
-        final Map<String, Object> matches = match.capture();
+        final Map<String, Object> matches = match.captureFlattened();
 
         final GrokTesterResponse response;
         if (matches.isEmpty()) {

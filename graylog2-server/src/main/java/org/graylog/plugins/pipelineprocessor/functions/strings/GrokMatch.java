@@ -63,7 +63,7 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
         final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern, onlyNamedCaptures);
 
         final Match match = grok.match(value);;
-        return new GrokResult(match.capture());
+        return new GrokResult(match.captureFlattened());
     }
 
     @Override
