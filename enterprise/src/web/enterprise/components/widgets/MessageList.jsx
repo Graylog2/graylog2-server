@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 import connect from 'stores/connect';
 import Immutable from 'immutable';
 
+import { TIMESTAMP_FIELD } from 'enterprise/Constants';
 import { MessageTableEntry } from 'enterprise/components/messagelist';
 import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
 
+import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import CombinedProvider from 'injection/CombinedProvider';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
@@ -18,7 +20,6 @@ import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 
 import styles from './MessageList.css';
-import { TIMESTAMP_FIELD } from '../../Constants';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 const { RefreshActions } = CombinedProvider.get('Refresh');
@@ -173,22 +174,24 @@ const MessageList = createReactClass({
                 {messageSlice.map((message) => {
                   const messageKey = `${message.index}-${message.id}`;
                   return (
-                    <MessageTableEntry key={messageKey}
-                                       fields={fields}
-                                       disableSurroundingSearch
-                                       message={message}
-                                       showMessageRow={selectedFields.contains('message')}
-                                       selectedFields={selectedColumns}
-                                       expanded={this.state.expandedMessages.contains(messageKey)}
-                                       toggleDetail={this._toggleMessageDetail}
-                                       inputs={inputsMap}
-                                       streams={streamsMap}
-                                       allStreams={allStreams}
-                                       allStreamsLoaded
-                                       nodes={nodesMap}
-                                       highlight={false}
-                                       expandAllRenderAsync={false}
-                                       searchConfig={this.props.configurations.searchesClusterConfig} />
+                    <AdditionalContext.Provider key={messageKey}
+                                                value={{ message }}>
+                      <MessageTableEntry fields={fields}
+                                         disableSurroundingSearch
+                                         message={message}
+                                         showMessageRow={selectedFields.contains('message')}
+                                         selectedFields={selectedColumns}
+                                         expanded={this.state.expandedMessages.contains(messageKey)}
+                                         toggleDetail={this._toggleMessageDetail}
+                                         inputs={inputsMap}
+                                         streams={streamsMap}
+                                         allStreams={allStreams}
+                                         allStreamsLoaded
+                                         nodes={nodesMap}
+                                         highlight={false}
+                                         expandAllRenderAsync={false}
+                                         searchConfig={this.props.configurations.searchesClusterConfig} />
+                    </AdditionalContext.Provider>
                   );
                 })}
               </table>
