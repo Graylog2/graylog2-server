@@ -17,7 +17,7 @@ EditWidgetDialog.propTypes = {
 const catchEvent = e => e.stopPropagation();
 
 type Props = {
-  children: React.Node,
+  children: Array<React.Node>,
 };
 
 export default class EditWidgetFrame extends React.Component<Props> {
@@ -37,9 +37,14 @@ export default class EditWidgetFrame extends React.Component<Props> {
     const { children } = this.props;
     return (
       <Modal show animation={false} dialogComponentClass={EditWidgetDialog} enforceFocus={false}>
-        <div role="presentation" style={{ height: 'calc(100% - 20px)' }} onMouseDown={catchEvent}>
-          {children}
-        </div>
+        <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
+          <div role="presentation" style={{ height: 'calc(100% - 20px)' }} onMouseDown={catchEvent}>
+            {children[0]}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          {children[1]}
+        </Modal.Footer>
       </Modal>
     );
   }

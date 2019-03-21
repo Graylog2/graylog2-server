@@ -6,20 +6,21 @@ import connect from 'stores/connect';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
+import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
-import MeasureDimensions from './MeasureDimensions';
 
+import MeasureDimensions from './MeasureDimensions';
 import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
-import { ViewMetadataStore } from '../../stores/ViewMetadataStore';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
+import SaveOrCancelButtons from './SaveOrCancelButtons';
 
 class Widget extends React.Component {
   static propTypes = {
@@ -153,11 +154,6 @@ class Widget extends React.Component {
                 <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
                   <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
                 </WidgetFilterMenu>
-                {' '}
-                <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => editWidgetFrameContent}>
-                  <MenuItem onSelect={this._onToggleEdit}>Finish Editing</MenuItem>
-                  <MenuItem onSelect={this._onCancelEdit}>Cancel</MenuItem>
-                </WidgetActionDropdown>
               </WidgetHeader>
               <EditComponent config={config}
                              fields={fields}
@@ -167,6 +163,7 @@ class Widget extends React.Component {
               </EditComponent>
             </MeasureDimensions>
           </span>
+          <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
         </EditWidgetFrame>
       );
     }

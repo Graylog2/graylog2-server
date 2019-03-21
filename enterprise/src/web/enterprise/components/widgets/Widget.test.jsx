@@ -104,21 +104,15 @@ describe('<Widget />', () => {
   });
   it('adds cancel action to widget in edit mode', () => {
     const wrapper = mount(<DummyWidget editing />);
-    const dropdown = wrapper.find('i.fa-chevron-down');
-    expect(dropdown).toExist();
-    dropdown.simulate('click');
-
-    expect(wrapper.find('a[children="Cancel"]')).toExist();
+    const cancel = wrapper.find('Button[children="Cancel"]');
+    expect(cancel).toExist();
   });
   it('does not trigger action when clicking cancel after no changes were made', () => {
     const wrapper = mount(<DummyWidget editing />);
-    const dropdown = wrapper.find('i.fa-chevron-down');
-    expect(dropdown).toExist();
-    dropdown.simulate('click');
 
     WidgetActions.updateConfig = jest.fn();
 
-    const cancelButton = wrapper.find('a[children="Cancel"]');
+    const cancelButton = wrapper.find('Button[children="Cancel"]');
     cancelButton.simulate('click');
 
     expect(WidgetActions.updateConfig).not.toHaveBeenCalled();
@@ -126,9 +120,6 @@ describe('<Widget />', () => {
   it('restores original state of widget config when clicking cancel after changes were made', () => {
     const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
     const wrapper = mount(<DummyWidget editing widget={widgetWithConfig} />);
-    const dropdown = wrapper.find('i.fa-chevron-down');
-    expect(dropdown).toExist();
-    dropdown.simulate('click');
 
     const editComponent = wrapper.find('edit-dummy-visualization').at(0);
     const widgetConfigChange = editComponent.props().onChange;
@@ -137,7 +128,7 @@ describe('<Widget />', () => {
     widgetConfigChange({ foo: 23 });
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const cancelButton = wrapper.find('a[children="Cancel"]');
+    const cancelButton = wrapper.find('Button[children="Cancel"]');
     cancelButton.simulate('click');
 
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 42 });
@@ -145,9 +136,6 @@ describe('<Widget />', () => {
   it('does not restores original state of widget config when clicking "Finish Editing"', () => {
     const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
     const wrapper = mount(<DummyWidget editing widget={widgetWithConfig} />);
-    const dropdown = wrapper.find('i.fa-chevron-down');
-    expect(dropdown).toExist();
-    dropdown.simulate('click');
 
     const editComponent = wrapper.find('edit-dummy-visualization').at(0);
     const widgetConfigChange = editComponent.props().onChange;
@@ -156,7 +144,7 @@ describe('<Widget />', () => {
     widgetConfigChange({ foo: 23 });
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const cancelButton = wrapper.find('a[children="Finish Editing"]');
+    const cancelButton = wrapper.find('Button[children="Save"]');
     cancelButton.simulate('click');
 
     expect(WidgetActions.updateConfig).not.toHaveBeenCalledWith('widgetId', { foo: 42 });
