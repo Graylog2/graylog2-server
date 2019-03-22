@@ -20,6 +20,7 @@ import { QueryFiltersActions, QueryFiltersStore } from 'enterprise/stores/QueryF
 import { ViewStore } from 'enterprise/stores/ViewStore';
 
 import StreamsFilter from './searchbar/StreamsFilter';
+import RefreshControls from './searchbar/RefreshControls';
 import ScrollToHint from './common/ScrollToHint';
 
 const SearchBar = createReactClass({
@@ -87,10 +88,13 @@ const SearchBar = createReactClass({
                                       config={this.props.config} />
                     </Col>
 
-                    <Col md={8}>
+                    <Col md={6}>
                       <StreamsFilter value={streams}
                                      streams={this.state.availableStreams}
                                      onChange={value => QueryFiltersActions.streams(id, value)} />
+                    </Col>
+                    <Col md={2}>
+                      <RefreshControls />
                     </Col>
                   </Row>
 

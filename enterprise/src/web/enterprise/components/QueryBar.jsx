@@ -12,9 +12,9 @@ import { QueriesActions } from 'enterprise/stores/QueriesStore';
 import { QueryIdsStore } from 'enterprise/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'enterprise/stores/QueryTitlesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import { ViewStatesActions } from 'enterprise/stores/ViewStatesStore';
 import QueryTabs from './QueryTabs';
 import CustomPropTypes from './CustomPropTypes';
-import { ViewStatesActions } from '../stores/ViewStatesStore';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 

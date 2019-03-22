@@ -41,7 +41,9 @@ class WidgetActionDropdown extends React.Component {
     };
   }
 
-  _onToggle = () => this.setState(({ show }) => ({ show: !show }));
+  _onToggle = () => {
+    this.setState(({ show }) => ({ show: !show }));
+  };
 
   render() {
     const { children, container, element } = this.props;

@@ -7,6 +7,7 @@ import { widgetDefinition } from 'enterprise/logic/Widget';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import { RefreshActions } from 'enterprise/stores/RefreshStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -89,6 +90,7 @@ class Widget extends React.Component {
           configChanged: undefined,
         };
       }
+      RefreshActions.disable();
       return {
         editing: true,
         oldConfig: this.props.widget.config,
@@ -167,10 +169,9 @@ class Widget extends React.Component {
         </EditWidgetFrame>
       );
     }
-    let container = null;
     return (
       <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-        <span ref={(elem) => { container = elem; }}>
+        <span>
           <MeasureDimensions>
             <WidgetHeader title={title}
                           onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
@@ -184,7 +185,7 @@ class Widget extends React.Component {
                 <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
               </WidgetFilterMenu>
               {' '}
-              <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => container}>
+              <WidgetActionDropdown element={widgetActionDropdownCaret} >
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                 <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
                 <MenuItem divider />

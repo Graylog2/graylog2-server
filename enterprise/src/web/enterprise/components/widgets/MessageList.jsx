@@ -18,11 +18,11 @@ import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { ViewStore } from 'enterprise/stores/ViewStore';
+import { RefreshActions } from 'enterprise/stores/RefreshStore';
 
 import styles from './MessageList.css';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
-const { RefreshActions } = CombinedProvider.get('Refresh');
 const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 const { InputsStore } = CombinedProvider.get('Inputs');
 const { NodesStore } = CombinedProvider.get('Nodes');
