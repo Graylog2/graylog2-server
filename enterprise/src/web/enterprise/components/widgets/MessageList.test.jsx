@@ -21,9 +21,11 @@ describe('MessageList', () => {
     CurrentUser: CurrentUserStore,
   });
   const SearchStore = StoreMock('searchSurroundingMessages');
+
+  const InputsStore = StoreMock('listen', 'getInitialState');
   const combinedProviderMock = new CombinedProviderMock({
     Search: { SearchStore },
-    Inputs: { InputsActions: { list: jest.fn() } },
+    Inputs: { InputsActions: { list: jest.fn() }, InputsStore },
   });
   const SearchConfigStore = StoreMock('listSearchesClusterConfig', 'configurations', 'listen');
   const WidgetActions = StoreMock('updateConfig');
@@ -94,5 +96,12 @@ describe('MessageList', () => {
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.props().children).toMatchSnapshot();
+  });
+  it('renders also when `inputs` is undefined', () => {
+    InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
+    mount(<MessageList editing
+                       data={data}
+                       fields={Immutable.List([])}
+                       config={{ fields: [] }} />);
   });
 });

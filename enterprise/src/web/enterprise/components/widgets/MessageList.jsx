@@ -127,7 +127,7 @@ const MessageList = createReactClass({
         };
       });
     const selectedFields = this._getSelectedFields();
-    const { inputs } = this.props.inputs;
+    const { inputs = [] } = this.props.inputs;
     const inputsMap = Immutable.Map(inputs.map(input => [input.id, input]));
     const { nodes } = this.props.nodes;
     const nodesMap = Immutable.Map(nodes);
