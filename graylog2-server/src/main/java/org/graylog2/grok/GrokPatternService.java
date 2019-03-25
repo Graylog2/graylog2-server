@@ -16,6 +16,7 @@
  */
 package org.graylog2.grok;
 
+import com.google.code.regexp.Matcher;
 import io.krakens.grok.api.GrokUtils;
 import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.database.NotFoundException;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 
 public interface GrokPatternService {
     GrokPattern load(String patternId) throws NotFoundException;
@@ -56,10 +56,9 @@ public interface GrokPatternService {
 
     static Set<String> extractPatternNames(String namedPattern) {
         final Set<String> result = new HashSet<>();
-        final Set<String> namedGroups = GrokUtils.getNameGroups(GrokUtils.GROK_PATTERN.pattern());
         final Matcher matcher = GrokUtils.GROK_PATTERN.matcher(namedPattern);
         while (matcher.find()) {
-            final Map<String, String> group = GrokUtils.namedGroups(matcher, namedGroups);
+            final Map<String, String> group = matcher.namedGroups();
             final String patternName = group.get("pattern");
             result.add(patternName);
         }
