@@ -305,6 +305,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 GrokPattern.create("GREEDY", ".*"),
                 GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"),
                 GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})"),
+                GrokPattern.create("UNDERSCORE", "(?<test_field>test)"),
                 GrokPattern.create("NUM", "%{BASE10NUM}")
         );
         when(grokPatternService.loadAll()).thenReturn(patterns);
@@ -630,11 +631,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule);
 
         assertThat(message).isNotNull();
-        assertThat(message.getFieldCount()).isEqualTo(5);
+        assertThat(message.getFieldCount()).isEqualTo(6);
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2015-07-31T10:05:36.773Z"));
         // named captures only
         assertThat(message.hasField("num")).isTrue();
         assertThat(message.hasField("BASE10NUM")).isFalse();
+
+        // Test for issue 5563 and 5794
+        // ensure named groups with underscore work
+        assertThat(message.hasField("test_field")).isTrue();
     }
 
     @Test

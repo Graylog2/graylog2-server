@@ -257,6 +257,25 @@ public class GrokExtractorTest {
                 );
     }
 
+    @Test
+    public void testIssue5563() {
+        // See: https://github.com/Graylog2/graylog2-server/issues/5563
+        //      https://github.com/Graylog2/graylog2-server/issues/5704
+        final Map<String, Object> config = new HashMap<>();
+
+        config.put("named_captures_only", true);
+
+        patternSet.add(GrokPattern.create("YOLO", "(?<test_field>test)"));
+        // Make sure that the user can use a capture name with an "_".
+        final GrokExtractor extractor = makeExtractor("%{YOLO}", config);
+
+        assertThat(extractor.run("test"))
+                .hasSize(1)
+                .containsOnly(
+                        new Extractor.Result("test", "test_field", -1, -1)
+                );
+    }
+
     private GrokExtractor makeExtractor(String pattern) {
         return makeExtractor(pattern, new HashMap<>());
     }
