@@ -7,4 +7,8 @@ then
     // only named captures
     let matches1 = grok("%{NUM:num}", "10", true);
     set_fields(matches1);
+
+    //test for underscore
+    let matches2 = grok("%{UNDERSCORE}", "test", true);
+    set_fields(matches2);
 end
