@@ -29,6 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,10 +52,19 @@ public class GrokExtractorTest {
         final GrokPattern baseNum = GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))");
         final GrokPattern number = GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})");
         final GrokPattern data = GrokPattern.create("GREEDY", ".*");
+        final GrokPattern twoBaseNums = GrokPattern.create("TWOBASENUMS", "%{BASE10NUM} %{BASE10NUM}");
+        final GrokPattern test1 = GrokPattern.create("TEST1", "test1");
+        final GrokPattern test2 = GrokPattern.create("TEST2", "test2");
+        final GrokPattern orPattern = GrokPattern.create("ORTEST", "(%{TEST1:test}|%{TEST2:test})");
 
         patternSet.add(baseNum);
         patternSet.add(number);
         patternSet.add(data);
+        patternSet.add(twoBaseNums);
+        patternSet.add(test1);
+        patternSet.add(test2);
+        patternSet.add(orPattern);
+
     }
 
     @Test
@@ -199,6 +210,19 @@ public class GrokExtractorTest {
         assertEquals(5, date.getMinuteOfHour());
         assertEquals(36, date.getSecondOfMinute());
         assertEquals(773, date.getMillisOfSecond());
+    }
+
+    @Test
+    public void testFlattenValue() throws Exception {
+        final Map<String, Object> config = new HashMap<>();
+
+        final GrokExtractor extractor1 = makeExtractor("%{TWOBASENUMS}", config);
+
+        Extractor.Result[] result = extractor1.run("22 23");
+        assertThat(result)
+                .hasSize(2)
+                .contains(new Extractor.Result("22 23", "TWOBASENUMS", -1, -1),
+                        new Extractor.Result(Arrays.asList("22", "23"), "BASE10NUM", -1, -1));
     }
 
     @Test
