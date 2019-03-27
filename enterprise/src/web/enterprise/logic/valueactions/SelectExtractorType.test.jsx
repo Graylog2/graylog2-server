@@ -1,0 +1,51 @@
+// @flow strict
+import * as React from 'react';
+import { mount } from 'enzyme';
+import { AdditionalContext } from 'enterprise/logic/ActionContext';
+
+import SelectExtractorType from './SelectExtractorType';
+
+jest.mock('logic/datetimes/DateTime', () => ({}));
+
+describe('SelectExtractorType', () => {
+  const value = 'value of message';
+  const field = 'value_field';
+  const focus = jest.fn();
+  window.open = jest.fn(() => { return { focus }; });
+
+  const message = {
+    fields: {
+      gl2_source_input: 'input-id',
+      gl2_source_node: 'node-id',
+    },
+    formattedFields: {},
+    id: 'message-id',
+    index: 'message-index',
+  };
+
+  it('should render', () => {
+    const wrapper = mount(
+      <AdditionalContext.Provider key={'message-key'} value={{ message }}>
+        <SelectExtractorType onClose={() => {}} value={value} field={field} />
+      </AdditionalContext.Provider>);
+    const bootstrapModalForm = wrapper.find('BootstrapModalForm');
+    expect(bootstrapModalForm).toExist();
+    expect(bootstrapModalForm).toHaveProp('show', true);
+  });
+
+  it('should select a extractor and open a new window', () => {
+    const wrapper = mount(
+      <AdditionalContext.Provider key={'message-key'} value={{ message }}>
+        <SelectExtractorType onClose={() => {}} value={value} field={field} />
+      </AdditionalContext.Provider>);
+    const select = wrapper.find('Select');
+    const form = wrapper.find('form');
+    expect(select).toExist();
+    expect(select.at(0)).toHaveProp('placeholder', 'Select extractor type');
+    wrapper.find('.Select-control').simulate('keyDown', { keyCode: 40 }); // arrow down
+    wrapper.find('.Select-control').simulate('keyDown', { keyCode: 13 }); // enter
+    form.simulate('submit');
+    expect(window.open).toHaveBeenCalled();
+    expect(focus).toHaveBeenCalled();
+  });
+});

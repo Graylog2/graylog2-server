@@ -42,6 +42,7 @@ import RemoveFromTableActionHandler from 'enterprise/logic/fieldactions/RemoveFr
 import CreateParameterDialog from 'enterprise/logic/creatoractions/CreateParameterDialog';
 import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
 import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
+import SelectExtractorType from 'enterprise/logic/valueactions/SelectExtractorType';
 
 import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -190,6 +191,12 @@ export default {
       title: 'Show documents for value',
       handler: ShowDocumentsHandler,
       condition: ShowDocumentsHandler.isEnabled,
+    },
+    {
+      type: 'create-extractor',
+      title: 'Create extractor',
+      condition: ({ type }) => type.type === 'string',
+      component: SelectExtractorType,
     },
   ],
   visualizationTypes: [

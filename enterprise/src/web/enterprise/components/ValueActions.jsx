@@ -71,6 +71,7 @@ class ValueActions extends React.Component {
         this._onMenuToggle();
         handler(queryId, event.field, event.value, type, this.context);
       };
+
       const condition = valueAction.condition || (() => true);
       const actionDisabled = !condition({ field, type, value, context: this.context });
       return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
