@@ -20,9 +20,10 @@ export const FieldTypesActions: FieldTypesActionsType = Reflux.createActions({
   all: { asyncResult: true },
 });
 
+export type FieldTypeMappingsList = Immutable.List<FieldTypeMapping>;
 export type FieldTypesStoreState = {
-  all: Immutable.List<FieldTypeMapping>,
-  queryFields: Immutable.Map<String, Immutable.List<FieldTypeMapping>>,
+  all: FieldTypeMappingsList,
+  queryFields: Immutable.Map<String, FieldTypeMappingsList>,
 };
 
 export const FieldTypesStore = Reflux.createStore({

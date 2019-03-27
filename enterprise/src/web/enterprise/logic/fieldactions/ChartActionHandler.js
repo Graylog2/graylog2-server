@@ -8,6 +8,7 @@ import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/Aggrega
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
@@ -22,13 +23,13 @@ const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
 
   const { queryFields, all } = _fieldTypes;
 
-  const fieldTypes: Immutable.List<FieldTypeMapping> = (!queryFields || queryFields.get(queryId, Immutable.List()).isEmpty()) ? all : queryFields.get(queryId, Immutable.List());
+  const fieldTypes: FieldTypeMappingsList = (!queryFields || queryFields.get(queryId, Immutable.List()).isEmpty()) ? all : queryFields.get(queryId, Immutable.List());
 
   if (!fieldTypes) {
     return FieldType.Unknown;
   }
 
-  const mapping: FieldTypeMapping = (fieldTypes: Immutable.List<FieldTypeMapping>)
+  const mapping: FieldTypeMapping = (fieldTypes: FieldTypeMappingsList)
     .find((m: FieldTypeMapping) => m.name === fieldName, null, new FieldTypeMapping(fieldName, FieldType.Unknown));
   return mapping.type;
 };

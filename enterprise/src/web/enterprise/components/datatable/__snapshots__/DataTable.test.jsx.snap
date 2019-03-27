@@ -2,13 +2,7 @@
 
 exports[`DataTable renders column pivot header without offset when rollup is disabled 1`] = `
 <div
-  className="messages-container"
-  style={
-    Object {
-      "height": "100%",
-      "overflow": "auto",
-    }
-  }
+  className="messages-container container"
 >
   <table
     className="table table-condensed messages"
@@ -16,12 +10,8 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
     <thead>
       <tr>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -37,12 +27,8 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
           </span>
         </th>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -60,12 +46,8 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
       </tr>
       <tr>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -85,12 +67,8 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
           </span>
         </th>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -153,13 +131,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
 
 exports[`DataTable should render with empty data 1`] = `
 <div
-  className="messages-container"
-  style={
-    Object {
-      "height": "100%",
-      "overflow": "auto",
-    }
-  }
+  className="messages-container container"
 >
   <table
     className="table table-condensed messages"
@@ -173,13 +145,7 @@ exports[`DataTable should render with empty data 1`] = `
 
 exports[`DataTable should render with filled data with rollup 1`] = `
 <div
-  className="messages-container"
-  style={
-    Object {
-      "height": "100%",
-      "overflow": "auto",
-    }
-  }
+  className="messages-container container"
 >
   <table
     className="table table-condensed messages"
@@ -187,20 +153,12 @@ exports[`DataTable should render with filled data with rollup 1`] = `
     <thead>
       <tr>
         <th
+          className="leftAligned"
           colSpan={2}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         />
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -218,15 +176,11 @@ exports[`DataTable should render with filled data with rollup 1`] = `
       </tr>
       <tr>
         <th
+          className="leftAligned"
           colSpan={
             Array [
               "timestamp",
             ]
-          }
-          style={
-            Object {
-              "left": "0px",
-            }
           }
         >
           <span>
@@ -247,15 +201,11 @@ exports[`DataTable should render with filled data with rollup 1`] = `
           </span>
         </th>
         <th
+          className="leftAligned"
           colSpan={
             Array [
               "count()",
             ]
-          }
-          style={
-            Object {
-              "left": "0px",
-            }
           }
         >
           <span>
@@ -276,12 +226,8 @@ exports[`DataTable should render with filled data with rollup 1`] = `
           </span>
         </th>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -358,13 +304,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
 
 exports[`DataTable should render with filled data without rollup 1`] = `
 <div
-  className="messages-container"
-  style={
-    Object {
-      "height": "100%",
-      "overflow": "auto",
-    }
-  }
+  className="messages-container container"
 >
   <table
     className="table table-condensed messages"
@@ -372,20 +312,12 @@ exports[`DataTable should render with filled data without rollup 1`] = `
     <thead>
       <tr>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         />
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span
@@ -403,15 +335,11 @@ exports[`DataTable should render with filled data without rollup 1`] = `
       </tr>
       <tr>
         <th
+          className="leftAligned"
           colSpan={
             Array [
               "timestamp",
             ]
-          }
-          style={
-            Object {
-              "left": "0px",
-            }
           }
         >
           <span>
@@ -432,12 +360,8 @@ exports[`DataTable should render with filled data without rollup 1`] = `
           </span>
         </th>
         <th
+          className="leftAligned"
           colSpan={1}
-          style={
-            Object {
-              "left": "0px",
-            }
-          }
         >
           <span>
             <span

@@ -8,7 +8,7 @@ import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import type { ValuePath } from 'enterprise/logic/valueactions/ValueActionHandler';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
 import type { CurrentViewType } from '../CustomPropTypes';
 
 type Props = {
@@ -18,7 +18,7 @@ type Props = {
   fields: Immutable.Set<string>,
   item: { [string]: * },
   series: Array<Series>,
-  types: Immutable.List<FieldTypeMapping>,
+  types: FieldTypeMappingsList,
   valuePath: ValuePath,
 };
 
@@ -27,12 +27,12 @@ const _c = (field, value, path) => ({ field, value, path });
 const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath) => (
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
-      <Value field={field} type={type} value={value} queryId={selectedQuery} />
+      {value && <Value field={field} type={type} value={value} queryId={selectedQuery} />}
     </AdditionalContext.Provider>
   </td>
 );
 
-const _fieldTypeFor = (field: string, types: Immutable.List<FieldTypeMapping>) => {
+const _fieldTypeFor = (field: string, types: FieldTypeMappingsList) => {
   const fieldType = types.find(f => f.name === field);
   return fieldType ? fieldType.type : FieldType.Unknown;
 };
