@@ -46,6 +46,8 @@ const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimeran
   } else {
     layout.xaxis = {
       fixedrange: true,
+      /* disable plotly sorting by setting the type of the xaxis to category */
+      type: config.sort.length > 0 ? 'category' : undefined,
     };
   }
   return (
