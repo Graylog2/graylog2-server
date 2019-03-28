@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { isString, trim, truncate as trunc } from 'lodash';
@@ -9,27 +10,35 @@ import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
 
-const _formatValue = (value, truncate) => {
+const _formatValue = (value, truncate, render) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
-  return trim(stringified) === '' ? <EmptyValue /> : (truncate ? trunc(stringified) : stringified);
+  const Component = render;
+  return trim(stringified) === '' ? <EmptyValue /> : <Component value={(truncate ? trunc(stringified) : stringified)} />;
 };
 
-const _renderTypeSpecific = (value, { type }, truncate) => {
+type RenderProps = {
+  value: any,
+};
+
+type Props = {
+  value: any,
+  type: FieldType,
+  truncate?: boolean,
+  render?: React.ComponentType<RenderProps>,
+};
+
+const defaultComponent = ({ value }: RenderProps) => value;
+
+const TypeSpecificValue = ({ value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
   if (value === undefined) {
     return null;
   }
-  switch (type) {
+  switch (type.type) {
     case 'date': return <UserTimezoneTimestamp dateTime={value} />;
     case 'boolean': return String(value);
-    default: return _formatValue(value, truncate);
+    default: return _formatValue(value, truncate, render);
   }
 };
-
-const TypeSpecificValue = ({ value, type, truncate = false }) => (
-  <React.Fragment>
-    {_renderTypeSpecific(value, type, truncate)}
-  </React.Fragment>
-);
 
 TypeSpecificValue.propTypes = {
   truncate: PropTypes.bool,
@@ -38,8 +47,7 @@ TypeSpecificValue.propTypes = {
 };
 
 TypeSpecificValue.defaultProps = {
-  truncate: false,
-  type: FieldType.Unknown,
+  render: defaultComponent,
 };
 
 export default TypeSpecificValue;

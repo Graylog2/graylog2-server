@@ -1,0 +1,138 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Highlight does not highlight string if length is negative 1`] = `
+<Highlight
+  field="foo"
+  value="foobar"
+>
+  foobar
+</Highlight>
+`;
+
+exports[`Highlight does not highlight string if range for field is absent 1`] = `
+<Highlight
+  field="foo"
+  value="foobar"
+>
+  foobar
+</Highlight>
+`;
+
+exports[`Highlight does not highlight string if start is negative 1`] = `
+<Highlight
+  field="foo"
+  value="foobar"
+>
+  foobar
+</Highlight>
+`;
+
+exports[`Highlight highlights remainder of string if length of range exceeds length of string 1`] = `
+<Highlight
+  field="foo"
+  value="foobar"
+>
+  foo
+  <span
+    className="result-highlight-colored"
+    key="highlight-0"
+  >
+    bar
+  </span>
+</Highlight>
+`;
+
+exports[`Highlight highlights string for multiple highlight ranges 1`] = `
+<Highlight
+  field="foo"
+  value="the brown fox jumps over the lazy dog"
+>
+  the 
+  <span
+    className="result-highlight-colored"
+    key="highlight-0"
+  >
+    brown
+  </span>
+   fox 
+  <span
+    className="result-highlight-colored"
+    key="highlight-1"
+  >
+    jumps over
+  </span>
+   the lazy dog
+</Highlight>
+`;
+
+exports[`Highlight highlights string for multiple highlight ranges where one is a complete subset of the other 1`] = `
+<Highlight
+  field="foo"
+  value="the brown fox jumps over the lazy dog"
+>
+  the 
+  <span
+    className="result-highlight-colored"
+    key="highlight-0"
+  >
+    brown
+  </span>
+  <span
+    className="result-highlight-colored"
+    key="highlight-1"
+  />
+   fox jumps over the lazy dog
+</Highlight>
+`;
+
+exports[`Highlight highlights string for multiple, overlapping highlight ranges 1`] = `
+<Highlight
+  field="foo"
+  value="the brown fox jumps over the lazy dog"
+>
+  the 
+  <span
+    className="result-highlight-colored"
+    key="highlight-0"
+  >
+    brown
+  </span>
+  <span
+    className="result-highlight-colored"
+    key="highlight-1"
+  >
+     fox jum
+  </span>
+  ps over the lazy dog
+</Highlight>
+`;
+
+exports[`Highlight highlights string for single highlight range 1`] = `
+<Highlight
+  field="foo"
+  value="foobar"
+>
+  <span
+    className="result-highlight-colored"
+    key="highlight-0"
+  >
+    foobar
+  </span>
+</Highlight>
+`;
+
+exports[`Highlight returns unmodified string without ranges 1`] = `
+<Highlight
+  field="foo"
+  value="bar"
+>
+  bar
+</Highlight>
+`;
+
+exports[`Highlight works for empty field & value 1`] = `
+<Highlight
+  field=""
+  value=""
+/>
+`;

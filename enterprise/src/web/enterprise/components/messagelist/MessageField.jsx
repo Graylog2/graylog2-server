@@ -1,15 +1,32 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import Field from 'enterprise/components/Field';
 import Value from 'enterprise/components/Value';
-import { ViewStore } from '../../stores/ViewStore';
+import { ViewStore } from 'enterprise/stores/ViewStore';
+import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+
 import CustomPropTypes from '../CustomPropTypes';
+import Highlight from './Highlight';
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
-const MessageField = ({ fieldName, fieldType, message, value, currentView }) => {
+type Props = {
+  fieldName: string,
+  fieldType: FieldType,
+  message: {
+    fields: { [string]: any },
+  },
+  value: any,
+  currentView: {
+    activeQuery: string,
+  },
+};
+
+const MessageField = ({ fieldName, fieldType, message, value, currentView }: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
   const { activeQuery } = currentView;
 
@@ -19,7 +36,7 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }) => 
         <Field interactive queryId={activeQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
       </dt>
       <dd>
-        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} />
+        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} render={Highlight} />
       </dd>
     </span>
   );

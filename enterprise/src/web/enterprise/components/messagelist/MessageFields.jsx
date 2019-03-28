@@ -12,7 +12,6 @@ class MessageFields extends React.Component {
     disableFieldActions: PropTypes.bool.isRequired,
     fields: PropTypes.object.isRequired,
     message: PropTypes.object.isRequired,
-    possiblyHighlight: PropTypes.func.isRequired,
     showDecoration: PropTypes.bool,
   };
 

@@ -2,12 +2,15 @@ package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes;
 
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.MetricAggregation;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog.plugins.enterprise.search.searchtypes.Sort;
 import org.graylog2.indexer.results.ResultMessage;
@@ -28,7 +31,12 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList);
         searchSourceBuilder
                 .size(messageList.limit() - messageList.offset())
-                .from(messageList.offset());
+                .from(messageList.offset())
+                .highlighter(new HighlightBuilder().requireFieldMatch(false)
+                        .highlightQuery(QueryBuilders.queryStringQuery(((ElasticsearchQueryString)query.query()).queryString()))
+                        .field("*")
+                        .fragmentSize(0)
+                        .numOfFragments(0));
         final List<Sort> sorts = messageList.sort();
         if (sorts == null) {
             searchSourceBuilder.sort(Message.FIELD_TIMESTAMP, SortOrder.DESC);

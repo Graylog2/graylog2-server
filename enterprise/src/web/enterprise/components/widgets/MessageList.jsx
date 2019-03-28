@@ -13,7 +13,10 @@ import CombinedProvider from 'injection/CombinedProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
-import { TIMESTAMP_FIELD } from 'enterprise/Constants';
+import CombinedProvider from 'injection/CombinedProvider';
+import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+
+import { TIMESTAMP_FIELD, Messages } from 'enterprise/Constants';
 import { MessageTableEntry } from 'enterprise/components/messagelist';
 import Field from 'enterprise/components/Field';
 
@@ -21,18 +24,13 @@ import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
-import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
-import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { ViewStore } from 'enterprise/stores/ViewStore';
 import { RefreshActions } from 'enterprise/stores/RefreshStore';
+import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
 
 import styles from './MessageList.css';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
-const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
-const { InputsStore } = CombinedProvider.get('Inputs');
-const { NodesStore } = CombinedProvider.get('Nodes');
-
 
 const MessageList = createReactClass({
   displayName: 'MessageList',
@@ -40,32 +38,25 @@ const MessageList = createReactClass({
   propTypes: {
     fields: CustomPropTypes.FieldListType.isRequired,
     pageSize: PropTypes.number,
+    config: PropTypes.instanceOf(MessagesWidgetConfig),
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,
-    config: PropTypes.object,
     containerHeight: PropTypes.number,
-    inputs: PropTypes.object,
-    nodes: PropTypes.object,
-    configurations: PropTypes.object,
     selectedFields: PropTypes.object,
-    availableStreams: PropTypes.object,
     currentView: PropTypes.object,
   },
 
   getDefaultProps() {
     return {
       filter: '',
-      config: undefined,
-      pageSize: UniversalSearchStore.DEFAULT_LIMIT,
+      pageSize: Messages.DEFAULT_LIMIT,
       editing: false,
       containerHeight: undefined,
       inputs: { inputs: [] },
-      nodes: {},
-      configurations: {},
       selectedFields: Immutable.Set(),
-      availableStreams: { streams: [] },
       currentView: { view: {}, activeQuery: undefined },
+      config: undefined,
     };
   },
 
@@ -130,18 +121,12 @@ const MessageList = createReactClass({
           formatted_fields: MessageFieldsFilter.filterFields(m.message),
           id: m.message._id,
           index: m.index,
+          highlight_ranges: m.highlight_ranges,
         };
       });
     const selectedFields = this._getSelectedFields();
-    const { inputs = [] } = this.props.inputs;
-    const inputsMap = Immutable.Map(inputs.map(input => [input.id, input]));
-    const { nodes } = this.props.nodes;
-    const nodesMap = Immutable.Map(nodes);
     const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
     const { activeQuery, view } = this.props.currentView;
-    const { streams } = this.props.availableStreams;
-    const streamsMap = Immutable.Map(streams.map(stream => [stream.id, stream]));
-    const allStreams = Immutable.List(streams);
 
     return (
       <span>
@@ -159,10 +144,12 @@ const MessageList = createReactClass({
               <table className="table table-condensed messages" style={{ marginTop: 0 }}>
                 <thead>
                   <tr>
-                    <th style={{ width: 180 }}><Field interactive
-                                                      name="Timestamp"
-                                                      queryId={activeQuery}
-                                                      type={this._fieldTypeFor(TIMESTAMP_FIELD, fields)} /></th>
+                    <th style={{ width: 180 }}>
+                      <Field interactive
+                             name="Timestamp"
+                             queryId={activeQuery}
+                             type={this._fieldTypeFor(TIMESTAMP_FIELD, fields)} />
+                    </th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
@@ -189,14 +176,8 @@ const MessageList = createReactClass({
                                          selectedFields={selectedColumns}
                                          expanded={this.state.expandedMessages.contains(messageKey)}
                                          toggleDetail={this._toggleMessageDetail}
-                                         inputs={inputsMap}
-                                         streams={streamsMap}
-                                         allStreams={allStreams}
-                                         allStreamsLoaded
-                                         nodes={nodesMap}
-                                         highlight={false}
-                                         expandAllRenderAsync={false}
-                                         searchConfig={this.props.configurations.searchesClusterConfig} />
+                                         highlight
+                                         expandAllRenderAsync={false} />
                     </AdditionalContext.Provider>
                   );
                 })}
@@ -211,10 +192,6 @@ const MessageList = createReactClass({
 
 export default connect(MessageList,
   {
-    inputs: InputsStore,
-    nodes: NodesStore,
-    configurations: SearchConfigStore,
     selectedFields: SelectedFieldsStore,
-    availableStreams: StreamsStore,
     currentView: ViewStore,
   });

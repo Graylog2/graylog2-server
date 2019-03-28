@@ -6,23 +6,35 @@ import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import ValueActions from './ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 
-type Props = {
-  children?: React.Node,
+type RenderProps = {
   field: string,
   value: *,
+};
+
+type Props = {
+  field: string,
+  value: *,
+  render?: React.ComponentType<RenderProps>,
   queryId: string,
   type: FieldType,
-}
+};
 
-const Value = ({ children, field, value, queryId, type = FieldType.Unknown }: Props) => {
-  const caption = <TypeSpecificValue value={value} type={type} />;
-  const element = children || caption;
+const defaultRenderer: React.ComponentType<RenderProps> = ({ value }: RenderProps) => value;
+
+const Value = ({ field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
+  const RenderComponent = render || ((props: RenderProps) => props.value);
+  const Component = v => <RenderComponent field={field} value={v.value} />;
+  const element = <TypeSpecificValue value={value} type={type} render={Component} />;
 
   return (
     <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
       {field} = <TypeSpecificValue value={value} type={type} truncate />
     </ValueActions>
   );
+};
+
+Value.defaultProps = {
+  children: null,
 };
 
 export default Value;

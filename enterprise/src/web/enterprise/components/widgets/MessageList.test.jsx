@@ -8,16 +8,15 @@ import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mock
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'enterprise/logic/ActionContext';
+import MessagesWidgetConfig from '../../logic/widgets/MessagesWidgetConfig';
 
 jest.mock('enterprise/components/messagelist/MessageTableEntry', () => ({}));
 
 describe('MessageList', () => {
-  const StreamsStore = StoreMock('listen', ['listStreams', () => ({ then: jest.fn() })], 'availableStreams');
   const ViewStore = StoreMock('listen', ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })]);
   const CurrentUserStore = StoreMock('listen', 'get');
   const SelectedFieldsStore = StoreMock('listen', 'selectedFields');
   const storeProviderMock = new StoreProviderMock({
-    Streams: StreamsStore,
     CurrentUser: CurrentUserStore,
   });
   const SearchStore = StoreMock('searchSurroundingMessages');
@@ -44,7 +43,6 @@ describe('MessageList', () => {
   jest.doMock('injection/StoreProvider', () => storeProviderMock);
   jest.doMock('legacy/result-histogram', () => 'Histogram');
   jest.doMock('enterprise/stores/SearchConfigStore', () => ({ SearchConfigStore: SearchConfigStore }));
-  jest.doMock('enterprise/stores/StreamsStore', () => ({ StreamsStore: StreamsStore }));
   jest.doMock('enterprise/stores/ViewStore', () => ({ ViewStore: ViewStore }));
   jest.doMock('components/search', () => ({ MessageTablePaginator: 'message-table-paginator' }));
   jest.doMock('enterprise/stores/WidgetStore', () => WidgetActions);
@@ -74,34 +72,36 @@ describe('MessageList', () => {
 
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
+    SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set(['file_name']));
     const wrapper1 = mount(<MessageList editing
                                         data={data}
-                                        fields={Immutable.List(fields)}
-                                        config={{ fields: ['file_name'] }} />);
+                                        fields={Immutable.List(fields)} />);
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
+    SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(<MessageList editing
                                         data={data}
-                                        fields={Immutable.List(fields)}
-                                        config={{ fields: [] }} />);
+                                        fields={Immutable.List(fields)} />);
     expect(wrapper2.find('span[role="presentation"]').length).toBe(1);
   });
   it('provides a message context for each individual entry', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
+    const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
     const wrapper = mount(<MessageList editing
                                        data={data}
                                        fields={Immutable.List(fields)}
-                                       config={{ fields: ['file_name'] }} />);
+                                       config={config} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.props().children).toMatchSnapshot();
   });
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
+    const config = MessagesWidgetConfig.builder().fields([]).build();
     mount(<MessageList editing
                        data={data}
                        fields={Immutable.List([])}
-                       config={{ fields: [] }} />);
+                       config={config} />);
   });
 });
