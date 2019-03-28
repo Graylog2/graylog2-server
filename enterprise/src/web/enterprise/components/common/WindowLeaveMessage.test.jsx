@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
+import { last } from 'lodash';
+
 // $FlowFixMe: imports from core need to be fixed in flow
 import AppConfig from 'util/AppConfig';
 import WindowLeaveMessage from './WindowLeaveMessage';
@@ -14,10 +16,7 @@ const mockRouter = () => ({
   setRouteLeaveHook: jest.fn(),
 });
 
-const lastCall = (fn) => {
-  const callCount = fn.mock.calls.length;
-  return fn.mock.calls[callCount - 1];
-};
+const lastCall = (fn, filter = () => true) => last(fn.mock.calls.filter(filter));
 
 describe('WindowLeaveMessage', () => {
   const addEventListener = window.addEventListener;
@@ -78,7 +77,7 @@ describe('WindowLeaveMessage', () => {
     const router = mockRouter();
 
     mount(<WindowLeaveMessage dirty route={{}} router={router} />);
-    const [, fn] = lastCall(window.addEventListener);
+    const [, fn] = lastCall(window.addEventListener, ([key]) => (key === 'beforeunload'));
     const e = {};
 
     const result = fn(e);
@@ -91,7 +90,7 @@ describe('WindowLeaveMessage', () => {
     const router = mockRouter();
 
     mount(<WindowLeaveMessage dirty={false} route={{}} router={router} />);
-    const [, fn] = lastCall(window.addEventListener);
+    const [, fn] = lastCall(window.addEventListener, ([key]) => (key === 'beforeunload'));
     const e = {};
 
     const result = fn(e);
@@ -105,7 +104,7 @@ describe('WindowLeaveMessage', () => {
     AppConfig.gl2DevMode = jest.fn(() => true);
 
     mount(<WindowLeaveMessage dirty route={{}} router={router} />);
-    const [, fn] = lastCall(window.addEventListener);
+    const [, fn] = lastCall(window.addEventListener, ([key]) => (key === 'beforeunload'));
     const e = {};
 
     const result = fn(e);
