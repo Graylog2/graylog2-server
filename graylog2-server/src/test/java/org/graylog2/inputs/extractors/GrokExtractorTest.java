@@ -218,11 +218,19 @@ public class GrokExtractorTest {
 
         final GrokExtractor extractor1 = makeExtractor("%{TWOBASENUMS}", config);
 
-        Extractor.Result[] result = extractor1.run("22 23");
-        assertThat(result)
+        /* Test flatten with a multiple non unique result [ 22, 23 ] */
+        Extractor.Result[] result1 = extractor1.run("22 23");
+        assertThat(result1)
                 .hasSize(2)
                 .contains(new Extractor.Result("22 23", "TWOBASENUMS", -1, -1),
                         new Extractor.Result(Arrays.asList("22", "23"), "BASE10NUM", -1, -1));
+
+        /* Test flatten with a multiple but unique result [ 22, 22 ] */
+        Extractor.Result[] result2 = extractor1.run("22 22");
+        assertThat(result2)
+                .hasSize(2)
+                .contains(new Extractor.Result("22 22", "TWOBASENUMS", -1, -1),
+                        new Extractor.Result("22", "BASE10NUM", -1, -1));
     }
 
     @Test
