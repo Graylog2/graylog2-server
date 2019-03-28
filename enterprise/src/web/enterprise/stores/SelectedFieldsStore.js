@@ -1,11 +1,10 @@
 // @flow strict
-
 import Reflux from 'reflux';
 import { Set } from 'immutable';
 import { get, isEqual } from 'lodash';
 
+import type ViewState from 'enterprise/logic/views/ViewState';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
-import type ViewState from '../logic/views/ViewState';
 
 type StateUpdate = {
   activeQuery: string,

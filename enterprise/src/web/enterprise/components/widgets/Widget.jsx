@@ -143,28 +143,25 @@ class Widget extends React.Component {
     const visualization = this.visualize();
     const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
     if (editing) {
-      let editWidgetFrameContent = null;
       const EditComponent = Widget._editComponentForType(widget.type);
       return (
         <EditWidgetFrame widgetId={id}>
-          <span ref={(elem) => { editWidgetFrameContent = elem; }}>
-            <MeasureDimensions>
-              <WidgetHeader title={title}
-                            hideDragHandle
-                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing}>
-                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                </WidgetFilterMenu>
-              </WidgetHeader>
-              <EditComponent config={config}
-                             fields={fields}
-                             id={id}
-                             onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
-                {visualization}
-              </EditComponent>
-            </MeasureDimensions>
-          </span>
+          <MeasureDimensions>
+            <WidgetHeader title={title}
+                          hideDragHandle
+                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                          editing={editing}>
+              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+              </WidgetFilterMenu>
+            </WidgetHeader>
+            <EditComponent config={config}
+                           fields={fields}
+                           id={id}
+                           onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
+              {visualization}
+            </EditComponent>
+          </MeasureDimensions>
           <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
         </EditWidgetFrame>
       );

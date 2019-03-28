@@ -1,19 +1,25 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+import * as Immutable from 'immutable';
+
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import Immutable from 'immutable';
+// $FlowFixMe: imports from core need to be fixed in flow
+import { MessageTablePaginator } from 'components/search';
+// $FlowFixMe: imports from core need to be fixed in flow
+import CombinedProvider from 'injection/CombinedProvider';
+// $FlowFixMe: imports from core need to be fixed in flow
+import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import { TIMESTAMP_FIELD } from 'enterprise/Constants';
 import { MessageTableEntry } from 'enterprise/components/messagelist';
-import { MessageTablePaginator } from 'components/search';
 import Field from 'enterprise/components/Field';
 
 import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
-import CombinedProvider from 'injection/CombinedProvider';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 import { StreamsStore } from 'enterprise/stores/StreamsStore';

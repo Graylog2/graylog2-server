@@ -1,24 +1,31 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { MenuItem } from 'react-bootstrap';
 
 import style from 'pages/ShowDashboardPage.css';
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
+
+import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import { SelectedFieldsActions, SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
+import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
 
 import WidgetHeader from '../widgets/WidgetHeader';
 import WidgetActionDropdown from '../widgets/WidgetActionDropdown';
 import EditWidgetFrame from '../widgets/EditWidgetFrame';
 import MessageList from '../widgets/MessageList';
 import MeasureDimensions from '../widgets/MeasureDimensions';
-import { FieldTypesStore } from '../../stores/FieldTypesStore';
-import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
 import widgetStyles from '../widgets/Widget.css';
+import EditMessageList from '../widgets/EditMessageList';
+
+import EmptyResultWidget from '../widgets/EmptyResultWidget';
+import SaveOrCancelButtons from '../widgets/SaveOrCancelButtons';
 
 import staticMessageListStyle from './StaticMessageList.css';
-import EditMessageList from '../widgets/EditMessageList';
-import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
 const StaticMessageList = createReactClass({
   propTypes: {
@@ -30,6 +37,7 @@ const StaticMessageList = createReactClass({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }),
     onToggleMessages: PropTypes.func.isRequired,
+    selectedFields: ImmutablePropTypes.setOf(PropTypes.string).isRequired,
     showMessages: PropTypes.bool.isRequired,
   },
 
@@ -45,7 +53,29 @@ const StaticMessageList = createReactClass({
   getInitialState() {
     return {
       editing: false,
+      oldFields: undefined,
     };
+  },
+
+  _onEdit() {
+    this.setState({
+      editing: true,
+      oldFields: this.props.selectedFields.toJS(),
+    });
+  },
+
+  _onSave() {
+    this.setState({ editing: false, oldFields: undefined });
+  },
+
+  _onCancel() {
+    const { oldFields } = this.state;
+    this.setState({ editing: false, oldFields: undefined }, () => SelectedFieldsActions.set(oldFields));
+  },
+
+  _onChangeFields(newConfig) {
+    const { fields } = newConfig;
+    SelectedFieldsActions.set(fields);
   },
 
   renderEditWidget() {
@@ -53,25 +83,19 @@ const StaticMessageList = createReactClass({
       return undefined;
     }
 
-    const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${widgetStyles.widgetActionDropdownCaret} ${widgetStyles.tonedDown}`} />;
-    let container;
+    const config = MessagesWidgetConfig.builder().fields(this.props.selectedFields.toJS()).build();
+
     return (
       <EditWidgetFrame>
-        <span ref={(node) => { container = node; }}>
-          <span className="pull-right">
-            <WidgetActionDropdown element={widgetActionDropdownCaret} container={() => container}>
-              <MenuItem onSelect={() => { this.setState({ editing: !this.state.editing }); }}>Finish Editing</MenuItem>
-            </WidgetActionDropdown>
-          </span>
-          <MeasureDimensions>
-            <WidgetHeader hideDragHandle title="All Messages" />
-            <EditMessageList fields={this.props.fieldTypes.all}>
-              <MessageList data={this.props.messages}
-                           fields={this.props.fieldTypes.all}
-                           pageSize={100} />
-            </EditMessageList>
-          </MeasureDimensions>
-        </span>
+        <MeasureDimensions>
+          <WidgetHeader hideDragHandle title="All Messages" />
+          <EditMessageList fields={this.props.fieldTypes.all} containerHeight={100} config={config} onChange={this._onChangeFields}>
+            <MessageList data={this.props.messages}
+                         fields={this.props.fieldTypes.all}
+                         pageSize={100} />
+          </EditMessageList>
+        </MeasureDimensions>
+        <SaveOrCancelButtons onFinish={this._onSave} onCancel={this._onCancel} />
       </EditWidgetFrame>
     );
   },
@@ -91,7 +115,7 @@ const StaticMessageList = createReactClass({
           </span>
           <span className={`pull-right ${staticMessageListStyle.carret}`}>
             <WidgetActionDropdown element={widgetActionDropdownCaret}>
-              <MenuItem onSelect={() => { this.setState({ editing: !this.state.editing }); }}>Edit</MenuItem>
+              <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
             </WidgetActionDropdown>
           </span>
           {this.props.showMessages ? <WidgetHeader hideDragHandle title="All Messages" /> : <span style={{ fontSize: 12 }}>Messages</span>}
@@ -111,4 +135,4 @@ const StaticMessageList = createReactClass({
   },
 });
 
-export default connect(StaticMessageList, { fieldTypes: FieldTypesStore });
+export default connect(StaticMessageList, { fieldTypes: FieldTypesStore, selectedFields: SelectedFieldsStore });
