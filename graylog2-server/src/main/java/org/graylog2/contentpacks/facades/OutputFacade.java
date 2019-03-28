@@ -63,16 +63,19 @@ public class OutputFacade implements EntityFacade<Output> {
     private final OutputService outputService;
     private final Set<PluginMetaData> pluginMetaData;
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories;
+    private final Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2;
 
     @Inject
     public OutputFacade(ObjectMapper objectMapper,
                         OutputService outputService,
                         Set<PluginMetaData> pluginMetaData,
-                        Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories) {
+                        Map<String, MessageOutput.Factory<? extends MessageOutput>> outputFactories,
+                        Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2) {
         this.objectMapper = objectMapper;
         this.outputService = outputService;
         this.pluginMetaData = pluginMetaData;
         this.outputFactories = outputFactories;
+        this.outputFactories2 = outputFactories2;
     }
 
     @VisibleForTesting
@@ -95,12 +98,21 @@ public class OutputFacade implements EntityFacade<Output> {
 
     private Set<Constraint> versionConstraints(Output output) {
         // TODO: Find more robust method of identifying the providing plugin
+
+        // We have two output lists for backwards compatibility.
+        // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
         final MessageOutput.Factory<? extends MessageOutput> outputFactory = outputFactories.get(output.getType());
-        if (outputFactory == null) {
+        final MessageOutput.Factory2<? extends MessageOutput> outputFactory2 = outputFactories2.get(output.getType());
+        if (outputFactory == null && outputFactory2 == null) {
             throw new ContentPackException("Unknown output type: " + output.getType());
         }
         // We have to use the descriptor because the factory is only a runtime-generated proxy. :(
-        final String packageName = outputFactory.getDescriptor().getClass().getPackage().getName();
+        final String packageName;
+        if (outputFactory2 != null) {
+            packageName = outputFactory2.getDescriptor().getClass().getPackage().getName();
+        } else {
+            packageName = outputFactory.getDescriptor().getClass().getPackage().getName();
+        }
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
                 .map(PluginVersionConstraint::of)

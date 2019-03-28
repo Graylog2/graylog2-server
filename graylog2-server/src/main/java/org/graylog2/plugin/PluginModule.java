@@ -94,13 +94,24 @@ public abstract class PluginModule extends Graylog2Module {
         serviceBinder.addBinding().to(initializerClass);
     }
 
+    // This should only be used by plugins that have been built before Graylog 3.0.1.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected void addMessageOutput(Class<? extends MessageOutput> messageOutputClass) {
         installOutput(outputsMapBinder(), messageOutputClass);
     }
 
+    // This should only be used by plugins that have been built before Graylog 3.0.1.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
     protected <T extends MessageOutput> void addMessageOutput(Class<T> messageOutputClass,
                                                               Class<? extends MessageOutput.Factory<T>> factory) {
         installOutput(outputsMapBinder(), messageOutputClass, factory);
+    }
+
+    // This should be used by plugins that have been built for 3.0.1 or later.
+    // See comments in MessageOutput.Factory and MessageOutput.Factory2 for details
+    protected <T extends MessageOutput> void addMessageOutput2(Class<T> messageOutputClass,
+                                                              Class<? extends MessageOutput.Factory2<T>> factory) {
+        installOutput2(outputsMapBinder2(), messageOutputClass, factory);
     }
 
     protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {
