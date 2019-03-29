@@ -13,9 +13,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
-import CombinedProvider from 'injection/CombinedProvider';
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
-
 import { TIMESTAMP_FIELD, Messages } from 'enterprise/Constants';
 import { MessageTableEntry } from 'enterprise/components/messagelist';
 import Field from 'enterprise/components/Field';
