@@ -67,7 +67,6 @@ class Timestamp extends React.Component {
         return dateTime.toBrowserLocalTime().toString(this.props.format);
       default:
         return dateTime.toTimeZone(this.props.tz).toString(this.props.format);
-
     }
   };
 
