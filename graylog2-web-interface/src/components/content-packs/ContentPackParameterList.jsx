@@ -25,7 +25,7 @@ class ContentPackParameterList extends React.Component {
     readOnly: false,
     onDeleteParameter: () => {},
     onAddParameter: () => {},
-    appliedParameter: {},
+    appliedParameter: undefined,
   };
 
   constructor(props) {
@@ -42,6 +42,9 @@ class ContentPackParameterList extends React.Component {
   }
 
   _parameterApplied = (paramName) => {
+    if (!this.props.appliedParameter) {
+      return false;
+    }
     const entityIds = Object.keys(this.props.appliedParameter);
     /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
     for (const i in entityIds) {
@@ -65,7 +68,7 @@ class ContentPackParameterList extends React.Component {
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
-        <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
+        {this.props.appliedParameter && <td><Badge className={bsStyle}><i className={icon} /></Badge></td>}
         {!this.props.readOnly &&
         <td>
           <ButtonToolbar>
@@ -154,10 +157,18 @@ class ContentPackParameterList extends React.Component {
     this.setState({ filteredParameters: filteredParameters, filter: filter });
   };
 
-  render() {
-    const headers = this.props.readOnly ?
+  _getHeaders = () => {
+    const headers = this.props.appliedParameter ?
       ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used'] :
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
+      ['Title', 'Name', 'Description', 'Value Type', 'Default Value'];
+    if (!this.props.readOnly) {
+      return headers.concat(['Action']);
+    }
+    return headers;
+  };
+
+  render() {
+    const headers = this._getHeaders();
     return (
       <div>
         <h2>Parameters list</h2>
