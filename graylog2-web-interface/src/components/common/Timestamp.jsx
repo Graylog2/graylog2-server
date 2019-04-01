@@ -50,6 +50,8 @@ class Timestamp extends React.Component {
 
   static defaultProps = {
     format: DateTime.Formats.TIMESTAMP,
+    relative: false,
+    tz: undefined,
   };
 
   _formatDateTime = () => {
