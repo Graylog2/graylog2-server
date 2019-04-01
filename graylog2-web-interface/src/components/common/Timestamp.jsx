@@ -20,9 +20,10 @@ class Timestamp extends React.Component {
   static propTypes = {
     /**
      * Date time to be displayed in the component. You can provide an ISO
-     * 8601 string, a JS native `Date` object, or a moment `Date` object.
+     * 8601 string, a JS native `Date` object, a moment `Date` object, or
+     * a number containing seconds after UNIX epoch.
      */
-    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.number]).isRequired,
     /**
      * Format to use to represent the date time. It supports any format
      * supported by momentjs http://momentjs.com/docs/#/displaying/format/.
@@ -49,6 +50,8 @@ class Timestamp extends React.Component {
 
   static defaultProps = {
     format: DateTime.Formats.TIMESTAMP,
+    relative: false,
+    tz: undefined,
   };
 
   _formatDateTime = () => {
@@ -64,7 +67,6 @@ class Timestamp extends React.Component {
         return dateTime.toBrowserLocalTime().toString(this.props.format);
       default:
         return dateTime.toTimeZone(this.props.tz).toString(this.props.format);
-
     }
   };
 
