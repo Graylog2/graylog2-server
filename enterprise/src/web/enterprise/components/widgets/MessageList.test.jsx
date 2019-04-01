@@ -8,7 +8,7 @@ import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mock
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'enterprise/logic/ActionContext';
-import MessagesWidgetConfig from '../../logic/widgets/MessagesWidgetConfig';
+import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
 
 jest.mock('enterprise/components/messagelist/MessageTableEntry', () => ({}));
 

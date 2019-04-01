@@ -29,6 +29,10 @@ class FieldTypeMapping {
     const { name, type } = value;
     return new FieldTypeMapping(name, FieldType.fromJSON(type));
   }
+
+  static create(name: string, type: FieldType) {
+    return new FieldTypeMapping(name, type);
+  }
 }
 
 export default FieldTypeMapping;

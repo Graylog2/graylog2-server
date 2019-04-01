@@ -29,7 +29,7 @@ export default class Series {
     return this._value.config;
   }
 
-  get effectiveName() {
+  get effectiveName(): string {
     const overridenName = get(this, 'config.name');
     return overridenName || this.function;
   }

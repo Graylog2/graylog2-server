@@ -35,6 +35,7 @@ const Value = ({ field, value, queryId, render = defaultRenderer, type = FieldTy
 
 Value.defaultProps = {
   children: null,
+  render: defaultRenderer,
 };
 
 export default Value;

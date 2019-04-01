@@ -8,17 +8,13 @@ import Value from 'enterprise/components/Value';
 import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
+import fieldTypeFor from 'enterprise/logic/fieldtypes/FieldTypeFor';
 
 import styles from './DataTable.css';
 
-const _fieldTypeFor = (fields, field) => {
-  const fieldType = fields.find(f => f.name === field);
-  return fieldType ? fieldType.type : FieldType.Unknown;
-};
-
-const _headerField = (activeQuery, fields, field, prefix = '', span = 1) => (
+const _headerField = (activeQuery: string, fields, field: string, prefix: (string | number) = '', span: number = 1) => (
   <th key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
-    <Field name={field} queryId={activeQuery} type={_fieldTypeFor(fields, field)}>{field}</Field>
+    <Field name={field} queryId={activeQuery} type={fieldTypeFor(field, fields)}>{field}</Field>
   </th>
 );
 
@@ -66,10 +62,10 @@ type Props = {
 const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields }: Props) => {
   const rowFieldNames = rowPivots.map(pivot => pivot.field);
   const columnFieldNames = columnPivots.map(pivot => pivot.field);
-  const headerField = (field, prefix = '', span = 1) => _headerField(activeQuery, fields, field, prefix, span);
-  const rowPivotFields = rowFieldNames.map(headerField);
-  const effectiveSeries = series.map(s => s.effectiveName);
-  const seriesFields = effectiveSeries.map(headerField);
+  const headerField = (field, prefix = '', span: number = 1) => _headerField(activeQuery, fields, field, prefix, span);
+  const rowPivotFields = rowFieldNames.map(fieldName => headerField(fieldName));
+  const effectiveSeries: Array<string> = series.map(s => s.effectiveName);
+  const seriesFields = effectiveSeries.map(fieldName => headerField(fieldName));
   const columnPivotFields = flatten(actualColumnPivotFields.map(key => effectiveSeries.map(s => headerField(s, key.join('-')))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 

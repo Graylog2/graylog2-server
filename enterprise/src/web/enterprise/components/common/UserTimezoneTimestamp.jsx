@@ -17,4 +17,8 @@ UserTimezoneTimestamp.defaultProps = {
   timezone: null,
 };
 
-export default connect(UserTimezoneTimestamp, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ timezone: currentUser.timezone }));
+export default connect(
+  UserTimezoneTimestamp,
+  { currentUser: CurrentUserStore },
+  ({ currentUser = { timezone: 'UTC' } }) => ({ timezone: currentUser.timezone }),
+);

@@ -177,11 +177,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
       <tr>
         <th
           className="leftAligned"
-          colSpan={
-            Array [
-              "timestamp",
-            ]
-          }
+          colSpan={1}
         >
           <span>
             <span
@@ -202,11 +198,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
         </th>
         <th
           className="leftAligned"
-          colSpan={
-            Array [
-              "count()",
-            ]
-          }
+          colSpan={1}
         >
           <span>
             <span
@@ -336,11 +328,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
       <tr>
         <th
           className="leftAligned"
-          colSpan={
-            Array [
-              "timestamp",
-            ]
-          }
+          colSpan={1}
         >
           <span>
             <span

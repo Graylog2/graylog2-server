@@ -9,6 +9,7 @@ import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import type { ValuePath } from 'enterprise/logic/valueactions/ValueActionHandler';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
+import fieldTypeFor from 'enterprise/logic/fieldtypes/FieldTypeFor';
 import type { CurrentViewType } from '../CustomPropTypes';
 
 type Props = {
@@ -32,11 +33,6 @@ const _column = (field: string, value: *, selectedQuery: string, idx: number, ty
   </td>
 );
 
-const _fieldTypeFor = (field: string, types: FieldTypeMappingsList) => {
-  const fieldType = types.find(f => f.name === field);
-  return fieldType ? fieldType.type : FieldType.Unknown;
-};
-
 const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
   const classes = 'message-group';
   const { activeQuery } = currentView;
@@ -57,7 +53,7 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   return (
     <tbody className={classes}>
       <tr className="fields-row">
-        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, _fieldTypeFor(field, types), path.slice()))}
+        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(field, types), path.slice()))}
       </tr>
     </tbody>
   );

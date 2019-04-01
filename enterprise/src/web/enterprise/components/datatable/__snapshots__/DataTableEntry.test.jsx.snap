@@ -1,0 +1,1596 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DataTableEntry does not fail without types 1`] = `
+<table>
+  <DataTableEntry
+    columnPivotValues={
+      Array [
+        Array [
+          "TCP",
+        ],
+        Array [
+          "UDP",
+        ],
+      ]
+    }
+    columnPivots={
+      Array [
+        "nf_proto_name",
+      ]
+    }
+    currentView={
+      Object {
+        "activeQuery": "6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d",
+      }
+    }
+    fields={
+      Immutable.OrderedSet [
+        "nf_dst_address",
+        "count()",
+        "max(timestamp)",
+        "card(timestamp)",
+      ]
+    }
+    item={
+      Object {
+        "card(timestamp)": 20,
+        "count()": 84,
+        "max(timestamp)": 1554106041841,
+        "nf_dst_address": "192.168.1.24",
+        "nf_proto_name": Object {
+          "TCP": Object {
+            "card(timestamp)": 14,
+            "count()": 20,
+            "max(timestamp)": 1554106041841,
+          },
+          "UDP": Object {
+            "card(timestamp)": 16,
+            "count()": 64,
+            "max(timestamp)": 1554106041841,
+          },
+        },
+      }
+    }
+    series={
+      Array [
+        Object {
+          "config": Object {
+            "name": null,
+          },
+          "function": "count()",
+        },
+        Object {
+          "config": Object {
+            "name": null,
+          },
+          "function": "max(timestamp)",
+        },
+        Object {
+          "config": Object {
+            "name": null,
+          },
+          "function": "card(timestamp)",
+        },
+      ]
+    }
+    types={Array []}
+    valuePath={
+      Array [
+        Object {
+          "nf_dst_address": "192.168.1.24",
+        },
+      ]
+    }
+  >
+    <tbody
+      className="message-group"
+    >
+      <tr
+        className="fields-row"
+      >
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-nf_dst_address=192.168.1.24-0"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="nf_dst_address"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "unknown",
+                    "properties": Immutable.Set [],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value="192.168.1.24"
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value="192.168.1.24"
+                  />
+                }
+                field="nf_dst_address"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "unknown",
+                      "properties": Immutable.Set [],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value="192.168.1.24"
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "unknown",
+                            "properties": Immutable.Set [],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value="192.168.1.24"
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "unknown",
+                              "properties": Immutable.Set [],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value="192.168.1.24"
+                      >
+                        <Component
+                          value="192.168.1.24"
+                        >
+                          <defaultRenderer
+                            field="nf_dst_address"
+                            value="192.168.1.24"
+                          >
+                            192.168.1.24
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-count()=84-1"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="count()"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "long",
+                    "properties": Immutable.Set [
+                      "numeric",
+                      "enumerable",
+                    ],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={84}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={84}
+                  />
+                }
+                field="count()"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "long",
+                      "properties": Immutable.Set [
+                        "numeric",
+                        "enumerable",
+                      ],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={84}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "long",
+                            "properties": Immutable.Set [
+                              "numeric",
+                              "enumerable",
+                            ],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={84}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "long",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={84}
+                      >
+                        <Component
+                          value="84"
+                        >
+                          <defaultRenderer
+                            field="count()"
+                            value="84"
+                          >
+                            84
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-max(timestamp)=1554106041841-2"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="max(timestamp)"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "unknown",
+                    "properties": Immutable.Set [],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={1554106041841}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={1554106041841}
+                  />
+                }
+                field="max(timestamp)"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "unknown",
+                      "properties": Immutable.Set [],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={1554106041841}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "unknown",
+                            "properties": Immutable.Set [],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={1554106041841}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "unknown",
+                              "properties": Immutable.Set [],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={1554106041841}
+                      >
+                        <Component
+                          value="1554106041841"
+                        >
+                          <defaultRenderer
+                            field="max(timestamp)"
+                            value="1554106041841"
+                          >
+                            1554106041841
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-card(timestamp)=20-3"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="card(timestamp)"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "long",
+                    "properties": Immutable.Set [
+                      "numeric",
+                      "enumerable",
+                    ],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={20}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={20}
+                  />
+                }
+                field="card(timestamp)"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "long",
+                      "properties": Immutable.Set [
+                        "numeric",
+                        "enumerable",
+                      ],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={20}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "long",
+                            "properties": Immutable.Set [
+                              "numeric",
+                              "enumerable",
+                            ],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={20}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "long",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={20}
+                      >
+                        <Component
+                          value="20"
+                        >
+                          <defaultRenderer
+                            field="card(timestamp)"
+                            value="20"
+                          >
+                            20
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-count()=20-4"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "nf_proto_name": "TCP",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="count()"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "long",
+                    "properties": Immutable.Set [
+                      "numeric",
+                      "enumerable",
+                    ],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={20}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={20}
+                  />
+                }
+                field="count()"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "long",
+                      "properties": Immutable.Set [
+                        "numeric",
+                        "enumerable",
+                      ],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={20}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "long",
+                            "properties": Immutable.Set [
+                              "numeric",
+                              "enumerable",
+                            ],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={20}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "long",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={20}
+                      >
+                        <Component
+                          value="20"
+                        >
+                          <defaultRenderer
+                            field="count()"
+                            value="20"
+                          >
+                            20
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-max(timestamp)=1554106041841-5"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "nf_proto_name": "TCP",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="max(timestamp)"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "unknown",
+                    "properties": Immutable.Set [],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={1554106041841}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={1554106041841}
+                  />
+                }
+                field="max(timestamp)"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "unknown",
+                      "properties": Immutable.Set [],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={1554106041841}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "unknown",
+                            "properties": Immutable.Set [],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={1554106041841}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "unknown",
+                              "properties": Immutable.Set [],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={1554106041841}
+                      >
+                        <Component
+                          value="1554106041841"
+                        >
+                          <defaultRenderer
+                            field="max(timestamp)"
+                            value="1554106041841"
+                          >
+                            1554106041841
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-card(timestamp)=14-6"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "nf_proto_name": "TCP",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="card(timestamp)"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "long",
+                    "properties": Immutable.Set [
+                      "numeric",
+                      "enumerable",
+                    ],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={14}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={14}
+                  />
+                }
+                field="card(timestamp)"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "long",
+                      "properties": Immutable.Set [
+                        "numeric",
+                        "enumerable",
+                      ],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={14}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "long",
+                            "properties": Immutable.Set [
+                              "numeric",
+                              "enumerable",
+                            ],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={14}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "long",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={14}
+                      >
+                        <Component
+                          value="14"
+                        >
+                          <defaultRenderer
+                            field="card(timestamp)"
+                            value="14"
+                          >
+                            14
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-count()=64-7"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "nf_proto_name": "UDP",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="count()"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "long",
+                    "properties": Immutable.Set [
+                      "numeric",
+                      "enumerable",
+                    ],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={64}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={64}
+                  />
+                }
+                field="count()"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "long",
+                      "properties": Immutable.Set [
+                        "numeric",
+                        "enumerable",
+                      ],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={64}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "long",
+                            "properties": Immutable.Set [
+                              "numeric",
+                              "enumerable",
+                            ],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={64}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "long",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={64}
+                      >
+                        <Component
+                          value="64"
+                        >
+                          <defaultRenderer
+                            field="count()"
+                            value="64"
+                          >
+                            64
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-max(timestamp)=1554106041841-8"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "nf_proto_name": "UDP",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="max(timestamp)"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "unknown",
+                    "properties": Immutable.Set [],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={1554106041841}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "unknown",
+                          "properties": Immutable.Set [],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={1554106041841}
+                  />
+                }
+                field="max(timestamp)"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "unknown",
+                      "properties": Immutable.Set [],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={1554106041841}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "unknown",
+                            "properties": Immutable.Set [],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={1554106041841}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "unknown",
+                              "properties": Immutable.Set [],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={1554106041841}
+                      >
+                        <Component
+                          value="1554106041841"
+                        >
+                          <defaultRenderer
+                            field="max(timestamp)"
+                            value="1554106041841"
+                          >
+                            1554106041841
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+        <td
+          key="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d-card(timestamp)=16-9"
+        >
+          <Provider
+            value={
+              Object {
+                "valuePath": Array [
+                  Object {
+                    "nf_dst_address": "192.168.1.24",
+                  },
+                  Object {
+                    "nf_proto_name": "UDP",
+                  },
+                ],
+              }
+            }
+          >
+            <Value
+              field="card(timestamp)"
+              queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+              render={[Function]}
+              type={
+                FieldType {
+                  "value": Immutable.Map {
+                    "type": "long",
+                    "properties": Immutable.Set [
+                      "numeric",
+                      "enumerable",
+                    ],
+                    "indexNames": Immutable.Set [],
+                  },
+                }
+              }
+              value={16}
+            >
+              <ValueActions
+                element={
+                  <TypeSpecificValue
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "long",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
+                    value={16}
+                  />
+                }
+                field="card(timestamp)"
+                menuContainer={<body />}
+                queryId="6ca0ea05-6fc1-4f46-9b22-20a5baab7b0d"
+                type={
+                  FieldType {
+                    "value": Immutable.Map {
+                      "type": "long",
+                      "properties": Immutable.Set [
+                        "numeric",
+                        "enumerable",
+                      ],
+                      "indexNames": Immutable.Set [],
+                    },
+                  }
+                }
+                value={16}
+              >
+                <OverlayDropdown
+                  menuContainer={<body />}
+                  onToggle={[Function]}
+                  placement="right"
+                  show={false}
+                  toggle={
+                    <TypeSpecificValue
+                      render={[Function]}
+                      type={
+                        FieldType {
+                          "value": Immutable.Map {
+                            "type": "long",
+                            "properties": Immutable.Set [
+                              "numeric",
+                              "enumerable",
+                            ],
+                            "indexNames": Immutable.Set [],
+                          },
+                        }
+                      }
+                      value={16}
+                    />
+                  }
+                >
+                  <span>
+                    <span
+                      className="dropdowntoggle"
+                      onClick={[Function]}
+                      role="presentation"
+                    >
+                      <TypeSpecificValue
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "long",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={16}
+                      >
+                        <Component
+                          value="16"
+                        >
+                          <defaultRenderer
+                            field="card(timestamp)"
+                            value="16"
+                          >
+                            16
+                          </defaultRenderer>
+                        </Component>
+                      </TypeSpecificValue>
+                      <span
+                        className="caret"
+                      />
+                    </span>
+                    <Overlay
+                      container={<body />}
+                      containerPadding={10}
+                      onHide={[Function]}
+                      placement="right"
+                      rootClose={true}
+                      shouldUpdatePosition={true}
+                      show={false}
+                      target={[Function]}
+                    />
+                  </span>
+                </OverlayDropdown>
+              </ValueActions>
+            </Value>
+          </Provider>
+        </td>
+      </tr>
+    </tbody>
+  </DataTableEntry>
+</table>
+`;
+
+exports[`DataTableEntry provides valuePath in context for each value 1`] = `
+Array [
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "TCP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "UDP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "UDP",
+      },
+    ],
+  },
+  Object {
+    "valuePath": Array [
+      Object {
+        "nf_dst_address": "192.168.1.24",
+      },
+      Object {
+        "nf_proto_name": "UDP",
+      },
+    ],
+  },
+]
+`;
