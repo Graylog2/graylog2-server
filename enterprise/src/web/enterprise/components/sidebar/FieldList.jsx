@@ -89,7 +89,6 @@ const FieldList = createReactClass({
         <Field queryId={selectedQuery}
                viewId={selectedView}
                disabled={disabled}
-               menuContainer={document && document.getElementById('sidebar')}
                name={name}
                type={type}
                interactive>
