@@ -477,17 +477,8 @@ public class InputFacadeTest {
                 ValueReference.of("BOOLEAN")
         );
 
-        final LookupTableEntity torNodeEntity = LookupTableEntity.create(
-                ValueReference.of("tor-exit-node-list"),
-                ValueReference.of("title"),
-                ValueReference.of("description"),
-                ValueReference.of("cache_name"),
-                ValueReference.of("dataadapter_name"),
-                ValueReference.of("default_single_value"),
-                ValueReference.of("BOOLEAN"),
-                ValueReference.of("default_multi_value"),
-                ValueReference.of("BOOLEAN")
-        );
+        final LookupTableEntity torNodeEntity  = generateTorNodeEntity();
+
         final Entity expectedWhoIsEntity = EntityV1.builder()
                 .id(ModelId.of("dead-beef"))
                 .data(objectMapper.convertValue(whoIsEntity, JsonNode.class))
@@ -507,6 +498,21 @@ public class InputFacadeTest {
         Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
         assertThat(graph.nodes()).contains(expectedWhoIsEntity);
         assertThat(graph.nodes()).contains(expectedTorEntity);
+    }
+
+    private LookupTableEntity generateTorNodeEntity() {
+        final LookupTableEntity torNodeEntity = LookupTableEntity.create(
+            ValueReference.of("tor-exit-node-list"),
+            ValueReference.of("title"),
+            ValueReference.of("description"),
+            ValueReference.of("cache_name"),
+            ValueReference.of("dataadapter_name"),
+            ValueReference.of("default_single_value"),
+            ValueReference.of("BOOLEAN"),
+            ValueReference.of("default_multi_value"),
+            ValueReference.of("BOOLEAN")
+        );
+        return torNodeEntity;
     }
 
     @Test
