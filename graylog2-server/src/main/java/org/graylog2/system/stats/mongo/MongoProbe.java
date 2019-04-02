@@ -186,31 +186,38 @@ public class MongoProbe {
             dbStats = null;
         }
 
+        final ServerStatus serverStatus = getServerStatus();
+
+        // TODO Collection stats? http://docs.mongodb.org/manual/reference/command/collStats/
+        return MongoStats.create(servers, buildInfo, hostInfo, serverStatus, dbStats);
+    }
+
+    private ServerStatus getServerStatus() {
         final ServerStatus serverStatus;
         final CommandResult serverStatusResult = adminDb.command("serverStatus");
         if (serverStatusResult.ok()) {
             final BasicDBObject connectionsMap = (BasicDBObject) serverStatusResult.get("connections");
             final ServerStatus.Connections connections = ServerStatus.Connections.create(
-                    connectionsMap.getInt("current"),
-                    connectionsMap.getInt("available"),
-                    connectionsMap.containsField("totalCreated") ? connectionsMap.getLong("totalCreated") : null
+                connectionsMap.getInt("current"),
+                connectionsMap.getInt("available"),
+                connectionsMap.containsField("totalCreated") ? connectionsMap.getLong("totalCreated") : null
             );
 
             final BasicDBObject networkMap = (BasicDBObject) serverStatusResult.get("network");
             final ServerStatus.Network network = ServerStatus.Network.create(
-                    networkMap.getInt("bytesIn"),
-                    networkMap.getInt("bytesOut"),
-                    networkMap.getInt("numRequests")
+                networkMap.getInt("bytesIn"),
+                networkMap.getInt("bytesOut"),
+                networkMap.getInt("numRequests")
             );
 
             final BasicDBObject memoryMap = (BasicDBObject) serverStatusResult.get("mem");
             final ServerStatus.Memory memory = ServerStatus.Memory.create(
-                    memoryMap.getInt("bits"),
-                    memoryMap.getInt("resident"),
-                    memoryMap.getInt("virtual"),
-                    memoryMap.getBoolean("supported"),
-                    memoryMap.getInt("mapped"),
-                    memoryMap.getInt("mappedWithJournal", -1)
+                memoryMap.getInt("bits"),
+                memoryMap.getInt("resident"),
+                memoryMap.getInt("virtual"),
+                memoryMap.getBoolean("supported"),
+                memoryMap.getInt("mapped"),
+                memoryMap.getInt("mappedWithJournal", -1)
             );
 
             final BasicDBObject storageEngineMap = (BasicDBObject) serverStatusResult.get("storageEngine");
@@ -223,24 +230,22 @@ public class MongoProbe {
 
             final int uptime = serverStatusResult.getInt("uptime", 0);
             serverStatus = ServerStatus.create(
-                    serverStatusResult.getString("host"),
-                    serverStatusResult.getString("version"),
-                    serverStatusResult.getString("process"),
-                    serverStatusResult.getLong("pid", 0),
-                    uptime,
-                    serverStatusResult.getLong("uptimeMillis", uptime * 1000L),
-                    serverStatusResult.getInt("uptimeEstimate"),
-                    new DateTime(serverStatusResult.getDate("localTime")),
-                    connections,
-                    network,
-                    memory,
-                    storageEngine);
+                serverStatusResult.getString("host"),
+                serverStatusResult.getString("version"),
+                serverStatusResult.getString("process"),
+                serverStatusResult.getLong("pid", 0),
+                uptime,
+                serverStatusResult.getLong("uptimeMillis", uptime * 1000L),
+                serverStatusResult.getInt("uptimeEstimate"),
+                new DateTime(serverStatusResult.getDate("localTime")),
+                connections,
+                network,
+                memory,
+                storageEngine);
         } else {
             LOG.debug("Couldn't retrieve MongoDB serverStatus: {}", serverStatusResult.getErrorMessage());
             serverStatus = null;
         }
-
-        // TODO Collection stats? http://docs.mongodb.org/manual/reference/command/collStats/
-        return MongoStats.create(servers, buildInfo, hostInfo, serverStatus, dbStats);
+        return serverStatus;
     }
 }
