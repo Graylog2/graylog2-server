@@ -275,10 +275,7 @@ public class ContentPackTest {
 
     @Test
     public void deserializeLegacyContentPack() throws IOException {
-        final URL resourceUrl = Resources.getResource(ContentPackTest.class, "contentpack_legacy.json");
-        final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
-        assertThat(contentPack).isInstanceOf(LegacyContentPack.class);
-
+        ContentPack contentPack = getContentPack();
         final LegacyContentPack legacyContentPack = (LegacyContentPack) contentPack;
         assertThat(legacyContentPack).isNotNull();
         assertThat(legacyContentPack.version()).isEqualTo(ModelVersion.of("0"));
@@ -425,6 +422,13 @@ public class ContentPackTest {
                                 .set("config", objectMapper.createObjectNode().put("type", "torexitnode")))
                         .build()
         );
+    }
+
+    private ContentPack getContentPack() throws IOException {
+        final URL resourceUrl = Resources.getResource(ContentPackTest.class, "contentpack_legacy.json");
+        final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
+        assertThat(contentPack).isInstanceOf(LegacyContentPack.class);
+        return contentPack;
     }
 
     @Test
