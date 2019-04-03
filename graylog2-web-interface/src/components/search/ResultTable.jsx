@@ -156,7 +156,7 @@ class ResultTable extends React.Component {
   render() {
     const selectedColumns = this._fieldColumns();
     let { messages } = this.props;
-    if (this.state.reverseMessages) messages = messages.reverse();
+    if (this.state.reverseMessages) messages = messages.concat().reverse();
 
     return (
       <div className="content-col">

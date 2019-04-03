@@ -1,0 +1,8 @@
+1. Start docker-compose to back web interface
+2. `yarn start` in graylog2-web-interface
+3. Emit some messages:
+```
+for i in (seq 0 400);
+  echo "test message $i" | nc localhost 514
+end
+```

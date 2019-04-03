@@ -6,8 +6,18 @@
 }
 
 :local .terminalView :global(tr.message-row td) {
+    left: 5px;
     padding-bottom: 0 !important;
-    color: white;
+    color: white !important;
+    font-size: 105%;
+    word-break: break-word;
+    border-bottom: 1px solid #444;
+    overflow: visible;
+    padding-left: 10px;
+}
+
+:local .terminalView :global(tr.message-row time) {
+    margin-left: -10px;
 }
 
 :local .terminalView :global(.message-detail-row td) {
