@@ -48,7 +48,7 @@ const Stream = createReactClass({
     if (stream.is_default) {
       return 'The default stream contains all messages.';
     }
-    if (stream.rules.length === 0) {
+    if (!stream.rules || stream.rules.length === 0) {
       return 'No configured rules.';
     }
 

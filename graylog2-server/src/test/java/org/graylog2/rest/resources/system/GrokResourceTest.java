@@ -24,6 +24,7 @@ import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.GrokPatternsDeletedEvent;
 import org.graylog2.grok.GrokPatternsUpdatedEvent;
 import org.graylog2.grok.InMemoryGrokPatternService;
+import org.graylog2.grok.PaginatedGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.shared.SuppressForbidden;
@@ -32,6 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -48,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.mock;
 
 public class GrokResourceTest {
     private static final String[] GROK_LINES = {
@@ -62,6 +65,9 @@ public class GrokResourceTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    @Mock
+    private PaginatedGrokPatternService paginatedGrokPatternService;
+
     private InMemoryGrokPatternService grokPatternService;
 
     private GrokResource grokResource;
@@ -74,11 +80,12 @@ public class GrokResourceTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() {
+        paginatedGrokPatternService = mock(PaginatedGrokPatternService.class);
         final ClusterEventBus clusterBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         grokPatternService = new InMemoryGrokPatternService(clusterBus);
         subscriber = new GrokPatternsChangedEventSubscriber();
         clusterBus.registerClusterEventSubscriber(subscriber);
-        grokResource = new PermittedTestResource(grokPatternService);
+        grokResource = new PermittedTestResource(grokPatternService, paginatedGrokPatternService);
     }
 
     @Test
@@ -186,8 +193,9 @@ public class GrokResourceTest {
     }
 
     static class PermittedTestResource extends GrokResource {
-        PermittedTestResource(GrokPatternService grokPatternService) {
-            super(grokPatternService);
+        PermittedTestResource(GrokPatternService grokPatternService,
+                              PaginatedGrokPatternService paginatedGrokPatternService) {
+            super(grokPatternService, paginatedGrokPatternService);
         }
 
         @Override

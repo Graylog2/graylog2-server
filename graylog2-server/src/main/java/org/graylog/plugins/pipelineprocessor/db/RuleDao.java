@@ -27,8 +27,14 @@ import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class RuleDao {
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_SOURCE = "source";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_MODFIED_AT = "modfied_at";
 
-    @JsonProperty("id")
+    @JsonProperty(FIELD_ID)
     @Nullable
     @Id
     @ObjectId
@@ -60,11 +66,11 @@ public abstract class RuleDao {
 
     @JsonCreator
     public static RuleDao create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                    @JsonProperty("title")  String title,
-                                    @JsonProperty("description") @Nullable String description,
-                                    @JsonProperty("source") String source,
-                                    @JsonProperty("created_at") @Nullable DateTime createdAt,
-                                    @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
+                                    @JsonProperty(FIELD_TITLE)  String title,
+                                    @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                    @JsonProperty(FIELD_SOURCE) String source,
+                                    @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
+                                    @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt) {
         return builder()
                 .id(id)
                 .source(source)

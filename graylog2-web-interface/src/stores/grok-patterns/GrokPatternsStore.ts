@@ -1,5 +1,6 @@
 const UserNotification = require("util/UserNotification");
 const URLUtils = require('util/URLUtils');
+const PaginationHelper = require('util/PaginationHelper');
 const ApiRoutes = require('routing/ApiRoutes');
 
 const fetchDefault = require('logic/rest/FetchProvider').default;
@@ -36,6 +37,29 @@ const GrokPatternsStore = {
         return resp;
       },
       failCallback);
+  },
+
+  searchPaginated(page, perPage, query) {
+    const url = PaginationHelper.urlGenerator(ApiRoutes.GrokPatternsController.indexPage().url, page, perPage, query);
+    const promise = fetchDefault('GET', URLUtils.qualifyUrl(url))
+      .then((response: any) => {
+        const pagination = {
+          count: response.pagination.count,
+          total: response.pagination.total,
+          page: response.pagination.page,
+          perPage: response.pagination.per_page,
+          query: response.pagination.query,
+        };
+        return {
+          patterns: response.patterns,
+          pagination: pagination,
+        };
+      })
+      .catch((errorThrown) => {
+        UserNotification.error("Loading patterns failed with status: " + errorThrown,
+          "Could not load streams");
+      });
+    return promise;
   },
 
   testPattern(pattern: GrokPatternTest, callback: (response) => void, errCallback: (err_message) => void) {

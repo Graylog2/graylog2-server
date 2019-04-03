@@ -5,6 +5,7 @@ const DashboardsActions = Reflux.createActions({
   delete: { asyncResult: true },
   get: { asyncResult: true },
   list: { asyncResult: true },
+  listPage: { asyncResult: true },
   update: { asyncResult: true },
   updatePositions: { asyncResult: true },
 });

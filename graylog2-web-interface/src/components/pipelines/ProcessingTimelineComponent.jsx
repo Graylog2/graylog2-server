@@ -1,12 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 
-import { DataTable, Spinner } from 'components/common';
+import { SearchForm, PaginatedList, DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
@@ -24,7 +24,7 @@ const ProcessingTimelineComponent = createReactClass({
 
   componentDidMount() {
     this.style.use();
-    PipelinesActions.list();
+    this.loadData();
     PipelineConnectionsActions.list();
 
     StreamsStore.listStreams().then((streams) => {
@@ -38,6 +38,36 @@ const ProcessingTimelineComponent = createReactClass({
 
   // eslint-disable-next-line
   style: require('!style/useable!css!./ProcessingTimelineComponent.css'),
+
+  loadData(callback) {
+    const { page, perPage, query } = this.state.pagination;
+    PipelinesActions.listPage(page, perPage, query).then(() => {
+      if (callback) {
+        callback();
+      }
+    });
+  },
+
+  _onPageChange(newPage, newPerPage) {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, {
+      page: newPage,
+      perPage: newPerPage,
+    });
+    this.setState({ pagination, newPagination }, this.loadData);
+  },
+
+  _onSearch(query, resetLoadingCallback) {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, { query: query });
+    this.setState({ pagination, newPagination }, () => this.loadData(resetLoadingCallback));
+  },
+
+  _onReset() {
+    const pagination = this.state.pagination;
+    const newPagination = Object.assign(pagination, { query: '' });
+    this.setState({ pagination, newPagination }, this.loadData);
+  },
 
   _calculateUsedStages(pipelines) {
     return pipelines
@@ -129,39 +159,51 @@ const ProcessingTimelineComponent = createReactClass({
     }
 
     const addNewPipelineButton = (
-      <div className="pull-right">
+      <div className={'pipeline-create-button'}>
         <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
           <Button bsStyle="success">Add new pipeline</Button>
         </LinkContainer>
       </div>
     );
 
-    if (this.state.pipelines.length === 0) {
-      return (
-        <div>
-          {addNewPipelineButton}
-          <Alert>
-            There are no pipelines configured in your system. Create one to start processing your messages.
-          </Alert>
-        </div>
-      );
-    }
+    const noDataText = (
+      <div>
+        <Alert>
+          There were no pipelines found. Change your query or create one to start processing your messages.
+        </Alert>
+      </div>
+    );
 
     this.usedStages = this._calculateUsedStages(this.state.pipelines);
 
     const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
     return (
       <div>
-        {addNewPipelineButton}
-        <DataTable id="processing-timeline"
-                   className="table-hover"
-                   headers={headers}
-                   headerCellFormatter={this._headerCellFormatter}
-                   sortByKey={'title'}
-                   rows={this.state.pipelines}
-                   dataRowFormatter={this._pipelineFormatter}
-                   filterLabel="Filter pipelines"
-                   filterKeys={['title']} />
+        <Row className="row-sm">
+          <Col md={2}>
+            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+          </Col>
+          <Col>
+            {addNewPipelineButton}
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
+              <br />
+              <br />
+              <DataTable id="processing-timeline"
+                         className="table-hover"
+                         headers={headers}
+                         headerCellFormatter={this._headerCellFormatter}
+                         sortByKey={'title'}
+                         rows={this.state.pipelines}
+                         dataRowFormatter={this._pipelineFormatter}
+                         noDataText={noDataText}
+                         filterKeys={[]} />
+            </PaginatedList>
+          </Col>
+        </Row>
       </div>
     );
   },

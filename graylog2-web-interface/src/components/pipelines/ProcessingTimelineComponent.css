@@ -25,6 +25,10 @@
     width: 300px;
 }
 
+.pipeline-create-button {
+    margin-top: 15px;
+}
+
 .stream-list {
     max-width: 150px;
     width: 150px;

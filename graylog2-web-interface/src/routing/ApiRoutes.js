@@ -55,10 +55,12 @@ const ApiRoutes = {
   },
   GrokPatternsController: {
     test: () => { return { url: '/system/grok/test' }; },
+    indexPage: () => { return { url: '/system/grok/page' }; },
   },
   DashboardsApiController: {
     create: () => { return { url: '/dashboards' }; },
     index: () => { return { url: '/dashboards' }; },
+    pageIndex: () => { return { url: '/dashboards/page' }; },
     get: (id) => { return { url: `/dashboards/${id}` }; },
     delete: (id) => { return { url: `/dashboards/${id}` }; },
     update: (id) => { return { url: `/dashboards/${id}` }; },
@@ -183,6 +185,7 @@ const ApiRoutes = {
   },
   StreamsApiController: {
     index: () => { return { url: '/streams' }; },
+    indexPage: () => { return { url: '/streams/page' }; },
     get: (streamId) => { return { url: `/streams/${streamId}` }; },
     create: () => { return { url: '/streams' }; },
     update: (streamId) => { return { url: `/streams/${streamId}` }; },
@@ -356,6 +359,7 @@ const ApiRoutes = {
   },
   PipelinesController: {
     list: () => { return { url: '/system/pipelines/pipeline' }; },
+    listPage: () => { return { url: '/system/pipelines/pipeline/page' }; },
     create: () => { return { url: '/system/pipelines/pipeline' }; },
     get: (pipelineId) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
     update: (pipelineId) => { return { url: `/system/pipelines/pipeline/${pipelineId}` }; },
@@ -364,6 +368,7 @@ const ApiRoutes = {
   },
   RulesController: {
     list: () => { return { url: '/system/pipelines/rule' }; },
+    listPage: () => { return { url: '/system/pipelines/rule/page' }; },
     create: () => { return { url: '/system/pipelines/rule' }; },
     get: (ruleId) => { return { url: `/system/pipelines/rule/${ruleId}` }; },
     update: (ruleId) => { return { url: `/system/pipelines/rule/${ruleId}` }; },

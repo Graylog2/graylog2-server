@@ -27,11 +27,17 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.PaginatedGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.rest.models.system.responses.GrokPatternList;
+import org.graylog2.rest.models.system.responses.GrokPatternPageList;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -72,11 +78,22 @@ import java.util.stream.Collectors;
 public class GrokResource extends RestResource {
     private static final Pattern GROK_LINE_PATTERN = Pattern.compile("^(\\w+)[ \t]+(.*)$");
 
+    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put(GrokPattern.FIELD_NAME, SearchQueryField.create(GrokPattern.FIELD_NAME))
+            .put(GrokPattern.FIELD_PATTERN, SearchQueryField.create(GrokPattern.FIELD_PATTERN))
+            .build();
+
     private final GrokPatternService grokPatternService;
+    private final SearchQueryParser searchQueryParser;
+    private final PaginatedGrokPatternService paginatedGrokPatternService;
 
     @Inject
-    public GrokResource(GrokPatternService grokPatternService) {
+    public GrokResource(GrokPatternService grokPatternService,
+                        PaginatedGrokPatternService paginatedGrokPatternService) {
+
+        this.paginatedGrokPatternService = paginatedGrokPatternService;
         this.grokPatternService = grokPatternService;
+        this.searchQueryParser = new SearchQueryParser(GrokPattern.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -86,6 +103,36 @@ public class GrokResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_READ);
 
         return GrokPatternList.create(grokPatternService.loadAll());
+    }
+
+    @GET
+    @Timed
+    @Path("/page")
+    @ApiOperation("Get existing grok patterns paged")
+    @Produces(MediaType.APPLICATION_JSON)
+    public GrokPatternPageList getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                       @ApiParam(name = "sort",
+                                               value = "The field to sort the result on",
+                                               required = true,
+                                               allowableValues = "title,description,id")
+                                       @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
+                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                       @DefaultValue("asc") @QueryParam("order") String order) {
+        checkPermission(RestPermissions.INPUTS_READ);
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        final PaginatedList<GrokPattern> result = paginatedGrokPatternService
+                .findPaginated(searchQuery, page, perPage, sort, order);
+        final long total = paginatedGrokPatternService.count();
+
+        return GrokPatternPageList.create(query, result.pagination(), total, sort, order, result);
     }
 
     @GET

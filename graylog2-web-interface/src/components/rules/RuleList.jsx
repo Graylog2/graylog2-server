@@ -8,21 +8,11 @@ import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
-import CombinedProvider from 'injection/CombinedProvider';
-
-const { RulesActions } = CombinedProvider.get('Rules');
 
 class RuleList extends React.Component {
   static propTypes = {
     rules: PropTypes.array.isRequired,
-  };
-
-  _delete = (rule) => {
-    return () => {
-      if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
-        RulesActions.delete(rule);
-      }
-    };
+    onDelete: PropTypes.func.isRequired,
   };
 
   _headerCellFormatter = (header) => {
@@ -31,7 +21,7 @@ class RuleList extends React.Component {
 
   _ruleInfoFormatter = (rule) => {
     const actions = [
-      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={this._delete(rule)} title="Delete rule">
+      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={this.props.onDelete(rule)} title="Delete rule">
         Delete
       </Button>,
       <span key="space">&nbsp;</span>,
@@ -66,7 +56,6 @@ class RuleList extends React.Component {
   };
 
   render() {
-    const filterKeys = ['title', 'description'];
     const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
 
     return (
@@ -79,14 +68,7 @@ class RuleList extends React.Component {
                    rows={this.props.rules}
                    filterBy="Title"
                    dataRowFormatter={this._ruleInfoFormatter}
-                   filterLabel="Filter Rules"
-                   filterKeys={filterKeys}>
-          <div className="pull-right">
-            <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
-              <Button bsStyle="success">Create Rule</Button>
-            </LinkContainer>
-          </div>
-        </DataTable>
+                   filterKeys={[]} />
       </div>
     );
   }

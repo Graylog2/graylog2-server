@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import PaginationHelper from 'util/PaginationHelper';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -12,7 +13,16 @@ const PipelinesStore = Reflux.createStore({
   pipelines: undefined,
 
   getInitialState() {
-    return { pipelines: this.pipelines };
+    return {
+      pipelines: this.pipelines,
+      pagination: {
+        page: 1,
+        perPage: 10,
+        total: 0,
+        count: 0,
+        query: '',
+      },
+    };
   },
 
   _updatePipelinesState(pipeline) {
@@ -41,6 +51,32 @@ const PipelinesStore = Reflux.createStore({
       this.trigger({ pipelines: response });
     }, failCallback);
   },
+
+  listPage(page, perPage, query) {
+    const url = PaginationHelper.urlGenerator(ApiRoutes.PipelinesController.listPage().url, page, perPage, query);
+    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+
+    promise.then((response) => {
+      this.pagination = {
+        count: response.pagination.count,
+        total: response.pagination.total,
+        page: response.pagination.page,
+        perPage: response.pagination.per_page,
+        query: response.query,
+      };
+      this.trigger({
+        pipelines: response.pipelines,
+        pagination: this.pagination,
+      });
+    }, (error) => {
+      if (!error.additional || error.additional.status !== 404) {
+        UserNotification.error(`Loading pipelines list failed with status: ${error}`, 'Could not load pipelines');
+      }
+    });
+    PipelinesActions.listPage.promise(promise);
+    return promise;
+  },
+
 
   get(pipelineId) {
     const failCallback = (error) => {

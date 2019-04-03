@@ -40,7 +40,7 @@ class PipelinesOverviewPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <ProcessingTimelineComponent/>
+              <ProcessingTimelineComponent />
             </Col>
           </Row>
         </div>
