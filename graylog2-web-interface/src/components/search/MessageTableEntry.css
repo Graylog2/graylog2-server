@@ -1,3 +1,34 @@
 :local .timezoneInfo {
     color: #aaa;
 }
+
+:local .terminalView {
+}
+
+:local .terminalView :global(tr.message-row td) {
+    left: 5px;
+    padding-bottom: 0 !important;
+    color: white !important;
+    font-size: 105%;
+    word-break: break-word;
+    border-bottom: 1px solid #444;
+    overflow: visible;
+    padding-left: 10px;
+}
+
+:local .terminalView :global(tr.message-row time) {
+    margin-left: -10px;
+}
+
+:local .terminalView :global(.message-detail-row td) {
+    background: white;
+    left: 0;
+}
+
+:local .terminalView :global(.message-wrapper:after) {
+    display: none;
+}
+
+:local .terminalSource {
+    color: #AF892D;
+}

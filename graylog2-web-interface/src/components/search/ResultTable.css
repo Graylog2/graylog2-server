@@ -1,0 +1,7 @@
+:local .terminalView {
+    background: black;
+}
+
+:local .terminalView :global(thead) {
+    display: none;
+}
