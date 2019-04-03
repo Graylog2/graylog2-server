@@ -38,6 +38,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
         title="Preferences for user Full"
       >
         <BootstrapModalWrapper
+          backdrop="static"
           onClose={[Function]}
           onHide={[Function]}
           onOpen={[Function]}
@@ -46,7 +47,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
           <Modal
             animation={true}
             autoFocus={true}
-            backdrop={true}
+            backdrop="static"
             bsClass="modal"
             dialogComponentClass={[Function]}
             enforceFocus={true}
@@ -70,7 +71,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
           >
             <Modal
               autoFocus={true}
-              backdrop={true}
+              backdrop="static"
               backdropClassName="modal-backdrop"
               backdropTransitionTimeout={150}
               containerClassName="modal-open"
