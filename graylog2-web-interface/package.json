@@ -133,7 +133,7 @@
     "less-loader": "^4.1.0",
     "phantomjs-prebuilt": ">=1.9",
     "react-immutable-proptypes": "^2.1.0",
-    "react-styleguidist": "^7.0.7",
+    "react-styleguidist": "^9.0.5",
     "react-test-renderer": "16.8.3",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
