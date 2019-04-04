@@ -19,6 +19,7 @@ module.exports = {
     'no-else-return': 1,
     'no-nested-ternary': 1,
     'no-underscore-dangle': 0,
+    'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': [2, 'methods'],
     'react/forbid-prop-types': 0,
     'react/jsx-closing-bracket-location': [1, 'after-props'],
