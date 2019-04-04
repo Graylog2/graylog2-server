@@ -15,7 +15,7 @@
   "dependencies": {
     "eslint": "^4.3.0",
     "eslint-config-airbnb": "^15.1.0",
-    "eslint-import-resolver-webpack": "^0.8.1",
+    "eslint-import-resolver-webpack": "^0.11.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0"
