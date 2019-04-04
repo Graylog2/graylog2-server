@@ -5,12 +5,13 @@ import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
-import LegacyFieldGraph from './LegacyFieldGraph';
 
 import StoreProvider from 'injection/StoreProvider';
-const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 import UIUtils from 'util/UIUtils';
+import LegacyFieldGraph from './LegacyFieldGraph';
+
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 const FieldGraphs = createReactClass({
   displayName: 'FieldGraphs',
@@ -66,18 +67,18 @@ const FieldGraphs = createReactClass({
   render() {
     const fieldGraphs = this.state.fieldGraphs
       .sortBy(graph => graph.createdAt)
-      .map((graphOptions, graphId) =>
+      .map((graphOptions, graphId) => (
         <LegacyFieldGraph key={graphId}
-                            ref={(elem) => { this.graphs[graphId] = elem; }}
-                            graphId={graphId}
-                            graphOptions={graphOptions.toJS()}
-                            onDelete={() => this.deleteFieldGraph(graphId)}
-                            from={this.props.from}
-                            to={this.props.to}
-                            permissions={this.props.permissions}
-                            stacked={this.state.stackedGraphs.has(graphId)}
-                            hidden={this.state.stackedGraphs.some(stackedGraphs => stackedGraphs.has(graphId))} />,
-      );
+                          ref={(elem) => { this.graphs[graphId] = elem; }}
+                          graphId={graphId}
+                          graphOptions={graphOptions.toJS()}
+                          onDelete={() => this.deleteFieldGraph(graphId)}
+                          from={this.props.from}
+                          to={this.props.to}
+                          permissions={this.props.permissions}
+                          stacked={this.state.stackedGraphs.has(graphId)}
+                          hidden={this.state.stackedGraphs.some(stackedGraphs => stackedGraphs.has(graphId))} />
+      ));
 
     return (
       <div id="field-graphs">

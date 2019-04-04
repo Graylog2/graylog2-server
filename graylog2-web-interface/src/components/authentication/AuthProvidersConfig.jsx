@@ -75,7 +75,7 @@ const AuthProvidersConfig = createReactClass({
     return () => {
       const disabledProcessors = this.state.config.disabled_realms;
       const update = ObjectUtils.clone(this.state.config);
-      const checked = this.inputs[realmName].checked;
+      const { checked } = this.inputs[realmName];
 
       if (checked) {
         update.disabled_realms = disabledProcessors.filter(p => p !== realmName);

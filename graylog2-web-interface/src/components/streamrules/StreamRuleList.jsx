@@ -18,9 +18,14 @@ class StreamRuleList extends React.Component {
     if (streamRules && streamRules.length > 0) {
       return streamRules.map((streamRule) => {
         return (
-          <StreamRule key={streamRule.id} permissions={this.props.permissions} matchData={this.props.matchData}
-                      onSubmit={this.props.onSubmit} onDelete={this.props.onDelete}
-                      stream={this.props.stream} streamRule={streamRule} streamRuleTypes={this.props.streamRuleTypes} />
+          <StreamRule key={streamRule.id}
+                      permissions={this.props.permissions}
+                      matchData={this.props.matchData}
+                      onSubmit={this.props.onSubmit}
+                      onDelete={this.props.onDelete}
+                      stream={this.props.stream}
+                      streamRule={streamRule}
+                      streamRuleTypes={this.props.streamRuleTypes} />
         );
       });
     }

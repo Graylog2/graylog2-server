@@ -25,7 +25,7 @@ class ConfigurationRow extends React.Component {
   };
 
   _handleDelete = () => {
-    const configuration = this.props.configuration;
+    const { configuration } = this.props;
     if (window.confirm(`You are about to delete configuration "${configuration.name}". Are you sure?`)) {
       this.props.onDelete(configuration);
     }

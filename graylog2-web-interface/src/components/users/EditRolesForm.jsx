@@ -9,13 +9,14 @@ import ObjectUtils from 'util/ObjectUtils';
 import history from 'util/History';
 
 import StoreProvider from 'injection/StoreProvider';
-const RolesStore = StoreProvider.getStore('Roles');
-const UsersStore = StoreProvider.getStore('Users');
 
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';
 
 import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
+
+const RolesStore = StoreProvider.getStore('Roles');
+const UsersStore = StoreProvider.getStore('Users');
 
 class EditRolesForm extends React.Component {
   static propTypes = {
@@ -57,19 +58,21 @@ class EditRolesForm extends React.Component {
   };
 
   render() {
-    const user = this.props.user;
+    const { user } = this.props;
     if (!this.state.roles) {
       return <Spinner />;
     }
     let rolesAlert = null;
     const roles = this.state.newRoles;
     if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
-      rolesAlert = (<Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
+      rolesAlert = (
+        <Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
         You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
-      </Alert>);
+        </Alert>
+      );
     }
-    const externalUser = user.external ?
-      (
+    const externalUser = user.external
+      ? (
         <Col smOffset={3} sm={9} style={{ marginBottom: 15 }}>
           <Alert bsStyle="warning" role="alert">
             This user was created from an external LDAP system, please consider mapping LDAP groups instead of manually editing roles here.

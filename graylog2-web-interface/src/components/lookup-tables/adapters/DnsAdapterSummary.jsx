@@ -14,21 +14,23 @@ const DnsAdapterSummary = ({ dataAdapter }) => {
     TXT: 'Text lookup (TXT)',
   };
 
-  return (<dl>
-    <dt>DNS Lookup Type</dt>
-    <dd>{ lookupType[config.lookup_type] }</dd>
+  return (
+    <dl>
+      <dt>DNS Lookup Type</dt>
+      <dd>{ lookupType[config.lookup_type] }</dd>
 
-    <dt>DNS Server IP Address</dt>
-    <dd>{ config.server_ips || 'n/a' }</dd>
+      <dt>DNS Server IP Address</dt>
+      <dd>{ config.server_ips || 'n/a' }</dd>
 
-    <dt>DNS Request Timeout</dt>
-    <dd>{ config.request_timeout } ms</dd>
+      <dt>DNS Request Timeout</dt>
+      <dd>{ config.request_timeout } ms</dd>
 
-    <dt>Cache TTL Override</dt>
-    <dd>
-      { !config.cache_ttl_override_enabled ? 'n/a' : <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} /> }
-    </dd>
-  </dl>);
+      <dt>Cache TTL Override</dt>
+      <dd>
+        { !config.cache_ttl_override_enabled ? 'n/a' : <TimeUnit value={config.cache_ttl_override} unit={config.cache_ttl_override_unit} /> }
+      </dd>
+    </dl>
+  );
 };
 
 DnsAdapterSummary.propTypes = {

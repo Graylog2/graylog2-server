@@ -40,7 +40,8 @@ describe('<ContentPackParameters />', () => {
           description: 'A parameter descriptions',
           type: 'string',
           default_value: 'test',
-        }])
+        }],
+      )
       .entities([entity])
       .build();
     const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);

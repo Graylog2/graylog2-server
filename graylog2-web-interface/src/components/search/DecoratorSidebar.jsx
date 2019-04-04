@@ -12,13 +12,14 @@ import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import StoreProvider from 'injection/StoreProvider';
-const DecoratorsStore = StoreProvider.getStore('Decorators');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
+const DecoratorsStore = StoreProvider.getStore('Decorators');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const DecoratorSidebar = createReactClass({
   displayName: 'DecoratorSidebar',
@@ -62,10 +63,12 @@ const DecoratorSidebar = createReactClass({
 
   _formatDecorator(decorator) {
     const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
-    return ({ id: decorator.id,
+    return ({
+      id: decorator.id,
       title: <Decorator key={`decorator-${decorator.id}`}
-                                                   decorator={decorator}
-                                                   typeDefinition={typeDefinition} /> });
+                        decorator={decorator}
+                        typeDefinition={typeDefinition} />,
+    });
   },
 
   _updateOrder(decorators) {

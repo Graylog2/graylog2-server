@@ -4,12 +4,13 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { Spinner } from 'components/common';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const StreamThroughput = createReactClass({
   displayName: 'StreamThroughput',

@@ -59,8 +59,8 @@ const AlertConditionForm = createReactClass({
   },
 
   render() {
-    const alertCondition = this.props.alertCondition;
-    const conditionType = this.props.conditionType;
+    const { alertCondition } = this.props;
+    const { conditionType } = this.props;
 
     return (
       <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}

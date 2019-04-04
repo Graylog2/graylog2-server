@@ -29,18 +29,21 @@ class EditOutputButton extends React.Component {
   };
 
   render() {
-    const typeDefinition = this.state.typeDefinition;
-    const output = this.props.output;
+    const { typeDefinition } = this.state;
+    const { output } = this.props;
     let configurationForm;
 
     if (typeDefinition) {
       configurationForm = (
-        <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} key={`configuration-form-output-${output.id}`}
+        <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                           key={`configuration-form-output-${output.id}`}
                            configFields={this.state.typeDefinition}
                            title={`Editing Output ${output.title}`}
                            typeName={output.type}
-                           helpBlock={'Select a name of your new output that describes it.'}
-                           submitAction={this._handleSubmit} values={output.configuration} titleValue={output.title} />
+                           helpBlock="Select a name of your new output that describes it."
+                           submitAction={this._handleSubmit}
+                           values={output.configuration}
+                           titleValue={output.title} />
       );
     }
 

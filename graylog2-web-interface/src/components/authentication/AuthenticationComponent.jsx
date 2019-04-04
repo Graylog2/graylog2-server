@@ -12,13 +12,14 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import AuthProvidersConfig from './AuthProvidersConfig';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const AuthenticationActions = ActionsProvider.getActions('Authentication');
 
 import StoreProvider from 'injection/StoreProvider';
-const AuthenticationStore = StoreProvider.getStore('Authentication');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
+
+const AuthenticationActions = ActionsProvider.getActions('Authentication');
+const AuthenticationStore = StoreProvider.getStore('Authentication');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const AuthenticationComponent = createReactClass({
   displayName: 'AuthenticationComponent',
@@ -44,7 +45,7 @@ const AuthenticationComponent = createReactClass({
   authenticatorConfigurations: {},
 
   _pluginPane() {
-    const name = this.props.params.name;
+    const { name } = this.props.params;
     const auth = this.authenticatorConfigurations[name];
 
     if (auth) {
@@ -64,9 +65,11 @@ const AuthenticationComponent = createReactClass({
       return <Spinner />;
     }
     if (this.props.params.name === undefined) {
-      return (<AuthProvidersConfig config={this.state.authenticators}
-                                   descriptors={this.authenticatorConfigurations}
-                                   updateConfig={this._onUpdateProviders} />);
+      return (
+        <AuthProvidersConfig config={this.state.authenticators}
+                             descriptors={this.authenticatorConfigurations}
+                             updateConfig={this._onUpdateProviders} />
+      );
     }
     return this._pluginPane();
   },
@@ -81,9 +84,11 @@ const AuthenticationComponent = createReactClass({
           const auth = this.authenticatorConfigurations[name];
           const title = (auth || { displayName: name }).displayName;
           const numberedTitle = `${idx + 1}. ${title}`;
-          return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
-            <NavItem key={name} title={numberedTitle}>{numberedTitle}</NavItem>
-          </LinkContainer>);
+          return (
+            <LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
+              <NavItem key={name} title={numberedTitle}>{numberedTitle}</NavItem>
+            </LinkContainer>
+          );
         });
 
         authenticators.unshift(
@@ -96,7 +101,7 @@ const AuthenticationComponent = createReactClass({
         );
       }
     } else {
-      authenticators = [<NavItem key={'loading'} disabled title="Loading...">Loading...</NavItem>];
+      authenticators = [<NavItem key="loading" disabled title="Loading...">Loading...</NavItem>];
     }
 
     // add submenu items based on permissions
@@ -134,10 +139,12 @@ const AuthenticationComponent = createReactClass({
 
     const contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
 
-    return (<Row>
-      <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
-      <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
-    </Row>);
+    return (
+      <Row>
+        <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
+        <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
+      </Row>
+    );
   },
 });
 

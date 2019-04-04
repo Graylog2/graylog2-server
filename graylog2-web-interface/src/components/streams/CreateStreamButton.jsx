@@ -24,11 +24,15 @@ class CreateStreamButton extends React.Component {
   render() {
     return (
       <span>
-        <Button bsSize={this.props.bsSize} bsStyle={this.props.bsStyle} className={this.props.className}
+        <Button bsSize={this.props.bsSize}
+                bsStyle={this.props.bsStyle}
+                className={this.props.className}
                 onClick={this.onClick}>
           {this.props.buttonText}
         </Button>
-        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }} title="Creating Stream" indexSets={this.props.indexSets}
+        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }}
+                    title="Creating Stream"
+                    indexSets={this.props.indexSets}
                     onSubmit={this.props.onSave} />
       </span>
     );

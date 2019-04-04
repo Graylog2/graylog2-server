@@ -139,7 +139,8 @@ export default class ValueReferenceData {
       this.pathGetter(path),
       this.pathSetter(path),
       this.pathParameterSetter(path),
-      this.pathType(path));
+      this.pathType(path),
+    );
     this.paths = this.paths.set(stringPath, leaf);
   }
 
@@ -178,8 +179,10 @@ export default class ValueReferenceData {
   pathParameterSetter(path) {
     return (name) => {
       if (ValueRefHelper.dataIsValueRef(this.data.getIn(path))) {
-        this.data = this.data.setIn(path, Map({ [ValueRefHelper.VALUE_REF_VALUE_FIELD]: name,
-          [ValueRefHelper.VALUE_REF_TYPE_FIELD]: ValueRefHelper.VALUE_REF_PARAMETER_VALUE }));
+        this.data = this.data.setIn(path, Map({
+          [ValueRefHelper.VALUE_REF_VALUE_FIELD]: name,
+          [ValueRefHelper.VALUE_REF_TYPE_FIELD]: ValueRefHelper.VALUE_REF_PARAMETER_VALUE,
+        }));
       } else {
         throw new Error(`Cannot set parameter on non-value-reference field: ${path.join('.')}`);
       }

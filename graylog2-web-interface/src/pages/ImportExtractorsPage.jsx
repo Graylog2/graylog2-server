@@ -7,9 +7,10 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const InputsActions = ActionsProvider.getActions('Inputs');
 const InputsStore = StoreProvider.getStore('Inputs');
 
 const ImportExtractorsPage = createReactClass({
@@ -47,7 +48,8 @@ const ImportExtractorsPage = createReactClass({
             <span>
               Exported extractors can be imported to an input. All you need is the JSON export of extractors from any
               other Graylog setup or from <a href="https://marketplace.graylog.org/" target="_blank">the Graylog
-              Marketplace</a>.
+              Marketplace
+              </a>.
             </span>
           </PageHeader>
           <ImportExtractors input={this.state.input} />

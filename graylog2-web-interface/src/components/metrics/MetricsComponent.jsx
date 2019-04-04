@@ -13,6 +13,7 @@ class MetricsComponent extends React.Component {
   };
 
   static defaultProps = { filter: '' };
+
   state = { filter: this.props.filter };
 
   componentWillReceiveProps(nextProps) {

@@ -3,12 +3,12 @@ import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 const MessageFormatter = {
   formatMessageSummary(messageSummary) {
-    const message = messageSummary.message;
+    const { message } = messageSummary;
     return this.formatMessage(message._id, messageSummary.index, message, message, messageSummary.highlight_ranges, messageSummary.decoration_stats);
   },
 
   formatResultMessage(resultMessage) {
-    const message = resultMessage.message;
+    const { message } = resultMessage;
     return this.formatMessage(message.id, resultMessage.index, message, message.fields, resultMessage.highlight_ranges, resultMessage.decoration_stats);
   },
 

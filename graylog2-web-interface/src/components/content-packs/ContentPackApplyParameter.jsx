@@ -38,9 +38,9 @@ class ContentPackApplyParameter extends React.Component {
   _configKeyRowFormatter = (paramMap) => {
     const enableClear = findIndex(this.props.appliedParameter,
       { paramName: paramMap.paramName, configKey: paramMap.configKey, readOnly: true }) < 0;
-    const lastCol = enableClear ?
-      <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td> :
-      <td />;
+    const lastCol = enableClear
+      ? <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td>
+      : <td />;
     return (
       <tr key={paramMap.configKey}>
         <td>{paramMap.configKey}</td>
@@ -93,7 +93,7 @@ class ContentPackApplyParameter extends React.Component {
       });
     const emptyOption = (name) => { return (<option key="EMPTY" value="">{name}</option>); };
     const configOptions = [emptyOption('Choose Config Key')].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
-    let parameters = this.props.parameters;
+    let { parameters } = this.props;
     let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';
     if (this.state.config_key !== '' && parameters.length > 0) {
       const configKeyType = configPaths[this.state.config_key].getValueType();
@@ -140,13 +140,11 @@ class ContentPackApplyParameter extends React.Component {
         </form>
         <Row>
           <Col smOffset={1} sm={10}>
-            <DataTable
-              id="config-key-list"
-              headers={['Config Key', 'Parameter', 'Action']}
-              filterKeys={[]}
-              rows={this.props.appliedParameter}
-              dataRowFormatter={this._configKeyRowFormatter}
-            />
+            <DataTable id="config-key-list"
+                       headers={['Config Key', 'Parameter', 'Action']}
+                       filterKeys={[]}
+                       rows={this.props.appliedParameter}
+                       dataRowFormatter={this._configKeyRowFormatter} />
           </Col>
         </Row>
       </div>

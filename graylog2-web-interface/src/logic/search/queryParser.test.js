@@ -1,26 +1,27 @@
-var queryParser = require("logic/search/queryParser");
-var DumpVisitor = require("logic/search/visitors/DumpVisitor");
+const queryParser = require('logic/search/queryParser');
+const DumpVisitor = require('logic/search/visitors/DumpVisitor');
 
-describe('Query Parser', function () {
-  var ExpressionAST, ExpressionListAST, ModifierAST, TermAST, TermWithFieldAST, Token, QueryParser, TokenType;
+describe('Query Parser', () => {
+  let ExpressionAST; let ExpressionListAST; let ModifierAST; let TermAST; let TermWithFieldAST; let Token; let QueryParser; let
+    TokenType;
 
-  var expectNoErrors = function (parser) {
+  const expectNoErrors = function (parser) {
     expect(parser.errors.length).toBe(0);
   };
 
   function expectIdentityDump(query, ignoreErrors) {
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
-    var dumpVisitor = new DumpVisitor();
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
+    const dumpVisitor = new DumpVisitor();
     dumpVisitor.visit(ast);
-    var dumped = dumpVisitor.result();
+    const dumped = dumpVisitor.result();
     if (!ignoreErrors) {
       expectNoErrors(parser);
     }
     expect(dumped).toBe(query);
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     TermAST = queryParser.TermAST;
     TermWithFieldAST = queryParser.TermWithFieldAST;
     Token = queryParser.Token;
@@ -31,10 +32,10 @@ describe('Query Parser', function () {
     ModifierAST = queryParser.ModifierAST;
   });
 
-  it('can parse a term', function () {
-    var query = "login";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a term', () => {
+    const query = 'login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermAST).toBeTruthy();
     expect(ast.term instanceof Token).toBeTruthy();
@@ -43,36 +44,36 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse two terms', function () {
-    var query = "login submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse two terms', () => {
+    const query = 'login submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(ast instanceof ExpressionListAST).toBeTruthy();
     expect(ast.expressions.length).toBe(2);
-    var firstExpr = ast.expressions[0];
+    const firstExpr = ast.expressions[0];
     expect(firstExpr instanceof TermAST).toBeTruthy();
     expectIdentityDump(query);
   });
 
-  it('can parse a term in a field', function () {
-    var query = "action:login";
+  it('can parse a term in a field', () => {
+    const query = 'action:login';
     expectIdentityDump(query);
   });
 
-  it('can parse a phrase in a field', function () {
-    var query = 'action:"login now"';
+  it('can parse a phrase in a field', () => {
+    const query = 'action:"login now"';
     expectIdentityDump(query);
   });
 
-  it('tolerates ws before and after colon in a field expression', function () {
-    var query = 'action : login';
+  it('tolerates ws before and after colon in a field expression', () => {
+    const query = 'action : login';
     expectIdentityDump(query);
   });
 
-  it('can parse a phrase', function () {
-    var query = '"login now"';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a phrase', () => {
+    const query = '"login now"';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermAST).toBeTruthy();
     expect(ast.isPhrase()).toBeTruthy();
@@ -82,25 +83,25 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a phrase and a term', function () {
-    var query = '"login now" submit';
+  it('can parse a phrase and a term', () => {
+    const query = '"login now" submit';
     expectIdentityDump(query);
   });
 
-  it('can parse a term and a phrase', function () {
-    var query = 'submit "login now"';
+  it('can parse a term and a phrase', () => {
+    const query = 'submit "login now"';
     expectIdentityDump(query);
   });
 
-  it('can parse many terms with ws', function () {
-    var query = '  submit  "login now" logout ';
+  it('can parse many terms with ws', () => {
+    const query = '  submit  "login now" logout ';
     expectIdentityDump(query);
   });
 
-  it('can parse an OR expression', function () {
-    var query = "login OR submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an OR expression', () => {
+    const query = 'login OR submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionAST).toBeTruthy();
     expect(ast.left instanceof TermAST).toBeTruthy();
@@ -112,20 +113,20 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('preserves whitespace on dump of simple expression', function () {
-    var query = " login ";
+  it('preserves whitespace on dump of simple expression', () => {
+    const query = ' login ';
     expectIdentityDump(query);
   });
 
-  it('preserves whitespace on dump of complex expression', function () {
-    var query = "  login  OR  \n \t  submit   ";
+  it('preserves whitespace on dump of complex expression', () => {
+    const query = '  login  OR  \n \t  submit   ';
     expectIdentityDump(query);
   });
 
-  it('can parse an AND expression', function () {
-    var query = "login AND submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an AND expression', () => {
+    const query = 'login AND submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionAST).toBeTruthy();
     expect(ast.left instanceof TermAST).toBeTruthy();
@@ -137,10 +138,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a complex AND expression', function () {
-    var query = "login AND submit AND action:login";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a complex AND expression', () => {
+    const query = 'login AND submit AND action:login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionAST).toBeTruthy();
     expect(ast.left instanceof TermAST).toBeTruthy();
@@ -149,7 +150,7 @@ describe('Query Parser', function () {
     expect(ast.op.type).toBe(TokenType.AND);
     expect(ast.right instanceof ExpressionAST).toBeTruthy();
 
-    var rightExpressionAST = ast.right;
+    const rightExpressionAST = ast.right;
     expect(rightExpressionAST instanceof ExpressionAST).toBeTruthy();
     expect(rightExpressionAST.left instanceof TermAST).toBeTruthy();
     expect(rightExpressionAST.left.term.type).toBe(TokenType.TERM);
@@ -160,10 +161,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse an && expression', function () {
-    var query = "login && submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an && expression', () => {
+    const query = 'login && submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionAST).toBeTruthy();
     expect(ast.left instanceof TermAST).toBeTruthy();
@@ -175,10 +176,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse an || expression', function () {
-    var query = "login || submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an || expression', () => {
+    const query = 'login || submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionAST).toBeTruthy();
     expect(ast.left instanceof TermAST).toBeTruthy();
@@ -190,89 +191,89 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('reports an error when right side of AND is missing', function () {
-    var query = "login AND ";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when right side of AND is missing', () => {
+    const query = 'login AND ';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
-    expect(parser.errors[0].message).toBe("Missing right side of expression");
+    expect(parser.errors[0].message).toBe('Missing right side of expression');
     expect(parser.errors[0].position).toBe(10);
     expectIdentityDump(query, true);
   });
 
-  it('reports an error when left side of AND is missing', function () {
-    var query = " AND login";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when left side of AND is missing', () => {
+    const query = ' AND login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
-    expect(parser.errors[0].message).toBe("Missing left side of expression");
+    expect(parser.errors[0].message).toBe('Missing left side of expression');
     expect(parser.errors[0].position).toBe(1);
     expectIdentityDump(query, true);
   });
 
-  it('reports an error when field is missing term', function () {
-    var query = 'action : ';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when field is missing term', () => {
+    const query = 'action : ';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
-    expect(parser.errors[0].message).toBe("Missing term or phrase for field");
+    expect(parser.errors[0].message).toBe('Missing term or phrase for field');
     expect(parser.errors[0].position).toBe(9);
     expectIdentityDump(query, true);
   });
 
-  it('reports an error two OR are together with no term in between', function () {
-    var query = 'login OR OR submit';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error two OR are together with no term in between', () => {
+    const query = 'login OR OR submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(2);
-    expect(parser.errors[0].message).toBe("Missing right side of expression");
+    expect(parser.errors[0].message).toBe('Missing right side of expression');
     expect(parser.errors[0].position).toBe(9);
-    expect(parser.errors[1].message).toBe("Missing left side of expression");
+    expect(parser.errors[1].message).toBe('Missing left side of expression');
     expect(parser.errors[1].position).toBe(9);
     expectIdentityDump(query, true);
   });
 
-  it('trailing escape character gives error, but can still reproduce', function () {
-    var query = '\\';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('trailing escape character gives error, but can still reproduce', () => {
+    const query = '\\';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
     expect(parser.errors[0].message).toBe("Unexpected input: '\\'");
     expect(parser.errors[0].position).toBe(0);
     expectIdentityDump(query, true);
   });
 
-  it('can parse empty query', function () {
-    var query = '';
+  it('can parse empty query', () => {
+    const query = '';
     expectIdentityDump(query);
   });
 
-  it('can reproduce pure WS', function () {
-    var query = ' \n\t';
+  it('can reproduce pure WS', () => {
+    const query = ' \n\t';
     expectIdentityDump(query);
   });
 
   // none of those, really:
   // +-!():^[]"{}~*?\\/
-  it('can parse everything except for ws and special characters as term', function () {
-    var query = ' @$%&§öäüß#=.;_<>°"';
+  it('can parse everything except for ws and special characters as term', () => {
+    const query = ' @$%&§öäüß#=.;_<>°"';
     expectIdentityDump(query);
   });
 
-  it('can parse + and - literally inside term', function () {
-    var query = 'start+-end"';
+  it('can parse + and - literally inside term', () => {
+    const query = 'start+-end"';
     expectIdentityDump(query);
   });
 
-  it('can parse wildcards inside term', function () {
-    var query = 'st?rt *middle* end?"';
+  it('can parse wildcards inside term', () => {
+    const query = 'st?rt *middle* end?"';
     expectIdentityDump(query);
   });
 
-  it('can parse a unary NOT expression', function () {
-    var query = "NOT submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a unary NOT expression', () => {
+    const query = 'NOT submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ModifierAST).toBeTruthy();
     expect(ast.modifier.type).toBe(TokenType.NOT);
@@ -281,22 +282,22 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a complex expression with NOT, AND and OR', function () {
-    var query = "NOT submit AND action:login OR action:logout";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a complex expression with NOT, AND and OR', () => {
+    const query = 'NOT submit AND action:login OR action:logout';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ModifierAST).toBeTruthy();
     expect(ast.modifier.type).toBe(TokenType.NOT);
     expect(ast.right instanceof ExpressionAST).toBeTruthy();
 
-    var andAST = ast.right;
+    const andAST = ast.right;
     expect(andAST instanceof ExpressionAST).toBeTruthy();
     expect(andAST.left instanceof TermAST).toBeTruthy();
     expect(andAST.op.type).toBe(TokenType.AND);
     expect(andAST.right instanceof ExpressionAST).toBeTruthy();
 
-    var orAST = andAST.right;
+    const orAST = andAST.right;
     expect(orAST instanceof ExpressionAST).toBeTruthy();
     expect(orAST.left instanceof TermAST).toBeTruthy();
     expect(orAST.op.type).toBe(TokenType.OR);
@@ -305,38 +306,38 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('reports an error when NOT has no right part', function () {
-    var query = 'NOT ';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when NOT has no right part', () => {
+    const query = 'NOT ';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
-    expect(parser.errors[0].message).toBe("Missing right side of expression");
+    expect(parser.errors[0].message).toBe('Missing right side of expression');
     expect(parser.errors[0].position).toBe(4);
     expectIdentityDump(query, true);
   });
 
-  it('reports an error on double NOT', function () {
-    var query = 'NOT NOT login';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error on double NOT', () => {
+    const query = 'NOT NOT login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
-    expect(parser.errors[0].message).toBe("Missing right side of expression");
+    expect(parser.errors[0].message).toBe('Missing right side of expression');
     expect(parser.errors[0].position).toBe(4);
     expectIdentityDump(query, true);
   });
 
-  it('can parse a NOT expression preceded by a term', function () {
-    var query = "login NOT submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a NOT expression preceded by a term', () => {
+    const query = 'login NOT submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionListAST).toBeTruthy();
     expect(ast.expressions.length).toBe(2);
 
-    var firstExpr = ast.expressions[0];
+    const firstExpr = ast.expressions[0];
     expect(firstExpr instanceof TermAST).toBeTruthy();
 
-    var secondExpr = ast.expressions[1];
+    const secondExpr = ast.expressions[1];
     expect(secondExpr instanceof ModifierAST).toBeTruthy();
     expect(secondExpr.modifier.type).toBe(TokenType.NOT);
     expect(secondExpr.right instanceof TermAST).toBeTruthy();
@@ -344,18 +345,18 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a ! as NOT expression', function () {
-    var query = "login !submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a ! as NOT expression', () => {
+    const query = 'login !submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionListAST).toBeTruthy();
     expect(ast.expressions.length).toBe(2);
 
-    var firstExpr = ast.expressions[0];
+    const firstExpr = ast.expressions[0];
     expect(firstExpr instanceof TermAST).toBeTruthy();
 
-    var secondExpr = ast.expressions[1];
+    const secondExpr = ast.expressions[1];
     expect(secondExpr instanceof ModifierAST).toBeTruthy();
     expect(secondExpr.modifier.type).toBe(TokenType.NOT);
     expect(secondExpr.right instanceof TermAST).toBeTruthy();
@@ -363,21 +364,21 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a NOT expression preceded by other expressions', function () {
-    var query = "action:login OR action:logout NOT submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a NOT expression preceded by other expressions', () => {
+    const query = 'action:login OR action:logout NOT submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionListAST).toBeTruthy();
     expect(ast.expressions.length).toBe(2);
 
-    var firstExpr = ast.expressions[0];
+    const firstExpr = ast.expressions[0];
     expect(firstExpr instanceof ExpressionAST).toBeTruthy();
     expect(firstExpr.left instanceof TermAST).toBeTruthy();
     expect(firstExpr.op.type).toBe(TokenType.OR);
     expect(firstExpr.right instanceof TermAST).toBeTruthy();
 
-    var secondExpr = ast.expressions[1];
+    const secondExpr = ast.expressions[1];
     expect(secondExpr instanceof ModifierAST).toBeTruthy();
     expect(secondExpr.modifier.type).toBe(TokenType.NOT);
     expect(secondExpr.right instanceof TermAST).toBeTruthy();
@@ -385,19 +386,19 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a chain of NOT expressions', function () {
-    var query = "login NOT submit NOT logout NOT now";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a chain of NOT expressions', () => {
+    const query = 'login NOT submit NOT logout NOT now';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionListAST).toBeTruthy();
     expect(ast.expressions.length).toBe(4);
 
-    var firstExpr = ast.expressions[0];
+    const firstExpr = ast.expressions[0];
     expect(firstExpr instanceof TermAST).toBeTruthy();
 
-    for (var i = 1; i < ast.expressions.length; i++) {
-      var nextExpr = ast.expressions[i];
+    for (let i = 1; i < ast.expressions.length; i++) {
+      const nextExpr = ast.expressions[i];
       expect(nextExpr instanceof ModifierAST).toBeTruthy();
       expect(nextExpr.modifier.type).toBe(TokenType.NOT);
       expect(nextExpr.right instanceof TermAST).toBeTruthy();
@@ -406,10 +407,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse ! at the beginning of the query', function () {
-    var query = "!login";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse ! at the beginning of the query', () => {
+    const query = '!login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ModifierAST).toBeTruthy();
     expect(ast.modifier.type).toBe(TokenType.NOT);
@@ -417,49 +418,49 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a query where AND is followed by NOT', function () {
-    var query = "quick OR brown AND fox AND NOT news";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a query where AND is followed by NOT', () => {
+    const query = 'quick OR brown AND fox AND NOT news';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ExpressionAST).toBeTruthy();
     expect(ast.left instanceof TermAST).toBeTruthy();
     expect(ast.op.type).toBe(TokenType.OR);
     expect(ast.right instanceof ExpressionAST).toBeTruthy();
 
-    var firstAndExpression = ast.right;
+    const firstAndExpression = ast.right;
     expect(firstAndExpression.left instanceof TermAST).toBeTruthy();
     expect(firstAndExpression.op.type).toBe(TokenType.AND);
     expect(firstAndExpression.right instanceof ExpressionAST).toBeTruthy();
 
-    var secondAndExpression = firstAndExpression.right;
+    const secondAndExpression = firstAndExpression.right;
     expect(secondAndExpression.left instanceof TermAST).toBeTruthy();
     expect(secondAndExpression.op.type).toBe(TokenType.AND);
     expect(secondAndExpression.right instanceof ModifierAST).toBeTruthy();
 
-    var notExpression = secondAndExpression.right;
+    const notExpression = secondAndExpression.right;
     expect(notExpression.modifier.type).toBe(TokenType.NOT);
     expect(notExpression.right instanceof TermAST).toBeTruthy();
 
     expectIdentityDump(query);
   });
 
-  it('reports an error when AND is used with NOT and no term follows', function () {
-    var query = 'AND NOT';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when AND is used with NOT and no term follows', () => {
+    const query = 'AND NOT';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(2);
-    expect(parser.errors[0].message).toBe("Missing left side of expression");
+    expect(parser.errors[0].message).toBe('Missing left side of expression');
     expect(parser.errors[0].position).toBe(0);
-    expect(parser.errors[1].message).toBe("Missing right side of expression");
+    expect(parser.errors[1].message).toBe('Missing right side of expression');
     expect(parser.errors[1].position).toBe(7);
     expectIdentityDump(query, true);
   });
 
-  it('can parse a MUST expression', function () {
-    var query = "+submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a MUST expression', () => {
+    const query = '+submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ModifierAST).toBeTruthy();
     expect(ast.modifier.type).toBe(TokenType.MUST);
@@ -468,10 +469,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse a MUST_NOT expression', function () {
-    var query = "-submit";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse a MUST_NOT expression', () => {
+    const query = '-submit';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof ModifierAST).toBeTruthy();
     expect(ast.modifier.type).toBe(TokenType.MUST_NOT);
@@ -481,35 +482,35 @@ describe('Query Parser', function () {
   });
 
   // TODO: This kind of query should not create any errors, the modifier seems to be silently ignored. It applies to +, - and !
-  it('does not recognise MUST as modifier when followed by whitespace', function () {
-    var query = '+ login';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('does not recognise MUST as modifier when followed by whitespace', () => {
+    const query = '+ login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectIdentityDump(query, true);
   });
 
-  it('reports an error on double MUST or MUST_NOT modifier', function () {
-    var query = '+-login';
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error on double MUST or MUST_NOT modifier', () => {
+    const query = '+-login';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
-    expect(parser.errors[0].message).toBe("Missing right side of expression");
+    expect(parser.errors[0].message).toBe('Missing right side of expression');
     expect(parser.errors[0].position).toBe(1);
     expectIdentityDump(query, true);
   });
 
-  it('+ and - only work as modifiers at the beginning of the term', function () {
-    var query = "start+-end";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('+ and - only work as modifiers at the beginning of the term', () => {
+    const query = 'start+-end';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermAST).toBeTruthy();
   });
 
-  it('can parse an inclusive range search', function () {
-    var query = "[400 TO 500]";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an inclusive range search', () => {
+    const query = '[400 TO 500]';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermAST).toBeTruthy();
     expect(ast.term.type).toBe(TokenType.TERM);
@@ -518,10 +519,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse an inclusive range search preceded by a field', function () {
-    var query = "http_response_code:[400 TO 500]";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an inclusive range search preceded by a field', () => {
+    const query = 'http_response_code:[400 TO 500]';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermWithFieldAST).toBeTruthy();
     expect(ast.field.type).toBe(TokenType.TERM);
@@ -532,23 +533,23 @@ describe('Query Parser', function () {
   });
 
 
-  it('can parse pure wildcard', function () {
-    var query = 'http_response_code:*"';
+  it('can parse pure wildcard', () => {
+    const query = 'http_response_code:*"';
     expectIdentityDump(query);
   });
 
-  it('reports an error when using question mark as pure wildcard', function () {
-    var query = 'http_response_code:?"';
-    var parser = new QueryParser(query);
+  it('reports an error when using question mark as pure wildcard', () => {
+    const query = 'http_response_code:?"';
+    const parser = new QueryParser(query);
     parser.parse();
     expect(parser.errors.length).toBe(1);
     expectIdentityDump(query, true);
   });
 
-  it('can parse an exclusive range search', function () {
-    var query = "{alpha TO omega}";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an exclusive range search', () => {
+    const query = '{alpha TO omega}';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermAST).toBeTruthy();
     expect(ast.term.type).toBe(TokenType.TERM);
@@ -557,10 +558,10 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('can parse an exclusive range search preceded by a field', function () {
-    var query = "character:{alpha TO omega}";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('can parse an exclusive range search preceded by a field', () => {
+    const query = 'character:{alpha TO omega}';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expectNoErrors(parser);
     expect(ast instanceof TermWithFieldAST).toBeTruthy();
     expect(ast.field.type).toBe(TokenType.TERM);
@@ -570,20 +571,19 @@ describe('Query Parser', function () {
     expectIdentityDump(query);
   });
 
-  it('reports an error when the range brackets are not closed', function () {
-    var query = "[400 TO 500";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when the range brackets are not closed', () => {
+    const query = '[400 TO 500';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
     expectIdentityDump(query, true);
   });
 
-  it('reports an error when the range brackets do not match', function () {
-    var query = "{400 TO 500]";
-    var parser = new QueryParser(query);
-    var ast = parser.parse();
+  it('reports an error when the range brackets do not match', () => {
+    const query = '{400 TO 500]';
+    const parser = new QueryParser(query);
+    const ast = parser.parse();
     expect(parser.errors.length).toBe(1);
     expectIdentityDump(query, true);
   });
 });
-

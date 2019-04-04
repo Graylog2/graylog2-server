@@ -14,11 +14,9 @@ describe('<ContentPackEntityConfig />', () => {
     };
     const appliedParameter = [{ configKey: 'descr', paramName: 'descrParam' }];
     const parameter = [{ name: 'descrParam', title: 'A descr Parameter', type: 'string' }];
-    const wrapper = renderer.create(<ContentPackEntityConfig
-      entity={entity}
-      appliedParameter={appliedParameter}
-      parameters={parameter}
-    />);
+    const wrapper = renderer.create(<ContentPackEntityConfig entity={entity}
+                                                             appliedParameter={appliedParameter}
+                                                             parameters={parameter} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 });

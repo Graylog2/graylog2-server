@@ -66,7 +66,8 @@ class ContentPackParameterList extends React.Component {
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
         <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
-        {!this.props.readOnly &&
+        {!this.props.readOnly
+        && (
         <td>
           <ButtonToolbar>
             <Button bsStyle="primary"
@@ -78,6 +79,7 @@ class ContentPackParameterList extends React.Component {
             </Button>{this._parameterModal(parameter)}
           </ButtonToolbar>
         </td>
+        )
         }
       </tr>
     );
@@ -155,30 +157,26 @@ class ContentPackParameterList extends React.Component {
   };
 
   render() {
-    const headers = this.props.readOnly ?
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used'] :
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
+    const headers = this.props.readOnly
+      ? ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used']
+      : ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
     return (
       <div>
         <h2>Parameters list</h2>
         <br />
         { !this.props.readOnly && this._parameterModal() }
         { !this.props.readOnly && (<span><br /><br /></span>) }
-        <SearchForm
-          onSearch={this._filterParameters}
-          onReset={() => { this._filterParameters(''); }}
-          searchButtonLabel="Filter"
-        />
-        <DataTable
-          id="parameter-list"
-          headers={headers}
-          className={ContentPackParameterListStyle.scrollable}
-          sortByKey="title"
-          noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
-          filterKeys={[]}
-          rows={this.state.filteredParameters}
-          dataRowFormatter={this._parameterRowFormatter}
-        />
+        <SearchForm onSearch={this._filterParameters}
+                    onReset={() => { this._filterParameters(''); }}
+                    searchButtonLabel="Filter" />
+        <DataTable id="parameter-list"
+                   headers={headers}
+                   className={ContentPackParameterListStyle.scrollable}
+                   sortByKey="title"
+                   noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                   filterKeys={[]}
+                   rows={this.state.filteredParameters}
+                   dataRowFormatter={this._parameterRowFormatter} />
       </div>
     );
   }

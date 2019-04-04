@@ -83,8 +83,7 @@ const EditTokensPage = createReactClass({
                      onDelete={this._deleteToken}
                      onCreate={this._createToken}
                      creatingToken={this.state.creatingToken}
-                     deletingToken={this.state.deletingToken}
-          />
+                     deletingToken={this.state.deletingToken} />
         </span>
       </DocumentTitle>
     );

@@ -19,7 +19,7 @@ class LUTTableEntry extends React.Component {
   };
 
   _onDelete = () => {
-// eslint-disable-next-line no-alert
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete cache "${this.props.cache.title}"?`)) {
       LookupTableCachesActions.delete(this.props.cache.id).then(() => LookupTableCachesActions.reloadPage());
     }
@@ -96,4 +96,3 @@ class LUTTableEntry extends React.Component {
 }
 
 export default LUTTableEntry;
-

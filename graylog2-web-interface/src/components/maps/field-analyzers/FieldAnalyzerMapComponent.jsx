@@ -10,6 +10,7 @@ import { MapsActions, MapsStore } from 'stores/maps/MapsStore';
 import MapVisualization from 'components/maps/widgets/MapVisualization';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import StoreProvider from 'injection/StoreProvider';
+
 const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldAnalyzerMapComponent = createReactClass({
@@ -47,12 +48,12 @@ const FieldAnalyzerMapComponent = createReactClass({
 
   componentWillReceiveProps(nextProps) {
     // Reload values when executed search changes
-    if (this.props.query !== nextProps.query ||
-        this.props.rangeType !== nextProps.rangeType ||
-        JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
-        this.props.stream !== nextProps.stream ||
-        nextProps.forceFetch) {
-        this._loadData(nextProps);
+    if (this.props.query !== nextProps.query
+        || this.props.rangeType !== nextProps.rangeType
+        || JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams)
+        || this.props.stream !== nextProps.stream
+        || nextProps.forceFetch) {
+      this._loadData(nextProps);
     }
   },
 
@@ -74,7 +75,7 @@ const FieldAnalyzerMapComponent = createReactClass({
   eventThrottler: new EventHandlersThrottler(),
 
   addField(field) {
-    this.setState({field: field}, () => {
+    this.setState({ field: field }, () => {
       // We need to update the map width when the container is rendered
       this._updateMapWidth();
       this._loadData(this.props);
@@ -86,7 +87,7 @@ const FieldAnalyzerMapComponent = createReactClass({
   },
 
   _updateMapWidth() {
-    this.setState({width: (this.mapContainer ? this.mapContainer.clientWidth : this.DEFAULT_WIDTH)});
+    this.setState({ width: (this.mapContainer ? this.mapContainer.clientWidth : this.DEFAULT_WIDTH) });
   },
 
   _getStreamId() {
@@ -100,7 +101,7 @@ const FieldAnalyzerMapComponent = createReactClass({
         this.state.field,
         props.rangeType,
         props.rangeParams,
-        this._getStreamId()
+        this._getStreamId(),
       );
       promise.catch(() => this._resetStatus());
     }
@@ -118,7 +119,7 @@ const FieldAnalyzerMapComponent = createReactClass({
       inner = <Spinner />;
     } else {
       inner = (
-        <MapVisualization id="1" data={this.state.mapCoordinates} height={400} width={this.state.width} config={{}}/>
+        <MapVisualization id="1" data={this.state.mapCoordinates} height={400} width={this.state.width} config={{}} />
       );
     }
 
@@ -128,7 +129,7 @@ const FieldAnalyzerMapComponent = createReactClass({
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
-                                configuration={{field: this.state.field}}
+                                configuration={{ field: this.state.field }}
                                 pullRight
                                 permissions={this.props.permissions}>
 
@@ -137,7 +138,7 @@ const FieldAnalyzerMapComponent = createReactClass({
           </div>
           <h1>Map for field: {this.state.field}</h1>
 
-          <div ref={(mapContainer) => { this.mapContainer = mapContainer; }} style={{maxHeight: 400, overflow: 'auto', marginTop: 10}}>{inner}</div>
+          <div ref={(mapContainer) => { this.mapContainer = mapContainer; }} style={{ maxHeight: 400, overflow: 'auto', marginTop: 10 }}>{inner}</div>
         </div>
       );
     }

@@ -10,11 +10,11 @@ import { QuickValuesVisualization, QuickValuesHistogramVisualization } from 'com
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
+import CombinedProvider from 'injection/CombinedProvider';
 import QuickValuesOptionsForm from './QuickValuesOptionsForm';
 
 import style from './FieldQuickValues.css';
 
-import CombinedProvider from 'injection/CombinedProvider';
 
 const { FieldQuickValuesStore, FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
 const { RefreshStore } = CombinedProvider.get('Refresh');
@@ -67,11 +67,11 @@ const FieldQuickValues = createReactClass({
 
   componentWillReceiveProps(nextProps) {
     // Reload values when executed search changes
-    if (this.props.query !== nextProps.query ||
-        this.props.rangeType !== nextProps.rangeType ||
-        JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
-        this.props.stream !== nextProps.stream ||
-        nextProps.forceFetch) {
+    if (this.props.query !== nextProps.query
+        || this.props.rangeType !== nextProps.rangeType
+        || JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams)
+        || this.props.stream !== nextProps.stream
+        || nextProps.forceFetch) {
       this._loadQuickValuesData();
     }
   },
@@ -218,7 +218,7 @@ const FieldQuickValues = createReactClass({
 
   _showOverview() {
     // Reset the data when toggling histogram
-    this.setState({ data: [], showHistogram: false}, this._loadQuickValuesData);
+    this.setState({ data: [], showHistogram: false }, this._loadQuickValuesData);
   },
 
   _buildDashboardConfig(isHistogram) {
@@ -343,8 +343,10 @@ const FieldQuickValues = createReactClass({
               <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
-          <h1>Quick Values for <em>{fields}</em> {this.state.loadPending && <i
-            className="fa fa-spin fa-spinner" />}</h1>
+          <h1>Quick Values for <em>{fields}</em> {this.state.loadPending && (
+          <i className="fa fa-spin fa-spinner" />
+          )}
+          </h1>
 
           {inner}
         </div>

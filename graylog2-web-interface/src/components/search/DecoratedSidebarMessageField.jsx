@@ -14,9 +14,11 @@ class DecoratedSidebarMessageField extends React.Component {
   };
 
   render() {
-    const label = (<span>
-      {this.props.field.name}
-    </span>);
+    const label = (
+      <span>
+        {this.props.field.name}
+      </span>
+    );
     return (
       <li>
         <div className="pull-left" />

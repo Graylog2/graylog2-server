@@ -8,9 +8,10 @@ import { Button } from 'react-bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import { DataTable } from 'components/common';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const RoleList = createReactClass({
   displayName: 'RoleList',
@@ -28,15 +29,15 @@ const RoleList = createReactClass({
   },
 
   _editButton(role) {
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:edit:' + role.name]) === false || role.read_only) {
-        return null;
+    if (this.isPermitted(this.state.currentUser.permissions, [`roles:edit:${role.name}`]) === false || role.read_only) {
+      return null;
     }
     return (<Button key="edit" bsSize="xsmall" bsStyle="info" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</Button>);
   },
 
   _deleteButton(role) {
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:delete:' + role.name]) === false || role.read_only) {
-        return null;
+    if (this.isPermitted(this.state.currentUser.permissions, [`roles:delete:${role.name}`]) === false || role.read_only) {
+      return null;
     }
     return (<Button key="delete" bsSize="xsmall" bsStyle="primary" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</Button>);
   },
@@ -65,7 +66,7 @@ const RoleList = createReactClass({
                    className="table-hover"
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
-                   sortByKey={'name'}
+                   sortByKey="name"
                    rows={this.props.roles.toJS()}
                    filterBy="Name"
                    dataRowFormatter={this._roleInfoFormatter}

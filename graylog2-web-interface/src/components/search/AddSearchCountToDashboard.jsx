@@ -10,6 +10,7 @@ class AddSearchCountToDashboard extends React.Component {
   };
 
   SEARCH_COUNT_WIDGET_TYPE = 'SEARCH_RESULT_COUNT';
+
   STREAM_SEARCH_COUNT_WIDGET_TYPE = 'STREAM_SEARCH_RESULT_COUNT';
 
   render() {

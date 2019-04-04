@@ -65,8 +65,8 @@ class BootstrapModalForm extends React.Component {
     const formDOMNode = this.form;
     const $formDOMNode = $(formDOMNode);
 
-    if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||
-      (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
+    if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())
+      || (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
       event.preventDefault();
       return;
     }

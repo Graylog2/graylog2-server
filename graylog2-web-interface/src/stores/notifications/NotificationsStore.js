@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
 const NotificationsStore = Reflux.createStore({
@@ -25,7 +26,7 @@ const NotificationsStore = Reflux.createStore({
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
     const promise = this.promises.list || fetchPeriodically('GET', url)
-        .finally(() => delete this.promises.list);
+      .finally(() => delete this.promises.list);
 
     this.promises.list = promise;
 

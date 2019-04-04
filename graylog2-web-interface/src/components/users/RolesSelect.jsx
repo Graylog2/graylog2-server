@@ -24,13 +24,11 @@ class RolesSelect extends React.Component {
       return { value: role.name, label: role.name };
     });
     return (
-      <MultiSelect
-        ref={(select) => { this.select = select; }}
-        options={rolesOptions}
-        value={rolesValue}
-        onChange={this.props.onValueChange}
-        placeholder="Choose roles..."
-      />
+      <MultiSelect ref={(select) => { this.select = select; }}
+                   options={rolesOptions}
+                   value={rolesValue}
+                   onChange={this.props.onValueChange}
+                   placeholder="Choose roles..." />
     );
   }
 }

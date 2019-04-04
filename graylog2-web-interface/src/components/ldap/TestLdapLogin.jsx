@@ -7,6 +7,7 @@ import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const LdapActions = ActionsProvider.getActions('Ldap');
 
 const TestLdapLogin = createReactClass({
@@ -129,12 +130,12 @@ const TestLdapLogin = createReactClass({
         <dd>{loginStatus.result.entry[key]}</dd>,
       ];
     });
-    const formattedEntry = (attributes.length > 0 ? <dl>{attributes}</dl> :
-    <p>LDAP server did not return any attributes for the user.</p>);
+    const formattedEntry = (attributes.length > 0 ? <dl>{attributes}</dl>
+      : <p>LDAP server did not return any attributes for the user.</p>);
 
     const groups = (loginStatus.result.groups ? loginStatus.result.groups.map(group => <li key={group}>{group}</li>) : []);
-    const formattedGroups = (groups.length > 0 ? <ul style={{ padding: 0 }}>{groups}</ul> :
-    <p>LDAP server did not return any groups for the user.</p>);
+    const formattedGroups = (groups.length > 0 ? <ul style={{ padding: 0 }}>{groups}</ul>
+      : <p>LDAP server did not return any groups for the user.</p>);
 
     return (
       <Row>
@@ -157,28 +158,42 @@ const TestLdapLogin = createReactClass({
   },
 
   render() {
-    const loginStatus = this.state.loginStatus;
+    const { loginStatus } = this.state;
     const loginDisabled = this.props.disabled || !this.state.loginUser || loginStatus.loading;
 
     return (
       <div>
-        <Input id="test_login_username" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Login test"
+        <Input id="test_login_username"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9"
+               label="Login test"
                help="Verify the previous settings by loading the entry for the given user name. If you omit the password, no authentication attempt will be made.">
           <Row className="row-sm">
             <Col sm={5}>
-              <input type="text" id="test_login_username" name="test_login_username" className="form-control"
-                     value={this.state.loginUser} onChange={this._changeLoginForm}
+              <input type="text"
+                     id="test_login_username"
+                     name="test_login_username"
+                     className="form-control"
+                     value={this.state.loginUser}
+                     onChange={this._changeLoginForm}
                      onKeyPress={this._disableSubmitOnEnter}
-                     placeholder="Username for login test" disabled={this.props.disabled} />
+                     placeholder="Username for login test"
+                     disabled={this.props.disabled} />
             </Col>
             <Col sm={5}>
-              <input type="password" id="test_login_password" name="test_login_password" className="form-control"
-                     value={this.state.testLoginPassword} onChange={this._changeLoginForm}
+              <input type="password"
+                     id="test_login_password"
+                     name="test_login_password"
+                     className="form-control"
+                     value={this.state.testLoginPassword}
+                     onChange={this._changeLoginForm}
                      onKeyPress={this._disableSubmitOnEnter}
-                     placeholder="Password" disabled={this.props.disabled} />
+                     placeholder="Password"
+                     disabled={this.props.disabled} />
             </Col>
             <Col sm={2}>
-              <Button bsStyle={this._loginTestButtonStyle()} disabled={loginDisabled}
+              <Button bsStyle={this._loginTestButtonStyle()}
+                      disabled={loginDisabled}
                       onClick={this._testLogin}>
                 {loginStatus.loading ? 'Testing...' : 'Test login'}
               </Button>

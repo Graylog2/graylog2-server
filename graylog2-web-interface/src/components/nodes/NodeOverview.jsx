@@ -3,6 +3,7 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Button } from 'react-bootstrap';
 
+import Routes from 'routing/Routes';
 import BufferUsage from './BufferUsage';
 import SystemOverviewDetails from './SystemOverviewDetails';
 import JvmHeapUsage from './JvmHeapUsage';
@@ -12,7 +13,6 @@ import RestApiOverview from './RestApiOverview';
 import PluginsDataTable from './PluginsDataTable';
 import InputTypesDataTable from './InputTypesDataTable';
 
-import Routes from 'routing/Routes';
 
 class NodeOverview extends React.Component {
   static propTypes = {
@@ -25,8 +25,8 @@ class NodeOverview extends React.Component {
   };
 
   render() {
-    const node = this.props.node;
-    const systemOverview = this.props.systemOverview;
+    const { node } = this.props;
+    const { systemOverview } = this.props;
 
     let pluginCount;
     if (this.props.plugins) {

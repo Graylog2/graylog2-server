@@ -66,7 +66,7 @@ const resultHistogram = {
       pixelsPerTick: 30,
     });
 
-        // Only show a x-axis (time) when there is more than one bucket.
+    // Only show a x-axis (time) when there is more than one bucket.
     if (resultGraph.series != undefined && resultGraph.series[0] != undefined && resultGraph.series[0].data.length > 1) {
       new Rickshaw.Graph.Axis.Time({
         graph: resultGraph,
@@ -114,7 +114,7 @@ const resultHistogram = {
     }
   },
 
-    // I'm really sorry about this, but I can't figure out a better way of refreshing the annotator without flickering
+  // I'm really sorry about this, but I can't figure out a better way of refreshing the annotator without flickering
   _resetAlertAnnotator() {
     const $oldAnnotations = $('.content', this._graphTimeline);
 

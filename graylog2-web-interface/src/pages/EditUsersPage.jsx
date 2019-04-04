@@ -3,13 +3,14 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const UsersStore = StoreProvider.getStore('Users');
-const StartpageStore = StoreProvider.getStore('Startpage');
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import UserForm from 'components/users/UserForm';
 
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
+
+const UsersStore = StoreProvider.getStore('Users');
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 class EditUsersPage extends React.Component {
   static propTypes = {
@@ -38,7 +39,7 @@ class EditUsersPage extends React.Component {
 
   _resetStartpage = () => {
     if (window.confirm('Are you sure you want to reset the start page?')) {
-      const username = this.props.params.username;
+      const { username } = this.props.params;
       StartpageStore.set(username).then(() => this._loadUser(username));
     }
   };
@@ -48,16 +49,18 @@ class EditUsersPage extends React.Component {
       return <Spinner />;
     }
 
-    const user = this.state.user;
+    const { user } = this.state;
     let resetStartpageButton;
     if (!user.read_only && user.startpage !== null && Object.keys(user.startpage).length > 0) {
       resetStartpageButton = <Button bsStyle="info" onClick={this._resetStartpage}>Reset custom startpage</Button>;
     }
 
-    const userPreferencesButton = !user.read_only ?
-      (<span id="react-user-preferences-button" data-user-name={this.props.params.username}>
-        <UserPreferencesButton userName={user.username} />
-      </span>)
+    const userPreferencesButton = !user.read_only
+      ? (
+        <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
+          <UserPreferencesButton userName={user.username} />
+        </span>
+      )
       : null;
 
     return (

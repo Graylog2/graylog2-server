@@ -50,14 +50,14 @@ class ServerUnavailablePage extends React.Component {
       return noInformationMessage;
     }
 
-    const error = this.props.server.error;
+    const { error } = this.props.server;
 
     const errorDetails = [];
     if (error.message) {
       errorDetails.push(<dt key="error-title">Error message</dt>, <dd key="error-desc">{error.message}</dd>);
     }
     if (error.originalError) {
-      const originalError = error.originalError;
+      const { originalError } = error;
       errorDetails.push(
         <dt key="status-original-request-title">Original Request</dt>,
         <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>,

@@ -79,12 +79,10 @@ const ContentPacksPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <div id="react-configuration-bundles">
-                <ContentPacksList
-                  contentPacks={this.state.contentPacks}
-                  contentPackMetadata={this.state.contentPackMetadata}
-                  onDeletePack={this._deleteContentPack}
-                  onInstall={this._installContentPack}
-                />
+                <ContentPacksList contentPacks={this.state.contentPacks}
+                                  contentPackMetadata={this.state.contentPackMetadata}
+                                  onDeletePack={this._deleteContentPack}
+                                  onInstall={this._installContentPack} />
               </div>
             </Col>
           </Row>

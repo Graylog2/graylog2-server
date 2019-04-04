@@ -69,7 +69,7 @@ class CounterRate extends React.Component {
         return this._placeholder();
       }
     }
-    const count = this.props.metric.count;
+    const { count } = this.props.metric;
 
     let rate = null;
     if (this._checkPrevMetric()) {
@@ -83,10 +83,12 @@ class CounterRate extends React.Component {
       return null;
     }
 
-    return (<span>
-      {rate}
-      {this.props.showTotal && <span key="absolute" className="number-format"> ({numeral(count).format('0')} total)</span>}
-    </span>);
+    return (
+      <span>
+        {rate}
+        {this.props.showTotal && <span key="absolute" className="number-format"> ({numeral(count).format('0')} total)</span>}
+      </span>
+    );
   }
 }
 

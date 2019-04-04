@@ -76,7 +76,7 @@ const AlertNotification = createReactClass({
     }
 
     const notification = this.props.alertNotification;
-    const stream = this.props.stream;
+    const { stream } = this.props;
     const { isConfigurationShown } = this.state;
     const typeDefinition = this.state.availableNotifications[notification.type];
 
@@ -90,9 +90,9 @@ const AlertNotification = createReactClass({
       </a>
     );
 
-    const description = (stream ?
-      <span>Executed once per triggered alert condition in stream <em>{stream.title}</em>. {toggleConfigurationLink}</span> :
-      <span>Not executed, as it is not connected to a stream. {toggleConfigurationLink}</span>);
+    const description = (stream
+      ? <span>Executed once per triggered alert condition in stream <em>{stream.title}</em>. {toggleConfigurationLink}</span>
+      : <span>Not executed, as it is not connected to a stream. {toggleConfigurationLink}</span>);
 
     const actions = stream && (
       <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -126,13 +126,13 @@ const AlertNotification = createReactClass({
           <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                              key={`configuration-form-notification-${notification.id}`}
                              configFields={typeDefinition.requested_configuration}
-                             title={'Editing alert configuration '}
+                             title="Editing alert configuration "
                              typeName={notification.type}
                              titleValue={notification.title}
                              submitAction={this._onSubmit}
                              values={notification.configuration} />
-          {isConfigurationShown &&
-            <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
+          {isConfigurationShown
+            && <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
           }
         </div>
       </Col>

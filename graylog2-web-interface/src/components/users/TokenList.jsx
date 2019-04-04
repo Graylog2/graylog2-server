@@ -63,7 +63,7 @@ class TokenList extends React.Component {
     const deleteButton = this.props.deletingToken === token.token ? <Spinner text="Deleting..." /> : 'Delete';
     return (
       <ButtonGroup>
-        <ClipboardButton title={'Copy to clipboard'} text={token.token} bsSize="xsmall" />
+        <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />
         <Button bsSize="xsmall"
                 disabled={this.props.deletingToken === token.token}
                 bsStyle="primary"
@@ -85,35 +85,36 @@ class TokenList extends React.Component {
               <ControlLabel className={TokenListStyle.tokenNewNameLabel}>Token Name</ControlLabel>
             </Col>
             <Col sm={4}>
-              <FormControl
-                id="create-token-input"
-                type="text"
-                placeholder="e.g ServiceName"
-                value={this.state.token_name}
-                onChange={this._onNewTokeChanged} />
+              <FormControl id="create-token-input"
+                           type="text"
+                           placeholder="e.g ServiceName"
+                           value={this.state.token_name}
+                           onChange={this._onNewTokeChanged} />
             </Col>
             <Col sm={2}>
               <Button id="create-token"
-              disabled={this.state.token_name === '' || this.props.creatingToken}
-              type="submit"
-              bsStyle="primary" >{submitButton}</Button>
+                      disabled={this.state.token_name === '' || this.props.creatingToken}
+                      type="submit"
+                      bsStyle="primary">{submitButton}
+              </Button>
             </Col>
           </Row>
         </div>
         <hr />
-      </form>);
+      </form>
+    );
 
     return (
       <span>
         {createTokenForm}
         <TableList filterKeys={['name', 'token']}
-          items={Immutable.List(this.props.tokens)}
-          idKey="token"
-          titleKey="name"
-          descriptionKey="token"
-          hideDescription={this.state.hide_tokens}
-          enableBulkActions={false}
-          itemActionsFactory={this.itemActionsFactory} />
+                   items={Immutable.List(this.props.tokens)}
+                   idKey="token"
+                   titleKey="name"
+                   descriptionKey="token"
+                   hideDescription={this.state.hide_tokens}
+                   enableBulkActions={false}
+                   itemActionsFactory={this.itemActionsFactory} />
         <Checkbox id="hide-tokens" onChange={this._onShowTokensChanged} checked={this.state.hide_tokens}>
           Hide Tokens
         </Checkbox>

@@ -1,6 +1,6 @@
-import AppConfig from "util/AppConfig";
-import {PluginStore} from "graylog-web-plugin/plugin";
-import URI from "urijs";
+import AppConfig from 'util/AppConfig';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import URI from 'urijs';
 
 /*
  * Global registry of plugin routes. Route names are generated automatically from the route path, by removing

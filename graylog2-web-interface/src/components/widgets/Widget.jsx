@@ -169,7 +169,7 @@ const Widget = createReactClass({
   },
 
   _getTimeRange() {
-    const config = this.props.widget.config;
+    const { config } = this.props.widget;
     const rangeType = config.timerange.type;
 
     const timeRange = {
@@ -194,7 +194,7 @@ const Widget = createReactClass({
   },
 
   replayUrl() {
-    const config = this.props.widget.config;
+    const { config } = this.props.widget;
     if (this._isBoundToStream()) {
       return Routes.stream_search(this.props.widget.config.stream_id, config.query, this._getTimeRange(), config.interval);
     }
@@ -243,10 +243,10 @@ const Widget = createReactClass({
 
     /* Note that we consider two cases here: a dashboard configured from
        a stream and a dashboard configured from global search. */
-    const canReadConfiguredStream = this.props.widget.config.stream_id && this.props.streamIds != null &&
-      this.props.streamIds[this.props.widget.config.stream_id];
-    const canSearchGlobally = !this.props.widget.config.stream_id &&
-      this.isPermitted(this.state.currentUser.permissions,
+    const canReadConfiguredStream = this.props.widget.config.stream_id && this.props.streamIds != null
+      && this.props.streamIds[this.props.widget.config.stream_id];
+    const canSearchGlobally = !this.props.widget.config.stream_id
+      && this.isPermitted(this.state.currentUser.permissions,
         ['searches:absolute', 'searches:keyword', 'searches:relative']);
 
     const disabledReplay = !canReadConfiguredStream && !canSearchGlobally;

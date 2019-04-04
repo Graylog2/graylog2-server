@@ -4,6 +4,7 @@ import { ProgressBar } from 'react-bootstrap';
 import { LinkToNode, Timestamp } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
 class SystemJob extends React.Component {
@@ -17,11 +18,11 @@ class SystemJob extends React.Component {
   };
 
   render() {
-    const job = this.props.job;
-    const progress = job.percent_complete < 100 ?
-      (<ProgressBar bsStyle="info" active now={job.percent_complete} />) : <span className="label label-success finished">Finished!</span>;
-    const cancel = job.is_cancelable ?
-      (<button type="button" className="btn btn-primary btn-xs pull-right" onClick={this._onCancel(job)}>Cancel Job</button>) : null;
+    const { job } = this.props;
+    const progress = job.percent_complete < 100
+      ? (<ProgressBar bsStyle="info" active now={job.percent_complete} />) : <span className="label label-success finished">Finished!</span>;
+    const cancel = job.is_cancelable
+      ? (<button type="button" className="btn btn-primary btn-xs pull-right" onClick={this._onCancel(job)}>Cancel Job</button>) : null;
 
     return (
       <div>

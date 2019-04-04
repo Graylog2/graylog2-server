@@ -6,6 +6,7 @@ import Qs from 'qs';
 import { Spinner } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 class GettingStarted extends React.Component {
@@ -129,16 +130,18 @@ class GettingStarted extends React.Component {
         );
       }
 
-      gettingStartedContent = (<div>
-        {spinner}
-        <iframe src={url}
-                style={iframeStyles}
-                id="getting-started-frame"
-                frameBorder="0"
-                scrolling="yes">
-          <p>Sorry, no iframes</p>
-        </iframe>
-      </div>);
+      gettingStartedContent = (
+        <div>
+          {spinner}
+          <iframe src={url}
+                  style={iframeStyles}
+                  id="getting-started-frame"
+                  frameBorder="0"
+                  scrolling="yes">
+            <p>Sorry, no iframes</p>
+          </iframe>
+        </div>
+      );
     }
     return (
       <div id="react-gettingstarted">

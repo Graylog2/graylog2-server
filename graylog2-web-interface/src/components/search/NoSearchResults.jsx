@@ -10,6 +10,7 @@ import { ContactUs, DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
 
 const NoSearchResults = createReactClass({
@@ -71,7 +72,8 @@ const NoSearchResults = createReactClass({
               <Col md={8}>
                 <div className="actions">
                   <AddSearchCountToDashboard searchInStream={this.props.searchInStream}
-                                             permissions={this.props.permissions} pullRight />
+                                             permissions={this.props.permissions}
+                                             pullRight />
                   <AddToDashboardMenu title="Add histogram to dashboard"
                                       widgetType="SEARCH_RESULT_CHART"
                                       configuration={{ interval: this.props.histogram.interval }}

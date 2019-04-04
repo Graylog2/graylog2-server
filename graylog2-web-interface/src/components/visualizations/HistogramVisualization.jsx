@@ -15,6 +15,7 @@ import D3Utils from 'util/D3Utils';
 import graphHelper from 'legacy/graphHelper';
 
 import $ from 'jquery';
+
 global.jQuery = $;
 require('bootstrap/js/tooltip');
 

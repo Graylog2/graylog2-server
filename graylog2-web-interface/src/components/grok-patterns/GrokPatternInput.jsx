@@ -109,7 +109,8 @@ class GrokPatternInput extends React.Component {
                 Add
               </Button>
             </span>
-          </ListGroupItem>);
+          </ListGroupItem>
+        );
       });
     return (
       <Row className={this.props.className}>

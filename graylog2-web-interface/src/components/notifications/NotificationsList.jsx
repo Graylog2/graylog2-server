@@ -4,10 +4,11 @@ import Reflux from 'reflux';
 import { Alert, Row, Col } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const NotificationsStore = StoreProvider.getStore('Notifications');
 
 import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
+
+const NotificationsStore = StoreProvider.getStore('Notifications');
 
 const NotificationsList = createReactClass({
   displayName: 'NotificationsList',

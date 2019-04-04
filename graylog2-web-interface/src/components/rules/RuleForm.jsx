@@ -31,7 +31,7 @@ class RuleForm extends React.Component {
 
   constructor(props) {
     super(props);
-    const rule = props.rule;
+    const { rule } = props;
 
     this.state = {
       // when editing, take the rule that's been passed in
@@ -63,7 +63,7 @@ class RuleForm extends React.Component {
     if (this.parseTimer !== undefined) {
       clearTimeout(this.parseTimer);
     }
-    const rule = this.state.rule;
+    const { rule } = this.state;
     rule.source = value;
     this.setState({ rule });
 
@@ -74,13 +74,13 @@ class RuleForm extends React.Component {
   };
 
   _onDescriptionChange = (event) => {
-    const rule = this.state.rule;
+    const { rule } = this.state;
     rule.description = event.target.value;
     this.setState({ rule });
   };
 
   _onTitleChange = (event) => {
-    const rule = this.state.rule;
+    const { rule } = this.state;
     rule.title = event.target.value;
     this.setState({ rule });
   };
@@ -113,7 +113,7 @@ class RuleForm extends React.Component {
       return 'This rule is not being used in any pipelines.';
     }
 
-    const formattedPipelines = this.props.usedInPipelines.map(pipeline => {
+    const formattedPipelines = this.props.usedInPipelines.map((pipeline) => {
       return (
         <li key={pipeline.id}>
           <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
@@ -138,7 +138,7 @@ class RuleForm extends React.Component {
       );
     }
 
-    const annotations = this.state.parseErrors.map(e => {
+    const annotations = this.state.parseErrors.map((e) => {
       return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
 

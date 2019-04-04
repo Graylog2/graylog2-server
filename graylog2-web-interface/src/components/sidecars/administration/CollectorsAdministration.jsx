@@ -144,9 +144,9 @@ const CollectorsAdministration = createReactClass({
 
   handleSidecarCollectorSelect(sidecarCollectorId) {
     return (event) => {
-      const newSelection = (event.target.checked ?
-        lodash.union(this.state.selected, [sidecarCollectorId]) :
-        lodash.without(this.state.selected, sidecarCollectorId));
+      const newSelection = (event.target.checked
+        ? lodash.union(this.state.selected, [sidecarCollectorId])
+        : lodash.without(this.state.selected, sidecarCollectorId));
       this.setState({ selected: newSelection });
     };
   },
@@ -156,9 +156,9 @@ const CollectorsAdministration = createReactClass({
   },
 
   toggleSelectAll(event) {
-    const newSelection = (event.target.checked ?
-      this.state.enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector)) :
-      []);
+    const newSelection = (event.target.checked
+      ? this.state.enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector))
+      : []);
     this.setState({ selected: newSelection });
   },
 

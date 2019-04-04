@@ -7,6 +7,7 @@ import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
+
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 class ExtractorsListItem extends React.Component {
@@ -74,7 +75,7 @@ class ExtractorsListItem extends React.Component {
         <Button bsStyle="info">Edit</Button>
       </LinkContainer>,
     );
-    actions.push(<Button key={'delete-extractor-'} bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
+    actions.push(<Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
 
     return actions;
   };

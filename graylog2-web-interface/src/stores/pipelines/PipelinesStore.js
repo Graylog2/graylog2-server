@@ -70,7 +70,8 @@ const PipelinesStore = Reflux.createStore({
         this._updatePipelinesState(response);
         UserNotification.success(`Pipeline "${pipeline.title}" created successfully`);
       },
-      failCallback);
+      failCallback,
+    );
 
     PipelinesActions.save.promise(promise);
   },
@@ -93,7 +94,8 @@ const PipelinesStore = Reflux.createStore({
         this._updatePipelinesState(response);
         UserNotification.success(`Pipeline "${pipeline.title}" updated successfully`);
       },
-      failCallback);
+      failCallback,
+    );
 
     PipelinesActions.update.promise(promise);
   },

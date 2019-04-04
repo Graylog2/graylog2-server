@@ -115,12 +115,10 @@ class GrokExtractorConfiguration extends React.Component {
             <ControlLabel className="col-md-offset-2">Grok pattern</ControlLabel>
           </Col>
           <Col md={10}>
-            <GrokPatternInput
-              onPatternChange={this._onPatternChange}
-              pattern={this.props.configuration.grok_pattern || ''}
-              patterns={this.state.patterns}
-              className={Style.grokInput}
-            />
+            <GrokPatternInput onPatternChange={this._onPatternChange}
+                              pattern={this.props.configuration.grok_pattern || ''}
+                              patterns={this.state.patterns}
+                              className={Style.grokInput} />
           </Col>
         </Row>
         <Row>

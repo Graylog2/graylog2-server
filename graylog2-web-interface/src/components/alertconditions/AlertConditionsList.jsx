@@ -54,7 +54,7 @@ class AlertConditionsList extends React.Component {
   };
 
   render() {
-    const alertConditions = this.props.alertConditions;
+    const { alertConditions } = this.props;
 
     return (
       <PaginatedList totalItems={alertConditions.length}

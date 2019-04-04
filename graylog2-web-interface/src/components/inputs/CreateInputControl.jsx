@@ -6,13 +6,14 @@ import { Button, Row, Col } from 'react-bootstrap';
 import { ExternalLinkButton, Select } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const InputTypesActions = ActionsProvider.getActions('InputTypes');
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 import StoreProvider from 'injection/StoreProvider';
-const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import { InputForm } from 'components/inputs';
+
+const InputTypesActions = ActionsProvider.getActions('InputTypes');
+const InputsActions = ActionsProvider.getActions('Inputs');
+const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 const CreateInputControl = createReactClass({
   displayName: 'CreateInputControl',
@@ -70,7 +71,7 @@ const CreateInputControl = createReactClass({
                    key="configuration-form-input"
                    configFields={this.state.selectedInputDefinition.requested_configuration}
                    title={<span>Launch new <em>{inputTypeName}</em> input</span>}
-                   helpBlock={'Select a name of your new input that describes it.'}
+                   helpBlock="Select a name of your new input that describes it."
                    typeName={this.state.selectedInput}
                    submitAction={this._createInput} />
       );
@@ -80,8 +81,11 @@ const CreateInputControl = createReactClass({
         <Col md={12}>
           <form className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{ width: 300 }}>
-              <Select placeholder="Select input" options={this._formatSelectOptions()} matchProp="label"
-                      onChange={this._onInputSelect} value={this.state.selectedInput} />
+              <Select placeholder="Select input"
+                      options={this._formatSelectOptions()}
+                      matchProp="label"
+                      onChange={this._onInputSelect}
+                      value={this.state.selectedInput} />
             </div>
             &nbsp;
             <Button bsStyle="success" type="submit" disabled={!this.state.selectedInput}>Launch new input</Button>

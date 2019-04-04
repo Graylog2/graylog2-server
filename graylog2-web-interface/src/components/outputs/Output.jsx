@@ -43,9 +43,9 @@ class Output extends React.Component {
       return <Spinner />;
     }
 
-    const output = this.props.output;
-    const contentPack = (output.content_pack ?
-      <span title="Created from content pack"><i className="fa fa-gift" /></span> : null);
+    const { output } = this.props;
+    const contentPack = (output.content_pack
+      ? <span title="Created from content pack"><i className="fa fa-gift" /></span> : null);
 
     let alert;
     let configurationWell;
@@ -59,12 +59,13 @@ class Output extends React.Component {
     } else {
       configurationWell = (
         <ConfigurationWell key={`configuration-well-output-${output.id}`}
-                           id={output.id} configuration={output.configuration}
+                           id={output.id}
+                           configuration={output.configuration}
                            typeDefinition={this.state.typeDefinition} />
       );
     }
 
-    const streamId = this.props.streamId;
+    const { streamId } = this.props;
     let deleteFromStreamButton;
     if (streamId !== null && streamId !== undefined) {
       deleteFromStreamButton = (
@@ -93,7 +94,9 @@ class Output extends React.Component {
             <Col md={6}>
               <div className="text-right node-row-info">
                 <IfPermitted permissions="outputs:edit">
-                  <EditOutputButton disabled={this._typeNotAvailable()} output={output} onUpdate={this.props.onUpdate}
+                  <EditOutputButton disabled={this._typeNotAvailable()}
+                                    output={output}
+                                    onUpdate={this.props.onUpdate}
                                     getTypeDefinition={this.props.getTypeDefinition} />
                 </IfPermitted>
                 {deleteFromStreamButton}

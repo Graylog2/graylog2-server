@@ -44,7 +44,7 @@ class IndexSetConfigurationForm extends React.Component {
   };
 
   _validateIndexPrefix = (event) => {
-    const value = event.target.value;
+    const { value } = event.target;
 
     if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
       if (this.state.validationErrors[event.target.name]) {
@@ -106,7 +106,7 @@ class IndexSetConfigurationForm extends React.Component {
 
   render() {
     const { indexSet, fieldTypeRefreshIntervalUnit } = this.state;
-    const validationErrors = this.state.validationErrors;
+    const { validationErrors } = this.state;
 
     let rotationConfig;
     if (this.props.rotationStrategies) {
@@ -115,13 +115,15 @@ class IndexSetConfigurationForm extends React.Component {
         config: this.props.indexSet.rotation_strategy,
         strategy: this.props.indexSet.rotation_strategy_class,
       };
-      rotationConfig = (<IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                 description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
-                                                                 selectPlaceholder="Select rotation strategy"
-                                                                 pluginExports={PluginStore.exports('indexRotationConfig')}
-                                                                 strategies={this.props.rotationStrategies}
-                                                                 activeConfig={activeConfig}
-                                                                 updateState={this._updateRotationConfigState} />);
+      rotationConfig = (
+        <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                                 description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
+                                                 selectPlaceholder="Select rotation strategy"
+                                                 pluginExports={PluginStore.exports('indexRotationConfig')}
+                                                 strategies={this.props.rotationStrategies}
+                                                 activeConfig={activeConfig}
+                                                 updateState={this._updateRotationConfigState} />
+      );
     } else {
       rotationConfig = (<Spinner />);
     }
@@ -133,13 +135,15 @@ class IndexSetConfigurationForm extends React.Component {
         config: this.props.indexSet.retention_strategy,
         strategy: this.props.indexSet.retention_strategy_class,
       };
-      retentionConfig = (<IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                                  description="Graylog uses a retention strategy to clean up old indices."
-                                                                  selectPlaceholder="Select retention strategy"
-                                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
-                                                                  strategies={this.props.retentionStrategies}
-                                                                  activeConfig={activeConfig}
-                                                                  updateState={this._updateRetentionConfigState} />);
+      retentionConfig = (
+        <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                                 description="Graylog uses a retention strategy to clean up old indices."
+                                                 selectPlaceholder="Select retention strategy"
+                                                 pluginExports={PluginStore.exports('indexRetentionConfig')}
+                                                 strategies={this.props.retentionStrategies}
+                                                 activeConfig={activeConfig}
+                                                 updateState={this._updateRetentionConfigState} />
+      );
     } else {
       retentionConfig = (<Spinner />);
     }

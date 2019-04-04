@@ -65,7 +65,7 @@ const PipelineConnectionsForm = createReactClass({
 
   _getFormattedStreams(streams) {
     return streams
-      .map(s => {
+      .map((s) => {
         return { value: s.id, label: s.title };
       })
       .sort((s1, s2) => naturalSort(s1.label, s2.label));
@@ -88,8 +88,11 @@ const PipelineConnectionsForm = createReactClass({
         <Button onClick={this.openModal} bsStyle="info">
           <span>Edit connections</span>
         </Button>
-        <BootstrapModalForm ref={(modal) => { this.modal = modal; }} title={<span>Edit connections for <em>{this.props.pipeline.title}</em></span>}
-                            onSubmitForm={this._save} onCancel={this._resetForm} submitButtonText="Save">
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+                            title={<span>Edit connections for <em>{this.props.pipeline.title}</em></span>}
+                            onSubmitForm={this._save}
+                            onCancel={this._resetForm}
+                            submitButtonText="Save">
           <fieldset>
             <FormGroup id="streamsConnections">
               <ControlLabel>Streams</ControlLabel>

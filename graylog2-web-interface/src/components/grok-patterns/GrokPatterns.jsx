@@ -124,9 +124,9 @@ const GrokPatterns = createReactClass({
           <IfPermitted permissions="inputs:edit">
             <span>
               <BulkLoadPatternModal onSuccess={this.loadData} />
-              <EditPatternModal id={''}
-                                name={''}
-                                pattern={''}
+              <EditPatternModal id=""
+                                name=""
+                                pattern=""
                                 patterns={this.state.patterns}
                                 create
                                 testPattern={this.testPattern}
@@ -144,7 +144,7 @@ const GrokPatterns = createReactClass({
                          className="table-striped table-hover"
                          headers={headers}
                          headerCellFormatter={this._headerCellFormatter}
-                         sortByKey={'name'}
+                         sortByKey="name"
                          rows={this.state.patterns}
                          dataRowFormatter={this._patternFormatter}
                          filterLabel="Filter patterns"

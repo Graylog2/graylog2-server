@@ -9,6 +9,7 @@ import { AlertNotificationsComponent } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const AlertNotificationsPage = createReactClass({

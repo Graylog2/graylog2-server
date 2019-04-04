@@ -7,9 +7,10 @@ import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const SavedSearchesStore = StoreProvider.getStore('SavedSearches');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const SavedSearchesStore = StoreProvider.getStore('SavedSearches');
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 const SavedSearchControls = createReactClass({

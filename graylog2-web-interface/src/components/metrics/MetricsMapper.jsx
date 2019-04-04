@@ -4,6 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { MetricsActions, MetricsStore } = CombinedProvider.get('Metrics');
 
 const MetricsMapper = createReactClass({

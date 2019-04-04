@@ -12,10 +12,11 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const InputsActions = ActionsProvider.getActions('Inputs');
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const InputsActions = ActionsProvider.getActions('Inputs');
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 const InputsStore = StoreProvider.getStore('Inputs');
 const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
@@ -76,8 +77,7 @@ const EditExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`Edit extractor ${this.state.extractor.title}`}>
         <div>
-          <PageHeader
-            title={<span>Edit extractor <em>{this.state.extractor.title}</em> for input <em>{this.state.input.title}</em></span>}>
+          <PageHeader title={<span>Edit extractor <em>{this.state.extractor.title}</em> for input <em>{this.state.input.title}</em></span>}>
             <span>
               Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
               any text data into fields that allow you easy filtering and analysis later on.

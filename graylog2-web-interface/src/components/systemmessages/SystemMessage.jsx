@@ -10,7 +10,7 @@ class SystemMessage extends React.Component {
   };
 
   render() {
-    const message = this.props.message;
+    const { message } = this.props;
     return (
       <tr>
         <td>{moment(message.timestamp).format()}</td>

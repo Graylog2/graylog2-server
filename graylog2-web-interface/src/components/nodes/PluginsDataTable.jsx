@@ -45,7 +45,7 @@ class PluginsDataTable extends React.Component {
                  className="table-hover table-condensed table-striped"
                  headers={headers}
                  headerCellFormatter={this._headerCellFormatter}
-                 sortByKey={'name'}
+                 sortByKey="name"
                  rows={this.props.plugins}
                  dataRowFormatter={this._pluginInfoFormatter}
                  filterLabel="Filter"

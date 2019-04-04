@@ -37,7 +37,7 @@ const FieldQuickValuesStore = Reflux.createStore({
       // Do nothing
     }
 
-    const url = ApiRoutes.UniversalSearchApiController.fieldTerms(
+    const { url } = ApiRoutes.UniversalSearchApiController.fieldTerms(
       rangeType,
       originalSearchURLParams.get('q') || '*',
       field,
@@ -46,7 +46,7 @@ const FieldQuickValuesStore = Reflux.createStore({
       stackedFields,
       timerange,
       streamId,
-    ).url;
+    );
 
     const promise = fetch('GET', URLUtils.qualifyUrl(url));
     promise.then(
@@ -89,7 +89,7 @@ const FieldQuickValuesStore = Reflux.createStore({
     // Build a new query that scopes the result to the requested field terms
     const query = SearchStore.appendFieldQueryObjectToQueryString(originalSearchURLParams.get('q') || '*', fieldQueryObjects, SearchStore.AND_OPERATOR);
 
-    const url = ApiRoutes.UniversalSearchApiController.fieldTermsHistogram(
+    const { url } = ApiRoutes.UniversalSearchApiController.fieldTermsHistogram(
       rangeType,
       query,
       field,
@@ -99,7 +99,7 @@ const FieldQuickValuesStore = Reflux.createStore({
       timerange,
       interval,
       streamId,
-    ).url;
+    );
 
     const promise = fetch('GET', URLUtils.qualifyUrl(url));
     promise.then(

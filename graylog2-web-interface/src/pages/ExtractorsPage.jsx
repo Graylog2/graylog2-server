@@ -14,10 +14,11 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const NodesActions = ActionsProvider.getActions('Nodes');
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const NodesActions = ActionsProvider.getActions('Nodes');
+const InputsActions = ActionsProvider.getActions('Inputs');
 const NodesStore = StoreProvider.getStore('Nodes');
 const InputsStore = StoreProvider.getStore('Inputs');
 

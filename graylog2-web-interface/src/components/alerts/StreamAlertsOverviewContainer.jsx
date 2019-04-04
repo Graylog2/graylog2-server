@@ -48,7 +48,7 @@ const StreamAlertsOverviewContainer = createReactClass({
       return <Spinner />;
     }
 
-    const stream = this.props.stream;
+    const { stream } = this.props;
     const { alertConditions, availableConditions } = this.state;
 
     return (

@@ -13,12 +13,13 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import ActionsProvider from 'injection/ActionsProvider';
+
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 const InputsStore = StoreProvider.getStore('Inputs');
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
-
-import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
 

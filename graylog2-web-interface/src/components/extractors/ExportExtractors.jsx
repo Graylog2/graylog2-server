@@ -9,9 +9,10 @@ import { ClipboardButton, Spinner } from 'components/common';
 import Version from 'util/Version';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExportExtractors = createReactClass({

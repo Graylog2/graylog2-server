@@ -6,9 +6,6 @@ import dc from 'dc';
 import Qs from 'qs';
 import moment from 'moment';
 
-import SourceDataTable from './SourceDataTable';
-import SourcePieChart from './SourcePieChart';
-import SourceLineChart from './SourceLineChart';
 import SupportLink from 'components/support/SupportLink';
 import { Spinner } from 'components/common';
 
@@ -17,11 +14,15 @@ import UniversalSearch from 'logic/search/UniversalSearch';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import ActionsProvider from 'injection/ActionsProvider';
+import SourceLineChart from './SourceLineChart';
+import SourcePieChart from './SourcePieChart';
+import SourceDataTable from './SourceDataTable';
+
 const SourcesStore = StoreProvider.getStore('Sources');
 const HistogramDataStore = StoreProvider.getStore('HistogramData');
 const SearchStore = StoreProvider.getStore('Search');
-
-import ActionsProvider from 'injection/ActionsProvider';
 const HistogramDataActions = ActionsProvider.getActions('HistogramData');
 
 const daysToSeconds = days => moment.duration(days, 'days').as('seconds');
@@ -199,7 +200,7 @@ const SourceOverview = createReactClass({
     if (query) {
       if (query.indexOf('?') === 0 && query.length > 1) {
         query = query.substr(1, query.length - 1);
-        const range = Qs.parse(query).range;
+        const { range } = Qs.parse(query);
         if (range) {
           return range;
         }
@@ -223,16 +224,16 @@ const SourceOverview = createReactClass({
   },
 
   _getRangeFromHash() {
-    const hash = window.location.hash;
+    const { hash } = window.location;
     if (hash.indexOf('#') !== 0) {
       return DEFAULT_RANGE_IN_SECS;
     }
     const hashContent = hash.substring(1);
     if (hash.indexOf('&') < 0) {
-        // If there is only one param in the hash, return it
+      // If there is only one param in the hash, return it
       return hashContent;
     }
-      // If there are more than one params in the hash, return the numeric one
+    // If there are more than one params in the hash, return the numeric one
     const match = hashContent.match(/(\d+)=&/);
     return (match && match.length > 0) ? match[1] : DEFAULT_RANGE_IN_SECS;
   },
@@ -306,7 +307,7 @@ const SourceOverview = createReactClass({
   },
 
   _onRangeChanged(event) {
-    const value = event.target.value;
+    const { value } = event.target;
     this.changeRange(value, true);
   },
 
@@ -337,16 +338,19 @@ const SourceOverview = createReactClass({
                            resolution={this.state.resolution}
                            resetFilters={this.resetHistogramFilters} />
         </div>
-        {this.state.loading ?
-          <div className="row content"><div style={{ marginLeft: 10 }}><Spinner /></div></div> :
-          null}
+        {this.state.loading
+          ? <div className="row content"><div style={{ marginLeft: 10 }}><Spinner /></div></div>
+          : null}
         <div className="row content" style={{ display: this.state.loading ? 'none' : 'block' }}>
           <div className="col-md-7">
-            <SourceDataTable ref={(sourceDataTable) => { this.sourceDataTable = sourceDataTable; }} resetFilters={this.resetSourcesFilters}
-                             setSearchFilter={this.setSearchFilter} numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
+            <SourceDataTable ref={(sourceDataTable) => { this.sourceDataTable = sourceDataTable; }}
+                             resetFilters={this.resetSourcesFilters}
+                             setSearchFilter={this.setSearchFilter}
+                             numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
           </div>
           <div className="col-md-3 col-md-offset-1">
-            <SourcePieChart ref={(sourcePieChart) => { this.sourcePieChart = sourcePieChart; }} resetFilters={this.resetSourcesFilters}
+            <SourcePieChart ref={(sourcePieChart) => { this.sourcePieChart = sourcePieChart; }}
+                            resetFilters={this.resetSourcesFilters}
                             numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
           </div>
         </div>
@@ -359,7 +363,9 @@ const SourceOverview = createReactClass({
           <div className="col-md-12">
             <div>
               <div className="pull-right">
-                <select ref={(rangeSelector) => { this.rangeSelector = rangeSelector; }} className="sources-range form-control input-sm" value={this.state.range}
+                <select ref={(rangeSelector) => { this.rangeSelector = rangeSelector; }}
+                        className="sources-range form-control input-sm"
+                        value={this.state.range}
                         onChange={this._onRangeChanged}>
                   <option value={hoursToSeconds(1)}>Last Hour</option>
                   <option value={daysToSeconds(1)}>Last Day</option>
@@ -377,8 +383,8 @@ const SourceOverview = createReactClass({
             </p>
 
             <SupportLink>
-              {' Use your mouse to interact with the table and graphs on this page, and get a better ' +
-              'overview of the sources sending data into Graylog.'}
+              {' Use your mouse to interact with the table and graphs on this page, and get a better '
+              + 'overview of the sources sending data into Graylog.'}
             </SupportLink>
           </div>
         </div>

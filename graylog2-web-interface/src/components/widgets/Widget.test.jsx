@@ -21,27 +21,25 @@ describe('<Widget />', () => {
   };
   describe('locked and unlocked', () => {
     it('should render a locked Widget', () => {
-      const wrapper = mount(<Widget
-        id={widget.id}
-        key={`widget-${widget.id}`}
-        widget={widget}
-        dashboardId={'dashboard-id'}
-        locked
-        shouldUpdate
-        streamIds={{ 'stream-1': 'stream-1' }} />);
+      const wrapper = mount(<Widget id={widget.id}
+                                    key={`widget-${widget.id}`}
+                                    widget={widget}
+                                    dashboardId="dashboard-id"
+                                    locked
+                                    shouldUpdate
+                                    streamIds={{ 'stream-1': 'stream-1' }} />);
       expect(wrapper.find('.widget-replay').find('Button').prop('title')).toEqual('Replay search');
       expect(wrapper.find('.widget-edit').exists()).toBeFalsy();
     });
 
     it('should render a unlocked Widget', () => {
-      const wrapper = mount(<Widget
-        id={widget.id}
-        key={`widget-${widget.id}`}
-        widget={widget}
-        dashboardId={'dashboard-id'}
-        locked={false}
-        shouldUpdate
-        streamIds={{ 'stream-1': 'stream-1' }} />);
+      const wrapper = mount(<Widget id={widget.id}
+                                    key={`widget-${widget.id}`}
+                                    widget={widget}
+                                    dashboardId="dashboard-id"
+                                    locked={false}
+                                    shouldUpdate
+                                    streamIds={{ 'stream-1': 'stream-1' }} />);
       expect(wrapper.find('.widget-edit').find('Button').prop('title')).toEqual('Edit widget');
       expect(wrapper.find('.widget-replay').exists()).toBeFalsy();
     });
@@ -49,14 +47,13 @@ describe('<Widget />', () => {
 
   describe('disable and enable replay', () => {
     it('should not render a replay button if the user has no streams to read', () => {
-      const wrapper = mount(<Widget
-        id={widget.id}
-        key={`widget-${widget.id}`}
-        widget={widget}
-        dashboardId={'dashboard-id'}
-        locked
-        shouldUpdate
-        streamIds={{}} />);
+      const wrapper = mount(<Widget id={widget.id}
+                                    key={`widget-${widget.id}`}
+                                    widget={widget}
+                                    dashboardId="dashboard-id"
+                                    locked
+                                    shouldUpdate
+                                    streamIds={{}} />);
       expect(wrapper.find('.widget-replay').exists()).toBeFalsy();
     });
   });

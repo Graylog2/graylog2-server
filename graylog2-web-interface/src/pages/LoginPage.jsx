@@ -8,12 +8,13 @@ import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
 import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
 
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
+
+const SessionStore = StoreProvider.getStore('Session');
+const SessionActions = ActionsProvider.getActions('Session');
 
 const LoginPage = createReactClass({
   displayName: 'LoginPage',
@@ -116,4 +117,3 @@ const LoginPage = createReactClass({
 });
 
 export default LoginPage;
-

@@ -6,16 +6,17 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import StoreProvider from 'injection/StoreProvider';
-const ConfigurationsStore = StoreProvider.getStore('Configurations');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 
-import {} from 'components/maps/configurations'
+import {} from 'components/maps/configurations';
+
+const ConfigurationsStore = StoreProvider.getStore('Configurations');
+const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const ConfigurationsPage = createReactClass({
   displayName: 'ConfigurationsPage',
@@ -153,7 +154,8 @@ const ConfigurationsPage = createReactClass({
             </Col>
           </Row>
 
-          {pluginConfigRows.length > 0 && <Row className="content">
+          {pluginConfigRows.length > 0 && (
+          <Row className="content">
             <Col md={12}>
               <h2>Plugins</h2>
               <p className="description">Configuration for installed plugins.</p>
@@ -162,7 +164,8 @@ const ConfigurationsPage = createReactClass({
                 {pluginConfigRows}
               </div>
             </Col>
-          </Row>}
+          </Row>
+          )}
         </span>
       </DocumentTitle>
     );

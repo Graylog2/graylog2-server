@@ -28,6 +28,7 @@ class DocsHelper {
     USERS_ROLES: 'users_and_roles.html',
     WELCOME: '', // Welcome page to the documentation
   };
+
   DOCS_URL = 'http://docs.graylog.org/en/';
 
   toString(path) {

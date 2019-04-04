@@ -29,7 +29,7 @@ const SystemInformation = createReactClass({
   },
 
   render() {
-    const systemInformation = this.props.systemInformation;
+    const { systemInformation } = this.props;
     let jvmInformation;
     if (this.props.jvmInformation) {
       jvmInformation = <span>PID {this.props.jvmInformation.pid}, {this.props.jvmInformation.info}</span>;

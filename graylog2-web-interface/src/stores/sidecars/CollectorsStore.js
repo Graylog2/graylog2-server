@@ -74,7 +74,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
 
     CollectorsActions.all.promise(promise);
   },
@@ -99,7 +100,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
 
     CollectorsActions.list.promise(promise);
   },
@@ -122,7 +124,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
     CollectorsActions.create.promise(promise);
   },
 
@@ -140,7 +143,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
     CollectorsActions.update.promise(promise);
   },
 
@@ -196,7 +200,8 @@ const CollectorsStore = Reflux.createStore({
         error => (
           UserNotification.error(`Validating collector "${payload.name}" failed with status: ${error.message}`,
             'Could not validate collector')
-        ));
+        ),
+      );
 
     CollectorsActions.validate.promise(promise);
   },

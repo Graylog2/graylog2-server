@@ -32,9 +32,9 @@ class Page extends React.Component {
 
     return (
       <Pager.Item href={this.props.href}
-                className={className}
-                disabled={this.props.isDisabled}
-                onSelect={() => this.props.onPageChanged(this.props.page)}>
+                  className={className}
+                  disabled={this.props.isDisabled}
+                  onSelect={() => this.props.onPageChanged(this.props.page)}>
         {this.props.page}
       </Pager.Item>
     );

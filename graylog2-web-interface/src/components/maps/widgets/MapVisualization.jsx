@@ -129,7 +129,7 @@ const MapVisualization = createReactClass({
   render() {
     const { data, id, height, width, url, attribution, interactive, locked } = this.props;
 
-    const terms = data.terms;
+    const { terms } = data;
     const occurrences = Object.keys(terms).map(k => terms[k]);
     const minOccurrences = occurrences.reduce((prev, cur) => Math.min(prev, cur), Infinity);
     const maxOccurrences = occurrences.reduce((prev, cur) => Math.max(prev, cur), -Infinity);

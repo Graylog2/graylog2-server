@@ -4,13 +4,14 @@ import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
+
+const SessionStore = StoreProvider.getStore('Session');
+const SessionActions = ActionsProvider.getActions('Session');
 
 class UserMenu extends React.Component {
   static propTypes = {
@@ -38,4 +39,3 @@ class UserMenu extends React.Component {
 }
 
 export default UserMenu;
-

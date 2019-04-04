@@ -7,11 +7,12 @@ import URI from 'urijs';
 import { ExternalLinkButton, IfPermitted } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import Routes from 'routing/Routes';
+
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
 const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
 const SystemShutdownStore = StoreProvider.getStore('SystemShutdown');
-
-import Routes from 'routing/Routes';
 
 class NodesActions extends React.Component {
   static propTypes = {

@@ -8,11 +8,12 @@ import { Button } from 'react-bootstrap';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
 import StoreProvider from 'injection/StoreProvider';
-const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
-const RefreshStore = StoreProvider.getStore('Refresh');
 
 import NumberUtils from 'util/NumberUtils';
 import UserNotification from 'util/UserNotification';
+
+const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
+const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldStatistics = createReactClass({
   displayName: 'FieldStatistics',
@@ -39,11 +40,11 @@ const FieldStatistics = createReactClass({
 
   componentWillReceiveProps(nextProps) {
     // Reload values when executed search changes
-    if (this.props.query !== nextProps.query ||
-        this.props.rangeType !== nextProps.rangeType ||
-        JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
-        this.props.stream !== nextProps.stream ||
-        nextProps.forceFetch) {
+    if (this.props.query !== nextProps.query
+        || this.props.rangeType !== nextProps.rangeType
+        || JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams)
+        || this.props.stream !== nextProps.stream
+        || nextProps.forceFetch) {
       this._reloadAllStatistics();
     }
   },
@@ -200,9 +201,11 @@ const FieldStatistics = createReactClass({
         </div>
       );
     } else if (!this.state.statsLoadPending.isEmpty()) {
-      content = (<div className="content-col">
-        <h1>Field Statistics <i className="fa fa-spin fa-spinner" /></h1>
-      </div>);
+      content = (
+        <div className="content-col">
+          <h1>Field Statistics <i className="fa fa-spin fa-spinner" /></h1>
+        </div>
+      );
     }
 
     return (

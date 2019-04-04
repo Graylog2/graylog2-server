@@ -86,10 +86,15 @@ const TimeoutInput = createReactClass({
   render() {
     return (
       <span>
-        <Input type="checkbox" id="session-timeout-never" name="session_timeout_never"
-               labelClassName={`col-sm-${this.props.controlSize}`} wrapperClassName={`col-sm-offset-${this.props.labelSize} col-sm-${this.props.controlSize}`}
-               label="Sessions do not time out" help="When checked sessions never time out due to inactivity."
-               onChange={this._onClick} checked={this.state.sessionTimeoutNever} />
+        <Input type="checkbox"
+               id="session-timeout-never"
+               name="session_timeout_never"
+               labelClassName={`col-sm-${this.props.controlSize}`}
+               wrapperClassName={`col-sm-offset-${this.props.labelSize} col-sm-${this.props.controlSize}`}
+               label="Sessions do not time out"
+               help="When checked sessions never time out due to inactivity."
+               onChange={this._onClick}
+               checked={this.state.sessionTimeoutNever} />
 
         <Input id="timeout-controls"
                label="Timeout"
@@ -98,15 +103,23 @@ const TimeoutInput = createReactClass({
                wrapperClassName={`col-sm-${this.props.controlSize}`}>
           <Row>
             <Col sm={2}>
-              <input ref={(timeout) => { this.timeout = timeout; }} type="number" id="timeout"
+              <input ref={(timeout) => { this.timeout = timeout; }}
+                     type="number"
+                     id="timeout"
                      className="session-timeout-fields validatable form-control"
-                     name="timeout" min={1} data-validate="positive_number" disabled={this.state.sessionTimeoutNever}
-                     value={this.state.value} onChange={this._onChangeValue} />
+                     name="timeout"
+                     min={1}
+                     data-validate="positive_number"
+                     disabled={this.state.sessionTimeoutNever}
+                     value={this.state.value}
+                     onChange={this._onChangeValue} />
             </Col>
             <Col sm={3}>
-              <TimeoutUnitSelect ref={(session_timeout_unit) => { this.session_timeout_unit = session_timeout_unit; }} className="form-control session-timeout-fields"
+              <TimeoutUnitSelect ref={(session_timeout_unit) => { this.session_timeout_unit = session_timeout_unit; }}
+                                 className="form-control session-timeout-fields"
                                  disabled={this.state.sessionTimeoutNever}
-                                 value={this.state.unit} onChange={this._onChangeUnit} />
+                                 value={this.state.unit}
+                                 onChange={this._onChangeUnit} />
             </Col>
           </Row>
         </Input>

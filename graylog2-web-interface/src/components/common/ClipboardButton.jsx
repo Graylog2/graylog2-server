@@ -91,7 +91,7 @@ class ClipboardButton extends React.Component {
 
   render() {
     const filteredProps = this._getFilteredProps();
-    const tooltip = <Tooltip id={'copy-button-tooltip'}>{this.state.tooltipMessage}</Tooltip>;
+    const tooltip = <Tooltip id="copy-button-tooltip">{this.state.tooltipMessage}</Tooltip>;
 
     if (this.props.text) {
       filteredProps['data-clipboard-text'] = this.props.text;

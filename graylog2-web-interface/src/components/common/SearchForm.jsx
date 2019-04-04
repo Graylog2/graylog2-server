@@ -169,8 +169,8 @@ class SearchForm extends React.Component {
                    className="query form-control"
                    autoComplete="off"
                    spellCheck="false" />
-            {this.props.queryHelpComponent &&
-              <span className={`form-control-feedback ${style.helpFeedback}`}>{this.props.queryHelpComponent}</span>}
+            {this.props.queryHelpComponent
+              && <span className={`form-control-feedback ${style.helpFeedback}`}>{this.props.queryHelpComponent}</span>}
           </div>
 
           <div className="form-group" style={{ marginLeft: this.props.buttonLeftMargin }}>
@@ -181,12 +181,14 @@ class SearchForm extends React.Component {
               {this.state.isLoading ? <Spinner text={this.props.loadingLabel} /> : this.props.searchButtonLabel}
             </Button>
           </div>
-          {this.props.onReset &&
+          {this.props.onReset
+            && (
             <div className="form-group" style={{ marginLeft: this.props.buttonLeftMargin }}>
               <Button type="reset" className="reset-button" onClick={this._onReset}>
                 {this.props.resetButtonLabel}
               </Button>
             </div>
+            )
           }
           {this.props.children}
         </form>

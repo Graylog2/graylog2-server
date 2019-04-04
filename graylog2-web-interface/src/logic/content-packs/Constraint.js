@@ -49,9 +49,9 @@ export default class Constraint {
       return false;
     }
 
-    return other.version === this.version &&
-      other.type === this.type &&
-      other.plugin === this.plugin;
+    return other.version === this.version
+      && other.type === this.type
+      && other.plugin === this.plugin;
   }
 
   static fromJSON(value) {

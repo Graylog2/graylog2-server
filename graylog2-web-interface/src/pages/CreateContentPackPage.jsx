@@ -64,15 +64,16 @@ const CreateContentPackPage = createReactClass({
           history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         },
         (response) => {
-          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-            'Graylog logs for more information.';
+          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your '
+            + 'Graylog logs for more information.';
           const title = 'Could not import content pack';
           let smallMessage = '';
           if (response.additional && response.additional.body && response.additional.body.message) {
             smallMessage = `<br /><small>${response.additional.body.message}</small>`;
           }
           UserNotification.error(message + smallMessage, title);
-        });
+        },
+      );
   },
 
   _getEntities(selectedEntities) {
@@ -113,8 +114,7 @@ const CreateContentPackPage = createReactClass({
                            selectedEntities={this.state.selectedEntities}
                            appliedParameter={this.state.appliedParameter}
                            entityIndex={this.state.entityIndex}
-                           onSave={this._onSave}
-          />
+                           onSave={this._onSave} />
         </span>
       </DocumentTitle>
     );

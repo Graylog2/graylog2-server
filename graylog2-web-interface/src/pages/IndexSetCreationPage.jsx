@@ -70,7 +70,7 @@ const IndexSetCreationPage = createReactClass({
       return <Spinner />;
     }
 
-    const indexSet = this.state.indexSet;
+    const { indexSet } = this.state;
 
     return (
       <DocumentTitle title="Create Index Set">

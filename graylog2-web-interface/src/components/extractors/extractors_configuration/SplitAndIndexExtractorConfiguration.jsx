@@ -5,11 +5,12 @@ import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
-const ToolsStore = StoreProvider.getStore('Tools');
 
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
+
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const SplitAndIndexExtractorConfiguration = createReactClass({
   displayName: 'SplitAndIndexExtractorConfiguration',
@@ -71,7 +72,7 @@ const SplitAndIndexExtractorConfiguration = createReactClass({
   },
 
   _isTryButtonDisabled() {
-    const configuration = this.state.configuration;
+    const { configuration } = this.state;
     return this.state.trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1 || !this.props.exampleMessage;
   },
 

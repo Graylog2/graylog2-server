@@ -14,16 +14,17 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
-const ToolsStore = StoreProvider.getStore('Tools');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 import UIUtils from 'util/UIUtils';
 
 import DateTime from 'logic/datetimes/DateTime';
 import moment from 'moment';
+
+const SearchStore = StoreProvider.getStore('Search');
+const ToolsStore = StoreProvider.getStore('Tools');
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 const SearchBar = createReactClass({
   displayName: 'SearchBar',
@@ -150,7 +151,7 @@ const SearchBar = createReactClass({
 
   _keywordSearchChanged() {
     this._rangeParamsChanged('keyword')();
-    const value = this.inputs['keyword'].getValue();
+    const value = this.inputs.keyword.getValue();
 
     if (value === '') {
       this._resetKeywordPreview();
@@ -230,7 +231,7 @@ const SearchBar = createReactClass({
     this.width.value = SearchStore.width;
     this.highlightMessage.value = SearchStore.highlightMessage;
 
-    const searchForm = this.searchForm;
+    const { searchForm } = this;
     const searchQuery = $(searchForm).serialize();
     const searchURI = new URI(searchForm.action).search(searchQuery);
     const resource = searchURI.resource();
@@ -297,7 +298,7 @@ const SearchBar = createReactClass({
           <div className="timerange-selector relative"
                style={{ width: 270, marginLeft: 50 }}>
             <Input id="relative-timerange-selector"
-                   ref={(relative) => { this.inputs['relative'] = relative; }}
+                   ref={(relative) => { this.inputs.relative = relative; }}
                    type="select"
                    value={this.state.rangeParams.get('relative')}
                    name="relative"
@@ -320,7 +321,7 @@ const SearchBar = createReactClass({
                             date={this.state.rangeParams.get('from')}
                             onChange={this._onDateSelected('from')}>
                   <Input type="text"
-                         ref={(fromFormatted) => { this.inputs['fromFormatted'] = fromFormatted; }}
+                         ref={(fromFormatted) => { this.inputs.fromFormatted = fromFormatted; }}
                          id="timerange-absolute-from"
                          value={this._formattedDateStringInUserTZ('from')}
                          onChange={this._rangeParamsChanged('from')}
@@ -342,7 +343,7 @@ const SearchBar = createReactClass({
                             date={this.state.rangeParams.get('to')}
                             onChange={this._onDateSelected('to')}>
                   <Input type="text"
-                         ref={(toFormatted) => { this.inputs['toFormatted'] = toFormatted; }}
+                         ref={(toFormatted) => { this.inputs.toFormatted = toFormatted; }}
                          id="timerange-absolute-to"
                          value={this._formattedDateStringInUserTZ('to')}
                          onChange={this._rangeParamsChanged('to')}
@@ -364,7 +365,7 @@ const SearchBar = createReactClass({
             <div className="row no-bm" style={{ marginLeft: 50 }}>
               <div className="col-md-5" style={{ padding: 0 }}>
                 <Input type="text"
-                       ref={(keyword) => { this.inputs['keyword'] = keyword; }}
+                       ref={(keyword) => { this.inputs.keyword = keyword; }}
                        id="timerange-keyword"
                        name="keyword"
                        value={this.state.rangeParams.get('keyword')}
@@ -374,11 +375,13 @@ const SearchBar = createReactClass({
                        required />
               </div>
               <div className="col-md-7" style={{ paddingRight: 0 }}>
-                {this.state.keywordPreview.size > 0 &&
+                {this.state.keywordPreview.size > 0
+                && (
                 <Alert bsStyle="info" style={{ height: 30, paddingTop: 5, paddingBottom: 5, marginTop: 0 }}>
                   <strong style={{ marginRight: 8 }}>Preview:</strong>
                   {this.state.keywordPreview.get('from')} to {this.state.keywordPreview.get('to')}
                 </Alert>
+                )
                 }
               </div>
             </div>
@@ -401,8 +404,11 @@ const SearchBar = createReactClass({
       });
 
     return (
-      <Select placeholder="Saved searches" options={formattedSavedSearches} value={this.state.savedSearch}
-              onChange={this._onSavedSearchSelect} size="small" />
+      <Select placeholder="Saved searches"
+              options={formattedSavedSearches}
+              value={this.state.savedSearch}
+              onChange={this._onSavedSearchSelect}
+              size="small" />
     );
   },
 
@@ -451,10 +457,12 @@ const SearchBar = createReactClass({
                     <div className="col-md-6">
                       <div className="saved-searches-selector-container pull-right"
                            style={{ display: 'inline-flex', marginRight: 5 }}>
-                        {this.props.displayRefreshControls &&
+                        {this.props.displayRefreshControls
+                        && (
                         <div style={{ marginRight: 5 }}>
                           <RefreshControls />
                         </div>
+                        )
                         }
                         <div style={{ width: 270 }}>
                           {this._getSavedSearchesSelector()}

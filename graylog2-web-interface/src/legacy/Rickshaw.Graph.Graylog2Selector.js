@@ -5,6 +5,7 @@ import NumberUtils from 'util/NumberUtils';
 import DateTime from 'logic/datetimes/DateTime';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
 
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
@@ -12,7 +13,7 @@ Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
 const Graylog2Selector = Rickshaw.Class.create({
 
   initialize(args) {
-    const graph = args.graph;
+    const { graph } = args;
     this.graph = args.graph;
     this.build();
     graph.onUpdate(() => {
@@ -21,13 +22,13 @@ const Graylog2Selector = Rickshaw.Class.create({
   },
 
   build() {
-    const graph = this.graph;
+    const { graph } = this;
     const parent = graph.element.getElementsByTagName('svg')[0];
 
     let selectingActive = false;
     const position = this.position = {};
 
-        // Create selector box.
+    // Create selector box.
     const selectionBox = document.createElement('div');
     selectionBox.setAttribute('class', 'graph-range-selector');
     graph.element.appendChild(selectionBox);
@@ -36,7 +37,7 @@ const Graylog2Selector = Rickshaw.Class.create({
       e.preventDefault();
     };
 
-        // Function to reset selection.
+    // Function to reset selection.
     const clearSelection = function () {
       selectionBox.style.transition = 'opacity 0.2s ease-out';
       selectionBox.style.opacity = 0;
@@ -76,7 +77,7 @@ const Graylog2Selector = Rickshaw.Class.create({
       }, false);
     };
 
-        // On click in graph until button is released again. (begin of drag)
+    // On click in graph until button is released again. (begin of drag)
     graph.element.addEventListener('mousedown', (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -91,7 +92,7 @@ const Graylog2Selector = Rickshaw.Class.create({
       }
     }, true);
 
-        // On mouse button release after click. (end of drag / complete)
+    // On mouse button release after click. (end of drag / complete)
     graph.element.addEventListener('mouseup', (e) => {
       selectingActive = false;
       position.xMin = Math.round(graph.x.invert(position.minX));
@@ -115,7 +116,7 @@ const Graylog2Selector = Rickshaw.Class.create({
       clearSelection();
     }, false);
 
-        // Stop at chart boundaries.
+    // Stop at chart boundaries.
     if (this._validateSeries(graph.series)) {
       if (graph.dataDomain()[0] === position.xMin) {
         graph.window.xMin = undefined;
@@ -134,8 +135,8 @@ const Graylog2Selector = Rickshaw.Class.create({
   },
 
   update() {
-    let graph = this.graph,
-      position = this.position;
+    const { graph } = this;
+    const { position } = this;
     graph.window.xMin = position.xMin;
     graph.window.xMax = position.xMax;
 

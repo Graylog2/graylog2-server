@@ -42,19 +42,19 @@ const EditRole = createReactClass({
   },
 
   _setName(ev) {
-    const role = this.state.role;
+    const { role } = this.state;
     role.name = ev.target.value;
     this.setState({ role: this.state.role });
   },
 
   _setDescription(ev) {
-    const role = this.state.role;
+    const { role } = this.state;
     role.description = ev.target.value;
     this.setState({ role: this.state.role });
   },
 
   _updatePermissions(addedPerms, deletedPerms) {
-    const role = this.state.role;
+    const { role } = this.state;
     role.permissions = Immutable.Set(role.permissions)
       .subtract(deletedPerms)
       .union(addedPerms)
@@ -93,9 +93,16 @@ const EditRole = createReactClass({
         <Col md={12}>
           <h1>{titleText}</h1>
           <div style={{ marginTop: 10 }}>
-            <Input id="role-name" type="text" label="Name" onChange={this._setName} value={this.state.role.name}
+            <Input id="role-name"
+                   type="text"
+                   label="Name"
+                   onChange={this._setName}
+                   value={this.state.role.name}
                    required />
-            <Input id="role-description" type="text" label="Description" onChange={this._setDescription}
+            <Input id="role-description"
+                   type="text"
+                   label="Description"
+                   onChange={this._setDescription}
                    value={this.state.role.description} />
 
             <FormGroup>
@@ -105,8 +112,7 @@ const EditRole = createReactClass({
             <PermissionSelector streams={this.props.streams}
                                 dashboards={this.props.dashboards}
                                 permissions={Immutable.Set(this.state.role.permissions)}
-                                onChange={this._updatePermissions}
-            />
+                                onChange={this._updatePermissions} />
             <hr />
             {saveDisabledAlert}
             <Button onClick={this._onSave} style={{ marginRight: 5 }} bsStyle="primary" disabled={saveDisabled}>
@@ -115,7 +121,8 @@ const EditRole = createReactClass({
             <Button onClick={this.props.cancelEdit}>Cancel</Button>
           </div>
         </Col>
-      </Row>);
+      </Row>
+    );
   },
 });
 

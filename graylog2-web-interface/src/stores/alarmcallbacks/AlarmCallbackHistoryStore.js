@@ -6,6 +6,7 @@ import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const AlarmCallbackHistoryActions = ActionsProvider.getActions('AlarmCallbackHistory');
 
 const AlarmCallbackHistoryStore = Reflux.createStore({

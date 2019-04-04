@@ -57,7 +57,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
       <div>
         <Input id="rotation-period"
                type="text"
-               ref={(rotationPeriod) => { this.inputs['rotation_period'] = rotationPeriod; }}
+               ref={(rotationPeriod) => { this.inputs.rotation_period = rotationPeriod; }}
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
                value={this.state.rotation_period}

@@ -45,22 +45,19 @@ class DateConverterConfiguration extends React.Component {
   render() {
     const dateFormatHelpMessage = (
       <span>
-        String format the date uses. Read more in the <DocumentationLink
-        page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        String format the date uses. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
     const timezoneHelpMessage = (
       <span>
-        Time zone to apply to date. Read more in the <DocumentationLink
-        page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        Time zone to apply to date. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
     const localeHelpMessage = (
       <span>
-        Locale to use when parsing the date. Read more in the <DocumentationLink
-        page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        Locale to use when parsing the date. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 

@@ -50,7 +50,9 @@ class NumericVisualization extends React.Component {
   }
 
   DEFAULT_VALUE_FONT_SIZE = '60px';
+
   NUMBER_OF_INDICATORS = 3;
+
   PERCENTAGE_PER_INDICATOR = 30;
 
   _updateData = (data, renderCallback) => {
@@ -131,9 +133,9 @@ class NumericVisualization extends React.Component {
   };
 
   _isIndicatorActive = (index, trendIndicatorType) => {
-    if ((this.state.percentage === 0) ||
-      (this.state.currentNumber >= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.HIGHER) ||
-      (this.state.currentNumber <= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.LOWER)) {
+    if ((this.state.percentage === 0)
+      || (this.state.currentNumber >= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.HIGHER)
+      || (this.state.currentNumber <= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.LOWER)) {
       return false;
     }
 

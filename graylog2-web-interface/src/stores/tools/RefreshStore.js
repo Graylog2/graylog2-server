@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const RefreshStore = Reflux.createStore({

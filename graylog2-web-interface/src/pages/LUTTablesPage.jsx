@@ -113,22 +113,28 @@ const LUTTablesPage = createReactClass({
           </Row>
         );
       } else {
-        content = (<LookupTable dataAdapter={this.state.dataAdapter}
-                                cache={this.state.cache}
-                                table={this.state.table} />);
+        content = (
+          <LookupTable dataAdapter={this.state.dataAdapter}
+                       cache={this.state.cache}
+                       table={this.state.table} />
+        );
       }
     } else if (this._isCreating(this.props)) {
-      content = (<LookupTableCreate saved={this._saved}
-                                    validate={this._validateTable}
-                                    validationErrors={this.state.validationErrors} />);
+      content = (
+        <LookupTableCreate saved={this._saved}
+                           validate={this._validateTable}
+                           validationErrors={this.state.validationErrors} />
+      );
     } else if (!this.state || !this.state.tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
-      content = (<LookupTablesOverview tables={this.state.tables}
-                                       caches={this.state.caches}
-                                       dataAdapters={this.state.dataAdapters}
-                                       pagination={this.state.pagination}
-                                       errorStates={this.state.errorStates} />);
+      content = (
+        <LookupTablesOverview tables={this.state.tables}
+                              caches={this.state.caches}
+                              dataAdapters={this.state.dataAdapters}
+                              pagination={this.state.pagination}
+                              errorStates={this.state.errorStates} />
+      );
     }
 
     return (

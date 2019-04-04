@@ -30,10 +30,12 @@ const CollectorList = createReactClass({
 
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
-    return (<CollectorRow collector={collector}
-                          onClone={onClone}
-                          onDelete={onDelete}
-                          validateCollector={validateCollector} />);
+    return (
+      <CollectorRow collector={collector}
+                    onClone={onClone}
+                    onDelete={onDelete}
+                    validateCollector={validateCollector} />
+    );
   },
 
   render() {

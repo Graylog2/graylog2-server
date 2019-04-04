@@ -6,11 +6,12 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 
 import StoreProvider from 'injection/StoreProvider';
-const RolesStore = StoreProvider.getStore('Roles');
-const UsersStore = StoreProvider.getStore('Users');
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import NewUserForm from 'components/users/NewUserForm';
+
+const RolesStore = StoreProvider.getStore('Roles');
+const UsersStore = StoreProvider.getStore('Users');
 
 class CreateUsersPage extends React.Component {
   state = {

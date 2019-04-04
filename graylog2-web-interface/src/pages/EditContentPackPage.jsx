@@ -72,8 +72,8 @@ const EditContentPackPage = createReactClass({
       return;
     }
     const selectedEntities = this.state.contentPack.entities.reduce((result, entity) => {
-      if (this.state.entityCatalog[entity.type.name] &&
-        this.state.entityCatalog[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
+      if (this.state.entityCatalog[entity.type.name]
+        && this.state.entityCatalog[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
         const newResult = result;
         newResult[entity.type.name] = result[entity.type.name] || [];
         newResult[entity.type.name].push(entity);
@@ -122,15 +122,16 @@ const EditContentPackPage = createReactClass({
           history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         },
         (response) => {
-          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-            'Graylog logs for more information.';
+          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your '
+            + 'Graylog logs for more information.';
           const title = 'Could not import content pack';
           let smallMessage = '';
           if (response.additional && response.additional.body && response.additional.body.message) {
             smallMessage = `<br /><small>${response.additional.body.message}</small>`;
           }
           UserNotification.error(message + smallMessage, title);
-        });
+        },
+      );
   },
 
   _getEntities(selectedEntities) {
@@ -176,8 +177,7 @@ const EditContentPackPage = createReactClass({
                            entityIndex={this.state.entityCatalog}
                            appliedParameter={this.state.appliedParameter}
                            edit
-                           onSave={this._onSave}
-          />
+                           onSave={this._onSave} />
         </span>
       </DocumentTitle>
     );

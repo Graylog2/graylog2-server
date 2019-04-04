@@ -32,10 +32,9 @@ describe('<AddToDashboardMenu />', () => {
     let wrapper;
     const permissions = ['*'];
     beforeEach(() => {
-      wrapper = mount(<AddToDashboardMenu
-        widgetType={exampleProps.widgetType}
-        title={exampleProps.title}
-        permissions={permissions} />);
+      wrapper = mount(<AddToDashboardMenu widgetType={exampleProps.widgetType}
+                                          title={exampleProps.title}
+                                          permissions={permissions} />);
     });
 
     it('should see all dashboards', () => {
@@ -58,10 +57,9 @@ describe('<AddToDashboardMenu />', () => {
       let wrapper;
       const permissions = ['dashboards:read:1', 'dashboards:read:2', 'dashboards:edit:2', 'dashboards:read:3'];
       beforeEach(() => {
-        wrapper = mount(<AddToDashboardMenu
-          widgetType={exampleProps.widgetType}
-          title={exampleProps.title}
-          permissions={permissions} />);
+        wrapper = mount(<AddToDashboardMenu widgetType={exampleProps.widgetType}
+                                            title={exampleProps.title}
+                                            permissions={permissions} />);
       });
 
       it('should only see the dashboards that can edit', () => {
@@ -83,10 +81,9 @@ describe('<AddToDashboardMenu />', () => {
       let wrapper;
       const permissions = ['dashboards:create', 'dashboards:read:1', 'dashboards:read:2', 'dashboards:edit:2', 'dashboards:read:3'];
       beforeEach(() => {
-        wrapper = mount(<AddToDashboardMenu
-          widgetType={exampleProps.widgetType}
-          title={exampleProps.title}
-          permissions={permissions} />);
+        wrapper = mount(<AddToDashboardMenu widgetType={exampleProps.widgetType}
+                                            title={exampleProps.title}
+                                            permissions={permissions} />);
       });
 
       it('should only see the dashboards that can edit', () => {

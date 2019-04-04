@@ -156,7 +156,7 @@ const Select = createReactClass({
 
   render() {
     const { allowCreate, displayKey, size, onReactSelectChange, multi } = this.props;
-    const value = this.state.value;
+    const { value } = this.state;
     const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
     const SelectComponent = allowCreate ? ReactSelect.Creatable : ReactSelect;
 

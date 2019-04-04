@@ -23,9 +23,13 @@ class OutputList extends React.Component {
 
   _formatOutput = (output) => {
     return (
-      <Output key={output.id} output={output} streamId={this.props.streamId}
-              removeOutputFromStream={this.props.onRemove} removeOutputGlobally={this.props.onTerminate}
-              onUpdate={this.props.onUpdate} getTypeDefinition={this.props.getTypeDefinition}
+      <Output key={output.id}
+              output={output}
+              streamId={this.props.streamId}
+              removeOutputFromStream={this.props.onRemove}
+              removeOutputGlobally={this.props.onTerminate}
+              onUpdate={this.props.onUpdate}
+              getTypeDefinition={this.props.getTypeDefinition}
               types={this.props.types} />
     );
   };

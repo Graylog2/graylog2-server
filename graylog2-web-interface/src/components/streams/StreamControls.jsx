@@ -58,7 +58,7 @@ const StreamControls = createReactClass({
   },
 
   render() {
-    const stream = this.props.stream;
+    const { stream } = this.props;
 
     return (
       <span>

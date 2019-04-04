@@ -5,6 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
 const InputTypesStore = Reflux.createStore({
@@ -35,7 +36,8 @@ const InputTypesStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching Input Types failed with status: ${error}`,
             'Could not retrieve Inputs');
-        });
+        },
+      );
 
     InputTypesActions.list.promise(promise);
   },

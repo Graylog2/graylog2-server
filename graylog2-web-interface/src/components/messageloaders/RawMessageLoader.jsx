@@ -9,11 +9,12 @@ import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+import StoreProvider from 'injection/StoreProvider';
+
 const MessagesActions = ActionsProvider.getActions('Messages');
 const CodecTypesActions = ActionsProvider.getActions('CodecTypes');
 const InputsActions = ActionsProvider.getActions('Inputs');
-
-import StoreProvider from 'injection/StoreProvider';
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 const CodecTypesStore = StoreProvider.getStore('CodecTypes');
@@ -71,7 +72,8 @@ const RawMessageLoader = createReactClass({
           codec: codec,
           codecConfiguration: codecConfiguration,
           inputId: inputId,
-        });
+        },
+      );
     });
     promise.finally(() => this.setState({ loading: false }));
   },
@@ -95,7 +97,7 @@ const RawMessageLoader = createReactClass({
     return codecTypesIds
       .filter(id => id !== 'random-http-msg') // Skip Random HTTP codec, as nobody wants to enter a raw random message.
       .map((id) => {
-        const name = this.state.codecTypes[id].name;
+        const { name } = this.state.codecTypes[id];
         // Add id as label on codecs not having a descriptor name
         return { value: id, label: name === '' ? id : name };
       })
@@ -143,17 +145,41 @@ const RawMessageLoader = createReactClass({
 
     switch (configField.type) {
       case 'text':
-        return (<TextField key={elementKey} typeName={typeName} title={key} field={configField}
-                           value={value} onChange={this._onCodecConfigurationChange} />);
+        return (
+          <TextField key={elementKey}
+                     typeName={typeName}
+                     title={key}
+                     field={configField}
+                     value={value}
+                     onChange={this._onCodecConfigurationChange} />
+        );
       case 'number':
-        return (<NumberField key={elementKey} typeName={typeName} title={key} field={configField}
-                             value={value} onChange={this._onCodecConfigurationChange} />);
+        return (
+          <NumberField key={elementKey}
+                       typeName={typeName}
+                       title={key}
+                       field={configField}
+                       value={value}
+                       onChange={this._onCodecConfigurationChange} />
+        );
       case 'boolean':
-        return (<BooleanField key={elementKey} typeName={typeName} title={key} field={configField}
-                              value={value} onChange={this._onCodecConfigurationChange} />);
+        return (
+          <BooleanField key={elementKey}
+                        typeName={typeName}
+                        title={key}
+                        field={configField}
+                        value={value}
+                        onChange={this._onCodecConfigurationChange} />
+        );
       case 'dropdown':
-        return (<DropdownField key={elementKey} typeName={typeName} title={key} field={configField}
-                               value={value} onChange={this._onCodecConfigurationChange} />);
+        return (
+          <DropdownField key={elementKey}
+                         typeName={typeName}
+                         title={key}
+                         field={configField}
+                         value={value}
+                         onChange={this._onCodecConfigurationChange} />
+        );
       default:
         return null;
     }
@@ -175,10 +201,16 @@ const RawMessageLoader = createReactClass({
     let inputIdSelector;
     if (this.props.inputIdSelector) {
       inputIdSelector = (
-        <Input id="input" name="input" label={<span>Message input <small>(optional)</small></span>}
+        <Input id="input"
+               name="input"
+               label={<span>Message input <small>(optional)</small></span>}
                help="Select the message input ID that should be assigned to the parsed message.">
-          <Select id="input" placeholder="Select input" options={this._formatInputSelectOptions()}
-                  matchProp="label" onChange={this._onInputSelect} value={this.state.inputId} />
+          <Select id="input"
+                  placeholder="Select input"
+                  options={this._formatInputSelectOptions()}
+                  matchProp="label"
+                  onChange={this._onInputSelect}
+                  value={this.state.inputId} />
         </Input>
       );
     }
@@ -188,20 +220,36 @@ const RawMessageLoader = createReactClass({
         <Col md={7}>
           <form onSubmit={this._loadMessage}>
             <fieldset>
-              <Input id="message" name="message" type="textarea" label="Raw message"
-                     value={this.state.message} onChange={this._bindValue} rows={3} required />
-              <Input id="remoteAddress" name="remoteAddress" type="text"
+              <Input id="message"
+                     name="message"
+                     type="textarea"
+                     label="Raw message"
+                     value={this.state.message}
+                     onChange={this._bindValue}
+                     rows={3}
+                     required />
+              <Input id="remoteAddress"
+                     name="remoteAddress"
+                     type="text"
                      label={<span>Source IP address <small>(optional)</small></span>}
                      help={`Remote IP address to use as message source. Graylog will use ${this.DEFAULT_REMOTE_ADDRESS} by default.`}
-                     value={this.state.remoteAddress} onChange={this._bindValue} />
+                     value={this.state.remoteAddress}
+                     onChange={this._bindValue} />
             </fieldset>
             {inputIdSelector}
             <fieldset>
               <legend>Codec configuration</legend>
-              <Input id="codec" name="codec" label="Message codec"
-                     help="Select the codec that should be used to decode the message." required>
-                <Select id="codec" placeholder="Select codec" options={this._formatSelectOptions()}
-                        matchProp="label" onChange={this._onCodecSelect} value={this.state.codec} />
+              <Input id="codec"
+                     name="codec"
+                     label="Message codec"
+                     help="Select the codec that should be used to decode the message."
+                     required>
+                <Select id="codec"
+                        placeholder="Select codec"
+                        options={this._formatSelectOptions()}
+                        matchProp="label"
+                        onChange={this._onCodecSelect}
+                        value={this.state.codec} />
               </Input>
               {codecConfigurationOptions}
             </fieldset>

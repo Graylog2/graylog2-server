@@ -6,16 +6,17 @@ import { Tab, Tabs, Col } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import StoreProvider from 'injection/StoreProvider';
-const InputsStore = StoreProvider.getStore('Inputs');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 import MessageShow from 'components/search/MessageShow';
 import MessageLoader from 'components/extractors/MessageLoader';
 import RawMessageLoader from './RawMessageLoader';
 import RecentMessageLoader from './RecentMessageLoader';
+
+const InputsStore = StoreProvider.getStore('Inputs');
+const StreamsStore = StoreProvider.getStore('Streams');
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 const LoaderTabs = createReactClass({
   displayName: 'LoaderTabs',
@@ -158,7 +159,8 @@ const LoaderTabs = createReactClass({
     if (this.state.message && this.state.inputs && !this.props.disableMessagePreview) {
       displayMessage = (
         <Col md={12}>
-          <MessageShow message={this.state.message} inputs={this.state.inputs}
+          <MessageShow message={this.state.message}
+                       inputs={this.state.inputs}
                        streams={this.state.streams}
                        disableTestAgainstStream
                        disableSurroundingSearch

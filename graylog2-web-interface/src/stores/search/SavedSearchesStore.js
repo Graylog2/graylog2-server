@@ -6,13 +6,14 @@ import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
+const SearchStore = StoreProvider.getStore('Search');
 
 const SavedSearchesStore = Reflux.createStore({
   listenables: [SavedSearchesActions],
@@ -34,7 +35,8 @@ const SavedSearchesStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching saved searches failed with status: ${error}`,
             'Could not get saved searches');
-        });
+        },
+      );
 
     SavedSearchesActions.list.promise(promise);
   },
@@ -121,7 +123,8 @@ const SavedSearchesStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Saving search criteria failed with status: ${error}`,
             'Could not save search criteria');
-        });
+        },
+      );
 
     SavedSearchesActions.create.promise(promise);
   },
@@ -138,7 +141,8 @@ const SavedSearchesStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Updating saved search "${title}" failed with status: ${error}`,
             'Could not update saved search');
-        });
+        },
+      );
 
     SavedSearchesActions.update.promise(promise);
   },
@@ -146,7 +150,7 @@ const SavedSearchesStore = Reflux.createStore({
   delete(searchId) {
     const savedSearch = this.savedSearches.find(s => s.id === searchId);
     const title = savedSearch ? `"${savedSearch.title}"` : searchId;
-    const url = ApiRoutes.SavedSearchesApiController.delete(searchId).url;
+    const { url } = ApiRoutes.SavedSearchesApiController.delete(searchId);
     const promise = fetch('DELETE', URLUtils.qualifyUrl(url));
     promise
       .then(
@@ -159,7 +163,8 @@ const SavedSearchesStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Deleting saved search ${title} failed with status: ${error}`,
             'Could not delete saved search');
-        });
+        },
+      );
 
     SavedSearchesActions.delete.promise(promise);
   },

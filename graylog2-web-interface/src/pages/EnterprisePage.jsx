@@ -7,6 +7,7 @@ import { GraylogClusterOverview } from 'components/cluster';
 import PluginList from 'components/enterprise/PluginList';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const NodesStore = StoreProvider.getStore('Nodes');
 
 const EnterprisePage = createReactClass({

@@ -6,10 +6,10 @@ import dc from 'dc';
 import d3 from 'd3';
 
 import UniversalSearch from 'logic/search/UniversalSearch';
-import SourceTitle from './SourceTitle';
 import D3Utils from 'util/D3Utils';
 
 import graphHelper from 'legacy/graphHelper';
+import SourceTitle from './SourceTitle';
 
 class SourceLineChart extends React.Component {
   static propTypes = {

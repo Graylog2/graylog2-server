@@ -7,10 +7,11 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
 
 import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+
+const StreamsStore = StoreProvider.getStore('Streams');
 
 class SimulatorPage extends React.Component {
   state = {
@@ -30,7 +31,7 @@ class SimulatorPage extends React.Component {
   render() {
     let content;
     if (this._isLoading()) {
-      content = <Spinner/>;
+      content = <Spinner />;
     } else {
       content = <ProcessorSimulator streams={this.state.streams} />;
     }

@@ -8,15 +8,15 @@ import Immutable from 'immutable';
 import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
 
-const SearchStore = StoreProvider.getStore('Search');
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
-const WidgetsStore = StoreProvider.getStore('Widgets');
-
 import PermissionsMixin from 'util/PermissionsMixin';
 import { WidgetCreationModal } from 'components/widgets';
 import { EditDashboardModal } from 'components/dashboard';
 
 import style from './AddToDashboardMenu.css';
+
+const SearchStore = StoreProvider.getStore('Search');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+const WidgetsStore = StoreProvider.getStore('Widgets');
 
 const AddToDashboardMenu = createReactClass({
   displayName: 'AddToDashboardMenu',
@@ -197,7 +197,7 @@ const AddToDashboardMenu = createReactClass({
     }
 
     const { appendMenus, children } = this.props;
-    const loading = this.state.loading;
+    const { loading } = this.state;
 
     return (
       <div style={{ display: 'inline-block' }}>

@@ -71,14 +71,14 @@ const Graylog2Time = function () {
 
   this.formatDateTime = graphHelper.customDateTimeFormat();
 
-	// Data in histograms is calculated using UTC. When the histogram resolution is day or lower,
-	// we can't extrapolate the data to the user's local time, so we use UTC instead.
+  // Data in histograms is calculated using UTC. When the histogram resolution is day or lower,
+  // we can't extrapolate the data to the user's local time, so we use UTC instead.
   this.formatDate = graphHelper.customDateTimeFormat(0);
 
   this.ceil = function (time, unit) {
-    let date,
-      floor,
-      year;
+    let date;
+    let floor;
+    let year;
 
     if (unit.name == 'week') {
       const momentDate = moment.utc(time * 1000);

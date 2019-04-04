@@ -37,7 +37,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
       // If the newly selected strategy is the current active strategy, we use the active configuration.
       return this.state.activeConfig;
     }
-      // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
+    // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
     return this._getDefaultStrategyConfig(selectedStrategy);
   };
 

@@ -91,7 +91,7 @@ class CacheForm extends React.Component {
   _onChange = (event) => {
     const cache = ObjectUtils.clone(this.state.cache);
     cache[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    let generateName = this.state.generateName;
+    let { generateName } = this.state;
     if (generateName && event.target.name === 'title') {
       // generate the name
       cache.name = this._sanitizeTitle(cache.title);
@@ -146,11 +146,13 @@ class CacheForm extends React.Component {
 
   _validationMessage = (fieldName, defaultText) => {
     if (this.props.validationErrors[fieldName]) {
-      return (<div>
-        <span>{defaultText}</span>
+      return (
+        <div>
+          <span>{defaultText}</span>
         &nbsp;
-        <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
-      </div>);
+          <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
+        </div>
+      );
     }
     return <span>{defaultText}</span>;
   };
@@ -158,7 +160,7 @@ class CacheForm extends React.Component {
   state = this._initialState(this.props.cache);
 
   render() {
-    const cache = this.state.cache;
+    const { cache } = this.state;
 
     const cachePlugins = PluginStore.exports('lookupTableCaches');
 

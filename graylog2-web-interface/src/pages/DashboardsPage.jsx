@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 import { DocumentTitle } from 'components/common';
 import DashboardListPage from 'components/dashboard/DashboardListPage';
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const DashboardsPage = createReactClass({

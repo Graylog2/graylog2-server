@@ -39,7 +39,7 @@ class DataAdapter extends React.Component {
       plugins[p.type] = p;
     });
 
-    const dataAdapter = this.props.dataAdapter;
+    const { dataAdapter } = this.props;
     const plugin = plugins[dataAdapter.config.type];
     if (!plugin) {
       return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;

@@ -11,8 +11,7 @@ describe('<Spinner />', () => {
 
   it('should render with a different text string', () => {
     const text = 'Hello world!';
-    const wrapper = renderer.create(<Spinner text={text}/>);
+    const wrapper = renderer.create(<Spinner text={text} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
-
 });

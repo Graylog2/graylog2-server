@@ -115,7 +115,7 @@ class MessageTableEntry extends React.Component {
     return (
       <span>
         <Timestamp dateTime={value} format={DateTime.Formats.TIMESTAMP_TZ} />
-        <OverlayTrigger trigger={['hover']} overlay={popoverHoverFocus} >
+        <OverlayTrigger trigger={['hover']} overlay={popoverHoverFocus}>
           <i className={`fa fa-fw fa-info ${style.timezoneInfo}`} />
         </OverlayTrigger>
       </span>
@@ -139,9 +139,8 @@ class MessageTableEntry extends React.Component {
      * skip them from highlighting. */
     if (fieldName === 'timestamp') {
       return this._toTimestamp(fullOrigValue);
-    } else {
-      return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
     }
+    return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
   };
 
   render() {
@@ -160,17 +159,23 @@ class MessageTableEntry extends React.Component {
         <tr className="fields-row" onClick={this._toggleDetail}>
           <td><strong>
             <Timestamp dateTime={this.props.message.fields.timestamp} />
-          </strong></td>
-          { this.props.selectedFields.toSeq().map(selectedFieldName => (<td
-            key={selectedFieldName}>{this.renderForDisplay(selectedFieldName, true)} </td>)) }
+          </strong>
+          </td>
+          { this.props.selectedFields.toSeq().map(selectedFieldName => (
+            <td key={selectedFieldName}>{this.renderForDisplay(selectedFieldName, true)}
+            </td>
+          )) }
         </tr>
 
-        {this.props.showMessageRow &&
+        {this.props.showMessageRow
+        && (
         <tr className="message-row" onClick={this._toggleDetail}>
           <td colSpan={colSpanFixup}><div className="message-wrapper">{this.renderForDisplay('message', true)}</div></td>
         </tr>
+        )
         }
-        {this.props.expanded &&
+        {this.props.expanded
+        && (
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
             <MessageDetail message={this.props.message}
@@ -185,6 +190,7 @@ class MessageTableEntry extends React.Component {
                            searchConfig={this.props.searchConfig} />
           </td>
         </tr>
+        )
         }
       </tbody>
     );

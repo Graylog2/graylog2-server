@@ -7,11 +7,12 @@ import MessageShow from 'components/search/MessageShow';
 import { DocumentTitle, Spinner } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+import StoreProvider from 'injection/StoreProvider';
+
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
-
-import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
 const StreamsStore = StoreProvider.getStore('Streams');
 const InputsStore = StoreProvider.getStore('Inputs');
@@ -65,8 +66,12 @@ const ShowMessagePage = createReactClass({
     if (this._isLoaded()) {
       return (
         <DocumentTitle title={`Message ${this.props.params.messageId} on ${this.props.params.index}`}>
-          <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                       streams={this.state.streams} allStreamsLoaded searchConfig={this.props.searchConfig} />
+          <MessageShow message={this.state.message}
+                       inputs={this.state.inputs}
+                       nodes={Immutable.Map(this.state.nodes)}
+                       streams={this.state.streams}
+                       allStreamsLoaded
+                       searchConfig={this.props.searchConfig} />
         </DocumentTitle>
       );
     }

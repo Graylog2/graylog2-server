@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import FormsUtils from 'util/FormsUtils';
 import FieldHelpers from './FieldHelpers';
 
-import FormsUtils from 'util/FormsUtils';
 
 class BooleanField extends React.Component {
   static propTypes = {
@@ -15,9 +15,9 @@ class BooleanField extends React.Component {
   };
 
   render() {
-    const field = this.props.field;
-    const typeName = this.props.typeName;
-    const title = this.props.title;
+    const { field } = this.props;
+    const { typeName } = this.props;
+    const { title } = this.props;
     return (
       <div className="form-group">
         <div className="checkbox">

@@ -18,14 +18,18 @@ class PermissionSelector extends React.Component {
     const streamItemButtons = (stream) => {
       const isRead = this.props.permissions.contains(`streams:read:${stream.id}`);
       const isEdit = this.props.permissions.contains(`streams:edit:${stream.id}`);
-      return (<ButtonGroup bsSize="small">
-        <Button bsStyle={isRead ? 'info' : 'default'}
-                onClick={() => this._toggleStreamReadPermissions(stream)}
-                active={isRead}>Allow reading</Button>
-        <Button bsStyle={isEdit ? 'info' : 'default'}
-                onClick={() => this._toggleStreamEditPermissions(stream)}
-                active={isEdit}>Allow editing</Button>
-      </ButtonGroup>);
+      return (
+        <ButtonGroup bsSize="small">
+          <Button bsStyle={isRead ? 'info' : 'default'}
+                  onClick={() => this._toggleStreamReadPermissions(stream)}
+                  active={isRead}>Allow reading
+          </Button>
+          <Button bsStyle={isEdit ? 'info' : 'default'}
+                  onClick={() => this._toggleStreamEditPermissions(stream)}
+                  active={isEdit}>Allow editing
+          </Button>
+        </ButtonGroup>
+      );
     };
 
     const multiStreamButtons = (streamIds) => {
@@ -46,14 +50,18 @@ class PermissionSelector extends React.Component {
     const dashboardItemButtons = (dashboard) => {
       const isRead = this.props.permissions.contains(`dashboards:read:${dashboard.id}`);
       const isEdit = this.props.permissions.contains(`dashboards:edit:${dashboard.id}`);
-      return (<ButtonGroup bsSize="small">
-        <Button bsStyle={isRead ? 'info' : 'default'}
-                onClick={() => this._toggleDashboardReadPermissions(dashboard)}
-                active={isRead}>Allow reading</Button>
-        <Button bsStyle={isEdit ? 'info' : 'default'}
-                onClick={() => this._toggleDashboardEditPermissions(dashboard)}
-                active={isEdit}>Allow editing</Button>
-      </ButtonGroup>);
+      return (
+        <ButtonGroup bsSize="small">
+          <Button bsStyle={isRead ? 'info' : 'default'}
+                  onClick={() => this._toggleDashboardReadPermissions(dashboard)}
+                  active={isRead}>Allow reading
+          </Button>
+          <Button bsStyle={isEdit ? 'info' : 'default'}
+                  onClick={() => this._toggleDashboardEditPermissions(dashboard)}
+                  active={isEdit}>Allow editing
+          </Button>
+        </ButtonGroup>
+      );
     };
     const multiDashboardButtons = (dashboardIds) => {
       const selectedDashboards = this.props.dashboards.filter(dashboard => dashboardIds.contains(dashboard.id));
@@ -76,24 +84,20 @@ class PermissionSelector extends React.Component {
         <Tabs id="permissionSelectorTabs" defaultActiveKey={1} animation={false}>
           <Tab eventKey={1} title="Streams">
             <div style={{ marginTop: 10 }}>
-              <TableList
-                items={Immutable.List(this.props.streams)}
-                filterLabel="Filter Streams"
-                filterKeys={['title']}
-                itemActionsFactory={streamItemButtons}
-                bulkActionsFactory={multiStreamButtons}
-              />
+              <TableList items={Immutable.List(this.props.streams)}
+                         filterLabel="Filter Streams"
+                         filterKeys={['title']}
+                         itemActionsFactory={streamItemButtons}
+                         bulkActionsFactory={multiStreamButtons} />
             </div>
           </Tab>
           <Tab eventKey={2} title="Dashboards">
             <div style={{ marginTop: 10 }}>
-              <TableList
-                items={Immutable.List(this.props.dashboards)}
-                filterLabel="Filter Dashboards"
-                filterKeys={['title']}
-                itemActionsFactory={dashboardItemButtons}
-                bulkActionsFactory={multiDashboardButtons}
-              />
+              <TableList items={Immutable.List(this.props.dashboards)}
+                         filterLabel="Filter Dashboards"
+                         filterKeys={['title']}
+                         itemActionsFactory={dashboardItemButtons}
+                         bulkActionsFactory={multiDashboardButtons} />
             </div>
           </Tab>
         </Tabs>

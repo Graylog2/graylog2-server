@@ -8,10 +8,11 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import UserList from 'components/users/UserList';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const UsersPage = createReactClass({
   displayName: 'UsersPage',

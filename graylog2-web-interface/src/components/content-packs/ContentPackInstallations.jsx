@@ -84,15 +84,14 @@ class ContentPackInstallations extends React.Component {
 
     const headers = ['Comment', 'Version', 'Action'];
     return (
-      <DataTable
-        id="content-packs-versions"
-        headers={headers}
-        headerCellFormatter={this.headerFormater}
-        sortByKey="comment"
-        dataRowFormatter={this.rowFormatter}
-        rows={this.props.installations}
-        filterKeys={[]}
-      />);
+      <DataTable id="content-packs-versions"
+                 headers={headers}
+                 headerCellFormatter={this.headerFormater}
+                 sortByKey="comment"
+                 dataRowFormatter={this.rowFormatter}
+                 rows={this.props.installations}
+                 filterKeys={[]} />
+    );
   }
 }
 

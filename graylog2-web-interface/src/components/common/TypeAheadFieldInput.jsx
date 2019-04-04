@@ -53,13 +53,15 @@ class TypeAheadFieldInput extends React.Component {
                 name: 'fields',
                 displayKey: 'value',
                 source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
-              });
+              },
+            );
 
             if (this.props.autoFocus) {
               fieldInput.focus();
               fieldInput.typeahead('close');
             }
-          });
+          },
+        );
 
       const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {

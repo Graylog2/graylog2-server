@@ -43,7 +43,8 @@ const LookupTablesStore = Reflux.createStore({
     let url;
     if (query) {
       url = this._url(
-        `tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=true`);
+        `tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=true`,
+      );
     } else {
       url = this._url(`tables?page=${page}&per_page=${perPage}&resolve=true`);
     }

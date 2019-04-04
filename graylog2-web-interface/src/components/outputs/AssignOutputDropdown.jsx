@@ -28,20 +28,25 @@ class AssignOutputDropdown extends React.Component {
   };
 
   render() {
-    const outputs = this.props.outputs;
-    const outputList = (outputs.length > 0 ? outputs.map(this._formatOutput) :
-    <option disabled>No outputs available</option>);
+    const { outputs } = this.props;
+    const outputList = (outputs.length > 0 ? outputs.map(this._formatOutput)
+      : <option disabled>No outputs available</option>);
     return (
       <div className="output-add">
         <div className="form-inline">
-          <select value={this.state.selectedOutput} name="outputId" className="form-control"
+          <select value={this.state.selectedOutput}
+                  name="outputId"
+                  className="form-control"
                   onChange={this._handleUpdate}>
             <option value={this.PLACEHOLDER} disabled>Select existing output</option>
             {outputList}
           </select>
           &nbsp;
-          <Button id="add-existing-output" bsStyle="success" type="button"
-                  disabled={this.state.selectedOutput === this.PLACEHOLDER} onClick={this._handleClick}>
+          <Button id="add-existing-output"
+                  bsStyle="success"
+                  type="button"
+                  disabled={this.state.selectedOutput === this.PLACEHOLDER}
+                  onClick={this._handleClick}>
             Assign existing Output
           </Button>
         </div>

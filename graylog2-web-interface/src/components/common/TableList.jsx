@@ -134,10 +134,12 @@ class TableList extends React.Component {
 
     return (
       <ControlledTableList.Header>
-        {selectedItems > 0 &&
+        {selectedItems > 0
+        && (
         <div className={style.headerComponentsWrapper}>
           {this.props.bulkActionsFactory(selected)}
         </div>
+        )
         }
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"

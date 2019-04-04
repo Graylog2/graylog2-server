@@ -57,15 +57,15 @@ const AlertCondition = createReactClass({
   },
 
   render() {
-    const stream = this.props.stream;
+    const { stream } = this.props;
     const condition = this.props.alertCondition;
-    const conditionType = this.props.conditionType;
+    const { conditionType } = this.props;
 
     if (!conditionType) {
       return <UnknownAlertCondition alertCondition={condition} onDelete={this._onDelete} stream={stream} />;
     }
 
-    const permissions = this.state.currentUser.permissions;
+    const { permissions } = this.state.currentUser;
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [

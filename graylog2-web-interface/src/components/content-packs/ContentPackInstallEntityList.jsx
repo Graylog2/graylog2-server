@@ -15,17 +15,17 @@ const ContentPackInstallEntityList = (props) => {
     return <Spinner />;
   }
 
-  return (<div>
-    <h3>{headerTitle}</h3>
-    <DataTable
-      id="installed-entities"
-      headers={headers}
-      sortByKey="title"
-      dataRowFormatter={rowFormatter}
-      rows={props.entities}
-      filterKeys={[]}
-    />
-  </div>);
+  return (
+    <div>
+      <h3>{headerTitle}</h3>
+      <DataTable id="installed-entities"
+                 headers={headers}
+                 sortByKey="title"
+                 dataRowFormatter={rowFormatter}
+                 rows={props.entities}
+                 filterKeys={[]} />
+    </div>
+  );
 };
 
 ContentPackInstallEntityList.propTypes = {

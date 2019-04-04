@@ -6,10 +6,11 @@ import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
 
 import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const SystemStore = StoreProvider.getStore('System');
 
 import { Spinner, Timestamp } from 'components/common';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const SystemStore = StoreProvider.getStore('System');
 
 const TimesList = createReactClass({
   displayName: 'TimesList',
@@ -31,9 +32,9 @@ const TimesList = createReactClass({
     if (!this.state.system) {
       return <Spinner />;
     }
-    const time = this.state.time;
+    const { time } = this.state;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
-    const currentUser = this.state.currentUser;
+    const { currentUser } = this.state;
     const serverTimezone = this.state.system.timezone;
     return (
       <Row className="content">
@@ -49,7 +50,7 @@ const TimesList = createReactClass({
             <dt>User <em>{currentUser.username}</em>:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat} /></dd>
             <dt>Your web browser:</dt>
-            <dd><Timestamp dateTime={time} format={timeFormat} tz={'browser'} /></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat} tz="browser" /></dd>
             <dt>Graylog server:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} /></dd>
           </dl>

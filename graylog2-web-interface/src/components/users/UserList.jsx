@@ -8,12 +8,13 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
-const UsersStore = StoreProvider.getStore('Users');
-const RolesStore = StoreProvider.getStore('Roles');
 
 import { DataTable, Spinner, Timestamp } from 'components/common';
 
 import UserListStyle from '!style!css!./UserList.css';
+
+const UsersStore = StoreProvider.getStore('Users');
+const RolesStore = StoreProvider.getStore('Roles');
 
 const UserList = createReactClass({
   displayName: 'UserList',
@@ -76,18 +77,22 @@ const UserList = createReactClass({
         formattedHeaderCell = <th className="user-type">{header}</th>;
         break;
       case 'client address': {
-        const popover = (<Popover id="decorators-help" className={UserListStyle.sessionBadgeDetails}>
-          <p className="description">
+        const popover = (
+          <Popover id="decorators-help" className={UserListStyle.sessionBadgeDetails}>
+            <p className="description">
             The address of the client used to initially establish the session, not necessarily its current address.
-          </p>
-        </Popover>);
+            </p>
+          </Popover>
+        );
 
-        formattedHeaderCell = (<th>
-          {header}
-          <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
-            <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><i className="fa fa-fw fa-question-circle" /></Button>
-          </OverlayTrigger>
-        </th>);
+        formattedHeaderCell = (
+          <th>
+            {header}
+            <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
+              <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><i className="fa fa-fw fa-question-circle" /></Button>
+            </OverlayTrigger>
+          </th>
+        );
         break;
       }
       case 'actions':
@@ -110,9 +115,11 @@ const UserList = createReactClass({
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
-      userBadge = (<OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-        <i className={`fa fa-circle ${UserListStyle.activeSession}`} />
-      </OverlayTrigger>);
+      userBadge = (
+        <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
+          <i className={`fa fa-circle ${UserListStyle.activeSession}`} />
+        </OverlayTrigger>
+      );
     }
 
     const roleBadges = user.roles.map(role => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
@@ -149,8 +156,12 @@ const UserList = createReactClass({
       );
 
       const deleteAction = (
-        <MenuItem eventKey="2" id={`delete-user-${user.username}`} bsStyle="primary" bsSize="xs" title="Delete user"
-                onClick={this._deleteUserFunction(user.username)}>
+        <MenuItem eventKey="2"
+                  id={`delete-user-${user.username}`}
+                  bsStyle="primary"
+                  bsSize="xs"
+                  title="Delete user"
+                  onClick={this._deleteUserFunction(user.username)}>
           Delete
         </MenuItem>
       );
@@ -203,7 +214,7 @@ const UserList = createReactClass({
                      className="table-hover"
                      headers={headers}
                      headerCellFormatter={this._headerCellFormatter}
-                     sortByKey={'full_name'}
+                     sortByKey="full_name"
                      rows={this.state.users}
                      filterBy="role"
                      filterSuggestions={this.state.roles}

@@ -40,7 +40,7 @@ const InputStatesStore = Reflux.createStore({
   },
 
   _checkInputStateChangeResponse(input, response, action) {
-    const nodes = Object.keys(response).filter(node => input.global ? true : node === input.node);
+    const nodes = Object.keys(response).filter(node => (input.global ? true : node === input.node));
     const failedNodes = nodes.filter(nodeId => response[nodeId] === null);
 
     if (failedNodes.length === 0) {
@@ -66,7 +66,8 @@ const InputStatesStore = Reflux.createStore({
         },
         (error) => {
           UserNotification.error(`Error starting input '${input.title}': ${error}`, `Input '${input.title}' could not be started`);
-        });
+        },
+      );
   },
 
   stop(input) {
@@ -80,7 +81,8 @@ const InputStatesStore = Reflux.createStore({
         },
         (error) => {
           UserNotification.error(`Error stopping input '${input.title}': ${error}`, `Input '${input.title}' could not be stopped`);
-        });
+        },
+      );
   },
 });
 

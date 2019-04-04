@@ -70,7 +70,7 @@ class StackedGraphVisualization extends React.Component {
   };
 
   _formatData = (props) => {
-    const data = props.data;
+    const { data } = props;
     const normalizedData = this._normalizeData(data);
     const isSearchAll = (props.config.timerange.type === 'relative' && props.config.timerange.range === 0);
     const formattedSeries = [];
@@ -291,7 +291,8 @@ class StackedGraphVisualization extends React.Component {
   render() {
     const classNames = this.props.config.doNotShowCircles ? 'donotshowcircles' : '';
     return (
-      <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
+      <div ref={(c) => { this._graph = c; }}
+           id={`visualization-${this.props.id}`}
            className={`graph ${this.props.config.renderer}${classNames}`} />
     );
   }

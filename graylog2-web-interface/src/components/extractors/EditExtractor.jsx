@@ -3,17 +3,18 @@ import React from 'react';
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import ExtractorExampleMessage from './ExtractorExampleMessage';
-import EditExtractorConfiguration from './EditExtractorConfiguration';
-import EditExtractorConverters from './EditExtractorConverters';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+import EditExtractorConverters from './EditExtractorConverters';
+import EditExtractorConfiguration from './EditExtractorConfiguration';
+import ExtractorExampleMessage from './ExtractorExampleMessage';
+
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 const ToolsStore = StoreProvider.getStore('Tools');
 
 class EditExtractor extends React.Component {
@@ -43,7 +44,7 @@ class EditExtractor extends React.Component {
 
   // Ensures the target field only contains alphanumeric characters and underscores
   _onTargetFieldChange = (event) => {
-    const value = event.target.value;
+    const { value } = event.target;
     const newValue = value.replace(/[^\w\d_]/g, '');
 
     if (value !== newValue) {
@@ -56,7 +57,7 @@ class EditExtractor extends React.Component {
   _onFieldChange = (key) => {
     return (event) => {
       const nextState = {};
-      const updatedExtractor = this.state.updatedExtractor;
+      const { updatedExtractor } = this.state;
       updatedExtractor[key] = FormUtils.getValueFromInput(event.target);
       nextState.updatedExtractor = updatedExtractor;
 
@@ -70,13 +71,13 @@ class EditExtractor extends React.Component {
   };
 
   _onConfigurationChange = (newConfiguration) => {
-    const updatedExtractor = this.state.updatedExtractor;
+    const { updatedExtractor } = this.state;
     updatedExtractor.extractor_config = newConfiguration;
     this.setState({ updatedExtractor: updatedExtractor });
   };
 
   _onConverterChange = (converterType, newConverter) => {
-    const updatedExtractor = this.state.updatedExtractor;
+    const { updatedExtractor } = this.state;
     const previousConverter = updatedExtractor.converters.filter(converter => converter.type === converterType)[0];
 
     if (previousConverter) {
@@ -93,7 +94,7 @@ class EditExtractor extends React.Component {
   };
 
   _testCondition = () => {
-    const updatedExtractor = this.state.updatedExtractor;
+    const { updatedExtractor } = this.state;
     const tester = (updatedExtractor.condition_type === 'string' ? ToolsStore.testContainsString : ToolsStore.testRegex);
     const promise = tester(updatedExtractor.condition_value, this.state.exampleMessage);
     promise.then(result => this.setState({ conditionTestResult: result.matched }));
@@ -130,19 +131,24 @@ class EditExtractor extends React.Component {
 
     return (
       <div>
-        <Input id="condition_value" label={conditionInputLabel}
+        <Input id="condition_value"
+               label={conditionInputLabel}
                bsStyle={inputStyle}
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
                help={conditionInputHelp}>
           <Row className="row-sm">
             <Col md={11}>
-              <input type="text" id="condition_value" className="form-control"
+              <input type="text"
+                     id="condition_value"
+                     className="form-control"
                      defaultValue={this.state.updatedExtractor.condition_value}
-                     onChange={this._onFieldChange('condition_value')} required />
+                     onChange={this._onFieldChange('condition_value')}
+                     required />
             </Col>
             <Col md={1} className="text-right">
-              <Button bsStyle="info" onClick={this._testCondition}
+              <Button bsStyle="info"
+                      onClick={this._testCondition}
                       disabled={this._tryButtonDisabled()}>
                 Try
               </Button>
@@ -173,8 +179,8 @@ class EditExtractor extends React.Component {
   };
 
   render() {
-    const conditionTypeHelpMessage = 'Extracting only from messages that match a certain condition helps you ' +
-      'avoiding wrong or unnecessary extractions and can also save CPU resources.';
+    const conditionTypeHelpMessage = 'Extracting only from messages that match a certain condition helps you '
+      + 'avoiding wrong or unnecessary extractions and can also save CPU resources.';
 
     const cursorStrategyHelpMessage = (
       <span>
@@ -186,7 +192,8 @@ class EditExtractor extends React.Component {
     const targetFieldHelpMessage = (
       <span>
         Choose a field name to store the extracted value. It can only contain <b>alphanumeric characters and{' '}
-        underscores</b>. Example: <em>http_response_code</em>.
+        underscores
+        </b>. Example: <em>http_response_code</em>.
       </span>
     );
 
@@ -194,7 +201,10 @@ class EditExtractor extends React.Component {
     // Grok and JSON extractors create their required fields, so no need to add an input for them
     if (this.state.updatedExtractor.type !== ExtractorUtils.ExtractorTypes.GROK && this.state.updatedExtractor.type !== ExtractorUtils.ExtractorTypes.JSON) {
       storeAsFieldInput = (
-        <Input type="text" ref={(targetField) => { this.targetField = targetField; }} id="target_field" label="Store as field"
+        <Input type="text"
+               ref={(targetField) => { this.targetField = targetField; }}
+               id="target_field"
+               label="Store as field"
                defaultValue={this.state.updatedExtractor.target_field}
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
@@ -236,7 +246,9 @@ class EditExtractor extends React.Component {
                     <span>
                       <div className="radio">
                         <label>
-                          <input type="radio" name="condition_type" value="none"
+                          <input type="radio"
+                                 name="condition_type"
+                                 value="none"
                                  onChange={this._onFieldChange('condition_type')}
                                  defaultChecked={!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none'} />
                           Always try to extract
@@ -244,7 +256,9 @@ class EditExtractor extends React.Component {
                       </div>
                       <div className="radio">
                         <label>
-                          <input type="radio" name="condition_type" value="string"
+                          <input type="radio"
+                                 name="condition_type"
+                                 value="string"
                                  onChange={this._onFieldChange('condition_type')}
                                  defaultChecked={this.state.updatedExtractor.condition_type === 'string'} />
                           Only attempt extraction if field contains string
@@ -252,7 +266,9 @@ class EditExtractor extends React.Component {
                       </div>
                       <div className="radio">
                         <label>
-                          <input type="radio" name="condition_type" value="regex"
+                          <input type="radio"
+                                 name="condition_type"
+                                 value="regex"
                                  onChange={this._onFieldChange('condition_type')}
                                  defaultChecked={this.state.updatedExtractor.condition_type === 'regex'} />
                           Only attempt extraction if field matches regular expression
@@ -271,13 +287,17 @@ class EditExtractor extends React.Component {
                          help={cursorStrategyHelpMessage}>
                     <span>
                       <label className="radio-inline">
-                        <input type="radio" name="cursor_strategy" value="copy"
+                        <input type="radio"
+                               name="cursor_strategy"
+                               value="copy"
                                onChange={this._onFieldChange('cursor_strategy')}
                                defaultChecked={!this.state.updatedExtractor.cursor_strategy || this.state.updatedExtractor.cursor_strategy === 'copy'} />
                         Copy
                       </label>
                       <label className="radio-inline">
-                        <input type="radio" name="cursor_strategy" value="cut"
+                        <input type="radio"
+                               name="cursor_strategy"
+                               value="cut"
                                onChange={this._onFieldChange('cursor_strategy')}
                                defaultChecked={this.state.updatedExtractor.cursor_strategy === 'cut'} />
                         Cut
@@ -285,7 +305,9 @@ class EditExtractor extends React.Component {
                     </span>
                   </Input>
 
-                  <Input type="text" id="title" label="Extractor title"
+                  <Input type="text"
+                         id="title"
+                         label="Extractor title"
                          defaultValue={this.state.updatedExtractor.title}
                          labelClassName="col-md-2"
                          wrapperClassName="col-md-10"

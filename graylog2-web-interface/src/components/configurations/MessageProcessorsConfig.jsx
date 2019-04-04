@@ -70,7 +70,7 @@ const MessageProcessorsConfig = createReactClass({
     return () => {
       const disabledProcessors = this.state.config.disabled_processors;
       const update = ObjectUtils.clone(this.state.config);
-      const checked = this.inputs[className].checked;
+      const { checked } = this.inputs[className];
 
       if (checked) {
         update.disabled_processors = disabledProcessors.filter(p => p !== className);

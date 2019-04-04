@@ -4,9 +4,10 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 
 import StoreProvider from 'injection/StoreProvider';
-const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 
 import { Spinner } from 'components/common';
+
+const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 
 const GlobalThroughput = createReactClass({
   displayName: 'GlobalThroughput',

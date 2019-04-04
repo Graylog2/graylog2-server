@@ -69,8 +69,8 @@ const ConfigurationForm = createReactClass({
   },
 
   _hasErrors() {
-    return this.state.error ||
-      !this._isTemplateSet(this.state.formData.template);
+    return this.state.error
+      || !this._isTemplateSet(this.state.formData.template);
   },
 
   _validateFormData(nextFormData, checkForRequiredFields) {
@@ -325,4 +325,3 @@ const ConfigurationForm = createReactClass({
 });
 
 export default ConfigurationForm;
-

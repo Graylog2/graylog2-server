@@ -7,14 +7,15 @@ import { Button, ProgressBar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const BufferUsage = createReactClass({
   displayName: 'BufferUsage',
@@ -48,7 +49,7 @@ const BufferUsage = createReactClass({
     if (!this.state.metrics) {
       return <Spinner />;
     }
-    const nodeId = this.props.nodeId;
+    const { nodeId } = this.props;
     const prefix = this._metricPrefix();
     const usageMetric = this.state.metrics[nodeId][`${prefix}.usage`];
     const usage = usageMetric ? usageMetric.metric.value : NaN;
@@ -69,7 +70,8 @@ const BufferUsage = createReactClass({
                        label={percentLabel} />
         </div>
         <span><strong>{usage} messages</strong> in {this.props.title.toLowerCase()}, {percentLabel} utilized.</span>
-      </div>);
+      </div>
+    );
   },
 });
 

@@ -22,10 +22,10 @@ class FiltersSummary extends React.Component {
       // Get collector name
       const collector = collectors.find(c => c.id === value);
       return `${collector.name} on ${collector.node_operating_system}`;
-    } else if (type === 'configuration') {
+    } if (type === 'configuration') {
       // Get configuration name
       return configurations.find(c => c.id === value).name;
-    } else if (type === 'status') {
+    } if (type === 'status') {
       // Convert status code to string
       return SidecarStatusEnum.toString(value);
     }
@@ -54,7 +54,8 @@ class FiltersSummary extends React.Component {
             {this.formatFilters(filters)}
             <li>
               <Button bsStyle="link" bsSize="xsmall" className={style.deleteButton} onClick={onResetFilters}>
-                <i className="fa fa-times" /> Clear all</Button>
+                <i className="fa fa-times" /> Clear all
+              </Button>
             </li>
           </ul>
         </Col>
