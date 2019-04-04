@@ -25,7 +25,6 @@ module.exports = {
     'react/jsx-first-prop-new-line': [1, 'never'],
     'react/jsx-indent-props': [2, 'first'],
     'react/jsx-one-expression-per-line': 0,
-    'react/jsx-space-before-closing': 0,
     'react/prefer-es6-class': 0,
     'react/prefer-stateless-function': 1,
   },
