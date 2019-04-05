@@ -1,82 +1,87 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Checkbox,
-  ControlLabel,
-  DropdownButton,
-  FormControl,
-  FormGroup,
-  HelpBlock,
-  InputGroup,
-  MenuItem,
-} from 'react-bootstrap';
+import { Checkbox, ControlLabel, FormGroup } from 'react-bootstrap';
 
-import FormsUtils from 'util/FormsUtils';
+import TypeSpecificTimeHistogramConfiguration from './TypeSpecificTimeHistogramConfiguration';
 
-export default class TimeHistogramPivot extends React.Component {
+import styles from './TimeHistogramPivot.css';
+
+export type AutoInterval = {|
+  type: 'auto',
+  scaling?: number,
+|};
+
+export type TimeUnitInterval = {|
+  type: 'timeunit',
+  value: number,
+  unit: string,
+|};
+
+export type Interval = AutoInterval | TimeUnitInterval;
+export type IntervalConfig = {|
+  interval: Interval,
+|};
+
+type Props = {
+  onChange: (IntervalConfig) => void,
+  value: IntervalConfig,
+};
+
+type State = IntervalConfig;
+
+export default class TimeHistogramPivot extends React.Component<Props, State> {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     value: PropTypes.shape({
-      interval: PropTypes.shape({
-        type: PropTypes.string,
-        value: PropTypes.number,
-        unit: PropTypes.string,
-      }),
+      interval: PropTypes.oneOfType([
+        PropTypes.shape({
+          type: PropTypes.string.isRequired,
+          value: PropTypes.number.isRequired,
+          unit: PropTypes.string.isRequired,
+        }),
+        PropTypes.shape({
+          type: PropTypes.string.isRequired,
+          scaling: PropTypes.number,
+        }),
+      ]).isRequired,
     }).isRequired,
   };
 
-  static units = {
-    seconds: 'Seconds',
-    minutes: 'Minutes',
-    hours: 'Hours',
-    days: 'Days',
-    weeks: 'Weeks',
-    months: 'Months',
-  };
-
-  constructor(props, context) {
-    super(props, context);
+  constructor(props: Props) {
+    super(props);
 
     const { interval } = props.value;
-    this.state = interval || {};
+    this.state = { interval };
   }
 
   _toggleAuto = () => {
     this.setState((state) => {
-      if (state.type === 'auto') {
-        return { value: 1, unit: 'minutes', type: 'timeunit' };
+      if (state.interval.type === 'auto') {
+        return { interval: { value: 1, unit: 'minutes', type: 'timeunit' } };
       }
-      return { type: 'auto', value: undefined, unit: undefined };
+      return { interval: { type: 'auto', scaling: 1.0 } };
     }, this._propagateState);
   };
 
-  _isAuto = () => this.state && this.state.type === 'auto';
-  _propagateState = () => this.props.onChange({ interval: this.state });
+  _isAuto = () => this.state && this.state.interval && this.state.interval.type === 'auto';
+  _propagateState = () => this.props.onChange(this.state);
 
-  _changeUnit = unit => this.setState({ unit }, this._propagateState);
-  _changeValue = event => this.setState({ value: FormsUtils.getValueFromInput(event.target) }, this._propagateState);
+  _onChangeInterval = (interval: Interval) => this.setState(state => ({ ...state, interval }), this._propagateState);
 
   render() {
-    const units = TimeHistogramPivot.units;
+    const { interval } = this.state;
     return (
       <FormGroup>
         <ControlLabel>Interval</ControlLabel>
-        <InputGroup>
-          <FormControl type="number" value={this._isAuto() ? '' : this.state.value} onChange={this._changeValue} disabled={this._isAuto()} />
-          <DropdownButton
-            componentClass={InputGroup.Button}
-            id="input-dropdown-addon"
-            title={units[this.state.unit] || ''}
-            disabled={this._isAuto()}
-            onChange={this._changeUnit}
-          >
-            {Object.keys(units).map(unit => <MenuItem key={unit} onSelect={() => this._changeUnit(unit)}>{units[unit]}</MenuItem>)}
-          </DropdownButton>
-        </InputGroup>
-        <Checkbox checked={this._isAuto()} onChange={this._toggleAuto}>
-          Choose automatically
+        <Checkbox className={`pull-right ${styles.automaticCheckbox}`}
+                  checked={this._isAuto()}
+                  title="When this is enabled, the interval will be chosen automatically based on the timerange of the query"
+                  onChange={this._toggleAuto}>
+          Automatic
         </Checkbox>
-        <HelpBlock>The size of the buckets for this timestamp type</HelpBlock>
+
+        {interval && <TypeSpecificTimeHistogramConfiguration interval={interval} onChange={this._onChangeInterval} />}
       </FormGroup>
     );
   }

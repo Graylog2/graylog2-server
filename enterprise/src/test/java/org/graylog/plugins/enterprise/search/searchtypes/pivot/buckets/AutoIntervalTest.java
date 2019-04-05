@@ -19,35 +19,48 @@ public class AutoIntervalTest {
     private final String result;
     private final String expectedResult;
 
-    @Parameterized.Parameters(name = "{3}")
+    @Parameterized.Parameters(name = "{3}: Range of {0} should be {2} for scaling of {1}")
     public static Collection<Object[]> data() throws InvalidRangeParametersException {
         return Arrays.asList(new Object[][] {
-                // Scaling Factor of 1
-                {RelativeRange.create(1), 1, "40ms", "secondInterval"},
-                {RelativeRange.create(17 * 60), 1, "1m", "minuteInterval"},
-                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 1, "12h", "twelveHourInterval"},
-                {AbsoluteRange.create(DateTime.parse("2018-10-01T09:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.244Z")), 1, "1ms", "tenMillisecondIsTheLowerBoundary"},
-                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 1, "1M", "oneYearResultsInOneMonth"},
-                {AbsoluteRange.create(DateTime.parse("2017-09-01T07:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.234Z")), 1, "1M", "oneYearIsTheUpperBoundary"},
-                {AbsoluteRange.create("2018-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 1, "14d", "veryLongDurationDoesNotReturnNull"},
-
                 // Scaling Factor of 0.5
-                {RelativeRange.create(1), 0.5, "40ms", "secondInterval"},
-                {RelativeRange.create(17 * 60), 0.5, "30s", "minuteInterval"},
-                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 0.5, "4h", "twelveHourInterval"},
+                {RelativeRange.create(1), 0.5, "10ms", "secondInterval"},
+                {RelativeRange.create(300), 0.5, "5s", "defaultIntervalForSearch"},
+                {RelativeRange.create(17 * 60), 0.5, "20s", "17 minutes"},
+                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 0.5, "4h", "8d2h13m2s"},
                 {AbsoluteRange.create(DateTime.parse("2018-10-01T09:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.244Z")), 0.5, "1ms", "tenMillisecondIsTheLowerBoundary"},
-                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 0.5, "14d", "oneYearResultsInOneMonth"},
-                {AbsoluteRange.create(DateTime.parse("2017-09-01T07:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.234Z")), 0.5, "14d", "oneYearIsTheUpperBoundary"},
-                {AbsoluteRange.create("2018-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 0.5, "1w", "veryLongDurationDoesNotReturnNull"},
+                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 0.5, "1w", "resultForOneYear"},
+                {AbsoluteRange.create(DateTime.parse("2014-09-01T07:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.234Z")), 0.5, "1M", "fourYearsAreTheUpperBoundary"},
+                {AbsoluteRange.create("2000-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 0.5, "1M", "veryLongDurationDoesNotReturnNull"},
 
-                // Scaling Factor of 0.5
-                {RelativeRange.create(1), 2, "200ms", "secondInterval"},
-                {RelativeRange.create(17 * 60), 2, "2m", "minuteInterval"},
-                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 2, "1d", "twelveHourInterval"},
-                {AbsoluteRange.create(DateTime.parse("2018-10-01T09:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.244Z")), 2, "1ms", "tenMillisecondIsTheLowerBoundary"},
-                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 2, "1M", "oneYearResultsInOneMonth"},
+                // Scaling Factor of 1/4
+                {RelativeRange.create(1), 0.25, "10ms", "secondInterval"},
+                {RelativeRange.create(300), 0.25, "2s", "defaultIntervalForSearch"},
+                {RelativeRange.create(17 * 60), 0.25, "10s", "17 minutes"},
+                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 0.25, "2h", "8d2h13m2s"},
+                {AbsoluteRange.create(DateTime.parse("2018-10-01T09:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.244Z")), 0.25, "1ms", "tenMillisecondIsTheLowerBoundary"},
+                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 0.25, "2d", "resultForOneYear"},
+                {AbsoluteRange.create(DateTime.parse("2010-09-01T07:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.234Z")), 0.25, "1M", "eightYearsAreTheUpperBoundary"},
+                {AbsoluteRange.create("2000-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 0.25, "1M", "veryLongDurationDoesNotReturnNull"},
+
+                // Scaling Factor of 1
+                {RelativeRange.create(1), 1, "20ms", "secondInterval"},
+                {RelativeRange.create(300), 1, "10s", "defaultIntervalForSearch"},
+                {RelativeRange.create(17 * 60), 1, "30s", "17 minutes"},
+                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 1, "4h", "8d2h13m2s"},
+                {AbsoluteRange.create(DateTime.parse("2018-10-01T09:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.239Z")), 1, "1ms", "tenMillisecondIsTheLowerBoundary"},
+                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 1, "1w", "resultForOneYear"},
+                {AbsoluteRange.create(DateTime.parse("2016-09-01T07:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.234Z")), 1, "1M", "twoYearsAreTheUpperBoundary"},
+                {AbsoluteRange.create("2000-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 1, "1M", "veryLongDurationDoesNotReturnNull"},
+
+                // Scaling Factor of 2
+                {RelativeRange.create(1), 2, "40ms", "secondInterval"},
+                {RelativeRange.create(300), 2, "20s", "defaultIntervalForSearch"},
+                {RelativeRange.create(17 * 60), 2, "1m", "17 minutes"},
+                {RelativeRange.create(8 * 24 * 60 * 60 + 2 * 60 * 60 + 13 * 60 + 2), 2, "12h", "8d2h13m2s"},
+                {AbsoluteRange.create(DateTime.parse("2018-10-01T09:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 2, "1ms", "tenMillisecondIsTheLowerBoundary"},
+                {AbsoluteRange.create(DateTime.parse("2017-10-01T09:31:23.235Z"), DateTime.parse("2018-10-01T09:31:23.235Z")), 2, "1M", "resultForOneYear"},
                 {AbsoluteRange.create(DateTime.parse("2017-09-01T07:31:23.234Z"), DateTime.parse("2018-10-01T09:31:23.234Z")), 2, "1M", "oneYearIsTheUpperBoundary"},
-                {AbsoluteRange.create("2018-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 2, "1M", "veryLongDurationDoesNotReturnNull"}
+                {AbsoluteRange.create("2000-02-17T22:19:11.913Z", "2018-10-16T13:37:40.000Z"), 2, "1M", "veryLongDurationDoesNotReturnNull"}
         });
     }
 
