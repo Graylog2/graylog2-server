@@ -6,6 +6,7 @@ import { Timestamp } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
 class Notification extends React.Component {
@@ -20,7 +21,7 @@ class Notification extends React.Component {
   };
 
   render() {
-    const notification = this.props.notification;
+    const { notification } = this.props;
     const notificationView = NotificationsFactory.getForNotification(notification);
     return (
       <Alert bsStyle="danger" className="notification">

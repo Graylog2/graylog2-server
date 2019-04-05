@@ -129,10 +129,12 @@ class EditPatternModal extends React.Component {
             <GrokPatternInput onPatternChange={this._onPatternChange}
                               pattern={this.state.pattern}
                               patterns={this.props.patterns} />
-            { this.state.test_error &&
+            { this.state.test_error
+            && (
             <Panel bsStyle="danger" header="Grok Error">
-              <code style={{ display: 'block', whiteSpace: 'pre-wrap' }} >{this.state.test_error}</code>
-            </Panel> }
+              <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{this.state.test_error}</code>
+            </Panel>
+            ) }
             <Input type="textarea"
                    id={this._getId('sampleData')}
                    label="Sample Data"

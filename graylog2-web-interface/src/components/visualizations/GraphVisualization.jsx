@@ -17,6 +17,7 @@ import NumberUtils from 'util/NumberUtils';
 import graphHelper from 'legacy/graphHelper';
 
 import $ from 'jquery';
+
 global.jQuery = $;
 require('bootstrap/js/tooltip');
 
@@ -195,7 +196,7 @@ class GraphVisualization extends React.Component {
 
   // Draws a horizontal threshold line in the graph
   renderThreshold = () => {
-    const threshold = this.props.config.threshold;
+    const { threshold } = this.props.config;
     const thresholdColor = this.props.config.threshold_color || '#f00';
     const thresholdTooltip = this.props.config.threshold_tooltip || `threshold: ${threshold}`;
     const thresholdDotHidden = 1e-6;
@@ -274,7 +275,7 @@ class GraphVisualization extends React.Component {
 
   renderGraph = () => {
     const graphDomNode = this._graph;
-    const interactive = this.props.interactive;
+    const { interactive } = this.props;
 
     this.graph = GraphFactory.create(this.props.config, graphDomNode, interactive, this._formatTooltipTitle);
     this.graph
@@ -318,7 +319,8 @@ class GraphVisualization extends React.Component {
 
   render() {
     return (
-      <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
+      <div ref={(c) => { this._graph = c; }}
+           id={`visualization-${this.props.id}`}
            className={`graph ${this.props.config.renderer}`} />
     );
   }

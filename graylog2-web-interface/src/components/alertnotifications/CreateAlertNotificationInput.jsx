@@ -41,7 +41,7 @@ const CreateAlertNotificationInput = createReactClass({
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
       const nextState = { streams: streams };
-      const initialSelectedStream = this.props.initialSelectedStream;
+      const { initialSelectedStream } = this.props;
       if (initialSelectedStream) {
         nextState.selectedStream = this._findStream(streams, initialSelectedStream);
       }

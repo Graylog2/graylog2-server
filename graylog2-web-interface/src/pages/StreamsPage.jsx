@@ -13,11 +13,12 @@ import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import ActionsProvider from 'injection/ActionsProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const StreamsStore = StoreProvider.getStore('Streams');
 const IndexSetsStore = StoreProvider.getStore('IndexSets');
-
-import ActionsProvider from 'injection/ActionsProvider';
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const StreamsPage = createReactClass({
@@ -63,14 +64,17 @@ const StreamsPage = createReactClass({
             </span>
 
             <IfPermitted permissions="streams:create">
-              <CreateStreamButton bsSize="large" bsStyle="success" onSave={this._onSave}
+              <CreateStreamButton bsSize="large"
+                                  bsStyle="success"
+                                  onSave={this._onSave}
                                   indexSets={this.state.indexSets} />
             </IfPermitted>
           </PageHeader>
 
           <Row className="content">
             <Col md={12}>
-              <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}
+              <StreamComponent currentUser={this.state.currentUser}
+                               onStreamSave={this._onSave}
                                indexSets={this.state.indexSets} />
             </Col>
           </Row>

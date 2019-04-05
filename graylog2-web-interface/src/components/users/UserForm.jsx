@@ -16,14 +16,14 @@ import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
 
+import TimeoutInput from 'components/users/TimeoutInput';
+import EditRolesForm from 'components/users/EditRolesForm';
+import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
+
 const StreamsStore = StoreProvider.getStore('Streams');
 const { DashboardsStore } = CombinedProvider.get('Dashboards');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const UsersStore = StoreProvider.getStore('Users');
-
-import TimeoutInput from 'components/users/TimeoutInput';
-import EditRolesForm from 'components/users/EditRolesForm';
-import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
 
 const UserForm = createReactClass({
   displayName: 'UserForm',
@@ -194,8 +194,8 @@ const UserForm = createReactClass({
       return <Spinner />;
     }
 
-    const user = this.state.user;
-    const permissions = this.state.currentUser.permissions;
+    const { user } = this.state;
+    const { permissions } = this.state.currentUser;
     const dashboards = this.state.dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title));
 
     let requiresOldPassword = true;
@@ -216,7 +216,8 @@ const UserForm = createReactClass({
           <Col lg={8}>
             <h2>User information</h2>
             <form className="form-horizontal user-form" id="edit-user-form" onSubmit={this._updateUser}>
-              {user.read_only &&
+              {user.read_only
+                && (
                 <span>
                   <Col smOffset={3} sm={9}>
                     <Alert bsStyle="warning" role="alert">
@@ -226,16 +227,33 @@ const UserForm = createReactClass({
                   <div className="clearfix" />
                   <br />
                 </span>
+                )
               }
               <fieldset disabled={user.read_only}>
-                <Input name="full_name" id="full_name" type="text" maxLength={200} value={user.full_name}
-                       onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Full Name" help="Give a descriptive name for this account, e.g. the full name."
+                <Input name="full_name"
+                       id="full_name"
+                       type="text"
+                       maxLength={200}
+                       value={user.full_name}
+                       onChange={this._bindValue}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9"
+                       label="Full Name"
+                       help="Give a descriptive name for this account, e.g. the full name."
                        required />
 
-                <Input ref={(email) => { this.inputs['email'] = email; }} name="email" id="email" type="email" maxLength={254} value={user.email}
-                       onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Email Address" help="Give the contact email address." required />
+                <Input ref={(email) => { this.inputs.email = email; }}
+                       name="email"
+                       id="email"
+                       type="email"
+                       maxLength={254}
+                       value={user.email}
+                       onChange={this._bindValue}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9"
+                       label="Email Address"
+                       help="Give the contact email address."
+                       required />
 
                 <IfPermitted permissions="users:edit">
                   <span>
@@ -248,41 +266,52 @@ const UserForm = createReactClass({
                       </Col>
                       <label className="col-sm-3 control-label" htmlFor="streampermissions">Streams Permissions</label>
                       <Col sm={9}>
-                        <MultiSelect ref={(streamReadOptions) => { this.inputs['streamReadOptions'] = streamReadOptions; }} placeholder="Choose streams read permissions..."
+                        <MultiSelect ref={(streamReadOptions) => { this.inputs.streamReadOptions = streamReadOptions; }}
+                                     placeholder="Choose streams read permissions..."
                                      options={this.formatMultiselectOptions(this.state.streams)}
                                      value={streamReadOptions}
                                      onChange={this._onPermissionsChange('streams', 'read')} />
                         <span className="help-block">Choose streams the user can <strong>view</strong>
-                          . Removing read access will remove edit access, too.</span>
-                        <MultiSelect ref={(streamEditOptions) => { this.inputs['streamEditOptions'] = streamEditOptions; }} placeholder="Choose streams edit permissions..."
+                          . Removing read access will remove edit access, too.
+                        </span>
+                        <MultiSelect ref={(streamEditOptions) => { this.inputs.streamEditOptions = streamEditOptions; }}
+                                     placeholder="Choose streams edit permissions..."
                                      options={this.formatMultiselectOptions(this.state.streams)}
                                      value={streamEditOptions}
                                      onChange={this._onPermissionsChange('streams', 'edit')} />
                         <span className="help-block">Choose the streams the user can <strong>edit</strong>
-                          . Values chosen here will enable read access, too.</span>
+                          . Values chosen here will enable read access, too.
+                        </span>
                       </Col>
                     </div>
                     <div className="form-group">
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
                       <Col sm={9}>
-                        <MultiSelect ref={(dashboardReadOptions) => { this.inputs['dashboardReadOptions'] = dashboardReadOptions; }} placeholder="Choose dashboards read permissions..."
+                        <MultiSelect ref={(dashboardReadOptions) => { this.inputs.dashboardReadOptions = dashboardReadOptions; }}
+                                     placeholder="Choose dashboards read permissions..."
                                      options={this.formatMultiselectOptions(dashboards)}
                                      value={dashboardReadOptions}
                                      onChange={this._onPermissionsChange('dashboards', 'read')} />
                         <span className="help-block">Choose dashboards the user can <strong>view</strong>
-                          . Removing read access will remove edit access, too.</span>
-                        <MultiSelect ref={(dashboardEditOptions) => { this.inputs['dashboardEditOptions'] = dashboardEditOptions; }} placeholder="Choose dashboards edit permissions..."
+                          . Removing read access will remove edit access, too.
+                        </span>
+                        <MultiSelect ref={(dashboardEditOptions) => { this.inputs.dashboardEditOptions = dashboardEditOptions; }}
+                                     placeholder="Choose dashboards edit permissions..."
                                      options={this.formatMultiselectOptions(dashboards)}
                                      value={dashboardEditOptions}
                                      onChange={this._onPermissionsChange('dashboards', 'edit')} />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>
-                          . Values chosen here will enable read access, too.</span>
+                          . Values chosen here will enable read access, too.
+                        </span>
                       </Col>
                     </div>
                   </span>
                 </IfPermitted>
                 <IfPermitted permissions="*">
-                  <TimeoutInput ref={(session_timeout_ms) => { this.inputs['session_timeout_ms'] = session_timeout_ms; }} value={user.session_timeout_ms} labelSize={3} controlSize={9}
+                  <TimeoutInput ref={(session_timeout_ms) => { this.inputs.session_timeout_ms = session_timeout_ms; }}
+                                value={user.session_timeout_ms}
+                                labelSize={3}
+                                controlSize={9}
                                 onChange={this._onFieldChange('session_timeout_ms')} />
                 </IfPermitted>
 
@@ -291,7 +320,9 @@ const UserForm = createReactClass({
                        help="Choose your local time zone or leave it as it is to use the system's default."
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9">
-                  <TimezoneSelect ref={(timezone) => { this.inputs['timezone'] = timezone; }} className="timezone-select" value={user.timezone}
+                  <TimezoneSelect ref={(timezone) => { this.inputs.timezone = timezone; }}
+                                  className="timezone-select"
+                                  value={user.timezone}
                                   onChange={this._onFieldChange('timezone')} />
                 </Input>
 
@@ -310,46 +341,73 @@ const UserForm = createReactClass({
         <Row>
           <Col lg={8}>
             <h2>Change password</h2>
-            {user.read_only ?
-              <Col smOffset={3} sm={9}>
-                <Alert bsStyle="warning" role="alert">
-                Please edit your Graylog server configuration file to change the admin password.
-              </Alert>
-              </Col>
-            :
-              user.external ?
+            {user.read_only
+              ? (
                 <Col smOffset={3} sm={9}>
                   <Alert bsStyle="warning" role="alert">
+                Please edit your Graylog server configuration file to change the admin password.
+                  </Alert>
+                </Col>
+              )
+              : user.external
+                ? (
+                  <Col smOffset={3} sm={9}>
+                    <Alert bsStyle="warning" role="alert">
                   This user was created from an external system and you can't change the password here.
                   Please contact an administrator for more information.
-                </Alert>
-                </Col>
-              :
-                <form className="form-horizontal" style={{ marginTop: 10 }} onSubmit={this._changePassword}>
-                  {requiresOldPassword &&
-                  <Input ref={(old_password) => { this.inputs['old_password'] = old_password; }} name="old_password" id="old_password" type="password" maxLength={100}
-                         labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                         label="Old Password" required />
+                    </Alert>
+                  </Col>
+                )
+                : (
+                  <form className="form-horizontal" style={{ marginTop: 10 }} onSubmit={this._changePassword}>
+                    {requiresOldPassword
+                  && (
+                  <Input ref={(old_password) => { this.inputs.old_password = old_password; }}
+                         name="old_password"
+                         id="old_password"
+                         type="password"
+                         maxLength={100}
+                         labelClassName="col-sm-3"
+                         wrapperClassName="col-sm-9"
+                         label="Old Password"
+                         required />
+                  )
                 }
-                  <Input ref={(password) => { this.inputs['password'] = password; }} name="password" id="password" type="password" maxLength={100}
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="New Password" required minLength="6"
-                       help="Passwords must be at least 6 characters long. We recommend using a strong password."
-                       onChange={this._onPasswordChange} />
+                    <Input ref={(password) => { this.inputs.password = password; }}
+                           name="password"
+                           id="password"
+                           type="password"
+                           maxLength={100}
+                           labelClassName="col-sm-3"
+                           wrapperClassName="col-sm-9"
+                           label="New Password"
+                           required
+                           minLength="6"
+                           help="Passwords must be at least 6 characters long. We recommend using a strong password."
+                           onChange={this._onPasswordChange} />
 
-                  <Input ref={(password_repeat) => { this.inputs['password_repeat'] = password_repeat; }} name="password_repeat" id="password_repeat" type="password" maxLength={100}
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Repeat Password" required minLength="6" onChange={this._onPasswordChange} />
+                    <Input ref={(password_repeat) => { this.inputs.password_repeat = password_repeat; }}
+                           name="password_repeat"
+                           id="password_repeat"
+                           type="password"
+                           maxLength={100}
+                           labelClassName="col-sm-3"
+                           wrapperClassName="col-sm-9"
+                           label="Repeat Password"
+                           required
+                           minLength="6"
+                           onChange={this._onPasswordChange} />
 
-                  <div className="form-group">
-                    <Col smOffset={3} sm={9}>
-                      <Button bsStyle="primary" type="submit" className="save-button-margin">
+                    <div className="form-group">
+                      <Col smOffset={3} sm={9}>
+                        <Button bsStyle="primary" type="submit" className="save-button-margin">
                       Update Password
-                    </Button>
-                      <Button onClick={this._onCancel}>Cancel</Button>
-                    </Col>
-                  </div>
-                </form>
+                        </Button>
+                        <Button onClick={this._onCancel}>Cancel</Button>
+                      </Col>
+                    </div>
+                  </form>
+                )
             }
           </Col>
         </Row>

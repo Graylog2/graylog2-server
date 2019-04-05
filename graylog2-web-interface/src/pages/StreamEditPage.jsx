@@ -8,6 +8,7 @@ import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const StreamsStore = StoreProvider.getStore('Streams');
 
@@ -36,8 +37,12 @@ const StreamEditPage = createReactClass({
       return <Spinner />;
     }
 
-    let content = (<StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
-                                 messageId={this.props.location.query.message_id} index={this.props.location.query.index} />);
+    let content = (
+      <StreamRulesEditor currentUser={this.state.currentUser}
+                         streamId={this.props.params.streamId}
+                         messageId={this.props.location.query.message_id}
+                         index={this.props.location.query.index} />
+    );
     if (this.state.stream.is_default) {
       content = (
         <div className="row content">

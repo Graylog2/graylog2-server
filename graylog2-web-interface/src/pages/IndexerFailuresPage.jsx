@@ -4,13 +4,14 @@ import numeral from 'numeral';
 import moment from 'moment';
 
 import StoreProvider from 'injection/StoreProvider';
-const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
 
 import DocsHelper from 'util/DocsHelper';
 
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
+
+const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
 
 class IndexerFailuresPage extends React.Component {
   state = {};

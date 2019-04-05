@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 import Version from 'util/Version';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SystemStore = StoreProvider.getStore('System');
 
 const Footer = createReactClass({

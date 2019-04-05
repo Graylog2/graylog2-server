@@ -98,7 +98,7 @@ const SelectPopover = createReactClass({
 
   handleItemSelection(item) {
     return () => {
-      const selectedItems = this.state.selectedItems;
+      const { selectedItems } = this.state;
       let nextSelectedItems;
       if (this.props.multiple) {
         // Clicking on a selected value on a multiselect input will toggle the item's select status

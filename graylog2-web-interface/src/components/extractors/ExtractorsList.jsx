@@ -8,13 +8,13 @@ import naturalSort from 'javascript-natural-sort';
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
+import ActionsProvider from 'injection/ActionsProvider';
+import StoreProvider from 'injection/StoreProvider';
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
-import StoreProvider from 'injection/StoreProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExtractorsList = createReactClass({
@@ -33,7 +33,9 @@ const ExtractorsList = createReactClass({
 
   _formatExtractor(extractor) {
     return (
-      <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.id}
+      <ExtractorsListItem key={extractor.id}
+                          extractor={extractor}
+                          inputId={this.props.input.id}
                           nodeId={this.props.node.node_id} />
     );
   },
@@ -77,7 +79,8 @@ const ExtractorsList = createReactClass({
                 {sortExtractorsButton}
               </Col>
             </Row>
-            <EntityList bsNoItemsStyle="info" noItemsText="This input has no configured extractors."
+            <EntityList bsNoItemsStyle="info"
+                        noItemsText="This input has no configured extractors."
                         items={formattedExtractors} />
           </Col>
         </Row>

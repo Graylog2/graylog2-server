@@ -6,10 +6,11 @@ import fetch, { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
 import TimeHelper from 'util/TimeHelper';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
-const NodesStore = StoreProvider.getStore('Nodes');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const SessionStore = StoreProvider.getStore('Session');
+const NodesStore = StoreProvider.getStore('Nodes');
 const SessionActions = ActionsProvider.getActions('Session');
 const MetricsActions = ActionsProvider.getActions('Metrics');
 

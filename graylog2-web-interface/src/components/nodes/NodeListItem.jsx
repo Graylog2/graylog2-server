@@ -3,11 +3,11 @@ import React from 'react';
 import { Col } from 'react-bootstrap';
 
 import { EntityListItem, LinkToNode } from 'components/common';
+import NodeThroughput from 'components/throughput/NodeThroughput';
 import NodesActions from './NodesActions';
 import SystemOverviewSummary from './SystemOverviewSummary';
 import JvmHeapUsage from './JvmHeapUsage';
 import JournalState from './JournalState';
-import NodeThroughput from 'components/throughput/NodeThroughput';
 
 class NodeListItem extends React.Component {
   static propTypes = {
@@ -16,7 +16,7 @@ class NodeListItem extends React.Component {
   };
 
   render() {
-    const node = this.props.node;
+    const { node } = this.props;
     const title = <LinkToNode nodeId={node.node_id} />;
 
     if (!this.props.systemOverview) {

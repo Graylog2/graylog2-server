@@ -40,7 +40,7 @@ const RulesPage = createReactClass({
 
             <span>
               Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                                      text="documentation" />.
+                                                                               text="documentation" />.
             </span>
 
             <span>

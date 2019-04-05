@@ -137,10 +137,11 @@ class SourceCodeEditor extends React.Component {
     const { theme, resizable } = this.props;
     const validCssWidth = lodash.isFinite(width) ? width : '100%';
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
-    const overlay = <Tooltip id={'paste-button-tooltip'}>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
+    const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
     return (
       <div>
-        {this.props.toolbar &&
+        {this.props.toolbar
+          && (
           <div className={style.toolbar} style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup>
@@ -175,6 +176,7 @@ class SourceCodeEditor extends React.Component {
               </ButtonGroup>
             </ButtonToolbar>
           </div>
+          )
         }
         <Resizable height={height}
                    width={width}

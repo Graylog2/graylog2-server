@@ -7,6 +7,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import naturalSort from 'javascript-natural-sort';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 class IndexSetDeletionForm extends React.Component {

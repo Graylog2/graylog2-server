@@ -128,7 +128,8 @@ const AlertConditionsStore = Reflux.createStore({
       },
       (error) => {
         return (typeof failureCallback === 'function' ? failureCallback(error) : failCallback(error));
-      });
+      },
+    );
 
     AlertConditionsActions.get.promise(promise);
   },

@@ -9,9 +9,10 @@ import { Spinner } from 'components/common';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
 // TODO this is a copy of GlobalTroughput, it just renders differently and only targets a single node.
@@ -53,14 +54,15 @@ const NodeThroughput = createReactClass({
       return (
         <span>
           Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and <strong>
-            {numeral(metrics.totalOut).format('0,0')}</strong> outgoing msg/s.
+            {numeral(metrics.totalOut).format('0,0')}
+          </strong> outgoing msg/s.
         </span>
       );
     }
     return (
       <span>
           In {numeral(metrics.totalIn).format('0,0')} / Out {numeral(metrics.totalOut).format('0,0')} msg/s.
-        </span>
+      </span>
     );
   },
 
@@ -69,7 +71,7 @@ const NodeThroughput = createReactClass({
       return <Spinner text="Loading throughput..." />;
     }
 
-    const nodeId = this.props.nodeId;
+    const { nodeId } = this.props;
     const nodeMetrics = this.state.metrics[nodeId];
     const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
 

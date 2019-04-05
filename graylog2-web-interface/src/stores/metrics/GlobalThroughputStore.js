@@ -1,9 +1,10 @@
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const GlobalThroughputStore = Reflux.createStore({

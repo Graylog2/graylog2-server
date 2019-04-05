@@ -25,27 +25,21 @@ describe('<ContentPackApplyParameter />', () => {
   const appliedParameterReadOnly = { configKey: 'configuration.port', paramName: parameter.name, readOnly: true };
 
   it('should render with full props', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[appliedParameter]}
-    />);
+    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity}
+                                                               parameters={[parameter]}
+                                                               appliedParameter={[appliedParameter]} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render with readOnly', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[appliedParameterReadOnly]}
-    />);
+    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity}
+                                                               parameters={[parameter]}
+                                                               appliedParameter={[appliedParameterReadOnly]} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render with minimal props', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter
-      entity={entity}
-    />);
+    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -55,12 +49,10 @@ describe('<ContentPackApplyParameter />', () => {
       expect(paramName).toEqual('PORT');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[]}
-      onParameterApply={applyFn}
-    />);
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[]}
+                                                     onParameterApply={applyFn} />);
 
     wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
@@ -74,12 +66,10 @@ describe('<ContentPackApplyParameter />', () => {
       expect(paramName).toEqual('PORT');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
-      onParameterApply={applyFn}
-    />);
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
+                                                     onParameterApply={applyFn} />);
 
     wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
@@ -92,12 +82,10 @@ describe('<ContentPackApplyParameter />', () => {
       expect(configKey).toEqual('configuration.port');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[appliedParameter]}
-      onParameterClear={clearFn}
-    />);
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[appliedParameter]}
+                                                     onParameterClear={clearFn} />);
 
     wrapper.find('button[children="Clear"]').simulate('click');
     expect(clearFn.mock.calls.length).toBe(1);

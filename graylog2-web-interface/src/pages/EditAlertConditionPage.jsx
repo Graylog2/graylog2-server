@@ -62,7 +62,7 @@ const EditAlertConditionPage = createReactClass({
 
     const condition = this.state.alertCondition;
     const conditionType = this.state.availableConditions[condition.type];
-    const stream = this.state.stream;
+    const { stream } = this.state;
 
     return (
       <DocumentTitle title={`Condition ${condition.title || 'Untitled'}`}>

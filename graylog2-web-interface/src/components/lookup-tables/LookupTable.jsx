@@ -74,13 +74,15 @@ class LookupTable extends React.Component {
             <Button bsStyle="success">Edit</Button>
           </LinkContainer>
           {
-            (this.props.table.default_single_value || this.props.table.default_multi_value) &&
+            (this.props.table.default_single_value || this.props.table.default_multi_value)
+            && (
             <dl>
               <dt>Default single value</dt>
               <dd><code>{this.props.table.default_single_value}</code>{' '}({this.props.table.default_single_value_type.toLowerCase()})</dd>
               <dt>Default multi value</dt>
               <dd><code>{this.props.table.default_multi_value}</code>{' '}({this.props.table.default_multi_value_type.toLowerCase()})</dd>
             </dl>
+            )
           }
           <hr />
           <h2>Purge Cache</h2>

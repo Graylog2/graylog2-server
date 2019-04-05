@@ -5,13 +5,14 @@ import { Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
 import { DocumentTitle, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamOutputsPage = createReactClass({
   displayName: 'StreamOutputsPage',

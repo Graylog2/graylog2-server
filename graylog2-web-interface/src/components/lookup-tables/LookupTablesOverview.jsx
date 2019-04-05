@@ -61,40 +61,40 @@ class LookupTablesOverview extends React.Component {
         <p><strong>Available search fields</strong></p>
         <Table condensed>
           <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
+            <tr>
+              <th>Field</th>
+              <th>Description</th>
+            </tr>
           </thead>
           <tbody>
-          <tr>
-            <td>id</td>
-            <td>Lookup Table ID</td>
-          </tr>
-          <tr>
-            <td>title</td>
-            <td>The title of the lookup table</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>The reference name of the lookup table</td>
-          </tr>
-          <tr>
-            <td>description</td>
-            <td>The description of lookup table</td>
-          </tr>
+            <tr>
+              <td>id</td>
+              <td>Lookup Table ID</td>
+            </tr>
+            <tr>
+              <td>title</td>
+              <td>The title of the lookup table</td>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>The reference name of the lookup table</td>
+            </tr>
+            <tr>
+              <td>description</td>
+              <td>The description of lookup table</td>
+            </tr>
           </tbody>
         </Table>
         <p><strong>Examples</strong></p>
         <p>
           Find lookup tables by parts of their names:<br />
-          <kbd>{'name:geoip'}</kbd><br />
-          <kbd>{'name:geo'}</kbd>
+          <kbd>name:geoip</kbd><br />
+          <kbd>name:geo</kbd>
         </p>
         <p>
           Searching without a field name matches against the <code>title</code> field:<br />
-          <kbd>{'geoip'}</kbd> <br />is the same as<br />
-          <kbd>{'title:geoip'}</kbd>
+          <kbd>geoip</kbd> <br />is the same as<br />
+          <kbd>title:geoip</kbd>
         </p>
       </Popover>
     );
@@ -110,46 +110,50 @@ class LookupTablesOverview extends React.Component {
         dataAdapter: this._lookupAdapterError(table),
       };
 
-      return (<LUTTableEntry key={table.id}
-                             table={table}
-                             cache={cache}
-                             dataAdapter={dataAdapter}
-                             errors={errors} />);
+      return (
+        <LUTTableEntry key={table.id}
+                       table={table}
+                       cache={cache}
+                       dataAdapter={dataAdapter}
+                       errors={errors} />
+      );
     });
 
-    return (<div>
-      <Row className="content">
-        <Col md={12}>
-          <h2>
+    return (
+      <div>
+        <Row className="content">
+          <Col md={12}>
+            <h2>
             Configured lookup tables
-            <span>&nbsp;<small>{this.props.pagination.total} total</small></span>
-          </h2>
-          <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
-            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-                <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
-              </LinkContainer>
-              <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
-                <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
-              </OverlayTrigger>
-            </SearchForm>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th className={Styles.rowCache}>Cache</th>
-                  <th className={Styles.rowAdapter}>Data Adapter</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {lookupTables}
-            </Table>
-          </PaginatedList>
-        </Col>
-      </Row>
-    </div>);
+              <span>&nbsp;<small>{this.props.pagination.total} total</small></span>
+            </h2>
+            <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
+              <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+                  <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
+                </LinkContainer>
+                <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
+                  <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
+                </OverlayTrigger>
+              </SearchForm>
+              <Table condensed hover className={Styles.overviewTable}>
+                <thead>
+                  <tr>
+                    <th className={Styles.rowTitle}>Title</th>
+                    <th className={Styles.rowDescription}>Description</th>
+                    <th className={Styles.rowName}>Name</th>
+                    <th className={Styles.rowCache}>Cache</th>
+                    <th className={Styles.rowAdapter}>Data Adapter</th>
+                    <th className={Styles.rowActions}>Actions</th>
+                  </tr>
+                </thead>
+                {lookupTables}
+              </Table>
+            </PaginatedList>
+          </Col>
+        </Row>
+      </div>
+    );
   }
 }
 

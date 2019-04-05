@@ -19,8 +19,8 @@ class InputTypesDataTable extends React.Component {
         <td className="limited">{inputType.name}</td>
         <td className="limited">{inputType.type}</td>
         <td className="limited" style={{ width: 150 }}>
-          {inputType.link_to_docs &&
-          <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>
+          {inputType.link_to_docs
+          && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>
           }
         </td>
       </tr>
@@ -50,7 +50,7 @@ class InputTypesDataTable extends React.Component {
                  className="table-hover table-condensed table-striped"
                  headers={headers}
                  headerCellFormatter={this._headerCellFormatter}
-                 sortByKey={'name'}
+                 sortByKey="name"
                  rows={rows}
                  dataRowFormatter={this._inputTypeFormatter}
                  filterLabel="Filter"

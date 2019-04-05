@@ -30,56 +30,52 @@ describe('<MessageTableEntry />', () => {
 
   describe('rendering', () => {
     it('should render a MessageTableEntry', () => {
-      const wrapper = renderer.create(<MessageTableEntry
-        allStreams={allStreams}
-        allStreamsLoaded
-        disableSurroundingSearch
-        expandAllRenderAsync={false}
-        expanded
-        inputs={inputs}
-        searchConfig={{}}
-        message={message}
-        nodes={nodes}
-        streams={streams}
-        toggleDetail={jest.fn}
-      />);
+      const wrapper = renderer.create(<MessageTableEntry allStreams={allStreams}
+                                                         allStreamsLoaded
+                                                         disableSurroundingSearch
+                                                         expandAllRenderAsync={false}
+                                                         expanded
+                                                         inputs={inputs}
+                                                         searchConfig={{}}
+                                                         message={message}
+                                                         nodes={nodes}
+                                                         streams={streams}
+                                                         toggleDetail={jest.fn} />);
       expect(wrapper.toJSON()).toMatchSnapshot();
     });
   });
 
   describe('timezone handling', () => {
     it('should render a in the UTC timezone', () => {
-      const wrapper = mount(<table><MessageTableEntry
-        allStreams={allStreams}
-        allStreamsLoaded
-        disableSurroundingSearch
-        expandAllRenderAsync={false}
-        expanded
-        inputs={inputs}
-        searchConfig={{}}
-        message={message}
-        nodes={nodes}
-        streams={streams}
-        toggleDetail={jest.fn}
-      /></table>);
+      const wrapper = mount(<table><MessageTableEntry allStreams={allStreams}
+                                                      allStreamsLoaded
+                                                      disableSurroundingSearch
+                                                      expandAllRenderAsync={false}
+                                                      expanded
+                                                      inputs={inputs}
+                                                      searchConfig={{}}
+                                                      message={message}
+                                                      nodes={nodes}
+                                                      streams={streams}
+                                                      toggleDetail={jest.fn} />
+                            </table>);
       expect(wrapper.find('time').at(1).text()).toEqual('2018-01-22 16:36:02.189 +01:00');
     });
 
     it('should render a in the USA/Honolulu timezone', () => {
       DateTime.getBrowserTimezone = () => { return 'Pacific/Honolulu'; };
-      const wrapper = mount(<table><MessageTableEntry
-        allStreams={allStreams}
-        allStreamsLoaded
-        disableSurroundingSearch
-        expandAllRenderAsync={false}
-        expanded
-        inputs={inputs}
-        searchConfig={{}}
-        message={message}
-        nodes={nodes}
-        streams={streams}
-        toggleDetail={jest.fn}
-      /></table>);
+      const wrapper = mount(<table><MessageTableEntry allStreams={allStreams}
+                                                      allStreamsLoaded
+                                                      disableSurroundingSearch
+                                                      expandAllRenderAsync={false}
+                                                      expanded
+                                                      inputs={inputs}
+                                                      searchConfig={{}}
+                                                      message={message}
+                                                      nodes={nodes}
+                                                      streams={streams}
+                                                      toggleDetail={jest.fn} />
+                            </table>);
       expect(wrapper.find('time').at(1).text()).toEqual('2018-01-22 05:36:02.189 -10:00');
     });
   });

@@ -20,7 +20,7 @@ class IndexSetDetails extends React.Component {
   }
 
   render() {
-    const indexSet = this.props.indexSet;
+    const { indexSet } = this.props;
 
     return (
       <Row className="index-set-details">

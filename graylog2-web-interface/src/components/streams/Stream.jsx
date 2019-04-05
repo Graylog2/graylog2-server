@@ -113,12 +113,12 @@ const Stream = createReactClass({
   },
 
   render() {
-    const stream = this.props.stream;
-    const permissions = this.props.permissions;
+    const { stream } = this.props;
+    const { permissions } = this.props;
 
     const isDefaultStream = stream.is_default;
-    const defaultStreamTooltip = isDefaultStream ?
-      <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
+    const defaultStreamTooltip = isDefaultStream
+      ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
     let editRulesLink;
     let manageOutputsLink;
@@ -174,14 +174,16 @@ const Stream = createReactClass({
       }
     }
 
-    const createdFromContentPack = (stream.content_pack ?
-      <i className="fa fa-cube" title="Created from content pack" /> : null);
+    const createdFromContentPack = (stream.content_pack
+      ? <i className="fa fa-cube" title="Created from content pack" /> : null);
 
-    const streamRuleList = isDefaultStream ? null :
-      (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
-                                  stream={stream}
-                                  streamRuleTypes={this.props.streamRuleTypes}
-                                  permissions={this.props.permissions} />);
+    const streamRuleList = isDefaultStream ? null
+      : (
+        <CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
+                                   stream={stream}
+                                   streamRuleTypes={this.props.streamRuleTypes}
+                                   permissions={this.props.permissions} />
+      );
     const streamControls = (
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
         <StreamControls stream={stream}

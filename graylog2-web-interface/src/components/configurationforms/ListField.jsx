@@ -42,9 +42,9 @@ class ListField extends React.Component {
   };
 
   render() {
-    const field = this.state.field;
-    const typeName = this.state.typeName;
-    const value = this.state.value;
+    const { field } = this.state;
+    const { typeName } = this.state;
+    const { value } = this.state;
     const isRequired = !field.is_optional;
     const allowCreate = field.attributes.includes('allow_create');
     const options = (field.additional_info && field.additional_info.values ? field.additional_info.values : {});

@@ -10,13 +10,14 @@ import SearchBar from 'components/search/SearchBar';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import ActionsProvider from 'injection/ActionsProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const SearchStore = StoreProvider.getStore('Search');
 const SavedSearchesStore = StoreProvider.getStore('SavedSearches');
 const StreamsStore = StoreProvider.getStore('Streams');
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
-
-import ActionsProvider from 'injection/ActionsProvider';
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 

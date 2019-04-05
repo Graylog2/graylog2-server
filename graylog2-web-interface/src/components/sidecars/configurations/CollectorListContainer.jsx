@@ -31,12 +31,12 @@ const CollectorListContainer = createReactClass({
   },
 
   handlePageChange(page, pageSize) {
-    const query = this.state.collectors.query;
+    const { query } = this.state.collectors;
     CollectorsActions.list({ query: query, page: page, pageSize: pageSize });
   },
 
   handleQueryChange(query = '', callback = () => {}) {
-    const pageSize = this.state.collectors.pagination.pageSize;
+    const { pageSize } = this.state.collectors.pagination;
     CollectorsActions.list({ query: query, pageSize: pageSize }).finally(callback);
   },
 

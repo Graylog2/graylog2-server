@@ -117,8 +117,8 @@ class ContentPackSelection extends React.Component {
       return false;
     }
 
-    return !(this.props.selectedEntities[type].length === this.props.entities[type].length ||
-       this.props.selectedEntities[type].length === 0);
+    return !(this.props.selectedEntities[type].length === this.props.entities[type].length
+       || this.props.selectedEntities[type].length === 0);
   }
 
   _isSelected(entity) {
@@ -177,12 +177,14 @@ class ContentPackSelection extends React.Component {
         const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
           const checked = this._isSelected(entity);
           const header = this._entityItemHeader(entity);
-          return (<ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
-                                      key={entity.id}
-                                      checked={checked}
-                                      expandable={false}
-                                      padded={false}
-                                      header={header} />);
+          return (
+            <ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
+                                key={entity.id}
+                                checked={checked}
+                                expandable={false}
+                                padded={false}
+                                header={header} />
+          );
         });
         if (group.length <= 0) {
           return null;
@@ -266,18 +268,19 @@ class ContentPackSelection extends React.Component {
         <Row>
           <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
-            {this.props.edit && <HelpBlock>You can select between installed entities from the server (<i className="fa fa-server" />) or
-              entities from the former content pack revision (<i className={`fa fa-archive ${style.contentPackEntity}`} />).</HelpBlock>}
+            {this.props.edit && (
+            <HelpBlock>You can select between installed entities from the server (<i className="fa fa-server" />) or
+              entities from the former content pack revision (<i className={`fa fa-archive ${style.contentPackEntity}`} />).
+            </HelpBlock>
+            )}
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} lg={8}>
-            <SearchForm
-              id="filter-input"
-              onSearch={this._onSetFilter}
-              onReset={this._onClearFilter}
-              searchButtonLabel="Filter"
-            />
+            <SearchForm id="filter-input"
+                        onSearch={this._onSetFilter}
+                        onReset={this._onClearFilter}
+                        searchButtonLabel="Filter" />
           </Col>
         </Row>
         <Row>

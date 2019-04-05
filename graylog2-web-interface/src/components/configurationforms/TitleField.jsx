@@ -17,11 +17,16 @@ class TitleField extends React.Component {
   };
 
   render() {
-    const typeName = this.props.typeName;
+    const { typeName } = this.props;
     const titleField = { is_optional: false, attributes: [], human_name: 'Title', description: this.props.helpBlock };
     return (
-      <TextField key={`${typeName}-title`} typeName={typeName} title="title" field={titleField}
-                                 value={this.props.value} onChange={this.props.onChange} autoFocus />
+      <TextField key={`${typeName}-title`}
+                 typeName={typeName}
+                 title="title"
+                 field={titleField}
+                 value={this.props.value}
+                 onChange={this.props.onChange}
+                 autoFocus />
     );
   }
 }

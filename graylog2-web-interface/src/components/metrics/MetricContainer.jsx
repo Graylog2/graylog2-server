@@ -6,12 +6,13 @@ import Reflux from 'reflux';
 import TimeHelper from 'util/TimeHelper';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const MetricContainer = createReactClass({
   displayName: 'MetricContainer',
@@ -62,13 +63,15 @@ const MetricContainer = createReactClass({
     if (this.props.zeroOnMissing && (!throughput || !throughput.throughput)) {
       throughput = { throughput: 0 };
     }
-    return (<div>
-      {
+    return (
+      <div>
+        {
         React.Children.map(this.props.children, (child) => {
           return React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } });
         })
       }
-    </div>);
+      </div>
+    );
   },
 });
 

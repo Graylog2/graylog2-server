@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import React from "react";
-import {Col, Panel, Row} from "react-bootstrap";
+import React from 'react';
+import { Col, Panel, Row } from 'react-bootstrap';
 
-import {ContactUs} from "components/support";
+import { ContactUs } from 'components/support';
 
 class SearchExecutionError extends React.Component {
   static propTypes = {
@@ -10,13 +10,13 @@ class SearchExecutionError extends React.Component {
   };
 
   _getFormattedErrorDetails = (details) => {
-      return details.map(function(detail) {
-          return <li><code>{detail}</code></li>
-      });
+    return details.map((detail) => {
+      return <li><code>{detail}</code></li>;
+    });
   };
 
   render() {
-    const error = this.props.error;
+    const { error } = this.props;
     return (
       <div>
         <Row className="content content-head">

@@ -190,11 +190,13 @@ class LookupTableForm extends React.Component {
 
   _validationMessage = (fieldName, defaultText) => {
     if (this.props.validationErrors[fieldName]) {
-      return (<div>
-        <span>{defaultText}</span>
+      return (
+        <div>
+          <span>{defaultText}</span>
         &nbsp;
-        <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
-      </div>);
+          <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
+        </div>
+      );
     }
     return <span>{defaultText}</span>;
   };
@@ -202,7 +204,7 @@ class LookupTableForm extends React.Component {
   state = this._initialState(this.props.table);
 
   render() {
-    const table = this.state.table;
+    const { table } = this.state;
 
     return (
       <form className="form form-horizontal" onSubmit={this._save}>
@@ -246,10 +248,10 @@ class LookupTableForm extends React.Component {
                  checked={this.state.enable_default_single}
                  onChange={this._onCheckEnableSingleDefault}
                  help="Enable if the lookup table should provide a default for the single value."
-                 wrapperClassName="col-md-offset-3 col-md-9"
-                 />
+                 wrapperClassName="col-md-offset-3 col-md-9" />
 
-          {this.state.enable_default_single &&
+          {this.state.enable_default_single
+          && (
           <JSONValueInput label="Default single value"
                           help={this._validationMessage('default_single_value', 'The single value that is being used as lookup result if the data adapter or cache does not find a value.')}
                           validationState={this._validationState('default_single_value')}
@@ -260,6 +262,7 @@ class LookupTableForm extends React.Component {
                           allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
                           labelClassName="col-sm-3"
                           wrapperClassName="col-sm-9" />
+          )
           }
 
           <Input type="checkbox"
@@ -269,7 +272,8 @@ class LookupTableForm extends React.Component {
                  help="Enable if the lookup table should provide a default for the multi value."
                  wrapperClassName="col-md-offset-3 col-md-9" />
 
-          {this.state.enable_default_multi &&
+          {this.state.enable_default_multi
+          && (
           <JSONValueInput label="Default multi value"
                           help={this._validationMessage('default_multi_value', 'The multi value that is being used as lookup result if the data adapter or cache does not find a value.')}
                           validationState={this._validationState('default_multi_value')}
@@ -279,6 +283,7 @@ class LookupTableForm extends React.Component {
                           allowedTypes={['OBJECT', 'NULL']}
                           labelClassName="col-sm-3"
                           wrapperClassName="col-sm-9" />
+          )
           }
         </fieldset>
 

@@ -15,11 +15,11 @@ import DocsHelper from 'util/DocsHelper';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
+import Routes from 'routing/Routes';
+
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
 const { IndicesStore, IndicesActions } = CombinedProvider.get('Indices');
 const { IndexerOverviewStore, IndexerOverviewActions } = CombinedProvider.get('IndexerOverview');
-
-import Routes from 'routing/Routes';
 
 const IndexSetPage = createReactClass({
   displayName: 'IndexSetPage',
@@ -72,7 +72,8 @@ const IndexSetPage = createReactClass({
               <p>
                 We could not get the indices overview information. This usually means there was a problem
                 connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
-                Graylog</strong>.
+                Graylog
+                </strong>.
               </p>
               <p>
                 Graylog will continue storing your messages in its journal, but you will not be able to search on them
@@ -94,7 +95,7 @@ const IndexSetPage = createReactClass({
       return <Spinner />;
     }
 
-    const indexSet = this.state.indexSet;
+    const { indexSet } = this.state;
 
     const pageHeader = (
       <PageHeader title={`Index Set: ${indexSet.title}`}>

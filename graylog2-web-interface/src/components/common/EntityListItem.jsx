@@ -49,13 +49,15 @@ class EntityListItem extends React.Component {
               {actionsContainer}
             </div>
             <h2>{this.props.title} {titleSuffix}</h2>
-            {(this.props.createdFromContentPack || this.props.description) &&
+            {(this.props.createdFromContentPack || this.props.description)
+              && (
               <div className="item-description">
-                {this.props.createdFromContentPack &&
-                <span><i className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
+                {this.props.createdFromContentPack
+                && <span><i className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
               }
                 <span>{this.props.description}</span>
               </div>
+              )
             }
           </Col>
 

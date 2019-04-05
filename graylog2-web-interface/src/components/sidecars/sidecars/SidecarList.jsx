@@ -4,8 +4,8 @@ import { Alert, Button, Col, Row, Table } from 'react-bootstrap';
 
 import { PaginatedList } from 'components/common';
 
-import SidecarRow from './SidecarRow';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
+import SidecarRow from './SidecarRow';
 
 import style from './SidecarList.css';
 

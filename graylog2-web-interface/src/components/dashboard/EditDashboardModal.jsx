@@ -6,9 +6,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { Input } from 'components/bootstrap';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
-import CombinedProvider from 'injection/CombinedProvider';
 const { DashboardsActions } = CombinedProvider.get('Dashboards');
 
 const EditDashboardModal = createReactClass({

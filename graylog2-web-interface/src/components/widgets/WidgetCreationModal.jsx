@@ -141,7 +141,7 @@ const WidgetCreationModal = createReactClass({
   },
 
   render() {
-    const loading = this.props.loading;
+    const { loading } = this.props;
     const CustomCreateDialog = this.widgetPlugin.configurationCreateComponent;
     return (
       <BootstrapModalForm ref={(createModal) => { this.createModal = createModal; }}

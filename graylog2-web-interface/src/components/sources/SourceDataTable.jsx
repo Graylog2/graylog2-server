@@ -5,11 +5,12 @@ import d3 from 'd3';
 import dc from 'dc';
 import numeral from 'numeral';
 
-import SourceTitle from './SourceTitle';
 import UniversalSearch from 'logic/search/UniversalSearch';
 import StringUtils from 'util/StringUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+import SourceTitle from './SourceTitle';
+
 const SearchStore = StoreProvider.getStore('Search');
 
 class SourceDataTable extends React.Component {
@@ -130,7 +131,9 @@ class SourceDataTable extends React.Component {
           <div className="col-md-6">
             <div className="form-inline">
               <div className="form-group">
-                <input type="text" className="form-control input-sm" onChange={this._onFilterChanged}
+                <input type="text"
+                       className="form-control input-sm"
+                       onChange={this._onFilterChanged}
                        placeholder="Search" />
               </div>
             </div>
@@ -139,7 +142,9 @@ class SourceDataTable extends React.Component {
             <div className="form-inline text-right">
               <div className="form-group">
                 <label htmlFor="no-results">Show:</label>
-                <select id="no-results" className="form-control input-sm" onChange={this._onNumberOfSourcesChanged}
+                <select id="no-results"
+                        className="form-control input-sm"
+                        onChange={this._onNumberOfSourcesChanged}
                         value={this.state.numberOfSources}>
                   <option value="10">10</option>
                   <option value="50">50</option>

@@ -11,7 +11,7 @@ class GenericAlertConditionSummary extends React.Component {
   };
 
   render() {
-    const alertCondition = this.props.alertCondition;
+    const { alertCondition } = this.props;
     const graceSummary = alertCondition.parameters.grace ? <GracePeriodSummary alertCondition={alertCondition} /> : null;
     const backlogSummary = alertCondition.parameters.backlog ? <BacklogSummary alertCondition={alertCondition} /> : null;
     return (

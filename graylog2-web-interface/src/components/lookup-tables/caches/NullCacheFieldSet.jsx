@@ -8,7 +8,7 @@ class NullCacheFieldSet extends React.Component {
     handleFormEvent: PropTypes.func.isRequired,
     // eslint-disable-next-line react/no-unused-prop-types
     validationState: PropTypes.func.isRequired,
-// eslint-disable-next-line react/no-unused-prop-types
+    // eslint-disable-next-line react/no-unused-prop-types
     validationMessage: PropTypes.func.isRequired,
   };
 

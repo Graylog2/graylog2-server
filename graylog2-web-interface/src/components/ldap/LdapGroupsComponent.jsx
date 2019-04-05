@@ -8,9 +8,10 @@ import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
 const RolesStore = StoreProvider.getStore('Roles');
 const LdapGroupsStore = StoreProvider.getStore('LdapGroups');
 
@@ -32,7 +33,7 @@ class LdapGroupsComponent extends React.Component {
     LdapGroupsActions.loadGroups.triggerPromise()
       .then(
         groups => this.setState({ groups: Immutable.Set(groups) }),
-        error => {
+        (error) => {
           if (error.additional.status !== 400) {
             this.setState({ groupsErrorMessage: error });
           }

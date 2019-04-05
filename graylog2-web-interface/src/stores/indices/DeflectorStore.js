@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const DeflectorActions = ActionsProvider.getActions('Deflector');
 
 const DeflectorStore = Reflux.createStore({

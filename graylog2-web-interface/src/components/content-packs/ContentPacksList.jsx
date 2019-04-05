@@ -96,11 +96,11 @@ class ContentPacksList extends React.Component {
     return shownItems.map((item) => {
       const { openFunc, installModal } = this._installModal(item);
       let downloadRef;
-      const downloadModal = (<ContentPackDownloadControl
-        ref={(node) => { downloadRef = node; }}
-        contentPackId={item.id}
-        revision={item.rev}
-      />);
+      const downloadModal = (
+        <ContentPackDownloadControl ref={(node) => { downloadRef = node; }}
+                                    contentPackId={item.id}
+                                    revision={item.rev} />
+      );
 
       const metadata = this.props.contentPackMetadata[item.id] || {};
       const installed = Object.keys(metadata).find(rev => metadata[rev].installation_count > 0);
@@ -162,48 +162,52 @@ class ContentPacksList extends React.Component {
 
   render() {
     const numberPages = Math.ceil(this.state.filteredContentPacks.length / this.state.pageSize);
-    const pagination = (<Pagination bsSize="small"
-                                    bsStyle={`pagination ${ContentPacksListStyle.pager}`}
-                                    items={numberPages}
-                                    maxButtons={this.MAX_PAGE_BUTTONS}
-                                    activePage={this.state.currentPage}
-                                    onSelect={this._onChangePage}
-                                    prev
-                                    next
-                                    first
-                                    last />);
-    const pageSizeSelector = (<span>Show:&nbsp;
-      <select onChange={this._itemsShownChange} value={this.state.pageSize}>
-        <option>10</option>
-        <option>25</option>
-        <option>50</option>
-        <option>100</option>
-      </select>
-    </span>);
+    const pagination = (
+      <Pagination bsSize="small"
+                  bsStyle={`pagination ${ContentPacksListStyle.pager}`}
+                  items={numberPages}
+                  maxButtons={this.MAX_PAGE_BUTTONS}
+                  activePage={this.state.currentPage}
+                  onSelect={this._onChangePage}
+                  prev
+                  next
+                  first
+                  last />
+    );
+    const pageSizeSelector = (
+      <span>Show:&nbsp;
+        <select onChange={this._itemsShownChange} value={this.state.pageSize}>
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+      </span>
+    );
 
-    const noContentMessage = this.props.contentPacks.length <= 0 ?
-      'No content packs found. Please create or upload one' :
-      'No matching content packs found';
-    const content = this.state.filteredContentPacks.length <= 0 ?
-      (<div>{noContentMessage}</div>) :
-      (<ControlledTableList>
-        <ControlledTableList.Header />
-        {this._formatItems(this.state.filteredContentPacks)}
-      </ControlledTableList>);
+    const noContentMessage = this.props.contentPacks.length <= 0
+      ? 'No content packs found. Please create or upload one'
+      : 'No matching content packs found';
+    const content = this.state.filteredContentPacks.length <= 0
+      ? (<div>{noContentMessage}</div>)
+      : (
+        <ControlledTableList>
+          <ControlledTableList.Header />
+          {this._formatItems(this.state.filteredContentPacks)}
+        </ControlledTableList>
+      );
 
     return (
       <div>
         <Row className="row-sm">
           <Col md={5}>
-            <TypeAheadDataFilter
-              id="content-packs-filter"
-              label="Filter"
-              data={this.props.contentPacks}
-              displayKey="name"
-              onDataFiltered={this._filterContentPacks}
-              searchInKeys={['name', 'summary']}
-              filterSuggestions={[]}
-            />
+            <TypeAheadDataFilter id="content-packs-filter"
+                                 label="Filter"
+                                 data={this.props.contentPacks}
+                                 displayKey="name"
+                                 onDataFiltered={this._filterContentPacks}
+                                 searchInKeys={['name', 'summary']}
+                                 filterSuggestions={[]} />
           </Col>
           <Col md={5}>
             {pagination}

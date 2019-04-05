@@ -5,10 +5,11 @@ import Reflux from 'reflux';
 import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
-const NodesStore = StoreProvider.getStore('Nodes');
 
 import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
+
+const NodesStore = StoreProvider.getStore('Nodes');
 
 /**
  * Component that creates a link to a Graylog node. The information in the link includes:

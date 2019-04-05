@@ -111,14 +111,17 @@ class ContentPackEdit extends React.Component {
                             selectedEntities={this.props.selectedEntities}
                             edit={this.props.edit}
                             onStateChange={this.props.onStateChange}
-                            entities={this.props.entityIndex} />);
+                            entities={this.props.entityIndex} />
+    );
     const parameterComponent = (
       <ContentPackParameters contentPack={this.props.contentPack}
                              onStateChange={this.props.onStateChange}
-                             appliedParameter={this.props.appliedParameter} />);
+                             appliedParameter={this.props.appliedParameter} />
+    );
     const previewComponent = (
       <ContentPackPreview contentPack={this.props.contentPack}
-                          onSave={this.props.onSave} />);
+                          onSave={this.props.onSave} />
+    );
     const steps = [
       { key: 'selection', title: 'Content Selection', component: selectionComponent },
       { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableParameters() },
@@ -128,11 +131,13 @@ class ContentPackEdit extends React.Component {
     return (
       <div>
         <Wizard steps={steps} onStepChange={this._stepChanged} affixed>
-          {this.state.selectedStep !== 'preview' ? <AutoAffix viewportOffsetTop={65}>
-            <div>
-              <ContentPackDetails contentPack={this.props.contentPack} />
-            </div>
-          </AutoAffix> : undefined}
+          {this.state.selectedStep !== 'preview' ? (
+            <AutoAffix viewportOffsetTop={65}>
+              <div>
+                <ContentPackDetails contentPack={this.props.contentPack} />
+              </div>
+            </AutoAffix>
+          ) : undefined}
         </Wizard>
         <ScrollButton possition="middle" />
       </div>

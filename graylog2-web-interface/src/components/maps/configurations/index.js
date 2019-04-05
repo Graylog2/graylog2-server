@@ -9,4 +9,3 @@ PluginStore.register(new PluginManifest({}, {
     },
   ],
 }));
-

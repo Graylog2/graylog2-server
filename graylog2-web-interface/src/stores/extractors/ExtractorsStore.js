@@ -3,13 +3,14 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import ExtractorUtils from 'util/ExtractorUtils';
 import Promise from 'bluebird';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 function getExtractorDTO(extractor) {
   const converters = {};

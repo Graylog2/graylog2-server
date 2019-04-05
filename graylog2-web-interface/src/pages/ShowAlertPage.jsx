@@ -72,11 +72,11 @@ const ShowAlertPage = createReactClass({
       return <Spinner />;
     }
 
-    const alert = this.state.alert;
+    const { alert } = this.state;
     const condition = this.state.alertCondition;
     const conditionExists = Object.keys(condition).length > 0;
     const conditionType = this.state.availableConditions[condition.type] || {};
-    const stream = this.state.stream;
+    const { stream } = this.state;
 
     let statusLabel;
     let resolvedState;

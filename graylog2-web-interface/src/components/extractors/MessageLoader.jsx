@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MessagesActions = ActionsProvider.getActions('Messages');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const MessagesActions = ActionsProvider.getActions('Messages');
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 

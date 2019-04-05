@@ -4,13 +4,14 @@ import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const SystemJobsStore = StoreProvider.getStore('SystemJobs');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
 import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';
+
+const SystemJobsStore = StoreProvider.getStore('SystemJobs');
+const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
 const SystemJobsComponent = createReactClass({
   displayName: 'SystemJobsComponent',
@@ -31,7 +32,7 @@ const SystemJobsComponent = createReactClass({
       return <Spinner />;
     }
     const jobs = Object.keys(this.state.jobs)
-      .map(nodeId => this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : [])
+      .map(nodeId => (this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : []))
       .reduce((a, b) => a.concat(b));
     return (
       <Row className="content">

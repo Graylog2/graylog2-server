@@ -5,6 +5,7 @@ import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const InputStatesStore = StoreProvider.getStore('InputStates');
 
 function inputStateFilter(state) {

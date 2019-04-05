@@ -21,7 +21,8 @@ const AlertsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching alerts for stream "${stream.title}" failed with status: ${error.message}`,
             `Could not retrieve alerts for stream "${stream.title}".`);
-        });
+        },
+      );
 
     AlertsActions.list.promise(promise);
   },
@@ -34,7 +35,8 @@ const AlertsStore = Reflux.createStore({
         response => this.trigger({ alerts: response }),
         (error) => {
           UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
-        });
+        },
+      );
 
     AlertsActions.listPaginated.promise(promise);
   },
@@ -46,7 +48,8 @@ const AlertsStore = Reflux.createStore({
       response => this.trigger({ alerts: response }),
       (error) => {
         UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
-      });
+      },
+    );
 
     AlertsActions.listAllPaginated.promise(promise);
   },
@@ -59,7 +62,8 @@ const AlertsStore = Reflux.createStore({
         response => this.trigger({ alerts: response }),
         (error) => {
           UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
-        });
+        },
+      );
 
     AlertsActions.listAllStreams.promise(promise);
   },

@@ -51,28 +51,29 @@ class CacheCreate extends React.Component {
       return { value: type.type, label: cachePlugins[type.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
-    return (<div>
-      <Row className="content">
-        <Col lg={8}>
-          <form className="form form-horizontal" onSubmit={() => {}}>
-            <Input id="cache-type-select"
-                   label="Cache Type"
-                   required
-                   autoFocus
-                   help="The type of cache to configure."
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <Select placeholder="Select Cache Type"
-                      clearable={false}
-                      options={sortedCaches}
-                      matchProp="value"
-                      onChange={this._onTypeSelect}
-                      value={null} />
-            </Input>
-          </form>
-        </Col>
-      </Row>
-      {this.state.cache && (
+    return (
+      <div>
+        <Row className="content">
+          <Col lg={8}>
+            <form className="form form-horizontal" onSubmit={() => {}}>
+              <Input id="cache-type-select"
+                     label="Cache Type"
+                     required
+                     autoFocus
+                     help="The type of cache to configure."
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <Select placeholder="Select Cache Type"
+                        clearable={false}
+                        options={sortedCaches}
+                        matchProp="value"
+                        onChange={this._onTypeSelect}
+                        value={null} />
+              </Input>
+            </form>
+          </Col>
+        </Row>
+        {this.state.cache && (
         <Row className="content">
           <Col lg={12}>
             <h3>Configure Cache</h3>
@@ -84,8 +85,9 @@ class CacheCreate extends React.Component {
                        validate={this.props.validate} />
           </Col>
         </Row>
-      )}
-    </div>);
+        )}
+      </div>
+    );
   }
 }
 

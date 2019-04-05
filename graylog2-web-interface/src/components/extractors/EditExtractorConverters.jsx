@@ -93,86 +93,86 @@ class EditExtractorConverters extends React.Component {
         case ExtractorUtils.ConverterTypes.NUMERIC:
           return (
             <NumericConverterConfiguration key={converterType}
-                                         type={converterType}
-                                         configuration={converterConfig}
-                                         onChange={this._onConverterChange} />
+                                           type={converterType}
+                                           configuration={converterConfig}
+                                           onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.DATE:
           return (
             <DateConverterConfiguration key={converterType}
-                                      type={converterType}
-                                      configuration={converterConfig}
-                                      onChange={this._onConverterChange} />
+                                        type={converterType}
+                                        configuration={converterConfig}
+                                        onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.HASH:
           return (
             <HashConverterConfiguration key={converterType}
-                                      type={converterType}
-                                      configuration={converterConfig}
-                                      onChange={this._onConverterChange} />
+                                        type={converterType}
+                                        configuration={converterConfig}
+                                        onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.SPLIT_AND_COUNT:
           return (
             <SplitAndCountConverterConfiguration key={converterType}
-                                               type={converterType}
-                                               configuration={converterConfig}
-                                               onChange={this._onConverterChange} />
+                                                 type={converterType}
+                                                 configuration={converterConfig}
+                                                 onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.IP_ANONYMIZER:
           return (
             <IpAnonymizerConverterConfiguration key={converterType}
-                                              type={converterType}
-                                              configuration={converterConfig}
-                                              onChange={this._onConverterChange} />
-          );
-        case ExtractorUtils.ConverterTypes.SYSLOG_PRI_LEVEL:
-          return (
-            <SyslogPriLevelConverterConfiguration key={converterType}
                                                 type={converterType}
                                                 configuration={converterConfig}
                                                 onChange={this._onConverterChange} />
           );
+        case ExtractorUtils.ConverterTypes.SYSLOG_PRI_LEVEL:
+          return (
+            <SyslogPriLevelConverterConfiguration key={converterType}
+                                                  type={converterType}
+                                                  configuration={converterConfig}
+                                                  onChange={this._onConverterChange} />
+          );
         case ExtractorUtils.ConverterTypes.SYSLOG_PRI_FACILITY:
           return (
             <SyslogPriFacilityConverterConfiguration key={converterType}
-                                                   type={converterType}
-                                                   configuration={converterConfig}
-                                                   onChange={this._onConverterChange} />
+                                                     type={converterType}
+                                                     configuration={converterConfig}
+                                                     onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.TOKENIZER:
           return (
             <TokenizerConverterConfiguration key={converterType}
-                                           type={converterType}
-                                           configuration={converterConfig}
-                                           onChange={this._onConverterChange} />
+                                             type={converterType}
+                                             configuration={converterConfig}
+                                             onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.CSV:
           return (
             <CSVConverterConfiguration key={converterType}
-                                     type={converterType}
-                                     configuration={converterConfig}
-                                     onChange={this._onConverterChange} />
+                                       type={converterType}
+                                       configuration={converterConfig}
+                                       onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.LOWERCASE:
           return (
             <LowercaseConverterConfiguration key={converterType}
-                                           type={converterType}
-                                           configuration={converterConfig}
-                                           onChange={this._onConverterChange} />
+                                             type={converterType}
+                                             configuration={converterConfig}
+                                             onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.UPPERCASE:
           return (
             <UppercaseConverterConfiguration key={converterType}
-                                           type={converterType}
-                                           configuration={converterConfig}
-                                           onChange={this._onConverterChange} />
+                                             type={converterType}
+                                             configuration={converterConfig}
+                                             onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.FLEXDATE:
           return (
             <FlexdateConverterConfiguration key={converterType}
-                                          type={converterType}
-                                          configuration={converterConfig}
-                                          onChange={this._onConverterChange} />
+                                            type={converterType}
+                                            configuration={converterConfig}
+                                            onChange={this._onConverterChange} />
           );
         case ExtractorUtils.ConverterTypes.LOOKUP_TABLE:
           return (

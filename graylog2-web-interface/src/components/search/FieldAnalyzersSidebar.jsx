@@ -57,15 +57,15 @@ class FieldAnalyzersSidebar extends React.Component {
     if (this.highlightToggle) {
       const toggle = ReactDOM.findDOMNode(this.highlightToggle);
       const toggleCss = window.getComputedStyle(toggle);
-      highlightToggleMargins = parseFloat(toggleCss.getPropertyValue('margin-top')) +
-        parseFloat(toggleCss.getPropertyValue('margin-bottom'));
+      highlightToggleMargins = parseFloat(toggleCss.getPropertyValue('margin-top'))
+        + parseFloat(toggleCss.getPropertyValue('margin-bottom'));
     }
 
-    const maxHeight = this.props.maximumHeight -
-      fieldsContainer.getBoundingClientRect().top -
-      footerMargin -
-      footer.offsetHeight -
-      highlightToggleMargins;
+    const maxHeight = this.props.maximumHeight
+      - fieldsContainer.getBoundingClientRect().top
+      - footerMargin
+      - footer.offsetHeight
+      - highlightToggleMargins;
 
     this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   };
@@ -151,17 +151,22 @@ class FieldAnalyzersSidebar extends React.Component {
       <div>
         <div className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
           <span className="input-group-btn">
-            <button type="button" className="btn btn-default"
+            <button type="button"
+                    className="btn btn-default"
                     onClick={this._updateFieldSelectionToDefault}>Default
             </button>
-            <button type="button" className="btn btn-default"
+            <button type="button"
+                    className="btn btn-default"
                     onClick={this._updateFieldSelectionToAll}>All
             </button>
-            <button type="button" className="btn btn-default"
+            <button type="button"
+                    className="btn btn-default"
                     onClick={this._updateFieldSelectionToNone}>None
             </button>
           </span>
-          <input type="text" className="form-control" placeholder="Filter fields"
+          <input type="text"
+                 className="form-control"
+                 placeholder="Filter fields"
                  onChange={this._filterFields}
                  value={this.state.fieldFilter} />
         </div>
@@ -173,10 +178,14 @@ class FieldAnalyzersSidebar extends React.Component {
         <div ref={(footer) => { this.footer = footer; }} style={{ marginTop: 13, marginBottom: 0 }}>
           List{' '}
           <span className="message-result-fields-range"> fields of&nbsp;
-            <a href="#" style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}
-               onClick={this._showPageFields}>current page</a> or{' '}
-            <a href="#" style={{ fontWeight: this.props.showAllFields ? 'bold' : 'normal' }}
-               onClick={this._showAllFields}>all fields</a>.
+            <a href="#"
+               style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}
+               onClick={this._showPageFields}>current page
+            </a> or{' '}
+            <a href="#"
+               style={{ fontWeight: this.props.showAllFields ? 'bold' : 'normal' }}
+               onClick={this._showAllFields}>all fields
+            </a>.
           </span>
           <br />
           {shouldHighlightToggle}

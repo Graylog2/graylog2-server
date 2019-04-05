@@ -4,9 +4,10 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
 
 import moment from 'moment';
+
+const SearchStore = StoreProvider.getStore('Search');
 
 class SurroundingSearchButton extends React.Component {
   static propTypes = {

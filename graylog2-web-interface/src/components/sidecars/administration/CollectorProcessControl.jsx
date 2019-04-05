@@ -72,7 +72,8 @@ const CollectorProcessControl = createReactClass({
           {lodash.capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
         </p>
         <Button bsSize="xsmall" bsStyle="primary" onClick={this.hideConfigurationWarning}>Understood, continue
-          anyway</Button>
+          anyway
+        </Button>
       </Panel>
     );
   },
@@ -96,9 +97,9 @@ const CollectorProcessControl = createReactClass({
                              onConfirm={this.confirmProcessAction}
                              onCancel={this.cancelProcessAction}>
         <div>
-          {shouldShowConfigurationWarning ?
-            this.renderConfigurationWarning(selectedAction) :
-            this.renderSummaryContent(selectedAction, selectedSidecars)}
+          {shouldShowConfigurationWarning
+            ? this.renderConfigurationWarning(selectedAction)
+            : this.renderSummaryContent(selectedAction, selectedSidecars)}
         </div>
       </BootstrapModalConfirm>
     );
@@ -114,8 +115,11 @@ const CollectorProcessControl = createReactClass({
       <span>
         <SelectPopover id="process-management-action"
                        title="Manage collector processes"
-                       triggerNode={<Button bsSize="small"
-                                            bsStyle="link">Process <span className="caret" /></Button>}
+                       triggerNode={(
+                         <Button bsSize="small"
+                                 bsStyle="link">Process <span className="caret" />
+                         </Button>
+)}
                        items={PROCESS_ACTIONS}
                        itemFormatter={actionFormatter}
                        selectedItems={selectedAction ? [selectedAction] : []}

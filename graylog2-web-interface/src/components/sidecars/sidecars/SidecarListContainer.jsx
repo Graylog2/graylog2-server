@@ -41,9 +41,9 @@ const SidecarListContainer = createReactClass({
     if (this.state.pagination) {
       options.pageSize = pageSize || this.state.pagination.pageSize;
       options.onlyActive = onlyActive === undefined ? this.state.onlyActive : onlyActive; // Avoid || to handle false values
-      const shouldKeepPage = options.pageSize === this.state.pagination.pageSize &&
-        options.onlyActive === this.state.onlyActive &&
-        options.query === this.state.query; // Only keep page number when other parameters don't change
+      const shouldKeepPage = options.pageSize === this.state.pagination.pageSize
+        && options.onlyActive === this.state.onlyActive
+        && options.query === this.state.query; // Only keep page number when other parameters don't change
       let effectivePage = 1;
       if (shouldKeepPage) {
         effectivePage = page || this.state.pagination.page;

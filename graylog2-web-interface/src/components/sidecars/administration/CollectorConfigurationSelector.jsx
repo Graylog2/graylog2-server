@@ -51,10 +51,12 @@ class CollectorConfigurationSelector extends React.Component {
       <span>
         <ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}&emsp;
         <small>
-          {collector ?
-            <CollectorIndicator collector={collector.name}
-                                operatingSystem={collector.node_operating_system} /> :
-            <em>Unknown collector</em>
+          {collector
+            ? (
+              <CollectorIndicator collector={collector.name}
+                                  operatingSystem={collector.node_operating_system} />
+            )
+            : <em>Unknown collector</em>
           }
         </small>
       </span>

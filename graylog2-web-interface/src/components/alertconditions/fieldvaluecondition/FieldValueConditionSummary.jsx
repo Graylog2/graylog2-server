@@ -12,12 +12,12 @@ class FieldValueConditionSummary extends React.Component {
   };
 
   render() {
-    const alertCondition = this.props.alertCondition;
-    const field = alertCondition.parameters.field;
-    const threshold = alertCondition.parameters.threshold;
+    const { alertCondition } = this.props;
+    const { field } = alertCondition.parameters;
+    const { threshold } = alertCondition.parameters;
     const thresholdType = alertCondition.parameters.threshold_type.toLowerCase();
     const type = alertCondition.parameters.type.toLowerCase();
-    const time = alertCondition.parameters.time;
+    const { time } = alertCondition.parameters;
 
     return (
       <span>

@@ -4,6 +4,7 @@ import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 class RecentMessageLoader extends React.Component {
@@ -47,8 +48,10 @@ class RecentMessageLoader extends React.Component {
     return (
       <div style={{ marginTop: 5 }}>
         {helpMessage}
-        <InputDropdown inputs={this.props.inputs} preselectedInputId={this.props.selectedInputId}
-                       onLoadMessage={this.onClick} title={this.state.loading ? 'Loading message...' : 'Load Message'}
+        <InputDropdown inputs={this.props.inputs}
+                       preselectedInputId={this.props.selectedInputId}
+                       onLoadMessage={this.onClick}
+                       title={this.state.loading ? 'Loading message...' : 'Load Message'}
                        disabled={this.state.loading} />
       </div>
     );

@@ -12,16 +12,17 @@ class MessageCountConditionSummary extends React.Component {
   };
 
   render() {
-    const alertCondition = this.props.alertCondition;
-    const threshold = alertCondition.parameters.threshold;
+    const { alertCondition } = this.props;
+    const { threshold } = alertCondition.parameters;
     const thresholdType = alertCondition.parameters.threshold_type.toLowerCase();
-    const time = alertCondition.parameters.time;
+    const { time } = alertCondition.parameters;
 
     return (
       <span>
         Alert is triggered when there
         {' '}
-        <Pluralize value={threshold} singular={`is ${thresholdType} than one message`}
+        <Pluralize value={threshold}
+                   singular={`is ${thresholdType} than one message`}
                    plural={`are ${thresholdType} than ${threshold} messages`} />
         {' '}in the{' '}
         <Pluralize value={time} singular="last minute" plural={`last ${time} minutes`} />.

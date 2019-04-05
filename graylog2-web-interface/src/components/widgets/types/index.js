@@ -5,7 +5,8 @@ import {
   NumericVisualization,
   QuickValuesVisualization,
   QuickValuesHistogramVisualization,
-  StackedGraphVisualization } from 'components/visualizations';
+  StackedGraphVisualization,
+} from 'components/visualizations';
 import {
   CountWidgetCreateConfiguration,
   CountWidgetEditConfiguration,
@@ -16,7 +17,8 @@ import {
   QuickValuesHistogramWidgetEditConfiguration,
   StackedChartWidgetConfiguration,
   StatisticalCountWidgetCreateConfiguration,
-  StatisticalCountWidgetEditConfiguration } from 'components/widgets/configurations';
+  StatisticalCountWidgetEditConfiguration,
+} from 'components/widgets/configurations';
 import {} from 'components/maps/widgets';
 
 PluginStore.register(new PluginManifest({}, {

@@ -80,16 +80,19 @@ export default createReactClass({
     if (!this.state.rolesLoaded) {
       content = <span>Loading roles...</span>;
     } else if (this.state.showEditRole) {
-      content =
-        (<EditRole initialRole={this.state.editRole}
-                   streams={this.state.streams}
-                   dashboards={this.state.dashboards.dashboards}
-                   onSave={this._saveRole}
-                   cancelEdit={this._clearEditRole} />);
+      content = (
+        <EditRole initialRole={this.state.editRole}
+                  streams={this.state.streams}
+                  dashboards={this.state.dashboards.dashboards}
+                  onSave={this._saveRole}
+                  cancelEdit={this._clearEditRole} />
+      );
     } else {
-      content = (<RoleList roles={this.state.roles}
-                           showEditRole={this._showEditRole}
-                           deleteRole={this._deleteRole} />);
+      content = (
+        <RoleList roles={this.state.roles}
+                  showEditRole={this._showEditRole}
+                  deleteRole={this._deleteRole} />
+      );
     }
 
     let actionButton;

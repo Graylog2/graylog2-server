@@ -69,7 +69,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
             'Could not retrieve configurations');
-        });
+        },
+      );
 
     CollectorConfigurationsActions.all.promise(promise);
   },
@@ -94,7 +95,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
             'Could not retrieve configurations');
-        });
+        },
+      );
 
     CollectorConfigurationsActions.list.promise(promise);
   },
@@ -106,7 +108,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching configuration uploads failed with status: ${error}`,
             'Could not retrieve configurations');
-        });
+        },
+      );
 
     CollectorConfigurationsActions.listUploads.promise(promise);
   },
@@ -147,13 +150,15 @@ const CollectorConfigurationsStore = Reflux.createStore({
     const promise = fetch(
       'POST',
       URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/render/preview`),
-      requestTemplate);
+      requestTemplate,
+    );
     promise
       .catch(
         (error) => {
           UserNotification.error(`Fetching configuration preview failed with status: ${error}`,
             'Could not retrieve preview');
-        });
+        },
+      );
     CollectorConfigurationsActions.renderPreview.promise(promise);
   },
 
@@ -242,7 +247,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         error => (
           UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
             'Could not validate configuration')
-        ));
+        ),
+      );
 
     CollectorConfigurationsActions.validate.promise(promise);
   },

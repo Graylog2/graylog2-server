@@ -8,7 +8,8 @@ import { Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } = CombinedProvider.get(
-  'LookupTableDataAdapters');
+  'LookupTableDataAdapters',
+);
 
 const DataAdaptersContainer = createReactClass({
   displayName: 'DataAdaptersContainer',
@@ -39,8 +40,7 @@ const DataAdaptersContainer = createReactClass({
     }
     const childrenWithProps = React.Children.map(this.props.children,
       child => React.cloneElement(child,
-        { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }),
-    );
+        { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }));
     return <div>{childrenWithProps}</div>;
   },
 });

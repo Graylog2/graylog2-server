@@ -1,4 +1,4 @@
-const localStorage = window.localStorage;
+const { localStorage } = window;
 
 const Store = {
   set(key, value) {

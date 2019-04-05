@@ -17,6 +17,7 @@ import StringUtils from 'util/StringUtils';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
 
 function generateShortId() {
@@ -300,7 +301,7 @@ export const FieldChart = {
   },
 
   _fetchData(opts, timeRangeParams) {
-    const url = ApiRoutes.UniversalSearchApiController.fieldHistogram(
+    const { url } = ApiRoutes.UniversalSearchApiController.fieldHistogram(
       opts.rangetype,
       opts.query || '*',
       opts.field,
@@ -308,7 +309,7 @@ export const FieldChart = {
       timeRangeParams,
       opts.streamid,
       opts.valuetype === 'cardinality',
-    ).url;
+    );
 
     return fetch('GET', URLUtils.qualifyUrl(url))
       .then((response) => {

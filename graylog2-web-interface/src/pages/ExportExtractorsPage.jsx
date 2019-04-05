@@ -7,9 +7,10 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const InputsActions = ActionsProvider.getActions('Inputs');
 const InputsStore = StoreProvider.getStore('Inputs');
 
 const ExportExtractorsPage = createReactClass({

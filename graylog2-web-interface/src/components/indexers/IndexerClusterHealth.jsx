@@ -4,12 +4,13 @@ import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
 
 import { Spinner } from 'components/common';
 import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
+
+const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
 
 const IndexerClusterHealth = createReactClass({
   displayName: 'IndexerClusterHealth',
@@ -20,7 +21,7 @@ const IndexerClusterHealth = createReactClass({
   },
 
   render() {
-    const health = this.state.health;
+    const { health } = this.state;
 
     let content;
     if (health) {

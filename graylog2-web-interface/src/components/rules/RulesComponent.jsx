@@ -11,7 +11,7 @@ class RulesComponent extends React.Component {
 
   render() {
     if (!this.props.rules) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (

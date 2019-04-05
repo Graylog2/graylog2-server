@@ -6,11 +6,12 @@ import ReactDOM from 'react-dom';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import resultHistogram from 'legacy/result-histogram';
+
+const SearchStore = StoreProvider.getStore('Search');
 
 // Hue-manatee. We tried to be sorry, but aren't.
 const LegacyHistogram = createReactClass({
@@ -87,7 +88,9 @@ const LegacyHistogram = createReactClass({
       const suffix = resolution === this.RESOLUTIONS[this.RESOLUTIONS.length - 1] ? '' : ',';
       return (
         <li key={resolution}>
-          <a href="#" className={className} data-resolution={resolution}
+          <a href="#"
+             className={className}
+             data-resolution={resolution}
              onClick={this._resolutionChanged(resolution)}>
             {resolution}
           </a>
@@ -103,27 +106,30 @@ const LegacyHistogram = createReactClass({
       </ul>
     );
 
-    return (<div className="content-col">
-      <div className="pull-right">
-        <AddToDashboardMenu title="Add to dashboard"
-                            widgetType={this.WIDGET_TYPE}
-                            configuration={{ interval: this.props.histogram.interval }}
-                            pullRight
-                            permissions={this.props.permissions}
-                            isStreamSearch={this.props.stream !== null} />
+    return (
+      <div className="content-col">
+        <div className="pull-right">
+          <AddToDashboardMenu title="Add to dashboard"
+                              widgetType={this.WIDGET_TYPE}
+                              configuration={{ interval: this.props.histogram.interval }}
+                              pullRight
+                              permissions={this.props.permissions}
+                              isStreamSearch={this.props.stream !== null} />
+        </div>
+        <h1>Histogram</h1>
+
+        {resolutionSelector}
+
+        <div id="result-graph-container">
+          <div id="y_axis" />
+          <div id="result-graph"
+               data-from={this._getFirstHistogramValue()}
+               data-to={this.props.histogram.histogram_boundaries.to} />
+          <div id="result-graph-timeline" />
+        </div>
+
       </div>
-      <h1>Histogram</h1>
-
-      {resolutionSelector}
-
-      <div id="result-graph-container">
-        <div id="y_axis" />
-        <div id="result-graph" data-from={this._getFirstHistogramValue()}
-             data-to={this.props.histogram.histogram_boundaries.to} />
-        <div id="result-graph-timeline" />
-      </div>
-
-    </div>);
+    );
   },
 });
 

@@ -25,7 +25,8 @@ const CodecTypesStore = Reflux.createStore({
       (error) => {
         UserNotification.error(`Fetching codec types failed with status: ${error}`,
           'Could not retrieve codec types');
-      });
+      },
+    );
 
     CodecTypesActions.list.promise(promise);
   },

@@ -4,7 +4,7 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
-import lodash from "lodash";
+import lodash from 'lodash';
 
 const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
 
@@ -19,7 +19,8 @@ const ConfigurationVariableStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching configuration variables failed with status: ${error}`,
             'Could not retrieve configuration variables');
-        });
+        },
+      );
 
     ConfigurationVariableActions.all.promise(promise);
   },
@@ -62,7 +63,8 @@ const ConfigurationVariableStore = Reflux.createStore({
     promise.catch(
       (error) => {
         UserNotification.error(`Fetching configurations for this variable failed with status: ${error}`);
-      });
+      },
+    );
     ConfigurationVariableActions.getConfigurations.promise(promise);
   },
 
@@ -94,7 +96,8 @@ const ConfigurationVariableStore = Reflux.createStore({
       (error) => {
         UserNotification.error(`Validating variable "${configurationVariable.name}" failed with status: ${error.message}`,
           'Could not validate variable');
-      });
+      },
+    );
 
     ConfigurationVariableActions.validate.promise(promise);
   },

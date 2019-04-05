@@ -53,8 +53,8 @@ class SidecarStatusPage extends React.Component {
   };
 
   render() {
-    const sidecar = this.state.sidecar;
-    const collectors = this.state.collectors;
+    const { sidecar } = this.state;
+    const { collectors } = this.state;
     const isLoading = !sidecar || !collectors;
 
     if (isLoading) {

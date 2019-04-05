@@ -20,8 +20,11 @@ class IndicesOverview extends React.Component {
     return (
       <Row key={`index-summary-${indexName}`} className="content index-description">
         <Col md={12}>
-          <IndexSummary index={index} name={indexName} count={indexSummary.size}
-                        indexRange={indexRange} isDeflector={indexSummary.is_deflector}>
+          <IndexSummary index={index}
+                        name={indexName}
+                        count={indexSummary.size}
+                        indexRange={indexRange}
+                        isDeflector={indexSummary.is_deflector}>
             <span>
               <IndexDetails index={this.props.indexDetails[indexName]}
                             indexName={indexName}
@@ -52,8 +55,8 @@ class IndicesOverview extends React.Component {
 
   render() {
     const indices = Object.keys(this.props.indices).map((indexName) => {
-      return !this.props.indices[indexName].is_closed ?
-        this._formatIndex(indexName, this.props.indices[indexName]) : this._formatClosedIndex(indexName, this.props.indices[indexName]);
+      return !this.props.indices[indexName].is_closed
+        ? this._formatIndex(indexName, this.props.indices[indexName]) : this._formatClosedIndex(indexName, this.props.indices[indexName]);
     });
     return (
       <span>

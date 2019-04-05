@@ -3,8 +3,6 @@ import createReactClass from 'create-react-class';
 import { Row, Col } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const OutputsStore = StoreProvider.getStore('Outputs');
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import UserNotification from 'util/UserNotification';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -12,6 +10,9 @@ import Spinner from 'components/common/Spinner';
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
+
+const OutputsStore = StoreProvider.getStore('Outputs');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const OutputsComponent = createReactClass({
   displayName: 'OutputsComponent',
@@ -110,15 +111,21 @@ const OutputsComponent = createReactClass({
 
   render() {
     if (this.state.outputs && this.state.types && (!this.props.streamId || this.state.assignableOutputs)) {
-      const permissions = this.props.permissions;
-      const streamId = this.props.streamId;
-      const createOutputDropdown = (this.isPermitted(permissions, ['outputs:create']) ?
-        (<CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput}
-                              getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId} />) : null);
-      const assignOutputDropdown = (streamId ?
-        (<AssignOutputDropdown streamId={streamId}
-                               outputs={this.state.assignableOutputs}
-                               onSubmit={this._handleAssignOutput} />) : null);
+      const { permissions } = this.props;
+      const { streamId } = this.props;
+      const createOutputDropdown = (this.isPermitted(permissions, ['outputs:create'])
+        ? (
+          <CreateOutputDropdown types={this.state.types}
+                                onSubmit={this._handleCreateOutput}
+                                getTypeDefinition={OutputsStore.loadAvailable}
+                                streamId={streamId} />
+        ) : null);
+      const assignOutputDropdown = (streamId
+        ? (
+          <AssignOutputDropdown streamId={streamId}
+                                outputs={this.state.assignableOutputs}
+                                onSubmit={this._handleAssignOutput} />
+        ) : null);
       return (
         <div className="outputs">
           <Row className="content">
@@ -130,9 +137,13 @@ const OutputsComponent = createReactClass({
             </Col>
           </Row>
 
-          <OutputList streamId={streamId} outputs={this.state.outputs} permissions={permissions}
-                      getTypeDefinition={OutputsStore.loadAvailable} types={this.state.types}
-                      onRemove={this._removeOutputFromStream} onTerminate={this._removeOutputGlobally}
+          <OutputList streamId={streamId}
+                      outputs={this.state.outputs}
+                      permissions={permissions}
+                      getTypeDefinition={OutputsStore.loadAvailable}
+                      types={this.state.types}
+                      onRemove={this._removeOutputFromStream}
+                      onTerminate={this._removeOutputGlobally}
                       onUpdate={this._handleOutputUpdate} />
         </div>
       );

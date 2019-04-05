@@ -131,12 +131,15 @@ class Wizard extends React.Component {
         <Col md={7}>
           {this.props.steps[this._getSelectedIndex()].component}
         </Col>
-        {this.props.children &&
+        {this.props.children
+          && (
           <Col md={rightComponentCols}>
             {this.props.children}
           </Col>
+          )
         }
-      </Row>);
+      </Row>
+    );
   }
 }
 

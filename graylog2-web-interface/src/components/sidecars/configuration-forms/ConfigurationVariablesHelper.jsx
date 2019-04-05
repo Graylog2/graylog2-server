@@ -38,9 +38,11 @@ class ConfigurationVariablesHelper extends React.Component {
   };
 
   _renderConfigList = (configurations) => {
-    return (<ul className={ConfigurationHelperStyle.ulStyle}>
-      {configurations.map(conf => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
-    </ul>);
+    return (
+      <ul className={ConfigurationHelperStyle.ulStyle}>
+        {configurations.map(conf => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
+      </ul>
+    );
   };
 
   _handleDeleteConfirm = () => {
@@ -156,7 +158,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
         <BootstrapModalConfirm ref={(c) => { this.deleteConfirmModal = c; }}
                                title="Delete Configuration Variable?"
-                               onConfirm={this._handleDeleteConfirm} >
+                               onConfirm={this._handleDeleteConfirm}>
           <p>Are you sure you want to remove the configuration variable <strong>{this.state.variableToDelete.name}</strong>?</p>
         </BootstrapModalConfirm>
       </div>

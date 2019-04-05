@@ -69,9 +69,9 @@ const IndexSetsComponent = createReactClass({
         </LinkContainer>
         {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
-          <MenuItem
-            onSelect={this._onSetDefault(indexSet)}
-            disabled={!indexSet.writable || indexSet.default}>Set as default</MenuItem>
+          <MenuItem onSelect={this._onSetDefault(indexSet)}
+                    disabled={!indexSet.writable || indexSet.default}>Set as default
+          </MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
         </DropdownButton>
@@ -94,7 +94,7 @@ const IndexSetsComponent = createReactClass({
 
     const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
     const isReadOnly = !indexSet.writable ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
-    let description = indexSet.description;
+    let { description } = indexSet;
     if (indexSet.default) {
       description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
     }

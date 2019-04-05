@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 
 class InputStaticFields extends React.Component {

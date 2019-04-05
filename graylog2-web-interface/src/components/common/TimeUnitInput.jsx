@@ -137,9 +137,11 @@ const TimeUnitInput = createReactClass({
       return <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)}>{o.label}</MenuItem>;
     });
 
-    const checkbox = (<InputGroup.Addon>
-      <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} />
-    </InputGroup.Addon>);
+    const checkbox = (
+      <InputGroup.Addon>
+        <input type="checkbox" checked={this._isChecked()} onChange={this._onToggleEnable} />
+      </InputGroup.Addon>
+    );
 
     return (
       <FormGroup>

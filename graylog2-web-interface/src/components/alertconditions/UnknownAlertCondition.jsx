@@ -13,7 +13,7 @@ class UnknownAlertCondition extends React.Component {
 
   render() {
     const condition = this.props.alertCondition;
-    const stream = this.props.stream;
+    const { stream } = this.props;
 
     const actions = [
       <DropdownButton key="actions-button" title="Actions" pullRight id={`more-actions-dropdown-${condition.id}`}>

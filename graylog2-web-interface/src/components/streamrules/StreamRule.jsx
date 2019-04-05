@@ -8,9 +8,10 @@ import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
 
 import StoreProvider from 'injection/StoreProvider';
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 import UserNotification from 'util/UserNotification';
+
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 const StreamRule = createReactClass({
   displayName: 'StreamRule',
@@ -71,8 +72,8 @@ const StreamRule = createReactClass({
   },
 
   render() {
-    const streamRule = this.props.streamRule;
-    const streamRuleTypes = this.props.streamRuleTypes;
+    const { streamRule } = this.props;
+    const { streamRuleTypes } = this.props;
     const actionItems = (this.isPermitted(this.props.permissions, [`streams:edit:${this.props.stream.id}`]) ? this._formatActionItems() : null);
     const className = (this.props.matchData ? this._getMatchDataClassNames() : null);
     const description = this.props.streamRule.description ? <small>{' '}({this.props.streamRule.description})</small> : null;

@@ -19,7 +19,7 @@ class Cache extends React.Component {
       plugins[p.type] = p;
     });
 
-    const cache = this.props.cache;
+    const { cache } = this.props;
     const plugin = plugins[cache.config.type];
     if (!plugin) {
       return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;

@@ -13,7 +13,8 @@ import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
-  'LookupTableCaches');
+  'LookupTableCaches',
+);
 
 const LUTCachesPage = createReactClass({
   displayName: 'LUTCachesPage',
@@ -90,17 +91,20 @@ const LUTCachesPage = createReactClass({
       if (!this.state.types) {
         content = <Spinner text="Loading data cache types" />;
       } else {
-        content =
-          (<CacheCreate types={this.state.types}
-                        saved={this._saved}
-                        validate={this._validateCache}
-                        validationErrors={this.state.validationErrors} />);
+        content = (
+          <CacheCreate types={this.state.types}
+                       saved={this._saved}
+                       validate={this._validateCache}
+                       validationErrors={this.state.validationErrors} />
+        );
       }
     } else if (!this.state.caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = (<CachesOverview caches={this.state.caches}
-                                 pagination={this.state.pagination} />);
+      content = (
+        <CachesOverview caches={this.state.caches}
+                        pagination={this.state.pagination} />
+      );
     }
 
     return (

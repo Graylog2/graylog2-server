@@ -1,10 +1,11 @@
 import ActionsProvider from 'injection/ActionsProvider';
-const AlertsActions = ActionsProvider.getActions('Alerts');
 
 import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import DateTime from 'logic/datetimes/DateTime';
+
+const AlertsActions = ActionsProvider.getActions('Alerts');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const AlertsAnnotator = {
   streams: [],

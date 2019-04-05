@@ -64,7 +64,7 @@ class SidecarSearchForm extends React.Component {
         </p>
         <p>
           Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
-          <kbd>{'status:failing status:unknown'}</kbd><br />
+          <kbd>status:failing status:unknown</kbd><br />
         </p>
       </Popover>
     );

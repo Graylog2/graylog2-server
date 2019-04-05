@@ -54,7 +54,7 @@ class TimeRangeOptionsForm extends React.Component {
 
       options.forEach((o, idx) => {
         if (idx === changedIdx) {
-          let value = e.target.value;
+          let { value } = e.target;
 
           if (field === 'period') {
             value = value.toUpperCase();
@@ -73,8 +73,8 @@ class TimeRangeOptionsForm extends React.Component {
 
   _buildTimeRangeOptions = () => {
     return this.props.options.map((option, idx) => {
-      const period = option.period;
-      const description = option.description;
+      const { period } = option;
+      const { description } = option;
       const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'has-error');
 
       return (

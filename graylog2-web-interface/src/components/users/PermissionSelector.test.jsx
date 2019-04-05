@@ -17,12 +17,10 @@ describe('<PermissionSelector />', () => {
   ]);
 
   it('should render with empty permissions', () => {
-    const wrapper = renderer.create(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set([])}
-      dashboards={dashboards}
-      onChange={() => {}}
-    />);
+    const wrapper = renderer.create(<PermissionSelector streams={streams}
+                                                        permissions={Immutable.Set([])}
+                                                        dashboards={dashboards}
+                                                        onChange={() => {}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -32,12 +30,10 @@ describe('<PermissionSelector />', () => {
       'streams:edit:02',
       'dashboards:read:02',
     ]);
-    const wrapper = renderer.create(<PermissionSelector
-      streams={streams}
-      permissions={permissions}
-      dashboards={dashboards}
-      onChange={() => {}}
-    />);
+    const wrapper = renderer.create(<PermissionSelector streams={streams}
+                                                        permissions={permissions}
+                                                        dashboards={dashboards}
+                                                        onChange={() => {}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -45,12 +41,10 @@ describe('<PermissionSelector />', () => {
     const onButtonClick = jest.fn((added) => {
       expect(added).toEqual(Immutable.Set(['streams:read:01']));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set([])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set([])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('button[children="Allow reading"]').at(0).simulate('click');
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
@@ -59,12 +53,10 @@ describe('<PermissionSelector />', () => {
     const onButtonClick = jest.fn((added) => {
       expect(added).toEqual(Immutable.Set(['streams:read:01', 'streams:edit:01']));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set([])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set([])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('button[children="Allow editing"]').at(0).simulate('click');
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
@@ -73,12 +65,10 @@ describe('<PermissionSelector />', () => {
     const onButtonClick = jest.fn((_, deleted) => {
       expect(deleted).toEqual(Immutable.Set(['streams:read:01', 'streams:edit:01']));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set(['streams:read:01'])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set(['streams:read:01'])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('button[children="Allow reading"]').at(0).simulate('click');
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
@@ -88,12 +78,10 @@ describe('<PermissionSelector />', () => {
       expect(added).toEqual(Immutable.Set(['streams:read:01', 'streams:read:02']));
       expect(deleted).toEqual(Immutable.Set([]));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set(['streams:read:01'])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set(['streams:read:01'])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
     expect(wrapper.find('button').at(2).text()).toEqual('Set read permissions');
     wrapper.find('button').at(2).simulate('click');
@@ -105,12 +93,10 @@ describe('<PermissionSelector />', () => {
       expect(added).toEqual(Immutable.Set(['streams:read:01', 'streams:edit:01', 'streams:read:02', 'streams:edit:02']));
       expect(deleted).toEqual(Immutable.Set([]));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set(['streams:read:01', 'stream:edit:01'])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set(['streams:read:01', 'stream:edit:01'])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
     expect(wrapper.find('button').at(3).text()).toEqual('Set edit permissions');
     wrapper.find('button').at(3).simulate('click');
@@ -122,12 +108,10 @@ describe('<PermissionSelector />', () => {
       expect(added).toEqual(Immutable.Set([]));
       expect(deleted).toEqual(Immutable.Set(['streams:read:01', 'streams:edit:01', 'streams:read:02', 'streams:edit:02']));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set(['streams:read:01', 'streams:read:02'])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set(['streams:read:01', 'streams:read:02'])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
     expect(wrapper.find('button').at(2).text()).toEqual('Clear read permissions');
     wrapper.find('button').at(2).simulate('click');
@@ -140,12 +124,10 @@ describe('<PermissionSelector />', () => {
         'streams:read:02', 'streams:edit:02']));
       expect(deleted).toEqual(Immutable.Set([]));
     });
-    const wrapper = mount(<PermissionSelector
-      streams={streams}
-      permissions={Immutable.Set(['streams:read:01', 'streams:edit:01'])}
-      dashboards={dashboards}
-      onChange={onButtonClick}
-    />);
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set(['streams:read:01', 'streams:edit:01'])}
+                                              dashboards={dashboards}
+                                              onChange={onButtonClick} />);
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
     expect(wrapper.find('button').at(3).text()).toEqual('Set edit permissions');
     wrapper.find('button').at(3).simulate('click');

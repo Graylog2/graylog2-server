@@ -7,9 +7,10 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Pluralize } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
-const RefreshStore = StoreProvider.getStore('Refresh');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const RefreshStore = StoreProvider.getStore('Refresh');
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const RefreshControls = createReactClass({
@@ -37,13 +38,13 @@ const RefreshControls = createReactClass({
       return <MenuItem key={`RefreshControls-${key}`} onClick={() => this._changeInterval(interval)}>{key}</MenuItem>;
     });
     const intervalDuration = moment.duration(this.state.refresh.interval);
-    const naturalInterval = intervalDuration.asSeconds() < 60 ?
-      <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span> :
-      <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
+    const naturalInterval = intervalDuration.asSeconds() < 60
+      ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
+      : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
     const buttonLabel = <span>Update every {naturalInterval}</span>;
     return (
       <ButtonGroup>
-        <Button bsSize="small" onClick={() => this.state.refresh.enabled ? RefreshActions.disable() : RefreshActions.enable()}>
+        <Button bsSize="small" onClick={() => (this.state.refresh.enabled ? RefreshActions.disable() : RefreshActions.enable())}>
           {this.state.refresh.enabled ? <i className="fa fa-pause" /> : <i className="fa fa-play" />}
         </Button>
 

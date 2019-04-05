@@ -67,13 +67,13 @@ class CachesOverview extends React.Component {
         <p><strong>Examples</strong></p>
         <p>
           Find caches by parts of their names:<br />
-          <kbd>{'name:guava'}</kbd><br />
-          <kbd>{'name:gua'}</kbd>
+          <kbd>name:guava</kbd><br />
+          <kbd>name:gua</kbd>
         </p>
         <p>
           Searching without a field name matches against the <code>title</code> field:<br />
-          <kbd>{'guava'}</kbd> <br />is the same as<br />
-          <kbd>{'title:guava'}</kbd>
+          <kbd>guava</kbd> <br />is the same as<br />
+          <kbd>title:guava</kbd>
         </p>
       </Popover>
     );
@@ -84,45 +84,50 @@ class CachesOverview extends React.Component {
       return <Spinner text="Loading caches" />;
     }
     const caches = this.props.caches.map((cache) => {
-      return (<CacheTableEntry key={cache.id}
-                               cache={cache} />);
+      return (
+        <CacheTableEntry key={cache.id}
+                         cache={cache} />
+      );
     });
 
-    return (<div>
-      <Row className="content">
-        <Col md={12}>
-          <h2>
+    return (
+      <div>
+        <Row className="content">
+          <Col md={12}>
+            <h2>
             Configured lookup Caches
-            <span>&nbsp;
-              <small>{this.props.pagination.total} total</small></span>
-          </h2>
-          <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
-            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
-                <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
-              </LinkContainer>
-              <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
-                <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
-              </OverlayTrigger>
-            </SearchForm>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th>Entries</th>
-                  <th>Hit rate</th>
-                  <th>Throughput</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {caches}
-            </Table>
-          </PaginatedList>
-        </Col>
-      </Row>
-    </div>);
+              <span>&nbsp;
+                <small>{this.props.pagination.total} total</small>
+              </span>
+            </h2>
+            <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
+              <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+                  <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
+                </LinkContainer>
+                <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
+                  <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
+                </OverlayTrigger>
+              </SearchForm>
+              <Table condensed hover className={Styles.overviewTable}>
+                <thead>
+                  <tr>
+                    <th className={Styles.rowTitle}>Title</th>
+                    <th className={Styles.rowDescription}>Description</th>
+                    <th className={Styles.rowName}>Name</th>
+                    <th>Entries</th>
+                    <th>Hit rate</th>
+                    <th>Throughput</th>
+                    <th className={Styles.rowActions}>Actions</th>
+                  </tr>
+                </thead>
+                {caches}
+              </Table>
+            </PaginatedList>
+          </Col>
+        </Row>
+      </div>
+    );
   }
 }
 

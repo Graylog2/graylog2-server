@@ -72,7 +72,7 @@ class JSONValueInput extends React.Component {
   };
 
   _onUpdate = (e) => {
-    const value = e.target.value;
+    const { value } = e.target;
     this.setState({ value: value }, this._propagateState);
   };
 

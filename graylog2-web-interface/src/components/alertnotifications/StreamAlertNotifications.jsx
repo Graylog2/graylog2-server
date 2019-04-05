@@ -41,7 +41,7 @@ class StreamAlertNotifications extends React.Component {
       return <Spinner />;
     }
 
-    const stream = this.props.stream;
+    const { stream } = this.props;
 
     const notifications = this.state.conditionNotifications.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';

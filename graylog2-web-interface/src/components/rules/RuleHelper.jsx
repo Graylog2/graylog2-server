@@ -72,7 +72,8 @@ end`,
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{this._niceType(p.type)}</td>
           <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <i className="fa fa-check" />}</td>
           <td>{p.description}</td>
-        </tr>);
+        </tr>
+      );
     });
   },
 
@@ -81,31 +82,35 @@ end`,
     return descriptors.map((d) => {
       let details = null;
       if (this.state.expanded[d.name]) {
-        details = (<tr>
-          <td colSpan="2">
-            <Table condensed striped hover>
-              <thead>
-                <tr>
-                  <th>Parameter</th>
-                  <th>Type</th>
-                  <th>Required</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this._parameters(d)}
-              </tbody>
-            </Table>
-          </td>
-        </tr>);
+        details = (
+          <tr>
+            <td colSpan="2">
+              <Table condensed striped hover>
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this._parameters(d)}
+                </tbody>
+              </Table>
+            </td>
+          </tr>
+        );
       }
-      return (<tbody key={d.name}>
-        <tr onClick={() => this._toggleFunctionDetail(d.name)} className={RuleHelperStyle.clickableRow}>
-          <td className={RuleHelperStyle.functionTableCell}><code>{this._functionSignature(d)}</code></td>
-          <td>{d.description}</td>
-        </tr>
-        {details}
-      </tbody>);
+      return (
+        <tbody key={d.name}>
+          <tr onClick={() => this._toggleFunctionDetail(d.name)} className={RuleHelperStyle.clickableRow}>
+            <td className={RuleHelperStyle.functionTableCell}><code>{this._functionSignature(d)}</code></td>
+            <td>{d.description}</td>
+          </tr>
+          {details}
+        </tbody>
+      );
     });
   },
 
@@ -161,7 +166,7 @@ end`,
           <Col md={12}>
             <p className={RuleHelperStyle.marginQuickReferenceText}>
               Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                 text="full documentation" />{' '}
+                                          text="full documentation" />{' '}
               to gain a better understanding of how Graylog pipeline rules work.
             </p>
           </Col>

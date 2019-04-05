@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
-import MessageDetail from './MessageDetail';
 import StringUtils from 'util/StringUtils';
+import MessageDetail from './MessageDetail';
 
 class MessageShow extends React.Component {
   static propTypes = {
@@ -35,12 +35,13 @@ class MessageShow extends React.Component {
     return (
       <Row className="content">
         <Col md={12}>
-          <MessageDetail {...this.props} message={this.props.message}
-                                         inputs={this.props.inputs}
-                                         streams={this.state.streams}
-                                         nodes={this.state.nodes}
-                                         renderForDisplay={this.renderForDisplay}
-                                         showTimestamp />
+          <MessageDetail {...this.props}
+                         message={this.props.message}
+                         inputs={this.props.inputs}
+                         streams={this.state.streams}
+                         nodes={this.state.nodes}
+                         renderForDisplay={this.renderForDisplay}
+                         showTimestamp />
         </Col>
       </Row>
     );

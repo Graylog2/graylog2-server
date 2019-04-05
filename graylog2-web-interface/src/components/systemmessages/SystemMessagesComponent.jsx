@@ -2,10 +2,11 @@ import React from 'react';
 import { Col, Pagination, Row } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const SystemMessagesStore = StoreProvider.getStore('SystemMessages');
 
 import { Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
+
+const SystemMessagesStore = StoreProvider.getStore('SystemMessages');
 
 class SystemMessagesComponent extends React.Component {
   state = { currentPage: 1 };
@@ -43,10 +44,14 @@ class SystemMessagesComponent extends React.Component {
           <SystemMessagesList messages={this.state.messages} />
 
           <nav style={{ textAlign: 'center' }}>
-            <Pagination bsSize="small" items={numberPages}
+            <Pagination bsSize="small"
+                        items={numberPages}
                         activePage={this.state.currentPage}
                         onSelect={this._onSelected}
-                        prev next first last
+                        prev
+                        next
+                        first
+                        last
                         maxButtons={Math.min(paginatorSize, numberPages)} />
           </nav>
         </div>

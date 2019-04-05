@@ -48,7 +48,7 @@ const SimulationChanges = createReactClass({
 
     const formattedFields = [];
 
-    addedFields.sort().forEach(field => {
+    addedFields.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
       formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field], true, false));
     });
@@ -75,7 +75,7 @@ const SimulationChanges = createReactClass({
 
     const formattedFields = [];
 
-    removedFields.sort().forEach(field => {
+    removedFields.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
       formattedFields.push(this._formatFieldValue(field, originalMessage.fields[field], false, true));
     });
@@ -96,7 +96,7 @@ const SimulationChanges = createReactClass({
 
     const mutatedFields = [];
 
-    originalFields.forEach(field => {
+    originalFields.forEach((field) => {
       if (processedFields.indexOf(field) === -1) {
         return;
       }
@@ -120,7 +120,7 @@ const SimulationChanges = createReactClass({
 
     const formattedFields = [];
 
-    mutatedFields.sort().forEach(field => {
+    mutatedFields.sort().forEach((field) => {
       formattedFields.push(this._formatFieldTitle(field));
       formattedFields.push(this._formatFieldValue(`${field}-original`, originalMessage.fields[field], false, true));
       formattedFields.push(this._formatFieldValue(field, processedMessage.fields[field], true, false));
@@ -137,7 +137,7 @@ const SimulationChanges = createReactClass({
   },
 
   _getOriginalMessageChanges() {
-    const originalMessage = this.props.originalMessage;
+    const { originalMessage } = this.props;
     const processedMessages = this.props.simulationResults.messages;
 
     if (this._isOriginalMessageRemoved(originalMessage, processedMessages)) {

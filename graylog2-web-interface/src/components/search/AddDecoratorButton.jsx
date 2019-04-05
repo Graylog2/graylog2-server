@@ -10,12 +10,13 @@ import { ConfigurationForm } from 'components/configurationforms';
 import { Select, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
-const DecoratorsStore = StoreProvider.getStore('Decorators');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
+const DecoratorsStore = StoreProvider.getStore('Decorators');
+const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const AddDecoratorButton = createReactClass({
   displayName: 'AddDecoratorButton',
@@ -78,12 +79,17 @@ const AddDecoratorButton = createReactClass({
       return <Spinner />;
     }
     const decoratorTypes = jQuery.map(this.state.types, this._formatDecoratorType);
-    const configurationForm = (this.state.typeName !== this.PLACEHOLDER ?
-      (<ConfigurationForm ref={(elem) => { this.configurationForm = elem; }}
-                         key="configuration-form-output" configFields={this.state.typeDefinition.requested_configuration}
-                         title={`Create new ${this.state.typeDefinition.name}`}
-                         typeName={this.state.typeName} includeTitleField={false}
-                         submitAction={this._handleSubmit} cancelAction={this._handleCancel} />) : null);
+    const configurationForm = (this.state.typeName !== this.PLACEHOLDER
+      ? (
+        <ConfigurationForm ref={(elem) => { this.configurationForm = elem; }}
+                           key="configuration-form-output"
+                           configFields={this.state.typeDefinition.requested_configuration}
+                           title={`Create new ${this.state.typeDefinition.name}`}
+                           typeName={this.state.typeName}
+                           includeTitleField={false}
+                           submitAction={this._handleSubmit}
+                           cancelAction={this._handleCancel} />
+      ) : null);
     return (
       <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
         <div className={DecoratorStyles.addDecoratorSelect}>

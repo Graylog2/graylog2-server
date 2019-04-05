@@ -60,9 +60,9 @@ class Alert extends React.Component {
       alertTime = (
         <span>
           Triggered at {alertTime},&nbsp;
-          {alert.resolved_at ?
-            <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} />.</span> :
-            <span><strong>still ongoing</strong>.</span>}
+          {alert.resolved_at
+            ? <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} />.</span>
+            : <span><strong>still ongoing</strong>.</span>}
         </span>
       );
     } else {

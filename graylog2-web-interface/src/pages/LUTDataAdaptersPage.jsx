@@ -13,7 +13,8 @@ import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview }
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
-  'LookupTableDataAdapters');
+  'LookupTableDataAdapters',
+);
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 const LUTDataAdaptersPage = createReactClass({
@@ -122,16 +123,21 @@ const LUTDataAdaptersPage = createReactClass({
       if (!this.state.types) {
         content = <Spinner text="Loading data adapter types" />;
       } else {
-        content = (<DataAdapterCreate types={this.state.types}
-                                      saved={this._saved}
-                                      validate={this._validateAdapter}
-                                      validationErrors={this.state.validationErrors} />);
+        content = (
+          <DataAdapterCreate types={this.state.types}
+                             saved={this._saved}
+                             validate={this._validateAdapter}
+                             validationErrors={this.state.validationErrors} />
+        );
       }
     } else if (!this.state.dataAdapters) {
       content = <Spinner text="Loading data adapters" />;
     } else {
-      content = (<DataAdaptersOverview dataAdapters={this.state.dataAdapters}
-                                       pagination={this.state.pagination} errorStates={this.state.tableStore.errorStates} />);
+      content = (
+        <DataAdaptersOverview dataAdapters={this.state.dataAdapters}
+                              pagination={this.state.pagination}
+                              errorStates={this.state.tableStore.errorStates} />
+      );
     }
 
     return (

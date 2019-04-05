@@ -39,7 +39,7 @@ const Metric = createReactClass({
   },
 
   _formatName(metricName) {
-    const namespace = this.props.namespace;
+    const { namespace } = this.props;
     const split = metricName.split(namespace);
     const unqualifiedMetricName = split.slice(1).join(namespace);
     return (
@@ -56,7 +56,7 @@ const Metric = createReactClass({
   },
 
   render() {
-    const metric = this.props.metric;
+    const { metric } = this.props;
     const details = this.state.expanded ? <MetricDetails nodeId={this.props.nodeId} metric={this.props.metric} /> : null;
     return (
       <span>

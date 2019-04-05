@@ -25,14 +25,14 @@ class AlertConditionSummary extends React.Component {
   };
 
   render() {
-    const stream = this.props.stream;
+    const { stream } = this.props;
     const condition = this.props.alertCondition;
-    const conditionType = this.props.conditionType;
+    const { conditionType } = this.props;
     const conditionPlugin = PluginStore.exports('alertConditions').find(c => c.type === condition.type) || {};
     const SummaryComponent = conditionPlugin.summaryComponent || GenericAlertConditionSummary;
 
-    const description = (stream ?
-      <span>Alerting on stream <em>{stream.title}</em></span> : 'Not alerting on any stream');
+    const description = (stream
+      ? <span>Alerting on stream <em>{stream.title}</em></span> : 'Not alerting on any stream');
 
     const content = (
       <Col md={12}>

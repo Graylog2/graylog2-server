@@ -93,7 +93,7 @@ class DataAdapterForm extends React.Component {
   _onChange = (event) => {
     const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
     dataAdapter[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    let generateAdapterName = this.state.generateAdapterName;
+    let { generateAdapterName } = this.state;
     if (generateAdapterName && event.target.name === 'title') {
       // generate the name
       dataAdapter.name = this._sanitizeTitle(dataAdapter.title);
@@ -150,11 +150,13 @@ class DataAdapterForm extends React.Component {
 
   _validationMessage = (fieldName, defaultText) => {
     if (this.props.validationErrors[fieldName]) {
-      return (<div>
-        <span>{defaultText}</span>
+      return (
+        <div>
+          <span>{defaultText}</span>
         &nbsp;
-        <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
-      </div>);
+          <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
+        </div>
+      );
     }
     return <span>{defaultText}</span>;
   };
@@ -185,7 +187,7 @@ class DataAdapterForm extends React.Component {
 
     let documentationColumn = null;
     let formRowWidth = 8; // If there is no documentation component, we don't use the complete page
-                          // width
+    // width
     if (documentationComponent) {
       formRowWidth = 6;
       documentationColumn = (
@@ -240,7 +242,8 @@ class DataAdapterForm extends React.Component {
               <Row>
                 <Col mdOffset={3} md={9}>
                   <Button type="submit" bsStyle="success">{this.props.create ? 'Create Adapter'
-                    : 'Update Adapter'}</Button>
+                    : 'Update Adapter'}
+                  </Button>
                 </Col>
               </Row>
             </fieldset>

@@ -40,7 +40,7 @@ const LogLevelMetrics = createReactClass({
     if (!metrics || !metrics[nodeId] || !metrics[nodeId][this._metricName()]) {
       metricsDetails = <Spinner />;
     } else {
-      const metric = metrics[nodeId][this._metricName()].metric;
+      const { metric } = metrics[nodeId][this._metricName()];
       metricsDetails = (
         <dl className="loglevel-metrics-list">
           <dt>Total written:</dt>

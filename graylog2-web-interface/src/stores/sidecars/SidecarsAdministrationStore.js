@@ -57,7 +57,8 @@ const SidecarsAdministrationStore = Reflux.createStore({
       (error) => {
         UserNotification.error(error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
           'Could not retrieve Sidecars');
-      });
+      },
+    );
 
     SidecarsAdministrationActions.list.promise(promise);
   },
@@ -87,7 +88,8 @@ const SidecarsAdministrationStore = Reflux.createStore({
       (error) => {
         UserNotification.error(`Requesting ${action} failed with status: ${error}`,
           `Could not ${action} collectors`);
-      });
+      },
+    );
 
     SidecarsAdministrationActions.setAction.promise(promise);
   },

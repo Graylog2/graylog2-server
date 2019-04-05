@@ -87,11 +87,11 @@ class ContentPackVersions extends React.Component {
   rowFormatter(pack) {
     const { openFunc, installModal } = this._installModal(pack);
     let downloadRef;
-    const downloadModal = (<ContentPackDownloadControl
-      ref={(node) => { downloadRef = node; }}
-      contentPackId={pack.id}
-      revision={pack.rev}
-    />);
+    const downloadModal = (
+      <ContentPackDownloadControl ref={(node) => { downloadRef = node; }}
+                                  contentPackId={pack.id}
+                                  revision={pack.rev} />
+    );
     return (
       <tr key={pack.id + pack.rev}>
         <td>
@@ -107,7 +107,7 @@ class ContentPackVersions extends React.Component {
             <DropdownButton id={`action-${pack.rev}`} bsStyle="info" title="Actions" bsSize="small">
               <MenuItem onClick={openFunc}>Install</MenuItem>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
-                <MenuItem >Create New From Revision</MenuItem>
+                <MenuItem>Create New From Revision</MenuItem>
               </LinkContainer>
               <MenuItem divider />
               <MenuItem onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
@@ -128,18 +128,17 @@ class ContentPackVersions extends React.Component {
   };
 
   render() {
-    const contentPacks = this.props.contentPackRevisions.contentPacks;
+    const { contentPacks } = this.props.contentPackRevisions;
     const headers = ['Select', 'Revision', 'Action'];
     return (
-      <DataTable
-        id="content-packs-versions"
-        headers={headers}
-        headerCellFormatter={this.headerFormatter}
-        sortBy={c => c.rev.toString()}
-        dataRowFormatter={this.rowFormatter}
-        rows={contentPacks}
-        filterKeys={[]}
-      />);
+      <DataTable id="content-packs-versions"
+                 headers={headers}
+                 headerCellFormatter={this.headerFormatter}
+                 sortBy={c => c.rev.toString()}
+                 dataRowFormatter={this.rowFormatter}
+                 rows={contentPacks}
+                 filterKeys={[]} />
+    );
   }
 }
 

@@ -4,9 +4,10 @@ import { Row, Col, Button } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
-const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import UserNotification from 'util/UserNotification';
+
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 class ImportExtractors extends React.Component {
   static propTypes = {
@@ -17,7 +18,7 @@ class ImportExtractors extends React.Component {
     event.preventDefault();
     try {
       const parsedExtractors = JSON.parse(this.extractorsInput.getValue());
-      const extractors = parsedExtractors.extractors;
+      const { extractors } = parsedExtractors;
       ExtractorsActions.import(this.props.input.id, extractors);
     } catch (error) {
       UserNotification.error(`There was an error while parsing extractors. Are they in JSON format? ${error}`,

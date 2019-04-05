@@ -4,6 +4,7 @@ import { Input } from 'components/bootstrap';
 
 import { QueryConfiguration } from 'components/widgets/configurations';
 import StoreProvider from 'injection/StoreProvider';
+
 const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 class FieldChartWidgetConfiguration extends React.Component {

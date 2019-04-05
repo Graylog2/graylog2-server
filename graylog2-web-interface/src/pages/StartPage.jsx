@@ -9,10 +9,11 @@ import history from 'util/History';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const GettingStartedStore = StoreProvider.getStore('GettingStarted');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const GettingStartedStore = StoreProvider.getStore('GettingStarted');
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const StartPage = createReactClass({
@@ -54,7 +55,7 @@ const StartPage = createReactClass({
     }
 
     // Show custom startpage if it was set
-    const startpage = this.state.currentUser.startpage;
+    const { startpage } = this.state.currentUser;
     if (startpage !== null && Object.keys(startpage).length > 0) {
       if (startpage.type === 'stream') {
         this._redirect(Routes.stream_search(startpage.id));

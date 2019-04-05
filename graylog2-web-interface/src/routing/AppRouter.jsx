@@ -84,9 +84,11 @@ import {
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
-    return (<Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-                  path={URLUtils.appPrefixed(pluginRoute.path)}
-                  component={pluginRoute.component} />);
+    return (
+      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
+             path={URLUtils.appPrefixed(pluginRoute.path)}
+             component={pluginRoute.component} />
+    );
   });
   return (
     <Router history={history}>

@@ -3,10 +3,11 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { NodesList } from 'components/nodes';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const NodesPage = createReactClass({
   displayName: 'NodesPage',

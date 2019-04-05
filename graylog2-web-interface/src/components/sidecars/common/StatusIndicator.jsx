@@ -29,7 +29,7 @@ class StatusIndicator extends React.Component {
 
     let icon;
     let className;
-    let message = this.props.message;
+    let { message } = this.props;
 
     switch (this.props.status) {
       case SidecarStatusEnum.RUNNING:

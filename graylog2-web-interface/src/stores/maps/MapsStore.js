@@ -6,8 +6,8 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 export const MapsActions = Reflux.createActions({
-  'get': {asyncResult: true},
-  'getMapData': {asyncResult: true},
+  get: { asyncResult: true },
+  getMapData: { asyncResult: true },
 });
 
 export const MapsStore = Reflux.createStore({
@@ -15,12 +15,12 @@ export const MapsStore = Reflux.createStore({
   mapCoordinates: undefined,
 
   getInitialState() {
-    return {mapCoordinates: this.mapCoordinates};
+    return { mapCoordinates: this.mapCoordinates };
   },
 
   getMapData(query, field, rangeType, rangeParams, streamId) {
     // TODO: For relative searches, the param is "range" and not "relative"...
-    const timerange = rangeType === 'relative' ? {range: rangeParams.relative} : rangeParams;
+    const timerange = rangeType === 'relative' ? { range: rangeParams.relative } : rangeParams;
     // Make sure the query param is not empty!
     const q = !query || query.length < 1 ? '*' : query;
 
@@ -36,10 +36,10 @@ export const MapsStore = Reflux.createStore({
     });
 
     promise.then(
-      response => {
-        this.trigger({mapCoordinates: response.fields[field]});
+      (response) => {
+        this.trigger({ mapCoordinates: response.fields[field] });
       },
-      error => {
+      (error) => {
         let errorMessage;
         if (error.additional && error.additional.status === 400) {
           errorMessage = 'Map widget is only available for fields containing geo data.';
@@ -48,7 +48,7 @@ export const MapsStore = Reflux.createStore({
         }
 
         UserNotification.error(errorMessage, 'Could not load map information');
-      }
+      },
     );
 
     MapsActions.getMapData.promise(promise);

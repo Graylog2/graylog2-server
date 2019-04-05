@@ -44,7 +44,8 @@ const ShowContentPackPage = createReactClass({
     ContentPacksActions.get(this.props.params.contentPackId).catch((error) => {
       if (error.status === 404) {
         UserNotification.error(
-          `Cannot find Content Pack with the id ${this.props.params.contentPackId} and may have been deleted.`);
+          `Cannot find Content Pack with the id ${this.props.params.contentPackId} and may have been deleted.`,
+        );
       } else {
         UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
       }
@@ -161,8 +162,7 @@ const ShowContentPackPage = createReactClass({
                   <Col>
                     <h2>Installations</h2>
                     <ContentPackInstallations installations={this.state.installations}
-                                              onUninstall={this._onUninstallContentPackRev}
-                    />
+                                              onUninstall={this._onUninstallContentPackRev} />
                   </Col>
                 </Row>
               </div>
@@ -175,12 +175,10 @@ const ShowContentPackPage = createReactClass({
             </Col>
           </Row>
         </span>
-        <BootstrapModalConfirm
-          ref={(c) => { this.modal = c; }}
-          title="Do you really want to uninstall this Content Pack?"
-          onConfirm={this._uninstallContentPackRev}
-          onCancel={this._clearUninstall}
-        >
+        <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+                               title="Do you really want to uninstall this Content Pack?"
+                               onConfirm={this._uninstallContentPackRev}
+                               onCancel={this._clearUninstall}>
           <ContentPackInstallEntityList uninstall entities={this.state.uninstallEntities} />
         </BootstrapModalConfirm>
       </DocumentTitle>

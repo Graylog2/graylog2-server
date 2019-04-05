@@ -8,15 +8,17 @@ class GuavaCacheSummary extends React.Component {
   };
 
   render() {
-    const config = this.props.cache.config;
-    return (<dl>
-      <dt>Maximum entries</dt>
-      <dd>{config.max_size}</dd>
-      <dt>Expire after access</dt>
-      <dd><TimeUnit value={config.expire_after_access} unit={config.expire_after_access_unit} /></dd>
-      <dt>Expire after write</dt>
-      <dd><TimeUnit value={config.expire_after_write} unit={config.expire_after_write_unit} /></dd>
-    </dl>);
+    const { config } = this.props.cache;
+    return (
+      <dl>
+        <dt>Maximum entries</dt>
+        <dd>{config.max_size}</dd>
+        <dt>Expire after access</dt>
+        <dd><TimeUnit value={config.expire_after_access} unit={config.expire_after_access_unit} /></dd>
+        <dt>Expire after write</dt>
+        <dd><TimeUnit value={config.expire_after_write} unit={config.expire_after_write_unit} /></dd>
+      </dl>
+    );
   }
 }
 

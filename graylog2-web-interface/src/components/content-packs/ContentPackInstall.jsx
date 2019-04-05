@@ -108,25 +108,26 @@ class ContentPackInstall extends React.Component {
     });
     const contentPack = ContentPack.fromJSON(this.props.contentPack);
 
-    return (<div>
-      <Row>
-        <Col smOffset={1} sm={10}>
-          <h2>Install comment</h2>
-          <br />
-          <br />
-          <Input name="comment"
-                 id="comment"
-                 type="text"
-                 maxLength={512}
-                 value={this.state.comment}
-                 onChange={this._getComment}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-7"
-                 label="Comment"
-          />
-        </Col>
-      </Row>
-      {parameterInput.length > 0 &&
+    return (
+      <div>
+        <Row>
+          <Col smOffset={1} sm={10}>
+            <h2>Install comment</h2>
+            <br />
+            <br />
+            <Input name="comment"
+                   id="comment"
+                   type="text"
+                   maxLength={512}
+                   value={this.state.comment}
+                   onChange={this._getComment}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-7"
+                   label="Comment" />
+          </Col>
+        </Row>
+        {parameterInput.length > 0
+      && (
       <Row>
         <Col smOffset={1} sm={10}>
           <h2>Configure Parameter</h2>
@@ -134,13 +135,15 @@ class ContentPackInstall extends React.Component {
           <br />
           {parameterInput}
         </Col>
-      </Row>}
-      <Row>
-        <Col smOffset={1} sm={10}>
-          <ContentPackEntitiesList contentPack={contentPack} readOnly />
-        </Col>
       </Row>
-    </div>);
+      )}
+        <Row>
+          <Col smOffset={1} sm={10}>
+            <ContentPackEntitiesList contentPack={contentPack} readOnly />
+          </Col>
+        </Row>
+      </div>
+    );
   }
 }
 

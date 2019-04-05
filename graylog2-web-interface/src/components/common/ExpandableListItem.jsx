@@ -105,13 +105,15 @@ class ExpandableListItem extends React.Component {
       <li className={liClassName}>
         <div className={style.listItemContainer}>
           {selectable && <Checkbox inputRef={(c) => { this._checkbox = c; }} inline checked={checked} {...inputProps} />}
-          {expandable &&
+          {expandable
+          && (
           <div className={style.expandBoxContainer}>
             <div className={`fa-stack ${style.expandBox}`} role="button" tabIndex={0} onClick={this._toggleExpand}>
               <i className={`fa fa-circle-thin fa-stack-1x ${style.iconBackground}`} />
               <i className={`fa fa-stack-1x fa-angle-${expanded ? 'down' : 'up'}`} />
             </div>
           </div>
+          )
           }
           <span className={style.header}>{headerToRender}{subheader && <span className={style.subheader}>{subheader}</span>}</span>
         </div>

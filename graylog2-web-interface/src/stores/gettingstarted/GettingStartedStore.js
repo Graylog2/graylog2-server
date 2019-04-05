@@ -3,10 +3,11 @@ import Reflux from 'reflux';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
+
+const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const GettingStartedStore = Reflux.createStore({
   listenables: [GettingStartedActions],
@@ -51,7 +52,8 @@ const GettingStartedStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Dismissing Getting Started Guide failed with status: ${error}`,
             'Could not dismiss guide');
-        });
+        },
+      );
 
     GettingStartedActions.dismiss.promise(promise);
   },

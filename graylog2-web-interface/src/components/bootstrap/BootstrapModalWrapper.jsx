@@ -48,12 +48,10 @@ class BootstrapModalWrapper extends React.Component {
 
   render() {
     return (
-      <Modal
-        show={this.state.showModal}
-        onHide={this.hide}
-        bsSize={this.props.bsSize}
-        backdrop={this.props.backdrop}
-      >
+      <Modal show={this.state.showModal}
+             onHide={this.hide}
+             bsSize={this.props.bsSize}
+             backdrop={this.props.backdrop}>
         {this.props.children}
       </Modal>
     );

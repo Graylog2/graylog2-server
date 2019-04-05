@@ -50,13 +50,11 @@ class ContentPackEntityConfig extends React.Component {
 
     return (
       <div>
-        <DataTable
-          id="entiy-config-list"
-          headers={['Config Key', 'Type', 'Value']}
-          filterKeys={[]}
-          rows={configKeys}
-          dataRowFormatter={this._configKeyRowFormatter(configPaths)}
-        />
+        <DataTable id="entiy-config-list"
+                   headers={['Config Key', 'Type', 'Value']}
+                   filterKeys={[]}
+                   rows={configKeys}
+                   dataRowFormatter={this._configKeyRowFormatter(configPaths)} />
       </div>
     );
   }

@@ -23,7 +23,7 @@ const CollectorRow = createReactClass({
   },
 
   handleDelete() {
-    const collector = this.props.collector;
+    const { collector } = this.props;
     if (window.confirm(`You are about to delete collector "${collector.name}". Are you sure?`)) {
       this.props.onDelete(collector);
     }

@@ -6,9 +6,10 @@ import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';
-const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+
+const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 class BulkLoadPatternModal extends React.Component {
   static propTypes = {
@@ -42,9 +43,9 @@ class BulkLoadPatternModal extends React.Component {
         <Button bsStyle="info" style={{ marginRight: 5 }} onClick={() => this.modal.open()}>Import pattern file</Button>
 
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                              title="Import Grok patterns from file"
-                              submitButtonText="Upload"
-                              formProps={{ onSubmit: this._onSubmit }}>
+                            title="Import Grok patterns from file"
+                            submitButtonText="Upload"
+                            formProps={{ onSubmit: this._onSubmit }}>
           <Input id="pattern-file"
                  type="file"
                  ref={(patternFile) => { this.patternFile = patternFile; }}
@@ -56,8 +57,7 @@ class BulkLoadPatternModal extends React.Component {
                  type="checkbox"
                  name="replace"
                  label="Replace all existing patterns?"
-                 onChange={e => this.setState({ replacePatterns: e.target.checked })}
-          />
+                 onChange={e => this.setState({ replacePatterns: e.target.checked })} />
         </BootstrapModalForm>
       </span>
     );

@@ -5,13 +5,14 @@ import numeral from 'numeral';
 import moment from 'moment';
 
 import StoreProvider from 'injection/StoreProvider';
-const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
 import { Spinner } from 'components/common';
 import { SmallSupportLink, DocumentationLink } from 'components/support';
+
+const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
 
 class IndexerFailuresComponent extends React.Component {
   state = {};

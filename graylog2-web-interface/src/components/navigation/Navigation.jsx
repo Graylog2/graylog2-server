@@ -114,10 +114,12 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
           <UserMenu fullName={fullName} loginName={loginName} />
-          {AppConfig.gl2DevMode() ?
-            <NavItem className="notification-badge-link">
-              <Badge className={badgeStyles.badgeDanger}>DEV</Badge>
-            </NavItem>
+          {AppConfig.gl2DevMode()
+            ? (
+              <NavItem className="notification-badge-link">
+                <Badge className={badgeStyles.badgeDanger}>DEV</Badge>
+              </NavItem>
+            )
             : null}
         </Nav>
       </Navbar.Collapse>

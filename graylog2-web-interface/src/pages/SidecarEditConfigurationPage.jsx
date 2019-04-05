@@ -32,7 +32,7 @@ const SidecarEditConfigurationPage = createReactClass({
   },
 
   _reloadConfiguration() {
-    const configurationId = this.props.params.configurationId;
+    const { configurationId } = this.props.params;
 
     CollectorConfigurationsActions.getConfiguration(configurationId).then(
       (configuration) => {

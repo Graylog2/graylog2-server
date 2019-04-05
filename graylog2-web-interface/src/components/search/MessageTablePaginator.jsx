@@ -7,9 +7,10 @@ import { Page } from 'components/common';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import StoreProvider from 'injection/StoreProvider';
-const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 import $ from 'jquery';
+
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 global.jQuery = $;
 require('bootstrap/js/affix');
 
@@ -105,13 +106,22 @@ const MessageTablePaginator = createReactClass({
   render() {
     const pages = [];
 
-    pages.push(<Page key="previous" href="#" page="Previous" isDisabled={this.props.currentPage === 1}
+    pages.push(<Page key="previous"
+                     href="#"
+                     page="Previous"
+                     isDisabled={this.props.currentPage === 1}
                      onPageChanged={this._onPageChanged} />);
     for (let i = this._minPage(); i <= this._maxPage(); i++) {
-      pages.push(<Page key={`page${i}`} href="#" page={i} isActive={i === this.props.currentPage}
+      pages.push(<Page key={`page${i}`}
+                       href="#"
+                       page={i}
+                       isActive={i === this.props.currentPage}
                        onPageChanged={this._onPageChanged} />);
     }
-    pages.push(<Page key="next" href="#" page="Next" isDisabled={this.props.currentPage >= this._maxPage()}
+    pages.push(<Page key="next"
+                     href="#"
+                     page="Next"
+                     isDisabled={this.props.currentPage >= this._maxPage()}
                      onPageChanged={this._onPageChanged} />);
 
     const pagination = (

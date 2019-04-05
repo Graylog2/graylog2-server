@@ -8,6 +8,7 @@ import Select from 'components/common/Select';
  */
 class MultiSelect extends React.Component {
   static propTypes = Select.propTypes;
+
   _select = undefined;
 
   getValue = () => {

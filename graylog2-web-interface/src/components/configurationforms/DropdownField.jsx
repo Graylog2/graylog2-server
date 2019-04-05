@@ -44,12 +44,12 @@ class DropdownField extends React.Component {
   };
 
   render() {
-    const field = this.state.field;
+    const { field } = this.state;
     const options = $.map(field.additional_info.values, this._formatOption);
     if (this.props.addPlaceholder) {
       options.unshift(this._formatOption(`Select ${field.human_name || this.state.title}`, '', true));
     }
-    const typeName = this.state.typeName;
+    const { typeName } = this.state;
     return (
       <div className="form-group">
         <label htmlFor={`${typeName}-${field.title}`}>
@@ -58,9 +58,13 @@ class DropdownField extends React.Component {
           {FieldHelpers.optionalMarker(field)}
         </label>
 
-        <select id={field.title} value={this.state.value}
-                className="input-xlarge form-control" onChange={this.handleChange}
-                autoFocus={this.props.autoFocus} disabled={this.props.disabled} required={!field.is_optional}>
+        <select id={field.title}
+                value={this.state.value}
+                className="input-xlarge form-control"
+                onChange={this.handleChange}
+                autoFocus={this.props.autoFocus}
+                disabled={this.props.disabled}
+                required={!field.is_optional}>
           {options}
         </select>
         <p className="help-block">{field.description}</p>

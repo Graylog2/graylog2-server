@@ -44,7 +44,8 @@ const AlarmCallbackHistoryOverview = createReactClass({
     return (
       <Row>
         <Col md={12}>
-          <EntityList bsNoItemsStyle="info" noItemsText="No notifications were triggered during the alert."
+          <EntityList bsNoItemsStyle="info"
+                      noItemsText="No notifications were triggered during the alert."
                       items={histories} />
         </Col>
       </Row>

@@ -11,16 +11,17 @@ import {} from 'moment-duration-format';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
-const JournalStore = StoreProvider.getStore('Journal');
 
 import { Spinner, Timestamp } from 'components/common';
 
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
+
+const MetricsActions = ActionsProvider.getActions('Metrics');
+const MetricsStore = StoreProvider.getStore('Metrics');
+const JournalStore = StoreProvider.getStore('Journal');
 
 const JournalDetails = createReactClass({
   displayName: 'JournalDetails',
@@ -73,9 +74,9 @@ const JournalDetails = createReactClass({
       return <Spinner text="Loading journal metrics..." />;
     }
 
-    const nodeId = this.props.nodeId;
+    const { nodeId } = this.props;
     const nodeMetrics = this.state.metrics[nodeId];
-    const journalInformation = this.state.journalInformation;
+    const { journalInformation } = this.state;
 
     if (!journalInformation.enabled) {
       return (

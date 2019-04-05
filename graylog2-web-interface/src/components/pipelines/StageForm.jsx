@@ -126,12 +126,12 @@ const StageForm = createReactClass({
             </FormGroup>
 
             <Input type="radio"
-                     id="match_all"
-                     name="match_all"
-                     value="true"
-                     label="All rules on this stage match the message"
-                     onChange={this._onChange}
-                     checked={this.state.stage.match_all} />
+                   id="match_all"
+                   name="match_all"
+                   value="true"
+                   label="All rules on this stage match the message"
+                   onChange={this._onChange}
+                   checked={this.state.stage.match_all} />
 
             <Input type="radio"
                    id="match_any"

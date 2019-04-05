@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
 const SystemJobsStore = Reflux.createStore({

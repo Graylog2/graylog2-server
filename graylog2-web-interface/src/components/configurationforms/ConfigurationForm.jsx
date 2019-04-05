@@ -50,7 +50,7 @@ const ConfigurationForm = createReactClass({
 
   getValue() {
     const data = {};
-    const values = this.state.values;
+    const { values } = this.state;
     if (this.props.includeTitleField) {
       data.title = this.state.titleValue;
     }
@@ -116,47 +116,89 @@ const ConfigurationForm = createReactClass({
   },
 
   _handleChange(field, value) {
-    const values = this.state.values;
+    const { values } = this.state;
     values[field] = value;
     this.setState({ values: values });
   },
 
   _renderConfigField(configField, key, autoFocus) {
     const value = this.state.values[key];
-    const typeName = this.props.typeName;
+    const { typeName } = this.props;
     const elementKey = `${typeName}-${key}`;
 
     switch (configField.type) {
       case 'text':
-        return (<TextField key={elementKey} typeName={typeName} title={key} field={configField}
-                           value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
+        return (
+          <TextField key={elementKey}
+                     typeName={typeName}
+                     title={key}
+                     field={configField}
+                     value={value}
+                     onChange={this._handleChange}
+                     autoFocus={autoFocus} />
+        );
       case 'number':
-        return (<NumberField key={elementKey} typeName={typeName} title={key} field={configField}
-                             value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
+        return (
+          <NumberField key={elementKey}
+                       typeName={typeName}
+                       title={key}
+                       field={configField}
+                       value={value}
+                       onChange={this._handleChange}
+                       autoFocus={autoFocus} />
+        );
       case 'boolean':
-        return (<BooleanField key={elementKey} typeName={typeName} title={key} field={configField}
-                              value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
+        return (
+          <BooleanField key={elementKey}
+                        typeName={typeName}
+                        title={key}
+                        field={configField}
+                        value={value}
+                        onChange={this._handleChange}
+                        autoFocus={autoFocus} />
+        );
       case 'dropdown':
-        return (<DropdownField key={elementKey} typeName={typeName} title={key} field={configField}
-                               value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder />);
+        return (
+          <DropdownField key={elementKey}
+                         typeName={typeName}
+                         title={key}
+                         field={configField}
+                         value={value}
+                         onChange={this._handleChange}
+                         autoFocus={autoFocus}
+                         addPlaceholder />
+        );
       case 'list':
-        return (<ListField key={elementKey} typeName={typeName} title={key} field={configField}
-                           value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder />);
+        return (
+          <ListField key={elementKey}
+                     typeName={typeName}
+                     title={key}
+                     field={configField}
+                     value={value}
+                     onChange={this._handleChange}
+                     autoFocus={autoFocus}
+                     addPlaceholder />
+        );
       default:
         return null;
     }
   },
 
   render() {
-    const typeName = this.props.typeName;
-    const title = this.props.title;
-    const helpBlock = this.props.helpBlock;
+    const { typeName } = this.props;
+    const { title } = this.props;
+    const { helpBlock } = this.props;
 
     let shouldAutoFocus = true;
     let titleElement;
     if (this.props.includeTitleField) {
-      titleElement = (<TitleField key={`${typeName}-title`} typeName={typeName} value={this.state.titleValue}
-                                  onChange={this._handleTitleChange} helpBlock={helpBlock} />);
+      titleElement = (
+        <TitleField key={`${typeName}-title`}
+                    typeName={typeName}
+                    value={this.state.titleValue}
+                    onChange={this._handleTitleChange}
+                    helpBlock={helpBlock} />
+      );
       shouldAutoFocus = false;
     }
 

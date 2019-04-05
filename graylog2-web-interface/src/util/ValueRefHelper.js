@@ -1,6 +1,8 @@
 export default class ValueRefHelper {
   static VALUE_REF_VALUE_FIELD = '@value';
+
   static VALUE_REF_TYPE_FIELD = '@type';
+
   static VALUE_REF_PARAMETER_VALUE = 'parameter';
 
   static dataIsValueRef(data) {
@@ -11,8 +13,8 @@ export default class ValueRefHelper {
       return data.size === 2 && data.has(ValueRefHelper.VALUE_REF_TYPE_FIELD) && data.has(ValueRefHelper.VALUE_REF_VALUE_FIELD);
     }
     const keys = Object.keys(data);
-    return keys.length === 2 && keys.includes(ValueRefHelper.VALUE_REF_TYPE_FIELD) &&
-      keys.includes(ValueRefHelper.VALUE_REF_VALUE_FIELD);
+    return keys.length === 2 && keys.includes(ValueRefHelper.VALUE_REF_TYPE_FIELD)
+      && keys.includes(ValueRefHelper.VALUE_REF_VALUE_FIELD);
   }
 
   static dataValueIsParameter(data) {

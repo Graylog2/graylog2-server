@@ -29,9 +29,9 @@ class TextField extends React.Component {
   };
 
   render() {
-    const field = this.state.field;
-    const title = this.state.title;
-    const typeName = this.state.typeName;
+    const { field } = this.state;
+    const { title } = this.state;
+    const { typeName } = this.state;
 
     let inputField;
     const isRequired = !field.is_optional;
@@ -39,14 +39,25 @@ class TextField extends React.Component {
 
     if (FieldHelpers.hasAttribute(field.attributes, 'textarea')) {
       inputField = (
-        <textarea id={title} className="form-control" rows={10}
-                  name={`configuration[${title}]`} required={isRequired} value={this.state.value}
-                  onChange={this.handleChange} autoFocus={this.props.autoFocus} />
+        <textarea id={title}
+                  className="form-control"
+                  rows={10}
+                  name={`configuration[${title}]`}
+                  required={isRequired}
+                  value={this.state.value}
+                  onChange={this.handleChange}
+                  autoFocus={this.props.autoFocus} />
       );
     } else {
       inputField = (
-        <input id={title} type={fieldType} className="form-control" name={`configuration[${title}]`} value={this.state.value}
-               onChange={this.handleChange} required={isRequired} autoFocus={this.props.autoFocus} />
+        <input id={title}
+               type={fieldType}
+               className="form-control"
+               name={`configuration[${title}]`}
+               value={this.state.value}
+               onChange={this.handleChange}
+               required={isRequired}
+               autoFocus={this.props.autoFocus} />
       );
     }
 

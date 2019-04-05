@@ -81,24 +81,24 @@ describe('Navigation', () => {
     });
     it('contains top-level navigation element', () => {
       const wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
       expect(findLink(wrapper, 'Perpetuum Mobile')).toExist();
     });
     it('does not contain navigation elements from plugins where permissions are missing', () => {
       const wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
       expect(findLink(wrapper, 'Archives')).not.toExist();
     });
     it('contains restricted navigation elements from plugins if permissions are present', () => {
       currentUser.permissions = ['archive:read'];
       const wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
       expect(findLink(wrapper, 'Archives')).toExist();
     });
     it('does not render dropdown contributed by plugin if permissions for all elements are missing', () => {
