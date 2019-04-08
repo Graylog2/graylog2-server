@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
-import java.util.OptionalDouble;
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(AutoIntervalDTO.type)
@@ -19,7 +20,7 @@ public abstract class AutoIntervalDTO implements IntervalDTO {
     public abstract String type();
 
     @JsonProperty(FIELD_SCALING)
-    public abstract OptionalDouble scaling();
+    public abstract Optional<Double> scaling();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -27,7 +28,7 @@ public abstract class AutoIntervalDTO implements IntervalDTO {
         public abstract Builder type(String type);
 
         @JsonProperty(FIELD_SCALING)
-        public abstract Builder scaling(Double scaling);
+        public abstract Builder scaling(@Nullable Double scaling);
 
         public abstract AutoIntervalDTO build();
 
