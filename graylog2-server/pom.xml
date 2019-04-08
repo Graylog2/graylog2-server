@@ -607,7 +607,7 @@
         <finalName>graylog</finalName>
         <resources>
             <resource>
-                <directory>${webInterface.path}/build</directory>
+                <directory>${webInterface.path}/target/web/build</directory>
                 <targetPath>web-interface/assets</targetPath>
             </resource>
             <resource>
@@ -833,7 +833,7 @@
                                 <fileset>
                                     <directory>${webInterface.path}</directory>
                                     <includes>
-                                        <include>build/**/*</include>
+                                        <include>target/**/*</include>
                                         <include>node_modules/**/*</include>
                                     </includes>
                                     <followSymlinks>false</followSymlinks>

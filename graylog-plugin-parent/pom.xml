@@ -37,6 +37,7 @@
 
     <properties>
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
+        <web.build-dir>${project.build.directory}/web/build</web.build-dir>
 
         <!-- Dependencies -->
         <auto-service.version>1.0-rc4</auto-service.version>
@@ -100,7 +101,6 @@
                         <fileset>
                             <directory>${basedir}</directory>
                             <includes>
-                                <include>build/**/*</include>
                                 <include>node_modules/**/*</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
