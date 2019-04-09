@@ -1,16 +1,21 @@
+// @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 import moment from 'moment';
 
-import { ViewActions, ViewStore } from './ViewStore';
-import Search from '../logic/search/Search';
-import { QueriesActions } from '../actions/QueriesActions';
+import Search from 'enterprise/logic/search/Search';
+import { QueriesActions } from 'enterprise/actions/QueriesActions';
+import type { QueryId, TimeRange } from 'enterprise/logic/queries/Query';
+import Query from 'enterprise/logic/queries/Query';
 
-export { QueriesActions } from '../actions/QueriesActions';
+import { ViewActions, ViewStore } from './ViewStore';
+import { ViewStatesActions } from './ViewStatesStore';
+
+export { QueriesActions } from 'enterprise/actions/QueriesActions';
 export const QueriesStore = Reflux.createStore({
   listenables: [QueriesActions],
-  queries: new Immutable.Map(),
+  queries: new Immutable.Map<QueryId, Query>(),
   search: Search.create(),
 
   init() {
@@ -38,40 +43,48 @@ export const QueriesStore = Reflux.createStore({
     }
   },
 
-  remove(queryId) {
+  duplicate(queryId: QueryId) {
+    const newQuery = this.queries.get(queryId).toBuilder().newId().build();
+    const promise = ViewStatesActions.duplicate(queryId)
+      .then(newViewState => QueriesActions.create(newQuery, newViewState));
+    QueriesActions.duplicate.promise(promise);
+    return promise;
+  },
+
+  remove(queryId: QueryId) {
     const newQueries = this.queries.remove(queryId);
     const promise = this._propagateQueryChange(newQueries);
     QueriesActions.remove.promise(promise);
     return promise;
   },
-  update(queryId, query) {
+  update(queryId: QueryId, query: Query) {
     const newQueries = this.queries.set(queryId, query);
     const promise = this._propagateQueryChange(newQueries);
     QueriesActions.update.promise(promise);
     return promise;
   },
 
-  query(queryId, query) {
-    const activeQuery = this.queries.get(queryId);
+  query(queryId: QueryId, query: string) {
+    const activeQuery: Query = this.queries.get(queryId);
     const newQuery = activeQuery.toBuilder().query(Object.assign({}, activeQuery.query, { query_string: query })).build();
     const newQueries = this.queries.set(queryId, newQuery);
     const promise = this._propagateQueryChange(newQueries);
     QueriesActions.query.promise(promise);
     return promise;
   },
-  timerange(queryId, timerange) {
+  timerange(queryId: QueryId, timerange: TimeRange) {
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(timerange).build());
     const promise = this._propagateQueryChange(newQueries);
     QueriesActions.timerange.promise(promise);
     return promise;
   },
-  rangeParams(queryId, key, value) {
+  rangeParams(queryId: QueryId, key, value) {
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { [key]: value })).build());
     const promise = this._propagateQueryChange(newQueries);
     QueriesActions.rangeParams.promise(promise);
     return promise;
   },
-  rangeType(queryId, type) {
+  rangeType(queryId: QueryId, type) {
     const oldQuery = this.queries.get(queryId);
     const oldTimerange = oldQuery.timerange;
     const oldType = oldTimerange.type;
@@ -80,19 +93,28 @@ export const QueriesStore = Reflux.createStore({
       return Promise.resolve();
     }
 
-    const newTimerange = { type };
+    let newTimerange: TimeRange;
 
     // eslint-disable-next-line default-case
     switch (type) {
       case 'absolute':
-        newTimerange.from = moment().subtract(oldTimerange.range, 'seconds').toISOString();
-        newTimerange.to = moment().toISOString();
+        newTimerange = {
+          type,
+          from: moment().subtract(oldTimerange.range, 'seconds').toISOString(),
+          to: moment().toISOString(),
+        };
         break;
       case 'relative':
-        newTimerange.range = 300;
+        newTimerange = {
+          type,
+          range: 300,
+        };
         break;
       case 'keyword':
-        newTimerange.keyword = 'Last five Minutes';
+        newTimerange = {
+          type,
+          keyword: 'Last five Minutes',
+        };
         break;
     }
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(newTimerange).build());

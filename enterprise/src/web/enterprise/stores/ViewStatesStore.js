@@ -1,11 +1,21 @@
+// @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
+import type { QueryId } from 'enterprise/logic/queries/Query';
+import ViewState from 'enterprise/logic/views/ViewState';
 import { ViewActions, ViewStore } from './ViewStore';
 
-export const ViewStatesActions = Reflux.createActions({
+type ViewStatesActionsTypes = {
+  add: (QueryId, ViewState) => Promise<ViewState>,
+  duplicate: (QueryId) => Promise<ViewState>,
+  remove: (QueryId) => Promise<ViewState>,
+  update: (QueryId, ViewState) => Promise<ViewState>,
+}
+export const ViewStatesActions: ViewStatesActionsTypes = Reflux.createActions({
   add: { asyncResult: true },
+  duplicate: { asyncResult: true },
   remove: { asyncResult: true },
   update: { asyncResult: true },
 });
@@ -27,23 +37,35 @@ export const ViewStatesStore = Reflux.createStore({
       this._trigger();
     }
   },
-  add(queryId, viewState) {
+  add(queryId: QueryId, viewState: ViewState) {
     const newState = this.states.updateIn([queryId], (value) => {
       if (value !== undefined) {
         throw new Error(`Unable to add view state for id <${queryId}>, it is already present.`);
       }
       return viewState;
     });
-    ViewActions.state(newState);
+    const promise = ViewActions.state(newState).then(() => viewState);
+    ViewStatesActions.add.promise(promise);
+    return promise;
   },
-  remove(queryId) {
+  duplicate(oldQueryId: QueryId) {
+    const newViewState = this.states.get(oldQueryId).duplicate();
+    const promise = Promise.resolve(newViewState);
+    ViewStatesActions.duplicate.promise(promise);
+    return promise;
+  },
+  remove(queryId: QueryId) {
+    const oldState = this.states.get(queryId);
     const newState = this.states.remove(queryId);
-    ViewActions.state(newState);
+    const promise = ViewActions.state(newState).then(() => oldState);
+    ViewStatesActions.remove.promise(promise);
+    return promise;
   },
-  update(queryId, viewState) {
+  update(queryId: QueryId, viewState: ViewState) {
     const newState = this.states.set(queryId, viewState);
-    const promise = ViewActions.state(newState);
+    const promise = ViewActions.state(newState).then(() => viewState);
     ViewStatesActions.update.promise(promise);
+    return promise;
   },
   _state() {
     return this.states;

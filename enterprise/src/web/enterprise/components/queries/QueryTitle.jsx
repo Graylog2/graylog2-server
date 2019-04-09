@@ -1,7 +1,28 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
+import { MenuItem } from 'react-bootstrap';
 
-class QueryTitle extends React.Component {
+import { QueriesActions } from 'enterprise/stores/QueriesStore';
+import { ViewActions } from 'enterprise/stores/ViewStore';
+import type { QueryId } from 'enterprise/logic/queries/Query';
+
+import QueryActionDropdown from './QueryActionDropdown';
+
+type Props = {
+  active: boolean,
+  id: QueryId,
+  onChange: (string) => void,
+  onClose: () => void,
+  value: string,
+};
+
+type State = {
+  editing: boolean,
+  value: string,
+};
+
+class QueryTitle extends React.Component<Props, State> {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
@@ -10,10 +31,11 @@ class QueryTitle extends React.Component {
 
   state = {
     editing: false,
+    // eslint-disable-next-line react/destructuring-assignment
     value: this.props.value,
   };
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     this.setState({ value: nextProps.value });
   }
 
@@ -21,34 +43,41 @@ class QueryTitle extends React.Component {
     this.setState(state => ({ editing: !state.editing }));
   };
 
-  _onChange = (evt) => {
+  // eslint-disable-next-line no-undef
+  _onChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
     evt.preventDefault();
     evt.stopPropagation();
     this.setState({ value: evt.target.value });
   };
 
-  _onClose = (evt) => {
+  _onClose = () => {
     const { onClose } = this.props;
-    evt.preventDefault();
-    evt.stopPropagation();
     onClose();
   };
 
   _onSubmit = () => {
-    if (this.state.value !== '') {
-      this.props.onChange(this.state.value);
+    const { value } = this.state;
+    if (value !== '') {
+      const { onChange } = this.props;
+      onChange(value);
     } else {
+      // eslint-disable-next-line react/destructuring-assignment
       this.setState({ value: this.props.value });
     }
     this.setState({ editing: false });
   };
 
+  _onDuplicate = (id: QueryId) => {
+    QueriesActions.duplicate(id)
+      .then(newQuery => ViewActions.selectQuery(newQuery.id));
+  };
+
   render() {
     const { editing, value } = this.state;
+    const { active, id } = this.props;
     const valueField = editing ? (
       <form onSubmit={this._onSubmit}>
-        <input autoFocus
-               type="text"
+        <input type="text"
                value={value}
                onFocus={e => e.target.select()}
                onBlur={this._toggleEditing}
@@ -62,10 +91,13 @@ class QueryTitle extends React.Component {
     return (
       <span>
         {valueField}{' '}
-        {!editing && <i className="fa fa-times"
-                        role="button"
-                        tabIndex={0}
-                        onClick={this._onClose} />}
+        {!editing && active && (
+          <QueryActionDropdown>
+            <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+            <MenuItem divider />
+            <MenuItem onSelect={this._onClose}>Close</MenuItem>
+          </QueryActionDropdown>
+        )}
       </span>
     );
   }

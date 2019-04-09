@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'enzyme';
-import * as mockImmutable from 'immutable';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
@@ -84,11 +83,11 @@ describe('SearchBar', () => {
 
     const timeRangeTypeSelector = wrapper.find('TimeRangeTypeSelector');
     const onSelect = timeRangeTypeSelector.at(0).props().onSelect;
-    QueriesActions.rangeType = jest.fn(() => ({ then: x => x() }));
+    QueriesActions.rangeType = jest.fn(() => Promise.resolve(42));
 
-    onSelect('absolute');
-
-    expect(executeFn).toHaveBeenCalled();
+    return onSelect('absolute').then(() => {
+      expect(executeFn).toHaveBeenCalled();
+    });
   });
 
   it('changing the time range value executes a new search', () => {
@@ -98,10 +97,10 @@ describe('SearchBar', () => {
 
     const timeRangeInput = wrapper.find('TimeRangeInput');
     const onChange = timeRangeInput.at(0).props().onChange;
-    QueriesActions.rangeParams = jest.fn(() => ({ then: x => x() }));
+    QueriesActions.rangeParams = jest.fn(() => Promise.resolve());
 
-    onChange({ range: 300 });
-
-    expect(executeFn).toHaveBeenCalled();
+    return onChange({ range: 300 }).then(() => {
+      expect(executeFn).toHaveBeenCalled();
+    });
   });
 });

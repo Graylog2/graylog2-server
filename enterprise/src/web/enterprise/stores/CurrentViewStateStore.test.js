@@ -11,9 +11,9 @@ import { ViewStatesActions } from './ViewStatesStore';
 describe('CurrentViewStateStore', () => {
   const viewState = ViewState.create();
   const viewId = 'beef-1000';
-  const viewMap = {};
-  viewMap[viewId] = viewState;
-  const statesMap = Immutable.Map(viewMap);
+  const viewStateMap = {};
+  viewStateMap[viewId] = viewState;
+  const statesMap = Immutable.Map(viewStateMap);
   PluginStore.exports = () => {
     return [{ type: 'MESSAGES', defaultHeight: 5, defaultWidth: 6 }];
   };
@@ -22,7 +22,7 @@ describe('CurrentViewStateStore', () => {
     const updateFn = jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(viewState);
-      return Promise.resolve();
+      return Promise.resolve(viewState);
     });
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
@@ -38,15 +38,15 @@ describe('CurrentViewStateStore', () => {
     const widgets = [
       MessagesWidget.builder().id('dead').build(),
     ];
-    const newView = viewState.toBuilder()
+    const expectedViewState = viewState.toBuilder()
       .widgetPositions(widgetPositionsMap)
       .widgets(widgets)
       .build();
 
-    const updateFn = jest.fn((id, view) => {
+    const updateFn = jest.fn((id, newViewState) => {
       expect(id).toEqual(viewId);
-      expect(view).toEqual(newView);
-      return Promise.resolve();
+      expect(newViewState).toEqual(expectedViewState);
+      return Promise.resolve(expectedViewState);
     });
 
     ViewStatesActions.update = updateFn;
@@ -61,29 +61,29 @@ describe('CurrentViewStateStore', () => {
     const widgetPositionsMap = { dead: widgetPos };
     const oldWidget = MessagesWidget.builder().id('dead').build();
     const oldWidgets = [oldWidget];
-    const oldView = viewState.toBuilder()
+    const oldViewState = viewState.toBuilder()
       .widgetPositions(widgetPositionsMap)
       .widgets(oldWidgets)
       .build();
 
-    viewMap[viewId] = oldView;
-    const sMap = Immutable.Map(viewMap);
+    viewStateMap[viewId] = oldViewState;
+    const sMap = Immutable.Map(viewStateMap);
 
     const newWidget = MessagesWidget.builder().id('feed').build();
     const expectedWidgets = [oldWidget, newWidget];
-    const newView = viewState.toBuilder()
+    const expectedViewState = viewState.toBuilder()
       .widgetPositions(widgetPositionsMap)
       .widgets(expectedWidgets)
       .build();
 
-    const updateFn = jest.fn((id, view) => {
+    const updateFn = jest.fn((id, newViewState) => {
       expect(id).toEqual(viewId);
-      expect(view).toEqual(newView);
-      return Promise.resolve();
+      expect(newViewState).toEqual(expectedViewState);
+      return Promise.resolve(expectedViewState);
     });
 
     ViewStatesActions.update = updateFn;
-    CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: oldView });
+    CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: oldViewState });
     CurrentViewStateStore.onViewStatesStoreChange(sMap);
     CurrentViewStateStore.widgets(expectedWidgets);
     expect(updateFn.mock.calls.length).toBe(1);

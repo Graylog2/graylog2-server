@@ -1,22 +1,25 @@
+// @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
+import type { TitlesMap, TitleType } from './TitleTypes';
 
-export const TitlesActions = Reflux.createActions({
+type TitlesActionsTypes = {
+  set: (string, string, string) => Promise<TitlesMap>
+};
+
+export const TitlesActions: TitlesActionsTypes = Reflux.createActions({
   set: { asyncResult: true },
 });
 
-export const TitleTypes = {
-  Tab: 'tab',
-  Widget: 'widget',
-};
+export { default as TitleTypes } from './TitleTypes';
 
 export const TitlesStore = Reflux.createStore({
   listenables: [TitlesActions],
 
-  titles: new Immutable.Map(),
+  titles: new Immutable.Map<TitleType, Immutable.Map<string, string>>(),
 
   init() {
     this.listenTo(CurrentViewStateStore, this.onViewStateStoreChange, this.onViewStateStoreChange);
@@ -34,7 +37,7 @@ export const TitlesStore = Reflux.createStore({
 
   set(type, id, title) {
     this.titles = this.titles.setIn([type, id], title);
-    const promise = CurrentViewStateActions.titles(this.titles);
+    const promise = CurrentViewStateActions.titles(this.titles).then(() => this.titles);
     this._trigger();
     TitlesActions.set.promise(promise);
     return promise;

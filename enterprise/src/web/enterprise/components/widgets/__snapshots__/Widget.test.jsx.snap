@@ -49,6 +49,7 @@ exports[`<Widget /> should render with empty props 1`] = `
           <span>
             <span
               onClick={[Function]}
+              onKeyDown={[Function]}
               role="presentation"
             >
               <span>

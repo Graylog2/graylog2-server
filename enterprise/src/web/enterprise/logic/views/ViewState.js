@@ -5,16 +5,17 @@ import { fromPairs } from 'lodash';
 
 import Widget from 'enterprise/logic/widgets/Widget';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import TitleTypes from 'enterprise/stores/TitleTypes';
+import type { TitlesMap } from 'enterprise/stores/TitleTypes';
 
 type FieldNameList = Array<string>;
-type TitlesMap = Map<string, Map<string, string>>;
 type WidgetMapping = Map<string, Collection<string>>;
 type State = {
   fields: FieldNameList,
   titles: TitlesMap,
   widgets: Array<Widget>,
   widgetMapping: WidgetMapping,
-  widgetPositions: Array<WidgetPosition>
+  widgetPositions: { [string]: WidgetPosition },
 };
 
 type BuilderState = Map<string, any>;
@@ -24,13 +25,13 @@ type JsonState = {
   titles: TitlesMap,
   widgets: Array<any>,
   widget_mapping: WidgetMapping,
-  positions: Array<WidgetPosition>
+  positions: { [string]: WidgetPosition },
 };
 
 export default class ViewState {
   _value: State;
 
-  constructor(fields: FieldNameList, titles: TitlesMap, widgets: Array<Widget>, widgetMapping: WidgetMapping, widgetPositions: Array<WidgetPosition>) {
+  constructor(fields: FieldNameList, titles: TitlesMap, widgets: Array<Widget>, widgetMapping: WidgetMapping, widgetPositions: { [string]: WidgetPosition }) {
     this._value = { fields, titles, widgets, widgetMapping, widgetPositions };
   }
 
@@ -55,10 +56,31 @@ export default class ViewState {
     return this._value.widgetMapping;
   }
 
-  get widgetPositions(): Array<WidgetPosition> {
+  get widgetPositions(): { [string]: WidgetPosition } {
     return this._value.widgetPositions;
   }
 
+  duplicate() {
+    const widgetIdTranslation = {};
+    const newWidgets = this.widgets.map((widget) => {
+      const newWidget = widget.toBuilder().newId().build();
+      widgetIdTranslation[widget.id] = newWidget.id;
+      return newWidget;
+    });
+    const newWidgetTitles = this.titles.get(TitleTypes.Widget).mapEntries(([key, value]) => [widgetIdTranslation[key], value]);
+    const newTitles = this.titles
+      .set(TitleTypes.Widget, newWidgetTitles)
+      .updateIn([TitleTypes.Tab, 'title'], value => (value ? `${value} (Copy)` : value));
+    const newWidgetPositions = Map(this.widgetPositions).mapEntries(([key, value]) => [widgetIdTranslation[key], value]).toJS();
+    return this.toBuilder()
+      .widgetMapping(Map())
+      .widgetPositions(newWidgetPositions)
+      .widgets(newWidgets)
+      .titles(newTitles)
+      .build();
+  }
+
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { fields, titles, widgets, widgetMapping, widgetPositions } = this._value;
 
@@ -104,6 +126,7 @@ export default class ViewState {
       .build();
   }
 
+  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder();

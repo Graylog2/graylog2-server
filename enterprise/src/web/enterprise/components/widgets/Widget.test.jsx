@@ -88,7 +88,7 @@ describe('<Widget />', () => {
   it('copies title when duplicating widget', (done) => {
     const wrapper = mount(<DummyWidget title="Dummy Widget" />);
 
-    wrapper.find('WidgetActionToggle').simulate('click');
+    wrapper.find('ActionToggle').simulate('click');
     const duplicate = wrapper.find('a[children="Duplicate"]');
     WidgetActions.duplicate = jest.fn(() => Promise.resolve({ id: 'duplicatedWidgetId' }));
     TitlesActions.set = jest.fn((type, id, title) => {

@@ -26,7 +26,7 @@ import ShareViewModal from './views/ShareViewModal';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
 
-const QueryTabActions = createReactClass({
+const ViewActionsMenu = createReactClass({
   propTypes: {
     currentUser: PropTypes.shape({
       currentUser: PropTypes.shape({
@@ -137,4 +137,4 @@ const QueryTabActions = createReactClass({
   },
 });
 
-export default connect(QueryTabActions, { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore });
+export default connect(ViewActionsMenu, { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore });

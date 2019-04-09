@@ -1,6 +1,6 @@
 // @flow strict
-
 import Immutable, { is } from 'immutable';
+import uuid from 'uuid/v4';
 
 export type QueryId = string;
 
@@ -38,8 +38,8 @@ export type RelativeTimeRange = {
 
 export type AbsoluteTimeRange = {
   type: 'absolute',
-  from: Date,
-  to: Date,
+  from: string,
+  to: string,
 };
 
 export type KeywordTimeRange = {
@@ -76,6 +76,7 @@ export default class Query {
     return this._value.searchTypes;
   }
 
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, query, timerange, filter, searchTypes } = this._value;
     // eslint-disable-next-line no-use-before-define
@@ -111,6 +112,7 @@ export default class Query {
     };
   }
 
+  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
@@ -133,6 +135,10 @@ class Builder {
 
   id(value: QueryId): Builder {
     return new Builder(this.value.set('id', value));
+  }
+
+  newId(): Builder {
+    return this.id(uuid());
   }
 
   query(value: QueryString): Builder {

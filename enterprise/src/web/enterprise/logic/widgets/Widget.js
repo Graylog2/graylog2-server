@@ -12,6 +12,7 @@ type State = {
 class Widget {
   _value: State;
 
+  // eslint-disable-next-line no-use-before-define
   static Builder: typeof Builder;
 
   constructor(id: string, type: string, config: any, filter: ?string) {
@@ -38,6 +39,7 @@ class Widget {
     return this.toBuilder().id(newId).build();
   }
 
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, type, config, filter } = this._value;
     // eslint-disable-next-line no-use-before-define

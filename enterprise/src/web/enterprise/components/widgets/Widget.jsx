@@ -141,7 +141,6 @@ class Widget extends React.Component {
     const { editing } = this.state;
     const { config, filter } = widget;
     const visualization = this.visualize();
-    const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
     if (editing) {
       const EditComponent = Widget._editComponentForType(widget.type);
       return (
@@ -182,7 +181,7 @@ class Widget extends React.Component {
                 <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
               </WidgetFilterMenu>
               {' '}
-              <WidgetActionDropdown element={widgetActionDropdownCaret} >
+              <WidgetActionDropdown>
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                 <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
                 <MenuItem divider />

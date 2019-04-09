@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import { mount } from 'enzyme';
 
 import { MenuItem } from 'react-bootstrap';
@@ -8,20 +9,19 @@ import WidgetActionDropdown from './WidgetActionDropdown';
 describe('WidgetActionDropdown', () => {
   it('opens menu when trigger element is clicked', () => {
     const wrapper = mount((
-      <WidgetActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
+      <WidgetActionDropdown>
         <MenuItem>Foo</MenuItem>
       </WidgetActionDropdown>
     ));
     expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
     const trigger = wrapper.find('span[role="presentation"]');
-    expect(trigger).toContainMatchingElement('div.my-trigger-element');
     trigger.simulate('click');
     expect(wrapper).toContainMatchingElement('ul.dropdown-menu');
   });
   it('closes menu when MenuItem is clicked', () => {
     const onSelect = jest.fn();
     const wrapper = mount((
-      <WidgetActionDropdown element={<div>Trigger!</div>}>
+      <WidgetActionDropdown>
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
       </WidgetActionDropdown>
     ));
