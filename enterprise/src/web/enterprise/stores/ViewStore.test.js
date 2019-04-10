@@ -50,20 +50,29 @@ describe('ViewStore', () => {
       expect(state.activeQuery).toBe('firstQueryId');
     });
   });
-  it('resets dirty flag when an existing view is updated', () => {
-    const search = Search.create();
-    const newView = View.builder().newId().search(search).build();
-    return ViewActions.load(newView)
-      .then(() => ViewActions.description('My view!'))
-      .then(({ view }) => {
-        const state = ViewStore.getInitialState();
-        expect(state.dirty).toEqual(true);
-        return ViewManagementActions.update(view);
-      })
-      .then(() => {
-        const state = ViewStore.getInitialState();
-        expect(state.dirty).toEqual(false);
-      });
+  describe('maintains dirty flag:', () => {
+    beforeEach(() => {
+      SearchActions.create = jest.fn(s => Promise.resolve({ search: s }));
+    });
+    it('resets dirty flag when an existing view is updated', () => {
+      const search = Search.create();
+      const newView = View.builder().newId().search(search).build();
+      return ViewActions.load(newView)
+        .then(() => ViewActions.description('My view!'))
+        .then(({ view }) => {
+          const state = ViewStore.getInitialState();
+          expect(state.dirty).toEqual(true);
+          return ViewManagementActions.update(view);
+        })
+        .then(() => {
+          const state = ViewStore.getInitialState();
+          expect(state.dirty).toEqual(false);
+        });
+    });
+    it('sets dirty flag to false when creating a view', () => {
+      return ViewActions.create()
+        .then(({ dirty }) => expect(dirty).toBeFalsy());
+    });
   });
 
   describe('search recreation:', () => {

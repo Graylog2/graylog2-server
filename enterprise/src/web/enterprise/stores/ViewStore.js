@@ -76,12 +76,13 @@ export const ViewStore: ViewStoreType = Reflux.createStore({
   create() {
     const [view] = this._updateSearch(ViewGenerator());
     this.view = view;
-    this.dirty = false;
     const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
     const firstQueryId = queries.first().id;
     this.activeQuery = firstQueryId;
 
-    const promise = ViewActions.search(view.search).then(() => this._trigger());
+    const promise = ViewActions.search(view.search)
+      .then(() => { this.dirty = false; })
+      .then(() => this._trigger());
 
     ViewActions.create.promise(promise.then(() => this._state()));
 
