@@ -211,7 +211,7 @@ public class StreamResource extends RestResource {
 
     @GET
     @Timed
-    @Path("/page")
+    @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of streams")
     @Produces(MediaType.APPLICATION_JSON)
     public StreamPageListResponse getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
