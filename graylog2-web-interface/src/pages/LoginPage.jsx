@@ -10,7 +10,9 @@ import LoadingPage from './LoadingPage';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const SessionStore = StoreProvider.getStore('Session');
@@ -47,12 +49,22 @@ const LoginPage = createReactClass({
     const username = this.username.getValue();
     const password = this.password.getValue();
     const location = document.location.host;
-    this.promise = SessionActions.login.triggerPromise(username, password, location);
+    this.promise = SessionActions.login.triggerPromise(
+      username,
+      password,
+      location,
+    );
     this.promise.catch((error) => {
       if (error.additional.status === 401) {
-        this.setState({ lastError: 'Invalid credentials, please verify them and retry.' });
+        this.setState({
+          lastError: 'Invalid credentials, please verify them and retry.',
+        });
       } else {
-        this.setState({ lastError: `Error - the server returned: ${error.additional.status} - ${error.message}` });
+        this.setState({
+          lastError: `Error - the server returned: ${
+            error.additional.status
+          } - ${error.message}`,
+        });
       }
     });
     this.promise.finally(() => {
@@ -67,7 +79,12 @@ const LoginPage = createReactClass({
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <a className="close" onClick={this.resetLastError}>×</a>{error}
+            <button className="close"
+                    onClick={this.resetLastError}
+                    type="button">
+              &times;
+            </button>
+            {error}
           </Alert>
         </div>
       );
@@ -80,33 +97,47 @@ const LoginPage = createReactClass({
   },
 
   render() {
-    if (this.state.validatingSession) {
-      return (
-        <LoadingPage />
-      );
+    const { lastError, loading, validatingSession } = this.state;
+
+    if (validatingSession) {
+      return <LoadingPage />;
     }
 
-    const alert = this.formatLastError(this.state.lastError);
+    const alert = this.formatLastError(lastError);
     return (
       <DocumentTitle title="Sign in">
         <div>
           <div className="container" id="login-box">
             <Row>
-              <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
-                <legend><i className="fa fa-group" /> Welcome to Graylog</legend>
+              <form className="col-md-4 col-md-offset-4 well"
+                    id="login-box-content"
+                    onSubmit={this.onSignInClicked}>
+                <legend>
+                  <i className="fa fa-group" /> Welcome to Graylog
+                </legend>
 
                 {alert}
 
-                <Input ref={(username) => { this.username = username; }} id="username" type="text" placeholder="Username" autoFocus />
+                <Input ref={(username) => {
+                  this.username = username;
+                }}
+                       id="username"
+                       type="text"
+                       placeholder="Username"
+                       autoFocus />
 
-                <Input ref={(password) => { this.password = password; }} id="password" type="password" placeholder="Password" />
+                <Input ref={(password) => {
+                  this.password = password;
+                }}
+                       id="password"
+                       type="password"
+                       placeholder="Password" />
 
                 <FormGroup>
-                  <Button type="submit" bsStyle="info" disabled={this.state.loading}>
-                    {this.state.loading ? 'Signing in...' : 'Sign in'}
+                  <Button type="submit" bsStyle="info" disabled={loading}>
+                    {loading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </FormGroup>
-
               </form>
             </Row>
           </div>
