@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const puppeteer = require('puppeteer');
 const express = require('express');
 
@@ -16,11 +17,13 @@ function generateIndexHtml(assets) {
     <html>
   `;
 }
-function bootstrapExpress(buildDir, config, indexHtml = '<html><body></body></html>') {
+function bootstrapExpress(buildDir, config, pluginMounts, indexHtml = '<html><body></body></html>') {
   const app = express();
   app.get('/', (req, res) => res.send(indexHtml));
   app.get('/assets/config.js', (req, res) => res.send(config));
   app.use('/assets', express.static(buildDir));
+  Object.entries(pluginMounts)
+    .forEach(([name, pluginPath]) => app.use(`/assets/${name}`, express.static(pluginPath)));
   const server = app.listen();
   const { port } = server.address();
 
@@ -43,6 +46,7 @@ async function loadPage(url, handleError, handleConsole) {
 }
 
 const buildDir = process.argv[2] || 'build';
+const plugins = process.argv.slice(3);
 
 const config = `
 window.appConfig = {
@@ -52,22 +56,38 @@ window.appConfig = {
 };
 `;
 
-function collectAssets() {
+function collectMounts(pluginModuleNames) {
+  return pluginModuleNames.map((pluginModuleName) => {
+    const pluginModule = JSON.parse(fs.readFileSync(pluginModuleName));
+    const name = Object.keys(pluginModule.files.chunks)[0];
+    return { [name]: path.dirname(pluginModuleName) };
+  }).reduce((prev, cur) => ({ ...prev, ...cur }), {});
+}
+
+function collectAssets(pluginModules) {
   const vendorModule = JSON.parse(fs.readFileSync(`${buildDir}/${VENDORMODULE}`));
   const buildModule = JSON.parse(fs.readFileSync(`${buildDir}/${BUILDMODULE}`));
+  const pluginAssets = pluginModules.map((pluginModule) => {
+    const name = Object.keys(pluginModule.files.chunks)[0];
+    const file = pluginModule.files.chunks[name].entry;
+    return `${name}/${file}`;
+  });
 
   return [
     'config.js',
     ...vendorModule.files.js,
     buildModule.files.chunks.polyfill.entry,
     buildModule.files.chunks.builtins.entry,
+    ...pluginAssets,
     buildModule.files.chunks.app.entry,
   ].map(asset => `/assets/${asset}`);
 }
 
-const assets = collectAssets();
+const pluginModules = plugins.map(plugin => JSON.parse(fs.readFileSync(plugin)));
+const assets = collectAssets(pluginModules);
+const pluginMounts = collectMounts(plugins);
 
-const { url, server } = bootstrapExpress(buildDir, config, generateIndexHtml(assets));
+const { url, server } = bootstrapExpress(buildDir, config, pluginMounts, generateIndexHtml(assets));
 
 const pageErrors = [];
 const consoleLogs = [];
