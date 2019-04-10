@@ -18,6 +18,7 @@ export type FieldTypeJSON = {
 
 class FieldType {
   value: Immutable.Map<string, *>;
+
   constructor(type: string, properties: Array<Property>, indexNames: Array<string>) {
     this.value = Immutable.Map({ type, properties: Immutable.Set(properties), indexNames: Immutable.Set(indexNames) });
   }

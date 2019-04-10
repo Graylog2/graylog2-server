@@ -19,8 +19,8 @@ const mockRouter = () => ({
 const lastCall = (fn, filter = () => true) => last(fn.mock.calls.filter(filter));
 
 describe('WindowLeaveMessage', () => {
-  const addEventListener = window.addEventListener;
-  const removeEventListener = window.removeEventListener;
+  const { addEventListener } = window;
+  const { removeEventListener } = window;
 
   beforeEach(() => {
     window.addEventListener = jest.fn(addEventListener);

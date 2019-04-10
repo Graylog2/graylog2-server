@@ -1,5 +1,5 @@
-import ViewSharing from './ViewSharing';
 import { Map } from 'immutable';
+import ViewSharing from './ViewSharing';
 
 type SpecificUsersJson = {
   type: 'users',

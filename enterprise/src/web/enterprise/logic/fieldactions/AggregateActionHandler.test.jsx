@@ -16,7 +16,7 @@ describe('AggregateActionHandler', () => {
 
     expect(WidgetActions.create).toHaveBeenCalled();
     const widget: AggregationWidget = WidgetActions.create.mock.calls[0][0];
-    const config: AggregationWidgetConfig = widget.config;
+    const { config } = widget;
     expect(config.rowPivots[0]).toEqual(new Pivot('foo', 'values', { limit: 15 }));
   });
 });

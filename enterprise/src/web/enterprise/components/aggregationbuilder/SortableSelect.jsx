@@ -21,10 +21,10 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
   // eslint-disable-next-line react/prop-types
   const ValueList = ({ children, ...rest }) => (
     <SortableValueList {...rest}
-                        onSortEnd={v => _onSortEnd(v, onChange, value)}
-                        axis="x"
-                        helperClass={`Select--multi has-value is-clearable is-searchable ${styles.draggedElement}`}
-                        pressDelay={200}>
+                       onSortEnd={v => _onSortEnd(v, onChange, value)}
+                       axis="x"
+                       helperClass={`Select--multi has-value is-clearable is-searchable ${styles.draggedElement}`}
+                       pressDelay={200}>
       {children}
     </SortableValueList>
   );
@@ -40,13 +40,11 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
     ValueContainer: ValueList,
   };
   return (
-    <Select
-      isMulti
-      {...remainingProps}
-      onChange={onChange}
-      value={values}
-      components={_components}
-    />
+    <Select isMulti
+            {...remainingProps}
+            onChange={onChange}
+            value={values}
+            components={_components} />
   );
 };
 

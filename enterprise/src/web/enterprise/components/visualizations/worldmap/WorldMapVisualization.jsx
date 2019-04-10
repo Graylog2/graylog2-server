@@ -21,8 +21,7 @@ const WorldMapVisualization = ({ config, data, onChange, width, ...rest }) => {
       const newX = x.map(lastKey);
       const keys = x.map(k => k.slice(0, -1)
         .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-        .reduce(mergeObject, {}),
-      );
+        .reduce(mergeObject, {}));
       return { name, y, x: newX, keys };
     })
     .map(({ keys, name, x, y }) => {

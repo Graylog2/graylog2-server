@@ -15,9 +15,8 @@ const AddToTableActionHandler: FieldActionHandlerWithContext = (queryId: string,
       .fields(newFields)
       .build();
     return WidgetActions.updateConfig(widget.id, newConfig);
-  } else {
-    return SelectedFieldsActions.add(field);
   }
+  return SelectedFieldsActions.add(field);
 };
 
 AddToTableActionHandler.condition = ({ context, name }: { context: ActionContexts, name: string }) => {

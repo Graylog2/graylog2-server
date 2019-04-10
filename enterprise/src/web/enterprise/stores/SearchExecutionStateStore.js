@@ -84,7 +84,7 @@ export const SearchExecutionStateStore = Reflux.createStore({
   },
 
   setParameterValues(parameterMap: ParameterMap): SearchExecutionState {
-    let parameterBindings = this.executionState.parameterBindings;
+    let { parameterBindings } = this.executionState;
 
     parameterMap.forEach((value, parameterName) => {
       parameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(value));

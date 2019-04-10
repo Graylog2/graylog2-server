@@ -9,6 +9,7 @@ class FullSizeContainer extends React.Component {
       width: 0,
     };
   }
+
   componentDidMount() {
     if (this.wrapper) {
       const height = this.wrapper.offsetHeight;
@@ -18,6 +19,7 @@ class FullSizeContainer extends React.Component {
       }
     }
   }
+
   componentDidUpdate() {
     if (this.wrapper) {
       const height = this.wrapper.offsetHeight;
@@ -27,6 +29,7 @@ class FullSizeContainer extends React.Component {
       }
     }
   }
+
   render() {
     const { children } = this.props;
     const { height, width } = this.state;

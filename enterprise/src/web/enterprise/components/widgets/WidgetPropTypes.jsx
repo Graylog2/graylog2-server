@@ -29,4 +29,3 @@ export const WidgetError = PropTypes.shape({
 });
 export const WidgetErrorsList = PropTypes.arrayOf(WidgetError);
 export const WidgetErrorsMap = PropTypes.objectOf(WidgetErrorsList);
-

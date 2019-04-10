@@ -71,9 +71,9 @@ class RefreshControls extends React.Component<Props, State> {
       return <MenuItem key={`RefreshControls-${label}`} onClick={() => this._onChange(interval)}>{label}</MenuItem>;
     });
     const intervalDuration = moment.duration(this.props.refreshConfig.interval);
-    const naturalInterval = intervalDuration.asSeconds() < 60 ?
-      <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span> :
-      <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
+    const naturalInterval = intervalDuration.asSeconds() < 60
+      ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
+      : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
     const buttonLabel = <span>Update every {naturalInterval}</span>;
     return (
       <div className={`${styles.position} pull-right`}>

@@ -48,24 +48,30 @@ class MessageFields extends React.Component {
         return <ChangedMessageField key={key} fieldName={key} newValue={fields[key]} />;
       }
       if (decorationStats.changed_fields[key]) {
-        return (<ChangedMessageField key={key}
-                                     fieldName={key}
-                                     originalValue={decorationStats.changed_fields[key]}
-                                     newValue={fields[key]} />);
+        return (
+          <ChangedMessageField key={key}
+                               fieldName={key}
+                               originalValue={decorationStats.changed_fields[key]}
+                               newValue={fields[key]} />
+        );
       }
 
       if (decorationStats.removed_fields[key]) {
-        return (<ChangedMessageField key={key}
-                                     fieldName={key}
-                                     originalValue={decorationStats.removed_fields[key]} />);
+        return (
+          <ChangedMessageField key={key}
+                               fieldName={key}
+                               originalValue={decorationStats.removed_fields[key]} />
+        );
       }
 
-      return (<MessageField {...this.props}
-                           key={key}
-                           fieldName={key}
-                           fieldType={fieldType.type}
-                           value={fields[key]}
-                           disableFieldActions />);
+      return (
+        <MessageField {...this.props}
+                      key={key}
+                      fieldName={key}
+                      fieldType={fieldType.type}
+                      value={fields[key]}
+                      disableFieldActions />
+      );
     });
   };
 

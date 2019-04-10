@@ -46,8 +46,7 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
           <Select options={fieldsForSelect}
                   onChange={newFields => _onFieldSelectionChanged(newFields, config, onChange)}
                   value={selectedFieldsForSelect}
-                  multi
-          />
+                  multi />
         </DescriptionBox>
       </Col>
       <Col md={9}>

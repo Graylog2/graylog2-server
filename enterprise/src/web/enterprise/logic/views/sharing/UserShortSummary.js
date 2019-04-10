@@ -12,6 +12,7 @@ type State = {
 
 export default class UserShortSummary {
   _value: State;
+
   constructor(username: string, fullname: string) {
     this._value = { username, fullname };
   }

@@ -12,18 +12,16 @@ type Props = {
 };
 
 const SortDirectionSelect = ({ direction, disabled, onChange }: Props): Select => (
-  <Select
-    isDisabled={disabled}
-    isClearable={false}
-    isSearchable={false}
-    options={[
-      { label: 'Ascending', value: 'Ascending' },
-      { label: 'Descending', value: 'Descending' },
-    ]}
-    onChange={({ value }) => onChange(Direction.fromString(value))}
-    placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-    value={direction && { label: direction, value: direction }}
-  />
+  <Select isDisabled={disabled}
+          isClearable={false}
+          isSearchable={false}
+          options={[
+            { label: 'Ascending', value: 'Ascending' },
+            { label: 'Descending', value: 'Descending' },
+          ]}
+          onChange={({ value }) => onChange(Direction.fromString(value))}
+          placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
+          value={direction && { label: direction, value: direction }} />
 );
 
 SortDirectionSelect.propTypes = {

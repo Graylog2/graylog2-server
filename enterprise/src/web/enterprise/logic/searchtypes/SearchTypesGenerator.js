@@ -27,7 +27,8 @@ export default (widgets) => {
           {
             id: searchTypeId,
             type: searchType.type,
-          });
+          },
+        );
     })
     .add(Immutable.Map({
       id: uuid(),

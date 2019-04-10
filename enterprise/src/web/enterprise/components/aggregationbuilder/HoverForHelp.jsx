@@ -6,7 +6,7 @@ import { Position } from 'react-overlays';
 
 class HoverForHelp extends React.Component {
   state = {
-    hover: false
+    hover: false,
   };
 
   _onToggleHover = () => this.setState(({ hover }) => ({ hover: !hover }));
@@ -15,11 +15,9 @@ class HoverForHelp extends React.Component {
     const { children, title } = this.props;
     const popover = this.state.hover ? (
       <Portal>
-        <Position
-          /* eslint-disable-next-line no-undef */
-          container={document.body}
-          placement="bottom"
-          target={this.target}>
+        <Position container={document.body}
+                  placement="bottom"
+                  target={this.target}>
           <Popover title={title} id="configuration-popover">
             {children}
           </Popover>

@@ -63,8 +63,8 @@ class MessageDetail extends React.Component {
         <a href={nodeURL}>
           <i className="fa fa-code-fork" />
           &nbsp;
-          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span
-          style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
+          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
+          </span>
         </a>
       );
     } else {

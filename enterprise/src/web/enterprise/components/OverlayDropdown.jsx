@@ -6,8 +6,7 @@ import { Overlay } from 'react-overlays';
 import styles from './OverlayDropdown.css';
 
 const FilterProps = ({ children, style }) => React.Children.map(children,
-  child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }),
-);
+  child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }));
 
 export default class OverlayDropdown extends React.Component {
   static propTypes = {

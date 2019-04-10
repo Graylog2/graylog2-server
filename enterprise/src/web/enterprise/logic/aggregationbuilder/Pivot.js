@@ -16,9 +16,11 @@ type InternalState = {
 
 export default class Pivot {
   _value: InternalState;
+
   constructor(field: string, type: string, config: ConfigType = {}) {
     this._value = { field, type, config };
   }
+
   get field() {
     return this._value.field;
   }

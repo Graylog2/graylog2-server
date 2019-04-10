@@ -58,7 +58,8 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
       // $FlowFixMe: Should be safe, even if rollup is not present
       .filter(({ rollup }) => !rollup)
       .map(({ key }) => key.slice(0, -1)),
-    isEqual);
+    isEqual,
+  );
   return Immutable.List(uniqRows).sort(_compareArray).toArray();
 };
 
@@ -79,15 +80,17 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map(pivotField => ({ [pivotField]: expandedRows[idx][pivotField] }));
     // eslint-disable-next-line react/no-array-index-key
-    return (<DataTableEntry key={`datatableentry-${idx}`}
-                            fields={effectiveFields}
-                            item={reducedItem}
-                            valuePath={valuePath}
-                            currentView={currentView}
-                            columnPivots={columnFieldNames}
-                            columnPivotValues={actualColumnPivotFields}
-                            types={fields}
-                            series={series} />);
+    return (
+      <DataTableEntry key={`datatableentry-${idx}`}
+                      fields={effectiveFields}
+                      item={reducedItem}
+                      valuePath={valuePath}
+                      currentView={currentView}
+                      columnPivots={columnFieldNames}
+                      columnPivotValues={actualColumnPivotFields}
+                      types={fields}
+                      series={series} />
+    );
   });
 
   return (

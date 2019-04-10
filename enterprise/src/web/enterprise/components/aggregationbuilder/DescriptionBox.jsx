@@ -41,11 +41,9 @@ export default class DescriptionBox extends React.Component {
 
     return (
       <Portal>
-        <Position
-          /* eslint-disable-next-line no-undef */
-          container={document.body}
-          placement="bottom"
-          target={this.target}>
+        <Position container={document.body}
+                  placement="bottom"
+                  target={this.target}>
           <Popover title="Config options" id="config-popover">
             {configurableElement}
           </Popover>
@@ -56,11 +54,13 @@ export default class DescriptionBox extends React.Component {
 
   configCaret = () => {
     if (this.props.configurableOptions) {
-      return (<i ref={(node) => { this.target = node; }}
-                 role="button"
-                 tabIndex={0}
-                 onClick={this.onToggleConfig}
-                 className="fa fa-wrench" />);
+      return (
+        <i ref={(node) => { this.target = node; }}
+           role="button"
+           tabIndex={0}
+           onClick={this.onToggleConfig}
+           className="fa fa-wrench" />
+      );
     }
     return null;
   };

@@ -37,7 +37,7 @@ export default class ViewPropertiesModal extends React.Component {
 
   // eslint-disable-next-line consistent-return
   _onChange = (event) => {
-    const name = event.target.name;
+    const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
 
     switch (name) {
@@ -49,6 +49,7 @@ export default class ViewPropertiesModal extends React.Component {
   };
 
   _onClose = () => this.props.onClose();
+
   _onSave = () => {
     this.props.onSave(this.state.view);
     this.props.onClose();

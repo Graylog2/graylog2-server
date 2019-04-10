@@ -6,13 +6,13 @@ import { Button } from 'react-bootstrap';
 import Input from 'components/bootstrap/Input';
 
 const ColumnPivotConfiguration = ({ onClose, onRollupChange, rollup }) => (
-  <div >
+  <div>
     <Input type="checkbox"
            id="rollup"
            name="rollup"
            label="Rollup"
            autoFocus
-           onChange={e => onRollupChange(e.target.checked) }
+           onChange={e => onRollupChange(e.target.checked)}
            help="When rollup is enabled, an additional trace totalling individual subtraces will be included."
            checked={rollup} />
     <div className="pull-right" style={{ marginBottom: '10px' }}>

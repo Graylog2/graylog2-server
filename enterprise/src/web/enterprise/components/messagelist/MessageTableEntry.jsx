@@ -97,11 +97,14 @@ class MessageTableEntry extends React.Component {
           ))}
         </tr>
 
-        {this.props.showMessageRow &&
+        {this.props.showMessageRow
+        && (
         <tr className="message-row" onClick={this._toggleDetail}>
           <td colSpan={colSpanFixup}><div className="message-wrapper"><Highlight field="message" value={message.fields.message} /></div></td>
-        </tr>}
-        {this.props.expanded &&
+        </tr>
+        )}
+        {this.props.expanded
+        && (
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
             <ConnectedMessageDetail message={message}
@@ -109,7 +112,8 @@ class MessageTableEntry extends React.Component {
                                     disableSurroundingSearch={this.props.disableSurroundingSearch}
                                     expandAllRenderAsync={this.props.expandAllRenderAsync} />
           </td>
-        </tr>}
+        </tr>
+        )}
       </tbody>
     );
   }

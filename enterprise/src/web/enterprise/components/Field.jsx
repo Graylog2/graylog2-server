@@ -52,10 +52,13 @@ export default class Field extends React.Component {
       };
       const condition = fieldAction.condition || (() => true);
       const actionDisabled = !condition({ name, type, context: this.context });
-      return (<MenuItem key={`${name}-action-${fieldAction.type}`}
-                        disabled={actionDisabled}
-                        eventKey={{ action: fieldAction.type, field: name }}
-                        onSelect={onSelect}>{fieldAction.title}</MenuItem>);
+      return (
+        <MenuItem key={`${name}-action-${fieldAction.type}`}
+                  disabled={actionDisabled}
+                  eventKey={{ action: fieldAction.type, field: name }}
+                  onSelect={onSelect}>{fieldAction.title}
+        </MenuItem>
+      );
     });
 
     return (
@@ -63,7 +66,7 @@ export default class Field extends React.Component {
                        toggle={wrappedElement}
                        placement="right"
                        onToggle={this._onMenuToggle}
-                       menuContainer={menuContainer} >
+                       menuContainer={menuContainer}>
         <div style={{ marginBottom: '10px' }}>
           <span className={`field-name ${style.dropdownheader}`}>
             {name} = {type.type}

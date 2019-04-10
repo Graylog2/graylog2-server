@@ -31,8 +31,7 @@ describe('XYPlot', () => {
               config={config}
               currentUser={currentUser}
               currentQuery={currentQuery}
-              effectiveTimerange={{ from: 'foo', to: 'bar' }}
-      />
+              effectiveTimerange={{ from: 'foo', to: 'bar' }} />
     ));
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', { yaxis: { fixedrange: true }, xaxis: { fixedrange: true } });
@@ -49,8 +48,7 @@ describe('XYPlot', () => {
               config={config}
               currentUser={currentUser}
               currentQuery={currentQuery}
-              effectiveTimerange={{ from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' }}
-      />
+              effectiveTimerange={{ from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' }} />
     ));
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', { yaxis: { fixedrange: true }, xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'] } });

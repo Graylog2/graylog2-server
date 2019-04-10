@@ -86,6 +86,7 @@ class ShareViewModal extends React.Component<Props, State> {
     }
     promise.then(() => this.props.onClose(viewSharing));
   };
+
   _onClose = () => this.props.onClose();
 
   // eslint-disable-next-line no-undef

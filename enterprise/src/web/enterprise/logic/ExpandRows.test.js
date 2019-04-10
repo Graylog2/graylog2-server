@@ -29,7 +29,8 @@ describe('ExpandRows', () => {
         action: {
           edit: {
             'count()': 118,
-            'sum(took_ms)': 6580 },
+            'sum(took_ms)': 6580,
+          },
           index: {
             'count()': 2696,
             'sum(took_ms)': 239622,

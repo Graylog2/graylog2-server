@@ -65,12 +65,13 @@ class GenericPlot extends React.Component {
 
     const config = { displayModeBar: false, doubleClick: false };
 
-    return (<Plot data={chartData}
-                  useResizeHandler
-                  layout={plotLayout}
-                  style={style}
-                  onRelayout={this._onRelayout}
-                  config={config} />
+    return (
+      <Plot data={chartData}
+            useResizeHandler
+            layout={plotLayout}
+            style={style}
+            onRelayout={this._onRelayout}
+            config={config} />
     );
   }
 }

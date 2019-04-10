@@ -48,4 +48,4 @@ export default class SeriesConfiguration extends React.Component {
       </span>
     );
   }
-};
+}

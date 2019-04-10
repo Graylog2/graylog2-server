@@ -46,9 +46,11 @@ describe('SearchDetails', () => {
     const wrapper = mount(<SearchDetails results={searchResult} />);
 
     expect(wrapper).toContainReact(<time title="2018-12-18T14:34:49.519Z"
-                                         dateTime="2018-12-18T14:34:49.519Z">2018-12-18 14:34:49.519</time>);
+                                         dateTime="2018-12-18T14:34:49.519Z">2018-12-18 14:34:49.519
+    </time>);
     expect(wrapper).toContainReact(<time title="2018-12-18T14:39:49.519Z"
-                                         dateTime="2018-12-18T14:39:49.519Z">2018-12-18 14:39:49.519</time>);
+                                         dateTime="2018-12-18T14:39:49.519Z">2018-12-18 14:39:49.519
+    </time>);
   });
 
   it('renders effective timerange in Europe/Berlin from search result', () => {
@@ -58,9 +60,11 @@ describe('SearchDetails', () => {
     const wrapper = mount(<SearchDetails results={searchResult} />);
 
     expect(wrapper).toContainReact(<time title="2018-12-18T14:34:49.519Z"
-                                         dateTime="2018-12-18T14:34:49.519Z">2018-12-18 15:34:49.519</time>);
+                                         dateTime="2018-12-18T14:34:49.519Z">2018-12-18 15:34:49.519
+    </time>);
     expect(wrapper).toContainReact(<time title="2018-12-18T14:39:49.519Z"
-                                         dateTime="2018-12-18T14:39:49.519Z">2018-12-18 15:39:49.519</time>);
+                                         dateTime="2018-12-18T14:39:49.519Z">2018-12-18 15:39:49.519
+    </time>);
   });
 
   it('renders effective timerange from search result in browser\'s timezone if user timezone is null', () => {
@@ -72,8 +76,10 @@ describe('SearchDetails', () => {
     const wrapper = mount(<SearchDetails results={searchResult} />);
 
     expect(wrapper).toContainReact(<time title="2018-12-18T14:34:49.519Z"
-                                         dateTime="2018-12-18T14:34:49.519Z">2018-12-18 10:34:49.519</time>);
+                                         dateTime="2018-12-18T14:34:49.519Z">2018-12-18 10:34:49.519
+    </time>);
     expect(wrapper).toContainReact(<time title="2018-12-18T14:39:49.519Z"
-                                         dateTime="2018-12-18T14:39:49.519Z">2018-12-18 10:39:49.519</time>);
+                                         dateTime="2018-12-18T14:39:49.519Z">2018-12-18 10:39:49.519
+    </time>);
   });
 });

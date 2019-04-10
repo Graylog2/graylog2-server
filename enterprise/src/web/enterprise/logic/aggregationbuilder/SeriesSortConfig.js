@@ -32,6 +32,7 @@ export default class SeriesSortConfig extends SortConfig {
 type BuilderState = Immutable.Map<string, any>;
 class Builder {
   value: BuilderState;
+
   constructor(value = Immutable.Map()) {
     this.value = value;
   }

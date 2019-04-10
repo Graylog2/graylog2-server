@@ -45,7 +45,7 @@ describe('ViewManagementPage', () => {
     const wrapper = mount(<ViewManagementPage />);
 
     const viewList = wrapper.find('view-list');
-    const handleViewDelete = viewList.at(0).props().handleViewDelete;
+    const { handleViewDelete } = viewList.at(0).props();
 
     const oldConfirm = window.confirm;
     const dummyView = { title: 'Dummy view' };

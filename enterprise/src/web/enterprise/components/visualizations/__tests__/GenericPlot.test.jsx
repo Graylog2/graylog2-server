@@ -10,7 +10,7 @@ describe('GenericPlot', () => {
       const wrapper = mount(<GenericPlot chartData={[]} onZoom={onZoom} />);
 
       const plot = wrapper.find('PlotlyComponent');
-      const onRelayout = plot.get(0).props.onRelayout;
+      const { onRelayout } = plot.get(0).props;
 
       onRelayout({ 'xaxis.range[0]': 'foo', 'xaxis.range[1]': 'bar' });
 
@@ -23,7 +23,7 @@ describe('GenericPlot', () => {
       const wrapper = mount(<GenericPlot chartData={[]} onZoom={onZoom} />);
 
       const plot = wrapper.find('PlotlyComponent');
-      const onRelayout = plot.get(0).props.onRelayout;
+      const { onRelayout } = plot.get(0).props;
 
       onRelayout({ autosize: true });
 

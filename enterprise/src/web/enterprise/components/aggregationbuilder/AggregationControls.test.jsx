@@ -18,7 +18,7 @@ describe('AggregationControls', () => {
   /* eslint-disable-next-line global-require */
   const AggregationControls = require('./AggregationControls').default;
   // eslint-disable-next-line no-unused-vars, react/prop-types
-  const DummyComponent = ({ onVisualizationConfigChange}) => <div>The spice must flow.</div>;
+  const DummyComponent = ({ onVisualizationConfigChange }) => <div>The spice must flow.</div>;
   const children = <DummyComponent />;
   const config = new AggregationWidgetConfig([], [], [], [], 'table', true);
 

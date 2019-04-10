@@ -81,8 +81,10 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    onBlur={() => this.onBlur('from', this.props.onChange)}
                    onChange={event => this.onChange('from', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
-                   buttonAfter={<Button onClick={() => _setDateTimeToNow('from', this.props.onChange)}><i
-                     className="fa fa-magic" /></Button>}
+                   buttonAfter={(
+                     <Button onClick={() => _setDateTimeToNow('from', this.props.onChange)}><i className="fa fa-magic" />
+                     </Button>
+)}
                    bsStyle={_isValidDateString(from) ? null : 'error'}
                    required />
           </DatePicker>
@@ -104,8 +106,10 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    onBlur={() => this.onBlur('to', this.props.onChange)}
                    onChange={event => this.onChange('to', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
-                   buttonAfter={<Button onClick={() => _setDateTimeToNow('to', this.props.onChange)}><i
-                     className="fa fa-magic" /></Button>}
+                   buttonAfter={(
+                     <Button onClick={() => _setDateTimeToNow('to', this.props.onChange)}><i className="fa fa-magic" />
+                     </Button>
+)}
                    bsStyle={_isValidDateString(to) ? null : 'error'}
                    required />
           </DatePicker>

@@ -42,6 +42,7 @@ class SelectExtractorType extends React.Component<Props, State> {
   }
 
   extractorRoutes = {};
+
   /* eslint-disable-next-line react/no-unused-prop-types */
   _renderOption = ({ label }: { label: string }) => <React.Fragment><strong>{label}</strong></React.Fragment>;
 
@@ -71,14 +72,13 @@ class SelectExtractorType extends React.Component<Props, State> {
                           submitButtonDisabled={!this.state.selectedExtractor}
                           show
                           onSubmitForm={this._onSubmit}>
-        <Select
-          placeholder="Select extractor type"
-          optionRenderer={this._renderOption}
-          clearable
-          onChange={this._onChange}
-          options={this._getExtractorTypes()}
-        />
-      </BootstrapModalForm>);
+        <Select placeholder="Select extractor type"
+                optionRenderer={this._renderOption}
+                clearable
+                onChange={this._onChange}
+                options={this._getExtractorTypes()} />
+      </BootstrapModalForm>
+    );
   }
 }
 

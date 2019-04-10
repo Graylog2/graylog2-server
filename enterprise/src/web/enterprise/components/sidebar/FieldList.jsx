@@ -72,8 +72,8 @@ const FieldList = createReactClass({
   _updateHeight() {
     const fieldsContainer = this.fieldList;
 
-    const maxHeight = this.props.maximumHeight -
-      fieldsContainer.getBoundingClientRect().top;
+    const maxHeight = this.props.maximumHeight
+      - fieldsContainer.getBoundingClientRect().top;
 
     this.setState({ maxFieldsHeight: Math.max(isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   },
@@ -83,7 +83,7 @@ const FieldList = createReactClass({
     const disabled = !fields.find(f => f.name === name);
 
     return (
-      <li key={`field-${name}`} className={styles.fieldListItem} style={style} >
+      <li key={`field-${name}`} className={styles.fieldListItem} style={style}>
         <FieldTypeIcon type={type} />
         {' '}
         <Field queryId={selectedQuery}

@@ -41,11 +41,10 @@ const TimeUnitTimeHistogramPivot = ({ interval, onChange }: Props) => (
       <FormControl type="number"
                    value={interval.value}
                    onChange={e => _changeValue(e, interval, onChange)} />
-      <DropdownButton
-        componentClass={InputGroup.Button}
-        id="input-dropdown-addon"
-        title={units[interval.unit] || ''}
-        onChange={newUnit => _changeUnit(newUnit, interval, onChange)}>
+      <DropdownButton componentClass={InputGroup.Button}
+                      id="input-dropdown-addon"
+                      title={units[interval.unit] || ''}
+                      onChange={newUnit => _changeUnit(newUnit, interval, onChange)}>
         {Object.keys(units).map(unit => <MenuItem key={unit} onSelect={() => _changeUnit(unit, interval, onChange)}>{units[unit]}</MenuItem>)}
       </DropdownButton>
     </InputGroup>

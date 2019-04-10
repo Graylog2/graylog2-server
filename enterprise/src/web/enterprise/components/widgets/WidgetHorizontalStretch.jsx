@@ -14,7 +14,7 @@ class WidgetHorizontalStretch extends React.Component {
 
   _onClick = () => {
     const { col, row, height, width } = this.props.position;
-    const defaultWidth = widgetDefinition(this.props.widgetType).defaultWidth;
+    const { defaultWidth } = widgetDefinition(this.props.widgetType);
     this.props.onStretch({
       id: this.props.widgetId, col: col, row: row, height: height, width: width === Infinity ? defaultWidth : Infinity,
     });

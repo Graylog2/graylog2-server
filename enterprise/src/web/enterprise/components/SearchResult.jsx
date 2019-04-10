@@ -32,7 +32,7 @@ class SearchResult extends React.Component {
   }
 
   render() {
-    const props = this.props;
+    const { props } = this;
     const { queryId } = props;
     const { fieldTypes, searches, showMessages, viewState } = props;
     const { onToggleMessages } = props;

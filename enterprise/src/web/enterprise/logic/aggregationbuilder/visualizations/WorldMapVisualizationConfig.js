@@ -58,6 +58,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
 
 class Builder {
   value: Immutable.Map<State>;
+
   constructor(value: Immutable.Map<State> = Immutable.Map()) {
     this.value = value;
   }

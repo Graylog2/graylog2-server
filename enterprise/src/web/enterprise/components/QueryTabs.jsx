@@ -35,11 +35,10 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
       <span className="pull-right">
         <ViewActionsMenu onSaveView={onSaveView} onSaveAsView={onSaveAsView} />
       </span>
-      <Tabs
-        id="QueryTabs"
-        activeKey={selectedQuery}
-        animation={false}
-        onSelect={onSelect}>
+      <Tabs id="QueryTabs"
+            activeKey={selectedQuery}
+            animation={false}
+            onSelect={onSelect}>
         {tabs}
       </Tabs>
     </span>

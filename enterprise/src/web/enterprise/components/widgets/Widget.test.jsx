@@ -70,9 +70,9 @@ describe('<Widget />', () => {
   it('should render error widget including all error messages for widget with multiple errors', () => {
     const wrapper = mount((
       <DummyWidget errors={[
-                { description: 'Something is wrong' },
-                { description: 'Very wrong' },
-              ]} />
+        { description: 'Something is wrong' },
+        { description: 'Very wrong' },
+      ]} />
     ));
     const errorWidgets = wrapper.find(ErrorWidget);
     expect(errorWidgets).toHaveLength(1);

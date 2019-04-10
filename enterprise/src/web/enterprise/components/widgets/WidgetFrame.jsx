@@ -30,6 +30,7 @@ export default class extends React.Component {
   }
 
   WIDGET_HEADER_HEIGHT = 25;
+
   WIDGET_FOOTER_HEIGHT = 40;
 
   _calculateWidgetSize = () => {

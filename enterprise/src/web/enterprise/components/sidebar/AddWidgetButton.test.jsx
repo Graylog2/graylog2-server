@@ -118,7 +118,7 @@ describe('AddWidgetButton', () => {
 
     expect(mockCreateParameterDialog).toExist();
 
-    const onClose = mockCreateParameterDialog.props().onClose;
+    const { onClose } = mockCreateParameterDialog.props();
     onClose();
 
     wrapper.update();

@@ -20,6 +20,7 @@ export default class QueryMetadata {
   get usedParameterNames(): Immutable.Set<string> {
     return this._value.usedParameterNames;
   }
+
   static fromJSON(value: QueryMetadataJson) {
     return new QueryMetadata(Immutable.Set(value.used_parameters_names));
   }

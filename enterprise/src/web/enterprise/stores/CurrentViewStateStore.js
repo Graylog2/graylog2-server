@@ -55,7 +55,6 @@ export const CurrentViewStateStore = Reflux.createStore({
     const newActiveState = this._activeState().toBuilder().fields(newFields).build();
     const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
     CurrentViewStateActions.fields.promise(promise);
-
   },
 
   titles(newTitles) {

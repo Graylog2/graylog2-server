@@ -135,6 +135,7 @@ export default class AggregationWidgetConfig {
 type BuilderState = Immutable.Map<string, any>;
 class Builder {
   value: BuilderState;
+
   constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }

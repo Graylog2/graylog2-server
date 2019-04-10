@@ -31,10 +31,9 @@ export default class PortaledPopover extends React.Component {
     const { container, popover, title, ...rest } = this.props;
     const popoverElem = this.state.isOpen && (
       <Portal node={container}>
-        <Position
-          container={container}
-          placement="bottom"
-          target={this.target}>
+        <Position container={container}
+                  placement="bottom"
+                  target={this.target}>
           <Popover title={title} id={title}>
             {popover}
           </Popover>

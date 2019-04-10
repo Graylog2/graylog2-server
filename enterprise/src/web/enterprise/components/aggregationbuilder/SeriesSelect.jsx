@@ -48,6 +48,7 @@ class SeriesSelect extends React.Component<Props, State> {
       options: suggester.defaults,
     };
   }
+
   _onChange = (newSeries: Array<Option | IncompleteOption | BackToFunctions>) => {
     const last = newSeries[newSeries.length - 1];
     if (!last) {
@@ -101,19 +102,21 @@ class SeriesSelect extends React.Component<Props, State> {
     const _components = {
       MultiValueLabel: valueComponent,
     };
-    return (<Select placeholder="None: click to add series"
-                    onChange={this._onChange}
-                    options={this.state.options}
-                    value={series.map(_wrapOption)}
-                    components={_components}
-                    onClose={this._onClose}
-                    closeMenuOnSelect={false}
-                    onBlurResetsInput
-                    onCloseResetsInput
-                    menuShouldScrollIntoView
-                    tabSelectsValue
-                    escapeClearsValue
-                    isMulti />);
+    return (
+      <Select placeholder="None: click to add series"
+              onChange={this._onChange}
+              options={this.state.options}
+              value={series.map(_wrapOption)}
+              components={_components}
+              onClose={this._onClose}
+              closeMenuOnSelect={false}
+              onBlurResetsInput
+              onCloseResetsInput
+              menuShouldScrollIntoView
+              tabSelectsValue
+              escapeClearsValue
+              isMulti />
+    );
   }
 }
 

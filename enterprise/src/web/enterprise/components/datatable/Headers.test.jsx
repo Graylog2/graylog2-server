@@ -31,20 +31,19 @@ describe('Headers', () => {
     rollup = true,
     actualColumnPivotFields = [],
     fields = [],
-  }: RenderHeadersProps) =>
-    (
-      <table>
-        <thead>
-          <Headers activeQuery="queryId"
-                   columnPivots={columnPivots}
-                   rowPivots={rowPivots}
-                   series={series}
-                   rollup={rollup}
-                   actualColumnPivotFields={actualColumnPivotFields}
-                   fields={fields} />
-        </thead>
-      </table>
-    );
+  }: RenderHeadersProps) => (
+    <table>
+      <thead>
+        <Headers activeQuery="queryId"
+                 columnPivots={columnPivots}
+                 rowPivots={rowPivots}
+                 series={series}
+                 rollup={rollup}
+                 actualColumnPivotFields={actualColumnPivotFields}
+                 fields={fields} />
+      </thead>
+    </table>
+  );
 
   it('renders a header for every series', () => {
     const wrapper = mount(<RenderHeaders series={[
@@ -62,7 +61,7 @@ describe('Headers', () => {
       Series.forFunction('avg(foo)'),
       Series.forFunction('min(foo)'),
     ]}
-      fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />);
+                                         fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />);
     expect(wrapper).not.toBeEmptyRender();
     const fields = wrapper.find('Field');
 

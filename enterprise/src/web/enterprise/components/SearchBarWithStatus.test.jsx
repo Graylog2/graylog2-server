@@ -12,7 +12,7 @@ import SearchExecutionState from '../logic/search/SearchExecutionState';
 import ParameterBinding from '../logic/parameters/ParameterBinding';
 import Parameter from '../logic/parameters/Parameter';
 
-jest.mock('stores/connect', () => (Component, _, propsMapper) => (props) => <Component {...(Object.assign({}, props, propsMapper(props)))} />);
+jest.mock('stores/connect', () => (Component, _, propsMapper) => props => <Component {...(Object.assign({}, props, propsMapper(props)))} />);
 jest.mock('enterprise/stores/SearchConfigStore', () => ({}));
 jest.mock('enterprise/stores/SearchMetadataStore', () => ({}));
 jest.mock('enterprise/stores/SearchExecutionStateStore', () => ({}));

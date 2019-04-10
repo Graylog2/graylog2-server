@@ -11,6 +11,7 @@ type InternalState = {
 
 export default class SeriesConfig {
   _value: InternalState;
+
   constructor(name: ?string) {
     this._value = { name };
   }
@@ -43,6 +44,7 @@ export default class SeriesConfig {
 type BuilderState = Immutable.Map<string, any>;
 class Builder {
   value: BuilderState;
+
   constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }

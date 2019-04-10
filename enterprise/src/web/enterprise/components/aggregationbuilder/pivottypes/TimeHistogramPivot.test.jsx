@@ -5,7 +5,7 @@ import TimeHistogramPivot from './TimeHistogramPivot';
 
 describe('TimeHistogramPivot', () => {
   it('renders for auto interval', () => {
-    const wrapper = mount(<TimeHistogramPivot onChange={() => {}} value={{ interval: { type: 'auto' } } } />);
+    const wrapper = mount(<TimeHistogramPivot onChange={() => {}} value={{ interval: { type: 'auto' } }} />);
     expect(wrapper).not.toBeEmptyRender();
   });
   it('renders for invalid pivot config', () => {

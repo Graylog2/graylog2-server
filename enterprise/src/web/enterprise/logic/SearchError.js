@@ -12,8 +12,12 @@ export default class SearchError {
   }
 
   get backtrace() { return this._state.backtrace; }
+
   get description() { return this._state.description; }
+
   get queryId() { return this._state.query_id; }
+
   get searchTypeId() { return this._state.search_type_id; }
+
   get type() { return this._state.type; }
 }

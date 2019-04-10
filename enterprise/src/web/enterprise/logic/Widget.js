@@ -33,4 +33,3 @@ export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
       .build(),
   )
   .build();
-

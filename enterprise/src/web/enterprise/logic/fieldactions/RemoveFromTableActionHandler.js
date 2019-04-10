@@ -15,9 +15,8 @@ const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: st
       .fields(newFields)
       .build();
     return WidgetActions.updateConfig(widget.id, newConfig);
-  } else {
-    return SelectedFieldsActions.remove(field);
   }
+  return SelectedFieldsActions.remove(field);
 };
 
 const condition: FieldActionHandlerCondition = ({ context, name }: { context: ActionContexts, name: string }) => {

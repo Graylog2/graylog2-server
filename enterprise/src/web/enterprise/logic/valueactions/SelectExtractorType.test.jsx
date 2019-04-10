@@ -25,9 +25,10 @@ describe('SelectExtractorType', () => {
 
   it('should render', () => {
     const wrapper = mount(
-      <AdditionalContext.Provider key={'message-key'} value={{ message }}>
+      <AdditionalContext.Provider key="message-key" value={{ message }}>
         <SelectExtractorType onClose={() => {}} value={value} field={field} />
-      </AdditionalContext.Provider>);
+      </AdditionalContext.Provider>,
+    );
     const bootstrapModalForm = wrapper.find('BootstrapModalForm');
     expect(bootstrapModalForm).toExist();
     expect(bootstrapModalForm).toHaveProp('show', true);
@@ -35,9 +36,10 @@ describe('SelectExtractorType', () => {
 
   it('should select a extractor and open a new window', () => {
     const wrapper = mount(
-      <AdditionalContext.Provider key={'message-key'} value={{ message }}>
+      <AdditionalContext.Provider key="message-key" value={{ message }}>
         <SelectExtractorType onClose={() => {}} value={value} field={field} />
-      </AdditionalContext.Provider>);
+      </AdditionalContext.Provider>,
+    );
     const select = wrapper.find('Select');
     const form = wrapper.find('form');
     expect(select).toExist();

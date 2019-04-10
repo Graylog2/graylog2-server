@@ -90,7 +90,9 @@ class QueryInput extends Component<Props, State> {
   }
 
   completer: AutoCompleter;
+
   isFocussed: boolean;
+
   editor: {
     editor: Editor,
   } | typeof undefined;
@@ -186,8 +188,7 @@ class QueryInput extends Component<Props, State> {
                      height: '34px',
                      width: '100%',
                    }}
-                   {...rest}
-        />
+                   {...rest} />
       </div>
     );
   }

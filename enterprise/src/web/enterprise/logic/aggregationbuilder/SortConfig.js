@@ -16,6 +16,7 @@ type InternalState = {
 
 export default class SortConfig {
   _value: InternalState;
+
   constructor(type: string, field: string, direction: Direction) {
     this._value = { type, field, direction };
   }

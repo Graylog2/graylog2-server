@@ -15,10 +15,9 @@ describe('PortaledPopover', () => {
   });
   it('does not render popover element when not clicked', () => {
     const wrapper = mount((
-      <PortaledPopover
-        popover={<PopoverComponent />}
-        container={portalsContainer}
-        title="A title">
+      <PortaledPopover popover={<PopoverComponent />}
+                       container={portalsContainer}
+                       title="A title">
         click me!
       </PortaledPopover>
     ), { attachTo: appRootContainer });
@@ -31,10 +30,9 @@ describe('PortaledPopover', () => {
 
   it('renders popover element after being clicked', () => {
     const wrapper = mount((
-      <PortaledPopover
-        popover={<PopoverComponent />}
-        container={portalsContainer}
-        title="A title">
+      <PortaledPopover popover={<PopoverComponent />}
+                       container={portalsContainer}
+                       title="A title">
         click me!
       </PortaledPopover>
     ), { attachTo: appRootContainer });

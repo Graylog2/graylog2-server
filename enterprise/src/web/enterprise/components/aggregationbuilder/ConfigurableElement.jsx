@@ -41,11 +41,9 @@ export default class ConfigurableElement extends React.Component {
     const { title } = this.props;
     const popover = this.state.isOpen && (
       <Portal>
-        <Position
-          /* eslint-disable-next-line no-undef */
-          container={document.body}
-          placement="bottom"
-          target={this.target}>
+        <Position container={document.body}
+                  placement="bottom"
+                  target={this.target}>
           <Popover title={title} id="configuration-popover">
             <ConfigurationElement onClose={this._onClose} />
           </Popover>

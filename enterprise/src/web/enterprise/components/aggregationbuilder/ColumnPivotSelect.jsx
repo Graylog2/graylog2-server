@@ -5,12 +5,10 @@ import { FieldList, PivotList } from './AggregationBuilderPropTypes';
 import PivotSelect from './PivotSelect';
 
 const ColumnPivotSelect = ({ columnPivots, fields, onChange }) => (
-  <PivotSelect
-    placeholder="None: click to add fields"
-    onChange={onChange}
-    options={fields}
-    value={columnPivots}
-  />
+  <PivotSelect placeholder="None: click to add fields"
+               onChange={onChange}
+               options={fields}
+               value={columnPivots} />
 );
 
 ColumnPivotSelect.propTypes = {

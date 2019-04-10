@@ -15,6 +15,7 @@ class WidgetFilterMenu extends React.Component {
     onChange: PropTypes.func.isRequired,
     value: PropTypes.string,
   };
+
   static defaultProps = {
     value: undefined,
   };
@@ -25,15 +26,18 @@ class WidgetFilterMenu extends React.Component {
       filter: props.value,
     };
   }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
       this.setState({ filter: nextProps.value });
     }
   }
+
   _onUpdate = () => {
     this.props.onChange(this.state.filter);
     this.overlayTrigger.hide();
   };
+
   _onClose = () => this.setState({ filter: this.props.value });
 
   render() {

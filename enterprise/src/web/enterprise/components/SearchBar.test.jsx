@@ -82,7 +82,7 @@ describe('SearchBar', () => {
     wrapper.setState({ currentQuery });
 
     const timeRangeTypeSelector = wrapper.find('TimeRangeTypeSelector');
-    const onSelect = timeRangeTypeSelector.at(0).props().onSelect;
+    const { onSelect } = timeRangeTypeSelector.at(0).props();
     QueriesActions.rangeType = jest.fn(() => Promise.resolve(42));
 
     return onSelect('absolute').then(() => {
@@ -96,7 +96,7 @@ describe('SearchBar', () => {
     wrapper.setState({ currentQuery });
 
     const timeRangeInput = wrapper.find('TimeRangeInput');
-    const onChange = timeRangeInput.at(0).props().onChange;
+    const { onChange } = timeRangeInput.at(0).props();
     QueriesActions.rangeParams = jest.fn(() => Promise.resolve());
 
     return onChange({ range: 300 }).then(() => {

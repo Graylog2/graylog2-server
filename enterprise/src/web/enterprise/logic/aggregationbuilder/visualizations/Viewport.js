@@ -16,6 +16,7 @@ export type ViewportJson = {
 
 export default class Viewport {
   _value: State;
+
   constructor(center: Center, zoom: Zoom) {
     this._value = { center, zoom };
   }
@@ -33,6 +34,7 @@ export default class Viewport {
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ center, zoom }));
   }
+
   static create(center: Center, zoom: Zoom) {
     return new Viewport(center, zoom);
   }

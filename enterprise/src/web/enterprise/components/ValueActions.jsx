@@ -74,10 +74,13 @@ class ValueActions extends React.Component {
 
       const condition = valueAction.condition || (() => true);
       const actionDisabled = !condition({ field, type, value, context: this.context });
-      return (<MenuItem key={`value-action-${field}-${valueAction.type}`}
-                        disabled={actionDisabled}
-                        eventKey={{ field, value }}
-                        onSelect={onSelect}>{valueAction.title}</MenuItem>);
+      return (
+        <MenuItem key={`value-action-${field}-${valueAction.type}`}
+                  disabled={actionDisabled}
+                  eventKey={{ field, value }}
+                  onSelect={onSelect}>{valueAction.title}
+        </MenuItem>
+      );
     });
     return (
       <React.Fragment>

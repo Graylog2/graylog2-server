@@ -19,4 +19,3 @@ LineVisualization.propTypes = {
 LineVisualization.type = 'line';
 
 export default LineVisualization;
-

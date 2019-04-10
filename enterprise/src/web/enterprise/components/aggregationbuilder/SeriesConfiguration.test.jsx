@@ -14,7 +14,7 @@ describe('SeriesConfiguration', () => {
 
   it('renders an input to change the series name', () => {
     const wrapper = mount(<SeriesConfiguration series={Series.forFunction('count()')} onClose={() => {}} />);
-    expect(wrapper.find('input')).toHaveProp('value','count()');
+    expect(wrapper.find('input')).toHaveProp('value', 'count()');
   });
 
   it('uses the series\' effective value for the input', () => {
@@ -23,7 +23,7 @@ describe('SeriesConfiguration', () => {
       .config(SeriesConfig.empty().toBuilder().name('Average Request Time').build())
       .build();
     const wrapper = mount(<SeriesConfiguration series={series} onClose={() => {}} />);
-    expect(wrapper.find('input')).toHaveProp('value','Average Request Time');
+    expect(wrapper.find('input')).toHaveProp('value', 'Average Request Time');
   });
 
   it('submit button calls onClose callback', () => {

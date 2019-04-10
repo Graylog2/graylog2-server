@@ -31,6 +31,7 @@ const _matchesFieldName = (prefix) => {
 
 class FieldNameCompletion implements Completer {
   activeQuery: string;
+
   fields: FieldTypesStoreState;
 
   constructor() {
