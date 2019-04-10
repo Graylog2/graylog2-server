@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.sidecar.rest.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
@@ -123,6 +124,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     }
 
     @GET
+    @Timed
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "List all collectors")
