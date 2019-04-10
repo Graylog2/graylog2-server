@@ -32,6 +32,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                 componentClass="input"
                 inputRef={[Function]}
                 label=""
+                name="inputWithAddon"
                 placeholder=""
                 type="text"
               >
@@ -39,6 +40,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                   className="form-control"
                   id="inputWithAddon"
                   label=""
+                  name="inputWithAddon"
                   placeholder=""
                   type="text"
                 />
@@ -101,6 +103,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                 componentClass="input"
                 inputRef={[Function]}
                 label=""
+                name="inputWithButton"
                 placeholder=""
                 type="text"
               >
@@ -108,6 +111,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                   className="form-control"
                   id="inputWithButton"
                   label=""
+                  name="inputWithButton"
                   placeholder=""
                   type="text"
                 />
@@ -180,6 +184,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                 componentClass="input"
                 inputRef={[Function]}
                 label=""
+                name="inputWithCheckboxAddon"
                 placeholder=""
                 type="text"
               >
@@ -187,6 +192,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                   className="form-control"
                   id="inputWithCheckboxAddon"
                   label=""
+                  name="inputWithCheckboxAddon"
                   placeholder=""
                   type="text"
                 />
@@ -206,6 +212,99 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
               </InputGroupAddon>
             </span>
           </InputGroup>
+        </span>
+      </InputWrapper>
+    </div>
+  </FormGroup>
+</Input>
+`;
+
+exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
+<Input
+  addonAfter={null}
+  bsStyle={null}
+  buttonAfter={null}
+  help=""
+  id="inputWithoutNameProp"
+  label=""
+  name="inputWithNameProp"
+  placeholder=""
+  type="text"
+>
+  <FormGroup
+    bsClass="form-group"
+    controlId="inputWithoutNameProp"
+    validationState={null}
+  >
+    <div
+      className="form-group"
+    >
+      <InputWrapper>
+        <span>
+          <FormControl
+            bsClass="form-control"
+            componentClass="input"
+            inputRef={[Function]}
+            label=""
+            name="inputWithNameProp"
+            placeholder=""
+            type="text"
+          >
+            <input
+              className="form-control"
+              id="inputWithoutNameProp"
+              label=""
+              name="inputWithNameProp"
+              placeholder=""
+              type="text"
+            />
+          </FormControl>
+        </span>
+      </InputWrapper>
+    </div>
+  </FormGroup>
+</Input>
+`;
+
+exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
+<Input
+  addonAfter={null}
+  bsStyle={null}
+  buttonAfter={null}
+  help=""
+  id="inputWithoutNameProp"
+  label=""
+  placeholder=""
+  type="text"
+>
+  <FormGroup
+    bsClass="form-group"
+    controlId="inputWithoutNameProp"
+    validationState={null}
+  >
+    <div
+      className="form-group"
+    >
+      <InputWrapper>
+        <span>
+          <FormControl
+            bsClass="form-control"
+            componentClass="input"
+            inputRef={[Function]}
+            label=""
+            name="inputWithoutNameProp"
+            placeholder=""
+            type="text"
+          >
+            <input
+              className="form-control"
+              id="inputWithoutNameProp"
+              label=""
+              name="inputWithoutNameProp"
+              placeholder=""
+              type="text"
+            />
+          </FormControl>
         </span>
       </InputWrapper>
     </div>
