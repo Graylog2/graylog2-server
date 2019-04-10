@@ -50,7 +50,7 @@ const plugins = process.argv.slice(3);
 
 const config = `
 window.appConfig = {
-  gl2ServerUrl: 'https://smd.torch.sh/api/',
+  gl2ServerUrl: 'http://localhost:9000/api/',
   gl2AppPathPrefix: '/',
   rootTimeZone: 'UTC',
 };
@@ -93,12 +93,10 @@ const pageErrors = [];
 const consoleLogs = [];
 
 const pagePromise = loadPage(url, (msg) => { pageErrors.push(msg); }, (msg) => { consoleLogs.push(msg); });
-
 pagePromise
   .catch(err => console.error('Error: ', err.toString()))
   .finally(() => {
     const isSuccess = pageErrors.length === 0 && consoleLogs.length === 0;
-    console.log(`\nLoading completed, encountered ${pageErrors.length} errors and ${consoleLogs.length} messages on the console - ${isSuccess ? 'Success' : 'Failure'}!`);
     if (pageErrors.length > 0) {
       console.log('Errors:');
       console.log(pageErrors);
@@ -106,8 +104,11 @@ pagePromise
 
     if (consoleLogs.length > 0) {
       console.log('Console Logs:');
-      console.table(consoleLogs);
+      console.log(consoleLogs);
     }
+
+    console.log(`\n${isSuccess ? 'Success' : 'Failure'}: Encountered ${pageErrors.length} errors and ${consoleLogs.length} messages on the console during loading.`);
+    process.exitCode = isSuccess ? 0 : 1;
   })
   .finally(async () => {
     const { browser } = await pagePromise;
