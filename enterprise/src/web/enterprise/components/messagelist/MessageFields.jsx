@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { ChangedMessageField } from 'components/search';
-import { MessageField } from 'enterprise/components/messagelist';
+import ChangedMessageField from 'components/search/ChangedMessageField';
+import MessageField from 'enterprise/components/messagelist/MessageField';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
 import styles from './MessageFields.css';

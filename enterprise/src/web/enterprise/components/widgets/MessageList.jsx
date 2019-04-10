@@ -7,7 +7,7 @@ import * as Immutable from 'immutable';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
-import { MessageTablePaginator } from 'components/search';
+import MessageTablePaginator from 'components/search/MessageTablePaginator';
 // $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
