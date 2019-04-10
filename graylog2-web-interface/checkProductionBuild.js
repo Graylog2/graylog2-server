@@ -83,8 +83,9 @@ loadAssets(pagePromise, url, assets)
       console.table(consoleLogs);
     }
   })
-  .then(async () => {
+  .catch(err => console.error('Error: ', err.toString()))
+  .finally(async () => {
     const { browser } = await pagePromise;
-    return browser.close();
-  })
-  .then(() => server.close());
+    await browser.close();
+    server.close();
+  });
