@@ -27,7 +27,7 @@ export default class Search {
   _value: InternalState;
 
   constructor(id: SearchId, queries: Array<Query>, parameters: Array<Parameter>) {
-    this._value = { id, queries: Immutable.Set(queries), parameters: Immutable.Set(parameters) };
+    this._value = { id, queries: Immutable.OrderedSet(queries), parameters: Immutable.Set(parameters) };
   }
 
   static create(): Search {

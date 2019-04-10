@@ -5,5 +5,5 @@ import ViewStateGenerator from './views/ViewStateGenerator';
 export default () => {
   const query = QueryGenerator();
   const state = ViewStateGenerator();
-  return QueriesActions.create(query, state);
+  return QueriesActions.create(query, state).then(() => query);
 };

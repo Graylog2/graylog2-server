@@ -15,7 +15,7 @@ import { ViewStatesActions } from './ViewStatesStore';
 export { QueriesActions } from 'enterprise/actions/QueriesActions';
 export const QueriesStore = Reflux.createStore({
   listenables: [QueriesActions],
-  queries: new Immutable.Map<QueryId, Query>(),
+  queries: new Immutable.OrderedMap<QueryId, Query>(),
   search: Search.create(),
 
   init() {
@@ -35,7 +35,7 @@ export const QueriesStore = Reflux.createStore({
     this.search = search;
 
     const { queries } = search;
-    const newQueries = Immutable.Map(queries.map(q => [q.id, q]));
+    const newQueries = Immutable.OrderedMap(queries.map(q => [q.id, q]));
 
     if (!isEqual(newQueries, this.queries)) {
       this.queries = newQueries;

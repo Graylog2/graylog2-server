@@ -1,7 +1,10 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { withRouter } from 'react-router';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import { TitlesActions } from 'enterprise/stores/TitlesStore';
 import { ViewActions } from 'enterprise/stores/ViewStore';
@@ -18,17 +21,11 @@ import CustomPropTypes from './CustomPropTypes';
 
 const onTitleChange = (queryId, newTitle) => TitlesActions.set('tab', 'title', newTitle);
 
-const onSelectQuery = (queryId, executeSearch) => {
-  if (queryId === 'new') {
-    NewQueryActionHandler().then(executeSearch);
-  } else {
-    ViewActions.selectQuery(queryId);
-  }
-};
+const onSelectQuery = queryId => (queryId === 'new' ? NewQueryActionHandler() : ViewActions.selectQuery(queryId));
 
 const onCloseTab = (queryId, currentQuery, queries) => {
   if (queries.size === 1) {
-    return;
+    return Promise.resolve();
   }
   let promise;
   if (queryId === currentQuery) {
@@ -42,10 +39,10 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   return promise.then(() => QueriesActions.remove(queryId)).then(() => ViewStatesActions.remove(queryId));
 };
 
-const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetadata }) => {
+const QueryBar = ({ children, queries, queryTitles, router, viewMetadata }) => {
   const { activeQuery } = viewMetadata;
   const childrenWithQueryId = React.Children.map(children, child => React.cloneElement(child, { queryId: activeQuery }));
-  const selectQueryAndExecute = queryId => onSelectQuery(queryId, onExecute);
+  const selectQueryAndExecute = queryId => onSelectQuery(queryId);
   return (
     <QueryTabs queries={queries}
                selectedQuery={activeQuery}
@@ -62,7 +59,6 @@ const QueryBar = ({ children, onExecute, queries, queryTitles, router, viewMetad
 
 QueryBar.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  onExecute: PropTypes.func.isRequired,
   queries: PropTypes.object.isRequired,
   queryTitles: PropTypes.object.isRequired,
   router: PropTypes.any.isRequired,
