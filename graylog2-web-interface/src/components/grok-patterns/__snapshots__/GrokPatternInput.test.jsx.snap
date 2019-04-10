@@ -21,6 +21,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
           className="form-control"
           id="pattern-input"
           label="Pattern"
+          name="pattern-input"
           onChange={[Function]}
           placeholder=""
           required={true}
@@ -54,6 +55,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
           className="form-control"
           id="pattern-selector"
           label="Filter pattern"
+          name="pattern-selector"
           onChange={[Function]}
           onKeyDown={[Function]}
           placeholder=""
@@ -188,6 +190,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
           className="form-control"
           id="pattern-input"
           label="Pattern"
+          name="pattern-input"
           onChange={[Function]}
           placeholder=""
           required={true}
@@ -221,6 +224,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
           className="form-control"
           id="pattern-selector"
           label="Filter pattern"
+          name="pattern-selector"
           onChange={[Function]}
           onKeyDown={[Function]}
           placeholder=""

@@ -36,6 +36,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 className="form-control"
                 id="content-packs-filter"
                 label="Filter"
+                name="content-packs-filter"
                 placeholder=""
                 type="text"
               />
@@ -1831,6 +1832,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                 className="form-control"
                 id="content-packs-filter"
                 label="Filter"
+                name="content-packs-filter"
                 placeholder=""
                 type="text"
               />
