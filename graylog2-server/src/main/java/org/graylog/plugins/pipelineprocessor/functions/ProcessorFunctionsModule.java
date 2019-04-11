@@ -164,6 +164,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
         addMessageProcessorFunction(RegexReplace.NAME, RegexReplace.class);
         addMessageProcessorFunction(GrokMatch.NAME, GrokMatch.class);
+        addMessageProcessorFunction(GrokExists.NAME, GrokExists.class);
 
         // string functions
         addMessageProcessorFunction(Abbreviate.NAME, Abbreviate.class);

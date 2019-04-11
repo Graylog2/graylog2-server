@@ -92,6 +92,4 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
             return captures.size() > 0;
         }
     }
-
-
 }
