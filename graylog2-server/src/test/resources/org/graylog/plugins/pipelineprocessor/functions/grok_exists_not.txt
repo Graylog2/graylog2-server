@@ -1,0 +1,6 @@
+rule "grok_exists_not"
+when
+    grok_exists("DOESNOTEXISTS")
+then
+    trigger_test();
+end

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
-import io.krakens.grok.api.Grok;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -46,8 +45,9 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
         patternParam = ParameterDescriptor.string("pattern")
                 .description("The Grok Pattern which is to be tested for existance.").build();
-        doLog = ParameterDescriptor.bool("do_log").optional()
-                .description("Log if the Grok Pattern is missing.").build();
+        doLog = ParameterDescriptor.bool("log_missing").optional()
+                .description("Log if the Grok Pattern is missing. Warning: Switching on this flag can lead" +
+                        " to a high volume of logs.").build();
     }
 
     @Override
@@ -61,7 +61,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
         final boolean patternExists = grokPatternRegistry.grokPatternExists(pattern);
         if (!patternExists && logWhenNotFound) {
-           log.info("Grok Pattern " + pattern + " was not found in pipeline rule function execution");
+           log.info("Grok Pattern " + pattern + " does not exists.");
         }
 
         return patternExists;
@@ -73,7 +73,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
                .name(NAME)
                .returnType(Boolean.class)
                .params(of(patternParam, doLog))
-               .description("Tests if the searched Grok Pattern exists.")
+               .description("Checks if the given Grok pattern exists.")
                .build();
     }
 }

@@ -483,6 +483,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void grok_exists_not() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isFalse();
+    }
+
+    @Test
     public void encodings() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
