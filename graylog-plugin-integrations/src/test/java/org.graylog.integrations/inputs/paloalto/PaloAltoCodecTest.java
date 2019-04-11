@@ -40,10 +40,10 @@ public class PaloAltoCodecTest {
 
     // These messages are in Panorama format. Panorama is Palo Alto's log management system.
     // Messages forwarded from Panorama will have the  - - - -  delimiter.
-    private final static String PANORAMA_TRAFFIC_MESSAGE = "<14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19 11:50:32,007255000045717,TRAFFIC,end,2049,2018/09/19 11:50:32,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,incomplete,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:32,205742,1,64575,443,41304,443,0x400070,tcp,allow,412,272,140,6,2018/09/19 11:50:15,0,any,0,54196730,0x8000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,4,2,tcp-fin,13,16,0,0,,Prod--2,from-policy,,,0,,0,,N/A,0,0,0,0";
-    private final static String PANORAMA_SYSTEM_MESSAGE = "<14>1 2018-09-19T11:50:35-05:00 Panorama-1 - - - - 1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\"Deviating device: Prod--2, Serial: 007255000045717, Object: N/A, Metric: mp-cpu, Value: 34\",1163103,0x0,0,0,0,0,,Panorama-1";
+    private final static String PANORAMA_TRAFFIC_MESSAGE = "<14>1 2018-09-19T11:50:32-05:00 Panorama--2 - - - - 1,2018/09/19 11:50:32,453524335,TRAFFIC,end,2049,2018/09/19 11:50:32,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,incomplete,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:32,205742,1,64575,443,41304,443,0x400070,tcp,allow,412,272,140,6,2018/09/19 11:50:15,0,any,0,54196730,0x8000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,4,2,tcp-fin,13,16,0,0,,Prod--2,from-policy,,,0,,0,,N/A,0,0,0,0";
+    private final static String PANORAMA_SYSTEM_MESSAGE = "<14>1 2018-09-19T11:50:35-05:00 Panorama-1 - - - - 1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\"Deviating device: Prod--2, Serial: 453524335, Object: N/A, Metric: mp-cpu, Value: 34\",1163103,0x0,0,0,0,0,,Panorama-1";
     private final static String PANORAMA_THREAT_MESSAGE = "<14>1 2018-09-19T11:50:33-05:00 Panorama--1 - - - - 1,2018/09/19 11:50:33,007255000045716,THREAT,spyware,2049,2018/09/19 11:50:33,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,ssl,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:33,201360,1,21131,443,56756,443,0x80403000,tcp,alert,\"test.com/\",Suspicious TLS Evasion Found(14978),online_test.com,informational,client-to-server,1007133,0xa000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,,1204440535977427988,,,0,,,,,,,,0,13,16,0,0,,Prod--1,,,,,0,,0,,N/A,spyware,AppThreat-8065-5006,0x0,0,4294967295";
-    private final static String PANORAMA_WITH_LINE_BREAK = "<14>1 2018-09-19T11:50:35-05:00 Panorama-1 - - - - 1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\\\"Deviating device: Prod--2, Serial: 007255000045717, Object: N/A, Metric: mp-cpu, Value: 34\\\",1163103,0x0,0,0,0,0,,Panorama-1\n";
+    private final static String PANORAMA_WITH_LINE_BREAK = "<14>1 2018-09-19T11:50:35-05:00 Panorama-1 - - - - 1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\\\"Deviating device: Prod--2, Serial: 453524335, Object: N/A, Metric: mp-cpu, Value: 34\\\",1163103,0x0,0,0,0,0,,Panorama-1\n";
 
     // Raw PAN device messages.
     // These help to test the various combinations that we might see.
@@ -124,16 +124,18 @@ public class PaloAltoCodecTest {
         Message message = codec.decode(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes()));
         assertEquals("SYSTEM", message.getField("type"));
         assertEquals(message.getField("module"), "general");
-        assertEquals(message.getField("description"), "\"Deviating device: Prod--2");
+
+        // Test quoted value with embedded commas.
+        assertEquals(message.getField("description"), "Deviating device: Prod--2, Serial: 453524335, Object: N/A, Metric: mp-cpu, Value: 34");
         assertEquals(message.getField("serial_number"), "000710000506");
         assertEquals(message.getField("source"), "Panorama-1");
-        assertEquals(message.getField("message"), "1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\"Deviating device: Prod--2, Serial: 007255000045717, Object: N/A, Metric: mp-cpu, Value: 34\",1163103,0x0,0,0,0,0,,Panorama-1");
+        assertEquals(message.getField("message"), "1,2018/09/19 11:50:35,000710000506,SYSTEM,general,0,2018/09/19 11:50:35,,general,,0,0,general,informational,\"Deviating device: Prod--2, Serial: 453524335, Object: N/A, Metric: mp-cpu, Value: 34\",1163103,0x0,0,0,0,0,,Panorama-1");
         assertEquals(message.getField("severity"), "informational");
         assertEquals(message.getField("generated_time"), "2018/09/19 11:50:35");
         assertEquals(message.getField("event_id"), "general");
-        assertEquals(message.getField("device_name"), "0");
+        assertEquals(message.getField("device_name"), "Panorama-1");
         assertEquals(message.getField("content_threat_type"), "general");
-        assertEquals(message.getField("virtual_system_name"), "0");
+        assertEquals(message.getField("virtual_system_name"), null);
         assertEquals(0, ((DateTime) message.getField("timestamp")).compareTo(new DateTime("2018-09-19T11:50:35.000-05:00")));
 
         // Test Traffic message results
@@ -158,8 +160,8 @@ public class PaloAltoCodecTest {
         assertEquals(message.getField("rule_name"), "HTTPS-strict");
         assertEquals(message.getField("nat_src_addr"), "10.20.30.40");
         assertEquals(message.getField("session_id"), 205742L);
-        assertEquals(message.getField("serial_number"), "007255000045717");
-        assertEquals(message.getField("message"), "1,2018/09/19 11:50:32,007255000045717,TRAFFIC,end,2049,2018/09/19 11:50:32,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,incomplete,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:32,205742,1,64575,443,41304,443,0x400070,tcp,allow,412,272,140,6,2018/09/19 11:50:15,0,any,0,54196730,0x8000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,4,2,tcp-fin,13,16,0,0,,Prod--2,from-policy,,,0,,0,,N/A,0,0,0,0");
+        assertEquals(message.getField("serial_number"), "453524335");
+        assertEquals(message.getField("message"), "1,2018/09/19 11:50:32,453524335,TRAFFIC,end,2049,2018/09/19 11:50:32,10.20.30.40,10.20.30.40,10.20.30.40,10.20.30.40,HTTPS-strict,,,incomplete,vsys1,Public,Public,ethernet1/1,ethernet1/1,ALK Logging,2018/09/19 11:50:32,205742,1,64575,443,41304,443,0x400070,tcp,allow,412,272,140,6,2018/09/19 11:50:15,0,any,0,54196730,0x8000000000000000,10.20.30.40-10.20.30.40,10.20.30.40-10.20.30.40,0,4,2,tcp-fin,13,16,0,0,,Prod--2,from-policy,,,0,,0,,N/A,0,0,0,0");
         assertEquals(message.getField("bytes_sent"), 272L);
         assertEquals(message.getField("dest_zone"), "Public");
         assertEquals(message.getField("nat_src_port"), 41304L);
@@ -175,22 +177,6 @@ public class PaloAltoCodecTest {
         assertEquals(message.getField("nat_dest_addr"), "10.20.30.40");
         assertEquals(message.getField("category"), "any");
         assertEquals(message.getField("nat_dest_port"), 443L);
-
-        // TODO: Implement and test THREAT parsing.
-        // message = codec.decode(new RawMessage(THREAT_MESSAGE.getBytes()));
-        // assertEquals("THREAT", message.getField("pa_type"));
-    }
-
-    // TODO: Implement this test.
-    @Ignore
-    @Test
-    public void invalidPositionTest() {
-
-        // Verify that fields that have invalid positions (do not exist in the logs) are ignored.
-        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
-
-        Message message = codec.decode(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes()));
-        assertEquals("SYSTEM", message.getField("type"));
     }
 
     /**

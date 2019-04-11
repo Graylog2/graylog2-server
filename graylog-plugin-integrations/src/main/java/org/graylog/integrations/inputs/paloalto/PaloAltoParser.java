@@ -16,8 +16,11 @@
  */
 package org.graylog.integrations.inputs.paloalto;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -27,6 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,8 +83,8 @@ public class PaloAltoParser {
                 String fieldsString = matcher.group(3);
 
                 DateTime timestamp = DateTime.parse(timestampString);
-                ImmutableList<String> fields = ImmutableList.copyOf(Splitter.on(",").split(fieldsString));
-                return PaloAltoMessageBase.create(source, timestamp, fieldsString, fields.get(3), fields);
+
+                return buildPaloAltoMessageBase(timestamp, fieldsString, source);
             } else {
                 LOG.error("Cannot parse malformed Panorama message: {}", raw);
                 return null;
@@ -93,12 +101,11 @@ public class PaloAltoParser {
                     // Remove two spaces in one digit day number "Apr  8 01:47:32"
                     // This solution feels terrible. Sorry.
                     String dateWithoutYear = matcher.group(1).replaceFirst(DOUBLE_SPACE, SINGLE_SPACE);
-                    DateTime timestamp  = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
+                    DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
                     String source = matcher.group(2);
                     String panData = matcher.group(3);
 
-                    ImmutableList<String> fields = ImmutableList.copyOf(Splitter.on(",").split(panData));
-                    return PaloAltoMessageBase.create(source, timestamp, panData, fields.get(3), fields);
+                    return buildPaloAltoMessageBase(timestamp, panData, source);
                 } else {
                     LOG.error("Cannot parse malformed Syslog message: {}", raw);
                     return null;
@@ -114,18 +121,63 @@ public class PaloAltoParser {
                     DateTime timestamp = SYSLOG_TIMESTAMP_FORMATTER.parseDateTime(dateWithoutYear + SINGLE_SPACE + DateTime.now().getYear());
                     String panData = matcher.group(2);
 
-                    ImmutableList<String> fields = ImmutableList.copyOf(Splitter.on(",").split(panData));
-
-                    // No source (host)
-                    return PaloAltoMessageBase.create("", timestamp, panData, fields.get(3), fields);
+                    // No source is supplied, so use a blank one
+                    return buildPaloAltoMessageBase(timestamp, panData, "");
                 } else {
                     LOG.error("Cannot parse malformed Syslog message: {}", raw);
                     return null;
                 }
             }
         }
-        
+
         LOG.error("Cannot parse malformed PAN message [unrecognized format]: {}", raw);
         return null;
+    }
+
+    /**
+     * @param timestamp The message timestamp.
+     * @param messagePayload The full CSV message payload. eg. <14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22...
+     * @param source The message source.
+     * @return The PaloAltoMessageBase, which contains all data needed to build the message.
+     */
+    private PaloAltoMessageBase buildPaloAltoMessageBase(DateTime timestamp, String messagePayload, String source) {
+
+        // Attempt to parse CSV fields.
+        ImmutableList<String> fields = parseCSVFields(messagePayload);
+        if (fields == null) {
+            return null;
+        }
+
+        return PaloAltoMessageBase.create(source, timestamp, messagePayload, fields.get(3), fields);
+    }
+
+    /**
+     * Use a CSV parser to ensure that quotes text with embedded (escaped) commas works correctly.
+     * This logic used to split just on the comma, which produced malformed parsing results when commas were embedded
+     * within quoted CSV values. eg. "testing 1, 2, 3"
+     *
+     * @param messagePayload The full CSV message payload. eg. <14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22...
+     * @return A list of strings containing the individual field values.
+     * All quoted values will be properly extracted (quotes will be removed, and only the inner value will be returned).
+     */
+    private ImmutableList<String> parseCSVFields(String messagePayload) {
+
+        Reader stringReader = new StringReader(messagePayload);
+        List<CSVRecord> csvRecords = null;
+        try {
+            csvRecords = new CSVParser(stringReader, CSVFormat.DEFAULT).getRecords();
+        } catch (IOException e) {
+            LOG.error("Cannot parse CSV PAN message: {}", messagePayload, e);
+            return null;
+        }
+
+        if (csvRecords.size() != 1) {
+            LOG.error("Cannot parse malformed/multiline Syslog message: {}", messagePayload);
+            return null;
+        }
+
+        // Convert the first row to a list
+        ArrayList<String> fieldValues = Lists.newArrayList(csvRecords.get(0).iterator());
+        return ImmutableList.copyOf(fieldValues);
     }
 }
