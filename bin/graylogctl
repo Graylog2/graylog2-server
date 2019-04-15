@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CMD=$1
 NOHUP=${NOHUP:=$(which nohup)}
