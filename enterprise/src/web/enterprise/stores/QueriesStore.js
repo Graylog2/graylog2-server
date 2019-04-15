@@ -6,7 +6,7 @@ import moment from 'moment';
 
 import Search from 'enterprise/logic/search/Search';
 import { QueriesActions } from 'enterprise/actions/QueriesActions';
-import type { QueryId, TimeRange } from 'enterprise/logic/queries/Query';
+import type { QueryId, TimeRange, TimeRangeTypes } from 'enterprise/logic/queries/Query';
 import Query from 'enterprise/logic/queries/Query';
 
 import { ViewActions, ViewStore } from './ViewStore';
@@ -53,13 +53,13 @@ export const QueriesStore = Reflux.createStore({
 
   remove(queryId: QueryId) {
     const newQueries = this.queries.remove(queryId);
-    const promise = this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
     QueriesActions.remove.promise(promise);
     return promise;
   },
   update(queryId: QueryId, query: Query) {
     const newQueries = this.queries.set(queryId, query);
-    const promise = this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
     QueriesActions.update.promise(promise);
     return promise;
   },
@@ -68,23 +68,23 @@ export const QueriesStore = Reflux.createStore({
     const activeQuery: Query = this.queries.get(queryId);
     const newQuery = activeQuery.toBuilder().query(Object.assign({}, activeQuery.query, { query_string: query })).build();
     const newQueries = this.queries.set(queryId, newQuery);
-    const promise = this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
     QueriesActions.query.promise(promise);
     return promise;
   },
   timerange(queryId: QueryId, timerange: TimeRange) {
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(timerange).build());
-    const promise = this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
     QueriesActions.timerange.promise(promise);
     return promise;
   },
-  rangeParams(queryId: QueryId, key, value) {
+  rangeParams(queryId: QueryId, key: string, value: string | number) {
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { [key]: value })).build());
-    const promise = this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
     QueriesActions.rangeParams.promise(promise);
     return promise;
   },
-  rangeType(queryId: QueryId, type) {
+  rangeType(queryId: QueryId, type: TimeRangeTypes) {
     const oldQuery = this.queries.get(queryId);
     const oldTimerange = oldQuery.timerange;
     const oldType = oldTimerange.type;
@@ -118,7 +118,7 @@ export const QueriesStore = Reflux.createStore({
         break;
     }
     const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(newTimerange).build());
-    const promise = this._propagateQueryChange(newQueries);
+    const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
     QueriesActions.rangeType.promise(promise);
     return promise;
   },

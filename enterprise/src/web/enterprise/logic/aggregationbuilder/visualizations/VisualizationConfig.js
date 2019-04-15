@@ -15,6 +15,11 @@ export default class VisualizationConfig {
     throw new Error(`Unable to find visualization config of type: ${type} - missing plugin?`);
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  toBuilder() {
+    throw new Error('Must not be called on abstract class!');
+  }
+
   static __registrations: { [string]: typeof VisualizationConfig } = {};
 
   static registerSubtype(type: string, implementingClass: typeof VisualizationConfig) {

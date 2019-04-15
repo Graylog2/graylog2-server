@@ -1,10 +1,14 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import { get } from 'lodash';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
+// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
+
 import { SearchActions, SearchStore } from 'enterprise/stores/SearchStore';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'enterprise/stores/CurrentQueryStore';
@@ -29,11 +33,11 @@ const onZoom = (config, currentQuery, currentUser, from, to) => {
 };
 
 const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimerange }) => {
-  const layout = {
-    yaxis: {
-      fixedrange: true,
-    },
+  const layout = {};
+  layout.yaxis = {
+    fixedrange: true,
   };
+
   let _onZoom = () => {};
   if (config.isTimeline) {
     const { timezone } = currentUser;

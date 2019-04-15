@@ -31,8 +31,8 @@ export const isFunction = (s: string) => seriesRegex.test(s);
 type ChartDefinition = {
   type: string,
   name: string,
-  x: Array<string>,
-  y: Array<any>,
+  x?: Array<string>,
+  y?: Array<any>,
 };
 
 const _defaultSeriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });

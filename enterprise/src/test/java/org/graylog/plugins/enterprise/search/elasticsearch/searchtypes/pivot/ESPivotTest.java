@@ -6,7 +6,9 @@ import com.jayway.jsonpath.JsonPath;
 import com.revinate.assertj.json.JsonPathAssert;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.Aggregation;
+import io.searchbox.core.search.aggregation.MaxAggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
+import io.searchbox.core.search.aggregation.MinAggregation;
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -34,6 +36,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -75,10 +78,26 @@ public class ESPivotTest {
         when(pivot.id()).thenReturn("dummypivot");
     }
 
+    private MetricAggregation createTimestampRangeAggregations(Double min, Double max) {
+        final MetricAggregation metricAggregation = mock(MetricAggregation.class);
+
+        final MinAggregation timestampMinAggregation = mock(MinAggregation.class);
+        when(timestampMinAggregation.getMin()).thenReturn(min);
+        final MaxAggregation timestampMaxAggregation = mock(MaxAggregation.class);
+        when(timestampMaxAggregation.getMax()).thenReturn(max);
+
+        when(metricAggregation.getMinAggregation("timestamp-min")).thenReturn(timestampMinAggregation);
+        when(metricAggregation.getMaxAggregation("timestamp-max")).thenReturn(timestampMaxAggregation);
+
+        return metricAggregation;
+    }
+
     @Test
     public void searchResultIncludesDocumentCount() {
         final long documentCount = 424242;
         when(queryResult.getTotal()).thenReturn(documentCount);
+        final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
+        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
 
         final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
 

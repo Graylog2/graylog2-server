@@ -31,6 +31,8 @@ export type ElasticsearchQueryString = {
 
 export type QueryString = ElasticsearchQueryString;
 
+export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
+
 export type RelativeTimeRange = {
   type: 'relative',
   range: number,

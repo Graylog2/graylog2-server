@@ -8,8 +8,13 @@ import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.errors.QueryError;
+import org.graylog.plugins.enterprise.search.searchtypes.pivot.PivotResult;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +35,28 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      */
     T generate(SearchJob job, Query query, Set<QueryResult> predecessorResults);
 
+    default boolean isAllMessages(TimeRange timeRange) {
+        return timeRange instanceof RelativeRange && ((RelativeRange)timeRange).range() == 0;
+    }
+
+    default AbsoluteRange effectiveTimeRangeForResult(Query query, QueryResult queryResult) {
+        if (isAllMessages(query.timerange())) {
+            final Optional<AbsoluteRange> effectiveRange = queryResult.searchTypes().values().stream()
+                    .filter(result -> result instanceof PivotResult)
+                    .map(result -> ((PivotResult) result).effectiveTimerange())
+                    .reduce((prev, next) -> {
+                        final DateTime from = prev.from().compareTo(next.from()) < 0 ? prev.from() : next.from();
+                        final DateTime to = prev.to().compareTo(next.to()) < 0 ? next.to() : prev.to();
+                        return AbsoluteRange.create(from, to);
+                    });
+
+            if (effectiveRange.isPresent()) {
+                return effectiveRange.get();
+            }
+        }
+        return AbsoluteRange.create(query.timerange().getFrom(), query.timerange().getTo());
+    }
+
     // TODO we can probably push job, query and predecessorResults into the GeneratedQueryContext to simplify the signature
     default QueryResult run(SearchJob job, Query query, GeneratedQueryContext generatedQueryContext, Set<QueryResult> predecessorResults) {
         try {
@@ -42,7 +69,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
             return result.toBuilder()
                     .executionStats(
                             statsBuilder.duration(stopwatch.elapsed(TimeUnit.MILLISECONDS))
-                                    .effectiveTimeRange(AbsoluteRange.create(query.timerange().getFrom(), query.timerange().getTo()))
+                                    .effectiveTimeRange(effectiveTimeRangeForResult(query, result))
                                     .build())
                     .build();
         } catch (Exception e) {

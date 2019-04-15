@@ -1,10 +1,13 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { fromPairs, get, zip } from 'lodash';
 
 import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
 import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import Viewport from 'enterprise/logic/aggregationbuilder/visualizations/Viewport';
+import type { VisualizationComponent, VisualizationComponentProps } from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+
 import MapVisualization from './MapVisualization';
 import { extractSeries } from '../Series';
 import transformKeys from '../TransformKeys';
@@ -13,7 +16,7 @@ const arrayToMap = ([name, x, y]) => ({ name, x, y });
 const lastKey = keys => keys[keys.length - 1];
 const mergeObject = (prev, last) => Object.assign({}, prev, last);
 
-const WorldMapVisualization = ({ config, data, onChange, width, ...rest }) => {
+const WorldMapVisualization: VisualizationComponent = ({ config, data, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const series = extractSeries(transformKeys(config.rowPivots, config.columnPivots, data))
     .map(arrayToMap)
@@ -41,7 +44,6 @@ const WorldMapVisualization = ({ config, data, onChange, width, ...rest }) => {
   return (
     <MapVisualization {...rest}
                       data={series}
-                      id={`worldmap-${config.id}`}
                       viewport={viewport}
                       width={width}
                       onChange={_onChange} />

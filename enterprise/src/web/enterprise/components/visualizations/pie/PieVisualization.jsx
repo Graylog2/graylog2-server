@@ -1,7 +1,10 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
+import type { VisualizationComponent, VisualizationComponentProps } from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+
 import GenericPlot from '../GenericPlot';
 import { generateSeries } from '../Series';
 import transformKeys from '../TransformKeys';
@@ -39,7 +42,9 @@ const _generateSeries = (data) => {
   }));
 };
 
-const PieVisualization = ({ config, data }) => <GenericPlot chartData={_generateSeries(transformKeys(config.rowPivots, config.columnPivots, data))} />;
+const PieVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
+  <GenericPlot chartData={_generateSeries(transformKeys(config.rowPivots, config.columnPivots, data))} />
+);
 
 PieVisualization.propTypes = {
   config: AggregationType.isRequired,

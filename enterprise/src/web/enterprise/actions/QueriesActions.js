@@ -1,18 +1,22 @@
 // @flow strict
 import Reflux from 'reflux';
-import type { QueryId } from 'enterprise/logic/queries/Query';
+import * as Immutable from 'immutable';
+
+import type { QueryId, TimeRange, TimeRangeTypes } from 'enterprise/logic/queries/Query';
 import Query from 'enterprise/logic/queries/Query';
 import ViewState from 'enterprise/logic/views/ViewState';
 
+type QueriesList = Immutable.OrderedMap<QueryId, Query>;
+
 type QueriesActionsType = {
-  create: (Query, ViewState) => Promise<*>,
-  duplicate: (QueryId) => Promise<Query>,
-  query: (QueryId, string) => Promise<*>,
-  rangeType: (QueryId) => Promise<*>,
-  rangeParams: (QueryId) => Promise<*>,
-  remove: (QueryId) => Promise<*>,
-  timerange: (QueryId) => Promise<*>,
-  update: (QueryId, Query) => Promise<*>,
+  create: (Query, ViewState) => Promise<QueriesList>,
+  duplicate: (QueryId) => Promise<QueriesList>,
+  query: (QueryId, string) => Promise<QueriesList>,
+  rangeType: (QueryId, TimeRangeTypes) => Promise<QueriesList>,
+  rangeParams: (QueryId, string, string | number) => Promise<QueriesList>,
+  remove: (QueryId) => Promise<QueriesList>,
+  timerange: (QueryId, TimeRange) => Promise<QueriesList>,
+  update: (QueryId, Query) => Promise<QueriesList>,
 };
 
 // eslint-disable-next-line import/prefer-default-export

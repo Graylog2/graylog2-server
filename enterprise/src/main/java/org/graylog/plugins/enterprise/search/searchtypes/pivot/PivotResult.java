@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.enterprise.search.SearchType;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -11,6 +12,8 @@ import java.util.List;
 
 @AutoValue
 public abstract class PivotResult implements SearchType.Result {
+    private static final String FIELD_EFFECTIVE_TIMERANGE = "effective_timerange";
+
     @Override
     @JsonProperty
     public abstract String id();
@@ -26,6 +29,9 @@ public abstract class PivotResult implements SearchType.Result {
 
     @JsonProperty
     public abstract long total();
+
+    @JsonProperty(FIELD_EFFECTIVE_TIMERANGE)
+    public abstract AbsoluteRange effectiveTimerange();
 
     public static Builder builder() {
         return new AutoValue_PivotResult.Builder();
@@ -51,6 +57,8 @@ public abstract class PivotResult implements SearchType.Result {
         }
 
         public abstract Builder total(long total);
+
+        public abstract Builder effectiveTimerange(AbsoluteRange effectiveTimerange);
 
         public abstract PivotResult build();
     }

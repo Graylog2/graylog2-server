@@ -7,6 +7,9 @@ import io.searchbox.core.search.aggregation.Aggregation;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import one.util.streamex.EntryStream;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.max.MaxAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.min.MinAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
@@ -18,6 +21,8 @@ import org.graylog.plugins.enterprise.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.SeriesSpec;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.joda.time.DateTime;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -120,6 +125,12 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             }
         }
 
+        final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
+        final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
+
+        searchSourceBuilder.aggregation(startTimestamp);
+        searchSourceBuilder.aggregation(endTimestamp);
+
         if (topLevelAggregation == null) {
             LOG.debug("No aggregations generated for {}", pivot);
         }
@@ -138,8 +149,16 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
+        final Double from = queryResult.getAggregations().getMinAggregation("timestamp-min").getMin();
+        final Double to = queryResult.getAggregations().getMaxAggregation("timestamp-max").getMax();
+        final AbsoluteRange effectiveTimerange = AbsoluteRange.create(
+                from == null ? query.timerange().getFrom() : new DateTime(from.longValue()),
+                to == null ? query.timerange().getTo() : new DateTime(to.longValue())
+        );
+
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
+                .effectiveTimerange(effectiveTimerange)
                 .total(extractDocumentCount(queryResult, pivot, queryContext));
 
         // pivot results are a table where cells can contain multiple "values" and not only scalars:
