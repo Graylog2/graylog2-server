@@ -29,7 +29,7 @@ const _wrapOption = series => ({ label: series.effectiveName, value: series });
 type Props = {
   onChange: (Array<*>) => boolean,
   series: Array<Series>,
-  suggester: (string) => Array<Option>,
+  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption>, for: (string) => Array<Option> },
 };
 
 type State = {
@@ -50,15 +50,13 @@ class SeriesSelect extends React.Component<Props, State> {
   }
 
   _onChange = (newSeries: Array<Option | IncompleteOption | BackToFunctions>) => {
+    const { onChange, suggester } = this.props;
     const last = newSeries[newSeries.length - 1];
-    if (!last) {
-      return false;
-    }
 
-    if (last.incomplete) {
+    if (last && last.incomplete) {
       const options = [].concat(
         [{ label: 'Back to function list', backToFunctions: true }],
-        this.props.suggester.for(last.value),
+        suggester.for(last.value),
       );
       this.setState({ options });
       return false;
@@ -66,17 +64,18 @@ class SeriesSelect extends React.Component<Props, State> {
 
     this._resetToFunctions();
 
-    if (last.backToFunctions) {
+    if (last && last.backToFunctions) {
       return false;
     }
 
     // $FlowFixMe: Only `Option` present now.
-    this.props.onChange(parseSeries(newSeries));
+    onChange(parseSeries(newSeries));
     return true;
   };
 
   _resetToFunctions = () => {
-    this.setState({ options: this.props.suggester.defaults });
+    const { suggester } = this.props;
+    this.setState({ options: suggester.defaults });
   };
 
   _onClose = () => {
@@ -85,6 +84,7 @@ class SeriesSelect extends React.Component<Props, State> {
 
   render() {
     const { onChange, series } = this.props;
+    const { options } = this.state;
     const valueComponent = ({ children, innerProps, ...rest }) => {
       const element = rest.data.value;
       const { className } = innerProps;
@@ -105,7 +105,7 @@ class SeriesSelect extends React.Component<Props, State> {
     return (
       <Select placeholder="None: click to add series"
               onChange={this._onChange}
-              options={this.state.options}
+              options={options}
               value={series.map(_wrapOption)}
               components={_components}
               onClose={this._onClose}

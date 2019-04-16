@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
@@ -9,14 +10,19 @@ import SeriesSelect from './SeriesSelect';
 jest.mock('enterprise/stores/AggregationFunctionsStore', () => ({ getInitialState: jest.fn(), listen: jest.fn() }));
 
 describe('SeriesSelect', () => {
+  let suggester;
+  beforeEach(() => {
+    suggester = () => [];
+    suggester.defaults = [];
+  });
   it('renders with minimal props', () => {
-    const wrapper = renderer.create(<SeriesSelect series={[]} onChange={() => {}} />);
+    const wrapper = renderer.create(<SeriesSelect series={[]} onChange={() => true} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('renders given series', () => {
     const series = [Series.forFunction('count()'), Series.forFunction('avg(took_ms)')];
-    const wrapper = mount(<SeriesSelect series={series} onChange={() => {}} />);
+    const wrapper = mount(<SeriesSelect series={series} onChange={() => true} />);
 
     expect(wrapper.find('ConfigurableElement')).toHaveLength(2);
     const values = wrapper.find('ConfigurableElement');
@@ -25,7 +31,7 @@ describe('SeriesSelect', () => {
   });
 
   it('opens menu when focussed, returning no results without suggester', () => {
-    const wrapper = mount(<SeriesSelect series={[]} onChange={() => {}} />);
+    const wrapper = mount(<SeriesSelect series={[]} onChange={() => true} />);
     const input = wrapper.find('input');
     expect(wrapper).not.toIncludeText('0 results available.');
 
@@ -35,8 +41,7 @@ describe('SeriesSelect', () => {
   });
 
   it('opens menu when focussed, returning no results for empty suggester defaults', () => {
-    const suggester = { defaults: [] };
-    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => {}} />);
+    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => true} />);
     const input = wrapper.find('input');
     expect(wrapper).not.toIncludeText('0 results available.');
 
@@ -46,8 +51,8 @@ describe('SeriesSelect', () => {
   });
 
   it('opens menu when focussed, returning suggester defaults', () => {
-    const suggester = { defaults: [{ label: 'Something', value: 'Something' }, { label: 'Anything', value: 'Anything' }] };
-    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => {}} />);
+    suggester.defaults = [{ label: 'Something', value: 'Something' }, { label: 'Anything', value: 'Anything' }];
+    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={() => true} />);
     const input = wrapper.find('input');
     expect(wrapper).not.toIncludeText('Something');
     expect(wrapper).not.toIncludeText('Anything');
@@ -59,13 +64,14 @@ describe('SeriesSelect', () => {
   });
 
   it('shows next suggestions when selecting incomplete suggestion', () => {
-    const suggester = {
-      defaults: [{ label: 'func1', value: 'func1', incomplete: true }, { label: 'Anything', value: 'Anything' }],
-      for: jest.fn(() => [
-        { label: 'func1(foo)', value: 'func1(foo)' },
-        { label: 'func1(bar)', value: 'func1(bar)' },
-      ]),
-    };
+    suggester.defaults = [
+      { value: 'func1', incomplete: true },
+      { label: 'Anything', value: 'Anything' },
+    ];
+    suggester.for = jest.fn(() => [
+      { label: 'func1(foo)', value: 'func1(foo)' },
+      { label: 'func1(bar)', value: 'func1(bar)' },
+    ]);
     const onChange = jest.fn();
     const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={onChange} />);
     const input = wrapper.find('input');
@@ -80,7 +86,6 @@ describe('SeriesSelect', () => {
   });
 
   it('unwraps value and returns it when final option was selected', () => {
-    const suggester = {};
     const onChange = jest.fn();
     const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={onChange} />);
 
@@ -91,5 +96,13 @@ describe('SeriesSelect', () => {
 
     expect(onChange).toHaveBeenCalled();
     expect(onChange).toHaveBeenCalledWith(['func1(foo)']);
+  });
+  it('allows removing the last element', () => {
+    const onChange = jest.fn(() => true);
+    const wrapper = mount(<SeriesSelect series={[Series.forFunction('count()')]} suggester={suggester} onChange={onChange} />);
+    const removeSeries = wrapper.find('div[children="×"]');
+    removeSeries.simulate('click');
+
+    expect(onChange).toHaveBeenCalledWith([]);
   });
 });
