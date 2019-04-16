@@ -48,7 +48,7 @@ const _visualizationForType = (type: string): VisualizationComponent => {
   return visualization.component;
 };
 
-const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange }: Props) => {
+const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {} }: Props) => {
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
   const { rows } = data;
   return (

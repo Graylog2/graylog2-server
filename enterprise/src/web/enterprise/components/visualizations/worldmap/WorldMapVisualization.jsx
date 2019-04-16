@@ -16,7 +16,7 @@ const arrayToMap = ([name, x, y]) => ({ name, x, y });
 const lastKey = keys => keys[keys.length - 1];
 const mergeObject = (prev, last) => Object.assign({}, prev, last);
 
-const WorldMapVisualization: VisualizationComponent = ({ config, data, onChange, width, ...rest }: VisualizationComponentProps) => {
+const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const series = extractSeries(transformKeys(config.rowPivots, config.columnPivots, data))
     .map(arrayToMap)
@@ -38,12 +38,15 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, onChange,
     const visualizationConfig = (config.visualizationConfig ? config.visualizationConfig.toBuilder() : WorldMapVisualizationConfig.builder())
       .viewport(Viewport.create(newViewport.center, newViewport.zoom))
       .build();
-    onChange(visualizationConfig);
+    if (editing) {
+      onChange(visualizationConfig);
+    }
   };
 
   return (
     <MapVisualization {...rest}
                       data={series}
+                      id="world-map"
                       viewport={viewport}
                       width={width}
                       onChange={_onChange} />
