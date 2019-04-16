@@ -1,10 +1,9 @@
 // @flow strict
 
-import { parseSeries } from 'enterprise/components/visualizations/Series';
+import Series, { parseSeries } from 'enterprise/logic/aggregationbuilder/Series';
 
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
-import Series from '../aggregationbuilder/Series';
 
 const typePreservingFunctions = ['avg', 'min', 'max'];
 const constantTypeFunctions = {

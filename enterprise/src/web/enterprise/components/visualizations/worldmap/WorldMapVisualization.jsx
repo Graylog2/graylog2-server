@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { fromPairs, get, zip } from 'lodash';
+import { flow, fromPairs, get, zip } from 'lodash';
 
 import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
 import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -9,7 +9,7 @@ import Viewport from 'enterprise/logic/aggregationbuilder/visualizations/Viewpor
 import type { VisualizationComponent, VisualizationComponentProps } from 'enterprise/components/aggregationbuilder/AggregationBuilder';
 
 import MapVisualization from './MapVisualization';
-import { extractSeries } from '../Series';
+import { extractSeries } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
 const arrayToMap = ([name, x, y]) => ({ name, x, y });
@@ -18,8 +18,12 @@ const mergeObject = (prev, last) => Object.assign({}, prev, last);
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
-  const series = extractSeries(transformKeys(config.rowPivots, config.columnPivots, data))
-    .map(arrayToMap)
+  const pipeline = flow([
+    transformKeys(config.rowPivots, config.columnPivots),
+    extractSeries(),
+    results => results.map(arrayToMap),
+  ]);
+  const series = pipeline(data)
     .map(({ name, x, y }) => {
       const newX = x.map(lastKey);
       const keys = x.map(k => k.slice(0, -1)

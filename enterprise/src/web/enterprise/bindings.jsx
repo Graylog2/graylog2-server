@@ -25,7 +25,7 @@ import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
 import DataTable from 'enterprise/components/datatable/DataTable';
 import FieldStatisticsHandler from 'enterprise/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'enterprise/logic/valueactions/ExcludeFromQueryHandler';
-import { isFunction } from 'enterprise/components/visualizations/Series';
+import { isFunction } from 'enterprise/logic/aggregationbuilder/Series';
 import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'enterprise/components/widgets/EditMessageList';
 import {

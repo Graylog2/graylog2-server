@@ -1,4 +1,4 @@
-import * as Series from 'enterprise/components/visualizations/Series';
+import { parseSeries } from 'enterprise/logic/aggregationbuilder/Series';
 
 const formatPivot = (pivot) => {
   const { type, field, config } = pivot;
@@ -29,7 +29,7 @@ export default ({ columnPivots, rowPivots, series, rollup, sort }) => [{
     rollup,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
-    series: series.map(s => Object.assign({ id: s.effectiveName }, Series.parseSeries(s.function))),
+    series: series.map(s => Object.assign({ id: s.effectiveName }, parseSeries(s.function))),
     sort: sort,
   },
 }];

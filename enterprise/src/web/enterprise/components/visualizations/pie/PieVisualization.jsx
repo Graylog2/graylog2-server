@@ -6,8 +6,7 @@ import { AggregationType } from 'enterprise/components/aggregationbuilder/Aggreg
 import type { VisualizationComponent, VisualizationComponentProps } from 'enterprise/components/aggregationbuilder/AggregationBuilder';
 
 import GenericPlot from '../GenericPlot';
-import { generateSeries } from '../Series';
-import transformKeys from '../TransformKeys';
+import { chartData } from '../ChartData';
 
 const maxItemsPerRow = 4;
 
@@ -28,22 +27,20 @@ const _horizontalDimensions = (idx, total) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (data) => {
-  return generateSeries(data, 'pie', (type, name, x, y, idx, total) => ({
-    type,
-    name,
-    hole: 0.4,
-    labels: x,
-    values: y,
-    domain: {
-      x: _horizontalDimensions(idx, total),
-      y: _verticalDimensions(idx, total),
-    },
-  }));
-};
+const _generateSeries = (type, name, x, y, idx, total) => ({
+  type,
+  name,
+  hole: 0.4,
+  labels: x,
+  values: y,
+  domain: {
+    x: _horizontalDimensions(idx, total),
+    y: _verticalDimensions(idx, total),
+  },
+});
 
 const PieVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
-  <GenericPlot chartData={_generateSeries(transformKeys(config.rowPivots, config.columnPivots, data))} />
+  <GenericPlot chartData={chartData(config, data, 'pie', _generateSeries)} />
 );
 
 PieVisualization.propTypes = {

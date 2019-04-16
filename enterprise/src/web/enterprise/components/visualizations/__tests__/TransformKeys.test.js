@@ -1,3 +1,5 @@
+// @flow strict
+import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
 import * as fixtures from './TransformKeys.fixtures';
 
 const CurrentUserStore = { get: jest.fn() };
@@ -14,14 +16,26 @@ describe('TransformKeys', () => {
   });
   it('returns original result when no aggregations are present', () => {
     const transformKeys = loadSUT();
-    const result = transformKeys([], [], { result: 42 });
-    expect(result).toEqual({ result: 42 });
+    const rows = [{
+      source: 'row-leaf',
+      value: 42,
+      key: ['foo'],
+      rollup: false,
+    }];
+    const result = transformKeys([], [])(rows);
+    expect(result).toEqual(rows);
   });
 
   it('returns original result when no time aggregations are present', () => {
     const transformKeys = loadSUT();
-    const result = transformKeys([{ type: 'value' }], [{ type: 'value' }], { result: 42 });
-    expect(result).toEqual({ result: 42 });
+    const rows = [{
+      source: 'row-leaf',
+      value: 42,
+      key: ['foo'],
+      rollup: false,
+    }];
+    const result = transformKeys([Pivot.create('foo', 'value')], [Pivot.create('bar', 'value')])(rows);
+    expect(result).toEqual(rows);
   });
 
   it('transforms row keys using current user\'s timezone', () => {
@@ -32,22 +46,26 @@ describe('TransformKeys', () => {
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
+        values: [],
       },
       {
         source: 'leaf',
         key: ['2017-03-12T09:32:21.283-08:00'],
+        values: [],
       },
     ];
 
-    const result = transformKeys([{ type: 'time' }], [], input);
+    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
 
     expect(result).toEqual([
       {
         key: ['2018-10-01T17:10:55.323+02:00'],
         source: 'leaf',
+        values: [],
       }, {
         key: ['2017-03-12T18:32:21.283+01:00'],
         source: 'leaf',
+        values: [],
       },
     ]);
   });
@@ -60,22 +78,26 @@ describe('TransformKeys', () => {
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
+        values: [],
       },
       {
         source: 'leaf',
         key: ['2017-03-12T09:32:21.283-08:00'],
+        values: [],
       },
     ];
 
-    const result = transformKeys([{ type: 'time' }], [], input);
+    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
 
     expect(result).toEqual([
       {
         key: ['2018-10-01T17:10:55.323+02:00'],
         source: 'leaf',
+        values: [],
       }, {
         key: ['2017-03-12T18:32:21.283+01:00'],
         source: 'leaf',
+        values: [],
       },
     ]);
   });
@@ -88,22 +110,26 @@ describe('TransformKeys', () => {
       {
         source: 'leaf',
         key: ['2018-10-01T15:10:55.323Z'],
+        values: [],
       },
       {
         source: 'leaf',
         key: ['2017-03-12T09:32:21.283-08:00'],
+        values: [],
       },
     ];
 
-    const result = transformKeys([{ type: 'time' }], [], input);
+    const result = transformKeys([Pivot.create('timestamp', 'time')], [])(input);
 
     expect(result).toEqual([
       {
         key: ['2018-10-01T15:10:55.323+00:00'],
         source: 'leaf',
+        values: [],
       }, {
         key: ['2017-03-12T17:32:21.283+00:00'],
         source: 'leaf',
+        values: [],
       },
     ]);
   });
@@ -112,7 +138,7 @@ describe('TransformKeys', () => {
     CurrentUserStore.get.mockImplementationOnce(() => ({ timezone: 'America/New_York' }));
     const { rowPivots, columnPivots, input, output } = fixtures.singleRowPivot;
     const transformKeys = loadSUT();
-    const result = transformKeys(rowPivots, columnPivots, input);
+    const result = transformKeys(rowPivots, columnPivots)(input);
 
     expect(result).toEqual(output);
   });
@@ -120,7 +146,7 @@ describe('TransformKeys', () => {
   it('does not transform complete results without time pivots', () => {
     const { rowPivots, columnPivots, input, output } = fixtures.noTimePivots;
     const transformKeys = loadSUT();
-    const result = transformKeys(rowPivots, columnPivots, input);
+    const result = transformKeys(rowPivots, columnPivots)(input);
 
     expect(result).toEqual(output);
   });

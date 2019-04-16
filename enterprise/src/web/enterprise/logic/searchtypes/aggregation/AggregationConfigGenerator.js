@@ -1,4 +1,4 @@
-import * as Series from 'enterprise/components/visualizations/Series';
+import { parseSeries } from 'enterprise/logic/aggregationbuilder/Series';
 
 const formatInterval = ({ value, unit }) => `${value}${unit[0]}`;
 
@@ -16,7 +16,7 @@ const _groupDefinition = (pivot, series, groups) => {
   return Object.assign(
     {
       field,
-      metrics: series.map(s => Series.parseSeries(s.function)),
+      metrics: series.map(s => parseSeries(s.function)),
       groups,
     },
     _typeForField(field, config),

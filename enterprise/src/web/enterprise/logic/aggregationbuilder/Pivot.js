@@ -33,6 +33,10 @@ export default class Pivot {
     return this._value.config;
   }
 
+  static create(field: string, type: string, config: ConfigType = {}) {
+    return new Pivot(field, type, config);
+  }
+
   static fromJSON(value: PivotJson) {
     const { field, type, config = {} } = value;
     return new Pivot(field, type, config);

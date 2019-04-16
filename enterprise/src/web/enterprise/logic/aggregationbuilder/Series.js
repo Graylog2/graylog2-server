@@ -15,6 +15,29 @@ type InternalState = {
   function: string,
 };
 
+export type Definition = {
+  type: string,
+  field?: string,
+};
+
+export const seriesRegex = /^(\w+)\((\w*)\)$/;
+export const isFunction = (s: string) => seriesRegex.test(s);
+export const parseSeries = (s: string) => {
+  const result = seriesRegex.exec(s);
+  if (!result) {
+    return null;
+  }
+  // eslint-disable-next-line no-unused-vars
+  const [_, type, field] = result;
+  const definition: Definition = {
+    type,
+  };
+  if (field !== '') {
+    definition.field = field;
+  }
+  return definition;
+};
+
 export default class Series {
   _value: InternalState;
 
