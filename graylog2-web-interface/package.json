@@ -15,7 +15,8 @@
     "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "lint": "eslint --ext js,jsx src",
-    "test": "jest"
+    "test": "jest",
+    "check-production-build": "node checkProductionBuild.js build"
   },
   "jest": {
     "collectCoverageFrom": [
