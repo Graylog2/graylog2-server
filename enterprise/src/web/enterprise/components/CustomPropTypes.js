@@ -1,5 +1,7 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+
 import TFieldType from 'enterprise/logic/fieldtypes/FieldType';
 import TFieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 
