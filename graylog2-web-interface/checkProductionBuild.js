@@ -6,6 +6,11 @@ const express = require('express');
 const VENDORMODULE = 'vendor-module.json';
 const BUILDMODULE = 'module.json';
 
+function fatal(throwable) {
+  console.error(throwable);
+  process.exit(128);
+}
+
 function generateIndexHtml(assets) {
   return `
     <html>
@@ -33,16 +38,20 @@ function bootstrapExpress(buildDir, config, pluginMounts, indexHtml = '<html><bo
 process.setMaxListeners(0);
 
 async function loadPage(url, handleError, handleConsole) {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
-  const page = await browser.newPage();
-  page.on('console', handleConsole);
-  page.on('pageerror', handleError);
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+    page.on('console', handleConsole);
+    page.on('pageerror', handleError);
 
-  await page.goto(url);
-  return { page, browser };
+    await page.goto(url);
+    return { page, browser };
+  } catch (e) {
+    return fatal(e);
+  }
 }
 
 const buildDir = process.argv[2] || 'build';
