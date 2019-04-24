@@ -7,9 +7,6 @@ import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import { defaultCompare } from 'enterprise/logic/DefaultCompare';
 
-import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
-import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
-
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
@@ -17,6 +14,7 @@ import ColumnPivotSelect from './ColumnPivotSelect';
 import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
+import BarVisualizationConfiguration from './BarVisualizationConfiguration';
 import { PivotList } from './AggregationBuilderPropTypes';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
@@ -31,25 +29,28 @@ export default class AggregationControls extends React.Component {
       sort: PropTypes.arrayOf(PropTypes.string),
       visualization: PropTypes.string,
       rollup: PropTypes.bool,
+      visualizationConfig: PropTypes.object,
     }).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    rowPivots: [],
-    columnPivots: [],
-    sort: [],
-    series: [],
-    visualization: 'table',
   };
 
   constructor(props) {
     super(props);
 
     const { config } = props;
-    const { columnPivots, rowPivots, sort, series, visualization, rollup } = config;
-    this.state = { config: new AggregationWidgetConfig(columnPivots, rowPivots, series, sort, visualization, rollup) };
+    const { columnPivots, rowPivots, sort, series, visualization, rollup, visualizationConfig } = config;
+    this.state = {
+      config: AggregationWidgetConfig.builder()
+        .columnPivots(columnPivots)
+        .rowPivots(rowPivots)
+        .sort(sort)
+        .series(series)
+        .visualization(visualization)
+        .rollup(rollup)
+        .visualizationConfig(visualizationConfig)
+        .build(),
+    };
   }
 
   _onColumnPivotChange = (columnPivots) => {
@@ -77,7 +78,7 @@ export default class AggregationControls extends React.Component {
   };
 
   _onVisualizationChange = (visualization) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).build() }));
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
   };
 
   _onVisualizationConfigChange = (visualizationConfig) => {
@@ -87,12 +88,15 @@ export default class AggregationControls extends React.Component {
   _setAndPropagate = fn => this.setState(fn, this._propagateState);
 
   _propagateState() {
-    this.props.onChange(this.state.config);
+    const { config } = this.state;
+    const { onChange } = this.props;
+    onChange(config);
   }
 
   render() {
     const { children, fields } = this.props;
-    const { columnPivots, rowPivots, series, sort, visualization, rollup } = this.state.config;
+    const { config } = this.state;
+    const { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig } = config;
 
     const sortDirection = Immutable.Set(sort.map(s => s.direction)).first();
 
@@ -143,6 +147,11 @@ export default class AggregationControls extends React.Component {
             <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn.">
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
+            {visualization === 'bar' && (
+              <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
+                <BarVisualizationConfiguration config={visualizationConfig} onChange={this._onVisualizationConfigChange} />
+              </DescriptionBox>
+            )}
           </Col>
           <Col md={10} style={{ height: '100%' }}>
             {childrenWithCallback}

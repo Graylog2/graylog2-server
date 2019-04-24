@@ -46,6 +46,7 @@ import SelectExtractorType from 'enterprise/logic/valueactions/SelectExtractorTy
 
 import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import BarVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
 import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstance';
@@ -68,6 +69,7 @@ const showViewsPath = `${viewsPath}/:viewId`;
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
+VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);

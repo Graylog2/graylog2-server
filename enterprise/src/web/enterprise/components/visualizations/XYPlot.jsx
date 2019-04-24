@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
-import { get } from 'lodash';
+import { get, merge } from 'lodash';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
@@ -32,12 +32,12 @@ const onZoom = (config, currentQuery, currentUser, from, to) => {
   return false;
 };
 
-const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimerange }) => {
-  const layout = {};
-  layout.yaxis = {
-    fixedrange: true,
-  };
-
+const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimerange, plotLayout = {} }) => {
+  const layout = merge({
+    yaxis: {
+      fixedrange: true,
+    },
+  }, plotLayout);
   let _onZoom = () => {};
   if (config.isTimeline) {
     const { timezone } = currentUser;
@@ -54,6 +54,7 @@ const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimeran
       type: config.sort.length > 0 ? 'category' : undefined,
     };
   }
+
   return (
     <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} />
   );
@@ -70,6 +71,11 @@ XYPlot.propTypes = {
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
   }).isRequired,
+  plotLayout: PropTypes.object,
+};
+
+XYPlot.defaultProps = {
+  plotLayout: {},
 };
 
 export default connect(XYPlot, {

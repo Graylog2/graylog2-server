@@ -69,6 +69,9 @@ export default class AggregationWidgetConfig {
   }
 
   get visualizationConfig() {
+    if (this._value.visualizationConfig === null) {
+      return undefined;
+    }
     return this._value.visualizationConfig;
   }
 
