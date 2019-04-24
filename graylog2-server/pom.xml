@@ -903,6 +903,28 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>1.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>install-headless-shell</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://packages.graylog2.org/releases/graylog-plugin-artifacts/report/chrome/72.0.3583.1/headless_shell
+                                    </url>
+                                    <unpack>false</unpack>
+                                    <outputDirectory>${project.basedir}/../graylog2-web-interface/test/bin</outputDirectory>
+                                    <md5>22e07d7f108fcf6cb3e296d9802a9897</md5>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

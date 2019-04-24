@@ -6,6 +6,36 @@ const express = require('express');
 const VENDORMODULE = 'vendor-module.json';
 const BUILDMODULE = 'module.json';
 
+const HEADLESS_SHELL = 'test/bin/headless_shell';
+
+const isExecutable = (filename) => {
+  try {
+    // eslint-disable-next-line no-bitwise
+    fs.accessSync(filename, fs.constants.R_OK | fs.constants.X_OK);
+  } catch (e) {
+    return false;
+  }
+  return true;
+};
+
+const useHeadlessShell = (filename = HEADLESS_SHELL) => {
+  const isLinux = process.platform === 'linux';
+  if (!isLinux) {
+    return false;
+  }
+  if (!fs.existsSync(filename)) {
+    return false;
+  }
+  if (!isExecutable(filename)) {
+    try {
+      fs.chmodSync(filename, 0o755);
+    } catch (e) {
+      return false;
+    }
+  }
+  return true;
+};
+
 function fatal(throwable) {
   console.error(throwable);
   process.exit(128);
@@ -39,10 +69,15 @@ process.setMaxListeners(0);
 
 async function loadPage(url, handleError, handleConsole) {
   try {
-    const browser = await puppeteer.launch({
+    const options = {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    };
+    if (useHeadlessShell()) {
+      options.executable_path = HEADLESS_SHELL;
+    }
+    console.log('Options: ', options);
+    const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.on('console', handleConsole);
     page.on('pageerror', handleError);
