@@ -76,7 +76,6 @@ async function loadPage(url, handleError, handleConsole) {
     if (useHeadlessShell()) {
       options.executablePath = HEADLESS_SHELL;
     }
-    console.log('Options: ', options);
     const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.on('console', handleConsole);
