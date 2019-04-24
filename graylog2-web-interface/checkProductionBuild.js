@@ -74,7 +74,7 @@ async function loadPage(url, handleError, handleConsole) {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     };
     if (useHeadlessShell()) {
-      options.executable_path = HEADLESS_SHELL;
+      options.executablePath = HEADLESS_SHELL;
     }
     console.log('Options: ', options);
     const browser = await puppeteer.launch(options);
