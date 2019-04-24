@@ -9,7 +9,6 @@ import { widgetDefinition } from 'enterprise/logic/Widget';
 import WidgetGrid from 'enterprise/components/WidgetGrid';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore';
-import StaticMessageList from './messagelist/StaticMessageList';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 
 const MAXIMUM_GRID_SIZE = 12;
@@ -19,7 +18,7 @@ const _onPositionsChange = (positions) => {
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
-const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields, staticWidgets) => {
+const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryId, fields, allFields) => {
   const widgets = {};
   const data = {};
   const errors = {};
@@ -54,20 +53,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
                 locked={false}
                 onPositionsChange={p => _onPositionsChange(p)}
                 positions={positions}
-                staticWidgets={staticWidgets}
                 widgets={widgets} />
   );
 };
 
-const Query = ({ children, allFields, fields, onToggleMessages, results, positions, showMessages, widgetMapping, widgets, queryId }) => {
+const Query = ({ children, allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (results) {
-    const staticWidgets = [
-      <StaticMessageList key="staticMessageList"
-                         messages={results.messages}
-                         onToggleMessages={onToggleMessages}
-                         showMessages={showMessages} />,
-    ];
-    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields, staticWidgets);
+    const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
     return (
       <span>
         <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
@@ -87,11 +79,9 @@ Query.propTypes = {
   allFields: PropTypes.object.isRequired,
   children: PropTypes.node.isRequired,
   fields: PropTypes.object.isRequired,
-  onToggleMessages: PropTypes.func.isRequired,
   positions: PositionsMap,
   queryId: PropTypes.string.isRequired,
   results: PropTypes.object.isRequired,
-  showMessages: PropTypes.bool.isRequired,
   widgetMapping: PropTypes.object.isRequired,
   widgets: ImmutableWidgetsMap.isRequired,
 };

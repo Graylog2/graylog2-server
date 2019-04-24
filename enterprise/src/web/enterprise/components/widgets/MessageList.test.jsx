@@ -9,6 +9,7 @@ import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'enterprise/logic/ActionContext';
 import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
+import { TIMESTAMP_FIELD } from 'enterprise/Constants';
 
 jest.mock('enterprise/components/messagelist/MessageTableEntry', () => ({}));
 
@@ -72,7 +73,7 @@ describe('MessageList', () => {
 
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
-    SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set(['file_name']));
+    SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const wrapper1 = mount(<MessageList editing
                                         data={data}
                                         fields={Immutable.List(fields)} />);
@@ -83,7 +84,7 @@ describe('MessageList', () => {
     const wrapper2 = mount(<MessageList editing
                                         data={data}
                                         fields={Immutable.List(fields)} />);
-    expect(wrapper2.find('span[role="presentation"]').length).toBe(1);
+    expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
   it('provides a message context for each individual entry', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];

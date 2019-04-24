@@ -1,21 +1,25 @@
 import ViewState from './ViewState';
-import { resultHistogram } from '../Widget';
+import { resultHistogram, allMessagesTable } from '../Widget';
 import WidgetPosition from '../widgets/WidgetPosition';
 
 const _defaultWidgets = () => {
   const histogram = resultHistogram();
+  const messageTable = allMessagesTable();
   const widgets = [
     histogram,
+    messageTable,
   ];
 
   const titles = {
     widget: {
       [histogram.id]: 'Message Count',
+      [messageTable.id]: 'All Messages',
     },
   };
 
   const positions = {
     [histogram.id]: new WidgetPosition(1, 1, 2, Infinity),
+    [messageTable.id]: new WidgetPosition(1, 3, 6, Infinity),
   };
 
   return { titles, widgets, positions };

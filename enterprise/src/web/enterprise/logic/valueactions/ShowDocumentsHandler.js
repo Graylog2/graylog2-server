@@ -21,7 +21,9 @@ const ShowDocumentsHandler: ValueActionHandlerWithContext = (queryId: string, fi
   const widget = MessagesWidget.builder()
     .filter(filter)
     .newId()
-    .config(new MessagesWidgetConfig([...DEFAULT_MESSAGE_FIELDS, ...(Object.keys(mergedObject))], true))
+    .config(new MessagesWidgetConfig.builder()
+      .fields([...DEFAULT_MESSAGE_FIELDS, ...(Object.keys(mergedObject))])
+      .showMessageRow(true).build())
     .build();
   return WidgetActions.create(widget);
 };

@@ -1,22 +1,26 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Checkbox } from 'react-bootstrap';
 import * as Immutable from 'immutable';
 
-// $FlowFixMe: imports from core need to be fixed in flow
-import Select from 'components/common/Select';
-
+import SortableSelect from 'enterprise/components/aggregationbuilder/SortableSelect';
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
 import { defaultCompare } from 'enterprise/logic/DefaultCompare';
 import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import DescriptionBox from 'enterprise/components/aggregationbuilder/DescriptionBox';
 
-import DescriptionBox from '../aggregationbuilder/DescriptionBox';
+import style from './EditMessageList.css';
 
 const _onFieldSelectionChanged = (fields, config, onChange) => {
-  const newFields = fields.split(',');
+  const newFields = fields.map(({ value }) => value);
   const newConfig = config.toBuilder().fields(newFields).build();
+  return onChange(newConfig);
+};
+
+const _onShowMessageRowChanged = (config, onChange) => {
+  const newConfig = config.toBuilder().showMessageRow(!config.showMessageRow).build();
   return onChange(newConfig);
 };
 
@@ -37,16 +41,19 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
     .valueSeq()
     .toJS()
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));
-  const selectedFieldsForSelect = Immutable.Set(config.fields).join(',');
+  const selectedFieldsForSelect = config.fields.map(fieldName => ({ field: fieldName }));
 
   return (
     <Row>
       <Col md={3}>
         <DescriptionBox description="Fields">
-          <Select options={fieldsForSelect}
-                  onChange={newFields => _onFieldSelectionChanged(newFields, config, onChange)}
-                  value={selectedFieldsForSelect}
-                  multi />
+          <SortableSelect options={fieldsForSelect}
+                          onChange={newFields => _onFieldSelectionChanged(newFields, config, onChange)}
+                          valueComponent={({ children: _children }) => <span className={style.valueComponent}>{_children}</span>}
+                          value={selectedFieldsForSelect} />
+          <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
+            Show message in new row
+          </Checkbox>
         </DescriptionBox>
       </Col>
       <Col md={9}>

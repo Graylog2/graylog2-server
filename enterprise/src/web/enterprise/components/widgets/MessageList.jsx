@@ -3,7 +3,6 @@ import * as React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
@@ -13,7 +12,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
-import { TIMESTAMP_FIELD, Messages } from 'enterprise/Constants';
+import { Messages } from 'enterprise/Constants';
 import { MessageTableEntry } from 'enterprise/components/messagelist';
 import Field from 'enterprise/components/Field';
 
@@ -46,11 +45,8 @@ const MessageList = createReactClass({
 
   getDefaultProps() {
     return {
-      filter: '',
       pageSize: Messages.DEFAULT_LIMIT,
-      editing: false,
       containerHeight: undefined,
-      inputs: { inputs: [] },
       selectedFields: Immutable.Set(),
       currentView: { view: {}, activeQuery: undefined },
       config: undefined,
@@ -69,30 +65,29 @@ const MessageList = createReactClass({
   },
 
   _getSelectedFields() {
-    if (this.props.config) {
-      return Immutable.Set(this.props.config.fields);
+    const { selectedFields, config } = this.props;
+    if (config) {
+      return Immutable.Set(config.fields);
     }
-    return this.props.selectedFields;
+    return selectedFields;
   },
 
   _columnStyle(fieldName) {
-    const selectedFields = Immutable.OrderedSet(this.props.fields);
-    if (fieldName.toLowerCase() === 'source' && this._fieldColumns(selectedFields).size > 1) {
+    const { fields } = this.props;
+    const selectedFields = Immutable.OrderedSet(fields);
+    if (fieldName.toLowerCase() === 'source' && selectedFields.size > 1) {
       return { width: 180 };
     }
     return {};
   },
 
-  _fieldColumns(fields) {
-    return fields.delete('message');
-  },
-
   _toggleMessageDetail(id) {
     let newSet;
-    if (this.state.expandedMessages.contains(id)) {
-      newSet = this.state.expandedMessages.delete(id);
+    const { expandedMessages } = this.state;
+    if (expandedMessages.contains(id)) {
+      newSet = expandedMessages.delete(id);
     } else {
-      newSet = this.state.expandedMessages.add(id);
+      newSet = expandedMessages.add(id);
       RefreshActions.disable();
     }
     this.setState({ expandedMessages: newSet });
@@ -103,15 +98,17 @@ const MessageList = createReactClass({
   },
 
   render() {
-    const { containerHeight, data, fields } = this.props;
+    const { containerHeight, data, fields, currentView, pageSize = 7, config } = this.props;
     let maxHeight = null;
     if (containerHeight) {
       maxHeight = containerHeight - 60;
+    } else {
+      maxHeight = 'calc(100% - 60px)';
     }
-    const pageSize = this.props.pageSize || 7;
     const messages = (data && data.messages) || [];
+    const { currentPage, expandedMessages } = this.state;
     const messageSlice = messages
-      .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
+      .slice((currentPage - 1) * pageSize, currentPage * pageSize)
       .map((m) => {
         return {
           fields: m.message,
@@ -122,13 +119,13 @@ const MessageList = createReactClass({
         };
       });
     const selectedFields = this._getSelectedFields();
-    const selectedColumns = Immutable.OrderedSet(this._fieldColumns(selectedFields));
-    const { activeQuery, view } = this.props.currentView;
+    const selectedColumns = Immutable.OrderedSet(selectedFields);
+    const { activeQuery, view } = currentView;
 
     return (
       <span>
         <div className={styles.messageListPaginator}>
-          <MessageTablePaginator currentPage={Number(this.state.currentPage)}
+          <MessageTablePaginator currentPage={Number(currentPage)}
                                  onPageChange={newPage => this.setState({ currentPage: newPage })}
                                  pageSize={pageSize}
                                  position="top"
@@ -141,12 +138,6 @@ const MessageList = createReactClass({
               <table className="table table-condensed messages" style={{ marginTop: 0 }}>
                 <thead>
                   <tr>
-                    <th style={{ width: 180 }}>
-                      <Field interactive
-                             name="Timestamp"
-                             queryId={activeQuery}
-                             type={this._fieldTypeFor(TIMESTAMP_FIELD, fields)} />
-                    </th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
@@ -169,9 +160,9 @@ const MessageList = createReactClass({
                       <MessageTableEntry fields={fields}
                                          disableSurroundingSearch
                                          message={message}
-                                         showMessageRow={selectedFields.contains('message')}
+                                         showMessageRow={config && config.showMessageRow}
                                          selectedFields={selectedColumns}
-                                         expanded={this.state.expandedMessages.contains(messageKey)}
+                                         expanded={expandedMessages.contains(messageKey)}
                                          toggleDetail={this._toggleMessageDetail}
                                          highlight
                                          expandAllRenderAsync={false} />

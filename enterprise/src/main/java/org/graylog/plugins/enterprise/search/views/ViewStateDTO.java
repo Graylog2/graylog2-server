@@ -15,6 +15,7 @@ import java.util.Set;
 @WithBeanGetter
 public abstract class ViewStateDTO {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
+    static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";
     static final String FIELD_TITLES = "titles";
     static final String FIELD_WIDGETS = "widgets";
     static final String FIELD_WIDGET_MAPPING = "widget_mapping";
@@ -22,6 +23,9 @@ public abstract class ViewStateDTO {
 
     @JsonProperty(FIELD_SELECTED_FIELDS)
     public abstract Set<String> fields();
+
+    @JsonProperty(FIELD_STATIC_MESSAGE_LIST_ID)
+    public abstract String staticMessageListId();
 
     @JsonProperty(FIELD_TITLES)
     public abstract Map<String, Map<String, String>> titles();
@@ -39,6 +43,9 @@ public abstract class ViewStateDTO {
     public static abstract class Builder {
         @JsonProperty(FIELD_SELECTED_FIELDS)
         public abstract Builder fields(Set<String> fields);
+
+        @JsonProperty(FIELD_STATIC_MESSAGE_LIST_ID)
+        public abstract Builder staticMessageListId(String staticMessageListId);
 
         @JsonProperty(FIELD_TITLES)
         public abstract Builder titles(Map<String, Map<String, String>> titles);

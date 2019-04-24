@@ -3,15 +3,16 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import connect from 'stores/connect';
 
-import { Timestamp } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 
+import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 import MessageDetail from './MessageDetail';
 import TypeSpecificValue from '../TypeSpecificValue';
 import Highlight from './Highlight';
+import style from './MessageTableEntry.css';
 
 const { NodesStore } = CombinedProvider.get('Nodes');
 const { InputsStore } = CombinedProvider.get('Inputs');
@@ -71,6 +72,13 @@ class MessageTableEntry extends React.Component {
     this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
   };
 
+  _renderStrong = (children, strong = false) => {
+    if (strong) {
+      return <strong>{children}</strong>;
+    }
+    return children;
+  };
+
   render() {
     const colSpanFixup = this.props.selectedFields.size + 1;
     const { message } = this.props;
@@ -85,16 +93,17 @@ class MessageTableEntry extends React.Component {
     return (
       <tbody className={classes}>
         <tr className="fields-row" onClick={this._toggleDetail}>
-          <td>
-            <strong>
-              <Timestamp dateTime={message.fields.timestamp} />
-            </strong>
-          </td>
-          {this.props.selectedFields.toSeq().map(selectedFieldName => (
-            <td key={selectedFieldName}>
-              <TypeSpecificValue value={message.fields[selectedFieldName]} render={({ value }) => <Highlight field={selectedFieldName} value={value} />} />
-            </td>
-          ))}
+          { this.props.selectedFields.toArray().map((selectedFieldName, idx) => {
+            const fieldTypeMapping = this.props.fields.find(type => type.name === selectedFieldName);
+            const fieldType = fieldTypeMapping ? fieldTypeMapping.type : FieldType.Unknown;
+            return (<td className={style.fieldsRowField} key={selectedFieldName}>
+              {this._renderStrong(
+                <TypeSpecificValue value={message.fields[selectedFieldName]}
+                                   type={fieldType}
+                                   render={({ value }) => <Highlight field={selectedFieldName} value={value} />} />,
+                idx === 0)}
+            </td>);
+          }) }
         </tr>
 
         {this.props.showMessageRow

@@ -14,6 +14,7 @@ jest.mock('enterprise/logic/Widget', () => ({
     searchTypes: () => [],
   }),
   resultHistogram: () => ({}),
+  allMessagesTable: () => ({}),
 }));
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 

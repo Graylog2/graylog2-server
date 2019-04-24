@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 import Immutable from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -9,7 +9,6 @@ import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidg
 import WidgetGrid from './WidgetGrid';
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
-jest.mock('./messagelist/StaticMessageList', () => mockComponent('StaticMessageList'));
 jest.mock('enterprise/logic/Widget', () => ({ widgetDefinition: () => ({}) }));
 jest.mock('enterprise/components/widgets/Widget', () => mockComponent('Widget'));
 

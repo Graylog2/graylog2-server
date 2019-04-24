@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.enterprise.search.views.WidgetConfigDTO;
-
-import java.util.Set;
 
 @AutoValue
 @JsonTypeName(MessageListConfigDTO.NAME)
@@ -18,7 +17,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     private static final String FIELD_SHOW_MESSAGE_ROW = "show_message_row";
 
     @JsonProperty(FIELD_FIELDS)
-    public abstract Set<String> fields();
+    public abstract ImmutableSet<String> fields();
 
     @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
     public abstract boolean showMessageRow();
@@ -26,7 +25,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_FIELDS)
-        public abstract Builder fields(Set<String> fields);
+        public abstract Builder fields(ImmutableSet<String> fields);
 
         @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
         public abstract Builder showMessageRow(boolean showMessageRow);

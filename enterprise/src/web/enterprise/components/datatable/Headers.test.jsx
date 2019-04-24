@@ -11,6 +11,7 @@ import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
+jest.mock('logic/datetimes/DateTime', () => 'DateTime');
 
 describe('Headers', () => {
   /* eslint-disable react/require-default-props */
