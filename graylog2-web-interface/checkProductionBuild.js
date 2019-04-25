@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
@@ -108,7 +109,7 @@ async function loadPage(url, handleError, handleConsole) {
 const buildDir = process.argv[2] || 'build';
 const plugins = process.argv.slice(3);
 
-const config = (url) => `
+const config = url => `
 window.appConfig = {
   gl2ServerUrl: '${url}',
   gl2AppPathPrefix: '/',
@@ -127,7 +128,7 @@ function collectMounts(pluginModuleNames) {
 function collectAssets(pluginModules) {
   const vendorModule = JSON.parse(fs.readFileSync(`${buildDir}/${VENDORMODULE}`));
   const buildModule = JSON.parse(fs.readFileSync(`${buildDir}/${BUILDMODULE}`));
-    const pluginAssets = pluginModules.map((pluginModule) => {
+  const pluginAssets = pluginModules.map((pluginModule) => {
     const name = Object.keys(pluginModule.files.chunks)[0];
     const file = pluginModule.files.chunks[name].entry;
     return `${name}/${file}`;
@@ -156,7 +157,7 @@ const consoleLogs = [];
 const trackEvent = (evt, arr) => {
   console.error(evt);
   arr.push(evt);
-}
+};
 
 const pagePromise = loadPage(url, msg => trackEvent(msg, pageErrors), msg => trackEvent(msg, consoleLogs));
 pagePromise
