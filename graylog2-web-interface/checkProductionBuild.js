@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const express = require('express');
+const cors = require('cors');
 
 const VENDORMODULE = 'vendor-module.json';
 const BUILDMODULE = 'module.json';
@@ -65,6 +66,21 @@ function bootstrapExpress(buildDir, config, pluginMounts, indexHtml = '<html><bo
   return { url: `http://localhost:${port}`, server };
 }
 
+function bootstrapApi(prefix = '/api/') {
+  const api = express();
+  api.use(cors());
+
+  const rootHandler = (req, res) => res.json({ cluster_id: 'deadbeef', node_id: 'deadbeef', version: '3.0.0', tagline: 'Manage your logs in the dark and have lasers going and make it look like you\'re from space!' });
+  api.get(prefix, rootHandler);
+
+  const sessionHandler = (req, res) => res.json({ session_id: null, username: null, is_valid: false });
+  api.get(`${prefix}system/sessions`, sessionHandler);
+  const server = api.listen();
+  const { port } = server.address();
+
+  return { url: `http://localhost:${port}${prefix}`, server };
+}
+
 process.setMaxListeners(0);
 
 async function loadPage(url, handleError, handleConsole) {
@@ -81,7 +97,8 @@ async function loadPage(url, handleError, handleConsole) {
     page.on('console', handleConsole);
     page.on('pageerror', handleError);
 
-    await page.goto(url);
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+
     return { page, browser };
   } catch (e) {
     return fatal(e);
@@ -91,9 +108,9 @@ async function loadPage(url, handleError, handleConsole) {
 const buildDir = process.argv[2] || 'build';
 const plugins = process.argv.slice(3);
 
-const config = `
+const config = (url) => `
 window.appConfig = {
-  gl2ServerUrl: 'http://localhost:9000/api/',
+  gl2ServerUrl: '${url}',
   gl2AppPathPrefix: '/',
   rootTimeZone: 'UTC',
 };
@@ -110,7 +127,7 @@ function collectMounts(pluginModuleNames) {
 function collectAssets(pluginModules) {
   const vendorModule = JSON.parse(fs.readFileSync(`${buildDir}/${VENDORMODULE}`));
   const buildModule = JSON.parse(fs.readFileSync(`${buildDir}/${BUILDMODULE}`));
-  const pluginAssets = pluginModules.map((pluginModule) => {
+    const pluginAssets = pluginModules.map((pluginModule) => {
     const name = Object.keys(pluginModule.files.chunks)[0];
     const file = pluginModule.files.chunks[name].entry;
     return `${name}/${file}`;
@@ -130,14 +147,23 @@ const pluginModules = plugins.map(plugin => JSON.parse(fs.readFileSync(plugin)))
 const assets = collectAssets(pluginModules);
 const pluginMounts = collectMounts(plugins);
 
-const { url, server } = bootstrapExpress(buildDir, config, pluginMounts, generateIndexHtml(assets));
+const api = bootstrapApi();
+const { url, server } = bootstrapExpress(buildDir, config(api.url), pluginMounts, generateIndexHtml(assets));
 
 const pageErrors = [];
 const consoleLogs = [];
 
-const pagePromise = loadPage(url, (msg) => { pageErrors.push(msg); }, (msg) => { consoleLogs.push(msg); });
+const trackEvent = (evt, arr) => {
+  console.error(evt);
+  arr.push(evt);
+}
+
+const pagePromise = loadPage(url, msg => trackEvent(msg, pageErrors), msg => trackEvent(msg, consoleLogs));
 pagePromise
-  .catch(err => console.error('Error: ', err.toString()))
+  .catch((err) => {
+    console.error('Error: ', err.toString());
+    process.exitCode = 1;
+  })
   .finally(() => {
     const isSuccess = pageErrors.length === 0 && consoleLogs.length === 0;
     if (pageErrors.length > 0) {
@@ -157,4 +183,5 @@ pagePromise
     const { browser } = await pagePromise;
     await browser.close();
     server.close();
+    api.server.close();
   });

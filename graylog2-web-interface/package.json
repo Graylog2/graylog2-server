@@ -115,6 +115,7 @@
     "compression": "^1.7.2",
     "connect-history-api-fallback": "^1.4.0",
     "copy-webpack-plugin": "^4.5.1",
+    "cors": "^2.8.5",
     "css-loader": "^0.28.10",
     "enzyme": "3.9.0",
     "enzyme-adapter-react-16": "^1.7.0",
