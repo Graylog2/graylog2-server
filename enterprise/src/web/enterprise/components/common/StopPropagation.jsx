@@ -11,7 +11,7 @@ const stopPropagation = (evt) => {
 };
 
 const StopPropagation = ({ children }: Props) => (
-  <span role="presentation" onClick={stopPropagation} onKeyDown={stopPropagation} onMouseDown={stopPropagation}>
+  <span role="presentation" onClick={stopPropagation} onMouseDown={stopPropagation}>
     {children}
   </span>
 );
