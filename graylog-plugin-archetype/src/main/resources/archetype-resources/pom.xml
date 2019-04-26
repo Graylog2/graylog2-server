@@ -96,7 +96,7 @@
 
     <build>
         <resources>
-            <resource><directory>build</directory></resource>
+            <resource><directory>${web.build-dir}</directory></resource>
             <resource>
               <directory>src/main/resources</directory>
               <filtering>true</filtering>

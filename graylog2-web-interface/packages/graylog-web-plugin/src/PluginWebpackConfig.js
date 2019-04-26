@@ -7,7 +7,7 @@ const defaultRootPath = path.resolve(module.parent.parent.filename, '../');
 const defaultOptions = {
   root_path: defaultRootPath,
   entry_path: path.resolve(defaultRootPath, 'src/web/index.jsx'),
-  build_path: path.resolve(defaultRootPath, 'build'),
+  build_path: path.resolve(defaultRootPath, 'target/web/build'),
 };
 
 function getPluginFullName(fqcn) {

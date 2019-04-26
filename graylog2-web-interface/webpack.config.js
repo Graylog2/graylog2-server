@@ -9,7 +9,7 @@ const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
-const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const TARGET = process.env.npm_lifecycle_event;
@@ -17,7 +17,7 @@ process.env.BABEL_ENV = TARGET;
 
 const BABELRC = path.resolve(ROOT_PATH, 'babel.config.js');
 const BABELOPTIONS = {
-  cacheDirectory: 'cache',
+  cacheDirectory: 'target/web/cache',
   extends: BABELRC,
 };
 
@@ -98,7 +98,7 @@ const webpackConfig = {
       filename: 'index.html',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
-      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(ROOT_PATH, 'build/vendor-module.json'), 'utf8')),
+      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
         if (c1.names[0] === 'polyfill') {
