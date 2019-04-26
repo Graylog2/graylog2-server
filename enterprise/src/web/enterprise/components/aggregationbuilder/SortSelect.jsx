@@ -10,6 +10,7 @@ import { defaultCompare } from 'enterprise/logic/DefaultCompare';
 import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
 import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
 import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
+import { PivotList, SeriesList, SortList } from './AggregationBuilderPropTypes';
 
 const mapFields = fields => fields.sort(defaultCompare)
   .map((v, idx) => ({ label: v.label, value: idx }));
@@ -58,10 +59,10 @@ const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
 };
 
 SortSelect.propTypes = {
-  pivots: PropTypes.arrayOf(Pivot).isRequired,
-  series: PropTypes.arrayOf(Series).isRequired,
+  pivots: PivotList.isRequired,
+  series: SeriesList.isRequired,
   onChange: PropTypes.func.isRequired,
-  sort: PropTypes.arrayOf(PropTypes.instanceOf(SortConfig)).isRequired,
+  sort: SortList.isRequired,
 };
 
 export default SortSelect;

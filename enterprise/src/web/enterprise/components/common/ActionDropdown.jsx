@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { Overlay } from 'react-overlays';
+import StopPropagation from './StopPropagation';
 
 /**
  * This implements a custom toggle for a dropdown menu.
@@ -109,7 +110,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
       } : {})),
     );
     return (
-      <span>
+      <StopPropagation>
         <ActionToggle bsRole="toggle" onClick={this._onToggle}>
           <span ref={(elem) => { this.target = elem; }}>{element}</span>
         </ActionToggle>
@@ -127,7 +128,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
             </ul>
           </FilterProps>
         </Overlay>
-      </span>
+      </StopPropagation>
     );
   }
 }

@@ -23,5 +23,4 @@ module.name_mapper='^!style/useable!.*\.css$' -> '<PROJECT_ROOT>/src/web/flow/cs
 module.name_mapper='.*\.css$' -> '<PROJECT_ROOT>/src/web/flow/css-modules.js'
 
 [untyped]
-.*/node_modules/memoize-one
 

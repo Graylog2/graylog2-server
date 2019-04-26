@@ -15,7 +15,13 @@ import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import BarVisualizationConfiguration from './BarVisualizationConfiguration';
-import { PivotList } from './AggregationBuilderPropTypes';
+import {
+  PivotList,
+  SeriesList,
+  SortList,
+  VisualizationConfigType,
+  VisualizationType,
+} from './AggregationBuilderPropTypes';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 
@@ -25,11 +31,11 @@ export default class AggregationControls extends React.Component {
     config: PropTypes.shape({
       columnPivots: PivotList,
       rowPivots: PivotList,
-      series: PropTypes.arrayOf(PropTypes.string),
-      sort: PropTypes.arrayOf(PropTypes.string),
-      visualization: PropTypes.string,
+      series: SeriesList,
+      sort: SortList,
+      visualization: VisualizationType,
       rollup: PropTypes.bool,
-      visualizationConfig: PropTypes.object,
+      visualizationConfig: VisualizationConfigType,
     }).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,

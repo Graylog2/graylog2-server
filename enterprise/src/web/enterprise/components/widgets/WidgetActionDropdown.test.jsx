@@ -14,7 +14,7 @@ describe('WidgetActionDropdown', () => {
       </WidgetActionDropdown>
     ));
     expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
-    const trigger = wrapper.find('span[role="presentation"]');
+    const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');
     expect(wrapper).toContainMatchingElement('ul.dropdown-menu');
   });
@@ -25,7 +25,7 @@ describe('WidgetActionDropdown', () => {
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
       </WidgetActionDropdown>
     ));
-    const trigger = wrapper.find('span[role="presentation"]');
+    const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');
 
     const menuItem = wrapper.find('a[children="Foo"]');

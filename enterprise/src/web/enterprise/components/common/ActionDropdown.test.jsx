@@ -14,7 +14,7 @@ describe('ActionDropdown', () => {
       </ActionDropdown>
     ));
     expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
-    const trigger = wrapper.find('span[role="presentation"]');
+    const trigger = wrapper.find('ActionToggle');
     expect(trigger).toContainMatchingElement('div.my-trigger-element');
     trigger.simulate('click');
     expect(wrapper).toContainMatchingElement('ul.dropdown-menu');
@@ -28,7 +28,7 @@ describe('ActionDropdown', () => {
         </ActionDropdown>
       </div>
     ));
-    const trigger = wrapper.find('span[role="presentation"]');
+    const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');
 
     expect(onClick).not.toHaveBeenCalled();
@@ -40,7 +40,7 @@ describe('ActionDropdown', () => {
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
       </ActionDropdown>
     ));
-    const trigger = wrapper.find('span[role="presentation"]');
+    const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');
 
     const menuItem = wrapper.find('a[children="Foo"]');
@@ -59,7 +59,7 @@ describe('ActionDropdown', () => {
         </ActionDropdown>
       </div>
     ));
-    const trigger = wrapper.find('span[role="presentation"]');
+    const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');
 
     const menuItem = wrapper.find('a[children="Foo"]');
