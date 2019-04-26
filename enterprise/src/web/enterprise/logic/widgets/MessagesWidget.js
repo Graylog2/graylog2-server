@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map, is } from 'immutable';
 
 import Widget from './Widget';
 import MessagesWidgetConfig from './MessagesWidgetConfig';
@@ -13,6 +13,13 @@ export default class MessagesWidget extends Widget {
   static fromJSON(value) {
     const { id, config, filter } = value;
     return new MessagesWidget(id, MessagesWidgetConfig.fromJSON(config), filter);
+  }
+
+  equals(other) {
+    if (other instanceof MessagesWidget) {
+      return ['id', 'config', 'filter'].every(key => is(this[key], other[key]));
+    }
+    return false;
   }
 
   toBuilder() {

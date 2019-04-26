@@ -34,6 +34,12 @@ export default class MessagesWidgetConfig {
     };
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  equals(other: any) : boolean {
+    return other instanceof MessagesWidgetConfig;
+  }
+
+  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
@@ -53,8 +59,8 @@ class Builder {
     this.value = value;
   }
 
-  fields(fields) {
-    return new Builder(this.value.set('fields', fields.slice(0)));
+  fields(value) {
+    return new Builder(this.value.set('fields', value.slice(0)));
   }
 
   showMessageRow(value) {
