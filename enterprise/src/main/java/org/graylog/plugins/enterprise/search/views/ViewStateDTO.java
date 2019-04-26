@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,7 @@ public abstract class ViewStateDTO {
     @JsonProperty(FIELD_SELECTED_FIELDS)
     public abstract Set<String> fields();
 
+    @Nullable
     @JsonProperty(FIELD_STATIC_MESSAGE_LIST_ID)
     public abstract String staticMessageListId();
 
@@ -44,6 +46,7 @@ public abstract class ViewStateDTO {
         @JsonProperty(FIELD_SELECTED_FIELDS)
         public abstract Builder fields(Set<String> fields);
 
+        @Nullable
         @JsonProperty(FIELD_STATIC_MESSAGE_LIST_ID)
         public abstract Builder staticMessageListId(String staticMessageListId);
 

@@ -23,8 +23,6 @@ export default class Field extends React.Component {
   static defaultProps = {
     children: null,
     disabled: false,
-    interactive: false,
-    viewId: null,
     menuContainer: document.body,
   };
 
@@ -42,27 +40,33 @@ export default class Field extends React.Component {
   render() {
     const { children, disabled, menuContainer, name, queryId, type } = this.props;
     const element = children || name;
-    const activeClass = this.state.open ? style.active : '';
+    const { open } = this.state;
+    const activeClass = open ? style.active : '';
     const disabledClass = disabled ? style.disabled : '';
     const wrappedElement = <span className={`field-element ${activeClass} ${disabledClass}`}>{element}</span>;
-    const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
-      const onSelect = ({ field }) => {
-        this._onMenuToggle();
-        fieldAction.handler(queryId, field, type, this.context);
-      };
-      const condition = fieldAction.condition || (() => true);
-      const actionDisabled = !condition({ name, type, context: this.context });
-      return (
-        <MenuItem key={`${name}-action-${fieldAction.type}`}
-                  disabled={actionDisabled}
-                  eventKey={{ action: fieldAction.type, field: name }}
-                  onSelect={onSelect}>{fieldAction.title}
-        </MenuItem>
-      );
-    });
+    const fieldActions = PluginStore.exports('fieldActions')
+      .filter((fieldAction) => {
+        const hide = fieldAction.hide || (() => false);
+        return !hide(this.context);
+      })
+      .map((fieldAction) => {
+        const onSelect = ({ field }) => {
+          this._onMenuToggle();
+          fieldAction.handler(queryId, field, type, this.context);
+        };
+        const condition = fieldAction.condition || (() => true);
+        const actionDisabled = !condition({ name, type, context: this.context });
+        return (
+          <MenuItem key={`${name}-action-${fieldAction.type}`}
+                    disabled={actionDisabled}
+                    eventKey={{ action: fieldAction.type, field: name }}
+                    onSelect={onSelect}>{fieldAction.title}
+          </MenuItem>
+        );
+      });
 
     return (
-      <OverlayDropdown show={this.state.open}
+      <OverlayDropdown show={open}
                        toggle={wrappedElement}
                        placement="right"
                        onToggle={this._onMenuToggle}

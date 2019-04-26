@@ -1,6 +1,7 @@
 import { MessageListHandler } from 'enterprise/logic/searchtypes';
 
 import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
+import AddToAllTablesActionHandler from 'enterprise/logic/fieldactions/AddToAllTablesActionHandler';
 import AddToQueryHandler from 'enterprise/logic/valueactions/AddToQueryHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
 import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
@@ -39,6 +40,7 @@ import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
 import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'enterprise/logic/fieldactions/RemoveFromTableActionHandler';
+import RemoveFromAllTablesActionHandler from 'enterprise/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import CreateParameterDialog from 'enterprise/logic/creatoractions/CreateParameterDialog';
 import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
 import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
@@ -157,12 +159,24 @@ export default {
       title: 'Add to table',
       handler: AddToTableActionHandler,
       condition: AddToTableActionHandler.condition,
+      hide: AddToTableActionHandler.hide,
     },
     {
       type: 'remove-to-table',
       title: 'Remove from table',
       handler: RemoveFromTableActionHandler,
       condition: RemoveFromTableActionHandler.condition,
+      hide: RemoveFromTableActionHandler.hide,
+    },
+    {
+      type: 'add-to-all-tables',
+      title: 'Add to all tables',
+      handler: AddToAllTablesActionHandler,
+    },
+    {
+      type: 'remove-from-all-tables',
+      title: 'Remove from all tables',
+      handler: RemoveFromAllTablesActionHandler,
     },
   ],
   valueActions: [

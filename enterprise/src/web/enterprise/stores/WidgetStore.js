@@ -1,18 +1,35 @@
+// @flow strict
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import { get, isEqual } from 'lodash';
 
+import Widget from '../logic/widgets/Widget';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
-export const WidgetActions = Reflux.createActions({
+
+type WidgetActionsType = {
+  create: (Widget) => Promise<Widget>,
+  duplicate: (string) => Promise<Widget>,
+  filter: (string, string) => Promise<void>,
+  remove: (string) => Promise<void>,
+  update: (string, Widget) => Promise<void>,
+  updateConfig: (string, any) => Promise<void>,
+  updateWidgets: (Map<string, Widget>) => Promise<void>,
+};
+
+type WidgetStoreState = {
+  widgets: Map<string, Widget>,
+};
+
+export const WidgetActions: WidgetActionsType = Reflux.createActions({
   create: { asyncResult: true },
   duplicate: { asyncResult: true },
   filter: { asyncResult: true },
-  load: { asyncResult: true },
   remove: { asyncResult: true },
   update: { asyncResult: true },
   updateConfig: { asyncResult: true },
+  updateWidgets: { asyncResult: true },
 });
 
 export const WidgetStore = Reflux.createStore({
@@ -25,7 +42,7 @@ export const WidgetStore = Reflux.createStore({
     this.listenTo(CurrentViewStateStore, this.onCurrentViewStateChange, this.onCurrentViewStateChange);
   },
 
-  getInitialState() {
+  getInitialState(): WidgetStoreState {
     return this.widgets;
   },
 
@@ -72,6 +89,9 @@ export const WidgetStore = Reflux.createStore({
   },
   update(widgetId, widget) {
     const newWidgets = this.widgets.set(widgetId, widget);
+    this._updateWidgets(newWidgets);
+  },
+  updateWidgets(newWidgets) {
     this._updateWidgets(newWidgets);
   },
   updateConfig(widgetId, config) {
