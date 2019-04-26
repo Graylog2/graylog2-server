@@ -248,6 +248,10 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.reflections</groupId>
@@ -294,7 +298,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.eaio.uuid</groupId>
+            <groupId>org.graylog2.repackaged</groupId>
             <artifactId>uuid</artifactId>
         </dependency>
         <dependency>

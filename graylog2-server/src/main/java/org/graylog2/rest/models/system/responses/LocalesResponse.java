@@ -22,8 +22,9 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.function.Function;
+import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
@@ -32,13 +33,11 @@ public abstract class LocalesResponse {
     public abstract ImmutableMap<String, LocaleDescription> locales();
 
     public static LocalesResponse create(Locale[] locales) {
-        final ImmutableMap<String, LocaleDescription> localeMap = Arrays.stream(locales)
+        final Map<String, LocaleDescription> localeMap = new HashMap<>();
+        Arrays.stream(locales)
                 .map(LocaleDescription::create)
-                .collect(ImmutableMap.toImmutableMap(
-                        LocaleDescription::languageTag,
-                        Function.identity()
-                ));
-        return new AutoValue_LocalesResponse(localeMap);
+                .forEach(localeDescription -> localeMap.put(localeDescription.languageTag(), localeDescription));
+        return new AutoValue_LocalesResponse(ImmutableMap.copyOf(localeMap));
     }
 
     @JsonAutoDetect
