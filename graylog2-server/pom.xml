@@ -730,6 +730,35 @@
                         </manifest>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Building a test-jar allows us to share common test infrastructure classes like
+                              ~  elasticsearch test base classes in other maven modules. (e.g. plugins)
+                              ~
+                              ~  A module that wants to use the test-jar classes needs to define an additional
+                              ~  graylog2-server dependency in it's pom.xml:
+                              ~
+                              ~     <dependency>
+                              ~         <groupId>org.graylog2</groupId>
+                              ~         <artifactId>graylog2-server</artifactId>
+                              ~         <version>${graylog.version}</version>
+                              ~         <type>test-jar</type>
+                              ~         <scope>test</scope>
+                              ~     </dependency>
+                              ~
+                              ~ One problem with this is, that transitive test-scoped dependencies will be lost so
+                              ~ the module's pom.xml needs to explicitly add them.
+                              ~
+                              ~ More details:
+                              ~   - https://maven.apache.org/plugins/maven-jar-plugin/examples/create-test-jar.html
+                              ~     (don't use the "<classifier>" though)
+                              ~   - https://stackoverflow.com/a/174670
+                              -->
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
