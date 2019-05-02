@@ -13,34 +13,30 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            TCP
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              TCP
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </th>
         <th
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            UDP
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              UDP
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </th>
       </tr>
@@ -49,42 +45,38 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                count()
-              </span>
-              <span
-                className="caret"
-              />
+              count()
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
         <th
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                count()
-              </span>
-              <span
-                className="caret"
-              />
+              count()
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
       </tr>
@@ -96,31 +88,27 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
         className="fields-row"
       >
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            239
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              239
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            226
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              226
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
       </tr>
@@ -160,17 +148,15 @@ exports[`DataTable should render with filled data with rollup 1`] = `
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            hulud.net
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              hulud.net
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </th>
       </tr>
@@ -179,63 +165,57 @@ exports[`DataTable should render with filled data with rollup 1`] = `
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                timestamp
-              </span>
-              <span
-                className="caret"
-              />
+              timestamp
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
         <th
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                count()
-              </span>
-              <span
-                className="caret"
-              />
+              count()
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
         <th
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                count()
-              </span>
-              <span
-                className="caret"
-              />
+              count()
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
       </tr>
@@ -247,45 +227,39 @@ exports[`DataTable should render with filled data with rollup 1`] = `
         className="fields-row"
       >
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            2018-10-04T09:43:50.000Z
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              2018-10-04T09:43:50.000Z
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            408
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              408
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            408
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              408
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
       </tr>
@@ -311,17 +285,15 @@ exports[`DataTable should render with filled data without rollup 1`] = `
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            hulud.net
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              hulud.net
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </th>
       </tr>
@@ -330,42 +302,38 @@ exports[`DataTable should render with filled data without rollup 1`] = `
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                timestamp
-              </span>
-              <span
-                className="caret"
-              />
+              timestamp
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
         <th
           className="leftAligned"
           colSpan={1}
         >
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
+              className="field-element  "
             >
-              <span
-                className="field-element  "
-              >
-                count()
-              </span>
-              <span
-                className="caret"
-              />
+              count()
             </span>
+            <span
+              className="caret"
+            />
           </span>
         </th>
       </tr>
@@ -377,31 +345,27 @@ exports[`DataTable should render with filled data without rollup 1`] = `
         className="fields-row"
       >
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            2018-10-04T09:43:50.000Z
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              2018-10-04T09:43:50.000Z
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
         <td>
-          <span>
+          <span
+            className="dropdowntoggle"
+            onClick={[Function]}
+            role="presentation"
+          >
+            408
             <span
-              className="dropdowntoggle"
-              onClick={[Function]}
-              role="presentation"
-            >
-              408
-              <span
-                className="caret"
-              />
-            </span>
+              className="caret"
+            />
           </span>
         </td>
       </tr>

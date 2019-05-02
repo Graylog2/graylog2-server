@@ -35,7 +35,7 @@ export default class OverlayDropdown extends React.Component {
     };
 
     return (
-      <span>
+      <React.Fragment>
         <span onClick={onToggle}
               ref={(elem) => { this.target = elem; }}
               role="presentation"
@@ -56,7 +56,7 @@ export default class OverlayDropdown extends React.Component {
             </ul>
           </FilterProps>
         </Overlay>
-      </span>
+      </React.Fragment>
     );
   }
 }

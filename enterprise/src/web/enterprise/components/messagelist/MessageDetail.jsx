@@ -170,12 +170,10 @@ class MessageDetail extends React.Component {
                              streams={streams} />
           </Col>
           <Col md={9}>
-            <div>
-              <MessageFields message={message}
-                             fields={this.props.fields}
-                             disableFieldActions={this.props.disableFieldActions}
-                             showDecoration={this.state.showOriginal} />
-            </div>
+            <MessageFields message={message}
+                           fields={this.props.fields}
+                           disableFieldActions={this.props.disableFieldActions}
+                           showDecoration={this.state.showOriginal} />
           </Col>
         </Row>
       </React.Fragment>

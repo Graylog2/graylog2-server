@@ -10,7 +10,7 @@ import { ViewStore } from 'enterprise/stores/ViewStore';
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
 import CustomPropTypes from '../CustomPropTypes';
-import Highlight from './Highlight';
+import DecoratedValue from './decoration/DecoratedValue';
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
@@ -31,14 +31,14 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }: Pro
   const { activeQuery } = currentView;
 
   return (
-    <span>
+    <React.Fragment>
       <dt>
         <Field interactive queryId={activeQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
       </dt>
       <dd>
-        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} render={Highlight} />
+        <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} render={DecoratedValue} />
       </dd>
-    </span>
+    </React.Fragment>
   );
 };
 

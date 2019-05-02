@@ -1,15 +1,28 @@
+// @flow strict
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import { isEqual, maxBy } from 'lodash';
 
 import { widgetDefinition } from 'enterprise/logic/Widget';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import FormattingSettings from 'enterprise/logic/views/formatting/FormattingSettings';
+import Widget from 'enterprise/logic/widgets/Widget';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
-import WidgetPosition from '../logic/widgets/WidgetPosition';
+import type { TitleType } from './TitleTypes';
 
-export const CurrentViewStateActions = Reflux.createActions({
+type CurrentViewStateActionsType = {
+  fields: (Immutable.Set<string>) => Promise<*>,
+  formatting: (FormattingSettings) => Promise<*>,
+  titles: (Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<*>,
+  widgets: (Immutable.List<Widget>) => Promise<*>,
+  widgetPositions: () => Promise<*>,
+};
+
+export const CurrentViewStateActions: CurrentViewStateActionsType = Reflux.createActions({
   fields: { asyncResult: true },
+  formatting: { asyncResult: true },
   titles: { asyncResult: true },
   widgets: { asyncResult: true },
   widgetPositions: { asyncResult: true },
@@ -90,6 +103,12 @@ export const CurrentViewStateStore = Reflux.createStore({
     const newActiveState = this._activeState().toBuilder().widgetPositions(newPositions).build();
     const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
     CurrentViewStateActions.widgetPositions.promise(promise);
+  },
+
+  formatting(formatting) {
+    const newActiveState = this._activeState().toBuilder().formatting(formatting).build();
+    const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+    CurrentViewStateActions.formatting.promise(promise);
   },
 
   _activeState() {

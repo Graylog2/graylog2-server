@@ -11,6 +11,8 @@ import Series from 'enterprise/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
 import fieldTypeFor from 'enterprise/logic/fieldtypes/FieldTypeFor';
 import type { CurrentViewType } from '../CustomPropTypes';
+import CustomHighlighting from '../messagelist/CustomHighlighting';
+import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
 type Props = {
   columnPivots: Array<string>,
@@ -28,7 +30,9 @@ const _c = (field, value, path) => ({ field, value, path });
 const _column = (field: string, value: *, selectedQuery: string, idx: number, type: FieldType, valuePath: ValuePath) => (
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
-      {value && <Value field={field} type={type} value={value} queryId={selectedQuery} />}
+      <CustomHighlighting field={field} value={value}>
+        {value && <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} />}
+      </CustomHighlighting>
     </AdditionalContext.Provider>
   </td>
 );

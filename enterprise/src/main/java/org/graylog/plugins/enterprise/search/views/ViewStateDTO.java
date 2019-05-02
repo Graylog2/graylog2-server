@@ -21,6 +21,7 @@ public abstract class ViewStateDTO {
     static final String FIELD_WIDGETS = "widgets";
     static final String FIELD_WIDGET_MAPPING = "widget_mapping";
     static final String FIELD_WIDGET_POSITIONS = "positions";
+    static final String FIELD_FORMATTING = "formatting";
 
     @JsonProperty(FIELD_SELECTED_FIELDS)
     public abstract Set<String> fields();
@@ -40,6 +41,10 @@ public abstract class ViewStateDTO {
 
     @JsonProperty(FIELD_WIDGET_POSITIONS)
     public abstract Map<String, WidgetPositionDTO> widgetPositions();
+
+    @JsonProperty(FIELD_FORMATTING)
+    @Nullable
+    public abstract FormattingSettings formatting();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -61,6 +66,9 @@ public abstract class ViewStateDTO {
 
         @JsonProperty(FIELD_WIDGET_POSITIONS)
         public abstract Builder widgetPositions(Map<String, WidgetPositionDTO> widgetPositions);
+
+        @JsonProperty(FIELD_FORMATTING)
+        public abstract Builder formatting(FormattingSettings formattingSettings);
 
         public abstract ViewStateDTO build();
 

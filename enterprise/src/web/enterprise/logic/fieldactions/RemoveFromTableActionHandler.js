@@ -3,7 +3,11 @@ import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import type { ActionContexts } from 'enterprise/logic/ActionContext';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import type { FieldActionHandlerCondition, FieldActionHandlerWithContext } from './FieldActionHandler';
+import type {
+  FieldActionHandlerCondition,
+  FieldActionHandlerConditionProps,
+  FieldActionHandlerWithContext,
+} from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 
 const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
@@ -15,7 +19,7 @@ const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: st
   return WidgetActions.updateConfig(widget.id, newConfig);
 };
 
-const condition: FieldActionHandlerCondition = ({ context, name }: { context: ActionContexts, name: string }) => {
+const condition: FieldActionHandlerCondition = ({ context, name }: FieldActionHandlerConditionProps) => {
   const { widget } = context;
   if (widget instanceof MessagesWidget && widget.config instanceof MessagesWidgetConfig) {
     const fields = widget.config.fields || [];

@@ -1,4 +1,8 @@
+// @flow strict
+import * as Permissions from 'enterprise/Permissions';
+
 import { MessageListHandler } from 'enterprise/logic/searchtypes';
+import { MessageList } from 'enterprise/components/widgets';
 
 import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
 import AddToAllTablesActionHandler from 'enterprise/logic/fieldactions/AddToAllTablesActionHandler';
@@ -19,7 +23,6 @@ import PivotConfigGenerator from 'enterprise/logic/searchtypes/aggregation/Pivot
 import PivotHandler from 'enterprise/logic/searchtypes/pivot/PivotHandler';
 import PivotTransformer from 'enterprise/logic/searchresulttransformers/PivotTransformer';
 
-import { MessageList } from 'enterprise/components/widgets';
 import Widget from 'enterprise/logic/widgets/Widget';
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
@@ -29,11 +32,7 @@ import ExcludeFromQueryHandler from 'enterprise/logic/valueactions/ExcludeFromQu
 import { isFunction } from 'enterprise/logic/aggregationbuilder/Series';
 import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'enterprise/components/widgets/EditMessageList';
-import {
-  ShowViewPage,
-  NewSearchPage,
-  ViewManagementPage,
-} from 'enterprise/pages';
+import { ShowViewPage, NewSearchPage, ViewManagementPage } from 'enterprise/pages';
 
 import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
 
@@ -61,8 +60,9 @@ import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConf
 
 import UseInNewQueryHandler from 'enterprise/logic/valueactions/UseInNewQueryHandler';
 import ShowDocumentsHandler from 'enterprise/logic/valueactions/ShowDocumentsHandler';
-
-import * as Permissions from './Permissions';
+import HighlightValueHandler from 'enterprise/logic/valueactions/HighlightValueHandler';
+import type { ValueActionHandlerConditionProps } from './logic/valueactions/ValueActionHandler';
+import type { FieldActionHandlerConditionProps } from './logic/fieldactions/FieldActionHandler';
 
 const extendedSearchPath = '/extendedsearch';
 const viewsPath = '/views';
@@ -70,7 +70,9 @@ const showViewsPath = `${viewsPath}/:viewId`;
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
+// $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
+// $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
@@ -83,7 +85,6 @@ SortConfig.registerSubtype(SeriesSortConfig.type, SeriesSortConfig);
 export default {
   pages: {
     // search: { component: ExtendedSearchPage },
-
   },
   routes: [
     { path: extendedSearchPath, component: ViewsLicenseCheck(NewSearchPage), permissions: Permissions.ExtendedSearch.Use },
@@ -98,7 +99,7 @@ export default {
       defaultWidth: 6,
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
-      searchResultTransformer: data => data[0],
+      searchResultTransformer: (data: Array<*>) => data[0],
       searchTypes: () => [{ type: 'messages' }],
     },
     {
@@ -110,7 +111,7 @@ export default {
       editComponent: AggregationControls,
       searchResultTransformer: PivotTransformer,
       searchTypes: PivotConfigGenerator,
-      titleGenerator: (widget) => {
+      titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
           return `Aggregating ${widget.config.series.map(s => s.effectiveName)} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
         }
@@ -141,13 +142,13 @@ export default {
       type: 'chart',
       title: 'Chart',
       handler: ChartActionHandler,
-      condition: ({ type }) => type.isNumeric(),
+      condition: ({ type }: FieldActionHandlerConditionProps) => type.isNumeric(),
     },
     {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
-      condition: ({ type }) => !type.isCompound(),
+      condition: ({ type }: FieldActionHandlerConditionProps) => !type.isCompound(),
     },
     {
       type: 'statistics',
@@ -184,13 +185,13 @@ export default {
       type: 'exclude',
       title: 'Exclude from results',
       handler: new ExcludeFromQueryHandler().handle,
-      condition: ({ field }) => !isFunction(field),
+      condition: ({ field }: ValueActionHandlerConditionProps) => !isFunction(field),
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
-      condition: ({ field }) => !isFunction(field),
+      condition: ({ field }: ValueActionHandlerConditionProps) => !isFunction(field),
     },
     {
       type: 'execute-view-with-value',
@@ -211,8 +212,14 @@ export default {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      condition: ({ type }) => type.type === 'string',
+      condition: ({ type }: ValueActionHandlerConditionProps) => type.type === 'string',
       component: SelectExtractorType,
+    },
+    {
+      type: 'highlight-value',
+      title: 'Highlight this value',
+      handler: HighlightValueHandler,
+      condition: HighlightValueHandler.condition,
     },
   ],
   visualizationTypes: [

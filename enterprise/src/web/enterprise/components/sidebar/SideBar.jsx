@@ -1,11 +1,11 @@
-/* eslint-disable react/no-find-dom-node,react/no-string-refs */
-/* global window */
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import ReactDOM from 'react-dom';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { AutoAffix } from 'react-overlays';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import { Panel, PanelGroup } from 'react-bootstrap';
 import { AddWidgetButton, SearchResultOverview } from 'enterprise/components/sidebar';
@@ -13,6 +13,7 @@ import { AddWidgetButton, SearchResultOverview } from 'enterprise/components/sid
 import styles from './SideBar.css';
 import SearchDetails from './SearchDetails';
 import CustomPropTypes from '../CustomPropTypes';
+import HighlightingRules from './highlighting/HighlightingRules';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
@@ -59,8 +60,7 @@ const SideBar = createReactClass({
   _updateHeight() {
     const viewPortHeight = window.innerHeight;
 
-    const sidebar = ReactDOM.findDOMNode(this.sidebar);
-    const sidebarCss = window.getComputedStyle(ReactDOM.findDOMNode(sidebar));
+    const sidebarCss = window.getComputedStyle(this.sidebar);
     const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 
     const maxHeight = viewPortHeight - sidebarPaddingBottom - this.SIDEBAR_MARGIN_BOTTOM;
@@ -77,7 +77,8 @@ const SideBar = createReactClass({
   },
 
   render() {
-    const { results, viewMetadata, queryId } = this.props;
+    const { children, results, viewMetadata, queryId } = this.props;
+    const { activePanel, availableHeight } = this.state;
     const viewDescription = this.formatViewDescription(viewMetadata);
     return (
       <div className={styles.sidebarContainer}>
@@ -97,15 +98,18 @@ const SideBar = createReactClass({
                 <SearchResultOverview results={results} />
               </div>
 
-              <PanelGroup accordion activeKey={this.state.activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
+              <PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
                 <Panel eventKey="metadata" header="View Description">
                   {viewDescription}
                 </Panel>
                 <Panel eventKey="search-details" header="Search Details">
                   <SearchDetails results={results} />
                 </Panel>
+                <Panel eventKey="decorators" header="Formatting & Highlighting">
+                  <HighlightingRules />
+                </Panel>
                 <Panel eventKey="fields" header="Fields">
-                  {React.cloneElement(this.props.children, { maximumHeight: this.state.availableHeight })}
+                  {React.cloneElement(children, { maximumHeight: availableHeight })}
                 </Panel>
               </PanelGroup>
             </div>

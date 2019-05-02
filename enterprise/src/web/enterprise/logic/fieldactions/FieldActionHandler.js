@@ -5,4 +5,10 @@ import type { ActionContexts } from '../ActionContext';
 export type FieldActionHandler = (string, string, FieldType) => Promise<*>;
 export type FieldActionHandlerWithContext = (string, string, FieldType, ActionContexts) => Promise<*>;
 
-export type FieldActionHandlerCondition = ({ context: ActionContexts, name: string }) => boolean;
+export type FieldActionHandlerConditionProps = {
+  context: ActionContexts,
+  name: string,
+  type: FieldType,
+};
+
+export type FieldActionHandlerCondition = (FieldActionHandlerConditionProps) => boolean;

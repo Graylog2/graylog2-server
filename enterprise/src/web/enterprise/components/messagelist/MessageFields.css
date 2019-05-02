@@ -1,7 +1,11 @@
-:local(.messageFields) dl.message-details-fields {
+:local(.messageFields) {
     color: #666;
 }
 
-:local(.messageFields) dl.message-details-fields dd {
+:local(.messageFields) dd {
     font-family: monospace;
+}
+
+:local(.messageFields) dd:not(:last-child) {
+    border-bottom: 1px solid #ececec;
 }

@@ -19,7 +19,7 @@ export { default as TitleTypes } from './TitleTypes';
 export const TitlesStore = Reflux.createStore({
   listenables: [TitlesActions],
 
-  titles: new Immutable.Map<TitleType, Immutable.Map<string, string>>(),
+  titles: Immutable.Map<TitleType, Immutable.Map<string, string>>(),
 
   init() {
     this.listenTo(CurrentViewStateStore, this.onViewStateStoreChange, this.onViewStateStoreChange);

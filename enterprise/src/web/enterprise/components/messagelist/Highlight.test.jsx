@@ -24,7 +24,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('highlights string for single highlight range', () => {
     const message = messageFor({
@@ -35,7 +35,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('does not highlight string if start is negative', () => {
     const message = messageFor({
@@ -46,7 +46,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('does not highlight string if length is negative', () => {
     const message = messageFor({
@@ -57,7 +57,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('highlights remainder of string if length of range exceeds length of string', () => {
     const message = messageFor({
@@ -68,7 +68,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="foobar" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('highlights string for multiple highlight ranges', () => {
     const message = messageFor({
@@ -82,7 +82,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="the brown fox jumps over the lazy dog" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('highlights string for multiple, overlapping highlight ranges', () => {
     const message = messageFor({
@@ -96,7 +96,7 @@ describe('Highlight', () => {
         <Highlight field="foo" value="the brown fox jumps over the lazy dog" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
   it('highlights string for multiple highlight ranges where one is a complete subset of the other', () => {
     const message = messageFor({
@@ -110,6 +110,6 @@ describe('Highlight', () => {
         <Highlight field="foo" value="the brown fox jumps over the lazy dog" />
       </AdditionalContext.Provider>,
     );
-    expect(wrapper.find('Highlight')).toMatchSnapshot();
+    expect(wrapper.find('PossiblyHighlight')).toMatchSnapshot();
   });
 });

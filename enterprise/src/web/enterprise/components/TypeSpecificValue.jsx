@@ -9,34 +9,34 @@ import FieldType from 'enterprise/logic/fieldtypes/FieldType';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
+import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
 
-const _formatValue = (value, truncate, render) => {
+const _formatValue = (field, value, truncate, render, type) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
   const Component = render;
-  return trim(stringified) === '' ? <EmptyValue /> : <Component value={(truncate ? trunc(stringified) : stringified)} />;
-};
-
-type RenderProps = {
-  value: any,
+  return trim(stringified) === ''
+    ? <EmptyValue />
+    : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} type={type} />;
 };
 
 type Props = {
+  field: string,
   value: any,
   type: FieldType,
   truncate?: boolean,
-  render?: React.ComponentType<RenderProps>,
+  render?: React.ComponentType<ValueRendererProps>,
 };
 
-const defaultComponent = ({ value }: RenderProps) => value;
+const defaultComponent = ({ value }: ValueRendererProps) => value;
 
-const TypeSpecificValue = ({ value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
+const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
   if (value === undefined) {
     return null;
   }
   switch (type.type) {
     case 'date': return <UserTimezoneTimestamp dateTime={value} />;
     case 'boolean': return String(value);
-    default: return _formatValue(value, truncate, render);
+    default: return _formatValue(field, value, truncate, render, type);
   }
 };
 

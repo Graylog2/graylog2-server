@@ -1,17 +1,25 @@
-import PropTypes from 'prop-types';
+// @flow strict
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { StreamsStore } from 'enterprise/stores/StreamsStore';
 import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
 
 import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
+
 import MessageDetail from './MessageDetail';
 import TypeSpecificValue from '../TypeSpecificValue';
-import Highlight from './Highlight';
+import DecoratedValue from './decoration/DecoratedValue';
+import CustomHighlighting from './CustomHighlighting';
+
 import style from './MessageTableEntry.css';
 
 const { NodesStore } = CombinedProvider.get('Nodes');
@@ -41,91 +49,120 @@ const ConnectedMessageDetail = connect(
   },
 );
 
-class MessageTableEntry extends React.Component {
-  static propTypes = {
-    disableSurroundingSearch: PropTypes.bool,
-    expandAllRenderAsync: PropTypes.bool.isRequired,
-    expanded: PropTypes.bool.isRequired,
-    fields: PropTypes.object.isRequired,
-    highlight: PropTypes.bool,
-    highlightMessage: PropTypes.string,
-    message: PropTypes.shape({
-      fields: PropTypes.object.isRequired,
-      highlight_ranges: PropTypes.object,
-      id: PropTypes.string.isRequired,
-      index: PropTypes.string.isRequired,
-    }).isRequired,
-    selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
-    showMessageRow: PropTypes.bool,
-    toggleDetail: PropTypes.func.isRequired,
+type Props = {
+  disableSurroundingSearch?: boolean,
+  expandAllRenderAsync: boolean,
+  expanded: boolean,
+  fields: FieldTypeMappingsList,
+  highlightMessage?: string,
+  message: { [string]: any },
+  selectedFields?: Immutable.OrderedSet<string>,
+  showMessageRow?: boolean,
+  toggleDetail: (string) => void,
+};
+
+const MessageTableEntry = ({
+  disableSurroundingSearch,
+  expandAllRenderAsync,
+  expanded,
+  fields,
+  highlightMessage = '',
+  message,
+  showMessageRow = false,
+  selectedFields = Immutable.OrderedSet(),
+  toggleDetail,
+}: Props) => {
+  const _toggleDetail = () => {
+    toggleDetail(`${message.index}-${message.id}`);
   };
 
-  static defaultProps = {
-    disableSurroundingSearch: false,
-    highlight: false,
-    highlightMessage: undefined,
-    selectedFields: Immutable.OrderedSet(),
-    showMessageRow: false,
-  };
-
-  _toggleDetail = () => {
-    this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
-  };
-
-  _renderStrong = (children, strong = false) => {
+  const _renderStrong = (children, strong = false) => {
     if (strong) {
       return <strong>{children}</strong>;
     }
     return children;
   };
 
-  render() {
-    const colSpanFixup = this.props.selectedFields.size + 1;
-    const { message } = this.props;
+  const colSpanFixup = selectedFields.size + 1;
 
-    let classes = 'message-group';
-    if (this.props.expanded) {
-      classes += ' message-group-toggled';
-    }
-    if (this.props.message.id === this.props.highlightMessage) {
-      classes += ' message-highlight';
-    }
-    return (
-      <tbody className={classes}>
-        <tr className="fields-row" onClick={this._toggleDetail}>
-          { this.props.selectedFields.toArray().map((selectedFieldName, idx) => {
-            const fieldTypeMapping = this.props.fields.find(type => type.name === selectedFieldName);
-            const fieldType = fieldTypeMapping ? fieldTypeMapping.type : FieldType.Unknown;
-            return (<td className={style.fieldsRowField} key={selectedFieldName}>
-              {this._renderStrong(
-                <TypeSpecificValue value={message.fields[selectedFieldName]}
-                                   type={fieldType}
-                                   render={({ value }) => <Highlight field={selectedFieldName} value={value} />} />,
-                idx === 0)}
-            </td>);
-          }) }
-        </tr>
+  let classes = 'message-group';
+  if (expanded) {
+    classes += ' message-group-toggled';
+  }
+  if (message.id === highlightMessage) {
+    classes += ' message-highlight';
+  }
+  const messageFieldType = fields.find(type => type.name === 'message', FieldTypeMapping.create('message', FieldType.Unknown)).type;
+  return (
+    <tbody className={classes}>
+      <tr className="fields-row" onClick={_toggleDetail}>
+        { selectedFields.toArray().map((selectedFieldName, idx) => {
+          const { type } = fields.find(t => t.name === selectedFieldName, FieldTypeMapping.create(selectedFieldName, FieldType.Unknown));
+          return (
+            <td className={style.fieldsRowField} key={selectedFieldName}>
+              {_renderStrong(
+                <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
+                  <TypeSpecificValue value={message.fields[selectedFieldName]}
+                                     field={selectedFieldName}
+                                     type={type}
+                                     render={DecoratedValue} />
+                </CustomHighlighting>,
+                idx === 0,
+              )}
+            </td>
+          );
+        }) }
+      </tr>
 
-        {this.props.showMessageRow
-        && (
-        <tr className="message-row" onClick={this._toggleDetail}>
-          <td colSpan={colSpanFixup}><div className="message-wrapper"><Highlight field="message" value={message.fields.message} /></div></td>
+      {showMessageRow
+      && (
+        <tr className="message-row" onClick={_toggleDetail}>
+          <td colSpan={colSpanFixup}>
+            <div className="message-wrapper">
+              <CustomHighlighting field="message" value={message.fields.message}>
+                <DecoratedValue field="message" value={message.fields.message} type={messageFieldType} />
+              </CustomHighlighting>
+            </div>
+          </td>
         </tr>
-        )}
-        {this.props.expanded
-        && (
+      )}
+      {expanded
+      && (
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
             <ConnectedMessageDetail message={message}
-                                    fields={this.props.fields}
-                                    disableSurroundingSearch={this.props.disableSurroundingSearch}
-                                    expandAllRenderAsync={this.props.expandAllRenderAsync} />
+                                    fields={fields}
+                                    disableSurroundingSearch={disableSurroundingSearch}
+                                    expandAllRenderAsync={expandAllRenderAsync} />
           </td>
         </tr>
-        )}
-      </tbody>
-    );
-  }
-}
+      )}
+    </tbody>
+  );
+};
+
+MessageTableEntry.propTypes = {
+  disableSurroundingSearch: PropTypes.bool,
+  expandAllRenderAsync: PropTypes.bool.isRequired,
+  expanded: PropTypes.bool.isRequired,
+  fields: PropTypes.object.isRequired,
+  highlightMessage: PropTypes.string,
+  message: PropTypes.shape({
+    fields: PropTypes.object.isRequired,
+    highlight_ranges: PropTypes.object,
+    id: PropTypes.string.isRequired,
+    index: PropTypes.string.isRequired,
+  }).isRequired,
+  selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
+  showMessageRow: PropTypes.bool,
+  toggleDetail: PropTypes.func.isRequired,
+};
+
+MessageTableEntry.defaultProps = {
+  disableSurroundingSearch: false,
+  highlightMessage: undefined,
+  selectedFields: Immutable.OrderedSet(),
+  showMessageRow: false,
+};
 
 export default MessageTableEntry;
