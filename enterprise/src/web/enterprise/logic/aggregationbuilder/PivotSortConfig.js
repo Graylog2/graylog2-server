@@ -22,6 +22,7 @@ export default class PivotSortConfig extends SortConfig {
     return new PivotSortConfig(pivot.field, Direction.Ascending);
   }
 
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { type, field, direction } = this._value;
     // eslint-disable-next-line no-use-before-define

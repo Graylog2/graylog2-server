@@ -30,7 +30,7 @@ const newSeriesConfigChange = (values, series, newSeries, onChange) => {
 const _wrapOption = series => ({ label: series.effectiveName, value: series });
 
 type Props = {
-  onChange: (Array<*>) => boolean,
+  onChange: (Array<Series>) => boolean,
   series: Array<Series>,
   suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption>, for: (string) => Array<Option> },
 };

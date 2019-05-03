@@ -1,11 +1,13 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import * as Immutable from 'immutable';
 
 import CustomPropTypes from 'enterprise/components/CustomPropTypes';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
 import { defaultCompare } from 'enterprise/logic/DefaultCompare';
+import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
@@ -15,83 +17,81 @@ import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
 import BarVisualizationConfiguration from './BarVisualizationConfiguration';
-import {
-  PivotList,
-  SeriesList,
-  SortList,
-  VisualizationConfigType,
-  VisualizationType,
-} from './AggregationBuilderPropTypes';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 
-export default class AggregationControls extends React.Component {
+type Props = {
+  children: React.Node,
+  config: AggregationWidgetConfig,
+  fields: Immutable.List<FieldTypeMapping>,
+  onChange: (AggregationWidgetConfig) => void,
+};
+
+type State = {
+  config: AggregationWidgetConfig,
+};
+
+export default class AggregationControls extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.element.isRequired,
-    config: PropTypes.shape({
-      columnPivots: PivotList,
-      rowPivots: PivotList,
-      series: SeriesList,
-      sort: SortList,
-      visualization: VisualizationType,
-      rollup: PropTypes.bool,
-      visualizationConfig: VisualizationConfigType,
-    }).isRequired,
+    config: PropTypes.instanceOf(AggregationWidgetConfig).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     const { config } = props;
-    const { columnPivots, rowPivots, sort, series, visualization, rollup, visualizationConfig } = config;
     this.state = {
-      config: AggregationWidgetConfig.builder()
-        .columnPivots(columnPivots)
-        .rowPivots(rowPivots)
-        .sort(sort)
-        .series(series)
-        .visualization(visualization)
-        .rollup(rollup)
-        .visualizationConfig(visualizationConfig)
-        .build(),
+      config,
     };
   }
 
-  _onColumnPivotChange = (columnPivots) => {
+  // eslint-disable-next-line no-undef
+  _onColumnPivotChange = (columnPivots: $PropertyType<$PropertyType<Props, 'config'>, 'columnPivots'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }));
   };
 
-  _onRowPivotChange = (rowPivots) => {
+  // eslint-disable-next-line no-undef
+  _onRowPivotChange = (rowPivots: $PropertyType<$PropertyType<Props, 'config'>, 'rowPivots'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }));
   };
 
-  _onSeriesChange = (series) => {
+  // eslint-disable-next-line no-undef
+  _onSeriesChange = (series: $PropertyType<$PropertyType<Props, 'config'>, 'series'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().series(series).build() }));
+    return true;
   };
 
-  _onSortChange = (sort) => {
+  // eslint-disable-next-line no-undef
+  _onSortChange = (sort: $PropertyType<$PropertyType<Props, 'config'>, 'sort'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(sort).build() }));
   };
 
-  _onSortDirectionChange = (direction) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(state.config.sort.map(sort => sort.toBuilder().direction(direction).build())).build() }));
+  // eslint-disable-next-line no-undef
+  _onSortDirectionChange = (direction: $PropertyType<$PropertyType<Props, 'config'>, 'direction'>) => {
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(state.config.sort
+      // $FlowFixMe: SortConfig subclasses need to be removed and builder merged into base class
+      .map(sort => sort.toBuilder().direction(direction).build())).build() }));
   };
 
-  _onRollupChange = (checked) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(checked).build() }));
+  // eslint-disable-next-line no-undef
+  _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
+    this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };
 
-  _onVisualizationChange = (visualization) => {
+  // eslint-disable-next-line no-undef
+  _onVisualizationChange = (visualization: $PropertyType<$PropertyType<Props, 'config'>, 'visualization'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
   };
 
-  _onVisualizationConfigChange = (visualizationConfig) => {
+  // eslint-disable-next-line no-undef
+  _onVisualizationConfigChange = (visualizationConfig: $PropertyType<$PropertyType<Props, 'config'>, 'visualizationConfig'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
   };
 
-  _setAndPropagate = fn => this.setState(fn, this._propagateState);
+  _setAndPropagate = (fn: (State) => State) => this.setState(fn, this._propagateState);
 
   _propagateState() {
     const { config } = this.state;
@@ -155,7 +155,10 @@ export default class AggregationControls extends React.Component {
             </DescriptionBox>
             {visualization === 'bar' && (
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
-                <BarVisualizationConfiguration config={visualizationConfig} onChange={this._onVisualizationConfigChange} />
+                <BarVisualizationConfiguration
+                  // $FlowFixMe: If guard above is true, it is a `BarVisualizationConfig`
+                  config={visualizationConfig}
+                  onChange={this._onVisualizationConfigChange} />
               </DescriptionBox>
             )}
           </Col>

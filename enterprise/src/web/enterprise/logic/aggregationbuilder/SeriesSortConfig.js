@@ -22,6 +22,7 @@ export default class SeriesSortConfig extends SortConfig {
     return new SeriesSortConfig(series.function, Direction.Descending);
   }
 
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { type, field, direction } = this._value;
     // eslint-disable-next-line no-use-before-define
