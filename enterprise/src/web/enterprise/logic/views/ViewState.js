@@ -18,6 +18,7 @@ type State = {
   widgets: Array<Widget>,
   widgetMapping: WidgetMapping,
   widgetPositions: { [string]: WidgetPosition },
+  staticMessageListId?: string,
 };
 
 type BuilderState = Map<string, any>;
@@ -29,6 +30,8 @@ type JsonState = {
   titles: TitlesMap,
   widgets: Array<any>,
   widget_mapping: WidgetMapping,
+  positions: { [string]: WidgetPosition },
+  staticMessageListId?: string,
 };
 
 export default class ViewState {
@@ -39,8 +42,9 @@ export default class ViewState {
     widgets: Array<Widget>,
     widgetMapping: WidgetMapping,
     widgetPositions: { [string]: WidgetPosition },
-    formatting: FormattingSettings) {
-    this._value = { fields, titles, widgets, widgetMapping, widgetPositions, formatting };
+    formatting: FormattingSettings,
+    staticMessageListId?: string) {
+    this._value = { fields, titles, widgets, widgetMapping, widgetPositions, formatting, staticMessageListId };
   }
 
   static create(): ViewState {
@@ -70,6 +74,10 @@ export default class ViewState {
 
   get widgetPositions(): { [string]: WidgetPosition } {
     return this._value.widgetPositions;
+  }
+
+  get staticMessageListId() : ?string {
+    return this._value.staticMessageListId;
   }
 
   duplicate() {

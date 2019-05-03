@@ -4,10 +4,15 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
 import Series from 'enterprise/logic/aggregationbuilder/Series';
+import SeriesParameterOptions from 'enterprise/components/aggregationbuilder/SeriesParameterOptions';
 
 import SeriesSelect from './SeriesSelect';
 
 jest.mock('enterprise/stores/AggregationFunctionsStore', () => ({ getInitialState: jest.fn(), listen: jest.fn() }));
+
+jest.mock('enterprise/components/aggregationbuilder/SeriesParameterOptions', () => ({
+  parameterOptionsForType: jest.fn(),
+}));
 
 describe('SeriesSelect', () => {
   let suggester;
@@ -65,7 +70,7 @@ describe('SeriesSelect', () => {
 
   it('shows next suggestions when selecting incomplete suggestion', () => {
     suggester.defaults = [
-      { value: 'func1', incomplete: true },
+      { value: 'func1', incomplete: true, label: 'func1', parameterNeeded: false },
       { label: 'Anything', value: 'Anything' },
     ];
     suggester.for = jest.fn(() => [
@@ -81,7 +86,31 @@ describe('SeriesSelect', () => {
     select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true }]);
 
     expect(suggester.for).toHaveBeenCalledTimes(1);
-    expect(suggester.for).toHaveBeenCalledWith('func1');
+    expect(suggester.for).toHaveBeenCalledWith('func1', undefined);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('shows parameter suggestions when parameter is needed', () => {
+    SeriesParameterOptions.parameterOptionsForType = jest.fn(() => [1, 2, 3]);
+
+    suggester.defaults = [
+      { value: 'func1', incomplete: true, parameterNeeded: false, label: 'func1' },
+      { label: 'Anything', value: 'Anything' },
+    ];
+    suggester.for = jest.fn(() => [
+      { label: 'func1(foo)', value: 'func1(foo)' },
+      { label: 'func1(bar)', value: 'func1(bar)' },
+    ]);
+    const onChange = jest.fn();
+    const wrapper = mount(<SeriesSelect series={[]} suggester={suggester} onChange={onChange} />);
+    const input = wrapper.find('input');
+    input.simulate('focus');
+
+    const select = wrapper.find('Select').at(0);
+    select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true, parameterNeeded: true }]);
+
+    expect(SeriesParameterOptions.parameterOptionsForType).toHaveBeenCalledTimes(1);
+    expect(SeriesParameterOptions.parameterOptionsForType).toHaveBeenCalledWith('func1');
     expect(onChange).not.toHaveBeenCalled();
   });
 

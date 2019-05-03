@@ -5,7 +5,7 @@ import Series, { parseSeries } from 'enterprise/logic/aggregationbuilder/Series'
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
 
-const typePreservingFunctions = ['avg', 'min', 'max'];
+const typePreservingFunctions = ['avg', 'min', 'max', 'percentile'];
 const constantTypeFunctions = {
   card: FieldTypes.LONG,
   count: FieldTypes.LONG,
@@ -20,7 +20,9 @@ const inferTypeForSeries = (series: Series, types: Array<FieldTypeMapping>): Fie
 
   const { type, field } = definition;
 
+  // $FlowFixMe: this check should...
   if (constantTypeFunctions[type]) {
+    // $FlowFixMe: ... guard this access!
     return newMapping(constantTypeFunctions[type]());
   }
 

@@ -7,7 +7,7 @@ import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 
-const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card'];
+const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card', 'percentile'];
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
 const handler: FieldActionHandler = (queryId: string, field: string, type: FieldType) => {

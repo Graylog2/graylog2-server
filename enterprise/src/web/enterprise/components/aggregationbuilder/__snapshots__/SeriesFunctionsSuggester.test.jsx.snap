@@ -46,16 +46,19 @@ Array [
   Object {
     "incomplete": true,
     "label": "avg(...)",
+    "parameterNeeded": false,
     "value": "avg",
   },
   Object {
     "incomplete": true,
     "label": "min(...)",
+    "parameterNeeded": false,
     "value": "min",
   },
   Object {
     "incomplete": true,
     "label": "max(...)",
+    "parameterNeeded": false,
     "value": "max",
   },
 ]
@@ -75,11 +78,13 @@ Array [
   Object {
     "incomplete": true,
     "label": "card(...)",
+    "parameterNeeded": false,
     "value": "card",
   },
   Object {
     "incomplete": true,
     "label": "stddev(...)",
+    "parameterNeeded": false,
     "value": "stddev",
   },
 ]
@@ -99,16 +104,19 @@ Array [
   Object {
     "incomplete": true,
     "label": "avg(...)",
+    "parameterNeeded": false,
     "value": "avg",
   },
   Object {
     "incomplete": true,
     "label": "min(...)",
+    "parameterNeeded": false,
     "value": "min",
   },
   Object {
     "incomplete": true,
     "label": "max(...)",
+    "parameterNeeded": false,
     "value": "max",
   },
 ]

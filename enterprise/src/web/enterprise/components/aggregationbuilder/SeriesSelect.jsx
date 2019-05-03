@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import Select from 'enterprise/components/Select';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 
+import { parameterOptionsForType } from 'enterprise/components/aggregationbuilder/SeriesParameterOptions';
 import ConfigurableElement from './ConfigurableElement';
 import SeriesConfiguration from './SeriesConfiguration';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
@@ -12,9 +13,11 @@ import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 type Option = {|
   label: string,
   value: string,
+  parameter?: string | number,
 |};
 
-type IncompleteOption = {| incomplete: true, value: string |};
+type IncompleteOption = {| incomplete: true, parameterNeeded: false, value: string, label: string, value: string | number, parameter?: string | number |};
+type ParameterNeededOption = {| incomplete: true, parameterNeeded: true, value: string, value: string |};
 type BackToFunctions = {| label: string, backToFunctions: true |};
 
 const parseSeries = (series: Array<Option>) => (series ? series.map(s => s.value) : []);
@@ -29,11 +32,11 @@ const _wrapOption = series => ({ label: series.effectiveName, value: series });
 type Props = {
   onChange: (Array<*>) => boolean,
   series: Array<Series>,
-  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption>, for: (string) => Array<Option> },
+  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption>, for: (string) => Array<Option> },
 };
 
 type State = {
-  options: Array<Option | IncompleteOption | BackToFunctions>,
+  options: Array<Option | IncompleteOption | ParameterNeededOption| BackToFunctions>,
 };
 
 class SeriesSelect extends React.Component<Props, State> {
@@ -49,14 +52,22 @@ class SeriesSelect extends React.Component<Props, State> {
     };
   }
 
-  _onChange = (newSeries: Array<Option | IncompleteOption | BackToFunctions>) => {
+  _onChange = (newSeries: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>) => {
     const { onChange, suggester } = this.props;
     const last = newSeries[newSeries.length - 1];
+
+    if (last && last.parameterNeeded) {
+      const options = parameterOptionsForType(last.value)
+        .map(value => ({ label: value.toString(), value: last.value, parameterNeeded: false, incomplete: true, parameter: value }));
+
+      this.setState({ options });
+      return false;
+    }
 
     if (last && last.incomplete) {
       const options = [].concat(
         [{ label: 'Back to function list', backToFunctions: true }],
-        suggester.for(last.value),
+        suggester.for(last.value, last.parameter),
       );
       this.setState({ options });
       return false;

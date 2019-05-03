@@ -43,6 +43,7 @@ describe('FieldStatisticsHandler', () => {
         `stddev(${fieldName})`,
         `variance(${fieldName})`,
         `card(${fieldName})`,
+        `percentile(${fieldName})`,
       ]);
     });
   });

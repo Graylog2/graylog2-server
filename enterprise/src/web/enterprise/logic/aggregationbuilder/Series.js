@@ -20,22 +20,36 @@ export type Definition = {
   field?: string,
 };
 
-export const seriesRegex = /^(\w+)\((\w*)\)$/;
-export const isFunction = (s: string) => seriesRegex.test(s);
+const parametersRegex = /\((.+)\)/;
+const funcNameRegex = /(\w+)\(/;
+const testSeriesRegex = /^(\w+)\((\w*)(,(\w+))*\)$/;
+
+const definitionFor = (type : string, parameters : Array<string>) => {
+  // eslint-disable-next-line no-unused-vars
+  const [field, parameter] = parameters;
+  if (type === 'percentile') {
+    return { type, field, percentile: parameter };
+  }
+  return { type, field };
+};
+
+export const isFunction = (s: string) => testSeriesRegex.test(s);
 export const parseSeries = (s: string) => {
-  const result = seriesRegex.exec(s);
-  if (!result) {
+  const funcNameResult = funcNameRegex.exec(s);
+  if (!funcNameResult) {
     return null;
   }
-  // eslint-disable-next-line no-unused-vars
-  const [_, type, field] = result;
+  const type = funcNameResult[1];
   const definition: Definition = {
     type,
   };
-  if (field !== '') {
-    definition.field = field;
+
+  const parameterResult = parametersRegex.exec(s);
+  if (!parameterResult) {
+    return definition;
   }
-  return definition;
+
+  return definitionFor(type, parameterResult[1].split(','));
 };
 
 export default class Series {
@@ -75,7 +89,10 @@ export default class Series {
 
   static forFunction(func: string) {
     // eslint-disable-next-line no-use-before-define
-    return new Builder().function(func).config(SeriesConfig.empty()).build();
+    return new Builder()
+      .function(func)
+      .config(SeriesConfig.empty())
+      .build();
   }
 
   toBuilder() {
@@ -98,6 +115,10 @@ class Builder {
 
   config(newConfig: SeriesConfig) {
     return new Builder(this.value.set('config', newConfig));
+  }
+
+  parameter(newParameter: *) {
+    return new Builder(this.value.set('parameter', newParameter));
   }
 
   build() {

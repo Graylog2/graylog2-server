@@ -3,18 +3,26 @@ import { flatten } from 'lodash';
 import AggregationFunctionsStore from 'enterprise/stores/AggregationFunctionsStore';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 
-const _makeIncompleteFunction = fun => ({ label: `${fun}(...)`, value: fun, incomplete: true });
+import { parameterNeededForType } from './SeriesParameterOptions';
+
+const _makeIncompleteFunction = fun => ({ label: `${fun}(...)`, value: fun, incomplete: true, parameterNeeded: parameterNeededForType(fun) });
 
 const _wrapOption = series => ({ label: series.effectiveName, value: series });
 
 const _defaultFunctions = (functions) => {
+  const funcOptions = Object.keys(functions).map(_makeIncompleteFunction);
   return [].concat(
     [_wrapOption(Series.forFunction('count()'))],
-    Object.keys(functions).map(_makeIncompleteFunction),
+    funcOptions,
   );
 };
 
-const combineFunctionsWithFields = (functions, fields) => flatten(fields.map(name => functions.map(f => `${f}(${name})`)));
+const combineFunctionsWithFields = (functions, fields, parameter) => flatten(fields.map(name => functions.map((f) => {
+  if (parameter) {
+    return `${f}(${name},${parameter})`;
+  }
+  return `${f}(${name})`;
+})));
 
 export default class SeriesFunctionsSuggester {
   constructor(fields) {
@@ -34,5 +42,5 @@ export default class SeriesFunctionsSuggester {
     return this.defaultFunctions;
   }
 
-  for = func => combineFunctionsWithFields([func], this.fields).map(Series.forFunction).map(_wrapOption);
+  for = (func, parameter) => combineFunctionsWithFields([func], this.fields, parameter).map(Series.forFunction).map(_wrapOption);
 }

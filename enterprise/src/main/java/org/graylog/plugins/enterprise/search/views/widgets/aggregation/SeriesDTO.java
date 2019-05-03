@@ -10,8 +10,8 @@ import org.graylog.autovalue.WithBeanGetter;
 @JsonDeserialize(builder = SeriesDTO.Builder.class)
 @WithBeanGetter
 public abstract class SeriesDTO {
-    static final String FIELD_CONFIG = "config";
-    static final String FIELD_FUNCTION = "function";
+    private static final String FIELD_CONFIG = "config";
+    private static final String FIELD_FUNCTION = "function";
 
     @JsonProperty(FIELD_CONFIG)
     public abstract SeriesConfigDTO config();
