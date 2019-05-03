@@ -1,20 +1,27 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
+import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
 import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 import { RefreshActions } from 'enterprise/stores/RefreshStore';
+import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import WidgetModel from 'enterprise/logic/widgets/Widget';
+import WidgetConfig from 'enterprise/logic/widgets/WidgetConfig';
+import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
-import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 
+import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import MeasureDimensions from './MeasureDimensions';
 import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
@@ -22,8 +29,29 @@ import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
+import WidgetColorContext from './WidgetColorContext';
 
-class Widget extends React.Component {
+type Props = {
+  id: string,
+  widget: WidgetModel,
+  data?: Array<*>,
+  editing?: boolean,
+  errors?: Array<{ description: string }>,
+  fields: Immutable.List<FieldTypeMapping>,
+  height?: number,
+  width?: number,
+  title: string,
+  position: WidgetPosition,
+  onSizeChange: () => void,
+  onPositionsChange: () => void,
+};
+type State = {
+  configChanged?: boolean,
+  editing: boolean,
+  oldConfig?: WidgetConfig,
+};
+
+class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
     widget: PropTypes.shape({
@@ -63,7 +91,7 @@ class Widget extends React.Component {
     const { editing } = props;
     this.state = { editing };
     if (editing) {
-      this.state.oldConfig = props.widget.config;
+      this.state = { ...this.state, oldConfig: props.widget.config };
     }
   }
 
@@ -113,27 +141,26 @@ class Widget extends React.Component {
   };
 
   visualize = () => {
-    const { data, errors } = this.props;
+    const { data, errors, title } = this.props;
     if (errors && errors.length > 0) {
       return <ErrorWidget errors={errors} />;
     }
     if (data) {
       const { editing } = this.state;
       const { id, widget, height, width, fields } = this.props;
-      const { config, computationTimeRange, filter } = widget;
+      const { config, filter } = widget;
       const VisComponent = Widget._visualizationForType(widget.type);
       return (
         <VisComponent id={id}
                       editing={editing}
-                      title={widget.title}
+                      title={title}
                       config={config}
                       data={data}
                       fields={fields}
                       height={height}
                       width={width}
                       filter={filter}
-                      onFinishEditing={this._onToggleEdit}
-                      computationTimeRange={computationTimeRange} />
+                      onFinishEditing={this._onToggleEdit} />
       );
     }
     return <LoadingWidget />;
@@ -147,54 +174,58 @@ class Widget extends React.Component {
     if (editing) {
       const EditComponent = Widget._editComponentForType(widget.type);
       return (
-        <EditWidgetFrame widgetId={id}>
-          <MeasureDimensions>
-            <WidgetHeader title={title}
-                          hideDragHandle
-                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                          editing={editing}>
-              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-              </WidgetFilterMenu>
-            </WidgetHeader>
-            <EditComponent config={config}
-                           fields={fields}
-                           id={id}
-                           onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
-              {visualization}
-            </EditComponent>
-          </MeasureDimensions>
-          <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
-        </EditWidgetFrame>
+        <WidgetColorContext id={id}>
+          <EditWidgetFrame widgetId={id}>
+            <MeasureDimensions>
+              <WidgetHeader title={title}
+                            hideDragHandle
+                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            editing={editing}>
+                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                </WidgetFilterMenu>
+              </WidgetHeader>
+              <EditComponent config={config}
+                             fields={fields}
+                             id={id}
+                             onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
+                {visualization}
+              </EditComponent>
+            </MeasureDimensions>
+            <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
+          </EditWidgetFrame>
+        </WidgetColorContext>
       );
     }
     return (
-      <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-        <span>
-          <MeasureDimensions>
-            <WidgetHeader title={title}
-                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                          editing={editing}>
-              <WidgetHorizontalStretch widgetId={widget.id}
-                                       widgetType={widget.type}
-                                       onStretch={this.props.onPositionsChange}
-                                       position={this.props.position} />
-              {' '}
-              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-              </WidgetFilterMenu>
-              {' '}
-              <WidgetActionDropdown>
-                <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                <MenuItem divider />
-                <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-              </WidgetActionDropdown>
-            </WidgetHeader>
-            {visualization}
-          </MeasureDimensions>
-        </span>
-      </WidgetFrame>
+      <WidgetColorContext id={id}>
+        <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
+          <span>
+            <MeasureDimensions>
+              <WidgetHeader title={title}
+                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            editing={editing}>
+                <WidgetHorizontalStretch widgetId={widget.id}
+                                         widgetType={widget.type}
+                                         onStretch={this.props.onPositionsChange}
+                                         position={this.props.position} />
+                {' '}
+                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                </WidgetFilterMenu>
+                {' '}
+                <WidgetActionDropdown>
+                  <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                  <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+                </WidgetActionDropdown>
+              </WidgetHeader>
+              {visualization}
+            </MeasureDimensions>
+          </span>
+        </WidgetFrame>
+      </WidgetColorContext>
     );
   }
 }

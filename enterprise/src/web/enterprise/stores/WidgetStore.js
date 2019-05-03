@@ -4,9 +4,8 @@ import Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import { get, isEqual } from 'lodash';
 
-import Widget from '../logic/widgets/Widget';
+import Widget from 'enterprise/logic/widgets/Widget';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
-
 
 type WidgetActionsType = {
   create: (Widget) => Promise<Widget>,
@@ -81,22 +80,27 @@ export const WidgetStore = Reflux.createStore({
   },
   filter(widgetId, filter) {
     const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().filter(filter).build());
-    this._updateWidgets(newWidgets);
+    const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+    WidgetActions.filter.promise(promise);
   },
   remove(widgetId) {
     const newWidgets = this.widgets.remove(widgetId);
-    this._updateWidgets(newWidgets);
+    const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+    WidgetActions.remove.promise(promise);
   },
   update(widgetId, widget) {
     const newWidgets = this.widgets.set(widgetId, widget);
-    this._updateWidgets(newWidgets);
+    const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+    WidgetActions.update.promise(promise);
   },
   updateWidgets(newWidgets) {
-    this._updateWidgets(newWidgets);
+    const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+    WidgetActions.updateWidgets.promise(promise);
   },
   updateConfig(widgetId, config) {
     const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().config(config).build());
-    this._updateWidgets(newWidgets);
+    const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+    WidgetActions.updateConfig.promise(promise);
   },
   _updateWidgets(newWidgets) {
     const widgets = newWidgets.valueSeq().toList();

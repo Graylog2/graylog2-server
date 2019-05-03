@@ -38,7 +38,7 @@ const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimeran
       fixedrange: true,
     },
   }, plotLayout);
-  let _onZoom = () => {};
+  let _onZoom = () => true;
   if (config.isTimeline) {
     const { timezone } = currentUser;
     const normalizedFrom = moment.tz(effectiveTimerange.from, timezone).format();

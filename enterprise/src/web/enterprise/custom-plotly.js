@@ -1,12 +1,12 @@
-const Plotly = require('plotly.js/lib/core');
+import Plotly from 'plotly.js/lib/core';
+import Bar from 'plotly.js/lib/bar';
+import Pie from 'plotly.js/lib/pie';
+import Scatter from 'plotly.js/lib/scatter';
 
-// Load in the trace types for pie, and choropleth
 Plotly.register([
-  /* eslint-disable global-require */
-  require('plotly.js/lib/bar'),
-  require('plotly.js/lib/pie'),
-  require('plotly.js/lib/scatter'),
-  /* eslint-enable global-require */
+  Bar,
+  Pie,
+  Scatter,
 ]);
 
-module.exports = Plotly;
+export default Plotly;

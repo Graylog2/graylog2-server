@@ -1,11 +1,14 @@
+// @flow strict
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import WidgetModel from 'enterprise/logic/widgets/Widget';
 
 import Widget from './Widget';
 import LoadingWidget from './LoadingWidget';
@@ -26,8 +29,12 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
+jest.mock('enterprise/stores/ChartColorRulesStore', () => ({
+  ChartColorRulesStore: {},
+}));
 jest.mock('enterprise/stores/WidgetStore');
 jest.mock('enterprise/stores/TitlesStore');
+jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
 const createNodeMock = (element) => {
   if (element.type === 'div') {
@@ -90,12 +97,13 @@ describe('<Widget />', () => {
 
     wrapper.find('ActionToggle').simulate('click');
     const duplicate = wrapper.find('a[children="Duplicate"]');
-    WidgetActions.duplicate = jest.fn(() => Promise.resolve({ id: 'duplicatedWidgetId' }));
+    WidgetActions.duplicate = jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build()));
     TitlesActions.set = jest.fn((type, id, title) => {
       expect(type).toEqual(TitleTypes.Widget);
       expect(id).toEqual('duplicatedWidgetId');
       expect(title).toEqual('Dummy Widget (copy)');
       done();
+      return Promise.resolve();
     });
 
     duplicate.simulate('click');

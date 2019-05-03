@@ -24,6 +24,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     static final String FIELD_VISUALIZATION = "visualization";
     static final String FIELD_VISUALIZATION_CONFIG = "visualization_config";
     static final String FIELD_ROLLUP = "rollup";
+    static final String FIELD_FORMATTING_SETTINGS = "formatting_settings";
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
@@ -43,6 +44,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_VISUALIZATION_CONFIG)
     @Nullable
     public abstract VisualizationConfigDTO visualizationConfig();
+
+    @JsonProperty(FIELD_FORMATTING_SETTINGS)
+    @Nullable
+    public abstract WidgetFormattingSettings formattingSettings();
 
     @JsonProperty(FIELD_ROLLUP)
     public abstract boolean rollup();
@@ -72,6 +77,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
                 visible = true)
         @Nullable
         public abstract Builder visualizationConfig(VisualizationConfigDTO visualizationConfig);
+
+        @JsonProperty(FIELD_FORMATTING_SETTINGS)
+        @Nullable
+        public abstract Builder formattingSettings(WidgetFormattingSettings formattingSettings);
 
         @JsonProperty(FIELD_ROLLUP)
         public abstract Builder rollup(boolean roolup);

@@ -1,7 +1,22 @@
-import Immutable from 'immutable';
+// @flow strict
+import * as Immutable from 'immutable';
+import WidgetConfig from './WidgetConfig';
 
-export default class MessagesWidgetConfig {
-  constructor(fields, showMessageRow) {
+type InternalState = {
+  fields: Array<string>,
+  showMessageRow: boolean,
+};
+
+export type MessagesWidgetConfigJSON = {
+  fields: Array<string>,
+  show_message_row: boolean,
+};
+
+export default class MessagesWidgetConfig extends WidgetConfig {
+  _value: InternalState;
+
+  constructor(fields: Array<string>, showMessageRow: boolean) {
+    super();
     this._value = { fields: fields.slice(0), showMessageRow };
   }
 
@@ -15,8 +30,9 @@ export default class MessagesWidgetConfig {
 
   toObject() {
     const { fields, showMessageRow } = this._value;
+    const copiedFields: Array<string> = fields.slice(0);
     return {
-      fields: fields.slice(0),
+      fields: copiedFields,
       showMessageRow,
     };
   }
@@ -46,7 +62,7 @@ export default class MessagesWidgetConfig {
       .fields([]);
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: MessagesWidgetConfigJSON) {
     // eslint-disable-next-line camelcase
     const { show_message_row, fields } = value;
 
@@ -54,16 +70,18 @@ export default class MessagesWidgetConfig {
   }
 }
 
+type BuilderState = Immutable.Map<string, any>;
 class Builder {
-  constructor(value = Immutable.Map()) {
+  value: BuilderState;
+  constructor(value: BuilderState = Immutable.Map()) {
     this.value = value;
   }
 
-  fields(value) {
+  fields(value: Array<string>) {
     return new Builder(this.value.set('fields', value.slice(0)));
   }
 
-  showMessageRow(value) {
+  showMessageRow(value: boolean) {
     return new Builder(this.value.set('showMessageRow', value));
   }
 

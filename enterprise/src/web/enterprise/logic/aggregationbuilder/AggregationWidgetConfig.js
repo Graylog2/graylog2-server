@@ -10,28 +10,33 @@ import type { SeriesJson } from './Series';
 import type { SortConfigJson } from './SortConfig';
 import type { VisualizationConfigJson } from './visualizations/VisualizationConfig';
 import type { PivotJson } from './Pivot';
+import WidgetFormattingSettings from './WidgetFormattingSettings';
+import type { WidgetFormattingSettingsJSON } from './WidgetFormattingSettings';
+import WidgetConfig from '../widgets/WidgetConfig';
 
 type InternalState = {
   columnPivots: Array<Pivot>,
+  formattingSettings: WidgetFormattingSettings,
+  rollup: boolean,
   rowPivots: Array<Pivot>,
   series: Array<Series>,
   sort: Array<SortConfig>,
   visualization: string,
-  rollup: boolean,
   visualizationConfig: ?VisualizationConfig,
 };
 
 type AggregationWidgetConfigJson = {
-  row_pivots: Array<PivotJson>,
   column_pivots: Array<PivotJson>,
+  formatting_settings: WidgetFormattingSettingsJSON,
+  rollup: boolean,
+  row_pivots: Array<PivotJson>,
   series: Array<SeriesJson>,
   sort: Array<SortConfigJson>,
   visualization: string,
-  rollup: boolean,
   visualization_config: VisualizationConfigJson,
 };
 
-export default class AggregationWidgetConfig {
+export default class AggregationWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
   constructor(columnPivots: Array<Pivot>,
@@ -40,8 +45,10 @@ export default class AggregationWidgetConfig {
     sort: Array<SortConfig>,
     visualization: string,
     rollup: boolean,
-    visualizationConfig: VisualizationConfig) {
-    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig };
+    visualizationConfig: VisualizationConfig,
+    formattingSettings: WidgetFormattingSettings) {
+    super();
+    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings };
   }
 
   get rowPivots() {
@@ -75,6 +82,10 @@ export default class AggregationWidgetConfig {
     return this._value.visualizationConfig;
   }
 
+  get formattingSettings() {
+    return this._value.formattingSettings;
+  }
+
   get isTimeline() {
     return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
   }
@@ -95,15 +106,25 @@ export default class AggregationWidgetConfig {
   }
 
   toJSON() {
-    const { rowPivots, columnPivots, series, sort, visualization, visualizationConfig, rollup } = this._value;
+    const {
+      columnPivots,
+      formattingSettings,
+      rollup,
+      rowPivots,
+      series,
+      sort,
+      visualization,
+      visualizationConfig,
+    } = this._value;
     return {
-      row_pivots: rowPivots,
       column_pivots: columnPivots,
+      formatting_settings: formattingSettings,
+      rollup,
+      row_pivots: rowPivots,
       series,
       sort,
       visualization,
       visualization_config: visualizationConfig,
-      rollup,
     };
   }
 
@@ -112,14 +133,26 @@ export default class AggregationWidgetConfig {
     if (other instanceof AggregationWidgetConfig) {
       return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup']
         // $FlowFixMe: No typings for indexed access.
-        .every(key => is(this[key], other[key]));
+        .every(key => is(Immutable.fromJS(this[key]), Immutable.fromJS(other[key])));
     }
     return false;
   }
 
   static fromJSON(value: AggregationWidgetConfigJson) {
-    // eslint-disable-next-line camelcase
-    const { row_pivots, column_pivots, series, sort, visualization, rollup, visualization_config } = value;
+    const {
+      // eslint-disable-next-line camelcase
+      column_pivots,
+      // eslint-disable-next-line camelcase
+      formatting_settings,
+      rollup,
+      // eslint-disable-next-line camelcase
+      row_pivots,
+      series,
+      sort,
+      visualization,
+      // eslint-disable-next-line camelcase
+      visualization_config,
+    } = value;
 
     // eslint-disable-next-line no-use-before-define
     return new Builder()
@@ -131,6 +164,8 @@ export default class AggregationWidgetConfig {
       .rollup(rollup)
       // eslint-disable-next-line camelcase
       .visualizationConfig(visualization_config !== null ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
+      // eslint-disable-next-line camelcase
+      .formattingSettings(formatting_settings === null ? undefined : WidgetFormattingSettings.fromJSON(formatting_settings))
       .build();
   }
 }
@@ -171,12 +206,35 @@ class Builder {
     return new Builder(this.value.set('rollup', rollup));
   }
 
+  formattingSettings(value: ?WidgetFormattingSettings) {
+    return new Builder(this.value.set('formattingSettings', value));
+  }
+
   build() {
-    const { rowPivots, columnPivots, series, sort, visualization, rollup, visualizationConfig } = this.value.toObject();
+    const {
+      rowPivots,
+      columnPivots,
+      series,
+      sort,
+      visualization,
+      rollup,
+      visualizationConfig,
+      formattingSettings,
+    } = this.value.toObject();
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
-    const filteredSorts = sort.filter(s => availableSorts.find(availableSort => (s.field === availableSort.function || s.field === availableSort.field)));
+    const filteredSorts = sort.filter(s => availableSorts
+      .find(availableSort => (s.field === availableSort.function || s.field === availableSort.field)));
     const computedRollup = columnPivots.length > 0 ? rollup : true;
-    return new AggregationWidgetConfig(columnPivots, rowPivots, series, filteredSorts, visualization, computedRollup, visualizationConfig);
+    return new AggregationWidgetConfig(
+      columnPivots,
+      rowPivots,
+      series,
+      filteredSorts,
+      visualization,
+      computedRollup,
+      visualizationConfig,
+      formattingSettings,
+    );
   }
 }

@@ -1,7 +1,11 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import { mount } from 'enzyme';
 
+import ChartColorContext from '../ChartColorContext';
 import GenericPlot from '../GenericPlot';
+
+jest.mock('components/common/ColorPicker', () => 'color-picker');
 
 describe('GenericPlot', () => {
   describe('adds onRelayout handler', () => {
@@ -69,5 +73,85 @@ describe('GenericPlot', () => {
 
     const plot = wrapper.find('PlotlyComponent');
     expect(plot).toHaveProp('data', [{ x: 23 }, { x: 42 }]);
+  });
+  it('extracts series color from context', () => {
+    const lens = {
+      colors: {
+        'count()': '#783a8e',
+      },
+      setColor: jest.fn(),
+    };
+    const wrapper = mount((
+      <ChartColorContext.Provider value={lens}>
+        <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} />
+      </ChartColorContext.Provider>
+    ));
+
+    const newChartData = wrapper.find('PlotlyComponent').props().data;
+
+    expect(newChartData.find(chart => chart.name === 'count()').marker.color).toEqual('#783a8e');
+    expect(newChartData.find(chart => chart.name === 'sum(bytes)').marker).toBeUndefined();
+  });
+  describe('has color picker', () => {
+    const event = genericPlot => ({
+      node: {
+        textContent: 'x',
+        querySelector: jest.fn(() => genericPlot),
+      },
+      fullData: [
+        {
+          name: 'x',
+          marker: { color: '#414141' },
+        },
+      ],
+    });
+
+    const openLegend = (wrapper, genericPlot) => {
+      const plotlyComponent = wrapper.find('PlotlyComponent');
+      const { onLegendClick } = plotlyComponent.props();
+
+      const result = onLegendClick(event(genericPlot));
+      wrapper.update();
+
+      return result;
+    };
+
+    it('opening when clicking on legend item', () => {
+      let genericPlot = null;
+      const wrapper = mount(<GenericPlot ref={(elem) => { genericPlot = elem; }} chartData={[{ x: 23 }, { x: 42 }]} />);
+
+      expect(wrapper.find('color-picker')).not.toExist();
+
+      const result = openLegend(wrapper, genericPlot);
+      expect(result).toBeFalsy();
+
+      const colorPicker = wrapper.find('color-picker');
+      expect(colorPicker).toExist();
+      const { color } = colorPicker.props();
+      expect(color).toEqual('#414141');
+    });
+    it('calling onChange when new color is selected', () => {
+      const lens = {
+        colors: {},
+        setColor: jest.fn(() => Promise.resolve([])),
+      };
+      let genericPlot = null;
+      const wrapper = mount((
+        <ChartColorContext.Provider value={lens}>
+          <GenericPlot ref={(elem) => { genericPlot = elem; }} chartData={[{ x: 23 }, { x: 42 }]} />);
+        </ChartColorContext.Provider>
+      ));
+
+      expect(wrapper.find('color-picker')).not.toExist();
+
+      openLegend(wrapper, genericPlot);
+
+      const colorPicker = wrapper.find('color-picker');
+      const { onChange } = colorPicker.props();
+
+      onChange('#141414');
+
+      expect(lens.setColor).toHaveBeenCalledWith('x', '#141414');
+    });
   });
 });
