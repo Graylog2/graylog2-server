@@ -70,9 +70,22 @@ describe('CurrentViewStateStore', () => {
     const sMap = Immutable.Map(viewStateMap);
 
     const newWidget = MessagesWidget.builder().id('feed').build();
+    const newWidgetPositionDead = WidgetPosition.builder()
+      .col(1)
+      .row(6)
+      .height(5)
+      .width(6)
+      .build();
+    const newWidgetPositionFeed = WidgetPosition.builder()
+      .col(1)
+      .row(1)
+      .height(5)
+      .width(6)
+      .build();
     const expectedWidgets = [oldWidget, newWidget];
+    const expectedWidgetPosition = { dead: newWidgetPositionDead, feed: newWidgetPositionFeed };
     const expectedViewState = viewState.toBuilder()
-      .widgetPositions(widgetPositionsMap)
+      .widgetPositions(expectedWidgetPosition)
       .widgets(expectedWidgets)
       .build();
 

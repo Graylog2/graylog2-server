@@ -77,23 +77,23 @@ export const CurrentViewStateStore = Reflux.createStore({
   },
 
   widgets(newWidgets) {
-    const positionsMap = this._activeState().widgetPositions;
+    const positionsMap = Immutable.Map(this._activeState().widgetPositions);
     const widgetsWithoutPositions = newWidgets.filter((widget) => {
-      return !positionsMap[widget.id];
+      return !positionsMap.get(widget.id);
     });
 
-    widgetsWithoutPositions.forEach((widget) => {
+    const newPositionMap = widgetsWithoutPositions.reduce((nextPositionsMap, widget) => {
       const widgetDef = widgetDefinition(widget.type);
-      const positions = Object.keys(positionsMap).map(id => positionsMap[id]);
-      const lastPosition = maxBy(positions, (p) => { return p.row; });
-      const newWidgetRow = lastPosition ? lastPosition.row + lastPosition.height : 1;
-
-      positionsMap[widget.id] = new WidgetPosition(1, newWidgetRow, widgetDef.defaultHeight, widgetDef.defaultWidth);
-    });
+      const result = nextPositionsMap.reduce((newPosMap, position, id) => {
+        const pos = position.toBuilder().row(position.row + widgetDef.defaultHeight).build();
+        return newPosMap.set(id, pos);
+      }, Immutable.Map());
+      return result.set(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
+    }, positionsMap);
 
     const newActiveState = this._activeState().toBuilder()
       .widgets(newWidgets)
-      .widgetPositions(positionsMap)
+      .widgetPositions(newPositionMap.toObject())
       .build();
     const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
     CurrentViewStateActions.widgets.promise(promise);

@@ -1,7 +1,6 @@
 // @flow strict
 
 import { Map, Collection, fromJS, is } from 'immutable';
-import { fromPairs } from 'lodash';
 
 import Widget from 'enterprise/logic/widgets/Widget';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
@@ -139,7 +138,7 @@ export default class ViewState {
       .widgets(widgets.map(w => Widget.fromJSON(w)))
       .widgetMapping(fromJS(widget_mapping))
       .fields(selected_fields)
-      .widgetPositions(fromPairs(Object.entries(positions).map(([k, v]) => ([k, WidgetPosition.fromJSON(v)]))))
+      .widgetPositions(Map(positions).map(v => WidgetPosition.fromJSON(v)).toObject())
       .formatting(formatting ? FormattingSettings.fromJSON(formatting) : FormattingSettings.empty())
       .build();
   }
