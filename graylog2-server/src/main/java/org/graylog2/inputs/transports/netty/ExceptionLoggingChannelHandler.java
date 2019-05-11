@@ -18,16 +18,24 @@ package org.graylog2.inputs.transports.netty;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.ReadTimeoutException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 
 public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter {
     private final MessageInput input;
     private final Logger logger;
+    private final boolean doesTransportHaveKeepAliveEnabled;
 
     public ExceptionLoggingChannelHandler(MessageInput input, Logger logger) {
+        this(input, logger, false);
+    }
+
+    public ExceptionLoggingChannelHandler(MessageInput input, Logger logger,
+                                          boolean doesTransportHaveKeepAliveEnabled) {
         this.input = input;
         this.logger = logger;
+        this.doesTransportHaveKeepAliveEnabled = doesTransportHaveKeepAliveEnabled;
     }
 
     @Override
@@ -38,6 +46,13 @@ public class ExceptionLoggingChannelHandler extends ChannelInboundHandlerAdapter
                     input.getName(),
                     input.getId(),
                     ctx.channel());
+        } else if(this.doesTransportHaveKeepAliveEnabled && cause instanceof ReadTimeoutException) {
+            if(logger.isTraceEnabled()) {
+                logger.trace("KeepAlive Timeout in input [{}/{}] (channel {})",
+                        input.getName(),
+                        input.getId(),
+                        ctx.channel());
+            }
         } else {
             logger.error("Error in Input [{}/{}] (channel {}) (cause {})",
                     input.getName(),
