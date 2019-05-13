@@ -169,7 +169,7 @@ class Builder {
     return new Builder(this.value.set('fields', value));
   }
 
-  formatting(value) {
+  formatting(value: FormattingSettings) {
     return new Builder(this.value.set('formatting', value));
   }
 

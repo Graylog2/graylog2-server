@@ -103,7 +103,7 @@ export default class Parameter {
 class Builder {
   value: InternalBuilderState;
 
-  constructor(value = Immutable.Map()) {
+  constructor(value: Immutable.Map = Immutable.Map()) {
     this.value = value;
   }
 

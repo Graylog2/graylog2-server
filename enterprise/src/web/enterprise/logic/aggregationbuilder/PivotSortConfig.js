@@ -34,19 +34,19 @@ type BuilderState = Immutable.Map<string, any>;
 class Builder {
   value: BuilderState;
 
-  constructor(value = Immutable.Map()) {
+  constructor(value: Immutable.Map = Immutable.Map()) {
     this.value = value;
   }
 
-  type(value) {
+  type(value: string) {
     return new Builder(this.value.set('type', value));
   }
 
-  field(value) {
+  field(value: string) {
     return new Builder(this.value.set('field', value));
   }
 
-  direction(value) {
+  direction(value: Direction) {
     return new Builder(this.value.set('direction', value));
   }
 

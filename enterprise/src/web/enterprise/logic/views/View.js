@@ -173,7 +173,7 @@ export default class View {
 class Builder {
   value: Immutable.Map<string, any>;
 
-  constructor(value = Immutable.Map()) {
+  constructor(value: Immutable.Map = Immutable.Map()) {
     this.value = value;
   }
 
@@ -201,7 +201,7 @@ class Builder {
     return new Builder(this.value.set('search', value));
   }
 
-  properties(value): Builder {
+  properties(value: Properties): Builder {
     return new Builder(this.value.set('properties', value));
   }
 
@@ -213,7 +213,7 @@ class Builder {
     return new Builder(this.value.set('dashboardState', value));
   }
 
-  createdAt(value): Builder {
+  createdAt(value: Date): Builder {
     return new Builder(this.value.set('createdAt', value));
   }
 

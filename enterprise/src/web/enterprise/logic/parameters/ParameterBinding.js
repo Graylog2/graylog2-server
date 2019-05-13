@@ -68,11 +68,11 @@ class Builder {
     this.value = value;
   }
 
-  type(value): Builder {
+  type(value: string): Builder {
     return new Builder(this.value.set('type', value));
   }
 
-  value(value): Builder {
+  value(value: string): Builder {
     return new Builder(this.value.set('value', value));
   }
 

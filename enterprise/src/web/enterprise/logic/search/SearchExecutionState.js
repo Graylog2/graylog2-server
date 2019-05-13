@@ -57,7 +57,7 @@ type InternalBuilderState = Immutable.Map<string, any>;
 class Builder {
   value: InternalBuilderState;
 
-  constructor(value = Immutable.Map()) {
+  constructor(value: Immutable.Map = Immutable.Map()) {
     this.value = value;
   }
 
