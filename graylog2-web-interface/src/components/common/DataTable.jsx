@@ -77,9 +77,12 @@ class DataTable extends React.Component {
   };
 
   state = {
+    /* cannot destructure at this point */
+    /* eslint-disable react/destructuring-assignment */
     headers: this.props.headers,
     rows: this.props.rows,
     filteredRows: this.props.rows,
+    /* eslint-enable react/destructuring-assignment */
   };
 
   componentWillReceiveProps(newProps) {
@@ -92,8 +95,10 @@ class DataTable extends React.Component {
 
   getFormattedHeaders = () => {
     let i = 0;
-    const formattedHeaders = this.state.headers.map((header) => {
-      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={this.props.headerCellFormatter} />;
+    const { headers } = this.state;
+    const { headerCellFormatter } = this.props;
+    const formattedHeaders = headers.map((header) => {
+      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={headerCellFormatter} />;
       i += 1;
       return el;
     });
@@ -103,23 +108,23 @@ class DataTable extends React.Component {
 
   getFormattedDataRows = () => {
     let i = 0;
-    let sortedDataRows = this.state.filteredRows;
-    if (this.props.sortByKey) {
+    const { filteredRows } = this.state;
+    const { sortBy, sortByKey, dataRowFormatter } = this.props;
+    let sortedDataRows = filteredRows;
+    if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
+        return a[sortByKey].localeCompare(b[sortByKey]);
       });
-    } else if (this.props.sortBy) {
+    } else if (sortBy) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return this.props.sortBy(a).localeCompare(this.props.sortBy(b));
+        return sortBy(a).localeCompare(sortBy(b));
       });
     }
-    const formattedDataRows = sortedDataRows.map((row) => {
-      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={this.props.dataRowFormatter} />;
+    return sortedDataRows.map((row) => {
+      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={dataRowFormatter} />;
       i += 1;
       return el;
     });
-
-    return formattedDataRows;
   };
 
   filterDataRows = (filteredRows) => {
@@ -128,34 +133,49 @@ class DataTable extends React.Component {
 
   render() {
     let filter;
-    if (this.props.filterKeys.length !== 0) {
+    const {
+      wrapperClassName,
+      displayKey,
+      filterSuggestions,
+      filterBy,
+      className,
+      filterKeys,
+      filterLabel,
+      rowClassName,
+      useResponsiveTable,
+      id,
+      noDataText,
+      children,
+    } = this.props;
+    const { rows, filteredRows } = this.state;
+    if (filterKeys.length !== 0) {
       filter = (
         <div className="row">
           <div className="col-md-8">
-            <TypeAheadDataFilter id={`${this.props.id}-data-filter`}
-                                 label={this.props.filterLabel}
-                                 data={this.state.rows}
-                                 displayKey={this.props.displayKey}
-                                 filterBy={this.props.filterBy}
-                                 filterSuggestions={this.props.filterSuggestions}
-                                 searchInKeys={this.props.filterKeys}
+            <TypeAheadDataFilter id={`${id}-data-filter`}
+                                 label={filterLabel}
+                                 data={rows}
+                                 displayKey={displayKey}
+                                 filterBy={filterBy}
+                                 filterSuggestions={filterSuggestions}
+                                 searchInKeys={filterKeys}
                                  onDataFiltered={this.filterDataRows} />
           </div>
           <div className="col-md-4">
-            {this.props.children}
+            {children}
           </div>
         </div>
       );
     }
 
     let data;
-    if (this.state.rows.length === 0) {
-      data = <p>{this.props.noDataText}</p>;
-    } else if (this.state.filteredRows.length === 0) {
+    if (rows.length === 0) {
+      data = <p>{noDataText}</p>;
+    } else if (filteredRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <table className={`table ${this.props.className}`}>
+        <table className={`table ${className}`}>
           <thead>
             {this.getFormattedHeaders()}
           </thead>
@@ -167,11 +187,11 @@ class DataTable extends React.Component {
     }
 
     return (
-      <div className={this.props.wrapperClassName}>
+      <div className={wrapperClassName}>
         {filter}
-        <div className={`row ${this.props.rowClassName}`}>
+        <div className={`row ${rowClassName}`}>
           <div className="col-md-12">
-            <div id={this.props.id} className={`data-table ${this.props.useResponsiveTable ? 'table-responsive' : ''}`}>
+            <div id={id} className={`data-table ${useResponsiveTable ? 'table-responsive' : ''}`}>
               {data}
             </div>
           </div>

@@ -3,7 +3,7 @@ import React from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 
-import { Row, Col } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
 import ContentPackUtils from './ContentPackUtils';
@@ -45,26 +45,31 @@ class ContentPackInstall extends React.Component {
     }
 
     if (this._validateInput()) {
-      const contentPackId = this.props.contentPack.id;
-      const contentPackRev = this.props.contentPack.rev;
+      const { onInstall: onInstallProp, contentPack } = this.props;
+      const { comment } = this.state;
+      const contentPackId = contentPack.id;
+      const contentPackRev = contentPack.rev;
       const parameters = this._convertedParameters();
-      this.props.onInstall(contentPackId, contentPackRev,
-        { parameters: parameters, comment: this.state.comment });
+      onInstallProp(contentPackId, contentPackRev,
+        { parameters: parameters, comment: comment });
     }
   };
 
   _convertedParameters = () => {
-    return Object.keys(this.state.parameterInput).reduce((result, paramName) => {
+    const { parameterInput } = this.state;
+    const { contentPack } = this.props;
+    return Object.keys(parameterInput).reduce((result, paramName) => {
       const newResult = result;
-      const paramType = this.props.contentPack.parameters.find(parameter => parameter.name === paramName).type;
-      const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
+      const paramType = contentPack.parameters.find(parameter => parameter.name === paramName).type;
+      const value = ContentPackUtils.convertValue(paramType, parameterInput[paramName]);
       newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
       return newResult;
     }, {});
   };
 
   _getValue = (name, value) => {
-    const newParameterInput = this.state.parameterInput;
+    const { parameterInput } = this.state;
+    const newParameterInput = parameterInput;
     newParameterInput[name] = value;
     this.setState({ parameterInput: newParameterInput });
   };
@@ -75,7 +80,8 @@ class ContentPackInstall extends React.Component {
 
   _validateInput = () => {
     const { parameterInput } = this.state;
-    const errors = this.props.contentPack.parameters.reduce((result, parameter) => {
+    const { contentPack } = this.props;
+    const errors = contentPack.parameters.reduce((result, parameter) => {
       if (parameterInput[parameter.name] && parameterInput[parameter.name].length > 0) {
         return result;
       }
@@ -88,14 +94,15 @@ class ContentPackInstall extends React.Component {
   };
 
   renderParameter(parameter) {
-    const error = this.state.errorMessages[parameter.name];
+    const { parameterInput, errorMessages } = this.state;
+    const error = errorMessages[parameter.name];
     return (
       <Input name={parameter.name}
              id={parameter.name}
              key={parameter.name}
              type="text"
              maxLength={250}
-             value={this.state.parameterInput[parameter.name] || ''}
+             value={parameterInput[parameter.name] || ''}
              onChange={(e) => { this._getValue(parameter.name, e.target.value); }}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-7"
@@ -107,47 +114,51 @@ class ContentPackInstall extends React.Component {
   }
 
   render() {
-    const parameterInput = this.props.contentPack.parameters.map((parameter) => {
+    const { contentPack: contentPackData } = this.props;
+    const { comment } = this.state;
+    const parameterInput = contentPackData.parameters.map((parameter) => {
       return this.renderParameter(parameter);
     });
-    const contentPack = ContentPack.fromJSON(this.props.contentPack);
+    const contentPack = ContentPack.fromJSON(contentPackData);
 
     return (
       <div>
         <form onSubmit={this.onInstall}>
+          <Row>
+            <Col smOffset={1} sm={10}>
+              <h2>Install comment</h2>
+              <br />
+              <br />
+              <Input name="comment"
+                     id="comment"
+                     type="text"
+                     maxLength={512}
+                     value={comment}
+                     onChange={this._getComment}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-7"
+                     label="Comment" />
+
+            </Col>
+          </Row>
+          {parameterInput.length > 0
+          && (
+            <Row>
+              <Col smOffset={1} sm={10}>
+                <h2>Configure Parameter</h2>
+                <br />
+                <br />
+                {parameterInput}
+              </Col>
+            </Row>
+          )}
+        </form>
         <Row>
           <Col smOffset={1} sm={10}>
-            <h2>Install comment</h2>
-            <br />
-            <br />
-            <Input name="comment"
-                   id="comment"
-                   type="text"
-                   maxLength={512}
-                   value={this.state.comment}
-                   onChange={this._getComment}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-7"
-                   label="Comment"/>
-
+            <ContentPackEntitiesList contentPack={contentPack} readOnly />
           </Col>
         </Row>
-        {parameterInput.length > 0
-        && (<Row>
-          <Col smOffset={1} sm={10}>
-            <h2>Configure Parameter</h2>
-            <br />
-            <br />
-            {parameterInput}
-          </Col>
-        </Row>
-      )}</form>
-      <Row>
-        <Col smOffset={1} sm={10}>
-          <ContentPackEntitiesList contentPack={contentPack} readOnly />
-        </Col>
-      </Row>
-      <button style={{ display: 'none' }} type="submit" />
+        <button style={{ display: 'none' }} type="submit" />
       </div>
     );
   }

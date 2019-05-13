@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import Routes from 'routing/Routes';
 
 import Spinner from 'components/common/Spinner';
-import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -52,7 +52,8 @@ const ContentPacksPage = createReactClass({
   },
 
   render() {
-    if (!this.state.contentPacks) {
+    const { contentPackMetadata, contentPacks } = this.state;
+    if (!contentPacks) {
       return (<Spinner />);
     }
 
@@ -81,8 +82,8 @@ const ContentPacksPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <div id="react-configuration-bundles">
-                <ContentPacksList contentPacks={this.state.contentPacks}
-                                  contentPackMetadata={this.state.contentPackMetadata}
+                <ContentPacksList contentPacks={contentPacks}
+                                  contentPackMetadata={contentPackMetadata}
                                   onDeletePack={this._deleteContentPack}
                                   onInstall={this._installContentPack} />
               </div>

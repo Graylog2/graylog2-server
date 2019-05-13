@@ -4,7 +4,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import Routes from 'routing/Routes';
 import { Link } from 'react-router';
-import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, DropdownButton, MenuItem, Modal, Pagination, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
@@ -29,6 +29,8 @@ class ContentPacksList extends React.Component {
     onInstall: () => {},
     contentPackMetadata: {},
   };
+
+  MAX_PAGE_BUTTONS = 10;
 
   constructor(props) {
     super(props);
@@ -67,6 +69,7 @@ class ContentPacksList extends React.Component {
       modalRef.close();
     };
 
+    const { onInstall: onInstallProp } = this.props;
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
@@ -75,7 +78,7 @@ class ContentPacksList extends React.Component {
         <Modal.Body>
           <ContentPackInstall ref={(node) => { installRef = node; }}
                               contentPack={item}
-                              onInstall={this.props.onInstall} />
+                              onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
           <div className="pull-right">
@@ -92,8 +95,10 @@ class ContentPacksList extends React.Component {
   }
 
   _formatItems(items) {
-    const begin = (this.state.pageSize * (this.state.currentPage - 1));
-    const end = begin + this.state.pageSize;
+    const { currentPage, pageSize } = this.state;
+    const { contentPackMetadata, onDeletePack } = this.props;
+    const begin = (pageSize * (currentPage - 1));
+    const end = begin + pageSize;
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => {
@@ -105,7 +110,7 @@ class ContentPacksList extends React.Component {
                                     revision={item.rev} />
       );
 
-      const metadata = this.props.contentPackMetadata[item.id] || {};
+      const metadata = contentPackMetadata[item.id] || {};
       const installed = Object.keys(metadata).find(rev => metadata[rev].installation_count > 0);
       const states = installed ? ['installed'] : [];
       const updateButton = states.includes('updatable') ? <Button bsSize="small" bsStyle="primary">Update</Button> : '';
@@ -132,7 +137,7 @@ class ContentPacksList extends React.Component {
                 </LinkContainer>
                 <MenuItem onSelect={() => { downloadRef.open(); }}>Download</MenuItem>
                 <MenuItem divider />
-                <MenuItem onSelect={() => { this.props.onDeletePack(item.id); }}>Delete All Versions</MenuItem>
+                <MenuItem onSelect={() => { onDeletePack(item.id); }}>Delete All Versions</MenuItem>
               </DropdownButton>
               {downloadModal}
             </Col>
@@ -161,16 +166,17 @@ class ContentPacksList extends React.Component {
     this.setState({ currentPage: pageNo });
   }
 
-  MAX_PAGE_BUTTONS = 10;
 
   render() {
-    const numberPages = Math.ceil(this.state.filteredContentPacks.length / this.state.pageSize);
+    const { filteredContentPacks, currentPage, pageSize } = this.state;
+    const { contentPacks } = this.props;
+    const numberPages = Math.ceil(filteredContentPacks.length / pageSize);
     const pagination = (
       <Pagination bsSize="small"
                   bsStyle={`pagination ${ContentPacksListStyle.pager}`}
                   items={numberPages}
                   maxButtons={this.MAX_PAGE_BUTTONS}
-                  activePage={this.state.currentPage}
+                  activePage={currentPage}
                   onSelect={this._onChangePage}
                   prev
                   next
@@ -179,7 +185,7 @@ class ContentPacksList extends React.Component {
     );
     const pageSizeSelector = (
       <span>Show:&nbsp;
-        <select onChange={this._itemsShownChange} value={this.state.pageSize}>
+        <select onChange={this._itemsShownChange} value={pageSize}>
           <option>10</option>
           <option>25</option>
           <option>50</option>
@@ -188,15 +194,15 @@ class ContentPacksList extends React.Component {
       </span>
     );
 
-    const noContentMessage = this.props.contentPacks.length <= 0
+    const noContentMessage = contentPacks.length <= 0
       ? 'No content packs found. Please create or upload one'
       : 'No matching content packs found';
-    const content = this.state.filteredContentPacks.length <= 0
+    const content = filteredContentPacks.length <= 0
       ? (<div>{noContentMessage}</div>)
       : (
         <ControlledTableList>
           <ControlledTableList.Header />
-          {this._formatItems(this.state.filteredContentPacks)}
+          {this._formatItems(filteredContentPacks)}
         </ControlledTableList>
       );
 
@@ -206,7 +212,7 @@ class ContentPacksList extends React.Component {
           <Col md={5}>
             <TypeAheadDataFilter id="content-packs-filter"
                                  label="Filter"
-                                 data={this.props.contentPacks}
+                                 data={contentPacks}
                                  displayKey="name"
                                  onDataFiltered={this._filterContentPacks}
                                  searchInKeys={['name', 'summary']}

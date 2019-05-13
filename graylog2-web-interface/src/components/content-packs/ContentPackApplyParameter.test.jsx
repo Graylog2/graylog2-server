@@ -54,7 +54,7 @@ describe('<ContentPackApplyParameter />', () => {
                                                      appliedParameter={[]}
                                                      onParameterApply={applyFn} />);
 
-    wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
+    wrapper.find('select#configKey').simulate('change', { target: { name: 'configKey', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
     wrapper.find('form').simulate('submit');
     expect(applyFn.mock.calls.length).toBe(1);
@@ -71,7 +71,7 @@ describe('<ContentPackApplyParameter />', () => {
                                                      appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
                                                      onParameterApply={applyFn} />);
 
-    wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
+    wrapper.find('select#configKey').simulate('change', { target: { name: 'configKey', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
     wrapper.find('form').simulate('submit');
     expect(applyFn.mock.calls.length).toBe(0);

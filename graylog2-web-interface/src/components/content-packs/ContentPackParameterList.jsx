@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { findIndex } from 'lodash';
 
-import { Button, Modal, ButtonToolbar, Badge } from 'react-bootstrap';
+import { Badge, Button, ButtonToolbar, Modal } from 'react-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { DataTable, SearchForm } from 'components/common';
 
@@ -38,14 +38,16 @@ class ContentPackParameterList extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    this._filterParameters(this.state.filter, newProps.contentPack.parameters);
+    const { filter } = this.state;
+    this._filterParameters(filter, newProps.contentPack.parameters);
   }
 
   _parameterApplied = (paramName) => {
-    const entityIds = Object.keys(this.props.appliedParameter);
+    const { appliedParameter } = this.props;
+    const entityIds = Object.keys(appliedParameter);
     /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
     for (const i in entityIds) {
-      const params = this.props.appliedParameter[entityIds[i]];
+      const params = appliedParameter[entityIds[i]];
       if (findIndex(params, { paramName: paramName }) >= 0) {
         return true;
       }
@@ -54,6 +56,7 @@ class ContentPackParameterList extends React.Component {
   };
 
   _parameterRowFormatter = (parameter) => {
+    const { readOnly, onDeleteParameter } = this.props;
     const parameterApplied = this._parameterApplied(parameter.name);
     const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
     const icon = parameterApplied ? 'fa fa-check' : 'fa fa-times';
@@ -66,7 +69,7 @@ class ContentPackParameterList extends React.Component {
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
         <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
-        {!this.props.readOnly
+        {!readOnly
         && (
         <td>
           <ButtonToolbar>
@@ -74,7 +77,9 @@ class ContentPackParameterList extends React.Component {
                     bsSize="xs"
                     title={buttonTitle}
                     disabled={parameterApplied}
-                    onClick={() => { this.props.onDeleteParameter(parameter); }}>
+                    onClick={() => {
+                      onDeleteParameter(parameter);
+                    }}>
               Delete
             </Button>{this._parameterModal(parameter)}
           </ButtonToolbar>
@@ -85,7 +90,7 @@ class ContentPackParameterList extends React.Component {
     );
   };
 
-  _parameterModal(parameter) {
+  _parameterModal = (parameter) => {
     let modalRef;
     let editParameter;
 
@@ -105,6 +110,7 @@ class ContentPackParameterList extends React.Component {
     const name = parameter ? 'Edit' : 'Create parameter';
     const createClassName = parameter ? '' : ContentPackParameterListStyle.createButton;
 
+    const { contentPack, onAddParameter } = this.props;
     const modal = (
       <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
         <Modal.Header closeButton>
@@ -112,9 +118,9 @@ class ContentPackParameterList extends React.Component {
         </Modal.Header>
         <Modal.Body>
           <ContentPackEditParameter ref={(node) => { editParameter = node; }}
-                                    parameters={this.props.contentPack.parameters}
+                                    parameters={contentPack.parameters}
                                     onUpdateParameter={(newParameter) => {
-                                      this.props.onAddParameter(newParameter, parameter);
+                                      onAddParameter(newParameter, parameter);
                                       closeModal();
                                     }}
                                     parameterToEdit={parameter} />
@@ -142,10 +148,11 @@ class ContentPackParameterList extends React.Component {
         {modal}
       </React.Fragment>
     );
-  }
+  };
 
   _filterParameters = (filter, parametersArg) => {
-    const parameters = ObjectUtils.clone(parametersArg || this.props.contentPack.parameters);
+    const { contentPack } = this.props;
+    const parameters = ObjectUtils.clone(parametersArg || contentPack.parameters);
     if (!filter || filter.length <= 0) {
       this.setState({ filteredParameters: parameters, filter: undefined });
       return;
@@ -159,7 +166,9 @@ class ContentPackParameterList extends React.Component {
   };
 
   render() {
-    const headers = this.props.readOnly
+    const { readOnly } = this.props;
+    const { filteredParameters } = this.state;
+    const headers = readOnly
       ? ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used']
       : ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
     return (
@@ -167,20 +176,18 @@ class ContentPackParameterList extends React.Component {
         <h2>Parameters list</h2>
         <br />
         <span className={ContentPackParameterListStyle.searchField}>
-          <SearchForm
-            onSearch={this._filterParameters}
-            onReset={() => { this._filterParameters(''); }}
-            searchButtonLabel="Filter"
-          />
+          <SearchForm onSearch={this._filterParameters}
+                      onReset={() => { this._filterParameters(''); }}
+                      searchButtonLabel="Filter" />
         </span>
-        { !this.props.readOnly && this._parameterModal() }
+        { !readOnly && this._parameterModal() }
         <DataTable id="parameter-list"
                    headers={headers}
                    className={ContentPackParameterListStyle.scrollable}
                    sortByKey="title"
                    noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
                    filterKeys={[]}
-                   rows={this.state.filteredParameters}
+                   rows={filteredParameters}
                    dataRowFormatter={this._parameterRowFormatter} />
       </div>
     );

@@ -18,16 +18,16 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
         >
           <label
             className="control-label"
-            htmlFor="config_key"
+            htmlFor="configKey"
           >
             Config Key
           </label>
           <span>
             <select
               className="form-control"
-              id="config_key"
+              id="configKey"
               label="Config Key"
-              name="config_key"
+              name="configKey"
               onChange={[Function]}
               placeholder=""
               required={true}
@@ -204,16 +204,16 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
         >
           <label
             className="control-label"
-            htmlFor="config_key"
+            htmlFor="configKey"
           >
             Config Key
           </label>
           <span>
             <select
               className="form-control"
-              id="config_key"
+              id="configKey"
               label="Config Key"
-              name="config_key"
+              name="configKey"
               onChange={[Function]}
               placeholder=""
               required={true}
@@ -353,16 +353,16 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
         >
           <label
             className="control-label"
-            htmlFor="config_key"
+            htmlFor="configKey"
           >
             Config Key
           </label>
           <span>
             <select
               className="form-control"
-              id="config_key"
+              id="configKey"
               label="Config Key"
-              name="config_key"
+              name="configKey"
               onChange={[Function]}
               placeholder=""
               required={true}

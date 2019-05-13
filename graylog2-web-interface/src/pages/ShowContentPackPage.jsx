@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Spinner from 'components/common/Spinner';
 import { BootstrapModalConfirm } from 'components/bootstrap';
@@ -41,17 +41,18 @@ const ShowContentPackPage = createReactClass({
 
 
   componentDidMount() {
-    ContentPacksActions.get(this.props.params.contentPackId).catch((error) => {
+    const { params } = this.props;
+    ContentPacksActions.get(params.contentPackId).catch((error) => {
       if (error.status === 404) {
         UserNotification.error(
-          `Cannot find Content Pack with the id ${this.props.params.contentPackId} and may have been deleted.`,
+          `Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`,
         );
       } else {
         UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
       }
       history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
     });
-    ContentPacksActions.installList(this.props.params.contentPackId);
+    ContentPacksActions.installList(params.contentPackId);
   },
 
   _onVersionChanged(newVersion) {
@@ -100,8 +101,9 @@ const ShowContentPackPage = createReactClass({
   },
 
   _uninstallContentPackRev() {
-    const contentPackId = this.state.uninstallContentPackId;
-    ContentPacksActions.uninstall(this.state.uninstallContentPackId, this.state.uninstallInstallId).then(() => {
+    const { uninstallInstallId, uninstallContentPackId } = this.state;
+    const contentPackId = uninstallContentPackId;
+    ContentPacksActions.uninstall(uninstallContentPackId, uninstallInstallId).then(() => {
       UserNotification.success('Content Pack uninstalled successfully.', 'Success');
       ContentPacksActions.installList(contentPackId);
       this._clearUninstall();
@@ -121,7 +123,8 @@ const ShowContentPackPage = createReactClass({
   },
 
   render() {
-    if (!this.state.contentPackRevisions) {
+    const { uninstallEntities, installations, contentPackRevisions: contentPackRevisions1 } = this.state;
+    if (!contentPackRevisions1) {
       return (<Spinner />);
     }
 
@@ -162,7 +165,7 @@ const ShowContentPackPage = createReactClass({
                 <Row className={ShowContentPackStyle.leftRow}>
                   <Col>
                     <h2>Installations</h2>
-                    <ContentPackInstallations installations={this.state.installations}
+                    <ContentPackInstallations installations={installations}
                                               onUninstall={this._onUninstallContentPackRev} />
                   </Col>
                 </Row>
@@ -180,7 +183,7 @@ const ShowContentPackPage = createReactClass({
                                title="Do you really want to uninstall this Content Pack?"
                                onConfirm={this._uninstallContentPackRev}
                                onCancel={this._clearUninstall}>
-          <ContentPackInstallEntityList uninstall entities={this.state.uninstallEntities} />
+          <ContentPackInstallEntityList uninstall entities={uninstallEntities} />
         </BootstrapModalConfirm>
       </DocumentTitle>
     );

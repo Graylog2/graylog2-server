@@ -11,13 +11,12 @@ import ContentPackParameterList from 'components/content-packs/ContentPackParame
 import 'components/content-packs/ContentPackDetails.css';
 
 const ContentPackDetails = (props) => {
-  const markdownDescription = markdown.toHTML(props.contentPack.description || '');
-  const { contentPack } = props;
-  const { constraints } = props;
+  const { contentPack, constraints, showConstraints, offset, verbose } = props;
+  const markdownDescription = markdown.toHTML(contentPack.description || '');
 
   return (
     <Row>
-      <Col smOffset={props.offset} sm={9}>
+      <Col smOffset={offset} sm={9}>
         <div id="content-pack-details">
           <h2>Details</h2>
           <br />
@@ -30,8 +29,8 @@ const ContentPackDetails = (props) => {
               <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
               <dt>URL:</dt> <dd>{contentPack.url}&nbsp;</dd>
               { contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>) }
-              { contentPack.parameters && !props.verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
-              { contentPack.entities && !props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
+              { contentPack.parameters && !verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>) }
+              { contentPack.entities && !verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
             </dl>
           </div>
           { contentPack.description
@@ -49,7 +48,7 @@ const ContentPackDetails = (props) => {
           { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
           <br />
           <br />
-          { contentPack.constraints && props.showConstraints
+          { contentPack.constraints && showConstraints
           && (
           <div>
             <ContentPackConstraints constraints={constraints} />
@@ -57,11 +56,11 @@ const ContentPackDetails = (props) => {
           </div>
           )
           }
-          { contentPack.entities && contentPack.entities.length > 0 && props.verbose
-          && <ContentPackEntitiesList contentPack={props.contentPack} readOnly />
+          { contentPack.entities && contentPack.entities.length > 0 && verbose
+          && <ContentPackEntitiesList contentPack={contentPack} readOnly />
           }
-          { contentPack.parameters && contentPack.parameters.length > 0 && props.verbose
-          && <ContentPackParameterList contentPack={props.contentPack} readOnly />
+          { contentPack.parameters && contentPack.parameters.length > 0 && verbose
+          && <ContentPackParameterList contentPack={contentPack} readOnly />
           }
         </div>
       </Col>

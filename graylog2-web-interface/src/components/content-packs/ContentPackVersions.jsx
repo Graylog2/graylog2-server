@@ -3,7 +3,7 @@ import React from 'react';
 
 import Routes from 'routing/Routes';
 import { DataTable } from 'components/common';
-import { Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'react-bootstrap';
+import { Button, ButtonToolbar, DropdownButton, MenuItem, Modal } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
@@ -37,15 +37,17 @@ class ContentPackVersions extends React.Component {
   }
 
   onChange(event) {
+    const { onChange: onChangeProp } = this.props;
     this.setState({
       selectedVersion: event.target.value,
     });
-    this.props.onChange(event.target.value);
+    onChangeProp(event.target.value);
   }
 
-  _installModal(item) {
+  _installModal = (item) => {
     let modalRef;
     let installRef;
+    const { onInstall: onInstallProp } = this.props;
 
     const closeModal = () => {
       modalRef.close();
@@ -68,7 +70,7 @@ class ContentPackVersions extends React.Component {
         <Modal.Body>
           <ContentPackInstall ref={(node) => { installRef = node; }}
                               contentPack={item}
-                              onInstall={this.props.onInstall} />
+                              onInstall={onInstallProp} />
         </Modal.Body>
         <Modal.Footer>
           <div className="pull-right">
@@ -82,10 +84,12 @@ class ContentPackVersions extends React.Component {
     );
 
     return { openFunc: open, installModal: modal };
-  }
+  };
 
-  rowFormatter(pack) {
+  rowFormatter = (pack) => {
     const { openFunc, installModal } = this._installModal(pack);
+    const { selectedVersion } = this.state;
+    const { onDeletePack } = this.props;
     let downloadRef;
     const downloadModal = (
       <ContentPackDownloadControl ref={(node) => { downloadRef = node; }}
@@ -98,7 +102,7 @@ class ContentPackVersions extends React.Component {
           <input type="radio"
                  value={pack.rev}
                  onChange={this.onChange}
-                 checked={parseInt(this.state.selectedVersion, 10) === pack.rev} />
+                 checked={parseInt(selectedVersion, 10) === pack.rev} />
         </td>
         <td>{pack.rev}</td>
         <td className="text-right">
@@ -110,7 +114,7 @@ class ContentPackVersions extends React.Component {
                 <MenuItem>Create New From Revision</MenuItem>
               </LinkContainer>
               <MenuItem divider />
-              <MenuItem onClick={() => { this.props.onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
+              <MenuItem onClick={() => { onDeletePack(pack.id, pack.rev); }}>Delete</MenuItem>
               {installModal}
             </DropdownButton>
           </ButtonToolbar>
@@ -118,7 +122,7 @@ class ContentPackVersions extends React.Component {
         {downloadModal}
       </tr>
     );
-  }
+  };
 
   headerFormatter = (header) => {
     if (header === 'Action') {
@@ -128,7 +132,8 @@ class ContentPackVersions extends React.Component {
   };
 
   render() {
-    const { contentPacks } = this.props.contentPackRevisions;
+    const { contentPackRevisions } = this.props;
+    const { contentPacks } = contentPackRevisions;
     const headers = ['Select', 'Revision', 'Action'];
     return (
       <DataTable id="content-packs-versions"
