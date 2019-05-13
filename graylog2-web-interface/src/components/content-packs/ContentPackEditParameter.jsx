@@ -128,7 +128,7 @@ class ContentPackEditParameter extends React.Component {
           break;
         }
         case 'double': {
-          if (Number.isNaN(value)) {
+          if (Number.isNaN(Number(value))) {
             this.setState({ defaultValueError: 'This is not a double value.' });
             return false;
           }
@@ -215,6 +215,7 @@ class ContentPackEditParameter extends React.Component {
                    label="Default value"
                    help={defaultValueError || 'Give a default value if the parameter is not optional.'} />
           </fieldset>
+          <button style={{ display: 'none' }} type="submit" />
         </form>
       </div>
     );
