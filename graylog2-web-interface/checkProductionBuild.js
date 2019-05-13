@@ -106,7 +106,7 @@ async function loadPage(url, handleError, handleConsole) {
   }
 }
 
-const buildDir = process.argv[2] || 'build';
+const buildDir = process.argv[2] || 'target/web/build';
 const plugins = process.argv.slice(3);
 
 const config = url => `
