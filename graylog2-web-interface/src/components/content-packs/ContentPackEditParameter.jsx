@@ -49,18 +49,21 @@ class ContentPackEditParameter extends React.Component {
       return;
     }
 
-    const realDefaultValue = ContentPackUtils.convertValue(this.state.newParameter.type,
-      this.state.newParameter.default_value);
-    const updatedParameter = ObjectUtils.clone(this.state.newParameter);
+    const { newParameter } = this.state;
+    const { onUpdateParameter } = this.props;
+    const realDefaultValue = ContentPackUtils.convertValue(newParameter.type,
+      newParameter.default_value);
+    const updatedParameter = ObjectUtils.clone(newParameter);
     updatedParameter.default_value = realDefaultValue;
-    this.props.onUpdateParameter(updatedParameter);
+    onUpdateParameter(updatedParameter);
 
     this.titleInput.getInputDOMNode().focus();
     this.setState({ newParameter: ObjectUtils.clone(ContentPackEditParameter.emptyParameter) });
   };
 
   _updateField = (name, value) => {
-    const updatedParameter = ObjectUtils.clone(this.state.newParameter);
+    const { newParameter } = this.state;
+    const updatedParameter = ObjectUtils.clone(newParameter);
     updatedParameter[name] = value;
     this.setState({ newParameter: updatedParameter });
   };
@@ -69,8 +72,9 @@ class ContentPackEditParameter extends React.Component {
     this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
   };
 
-  _validateParameter() {
-    const param = this.state.newParameter;
+  _validateParameter = () => {
+    const { newParameter } = this.state;
+    const param = newParameter;
     if (!param.name) {
       this.setState({ nameError: 'Name must be set.' });
       return false;
@@ -90,17 +94,19 @@ class ContentPackEditParameter extends React.Component {
     this.setState({ descrError: undefined });
 
     return this._validateDefaultValue() && this._validateName();
-  }
+  };
 
   _validateName = () => {
-    const value = this.state.newParameter.name;
+    const { newParameter } = this.state;
+    const { parameterToEdit = {}, parameters } = this.props;
+    const value = newParameter.name;
     if (value.match(/\W/)) {
       this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
       return false;
     }
 
-    if ((this.props.parameterToEdit || {}).name !== value &&
-      this.props.parameters.findIndex((parameter) => { return parameter.name === value; }) >= 0) {
+    if (parameterToEdit.name !== value
+      && parameters.findIndex((parameter) => { return parameter.name === value; }) >= 0) {
       this.setState({ nameError: 'The parameter name must be unique.' });
       return false;
     }
@@ -110,9 +116,10 @@ class ContentPackEditParameter extends React.Component {
   };
 
   _validateDefaultValue = () => {
-    const value = this.state.newParameter.default_value;
+    const { newParameter } = this.state;
+    const value = newParameter.default_value;
     if (value) {
-      switch (this.state.newParameter.type) {
+      switch (newParameter.type) {
         case 'integer': {
           if (`${parseInt(value, 10)}` !== value) {
             this.setState({ defaultValueError: 'This is not an integer value.' });
@@ -121,7 +128,7 @@ class ContentPackEditParameter extends React.Component {
           break;
         }
         case 'double': {
-          if (isNaN(value)) {
+          if (Number.isNaN(value)) {
             this.setState({ defaultValueError: 'This is not a double value.' });
             return false;
           }
@@ -143,8 +150,10 @@ class ContentPackEditParameter extends React.Component {
   };
 
   render() {
-    const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
-    const disableType = !!this.props.parameterToEdit;
+    const { parameterToEdit } = this.props;
+    const header = parameterToEdit ? 'Edit parameter' : 'Create parameter';
+    const disableType = !!parameterToEdit;
+    const { defaultValueError, nameError, descrError, newParameter, titleError } = this.state;
     return (
       <div>
         <h2>{header}</h2>
@@ -156,40 +165,37 @@ class ContentPackEditParameter extends React.Component {
                    id="title"
                    type="text"
                    maxLength={250}
-                   value={this.state.newParameter.title}
+                   value={newParameter.title}
                    onChange={this._bindValue}
-                   bsStyle={this.state.titleError ? 'error' : null}
+                   bsStyle={titleError ? 'error' : null}
                    label="Title"
-                   help={this.state.titleError ? this.state.titleError :
-                     'Give a descriptive title for this content pack.'}
+                   help={titleError || 'Give a descriptive title for this content pack.'}
                    required />
             <Input name="name"
                    id="name"
                    type="text"
                    maxLength={250}
-                   bsStyle={this.state.nameError ? 'error' : null}
-                   value={this.state.newParameter.name}
+                   bsStyle={nameError ? 'error' : null}
+                   value={newParameter.name}
                    onChange={this._bindValue}
                    label="Name"
-                   help={this.state.nameError ? this.state.nameError :
-                     'This is used as the parameter reference and must not contain a space.'}
+                   help={nameError || 'This is used as the parameter reference and must not contain a space.'}
                    required />
             <Input name="description"
                    id="description"
                    type="text"
-                   bsStyle={this.state.descrError ? 'error' : null}
+                   bsStyle={descrError ? 'error' : null}
                    maxLength={250}
-                   value={this.state.newParameter.description}
+                   value={newParameter.description}
                    onChange={this._bindValue}
                    label="Description"
-                   help={this.state.descrError ? this.state.descrError :
-                     'Give a description explaining what will be done with this parameter.'}
+                   help={descrError || 'Give a description explaining what will be done with this parameter.'}
                    required />
             <Input name="type"
                    id="type"
                    type="select"
                    disabled={disableType}
-                   value={this.state.newParameter.type}
+                   value={newParameter.type}
                    onChange={this._bindValue}
                    label="Value Type"
                    help="Give the type of the parameter."
@@ -203,14 +209,15 @@ class ContentPackEditParameter extends React.Component {
                    id="default_value"
                    type="text"
                    maxLength={250}
-                   bsStyle={this.state.defaultValueError ? 'error' : null}
-                   value={this.state.newParameter.default_value}
+                   bsStyle={defaultValueError ? 'error' : null}
+                   value={newParameter.default_value}
                    onChange={this._bindValue}
                    label="Default value"
-                   help={this.state.defaultValueError ? this.state.defaultValueError :
-                     'Give a default value if the parameter is not optional.'} />
+                   help={defaultValueError || 'Give a default value if the parameter is not optional.'} />
           </fieldset>
-        </form></div>);
+        </form>
+      </div>
+    );
   }
 }
 
