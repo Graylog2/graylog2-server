@@ -11,4 +11,3 @@ node
 manifests/*-manifest.json
 plugin
 cache
-
