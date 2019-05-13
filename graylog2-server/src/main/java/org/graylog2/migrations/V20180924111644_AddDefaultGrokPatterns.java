@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
@@ -71,9 +72,19 @@ public class V20180924111644_AddDefaultGrokPatterns extends Migration {
                     .getResource("V20180924111644_AddDefaultGrokPatterns_Default_Grok_Patterns.json");
             final ContentPack contentPack = this.objectMapper.readValue(contentPackURL, ContentPack.class);
             final ContentPack pack = this.contentPackPersistenceService.insert(contentPack)
-                    .orElseThrow(() -> new Error("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!"));
+                    .orElseThrow(() -> {
+                        configService.write(MigrationCompleted.create(contentPack.id().toString()));
+                        return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
+                    });
 
-            contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", "admin");
+            try {
+                contentPackService.installContentPack(pack, Collections.emptyMap(), "Add default Grok patterns", "admin");
+            } catch(ContentPackException e) {
+                LOG.warn("Could not install default grok patterns: the installation found some modified default grok" +
+                        "patterns in your setup and did not update them. If you wish to use the default grok" +
+                        "patterns we provide, please delete the modified grok pattern and install the 'Default grok" +
+                        "patterns' content pack manually.");
+            }
 
             configService.write(MigrationCompleted.create(pack.id().toString()));
         } catch (IOException e) {
