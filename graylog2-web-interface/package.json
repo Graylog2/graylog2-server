@@ -16,7 +16,7 @@
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "lint": "eslint --ext js,jsx src",
     "test": "jest",
-    "check-production-build": "node checkProductionBuild.js build"
+    "check-production-build": "node checkProductionBuild.js"
   },
   "jest": {
     "collectCoverageFrom": [
