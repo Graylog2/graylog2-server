@@ -10,6 +10,7 @@ export { default as ControlledTableList } from './ControlledTableList';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';
 export { default as DocumentTitle } from './DocumentTitle';
+export { default as EmptyEntity } from './EmptyEntity';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
 export { default as ExpandableList } from './ExpandableList';
