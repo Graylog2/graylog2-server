@@ -280,7 +280,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("metadata")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
     public SearchMetadata metadataForObject(@ApiParam Search search) {
-        final Map<String, QueryMetadata> map = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
-        return SearchMetadata.create(map, Maps.uniqueIndex(search.parameters(), Parameter::name));
+        final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
+        return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
     }
 }
