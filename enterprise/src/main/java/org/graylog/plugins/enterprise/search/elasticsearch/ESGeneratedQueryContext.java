@@ -3,7 +3,6 @@ package org.graylog.plugins.enterprise.search.elasticsearch;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import io.searchbox.core.search.aggregation.Aggregation;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -15,15 +14,11 @@ import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.errors.SearchError;
-import org.graylog.plugins.enterprise.search.searchtypes.aggregation.AggregationSpec;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.enterprise.search.util.UniqueNamer;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.Collection;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,8 +27,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     private final ElasticsearchBackend elasticsearchBackend;
     private final Map<String, SearchSourceBuilder> searchTypeQueries = Maps.newHashMap();
-    // do _NOT_ turn this into a regular hashmap!
-    private IdentityHashMap<AggregationSpec, Tuple2<String, Class<? extends Aggregation>>> aggResultTypes = Maps.newIdentityHashMap();
     private Map<Object, Object> contextMap = Maps.newHashMap();
     private final UniqueNamer uniqueNamer = new UniqueNamer("agg-");
     private Set<SearchError> errors = Sets.newHashSet();
@@ -68,15 +61,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         return MoreObjects.toStringHelper(this)
                 .add("elasticsearch query", ssb)
                 .toString();
-    }
-
-    public void recordAggregationType(AggregationSpec aggregationSpec, String name, Class<? extends Aggregation> aggregationClass) {
-        final Tuple2<String, Class<? extends Aggregation>> tuple = Tuple.tuple(name, aggregationClass);
-        aggResultTypes.put(aggregationSpec, tuple);
-    }
-
-    public Tuple2<String, Class<? extends Aggregation>> typeForAggregationSpec(AggregationSpec aggregationSpec) {
-        return aggResultTypes.get(aggregationSpec);
     }
 
     public Map<Object, Object> contextMap() {
