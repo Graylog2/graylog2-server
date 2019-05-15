@@ -71,9 +71,10 @@ export default class AggregationControls extends React.Component<Props, State> {
 
   // eslint-disable-next-line no-undef
   _onSortDirectionChange = (direction: $PropertyType<$PropertyType<Props, 'config'>, 'direction'>) => {
-    this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(state.config.sort
-      // $FlowFixMe: SortConfig subclasses need to be removed and builder merged into base class
-      .map(sort => sort.toBuilder().direction(direction).build())).build() }));
+    this._setAndPropagate(state => ({
+      config: state.config.toBuilder().sort(state.config.sort
+        .map(sort => sort.toBuilder().direction(direction).build())).build(),
+    }));
   };
 
   // eslint-disable-next-line no-undef
@@ -155,10 +156,9 @@ export default class AggregationControls extends React.Component<Props, State> {
             </DescriptionBox>
             {visualization === 'bar' && (
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
-                <BarVisualizationConfiguration
-                  // $FlowFixMe: If guard above is true, it is a `BarVisualizationConfig`
-                  config={visualizationConfig}
-                  onChange={this._onVisualizationConfigChange} />
+                <BarVisualizationConfiguration onChange={this._onVisualizationConfigChange}
+                                               // $FlowFixMe: If guard above is true, it is a `BarVisualizationConfig`
+                                               config={visualizationConfig} />
               </DescriptionBox>
             )}
           </Col>

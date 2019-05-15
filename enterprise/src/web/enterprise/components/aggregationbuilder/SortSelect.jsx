@@ -7,8 +7,6 @@ import * as Immutable from 'immutable';
 import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import { defaultCompare } from 'enterprise/logic/DefaultCompare';
-import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
-import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
 import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
 import { PivotList, SeriesList, SortList } from './AggregationBuilderPropTypes';
 
@@ -37,8 +35,8 @@ const currentValue = (sort, fields) => {
 };
 
 const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
-  const pivotOptions = pivots.map(pivot => ({ label: pivot.field, value: PivotSortConfig.fromPivot(pivot) }));
-  const seriesOptions = series.map(s => ({ label: s.effectiveName, value: SeriesSortConfig.fromSeries(s) }));
+  const pivotOptions = pivots.map(pivot => ({ label: pivot.field, value: SortConfig.fromPivot(pivot) }));
+  const seriesOptions = series.map(s => ({ label: s.effectiveName, value: SortConfig.fromSeries(s) }));
   const fields = [].concat(pivotOptions, seriesOptions);
   const options = mapFields(fields);
   const _onChange = (newValue, reason) => {

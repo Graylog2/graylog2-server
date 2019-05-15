@@ -1,4 +1,8 @@
 // @flow strict
+import * as Immutable from 'immutable';
+
+import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
+import Series from 'enterprise/logic/aggregationbuilder/Series';
 import type { DirectionJson } from './Direction';
 import Direction from './Direction';
 
@@ -15,6 +19,9 @@ type InternalState = {
 };
 
 export default class SortConfig {
+  static PIVOT_TYPE = 'pivot';
+  static SERIES_TYPE = 'series';
+
   _value: InternalState;
 
   constructor(type: string, field: string, direction: Direction) {
@@ -45,19 +52,70 @@ export default class SortConfig {
   }
 
   static fromJSON(value: SortConfigJson) {
-    const { type } = value;
-    const implementingClass = SortConfig.__registrations[type.toLocaleLowerCase()];
+    const { type, field, direction } = value;
 
-    if (implementingClass) {
-      return implementingClass.fromJSON(value);
-    }
-
-    throw new Error(`Invalid sort config type specified: ${type}`);
+    // eslint-disable-next-line no-use-before-define
+    return new Builder()
+      .type(type)
+      .field(field)
+      .direction(Direction.fromJSON(direction))
+      .build();
   }
 
   static __registrations: { [string]: typeof SortConfig } = {};
 
   static registerSubtype(type: string, implementingClass: typeof SortConfig) {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
+  }
+
+  static fromPivot(pivot: Pivot) {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder()
+      .type(this.PIVOT_TYPE)
+      .field(pivot.field)
+      .direction(Direction.Ascending)
+      .build();
+  }
+
+  static fromSeries(series: Series) {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder()
+      .type(this.SERIES_TYPE)
+      .field(series.function)
+      .direction(Direction.Descending)
+      .build();
+  }
+
+  // eslint-disable-next-line no-use-before-define
+  toBuilder(): Builder {
+    const { type, field, direction } = this._value;
+    // eslint-disable-next-line no-use-before-define
+    return new Builder(Immutable.Map({ type, field, direction }));
+  }
+}
+
+type BuilderState = Immutable.Map<string, any>;
+class Builder {
+  value: BuilderState;
+
+  constructor(value: Immutable.Map = Immutable.Map()) {
+    this.value = value;
+  }
+
+  type(value: string) {
+    return new Builder(this.value.set('type', value));
+  }
+
+  field(value: string) {
+    return new Builder(this.value.set('field', value));
+  }
+
+  direction(value: Direction) {
+    return new Builder(this.value.set('direction', value));
+  }
+
+  build() {
+    const { type, field, direction } = this.value.toObject();
+    return new SortConfig(type, field, direction);
   }
 }

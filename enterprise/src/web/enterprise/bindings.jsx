@@ -54,10 +54,6 @@ import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstanc
 import SpecificRoles from 'enterprise/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'enterprise/logic/views/sharing/SpecificUsers';
 
-import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
-import PivotSortConfig from 'enterprise/logic/aggregationbuilder/PivotSortConfig';
-import SeriesSortConfig from 'enterprise/logic/aggregationbuilder/SeriesSortConfig';
-
 import UseInNewQueryHandler from 'enterprise/logic/valueactions/UseInNewQueryHandler';
 import ShowDocumentsHandler from 'enterprise/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'enterprise/logic/valueactions/HighlightValueHandler';
@@ -78,9 +74,6 @@ VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfi
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
 ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
-
-SortConfig.registerSubtype(PivotSortConfig.type, PivotSortConfig);
-SortConfig.registerSubtype(SeriesSortConfig.type, SeriesSortConfig);
 
 export default {
   pages: {

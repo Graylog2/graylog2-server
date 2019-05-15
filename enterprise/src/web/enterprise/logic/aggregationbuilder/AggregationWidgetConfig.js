@@ -132,7 +132,6 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     const { is } = Immutable;
     if (other instanceof AggregationWidgetConfig) {
       return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup']
-        // $FlowFixMe: No typings for indexed access.
         .every(key => is(Immutable.fromJS(this[key]), Immutable.fromJS(other[key])));
     }
     return false;
