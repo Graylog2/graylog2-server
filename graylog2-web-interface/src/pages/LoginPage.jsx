@@ -10,7 +10,9 @@ import LoadingPage from './LoadingPage';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const SessionStore = StoreProvider.getStore('Session');
