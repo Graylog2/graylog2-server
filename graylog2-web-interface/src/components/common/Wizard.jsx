@@ -55,36 +55,45 @@ class Wizard extends React.Component {
   }
 
   _wizardChanged = (eventKey) => {
-    this.props.onStepChange(eventKey);
+    const { onStepChange } = this.props;
+    onStepChange(eventKey);
     this.setState({ selectedStep: eventKey });
   };
 
   _disableButton = (direction) => {
-    const len = this.props.steps.length;
+    const { steps } = this.props;
+    const { selectedStep } = this.state;
+    const len = steps.length;
     const disabledPosition = direction === 'next' ? (len - 1) : 0;
-    const currentPosition = this.props.steps.findIndex(step => step.key === this.state.selectedStep);
+    const currentPosition = steps.findIndex(step => step.key === selectedStep);
     const otherPosition = direction === 'next' ? (currentPosition + 1) : (currentPosition - 1);
-    const otherStep = (this.props.steps[otherPosition] || {});
-    return this.props.steps[disabledPosition].key === this.state.selectedStep || otherStep.disabled;
+    const otherStep = (steps[otherPosition] || {});
+    return steps[disabledPosition].key === selectedStep || otherStep.disabled;
   };
 
   _onNext = () => {
-    this._wizardChanged(this.props.steps[this._getSelectedIndex() + 1].key);
+    const { steps } = this.props;
+    this._wizardChanged(steps[this._getSelectedIndex() + 1].key);
   };
 
   _onPrevious = () => {
-    this._wizardChanged(this.props.steps[this._getSelectedIndex() - 1].key);
+    const { steps } = this.props;
+    this._wizardChanged(steps[this._getSelectedIndex() - 1].key);
   };
 
   _getSelectedIndex = () => {
-    return this.props.steps.map(step => step.key).indexOf(this.state.selectedStep);
+    const { steps } = this.props;
+    const { selectedStep } = this.state;
+    return steps.map(step => step.key).indexOf(selectedStep);
   };
 
   _renderVerticalStepNav = () => {
+    const { steps } = this.props;
+    const { selectedStep } = this.state;
     return (
       <Col md={2} className={WizardStyle.subnavigation}>
-        <Nav stacked bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
-          {this.props.steps.map((navItem) => {
+        <Nav stacked bsStyle="pills" activeKey={selectedStep} onSelect={this._wizardChanged}>
+          {steps.map((navItem) => {
             return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
         </Nav>
@@ -102,6 +111,8 @@ class Wizard extends React.Component {
   };
 
   _renderHorizontalStepNav = () => {
+    const { selectedStep } = this.state;
+    const { steps } = this.props;
     return (
       <Col sm={12} className={WizardStyle.horizontal}>
         <div className="pull-right">
@@ -114,8 +125,8 @@ class Wizard extends React.Component {
             </Button>
           </ButtonToolbar>
         </div>
-        <Nav bsStyle="pills" activeKey={this.state.selectedStep} onSelect={this._wizardChanged}>
-          {this.props.steps.map((navItem) => {
+        <Nav bsStyle="pills" activeKey={selectedStep} onSelect={this._wizardChanged}>
+          {steps.map((navItem) => {
             return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
         </Nav>
@@ -124,20 +135,19 @@ class Wizard extends React.Component {
   };
 
   render() {
-    const rightComponentCols = this.props.horizontal ? 5 : 3; // If horizontal, use more space for this component
+    const { steps, horizontal, containerClassName, children } = this.props;
+    const rightComponentCols = horizontal ? 5 : 3; // If horizontal, use more space for this component
     return (
-      <Row className={this.props.containerClassName}>
-        {this.props.horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}
+      <Row className={containerClassName}>
+        {horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}
         <Col md={7}>
-          {this.props.steps[this._getSelectedIndex()].component}
+          {steps[this._getSelectedIndex()].component}
         </Col>
-        {this.props.children
-          && (
+        {children && (
           <Col md={rightComponentCols}>
-            {this.props.children}
+            {children}
           </Col>
-          )
-        }
+        )}
       </Row>
     );
   }
