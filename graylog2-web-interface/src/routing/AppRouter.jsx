@@ -19,6 +19,7 @@ import {
   AlertsPage,
   ShowAlertPage,
   AlertConditionsPage,
+  AlertDefinitionsPage,
   AlertNotificationsPage,
   NewAlertConditionPage,
   NewAlertNotificationPage,
@@ -113,6 +114,7 @@ const AppRouter = () => {
             <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
             <Route path={Routes.ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
             <Route path={Routes.ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={AlertDefinitionsPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage} />

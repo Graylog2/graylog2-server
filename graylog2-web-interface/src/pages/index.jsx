@@ -1,6 +1,7 @@
 import loadAsync from 'routing/loadAsync';
 
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
+const AlertDefinitionsPage = loadAsync(() => import('./AlertDefinitionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
@@ -74,6 +75,7 @@ const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverv
 
 export {
   AlertConditionsPage,
+  AlertDefinitionsPage,
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,

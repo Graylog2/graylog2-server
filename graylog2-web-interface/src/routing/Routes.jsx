@@ -53,6 +53,13 @@ const Routes = {
     NOTIFICATIONS: '/alerts/notifications',
     NEW_NOTIFICATION: '/alerts/notifications/new',
   },
+  NEXT_ALERTS: {
+    DEFINITIONS: {
+      LIST: '/next/alerts/definitions',
+      CREATE: '/next/alerts/definitions/new',
+      edit: definitionId => `/next/alerts/definitions/${definitionId}`,
+    },
+  },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
