@@ -61,7 +61,7 @@ class MaxmindAdapterFieldSet extends React.Component {
           <Select placeholder="Select the type of database file"
                   clearable={false}
                   options={databaseTypes}
-                  matchProp="value"
+                  matchProp="label"
                   onChange={this._onDbTypeSelect}
                   value={config.database_type} />
         </Input>

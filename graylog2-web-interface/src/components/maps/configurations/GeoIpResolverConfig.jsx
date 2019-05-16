@@ -129,7 +129,7 @@ const GeoIpResolverConfig = createReactClass({
               <Select placeholder="Select MaxMind database type"
                       required
                       options={this._availableDatabaseTypes()}
-                      matchProp="value"
+                      matchProp="label"
                       value={this.state.config.db_type}
                       onChange={this._onDbTypeSelect} />
             </Input>

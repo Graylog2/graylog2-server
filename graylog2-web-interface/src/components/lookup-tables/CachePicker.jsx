@@ -42,7 +42,7 @@ class CachePicker extends React.Component {
           <Select placeholder="Select a cache"
                   clearable={false}
                   options={sortedCaches}
-                  matchProp="value"
+                  matchProp="label"
                   onChange={this.props.onSelect}
                   value={this.props.selectedId} />
         </Input>
