@@ -125,10 +125,10 @@ class AlertDefinitionsPage extends React.Component {
 
             <ButtonToolbar>
               <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
-                <Button bsStyle="success">Create Event Definition</Button>
+                <Button bsStyle="success">Create Alert Definition</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info" className="active">Event Definition</Button>
+                <Button bsStyle="info" className="active">Alert Definitions</Button>
               </LinkContainer>
             </ButtonToolbar>
           </PageHeader>
