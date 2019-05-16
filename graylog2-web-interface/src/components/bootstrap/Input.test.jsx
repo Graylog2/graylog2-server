@@ -24,4 +24,18 @@ describe('Input', () => {
     expect(wrapper.find('input#addonCheckbox')).toExist();
     expect(wrapper).toMatchSnapshot();
   });
+
+  it('renders input w/ `name` attribute w/o setting prop', () => {
+    const wrapper = mount(<Input id="inputWithoutNameProp" type="text" />);
+    expect(wrapper.find('input[name="inputWithoutNameProp"]')).toExist();
+    expect(wrapper).toMatchSnapshot();
+  });
+
+  it('renders input w/ `name` attribute w/ setting prop', () => {
+    const wrapper = mount(
+      <Input id="inputWithoutNameProp" name="inputWithNameProp" type="text" />,
+    );
+    expect(wrapper.find('input[name="inputWithNameProp"]')).toExist();
+    expect(wrapper).toMatchSnapshot();
+  });
 });

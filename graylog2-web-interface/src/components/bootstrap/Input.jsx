@@ -15,6 +15,7 @@ class Input extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     type: PropTypes.string,
+    name: PropTypes.string,
     label: PropTypes.oneOfType([
       PropTypes.element,
       PropTypes.string,
@@ -50,6 +51,7 @@ class Input extends React.Component {
     type: undefined,
     label: '',
     labelClassName: undefined,
+    name: undefined,
     formGroupClassName: undefined,
     bsStyle: null,
     value: undefined,
@@ -66,11 +68,13 @@ class Input extends React.Component {
   };
 
   getValue = () => {
-    if (!this.props.type) {
+    const { type } = this.props;
+
+    if (!type) {
       throw new Error('Cannot use getValue without specifying input type.');
     }
 
-    switch (this.props.type) {
+    switch (type) {
       case 'checkbox':
       case 'radio':
         return this.getInputDOMNode().checked;
@@ -150,9 +154,11 @@ class Input extends React.Component {
   };
 
   render() {
-    const { id, type, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, children, addonAfter, buttonAfter, ...controlProps } = this.props;
+    const { id, type, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, name, help, children, addonAfter, buttonAfter, ...controlProps } = this.props;
+
     controlProps.type = type;
     controlProps.label = label;
+    controlProps.name = name || id;
 
     if (!type) {
       return this._renderFormGroup(id, bsStyle, formGroupClassName, wrapperClassName, label, labelClassName, help, children);

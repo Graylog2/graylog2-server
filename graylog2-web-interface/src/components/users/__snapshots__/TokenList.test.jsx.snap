@@ -83,6 +83,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   className="form-control"
                   id="filter-data-filter"
                   label="Filter"
+                  name="filter-data-filter"
                   placeholder=""
                   type="text"
                 />
@@ -244,6 +245,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   className="form-control"
                   id="filter-data-filter"
                   label="Filter"
+                  name="filter-data-filter"
                   placeholder=""
                   type="text"
                 />

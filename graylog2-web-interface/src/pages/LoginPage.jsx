@@ -10,7 +10,9 @@ import LoadingPage from './LoadingPage';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const SessionStore = StoreProvider.getStore('Session');
@@ -67,7 +69,7 @@ const LoginPage = createReactClass({
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <a className="close" onClick={this.resetLastError}>×</a>{error}
+            <button type="button" className="close" onClick={this.resetLastError}>&times;</button>{error}
           </Alert>
         </div>
       );
@@ -80,13 +82,15 @@ const LoginPage = createReactClass({
   },
 
   render() {
-    if (this.state.validatingSession) {
+    const { lastError, loading, validatingSession } = this.state;
+
+    if (validatingSession) {
       return (
         <LoadingPage />
       );
     }
 
-    const alert = this.formatLastError(this.state.lastError);
+    const alert = this.formatLastError(lastError);
     return (
       <DocumentTitle title="Sign in">
         <div>
@@ -102,8 +106,8 @@ const LoginPage = createReactClass({
                 <Input ref={(password) => { this.password = password; }} id="password" type="password" placeholder="Password" />
 
                 <FormGroup>
-                  <Button type="submit" bsStyle="info" disabled={this.state.loading}>
-                    {this.state.loading ? 'Signing in...' : 'Sign in'}
+                  <Button type="submit" bsStyle="info" disabled={loading}>
+                    {loading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </FormGroup>
 
