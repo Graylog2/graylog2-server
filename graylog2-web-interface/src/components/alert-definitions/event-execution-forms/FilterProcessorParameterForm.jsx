@@ -6,7 +6,7 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import SimpleTimerangeSelector from 'components/alertdefinitions/common/SimpleTimerangeSelector';
+import SimpleTimerangeSelector from 'components/alert-definitions/common/SimpleTimerangeSelector';
 
 const { StreamsStore } = CombinedProvider.get('Streams');
 

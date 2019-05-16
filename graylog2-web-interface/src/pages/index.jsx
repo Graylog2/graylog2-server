@@ -7,12 +7,14 @@ const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
+const CreateAlertDefinitionPage = loadAsync(() => import('./CreateAlertDefinitionPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
 const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
+const EditAlertDefinitionPage = loadAsync(() => import('./EditAlertDefinitionPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
@@ -81,12 +83,14 @@ export {
   AuthenticationPage,
   ConfigurationsPage,
   ContentPacksPage,
+  CreateAlertDefinitionPage,
   CreateContentPackPage,
   CreateExtractorsPage,
   CreateUsersPage,
   DashboardsPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
+  EditAlertDefinitionPage,
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,

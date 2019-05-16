@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Input } from 'components/bootstrap';
 
-import SimpleTimerangeSelector from 'components/alertdefinitions/common/SimpleTimerangeSelector';
+import SimpleTimerangeSelector from 'components/alert-definitions/common/SimpleTimerangeSelector';
 
 // TODO: Defaults should come from the backend
 const DEFAULTS = {

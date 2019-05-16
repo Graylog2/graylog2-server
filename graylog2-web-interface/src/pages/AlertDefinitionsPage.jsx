@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, Col, DropdownButton, MenuItem, Row } from 'react
 import lodash from 'lodash';
 
 import { DocumentTitle, EmptyEntity, EntityList, EntityListItem, PageHeader } from 'components/common';
-import EventExecutionContainer from 'components/alertdefinitions/event-execution-forms/EventExecutionContainer';
+import EventExecutionContainer from 'components/alert-definitions/event-execution-forms/EventExecutionContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import connect from 'stores/connect';
