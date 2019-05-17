@@ -12,7 +12,12 @@ const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
 const handler: FieldActionHandler = (queryId: string, field: string, type: FieldType) => {
   const series = ((type && type.isNumeric()) ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
-    .map(f => `${f}(${field})`)
+    .map((f) => {
+      if (f === 'percentile') {
+        return `${f}(${field},95)`;
+      }
+      return `${f}(${field})`;
+    })
     .map(Series.forFunction);
   const config = AggregationWidgetConfig.builder()
     .series(series)
