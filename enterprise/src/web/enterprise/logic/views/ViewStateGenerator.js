@@ -1,3 +1,5 @@
+// @flow strict
+import * as Immutable from 'immutable';
 import ViewState from './ViewState';
 import { resultHistogram, allMessagesTable } from '../Widget';
 import WidgetPosition from '../widgets/WidgetPosition';
@@ -31,7 +33,7 @@ export default () => {
     .toBuilder()
     .fields(['source', 'message'])
     .titles(titles)
-    .widgets(widgets)
+    .widgets(Immutable.List(widgets))
     .widgetPositions(positions)
     .build();
 };

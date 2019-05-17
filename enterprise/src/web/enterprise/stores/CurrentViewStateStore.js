@@ -1,7 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { isEqual, maxBy } from 'lodash';
+import { isEqual } from 'lodash';
 
 import { widgetDefinition } from 'enterprise/logic/Widget';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';

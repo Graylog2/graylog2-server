@@ -5,6 +5,7 @@ import SearchActions from 'enterprise/actions/SearchActions';
 import Search from 'enterprise/logic/search/Search';
 import Query from 'enterprise/logic/queries/Query';
 import View from 'enterprise/logic/views/View';
+import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewManagementActions } from './ViewManagementStore';
 
@@ -101,7 +102,12 @@ describe('ViewStore', () => {
         });
     });
     it('should create search when state is updated', (done) => {
-      const newState = Immutable.fromJS({ firstQueryId: ViewState.create().toBuilder().fields(['message']).build() });
+      const newState = Immutable.fromJS({
+        firstQueryId: ViewState.create()
+          .toBuilder()
+          .widgets(Immutable.fromJS([AggregationWidget.builder().build()]))
+          .build(),
+      });
 
       ViewActions.state(newState)
         .then(() => {

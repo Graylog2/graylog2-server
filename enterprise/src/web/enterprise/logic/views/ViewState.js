@@ -1,6 +1,6 @@
 // @flow strict
 
-import { Map, Collection, fromJS, is } from 'immutable';
+import { List, Map, Collection, fromJS, is } from 'immutable';
 
 import Widget from 'enterprise/logic/widgets/Widget';
 import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
@@ -15,7 +15,7 @@ type State = {
   fields: FieldNameList,
   formatting: FormattingSettings,
   titles: TitlesMap,
-  widgets: Array<Widget>,
+  widgets: List<Widget>,
   widgetMapping: WidgetMapping,
   widgetPositions: { [string]: WidgetPosition },
   staticMessageListId?: string,
@@ -49,7 +49,7 @@ export default class ViewState {
 
   static create(): ViewState {
     // eslint-disable-next-line no-use-before-define
-    return new Builder().widgets([]).widgetPositions({}).build();
+    return new Builder().widgets(List()).widgetPositions({}).build();
   }
 
   get fields(): FieldNameList {
@@ -64,7 +64,7 @@ export default class ViewState {
     return this._value.titles;
   }
 
-  get widgets(): Array<Widget> {
+  get widgets(): List<Widget> {
     return this._value.widgets;
   }
 
@@ -143,7 +143,7 @@ export default class ViewState {
     const { selected_fields, titles, widgets, widget_mapping, positions, formatting } = value;
     return ViewState.builder()
       .titles(fromJS(titles))
-      .widgets(widgets.map(w => Widget.fromJSON(w)))
+      .widgets(List(widgets.map(w => Widget.fromJSON(w))))
       .widgetMapping(fromJS(widget_mapping))
       .fields(selected_fields)
       .widgetPositions(Map(positions).map(v => WidgetPosition.fromJSON(v)).toObject())
@@ -177,7 +177,7 @@ class Builder {
     return new Builder(this.value.set('titles', fromJS(value)));
   }
 
-  widgets(value: Array<Widget>): Builder {
+  widgets(value: List<Widget>): Builder {
     return new Builder(this.value.set('widgets', value));
   }
 

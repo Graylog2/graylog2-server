@@ -27,7 +27,7 @@ describe('CurrentViewStateStore', () => {
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
-    CurrentViewStateStore.widgets([]);
+    CurrentViewStateStore.widgets(Immutable.List());
 
     expect(updateFn.mock.calls.length).toBe(1);
   });

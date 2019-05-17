@@ -50,10 +50,10 @@ export const WidgetStore = Reflux.createStore({
     this.activeQuery = activeQuery;
 
     const activeWidgets = get(state, 'widgets', []);
-    const widgets = Immutable.Map(activeWidgets.map(w => [w.id, w]));
+    const widgets = Immutable.OrderedMap(activeWidgets.map(w => [w.id, w]));
 
     if (!isEqual(widgets, this.widgets)) {
-      this.widgets = Immutable.Map(widgets);
+      this.widgets = widgets;
       this._trigger();
     }
   },
