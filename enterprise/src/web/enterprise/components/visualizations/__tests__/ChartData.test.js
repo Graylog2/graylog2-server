@@ -43,27 +43,31 @@ describe('Chart helper functions', () => {
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
-    it('should mark non-present data points and leave order of values intact', () => {
+    it('should remove non-present data points and leave order of values intact', () => {
       const input = readFixture('ChartData.test.withHoles.json');
       const result = chartData(config, input, 'bar');
-      const timestamps = [
-        '2018-05-28T11:48:00.000Z',
-        '2018-05-28T11:49:00.000Z',
-        '2018-05-28T11:50:00.000Z',
-        '2018-05-28T11:51:00.000Z',
-        '2018-05-28T11:52:00.000Z',
-        '2018-05-28T11:53:00.000Z',
-      ];
       const expectedResult = [{
         name: 'count()',
         type: 'bar',
-        x: timestamps,
-        y: [7813, 8657, 8645, undefined, 8630, 702],
+        x: [
+          '2018-05-28T11:48:00.000Z',
+          '2018-05-28T11:49:00.000Z',
+          '2018-05-28T11:50:00.000Z',
+          '2018-05-28T11:52:00.000Z',
+          '2018-05-28T11:53:00.000Z',
+        ],
+        y: [7813, 8657, 8645, 8630, 702],
       }, {
         name: 'sum(took_ms)',
         type: 'bar',
-        x: timestamps,
-        y: [587008, undefined, 646728, 792102, 579708, 62596],
+        x: [
+          '2018-05-28T11:48:00.000Z',
+          '2018-05-28T11:50:00.000Z',
+          '2018-05-28T11:51:00.000Z',
+          '2018-05-28T11:52:00.000Z',
+          '2018-05-28T11:53:00.000Z',
+        ],
+        y: [587008, 646728, 792102, 579708, 62596],
       }];
       expect(result).toHaveLength(2);
       expect(result).toEqual(expectedResult);

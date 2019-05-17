@@ -62,6 +62,15 @@ export const generateChart = (chartType: string, generator: Generator = _default
   };
 };
 
+export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
+  return (results: ExtractedSeries) => results.map(([name, keys, values]) => {
+    const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
+    const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
+    const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
+    return [name, newKeys, newValues];
+  });
+};
+
 const doNotSuffixTraceForSingleSeries = keys => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
 
 export const chartData = (
@@ -72,5 +81,6 @@ export const chartData = (
 ): Array<ChartDefinition> => flow([
   transformKeys(rowPivots, columnPivots),
   extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined),
+  removeNulls(),
   generateChart(chartType, generator),
 ])(data);

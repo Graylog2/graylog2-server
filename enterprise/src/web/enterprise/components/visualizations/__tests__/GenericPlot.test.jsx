@@ -101,7 +101,7 @@ describe('GenericPlot', () => {
       fullData: [
         {
           name: 'x',
-          marker: { color: '#414141' },
+          line: { color: '#414141' },
         },
       ],
     });

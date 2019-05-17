@@ -72,7 +72,7 @@ class GenericPlot extends React.Component<Props, State> {
 
   _onLegendClick = (e: any) => {
     const name = e.node.textContent;
-    const { color } = e.fullData.find(data => (data.name === name)).marker;
+    const { color } = e.fullData.find(data => (data.name === name)).line;
     const target = e.node.querySelector('g.layers');
 
     this.setState({ legendConfig: { name, color, target } });
