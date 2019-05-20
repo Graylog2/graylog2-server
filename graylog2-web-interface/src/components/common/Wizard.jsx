@@ -35,15 +35,21 @@ class Wizard extends React.Component {
     children: PropTypes.element,
     /** Indicates if wizard should be rendered in horizontal or vertical */
     horizontal: PropTypes.bool,
+    /** Indicates if wizard should take the full width of their parent */
+    justified: PropTypes.bool,
     /** Customize the container CSS class used by this component */
     containerClassName: PropTypes.string,
+    /** Customize the navigation CSS class used by this component */
+    navigationClassName: PropTypes.string,
   };
 
   static defaultProps = {
     children: undefined,
     onStepChange: () => {},
     horizontal: false,
+    justified: false,
     containerClassName: 'content',
+    navigationClassName: '',
   };
 
   constructor(props) {
@@ -88,13 +94,20 @@ class Wizard extends React.Component {
   };
 
   _renderVerticalStepNav = () => {
-    const { steps } = this.props;
+    const { justified, navigationClassName, steps } = this.props;
     const { selectedStep } = this.state;
     return (
       <Col md={2} className={WizardStyle.subnavigation}>
-        <Nav stacked bsStyle="pills" activeKey={selectedStep} onSelect={this._wizardChanged}>
+        <Nav stacked
+             bsStyle="pills"
+             className={navigationClassName}
+             activeKey={selectedStep}
+             onSelect={this._wizardChanged}
+             justified={justified}>
           {steps.map((navItem) => {
-            return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
+            return (
+              <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
+            );
           })}
         </Nav>
         <br />
@@ -112,7 +125,7 @@ class Wizard extends React.Component {
 
   _renderHorizontalStepNav = () => {
     const { selectedStep } = this.state;
-    const { steps } = this.props;
+    const { justified, navigationClassName, steps } = this.props;
     return (
       <Col sm={12} className={WizardStyle.horizontal}>
         <div className="pull-right">
@@ -125,9 +138,14 @@ class Wizard extends React.Component {
             </Button>
           </ButtonToolbar>
         </div>
-        <Nav bsStyle="pills" activeKey={selectedStep} onSelect={this._wizardChanged}>
+        <Nav bsStyle="pills"
+             className={navigationClassName}
+             activeKey={selectedStep}
+             onSelect={this._wizardChanged}
+             justified={justified}>
           {steps.map((navItem) => {
-            return (<NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
+            return (
+              <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>);
           })}
         </Nav>
       </Col>
