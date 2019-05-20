@@ -90,6 +90,11 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
   }
 
+  get isEmpty(): boolean {
+    const empty = arr => !arr.length;
+    return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
+  }
+
   static builder() {
     // eslint-disable-next-line no-use-before-define
     return new Builder()

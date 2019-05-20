@@ -111,7 +111,7 @@ export default {
         if (widget.config.series.length > 0) {
           return `Aggregating ${widget.config.series.map(s => s.effectiveName)}`;
         }
-        return 'Empty Aggregation';
+        return 'Untitled Aggregation';
       },
     },
   ],

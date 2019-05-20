@@ -21,6 +21,7 @@ describe('WorldMapVisualization', () => {
                                                  editing={false}
                                                  fields={Immutable.List()}
                                                  onChange={onChange}
+                                                 toggleEdit={() => {}}
                                                  height={1024}
                                                  width={800} />);
     const mapVisualization = wrapper.find('map-visualization');
@@ -40,6 +41,7 @@ describe('WorldMapVisualization', () => {
                                                  editing
                                                  fields={Immutable.List()}
                                                  onChange={onChange}
+                                                 toggleEdit={() => {}}
                                                  height={1024}
                                                  width={800} />);
     const mapVisualization = wrapper.find('map-visualization');

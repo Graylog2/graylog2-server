@@ -7,6 +7,7 @@ import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizati
 import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
 import type { Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
 
+import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
 
 const defaultVisualizationType = 'table';
@@ -20,6 +21,7 @@ type Props = {
     rows: Rows,
   },
   editing?: boolean,
+  toggleEdit: () => void,
   fields: FieldTypeMappingsList,
   onVisualizationConfigChange: OnVisualizationConfigChange,
 };
@@ -32,6 +34,7 @@ export type VisualizationComponentProps = {|
   height: number,
   onChange: OnVisualizationConfigChange,
   width: number,
+  toggleEdit: () => void,
 |};
 
 // eslint-disable-next-line no-undef
@@ -48,7 +51,11 @@ const _visualizationForType = (type: string): VisualizationComponent => {
   return visualization.component;
 };
 
-const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {} }: Props) => {
+const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: Props) => {
+  if (config.isEmpty) {
+    return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
+  }
+
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
   const { rows } = data;
   return (
@@ -60,6 +67,7 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
                       fields={fields}
                       height={height}
                       width={width}
+                      toggleEdit={toggleEdit}
                       onChange={onVisualizationConfigChange} />
       )}
     </FullSizeContainer>

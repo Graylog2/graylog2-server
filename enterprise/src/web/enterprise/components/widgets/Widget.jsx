@@ -160,7 +160,7 @@ class Widget extends React.Component<Props, State> {
                       height={height}
                       width={width}
                       filter={filter}
-                      onFinishEditing={this._onToggleEdit} />
+                      toggleEdit={this._onToggleEdit} />
       );
     }
     return <LoadingWidget />;
@@ -187,6 +187,7 @@ class Widget extends React.Component<Props, State> {
               </WidgetHeader>
               <EditComponent config={config}
                              fields={fields}
+                             editting={editing}
                              id={id}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
                 {visualization}
