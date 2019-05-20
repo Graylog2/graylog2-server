@@ -4,6 +4,10 @@ import lodash from 'lodash';
 
 import AlertDefinitionPriorityEnum from 'logic/alerts/AlertDefinitionPriorityEnum';
 
+import { Wizard } from 'components/common';
+
+import styles from './AlertDefinitionForm.css';
+
 const priorityOptions = lodash.map(AlertDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: lodash.upperFirst(value.name) }));
 
 class AlertDefinitionForm extends React.Component {
@@ -67,8 +71,16 @@ class AlertDefinitionForm extends React.Component {
     const { action, alertDefinition, onCancel, onChange } = this.props;
     const { selectedStep, completedSteps, isFormVisible, formParameters } = this.state;
 
+    const steps = [
+      { key: 'alert-details', title: 'Alert Details', component: <div>TBD</div> },
+      { key: 'condition', title: 'Condition', component: <div>TBD</div> },
+      { key: 'fields', title: 'Fields', component: <div>TBD</div> },
+      { key: 'notifications', title: 'Notifications', component: <div>TBD</div> },
+      { key: 'summary', title: 'Summary', component: <div>TBD</div> },
+    ];
+
     return (
-      <div>TBD</div>
+      <Wizard steps={steps} horizontal justified navigationClassName="steps" containerClassName="" />
     );
   }
 }
