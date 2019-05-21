@@ -4,9 +4,9 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
   constructor() {
     super();
 
-    const keywords = 'let';
+    const keywords = 'let|rule|match|pipeline';
 
-    const builtinConstants = 'when|then|end';
+    const builtinConstants = 'all|either|and|or|not|during|when|then|end';
 
     const builtinFunctions = 'to_bool|to_double|to_long|to_string|to_map|is_bool|is_number|is_double|is_long|is_string|'
         + 'is_collection|is_list|is_map|is_date|is_period|is_ip|is_json|is_url|has_field|set_field|'
@@ -25,6 +25,8 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
 
     const keywordMapper = this.createKeywordMapper(
       {
+        'variable.language': 'stage',
+        'support.type': '$message',
         'support.function': builtinFunctions,
         keyword: keywords,
         'constant.language': builtinConstants,
@@ -38,6 +40,11 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
         {
           token: 'comment',
           regex: '\\/\\/.*$',
+        },
+        {
+          token: 'comment', // multi line comment
+          regex: '\\/\\*',
+          next: 'comment',
         },
         {
           token: 'string', // single line
@@ -61,21 +68,20 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
         },
         {
           token: keywordMapper,
-          // TODO: Unicode escape sequences
-          // TODO: Unicode identifiers
           regex: '[a-zA-Z_$][a-zA-Z0-9_$]*\\b',
-        },
-        {
-          token: 'lparen',
-          regex: '[[({]',
-        },
-        {
-          token: 'rparen',
-          regex: '[\\])}]',
         },
         {
           token: 'text',
           regex: '\\s+',
+        },
+      ],
+      comment: [
+        {
+          token: 'comment', // closing comment
+          regex: '\\*\\/',
+          next: 'start',
+        }, {
+          defaultToken: 'comment',
         },
       ],
     };
