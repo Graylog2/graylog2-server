@@ -80,7 +80,7 @@ class AlertDefinitionForm extends React.Component {
     ];
 
     return (
-      <Wizard steps={steps} horizontal justified navigationClassName="steps" containerClassName="" />
+      <Wizard steps={steps} horizontal justified navigationClassName={styles.steps} containerClassName="" />
     );
   }
 }

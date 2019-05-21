@@ -1,18 +1,18 @@
-.steps.nav > li:first-child {
+:local(.steps).nav > li:first-child {
     border-left: 1px solid #CCC;
     border-radius: 4px 0 0 4px;
 }
 
-.steps.nav > li:last-child {
+:local(.steps).nav > li:last-child {
     border-radius: 0 4px 4px 0;
 }
 
-.steps.nav > li {
+:local(.steps).nav > li {
     border: 1px solid #CCC;
     border-left: 0;
 }
 
-.steps.nav > li:not(:last-child):after {
+:local(.steps).nav > li:not(:last-child):after {
     background-color: #FFF;
     border-color: #CCC;
     border-style: solid;
@@ -28,18 +28,18 @@
     z-index: 2;
 }
 
-.steps.nav > li.active > a {
+:local(.steps).nav > li.active > a {
     border-radius: 0;
 }
 
-.steps.nav > li.active:first-child > a {
+:local(.steps).nav > li.active:first-child > a {
     border-radius: 4px 0 0 4px;
 }
 
-.steps.nav > li.active:last-child > a {
+:local(.steps).nav > li.active:last-child > a {
     border-radius: 0 4px 4px 0;
 }
 
-.steps.nav > li.active:after {
+:local(.steps).nav > li.active:after {
     background-color: #9E1F63;
 }
