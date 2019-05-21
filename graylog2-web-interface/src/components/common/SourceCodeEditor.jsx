@@ -7,6 +7,15 @@ import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'rea
 
 import { ClipboardButton } from 'components/common';
 
+import 'brace/mode/json';
+import 'brace/mode/lua';
+import 'brace/mode/markdown';
+import 'brace/mode/text';
+import 'brace/mode/yaml';
+import 'brace/theme/tomorrow';
+import 'brace/theme/monokai';
+
+import PipelineRulesMode from './mode-pipeline.js';
 import style from './SourceCodeEditor.css';
 // import PipelineRulesMode from './SourceCodeMode-pipeline';
 import './webpack-resolver';
@@ -78,19 +87,6 @@ class SourceCodeEditor extends React.Component {
       selectedText: '',
     };
   }
-
-  componentDidMount() {
-    const { mode } = this.props;
-
-    // if (mode === 'java') {
-    //   const pipelineRulesMode = new PipelineRulesMode();
-
-    //   pipelineRulesMode.then((pipelineMode) => {
-    //     this.reactAce.editor.getSession().setMode(pipelineMode);
-    //   });
-    // }
-  }
-
 
   componentDidUpdate(prevProps) {
     const { height, width } = this.props;
