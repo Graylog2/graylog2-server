@@ -6,7 +6,9 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
 
     const keywords = 'let|rule|match|pipeline';
 
-    const builtinConstants = 'all|either|and|or|not|during|when|then|end';
+    const operators = 'and|or|not';
+
+    const builtinConstants = 'all|either|during|when|then|end';
 
     const builtinFunctions = 'to_bool|to_double|to_long|to_string|to_map|is_bool|is_number|is_double|is_long|is_string|'
         + 'is_collection|is_list|is_map|is_date|is_period|is_ip|is_json|is_url|has_field|set_field|'
@@ -25,11 +27,12 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
 
     const keywordMapper = this.createKeywordMapper(
       {
-        'variable.language': 'stage',
-        'support.type': '$message',
-        'support.function': builtinFunctions,
-        keyword: keywords,
         'constant.language': builtinConstants,
+        keyword: keywords,
+        'support.function': builtinFunctions,
+        'support.type': '$message',
+        'variable.language': 'stage',
+        'language.support.class': operators,
       },
       'identifier',
       true,
@@ -65,6 +68,10 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
         {
           token: 'constant.language.boolean',
           regex: '(?:true|false)\\b',
+        },
+        {
+          token: 'language.support.class',
+          regex: '&&',
         },
         {
           token: keywordMapper,
