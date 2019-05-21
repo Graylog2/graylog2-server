@@ -27,7 +27,11 @@ class RuleForm extends React.Component {
       description: '',
       source: '',
     },
+    usedInPipelines: [],
+    create: false,
   };
+
+  parseTimer = undefined;
 
   constructor(props) {
     super(props);
@@ -52,8 +56,6 @@ class RuleForm extends React.Component {
     }
   }
 
-  parseTimer = undefined;
-
   _setParseErrors = (errors) => {
     this.setState({ parseErrors: errors });
   };
@@ -64,12 +66,14 @@ class RuleForm extends React.Component {
       clearTimeout(this.parseTimer);
     }
     const { rule } = this.state;
+    const { validateRule } = this.props;
+
     rule.source = value;
     this.setState({ rule });
 
-    if (this.props.validateRule) {
+    if (validateRule) {
       // have the caller validate the rule after typing stopped for a while. usually this will mean send to server to parse
-      this.parseTimer = setTimeout(() => this.props.validateRule(rule, this._setParseErrors), 500);
+      this.parseTimer = setTimeout(() => validateRule(rule, this._setParseErrors), 500);
     }
   };
 
@@ -86,7 +90,9 @@ class RuleForm extends React.Component {
   };
 
   _getId = (prefixIdName) => {
-    return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
+    const { name } = this.state;
+
+    return name !== undefined ? prefixIdName + name : prefixIdName;
   };
 
   _goBack = () => {
@@ -98,8 +104,11 @@ class RuleForm extends React.Component {
   };
 
   _save = () => {
-    if (this.state.parseErrors.length === 0) {
-      this.props.onSave(this.state.rule, this._saved);
+    const { parseErrors, rule } = this.state;
+    const { onSave } = this.props;
+
+    if (parseErrors.length === 0) {
+      onSave(rule, this._saved);
     }
   };
 
@@ -109,11 +118,13 @@ class RuleForm extends React.Component {
   };
 
   _formatPipelinesUsingRule = () => {
-    if (this.props.usedInPipelines.length === 0) {
+    const { usedInPipelines } = this.props;
+
+    if (usedInPipelines.length === 0) {
       return 'This rule is not being used in any pipelines.';
     }
 
-    const formattedPipelines = this.props.usedInPipelines.map((pipeline) => {
+    const formattedPipelines = usedInPipelines.map((pipeline) => {
       return (
         <li key={pipeline.id}>
           <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
@@ -127,8 +138,11 @@ class RuleForm extends React.Component {
   };
 
   render() {
+    const { parseErrors, rule } = this.state;
+    const { create } = this.props;
+
     let pipelinesUsingRule;
-    if (!this.props.create) {
+    if (!create) {
       pipelinesUsingRule = (
         <Input id="used-in-pipelines" label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">
           <div className="form-control-static">
@@ -138,7 +152,7 @@ class RuleForm extends React.Component {
       );
     }
 
-    const annotations = this.state.parseErrors.map((e) => {
+    const annotations = parseErrors.map((e) => {
       return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
 
@@ -156,14 +170,14 @@ class RuleForm extends React.Component {
                  onChange={this._onDescriptionChange}
                  autoFocus
                  help="Rule description (optional)."
-                 value={this.state.rule.description} />
+                 value={rule.description} />
 
           {pipelinesUsingRule}
 
           <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
-            <SourceCodeEditor id={`source${this.props.create ? '-create' : '-edit'}`}
+            <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                               annotations={annotations}
-                              value={this.state.rule.source}
+                              value={rule.source}
                               onLoad={this._onLoad}
                               onChange={this._onSourceChange}
                               mode="pipeline" />
