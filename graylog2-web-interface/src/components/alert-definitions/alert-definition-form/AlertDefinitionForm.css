@@ -43,3 +43,8 @@
 :local(.steps).nav > li.active:after {
     background-color: #9E1F63;
 }
+
+:local(.title) {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

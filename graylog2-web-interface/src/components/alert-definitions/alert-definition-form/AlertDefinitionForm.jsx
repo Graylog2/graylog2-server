@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Wizard } from 'components/common';
+import AlertDetailsForm from './AlertDetailsForm';
 
 import styles from './AlertDefinitionForm.css';
 
@@ -29,7 +30,13 @@ class AlertDefinitionForm extends React.Component {
     const { action, alertDefinition, onCancel, onChange } = this.props;
 
     const steps = [
-      { key: 'alert-details', title: 'Alert Details', component: <div>TBD</div> },
+      {
+        key: 'alert-details',
+        title: 'Alert Details',
+        component: (
+          <AlertDetailsForm alertDefinition={alertDefinition} onChange={onChange} />
+        ),
+      },
       { key: 'condition', title: 'Condition', component: <div>TBD</div> },
       { key: 'fields', title: 'Fields', component: <div>TBD</div> },
       { key: 'notifications', title: 'Notifications', component: <div>TBD</div> },
