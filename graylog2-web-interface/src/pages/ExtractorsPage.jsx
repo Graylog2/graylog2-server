@@ -20,7 +20,6 @@ import DocsHelper from 'util/DocsHelper';
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const NodesStore = StoreProvider.getStore('Nodes');
-const InputsStore = StoreProvider.getStore('Inputs');
 
 const ExtractorsPage = createReactClass({
   displayName: 'ExtractorsPage',
@@ -29,7 +28,7 @@ const ExtractorsPage = createReactClass({
     params: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(InputsStore), Reflux.listenTo(NodesStore, 'onNodesChange')],
+  mixins: [Reflux.listenTo(NodesStore, 'onNodesChange')],
 
   getInitialState() {
     return {
@@ -39,8 +38,8 @@ const ExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
-    InputsActions.get.triggerPromise(params.inputId);
-    NodesActions.list.triggerPromise();
+    InputsActions.get(params.inputId).then(input => this.setState({ input }));
+    NodesActions.list();
   },
 
   onNodesChange(nodes) {
