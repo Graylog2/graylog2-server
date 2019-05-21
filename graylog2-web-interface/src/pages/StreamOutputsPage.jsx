@@ -1,14 +1,16 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
+import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
+import { DocumentTitle, Spinner } from 'components/common';
 
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
-import { DocumentTitle, Spinner } from 'components/common';
+import createReactClass from 'create-react-class';
+
+import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -16,6 +18,12 @@ const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamOutputsPage = createReactClass({
   displayName: 'StreamOutputsPage',
+  propTypes: {
+    params: PropTypes.shape({
+      streamId: PropTypes.string.isRequired,
+    }).isRequired,
+  },
+
   mixins: [Reflux.connect(CurrentUserStore)],
 
   getInitialState() {
@@ -23,30 +31,32 @@ const StreamOutputsPage = createReactClass({
   },
 
   componentDidMount() {
-    StreamsStore.get(this.props.params.streamId, (stream) => {
+    const { params } = this.props;
+    StreamsStore.get(params.streamId, (stream) => {
       this.setState({ stream: stream });
     });
   },
 
   render() {
-    if (!this.state.stream) {
+    const { stream, currentUser } = this.state;
+    if (!stream) {
       return <Spinner />;
     }
     return (
-      <DocumentTitle title={`Outputs for Stream ${this.state.stream.title}`}>
+      <DocumentTitle title={`Outputs for Stream ${stream.title}`}>
         <div>
           <Row className="content content-head">
             <Col md={10}>
               <h1>
-                Outputs for Stream &raquo;{this.state.stream.title}&laquo;
+                Outputs for Stream &raquo;{stream.title}&laquo;
               </h1>
 
               <p className="description">
                 Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
                 You can also reuse outputs that are already running for other streams.
 
-                A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
-                You can find output plugins on <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
+                A global view of all configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.
+                You can find output plugins on <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
               </p>
 
               <SupportLink>
@@ -56,7 +66,7 @@ const StreamOutputsPage = createReactClass({
               </SupportLink>
             </Col>
           </Row>
-          <OutputsComponent streamId={this.state.stream.id} permissions={this.state.currentUser.permissions} />
+          <OutputsComponent streamId={stream.id} permissions={currentUser.permissions} />
         </div>
       </DocumentTitle>
     );
