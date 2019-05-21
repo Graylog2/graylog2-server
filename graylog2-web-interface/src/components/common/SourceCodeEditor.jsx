@@ -7,6 +7,15 @@ import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'rea
 
 import { ClipboardButton } from 'components/common';
 
+import 'brace/mode/json';
+import 'brace/mode/lua';
+import 'brace/mode/markdown';
+import 'brace/mode/text';
+import 'brace/mode/yaml';
+import 'brace/theme/tomorrow';
+import 'brace/theme/monokai';
+
+import PipelineRulesMode from './mode-pipeline.js';
 import style from './SourceCodeEditor.css';
 import './webpack-resolver';
 
@@ -34,7 +43,7 @@ class SourceCodeEditor extends React.Component {
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
-    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml']),
+    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */
@@ -77,6 +86,17 @@ class SourceCodeEditor extends React.Component {
       selectedText: '',
     };
   }
+
+  componentDidMount() {
+    const { mode } = this.props;
+
+    if (mode === 'pipeline') {
+      const pipelineRulesMode = new PipelineRulesMode();
+
+      this.reactAce.editor.getSession().setMode(pipelineRulesMode);
+    }
+  }
+
 
   componentDidUpdate(prevProps) {
     const { height, width } = this.props;

@@ -165,7 +165,8 @@ class RuleForm extends React.Component {
                               annotations={annotations}
                               value={this.state.rule.source}
                               onLoad={this._onLoad}
-                              onChange={this._onSourceChange} />
+                              onChange={this._onSourceChange}
+                              mode="pipeline" />
           </Input>
         </fieldset>
 
