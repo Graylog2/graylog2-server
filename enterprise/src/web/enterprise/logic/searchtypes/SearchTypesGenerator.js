@@ -1,12 +1,14 @@
+// @flow strict
 import Immutable from 'immutable';
 import uuid from 'uuid/v4';
+import Widget from 'enterprise/logic/widgets/Widget';
 
 import { widgetDefinition } from '../Widget';
 import searchTypeDefinition from '../SearchType';
 
 const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
-export default (widgets) => {
+export default (widgets: Array<Widget>) => {
   let widgetMapping = Immutable.Map();
   const searchTypes = widgets.map(widget => widgetDefinition(widget.type).searchTypes(widget.config).map(searchType => Object.assign(searchType, { widgetId: widget.id }, filterForWidget(widget))))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set())
@@ -29,13 +31,7 @@ export default (widgets) => {
             type: searchType.type,
           },
         );
-    })
-    .add(Immutable.Map({
-      id: uuid(),
-      type: 'messages',
-      limit: 150,
-      offset: 0,
-    }));
+    });
 
   return { widgetMapping, searchTypes };
 };
