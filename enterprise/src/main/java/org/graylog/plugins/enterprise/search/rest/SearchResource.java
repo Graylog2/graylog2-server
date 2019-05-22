@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
@@ -279,7 +280,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @Path("metadata")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
-    public SearchMetadata metadataForObject(@ApiParam Search search) {
+    public SearchMetadata metadataForObject(@ApiParam @NotNull Search search) {
+        if (search == null) {
+            throw new IllegalArgumentException("Search must not be null.");
+        }
         final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
         return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
     }
