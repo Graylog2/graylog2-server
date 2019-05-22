@@ -10,6 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import AlertDefinitionForm from './AlertDefinitionForm';
 
 const { AlertDefinitionsActions } = CombinedProvider.get('AlertDefinition');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 class AlertDefinitionFormContainer extends React.Component {
   static propTypes = {
@@ -35,7 +36,12 @@ class AlertDefinitionFormContainer extends React.Component {
 
     this.state = {
       alertDefinition: props.alertDefinition,
+      availableStreams: undefined,
     };
+  }
+
+  componentDidMount() {
+    StreamsStore.load(streams => this.setState({ availableStreams: streams }));
   }
 
   handleChange = (key, value) => {
@@ -64,11 +70,12 @@ class AlertDefinitionFormContainer extends React.Component {
 
   render() {
     const { action } = this.props;
-    const { alertDefinition } = this.state;
+    const { alertDefinition, availableStreams } = this.state;
 
     return (
       <AlertDefinitionForm action={action}
                            alertDefinition={alertDefinition}
+                           streams={availableStreams}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
                            onSubmit={this.handleSubmit} />

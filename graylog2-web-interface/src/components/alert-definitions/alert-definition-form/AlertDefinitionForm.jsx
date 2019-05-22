@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Wizard } from 'components/common';
 import AlertDetailsForm from './AlertDetailsForm';
+import ConditionForm from './ConditionForm';
 
 import styles from './AlertDefinitionForm.css';
 
@@ -10,6 +11,7 @@ class AlertDefinitionForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     alertDefinition: PropTypes.object.isRequired,
+    streams: PropTypes.array,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -27,20 +29,34 @@ class AlertDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, alertDefinition, onCancel, onChange } = this.props;
+    const { action, alertDefinition, streams, onCancel, onChange } = this.props;
 
     const steps = [
       {
         key: 'alert-details',
         title: 'Alert Details',
-        component: (
-          <AlertDetailsForm alertDefinition={alertDefinition} onChange={onChange} />
-        ),
+        component: <AlertDetailsForm alertDefinition={alertDefinition} onChange={onChange} />,
       },
-      { key: 'condition', title: 'Condition', component: <div>TBD</div> },
-      { key: 'fields', title: 'Fields', component: <div>TBD</div> },
-      { key: 'notifications', title: 'Notifications', component: <div>TBD</div> },
-      { key: 'summary', title: 'Summary', component: <div>TBD</div> },
+      {
+        key: 'condition',
+        title: 'Condition',
+        component: <ConditionForm alertDefinition={alertDefinition} streams={streams} onChange={onChange} />,
+      },
+      {
+        key: 'fields',
+        title: 'Fields',
+        component: <div>TBD</div>,
+      },
+      {
+        key: 'notifications',
+        title: 'Notifications',
+        component: <div>TBD</div>,
+      },
+      {
+        key: 'summary',
+        title: 'Summary',
+        component: <div>TBD</div>,
+      },
     ];
 
     return (
