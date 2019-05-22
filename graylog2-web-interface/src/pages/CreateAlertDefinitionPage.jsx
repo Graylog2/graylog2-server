@@ -9,15 +9,15 @@ import AlertDefinitionFormContainer from 'components/alert-definitions/alert-def
 class CreateAlertDefinitionPage extends React.Component {
   render() {
     return (
-      <DocumentTitle title="New Event Definition">
+      <DocumentTitle title="New Alert Definition">
         <span>
-          <PageHeader title="New Event Definition">
+          <PageHeader title="New Alert Definition">
             <span>
-              Event Definitions allow you to create Events from different Conditions and execute Actions on them.
+              Alert Definitions allow you to create Alerts from different Conditions and execute Actions on them.
             </span>
 
             <span>
-              Events are our new alerting system that let you define more flexible rules and
+              Alerts are our new alerting system that let you define more flexible rules and
             </span>
 
             <ButtonToolbar>
