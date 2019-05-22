@@ -7,6 +7,7 @@ import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import AlertDefinitionPriorityEnum from 'logic/alerts/AlertDefinitionPriorityEnum';
+import FormsUtils from 'util/FormsUtils';
 
 import styles from './AlertDefinitionForm.css';
 
@@ -23,9 +24,9 @@ class AlertDetailsForm extends React.Component {
   };
 
   handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name } = event.target;
     const { onChange } = this.props;
-    onChange(name, value);
+    onChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
   handlePriorityChange = (nextPriority) => {
@@ -38,7 +39,7 @@ class AlertDetailsForm extends React.Component {
 
     return (
       <Row>
-        <Col md={6}>
+        <Col md={7}>
           <h2 className={styles.title}>Alert Details</h2>
           <form onSubmit={this.handleSubmit}>
             <fieldset>
