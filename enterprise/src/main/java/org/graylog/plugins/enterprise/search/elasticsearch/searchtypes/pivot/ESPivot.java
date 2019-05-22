@@ -141,7 +141,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .mapKeyValue((integer, seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
-                    return seriesHandlers.get(seriesSpec.type()).createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
+                    final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
+                    if (esPivotSeriesSpecHandler == null) {
+                        throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
+                    }
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext);
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get);

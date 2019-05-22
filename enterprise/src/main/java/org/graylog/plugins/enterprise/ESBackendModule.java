@@ -34,6 +34,9 @@ import org.graylog.plugins.enterprise.search.searchtypes.pivot.series.Variance;
 public class ESBackendModule extends ViewsModule {
     @Override
     protected void configure() {
+        // Calling this once to set up binder, so injection does not fail.
+        esQueryDecoratorBinder();
+
         registerQueryBackend(ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);

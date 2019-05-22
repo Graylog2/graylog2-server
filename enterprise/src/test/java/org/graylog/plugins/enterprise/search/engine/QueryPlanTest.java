@@ -1,6 +1,5 @@
 package org.graylog.plugins.enterprise.search.engine;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -11,14 +10,13 @@ import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
+import org.graylog.plugins.enterprise.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.enterprise.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
-import org.graylog.plugins.enterprise.search.params.QueryReferenceBinding;
-import org.graylog.plugins.enterprise.search.params.ValueBinding;
 import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -57,12 +55,9 @@ public class QueryPlanTest {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, ESMessageList::new);
         handlers.put(DateHistogram.NAME, ESDateHistogram::new);
-        Map<String, Provider<Parameter.BindingHandler>> bindingHandlers = Maps.newHashMap();
-        bindingHandlers.put(ValueBinding.NAME, ValueBinding.Handler::new);
-        bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        ElasticsearchBackend backend = new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class));
+        ElasticsearchBackend backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake());
         queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend));
     }
 
@@ -147,12 +142,9 @@ public class QueryPlanTest {
 
         final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers =
                 ImmutableMap.of(MessageList.NAME, ESMessageList::new);
-        Map<String, Provider<Parameter.BindingHandler>> bindingHandlers = Maps.newHashMap();
-        bindingHandlers.put(ValueBinding.NAME, ValueBinding.Handler::new);
-        bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        final ElasticsearchBackend esBackend = spy(new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, mock(JestClient.class), mock(IndexRangeService.class), mock(StreamService.class)));
+        final ElasticsearchBackend esBackend = spy(new ElasticsearchBackend(handlers, queryStringParser, mock(JestClient.class), mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake()));
 
         doReturn(QueryResult.builder()
                 .searchTypes(ImmutableMap.of("messages", MessageList.Result.builder()

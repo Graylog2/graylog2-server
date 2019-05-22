@@ -3,9 +3,10 @@ package org.graylog.plugins.enterprise;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import io.searchbox.core.search.aggregation.Aggregation;
-import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.SearchType;
+import org.graylog.plugins.enterprise.search.elasticsearch.ESQueryDecorator;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
@@ -18,6 +19,14 @@ import org.graylog.plugins.enterprise.search.views.sharing.SharingStrategy;
 import org.graylog2.plugin.PluginModule;
 
 public abstract class ViewsModule extends PluginModule {
+    protected void registerESQueryDecorator(Class<? extends ESQueryDecorator> esQueryDecorator) {
+        esQueryDecoratorBinder().addBinding().to(esQueryDecorator);
+    }
+
+    protected Multibinder<ESQueryDecorator> esQueryDecoratorBinder() {
+        return Multibinder.newSetBinder(binder(), ESQueryDecorator.class);
+    }
+
     protected MapBinder<String, SeriesDescription> seriesSpecBinder() {
         return MapBinder.newMapBinder(binder(), String.class, SeriesDescription.class);
     }
@@ -25,17 +34,6 @@ public abstract class ViewsModule extends PluginModule {
     protected void registerPivotAggregationFunction(String name, Class<? extends SeriesSpec> seriesSpecClass) {
         registerJacksonSubtype(seriesSpecClass);
         seriesSpecBinder().addBinding(name).toInstance(SeriesDescription.create(name));
-    }
-
-    protected ScopedBindingBuilder registerParameterBinding(Class<? extends Parameter.Binding> bindingClass,
-                                                            String bindingName,
-                                                            Class<? extends Parameter.BindingHandler> bindingHandler) {
-        registerJacksonSubtype(bindingClass, bindingName);
-        MapBinder<String, Parameter.BindingHandler> bindingHandlerBinder =
-                MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class),
-                        new TypeLiteral<Parameter.BindingHandler>() {});
-
-        return bindingHandlerBinder.addBinding(bindingName).to(bindingHandler);
     }
 
     protected MapBinder<String, SharingStrategy> sharingStrategyBinder() {

@@ -63,6 +63,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.toSet;
 
 // TODO permission system
@@ -191,7 +192,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
             search = search.toBuilder().queries(newQueries).build();
         }
 
-        search = search.applyExecutionState(objectMapper, executionState);
+        search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
         final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
 

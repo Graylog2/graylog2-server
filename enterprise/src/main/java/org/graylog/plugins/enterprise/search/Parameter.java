@@ -1,5 +1,7 @@
 package org.graylog.plugins.enterprise.search;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -7,9 +9,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Parameters describe variable inputs to queries.
@@ -75,13 +79,52 @@ public abstract class Parameter {
             use = JsonTypeInfo.Id.NAME,
             include = JsonTypeInfo.As.PROPERTY,
             property = Binding.TYPE_FIELD,
-            visible = true)
+            visible = true,
+            defaultImpl = Binding.Fallback.class)
     public interface Binding {
-
         String TYPE_FIELD = "type";
 
         @JsonProperty(TYPE_FIELD)
         String type();
+
+        class Fallback implements Binding {
+            @JsonProperty
+            private String type;
+            private Map<String, Object> props = Maps.newHashMap();
+
+            @Override
+            public String type() {
+                return type;
+            }
+
+            @JsonAnySetter
+            public void setProperties(String key, Object value) {
+                props.put(key, value);
+            }
+
+            @JsonAnyGetter
+            public Map<String, Object> getProperties() {
+                return props;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
+                Binding.Fallback fallback = (Binding.Fallback) o;
+                return Objects.equals(type, fallback.type) &&
+                        Objects.equals(props, fallback.props);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(type, props);
+            }
+        }
     }
 
     @AutoValue.Builder
