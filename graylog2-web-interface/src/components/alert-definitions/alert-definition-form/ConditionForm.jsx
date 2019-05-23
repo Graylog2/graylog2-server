@@ -44,7 +44,6 @@ class AlertDetailsForm extends React.Component {
       return (
         <Row>
           <Col md={12} lg={7}>
-            <h2 className={commonStyles.title}>Filter</h2>
             <FilterForm alertDefinition={alertDefinition} streams={streams} onChange={this.propagateChange} />
 
             <FormGroup>

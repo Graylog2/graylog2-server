@@ -9,6 +9,8 @@ import { Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
 
+import commonStyles from '../common/commonStyles.css';
+
 class FilterForm extends React.Component {
   static propTypes = {
     alertDefinition: PropTypes.object.isRequired,
@@ -39,6 +41,7 @@ class FilterForm extends React.Component {
 
     return (
       <fieldset>
+        <h2 className={commonStyles.title}>Filter</h2>
         <Input id="filter-query"
                name="query"
                label="Search Query"
