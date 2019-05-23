@@ -99,11 +99,9 @@ const MessageList = createReactClass({
 
   render() {
     const { containerHeight, data, fields, currentView, pageSize = 7, config } = this.props;
-    let maxHeight = null;
+    let maxHeight = '';
     if (containerHeight) {
       maxHeight = containerHeight - 60;
-    } else {
-      maxHeight = 'calc(100% - 60px)';
     }
     const messages = (data && data.messages) || [];
     const { currentPage, expandedMessages } = this.state;
@@ -132,7 +130,7 @@ const MessageList = createReactClass({
                                  resultCount={messages.length} />
         </div>
 
-        <div className="search-results-table" style={{ overflow: 'auto', height: '100%', maxHeight: maxHeight }}>
+        <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 60px)', maxHeight: maxHeight }}>
           <div className="table-responsive">
             <div className={`messages-container ${styles.messageListTableHeader}`}>
               <table className="table table-condensed messages" style={{ marginTop: 0 }}>

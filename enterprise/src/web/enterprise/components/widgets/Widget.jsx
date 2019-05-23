@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
-
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import { widgetDefinition } from 'enterprise/logic/Widget';
@@ -96,8 +95,9 @@ class Widget extends React.Component<Props, State> {
   }
 
   _onDelete = (widget) => {
+    const { title } = this.props;
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to remove the widget "${this.props.title}"?`)) {
+    if (window.confirm(`Are you sure you want to remove the widget "${title}"?`)) {
       WidgetActions.remove(widget.id);
     }
   };
@@ -110,6 +110,7 @@ class Widget extends React.Component<Props, State> {
   };
 
   _onToggleEdit = () => {
+    const { widget } = this.props;
     this.setState((state) => {
       if (state.editing) {
         return {
@@ -121,13 +122,14 @@ class Widget extends React.Component<Props, State> {
       RefreshActions.disable();
       return {
         editing: true,
-        oldConfig: this.props.widget.config,
+        oldConfig: widget.config,
       };
     });
   };
 
   _onCancelEdit = () => {
-    if (this.state.configChanged) {
+    const { configChanged } = this.state;
+    if (configChanged) {
       const { id } = this.props;
       const { oldConfig } = this.state;
       WidgetActions.updateConfig(id, oldConfig);
@@ -167,7 +169,7 @@ class Widget extends React.Component<Props, State> {
   };
 
   render() {
-    const { id, widget, fields, onSizeChange, title } = this.props;
+    const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
     const { editing } = this.state;
     const { config, filter } = widget;
     const visualization = this.visualize();
@@ -202,28 +204,26 @@ class Widget extends React.Component<Props, State> {
       <WidgetColorContext id={id}>
         <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
           <span>
-            <MeasureDimensions>
-              <WidgetHeader title={title}
-                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing}>
-                <WidgetHorizontalStretch widgetId={widget.id}
-                                         widgetType={widget.type}
-                                         onStretch={this.props.onPositionsChange}
-                                         position={this.props.position} />
-                {' '}
-                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                </WidgetFilterMenu>
-                {' '}
-                <WidgetActionDropdown>
-                  <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                  <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                  <MenuItem divider />
-                  <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                </WidgetActionDropdown>
-              </WidgetHeader>
-              {visualization}
-            </MeasureDimensions>
+            <WidgetHeader title={title}
+                          onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                          editing={editing}>
+              <WidgetHorizontalStretch widgetId={widget.id}
+                                       widgetType={widget.type}
+                                       onStretch={onPositionsChange}
+                                       position={position} />
+              {' '}
+              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+              </WidgetFilterMenu>
+              {' '}
+              <WidgetActionDropdown>
+                <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                <MenuItem divider />
+                <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+              </WidgetActionDropdown>
+            </WidgetHeader>
+            {visualization}
           </span>
         </WidgetFrame>
       </WidgetColorContext>

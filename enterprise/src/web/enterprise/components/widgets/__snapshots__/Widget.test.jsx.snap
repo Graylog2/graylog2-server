@@ -19,59 +19,50 @@ exports[`<Widget /> should render with empty props 1`] = `
     }
   >
     <span>
-      <span
-        style={
-          Object {
-            "display": "block",
-            "height": "100%",
-          }
-        }
+      <widget-header
+        editing={false}
+        onRename={[Function]}
+        title="Widget Title"
       >
-        <widget-header
-          editing={false}
-          onRename={[Function]}
-          title="Widget Title"
-        >
-          <span>
-            <i
-              className="fa fa-arrows-h button"
-              onClick={[Function]}
-              role="link"
-              tabIndex={0}
-            />
-          </span>
-           
+        <span>
           <i
-            className="fa fa-filter widgetActionDropdownCaret filterNotSet"
+            className="fa fa-arrows-h button"
             onClick={[Function]}
+            role="link"
+            tabIndex={0}
           />
-           
+        </span>
+         
+        <i
+          className="fa fa-filter widgetActionDropdownCaret filterNotSet"
+          onClick={[Function]}
+        />
+         
+        <span
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          role="presentation"
+        >
           <span
             onClick={[Function]}
-            onMouseDown={[Function]}
+            onKeyDown={[Function]}
             role="presentation"
           >
-            <span
-              onClick={[Function]}
-              onKeyDown={[Function]}
-              role="presentation"
-            >
-              <span>
-                <i
-                  className="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
-                />
-              </span>
+            <span>
+              <i
+                className="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+              />
             </span>
           </span>
-        </widget-header>
-        <div
-          className="spinnerContainer"
-        >
-          <i
-            className="fa fa-spin fa-3x fa-refresh spinner"
-          />
-        </div>
-      </span>
+        </span>
+      </widget-header>
+      <div
+        className="spinnerContainer"
+      >
+        <i
+          className="fa fa-spin fa-3x fa-refresh spinner"
+        />
+      </div>
     </span>
   </div>
 </div>
