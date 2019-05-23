@@ -15,7 +15,7 @@ import 'brace/mode/yaml';
 import 'brace/theme/tomorrow';
 import 'brace/theme/monokai';
 
-import PipelineRulesMode from './mode-pipeline.js';
+import PipelineRulesMode from './SourceCodeMode-pipleline';
 import style from './SourceCodeEditor.css';
 import './webpack-resolver';
 
@@ -43,7 +43,7 @@ class SourceCodeEditor extends React.Component {
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
-    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
+    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'java']),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */
@@ -90,10 +90,12 @@ class SourceCodeEditor extends React.Component {
   componentDidMount() {
     const { mode } = this.props;
 
-    if (mode === 'pipeline') {
+    if (mode === 'java') {
       const pipelineRulesMode = new PipelineRulesMode();
 
-      this.reactAce.editor.getSession().setMode(pipelineRulesMode);
+      pipelineRulesMode.then((pipelineMode) => {
+        this.reactAce.editor.getSession().setMode(pipelineMode);
+      });
     }
   }
 

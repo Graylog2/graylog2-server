@@ -1,29 +1,23 @@
+import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+
 import 'brace/mode/java';
 
-class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules {
+const loadFunctions = () => {
+  const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
+
+  return fetch('GET', url).then(response => response.map(res => res.name).join('|'));
+};
+const keywords = 'let|rule|match|pipeline';
+const operators = 'and|or|not';
+const builtinConstants = 'all|either|during|when|then|end';
+
+let builtinFunctions = '';
+
+export class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules {
   constructor() {
     super();
-
-    const keywords = 'let|rule|match|pipeline';
-
-    const operators = 'and|or|not';
-
-    const builtinConstants = 'all|either|during|when|then|end';
-
-    const builtinFunctions = 'to_bool|to_double|to_long|to_string|to_map|is_bool|is_number|is_double|is_long|is_string|'
-        + 'is_collection|is_list|is_map|is_date|is_period|is_ip|is_json|is_url|has_field|set_field|'
-        + 'set_fields|rename_field|remove_field|drop_message|create_message|clone_message|'
-        + 'remove_from_stream|route_to_stream|from_input|regex|regex_replace|grok|grok_exists|abbreviate|'
-        + 'capitalize|contains|ends_with|lowercase|substring|swapcase|uncapitalize|uppercase|concat|key_value|'
-        + 'join|split|starts_with|replace|parse_json|select_jsonpath|to_date|now|parse_date|'
-        + 'parse_unix_milliseconds|flex_parse_date|format_date|years|months|weeks|days|hours|minutes|seconds|'
-        + 'millis|period|crc32|crc32c|md5|murmur3_32|murmur3_128|sha1|sha256|sha512|base16_encode|base16_decode|'
-        + 'base32_encode|base32_decode|base32human_encode|base32human_decode|base64_encode|base64_decode|'
-        + 'base64url_encode|base64url_decode|cidr_match|to_ip|is_null|is_not_null|to_url|urldecode|urlencode|'
-        + 'syslog_facility|syslog_level|expand_syslog_priority|expand_syslog_priority_as_string|lookup|'
-        + 'lookup_value|debug|parse_cef|otx_lookup_domain|otx_lookup_ip|tor_lookup|spamhaus_lookup_ip|'
-        + 'abusech_ransom_lookup_domain|abusech_ransom_lookup_ip|threat_intel_lookup_ip|'
-        + 'threat_intel_lookup_domain|whois_lookup_ip|in_private_net';
 
     const keywordMapper = this.createKeywordMapper(
       {
@@ -98,6 +92,12 @@ class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highligh
 export default class PipelineRulesMode extends window.ace.acequire('ace/mode/java').Mode {
   constructor() {
     super();
-    this.HighlightRules = PipelineHighlightRules;
+
+    return loadFunctions().then((res) => {
+      builtinFunctions = res;
+      this.HighlightRules = PipelineHighlightRules;
+
+      return this;
+    });
   }
 }

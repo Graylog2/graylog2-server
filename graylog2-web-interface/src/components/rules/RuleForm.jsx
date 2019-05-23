@@ -180,7 +180,7 @@ class RuleForm extends React.Component {
                               value={rule.source}
                               onLoad={this._onLoad}
                               onChange={this._onSourceChange}
-                              mode="pipeline" />
+                              mode="java" />
           </Input>
         </fieldset>
 
