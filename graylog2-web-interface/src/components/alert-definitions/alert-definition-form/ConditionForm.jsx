@@ -5,6 +5,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Radio, Row } from 'react-boots
 
 import FormsUtils from 'util/FormsUtils';
 import FilterForm from './FilterForm';
+import AggregationForm from './AggregationForm';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -42,29 +43,38 @@ class AlertDetailsForm extends React.Component {
 
     if (dataSource === 'log-messages') {
       return (
-        <Row>
-          <Col md={12} lg={7}>
-            <FilterForm alertDefinition={alertDefinition} streams={streams} onChange={this.propagateChange} />
+        <React.Fragment>
+          <Row>
+            <Col md={12} lg={7}>
+              <FilterForm alertDefinition={alertDefinition} streams={streams} onChange={this.propagateChange} />
 
-            <FormGroup>
-              <ControlLabel>Create Events for Alert if...</ControlLabel>
-              <Radio id="filter-type"
-                     name="type"
-                     value="filter-v1"
-                     checked={alertDefinition.config.type === 'filter-v1'}
-                     onChange={this.handleConfigChange}>
-                Filter has results
-              </Radio>
-              <Radio id="aggregation-type"
-                     name="type"
-                     value="aggregation-v1"
-                     checked={alertDefinition.config.type === 'aggregation-v1'}
-                     onChange={this.handleConfigChange}>
-                Aggregation of results reaches a threshold
-              </Radio>
-            </FormGroup>
-          </Col>
-        </Row>
+              <FormGroup>
+                <ControlLabel>Create Events for Alert if...</ControlLabel>
+                <Radio id="filter-type"
+                       name="type"
+                       value="filter-v1"
+                       checked={alertDefinition.config.type === 'filter-v1'}
+                       onChange={this.handleConfigChange}>
+                  Filter has results
+                </Radio>
+                <Radio id="aggregation-type"
+                       name="type"
+                       value="aggregation-v1"
+                       checked={alertDefinition.config.type === 'aggregation-v1'}
+                       onChange={this.handleConfigChange}>
+                  Aggregation of results reaches a threshold
+                </Radio>
+              </FormGroup>
+            </Col>
+          </Row>
+          {alertDefinition.config.type === 'aggregation-v1' && (
+            <Row>
+              <Col md={12}>
+                <AggregationForm alertDefinition={alertDefinition} onChange={this.propagateChange} />
+              </Col>
+            </Row>
+          )}
+        </React.Fragment>
       );
     }
 

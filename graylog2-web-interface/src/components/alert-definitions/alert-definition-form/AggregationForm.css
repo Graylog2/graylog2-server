@@ -1,0 +1,9 @@
+:local(.checkbox) {
+    margin-top: 30px;
+}
+
+:local(.helpButton) {
+    line-height: inherit;
+    vertical-align: middle;
+    padding: 0 0.5em 0 0.5em;
+}
