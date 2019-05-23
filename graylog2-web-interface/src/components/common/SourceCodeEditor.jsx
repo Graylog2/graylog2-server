@@ -15,7 +15,7 @@ import 'brace/mode/yaml';
 import 'brace/theme/tomorrow';
 import 'brace/theme/monokai';
 
-import PipelineRulesMode from './mode-pipeline.js';
+import PipelineRulesMode from './SourceCodeMode-pipleline';
 import style from './SourceCodeEditor.css';
 // import PipelineRulesMode from './SourceCodeMode-pipeline';
 import './webpack-resolver';
