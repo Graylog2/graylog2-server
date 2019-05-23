@@ -6,7 +6,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Radio, Row } from 'react-boots
 import FormsUtils from 'util/FormsUtils';
 import FilterForm from './FilterForm';
 
-import styles from './AlertDefinitionForm.css';
+import commonStyles from '../common/commonStyles.css';
 
 class AlertDetailsForm extends React.Component {
   static propTypes = {
@@ -44,7 +44,7 @@ class AlertDetailsForm extends React.Component {
       return (
         <Row>
           <Col md={12}>
-            <h2 className={styles.title}>Filter</h2>
+            <h2 className={commonStyles.title}>Filter</h2>
             <FilterForm alertDefinition={alertDefinition} streams={streams} onChange={this.propagateChange} />
 
             <FormGroup>
@@ -78,7 +78,7 @@ class AlertDetailsForm extends React.Component {
     return (
       <Row>
         <Col md={7}>
-          <h2 className={styles.title}>Select Data Source</h2>
+          <h2 className={commonStyles.title}>Select Data Source</h2>
           <form onSubmit={this.handleSubmit}>
             <fieldset>
               <FormGroup>

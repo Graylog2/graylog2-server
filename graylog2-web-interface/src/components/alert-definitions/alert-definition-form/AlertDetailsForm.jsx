@@ -9,7 +9,7 @@ import { Input } from 'components/bootstrap';
 import AlertDefinitionPriorityEnum from 'logic/alerts/AlertDefinitionPriorityEnum';
 import FormsUtils from 'util/FormsUtils';
 
-import styles from './AlertDefinitionForm.css';
+import commonStyles from '../common/commonStyles.css';
 
 const priorityOptions = lodash.map(AlertDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: lodash.upperFirst(value.name) }));
 
@@ -40,7 +40,7 @@ class AlertDetailsForm extends React.Component {
     return (
       <Row>
         <Col md={7}>
-          <h2 className={styles.title}>Alert Details</h2>
+          <h2 className={commonStyles.title}>Alert Details</h2>
           <form onSubmit={this.handleSubmit}>
             <fieldset>
               <Input id="alert-definition-title"
