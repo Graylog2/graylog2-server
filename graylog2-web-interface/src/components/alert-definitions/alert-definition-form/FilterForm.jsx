@@ -50,7 +50,7 @@ class FilterForm extends React.Component {
                value={lodash.defaultTo(alertDefinition.config.query, '')}
                onChange={this.handleConfigChange} />
 
-        <FormGroup>
+        <FormGroup controlId="filter-streams">
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
           <MultiSelect id="filter-streams"
                        matchProp="label"
