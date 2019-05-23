@@ -43,7 +43,7 @@ class AlertDetailsForm extends React.Component {
     if (dataSource === 'log-messages') {
       return (
         <Row>
-          <Col md={12}>
+          <Col md={12} lg={7}>
             <h2 className={commonStyles.title}>Filter</h2>
             <FilterForm alertDefinition={alertDefinition} streams={streams} onChange={this.propagateChange} />
 
@@ -77,7 +77,7 @@ class AlertDetailsForm extends React.Component {
 
     return (
       <Row>
-        <Col md={7}>
+        <Col md={12}>
           <h2 className={commonStyles.title}>Select Data Source</h2>
           <form onSubmit={this.handleSubmit}>
             <fieldset>
