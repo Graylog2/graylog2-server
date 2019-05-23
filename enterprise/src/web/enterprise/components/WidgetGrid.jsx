@@ -17,7 +17,7 @@ import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
 import { TitleTypes } from '../stores/TitlesStore';
 
-const defaultTitleGenerator = w => `Unnamed ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
+const defaultTitleGenerator = w => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {

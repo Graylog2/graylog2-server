@@ -94,6 +94,7 @@ export default {
       editComponent: EditMessageList,
       searchResultTransformer: (data: Array<*>) => data[0],
       searchTypes: () => [{ type: 'messages' }],
+      titleGenerator: () => 'Untitled Message Table',
     },
     {
       type: 'AGGREGATION',
