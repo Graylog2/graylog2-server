@@ -65,6 +65,8 @@ const TimeUnitInput = createReactClass({
     labelClassName: PropTypes.string,
     /** Add an additional class to the input wrapper. */
     wrapperClassName: PropTypes.string,
+    /** Specifies if the input should render a checkbox. Use this if the enabled state is controlled by another input */
+    hideCheckbox: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -80,6 +82,7 @@ const TimeUnitInput = createReactClass({
       defaultEnabled: false,
       labelClassName: undefined,
       wrapperClassName: undefined,
+      hideCheckbox: false,
     };
   },
 
@@ -156,13 +159,13 @@ const TimeUnitInput = createReactClass({
       </InputGroup.Addon>
     );
 
-    const { label, wrapperClassName, help, labelClassName, unit, required } = this.props;
+    const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox } = this.props;
     return (
       <FormGroup>
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           <InputGroup>
-            {!required && checkbox}
+            {(!required && !hideCheckbox) && checkbox}
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"

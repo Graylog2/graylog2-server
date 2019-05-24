@@ -62,4 +62,21 @@ describe('<TimeUnitInput />', () => {
     expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
     expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
   });
+
+  it('should not display checkbox when hideCheckbox is set', () => {
+    const wrapper = mount(<TimeUnitInput update={() => {}} hideCheckbox />);
+    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+  });
+
+  it('should use required and enabled when hideCheckbox is set', () => {
+    let wrapper = mount(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
+    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeFalsy();
+    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeFalsy();
+
+    wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} defaultEnabled={false} hideCheckbox />);
+    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
+    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
+  });
 });
