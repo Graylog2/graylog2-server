@@ -2,7 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import {
-  InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
+  ControlLabel,
+  DropdownButton,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  InputGroup,
+  MenuItem,
 } from 'react-bootstrap';
 import lodash from 'lodash';
 
@@ -78,20 +84,23 @@ const TimeUnitInput = createReactClass({
   },
 
   getInitialState() {
+    const { defaultEnabled, enabled, units } = this.props;
     return {
-      enabled: lodash.defaultTo(this.props.enabled, this.props.defaultEnabled),
-      unitOptions: this._getUnitOptions(this.props.units),
+      enabled: lodash.defaultTo(enabled, defaultEnabled),
+      unitOptions: this._getUnitOptions(units),
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!lodash.isEqual(this.props.units, nextProps.units)) {
+    const { units } = this.props;
+    if (!lodash.isEqual(units, nextProps.units)) {
       this.setState({ unitOptions: this._getUnitOptions(nextProps.units) });
     }
   },
 
   _getEffectiveValue() {
-    return lodash.defaultTo(this.props.value, this.props.defaultValue);
+    const { defaultValue, value } = this.props;
+    return lodash.defaultTo(value, defaultValue);
   },
 
   _getUnitOptions(units) {
@@ -101,20 +110,23 @@ const TimeUnitInput = createReactClass({
   },
 
   _isChecked() {
-    if (this.props.required) {
-      return this.props.required;
+    const { required, enabled } = this.props;
+    if (required) {
+      return required;
     }
-    return lodash.defaultTo(this.props.enabled, this.state.enabled);
+    const { enabled: enabledState } = this.state;
+    return lodash.defaultTo(enabled, enabledState);
   },
 
   _propagateInput(update) {
+    const { update: onUpdate, unit } = this.props;
     const previousInput = {
       value: this._getEffectiveValue(),
-      unit: this.props.unit,
+      unit: unit,
       checked: this._isChecked(),
     };
     const nextInput = Object.assign({}, previousInput, update);
-    this.props.update(nextInput.value, nextInput.unit, nextInput.checked);
+    onUpdate(nextInput.value, nextInput.unit, nextInput.checked);
   },
 
   _onToggleEnable(e) {
@@ -133,7 +145,8 @@ const TimeUnitInput = createReactClass({
   },
 
   render() {
-    const options = this.state.unitOptions.map((o) => {
+    const { unitOptions } = this.state;
+    const options = unitOptions.map((o) => {
       return <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)}>{o.label}</MenuItem>;
     });
 
@@ -143,20 +156,21 @@ const TimeUnitInput = createReactClass({
       </InputGroup.Addon>
     );
 
+    const { label, wrapperClassName, help, labelClassName, unit, required } = this.props;
     return (
       <FormGroup>
-        {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
-        <InputWrapper className={this.props.wrapperClassName}>
+        {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
+        <InputWrapper className={wrapperClassName}>
           <InputGroup>
-            {!this.props.required && checkbox}
+            {!required && checkbox}
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
-                            title={this.state.unitOptions.filter(o => o.value === this.props.unit)[0].label}>
+                            title={unitOptions.filter(o => o.value === unit)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>
-          {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
+          {help && <HelpBlock>{help}</HelpBlock>}
         </InputWrapper>
       </FormGroup>
     );
