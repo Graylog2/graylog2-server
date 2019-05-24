@@ -14,6 +14,7 @@ describe('<TimeUnitInput />', () => {
     const checkbox = wrapper.find('input[type="checkbox"]');
     expect(checkbox.prop('checked')).toBe(false);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
+    expect(wrapper.find('li.active a').prop('children')).toBe('seconds');
     checkbox.simulate('click');
   });
 
@@ -29,6 +30,21 @@ describe('<TimeUnitInput />', () => {
     expect(checkbox.prop('checked')).toBe(true);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(42);
     checkbox.simulate('click');
+  });
+
+  it('should use custom unit values', () => {
+    const onUpdate = (value, unit, checked) => {
+      expect(value).toBe(42);
+      expect(unit).toBe('DAYS');
+      expect(checked).toBeTruthy();
+    };
+
+    const wrapper = mount(<TimeUnitInput update={onUpdate} unit="DAYS" defaultEnabled />);
+    const checkbox = wrapper.find('input[type="checkbox"]');
+    expect(checkbox.prop('checked')).toBe(true);
+    expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
+    expect(wrapper.find('li.active a').prop('children')).toBe('days');
+    wrapper.find('input[type="number"]').simulate('change', { target: { value: 42 } });
   });
 
   it('should use values before default values', () => {
