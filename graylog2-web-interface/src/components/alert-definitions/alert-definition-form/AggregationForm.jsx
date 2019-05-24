@@ -32,8 +32,20 @@ class AggregationForm extends React.Component {
     onChange('config', config);
   };
 
+  handleCustomTimerangeChange = (nextValue, nextUnit) => {
+    const { alertDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(alertDefinition.config);
+    config.aggregation_timerange = {
+      value: nextValue,
+      unit: nextUnit,
+    };
+    onChange('config', config);
+  };
+
   render() {
     const { alertDefinition } = this.props;
+    const useScheduleTimerange = lodash.defaultTo(alertDefinition.config.use_schedule_timerange, true);
+    const aggregationTimerange = lodash.defaultTo(alertDefinition.config.aggregation_timerange, {});
 
     return (
       <fieldset>
@@ -96,11 +108,19 @@ class AggregationForm extends React.Component {
         <Row className="row-sm">
           <Col md={6}>
             <TimeUnitInput label="In the last"
-                           update={() => {}} />
+                           update={this.handleCustomTimerangeChange}
+                           enabled={!useScheduleTimerange}
+                           value={lodash.defaultTo(aggregationTimerange.value, 1)}
+                           unit={aggregationTimerange.unit}
+                           units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
+                           hideCheckbox />
           </Col>
           <Col md={6}>
             <FormGroup className={styles.checkbox}>
-              <Checkbox checked inline>
+              <Checkbox name="use_schedule_timerange"
+                        checked={useScheduleTimerange}
+                        onChange={this.handleConfigChange}
+                        inline>
                 Use schedule time range
               </Checkbox>
               <span className={styles.helpButton}>
