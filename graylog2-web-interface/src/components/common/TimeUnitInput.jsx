@@ -139,7 +139,8 @@ const TimeUnitInput = createReactClass({
   },
 
   _onUpdate(e) {
-    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), this.props.defaultValue);
+    const { defaultValue } = this.props;
+    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
     this._propagateInput({ value: value });
   },
 
