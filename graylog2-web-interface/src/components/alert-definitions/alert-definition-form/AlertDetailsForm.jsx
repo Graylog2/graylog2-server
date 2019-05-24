@@ -39,7 +39,7 @@ class AlertDetailsForm extends React.Component {
 
     return (
       <Row>
-        <Col md={7}>
+        <Col md={10} lg={7}>
           <h2 className={commonStyles.title}>Alert Details</h2>
           <form onSubmit={this.handleSubmit}>
             <fieldset>
