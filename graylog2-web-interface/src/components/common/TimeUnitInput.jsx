@@ -166,7 +166,8 @@ const TimeUnitInput = createReactClass({
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
-                            title={unitOptions.filter(o => o.value === unit)[0].label}>
+                            title={unitOptions.filter(o => o.value === unit)[0].label}
+                            disabled={!this._isChecked()}>
               {options}
             </DropdownButton>
           </InputGroup>

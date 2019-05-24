@@ -56,4 +56,10 @@ describe('<TimeUnitInput />', () => {
     expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
     wrapper.find('input[type="number"]').simulate('change', { target: { value: 42 } });
   });
+
+  it('should disable all inputs when disabled', () => {
+    const wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} />);
+    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
+    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
+  });
 });
