@@ -10,41 +10,44 @@ import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.plugins.enterprise.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog.plugins.enterprise.search.searchtypes.Sort;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
-    private static final Logger LOG = LoggerFactory.getLogger(ESMessageList.class);
+    private final ESQueryDecorators esQueryDecorators;
+
+    @Inject
+    public ESMessageList(ESQueryDecorators esQueryDecorators) {
+        this.esQueryDecorators = esQueryDecorators;
+    }
 
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList);
-        searchSourceBuilder
+        final String queryString = this.esQueryDecorators.decorate(((ElasticsearchQueryString)query.query()).queryString(), job, query, Collections.emptySet());
+
+        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit() - messageList.offset())
                 .from(messageList.offset())
                 .highlighter(new HighlightBuilder().requireFieldMatch(false)
-                        .highlightQuery(QueryBuilders.queryStringQuery(((ElasticsearchQueryString)query.query()).queryString()))
+                        .highlightQuery(QueryBuilders.queryStringQuery(queryString))
                         .field("*")
                         .fragmentSize(0)
                         .numOfFragments(0));
-        final List<Sort> sorts = messageList.sort();
-        if (sorts == null) {
-            searchSourceBuilder.sort(Message.FIELD_TIMESTAMP, SortOrder.DESC);
-        } else {
-            sorts.forEach(sort -> {
-                searchSourceBuilder.sort(sort.field(), sort.order());
-            });
-        }
+        final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, SortOrder.DESC)));
+        sorts.forEach(sort -> searchSourceBuilder.sort(sort.field(), sort.order()));
     }
 
     @Override

@@ -33,7 +33,7 @@ public class ElasticsearchBackendTest {
     @BeforeClass
     public static void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, ESMessageList::new);
+        handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
         handlers.put(DateHistogram.NAME, ESDateHistogram::new);
 
         final QueryStringParser queryStringParser = new QueryStringParser();

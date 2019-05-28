@@ -53,7 +53,7 @@ public class QueryPlanTest {
     public QueryPlanTest() throws InvalidRangeParametersException {
         timerange = RelativeRange.create(60);
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, ESMessageList::new);
+        handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
         handlers.put(DateHistogram.NAME, ESDateHistogram::new);
 
         final QueryStringParser queryStringParser = new QueryStringParser();
@@ -141,7 +141,7 @@ public class QueryPlanTest {
         SearchJob job = new SearchJob(randomUUID(), search, "admin");
 
         final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers =
-                ImmutableMap.of(MessageList.NAME, ESMessageList::new);
+                ImmutableMap.of(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
         final ElasticsearchBackend esBackend = spy(new ElasticsearchBackend(handlers, queryStringParser, mock(JestClient.class), mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake()));
