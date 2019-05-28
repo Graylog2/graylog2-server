@@ -57,10 +57,19 @@ public abstract class PaginatedDbService<DTO> {
                                  MongoJackObjectMapperProvider mapper,
                                  Class<DTO> dtoClass,
                                  String collectionName) {
+        this(mongoConnection, mapper, dtoClass, collectionName, null);
+    }
+
+    protected PaginatedDbService(MongoConnection mongoConnection,
+                                 MongoJackObjectMapperProvider mapper,
+                                 Class<DTO> dtoClass,
+                                 String collectionName,
+                                 Class<?> view) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
                 dtoClass,
                 ObjectId.class,
-                mapper.get());
+                mapper.get(),
+                view);
     }
 
     /**
