@@ -23,6 +23,7 @@ export default class SearchExecutionState {
     return this._value.parameterBindings;
   }
 
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { parameterBindings } = this._value;
     // eslint-disable-next-line no-use-before-define
@@ -73,6 +74,6 @@ class Builder {
 
 const getParameterBindingValue = (executionState: SearchExecutionState, parameterName: string) => executionState.parameterBindings.get(parameterName, ParameterBinding.empty()).value;
 
-const getParameterBindingsAsMap = (bindings: ParameterBindings): any => bindings.flatMap((binding: ParameterBinding, name: string) => ({ [name]: binding.value }));
+const getParameterBindingsAsMap = (bindings: ParameterBindings) => bindings.flatMap((binding: ParameterBinding, name: string) => ({ [name]: binding.value }));
 
 export { getParameterBindingsAsMap, getParameterBindingValue };

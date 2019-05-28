@@ -40,9 +40,7 @@ import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessa
 import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'enterprise/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'enterprise/logic/fieldactions/RemoveFromAllTablesActionHandler';
-import CreateParameterDialog from 'enterprise/logic/creatoractions/CreateParameterDialog';
 import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
-import ExecuteViewWithValue from 'enterprise/components/views/ExecuteViewWithValue';
 import SelectExtractorType from 'enterprise/logic/valueactions/SelectExtractorType';
 
 import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
@@ -57,6 +55,8 @@ import SpecificUsers from 'enterprise/logic/views/sharing/SpecificUsers';
 import UseInNewQueryHandler from 'enterprise/logic/valueactions/UseInNewQueryHandler';
 import ShowDocumentsHandler from 'enterprise/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'enterprise/logic/valueactions/HighlightValueHandler';
+import FieldNameCompletion from './components/searchbar/completions/FieldNameCompletion';
+import OperatorCompletion from './components/searchbar/completions/OperatorCompletion';
 import type { ValueActionHandlerConditionProps } from './logic/valueactions/ValueActionHandler';
 import type { FieldActionHandlerConditionProps } from './logic/fieldactions/FieldActionHandler';
 
@@ -188,11 +188,6 @@ export default {
       condition: ({ field }: ValueActionHandlerConditionProps) => !isFunction(field),
     },
     {
-      type: 'execute-view-with-value',
-      title: 'Insert into view',
-      component: ExecuteViewWithValue,
-    },
-    {
       type: 'new-query',
       title: 'Use in new query',
       handler: UseInNewQueryHandler,
@@ -269,10 +264,9 @@ export default {
       title: 'Custom Aggregation',
       func: CreateCustomAggregation,
     },
-    {
-      type: 'generic',
-      title: 'Parameter',
-      component: CreateParameterDialog,
-    },
+  ],
+  'views.completers': [
+    new FieldNameCompletion(),
+    new OperatorCompletion(),
   ],
 };

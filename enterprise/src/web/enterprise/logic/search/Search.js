@@ -51,6 +51,11 @@ export default class Search {
     return this._value.parameters;
   }
 
+  get requiredParameters(): Immutable.Set<Parameter> {
+    return this.parameters
+      .filter(p => (!p.optional && !p.defaultValue));
+  }
+
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, queries, parameters } = this._value;

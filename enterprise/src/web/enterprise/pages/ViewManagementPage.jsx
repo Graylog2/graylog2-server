@@ -1,10 +1,14 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 
+// $FlowFixMe: imports from core need to be fixed in flow
 import Routes from 'routing/Routes';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { DocumentTitle, PageHeader } from 'components/common';
 
 import { ViewManagementStore, ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
@@ -21,7 +25,7 @@ const ViewManagementPage = createReactClass({
 
   handleViewDelete(view) {
     // eslint-disable-next-line no-alert
-    if (confirm(`Are you sure you want to delete "${view.title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
       return ViewManagementActions.delete(view);
     }
     return null;

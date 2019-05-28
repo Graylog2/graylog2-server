@@ -24,6 +24,7 @@ type SearchActionsType = {
   create: (Search) => Promise<CreateSearchResponse>,
   execute: (SearchExecutionState) => Promise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
+  refresh: () => Promise<*>,
   get: (SearchId) => Promise<SearchJson>,
   parameters: (Array<Parameter>) => Promise<View>,
 };
@@ -42,6 +43,9 @@ const SearchActions: SearchActionsType = Reflux.createActions({
     asyncResult: true,
   },
   parameters: {
+    asyncResult: true,
+  },
+  refresh: {
     asyncResult: true,
   },
 });

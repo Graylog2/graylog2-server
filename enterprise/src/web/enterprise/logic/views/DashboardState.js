@@ -10,7 +10,7 @@ export default class DashboardState {
   }
 
   static create() {
-    return new DashboardState({}, {});
+    return new DashboardState({}, []);
   }
 
   get widgets() {

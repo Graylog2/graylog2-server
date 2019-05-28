@@ -41,7 +41,7 @@ type ViewManagementActionsType = {
   delete: (View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
   get: (string) => Promise<ViewJson>,
-  search: (string, number, number, SortField, SortOrder) => Promise<PaginatedViews>,
+  search: (string, number, number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
   update: (View) => Promise<View>,
 };
 

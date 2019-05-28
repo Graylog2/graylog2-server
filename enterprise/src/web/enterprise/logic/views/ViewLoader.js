@@ -1,19 +1,57 @@
 // @flow strict
-import * as Immutable from 'immutable';
-import { SearchParameterActions } from 'enterprise/stores/SearchParameterStore';
-import { SearchExecutionStateActions } from 'enterprise/stores/SearchExecutionStateStore';
+// $FlowFixMe: imports from core need to be fixed in flow
+import Routes from 'routing/Routes';
+// $FlowFixMe: imports from core need to be fixed in flow
+import history from 'util/History';
 
+import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
+import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 import View from './View';
-import Parameter from '../parameters/Parameter';
-import SearchExecutionState from '../search/SearchExecutionState';
-import ParameterBinding from '../parameters/ParameterBinding';
+import ViewDeserializer from './ViewDeserializer';
 
-export default function ViewLoader(view: View): Promise<View> {
-  const { search } = view;
-  const searchParameters: Immutable.Set<Parameter> = search.parameters || Immutable.Set();
-  const parameterBindings = Immutable.Map(searchParameters.map((parameter: Parameter) => [parameter.name, ParameterBinding.forValue(parameter.defaultValue)]));
-  const searchExecutionState = SearchExecutionState.create(parameterBindings);
+const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
+  return hooks.reduce((prev, cur: ViewHook) => prev.then(() => cur(args)), Promise.resolve());
+};
 
-  return Promise.all([SearchParameterActions.load(searchParameters), SearchExecutionStateActions.replace(searchExecutionState)])
-    .then(() => view);
-}
+type Query = { [string]: any };
+type OnSuccess = () => void;
+type OnError = () => void;
+
+const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess) => {
+  let promise;
+  if (viewHooks.length > 0) {
+    const retry = () => _processViewHooks(viewHooks, view, query, onSuccess);
+    promise = _chainHooks(viewHooks, { view, retry, query });
+  } else {
+    promise = Promise.resolve(true);
+  }
+  return promise.then(() => view).then(onSuccess).then(() => view);
+};
+
+const ViewLoader = (viewId: string,
+  loadingViewHooks: Array<ViewHook> = [],
+  executingViewHooks: Array<ViewHook> = [],
+  query: Query = {},
+  onSuccess: OnSuccess = () => {},
+  onError: OnError = () => {}) => {
+  return ViewManagementActions.get(viewId)
+    .then(ViewDeserializer, (e) => {
+      if (e.status === 404) {
+        history.replace(Routes.NOTFOUND);
+      } else {
+        throw e;
+      }
+      return View.create();
+    })
+    .then((view) => {
+      return _processViewHooks(loadingViewHooks, view, query, onSuccess);
+    })
+    .then((view) => {
+      return _processViewHooks(executingViewHooks, view, query, onSuccess);
+    })
+    .catch(onError);
+};
+
+export type ViewLoaderFn = typeof ViewLoader;
+
+export default ViewLoader;

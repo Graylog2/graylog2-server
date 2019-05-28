@@ -1,13 +1,10 @@
 // @flow strict
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { trim } from 'lodash';
 
 import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
-import Parameter from 'enterprise/logic/parameters/Parameter';
 import ParameterBinding from 'enterprise/logic/parameters/ParameterBinding';
-import { SearchParameterActions } from './SearchParameterStore';
-import { ViewMetadataStore } from './ViewMetadataStore';
+import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
 
 const defaultExecutionState = SearchExecutionState.empty();
 
@@ -33,8 +30,6 @@ export const SearchExecutionStateStore = Reflux.createStore({
   executionState: defaultExecutionState,
 
   init() {
-    this.listenTo(SearchParameterActions.remove, this._removeParameterBindingForRemovedParameter);
-    this.listenTo(SearchParameterActions.update, this._updateParameterBindingForUpdatedParameter);
     this.listenTo(ViewMetadataStore, this.handleViewMetadataChange, this.handleViewMetadataChange);
   },
 
@@ -46,24 +41,6 @@ export const SearchExecutionStateStore = Reflux.createStore({
     if (this.viewId !== id) {
       this.clear();
       this.viewId = id;
-    }
-  },
-
-  _removeParameterBindingForRemovedParameter(parameterName: string) {
-    const { parameterBindings } = this.executionState;
-    if (parameterBindings.has(parameterName)) {
-      const newParameterBindings = parameterBindings.delete(parameterName);
-      this.executionState = this.executionState.toBuilder().parameterBindings(newParameterBindings).build();
-      this.trigger(this.executionState);
-    }
-  },
-
-  _updateParameterBindingForUpdatedParameter(parameterName: string, newParameter: Parameter) {
-    const { parameterBindings } = this.executionState;
-    if (!trim(parameterBindings.get(parameterName, ParameterBinding.empty()).value) && newParameter.defaultValue) {
-      const newParameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(newParameter.defaultValue));
-      this.executionState = this.executionState.toBuilder().parameterBindings(newParameterBindings).build();
-      this.trigger(this.executionState);
     }
   },
 

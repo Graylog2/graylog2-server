@@ -58,7 +58,7 @@ const QueryBar = ({ children, queries, queryTitles, router, viewMetadata }) => {
 };
 
 QueryBar.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren.isRequired,
+  children: CustomPropTypes.node,
   queries: PropTypes.object.isRequired,
   queryTitles: PropTypes.object.isRequired,
   router: PropTypes.any.isRequired,

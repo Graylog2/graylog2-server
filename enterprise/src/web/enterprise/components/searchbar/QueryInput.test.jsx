@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import * as mockImmutable from 'immutable';
 import { mount } from 'enzyme';
 
 import QueryInput from './QueryInput';
@@ -12,12 +11,6 @@ jest.mock('enterprise/stores/FieldTypesStore', () => ({
     listen: jest.fn(),
   },
 }));
-jest.mock('enterprise/stores/SearchParameterStore', () => ({
-  SearchParameterStore: {
-    getInitialState: jest.fn(() => mockImmutable.Map()),
-    listen: jest.fn(),
-  },
-}));
 
 class Completer {
   getCompletions = (editor, session, pos, prefix, callback) => {
@@ -26,8 +19,10 @@ class Completer {
 }
 
 describe('QueryInput', () => {
+  const SimpleQueryInput = props => <QueryInput value="*" onChange={s => Promise.resolve(s)} onExecute={() => {}} completerClass={Completer} {...props} />;
+
   it('should update its state when props change', () => {
-    const wrapper = mount(<QueryInput value="*" onChange={s => Promise.resolve(s)} onExecute={() => {}} completerClass={Completer} />);
+    const wrapper = mount(<SimpleQueryInput />);
     const reactAce = wrapper.find('ReactAce');
 
     expect(reactAce).toHaveProp('value', '*');
@@ -39,9 +34,9 @@ describe('QueryInput', () => {
   });
   it('does not try to close popup if it does not exist while executing query', (done) => {
     const onExecute = jest.fn();
-    const wrapper = mount(<QueryInput value="*" onChange={s => Promise.resolve(s)} onExecute={onExecute} completerClass={Completer} />);
+    const wrapper = mount(<SimpleQueryInput onExecute={onExecute} />);
 
-    wrapper.instance()._onExecute({});
+    wrapper.find('QueryInput').instance()._onExecute({});
 
     setImmediate(() => {
       expect(onExecute).toHaveBeenCalledWith('*');

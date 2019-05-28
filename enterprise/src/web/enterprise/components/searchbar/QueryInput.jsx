@@ -1,13 +1,12 @@
 // @flow strict
-import React, { Component } from 'react';
+import withPluginEntities from 'enterprise/logic/withPluginEntities';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import type { AutoCompleter, Editor } from './ace-types';
 
 import AceEditor from './queryinput/ace';
+import type { Completer } from './SearchBarAutocompletions';
 import SearchBarAutoCompletions from './SearchBarAutocompletions';
-import FieldNameCompletion from './completions/FieldNameCompletion';
-import OperatorCompletion from './completions/OperatorCompletion';
-import type { AutoCompleter, Editor } from './ace-types';
-import ParameterCompletion from './completions/ParameterCompletion';
 
 const _placeholderNode = (placeholder) => {
   const node = document.createElement('div');
@@ -20,6 +19,7 @@ const _placeholderNode = (placeholder) => {
 
 type Props = {
   value: string,
+  completers: Array<Completer>,
   // eslint-disable-next-line no-undef
   completerClass?: Class<AutoCompleter>,
   onBlur?: (string) => void,
@@ -45,13 +45,11 @@ class QueryInput extends Component<Props, State> {
     this.state = {
       value: props.value,
     };
+    this.editor = undefined;
     const CompleterClass = props.completerClass;
+    const { completers = [] } = props;
     // $FlowFixMe: tailored for this specific one for now
-    this.completer = new CompleterClass([
-      new FieldNameCompletion(),
-      new OperatorCompletion(),
-      new ParameterCompletion(),
-    ]);
+    this.completer = new CompleterClass(completers);
   }
 
   componentDidMount() {
@@ -67,14 +65,16 @@ class QueryInput extends Component<Props, State> {
 
       editor.completers = [this.completer];
 
-      if (!this.props.value && !this._placeholderExists(editor)) {
+      const { value } = this.props;
+      if (!value && !this._placeholderExists(editor)) {
         this._addPlaceholder(editor);
       }
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.value !== this.state.value) {
+    const { value } = this.state;
+    if (nextProps.value !== value) {
       this.setState({ value: nextProps.value });
     }
     if (this.editor) {
@@ -89,17 +89,10 @@ class QueryInput extends Component<Props, State> {
     }
   }
 
-  completer: AutoCompleter;
-
-  isFocussed: boolean;
-
-  editor: {
-    editor: Editor,
-  } | typeof undefined;
-
   _addPlaceholder = (editor: Editor) => {
     if (!editor.renderer.emptyMessageNode) {
-      const node = _placeholderNode(this.props.placeholder);
+      const { placeholder } = this.props;
+      const node = _placeholderNode(placeholder);
       // eslint-disable-next-line no-param-reassign
       editor.renderer.emptyMessageNode = node;
       editor.renderer.scroller.appendChild(node);
@@ -119,14 +112,6 @@ class QueryInput extends Component<Props, State> {
     return emptyMessageNode !== undefined && emptyMessageNode !== null;
   };
 
-  editor = undefined;
-
-  _bindEditor(editor: { editor: Editor }) {
-    if (editor) {
-      this.editor = editor;
-    }
-  }
-
   _onChange = (newValue: string) => {
     this.setState({ value: newValue });
   };
@@ -140,7 +125,9 @@ class QueryInput extends Component<Props, State> {
         this._addPlaceholder(editor);
       }
     }
-    this.props.onChange(this.state.value).then(this.props.onBlur);
+    const { onBlur, onChange } = this.props;
+    const { value } = this.state;
+    onChange(value).then(onBlur);
   };
 
   _onFocus = () => {
@@ -156,11 +143,27 @@ class QueryInput extends Component<Props, State> {
     if (editor.completer && editor.completer.popup) {
       editor.completer.popup.hide();
     }
-    onChange(this.state.value).then(onExecute);
+    const { value } = this.state;
+    onChange(value).then(onExecute);
   };
 
+  _bindEditor(editor: { editor: Editor }) {
+    if (editor) {
+      this.editor = editor;
+    }
+  }
+
+  completer: AutoCompleter;
+
+  editor: {
+    editor: Editor,
+  } | typeof undefined;
+
+  isFocussed: boolean;
+
   render() {
-    const { onBlur, onChange, onExecute, placeholder, value, ...rest } = this.props;
+    const { onBlur, onChange, onExecute, placeholder, value: propsValue, ...rest } = this.props;
+    const { value } = this.state;
     return (
       <div className="query" style={{ display: 'flex' }}>
         <AceEditor mode="lucene"
@@ -169,7 +172,7 @@ class QueryInput extends Component<Props, State> {
                    onBlur={this._onBlur}
                    onChange={this._onChange}
                    onFocus={this._onFocus}
-                   value={this.state.value}
+                   value={value}
                    name="QueryEditor"
                    showGutter={false}
                    showPrintMargin={false}
@@ -195,6 +198,7 @@ class QueryInput extends Component<Props, State> {
 }
 
 QueryInput.propTypes = {
+  completers: PropTypes.array.isRequired,
   completerClass: PropTypes.any,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
@@ -203,4 +207,4 @@ QueryInput.propTypes = {
   value: PropTypes.string,
 };
 
-export default QueryInput;
+export default withPluginEntities(QueryInput, { completers: 'views.completers' });

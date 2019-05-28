@@ -205,7 +205,7 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: ViewState): Builder {
+  state(value: Immutable.Map<string, ViewState>): Builder {
     return new Builder(this.value.set('state', Immutable.fromJS(value)));
   }
 
