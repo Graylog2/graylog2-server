@@ -1,78 +1,130 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import NumberUtils from 'util/NumberUtils';
-import style from 'components/visualizations/NumericVisualization.css';
+import type { Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
+import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
+import type { CurrentViewType } from 'enterprise/components/CustomPropTypes';
+// $FlowFixMe: imports from core need to be fixed in flow
+import connect from 'stores/connect';
+import fieldTypeFor from 'enterprise/logic/fieldtypes/FieldTypeFor';
+import Value from 'enterprise/components/Value';
+import { ViewStore } from 'enterprise/stores/ViewStore';
+import DecoratedValue from 'enterprise/components/messagelist/decoration/DecoratedValue';
+import CustomHighlighting from 'enterprise/components/messagelist/CustomHighlighting';
+import style from './NumberVisualization.css';
 
-const DEFAULT_VALUE_FONT_SIZE = '60px';
+type Props = {
+  data: Rows,
+  width: number,
+  height: number,
+  fields: FieldTypeMappingsList,
+  currentView: CurrentViewType,
+};
 
-const _formatData = data => String(NumberUtils.formatNumber(data));
+type State = {
+  fontSize: number,
+};
 
-const _calculateFontSize = (data) => {
-  if (typeof data === 'undefined') {
-    return DEFAULT_VALUE_FONT_SIZE;
+class NumberVisualization extends React.Component<Props, State> {
+  static propTypes = {
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    currentView: PropTypes.object.isRequired,
+    data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    fields: PropTypes.object.isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      fontSize: 20,
+    };
   }
 
-  let fontSize;
-  const formattedLength = _formatData(data).length;
+  componentDidUpdate() {
+    const container = this.getContainer();
+    if (!container) {
+      return;
+    }
 
-  if (formattedLength < 7) {
-    fontSize = DEFAULT_VALUE_FONT_SIZE;
-  } else {
-    switch (formattedLength) {
-      case 7:
-        fontSize = '50px';
-        break;
-      case 8:
-        fontSize = '45px';
-        break;
-      case 9:
-      case 10:
-        fontSize = '40px';
-        break;
-      case 11:
-      case 12:
-        fontSize = '35px';
-        break;
-      default:
-        fontSize = '25px';
+    const { fontSize } = this.state;
+    const { width, height } = this.props;
+    const { childNodes } = container;
+
+    if (childNodes.length <= 0) {
+      return;
+    }
+
+    const content = childNodes[0];
+    // $FlowFixMe offsetWidth is part of Node!
+    const contentWidth = content.offsetWidth;
+    // $FlowFixMe offsetHeight is part of Node!
+    const contentHeight = content.offsetHeight;
+
+    const widthMultiplier = (width * 0.8) / contentWidth;
+    const heightMultiplier = (height * 0.8) / contentHeight;
+    const multiplier = Math.min(widthMultiplier, heightMultiplier);
+    if (Math.abs(1 - multiplier) <= 0.01) {
+      return;
+    }
+
+    const newFontsize = Math.floor(fontSize * multiplier);
+
+    if (fontSize !== newFontsize) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ fontSize: newFontsize });
     }
   }
 
-  return fontSize;
-};
-
-const _extractValue = (data) => {
-  if (!data || !data[0]) {
-    return undefined;
+  getContainer() {
+    return this.container;
   }
-  const results = data[0];
-  const leaf = results.values.find(f => f.source === 'row-leaf');
-  return leaf ? leaf.value : undefined;
-};
 
-const NumberVisualization = ({ data, height, width }) => {
-  const value = _extractValue(data);
-  return (
-    <div className={style.container}>
-      <svg viewBox="0 0 300 100"
-           className={style.number}
-           width="100%"
-           height="100%"
-           style={{ height: height, width: width }}>
-        <text x="150" y="45" className={style.value} style={{ fontSize: _calculateFontSize(value) }}>
-          {_formatData(value)}
-        </text>
-      </svg>
-    </div>
-  );
-};
+  getContainerRef = (node) => {
+    this.container = node;
+  };
 
-NumberVisualization.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  height: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
-};
-NumberVisualization.type = 'numeric';
+  _extractValueAndField = (data) => {
+    if (!data || !data[0]) {
+      return { value: undefined, field: undefined };
+    }
+    const results = data[0];
+    if (results.source === 'leaf') {
+      const leaf = results.values.find(f => f.source === 'row-leaf');
+      if (leaf && leaf.source === 'row-leaf') {
+        return { value: leaf.value, field: leaf.key[0] };
+      }
+    }
+    return { value: undefined, field: undefined };
+  };
 
-export default NumberVisualization;
+  container: HTMLElement | null;
+
+  render() {
+    const { fontSize } = this.state;
+    const { currentView, fields, data } = this.props;
+    const { activeQuery } = currentView;
+    const { value, field } = this._extractValueAndField(data);
+    if (!value || !field) {
+      return '';
+    }
+
+    return (
+      <div ref={this.getContainerRef} className={style.container} style={{ fontSize: `${fontSize}px` }}>
+        <CustomHighlighting field={field} value={value}>
+          <Value field={field}
+                 type={fieldTypeFor(field, fields)}
+                 value={value}
+                 queryId={activeQuery}
+                 render={DecoratedValue} />
+        </CustomHighlighting>
+      </div>
+    );
+  }
+}
+
+const ConnectedNumberVisualization = connect(NumberVisualization, { currentView: ViewStore });
+ConnectedNumberVisualization.type = 'numeric';
+
+export default ConnectedNumberVisualization;
