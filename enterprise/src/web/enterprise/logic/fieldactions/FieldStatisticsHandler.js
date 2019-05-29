@@ -1,16 +1,18 @@
 // @flow strict
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import Widget from 'enterprise/logic/widgets/Widget';
 import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
 import Series from 'enterprise/logic/aggregationbuilder/Series';
 import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
+import type { ActionContexts } from '../ActionContext';
 
 const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card', 'percentile'];
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
-const handler: FieldActionHandler = (queryId: string, field: string, type: FieldType) => {
+const handler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
   const series = ((type && type.isNumeric()) ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
     .map((f) => {
       if (f === 'percentile') {
@@ -24,10 +26,16 @@ const handler: FieldActionHandler = (queryId: string, field: string, type: Field
     .visualization('table')
     .rollup(true)
     .build();
-  const widget = AggregationWidget.builder()
+  const { widget: origWidget = Widget.empty() } = context;
+  const widgetBuilder = AggregationWidget.builder()
     .newId()
-    .config(config)
-    .build();
+    .config(config);
+
+  if (origWidget.filter) {
+    widgetBuilder.filter(origWidget.filter);
+  }
+  const widget = widgetBuilder.build();
+
   return WidgetActions.create(widget).then(newWidget => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Field Statistics for ${field}`));
 };
 

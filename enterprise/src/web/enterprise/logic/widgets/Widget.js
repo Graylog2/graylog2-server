@@ -63,6 +63,10 @@ class Widget {
     return new Widget(id, type, config, filter);
   }
 
+  static empty() {
+    return this.builder().build();
+  }
+
   static builder() {
     // eslint-disable-next-line no-use-before-define
     return new Builder();

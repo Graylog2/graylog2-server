@@ -6,11 +6,11 @@ import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 import type {
   FieldActionHandlerCondition,
   FieldActionHandlerConditionProps,
-  FieldActionHandlerWithContext,
+  FieldActionHandler,
 } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 
-const RemoveFromTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
+const RemoveFromTableActionHandler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
   const { widget } = context;
   const newFields = widget.config.fields.filter(f => (f !== field));
   const newConfig = widget.config.toBuilder()

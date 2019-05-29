@@ -2,8 +2,7 @@
 import FieldType from '../fieldtypes/FieldType';
 import type { ActionContexts } from '../ActionContext';
 
-export type FieldActionHandler = (string, string, FieldType) => Promise<*>;
-export type FieldActionHandlerWithContext = (string, string, FieldType, ActionContexts) => Promise<*>;
+export type FieldActionHandler = (string, string, FieldType, ActionContexts) => Promise<*>;
 
 export type FieldActionHandlerConditionProps = {
   context: ActionContexts,

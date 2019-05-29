@@ -1,12 +1,12 @@
 // @flow strict
 import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import type { FieldActionHandlerWithContext } from './FieldActionHandler';
+import type { FieldActionHandler } from './FieldActionHandler';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 import FieldType from '../fieldtypes/FieldType';
 import type { ActionContexts } from '../ActionContext';
 
-const AddToTableActionHandler: FieldActionHandlerWithContext = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
+const AddToTableActionHandler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
   const { widget } = context;
   const newFields = [].concat(widget.config.fields, [field]);
   const newConfig = widget.config.toBuilder()

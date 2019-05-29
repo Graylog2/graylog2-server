@@ -1,5 +1,8 @@
+// @flow strict
 import * as Immutable from 'immutable';
 
+import Widget from 'enterprise/logic/widgets/Widget';
+import { WidgetActions } from 'enterprise/stores/WidgetStore';
 import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
 import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
@@ -7,18 +10,25 @@ import FieldType from '../fieldtypes/FieldType';
 import ChartActionHandler from './ChartActionHandler';
 
 jest.mock('enterprise/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
-jest.mock('enterprise/stores/WidgetStore', () => ({ WidgetActions: { create: jest.fn() } }));
+jest.mock('enterprise/stores/WidgetStore', () => ({
+  WidgetActions: {
+    create: jest.fn(widget => Promise.resolve(widget)),
+  },
+}));
 jest.mock('enterprise/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
 
 describe('ChartActionHandler', () => {
+  const emptyFieldType = new FieldType('empty', [], []);
+
   describe('retrieves field type for `timestamp` field', () => {
     beforeEach(() => {
+      // $FlowFixMe this is a mock
       pivotForField.mockReturnValue('PIVOT');
     });
     it('uses Unknown if FieldTypeStore returns nothing', () => {
       FieldTypesStore.getInitialState.mockReturnValue(undefined);
 
-      ChartActionHandler('queryId', 'somefield');
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
@@ -28,10 +38,10 @@ describe('ChartActionHandler', () => {
         queryFields: Immutable.Map({}),
       });
 
-      ChartActionHandler('queryId', 'somefield');
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
-    });
+    })
     it('from query field types if present', () => {
       const timestampFieldType = new FieldType('date', [], []);
       FieldTypesStore.getInitialState.mockReturnValue({
@@ -45,7 +55,7 @@ describe('ChartActionHandler', () => {
         }),
       });
 
-      ChartActionHandler('queryId', 'somefield');
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
@@ -60,7 +70,7 @@ describe('ChartActionHandler', () => {
         queryFields: Immutable.fromJS({}),
       });
 
-      ChartActionHandler('queryId', 'somefield');
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
@@ -75,7 +85,7 @@ describe('ChartActionHandler', () => {
         }),
       });
 
-      ChartActionHandler('queryId', 'somefield');
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
@@ -88,9 +98,36 @@ describe('ChartActionHandler', () => {
         queryFields: Immutable.fromJS({}),
       });
 
-      ChartActionHandler('queryId', 'somefield');
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
+    });
+  });
+  describe('Widget creation', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+    it('should create widget with filter of original widget', () => {
+      const filter = "author: 'Vanth'";
+      const origWidget = Widget.builder().filter(filter).build();
+      const timestampFieldType = new FieldType('date', [], []);
+      FieldTypesStore.getInitialState.mockReturnValue({
+        all: Immutable.List([]),
+        queryFields: Immutable.fromJS({
+          queryId: [
+            new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
+            new FieldTypeMapping('somefield', new FieldType('othertype', [], [])),
+            new FieldTypeMapping('timestamp', timestampFieldType),
+          ],
+        }),
+      });
+
+      ChartActionHandler('queryId', 'somefield', emptyFieldType, { widget: origWidget });
+
+      const widget = WidgetActions.create.mock.calls[0][0];
+
+      expect(widget.filter).toEqual(filter);
+      expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
   });
 });
