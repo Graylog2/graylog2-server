@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Wizard } from 'components/common';
 import AlertDetailsForm from './AlertDetailsForm';
 import ConditionForm from './ConditionForm';
+import FieldsForm from './FieldsForm';
 
 import styles from './AlertDefinitionForm.css';
 
@@ -45,7 +46,7 @@ class AlertDefinitionForm extends React.Component {
       {
         key: 'fields',
         title: 'Fields',
-        component: <div>TBD</div>,
+        component: <FieldsForm alertDefinition={alertDefinition} onChange={onChange} />,
       },
       {
         key: 'notifications',

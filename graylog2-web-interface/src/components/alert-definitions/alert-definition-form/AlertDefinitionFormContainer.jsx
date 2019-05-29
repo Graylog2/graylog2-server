@@ -25,7 +25,7 @@ class AlertDefinitionFormContainer extends React.Component {
       description: '',
       priority: AlertDefinitionPriorityEnum.NORMAL,
       config: {},
-      field_spec: {},
+      field_spec: [],
       key_spec: [],
       actions: [],
     },
