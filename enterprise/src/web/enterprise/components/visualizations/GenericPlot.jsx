@@ -5,31 +5,54 @@ import { merge } from 'lodash';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 import { Popover } from 'react-bootstrap';
-
 // $FlowFixMe: imports from core need to be fixed in flow
 import ColorPicker from 'components/common/ColorPicker';
 
 import createPlotlyComponent from 'react-plotly.js/factory';
 import Plotly from 'enterprise/custom-plotly';
 import ChartColorContext from './ChartColorContext';
-
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style/useable!css!./GenericPlot.css';
 
 const Plot = createPlotlyComponent(Plotly);
 
+type LegendConfig = {
+  name: string,
+  target: HTMLElement,
+  color?: string,
+};
+
+type ChartMarker = {
+  colors?: Array<string>,
+  color?: string,
+};
+
+type ChartConfig = {
+  name: string,
+  labels: Array<string>,
+  line?: ChartMarker,
+  marker?: ChartMarker,
+};
+
+type ColorMap = {
+  [string]: string,
+};
+
+type ChartColor = {
+  line?: ChartMarker,
+  marker?: ChartMarker,
+};
+
 type Props = {
   chartData: Array<*>,
   layout: {},
   onZoom: (string, string) => boolean,
+  getChartColor?: (Array<ChartConfig>, string) => ?string,
+  setChartColor?: (ChartConfig, ColorMap) => ChartColor,
 };
 
 type State = {
-  legendConfig?: {
-    name: string,
-    color: string,
-    target: HTMLElement,
-  },
+  legendConfig?: LegendConfig,
 };
 
 type Axis = {
@@ -42,11 +65,15 @@ class GenericPlot extends React.Component<Props, State> {
     chartData: PropTypes.array.isRequired,
     layout: PropTypes.object,
     onZoom: PropTypes.func,
+    getChartColor: PropTypes.func,
+    setChartColor: PropTypes.func,
   };
 
   static defaultProps = {
     layout: {},
     onZoom: () => true,
+    getChartColor: undefined,
+    setChartColor: () => ({}),
   };
 
   state = {};
@@ -72,10 +99,13 @@ class GenericPlot extends React.Component<Props, State> {
 
   _onLegendClick = (e: any) => {
     const name = e.node.textContent;
-    const { color } = e.fullData.find(data => (data.name === name)).line;
     const target = e.node.querySelector('g.layers');
-
-    this.setState({ legendConfig: { name, color, target } });
+    const { getChartColor } = this.props;
+    if (getChartColor) {
+      const color = getChartColor(e.fullData, name);
+      /* $FlowFixMe color is already declared as optional */
+      this.setState({ legendConfig: { name, target, color } });
+    }
     return false;
   };
 
@@ -86,7 +116,7 @@ class GenericPlot extends React.Component<Props, State> {
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {
-    const { chartData, layout } = this.props;
+    const { chartData, layout, setChartColor } = this.props;
     const plotLayout = merge({
       autosize: true,
       showlegend: true,
@@ -117,8 +147,12 @@ class GenericPlot extends React.Component<Props, State> {
       <ChartColorContext.Consumer>
         {({ colors, setColor }) => {
           const newChartData = chartData.map((chart) => {
-            if (colors[chart.name]) {
-              return { ...chart, marker: { color: colors[chart.name] } };
+            if (setChartColor && colors) {
+              const conf = setChartColor(chart, colors);
+              if (conf.line || conf.marker) {
+                return merge(chart, conf);
+              }
+              return chart;
             }
 
             return chart;

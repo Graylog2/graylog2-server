@@ -39,8 +39,28 @@ const _generateSeries = (type, name, x, y, idx, total) => ({
   },
 });
 
+const getChartColor = (fullDataArray, name) => {
+  const fullData = fullDataArray.find(d => d.labels.indexOf(name) >= 0);
+  if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
+    const indexOfName = fullData.labels.indexOf(name);
+    // $FlowFixMe the check above ensures the presents of marker
+    const { marker: { colors } } = fullData;
+
+    // $FlowFixMe the check above ensures the presents of colors
+    return colors[indexOfName];
+  }
+  return undefined;
+};
+
+const setChartColor = (chart, colorMap) => {
+  const colors = chart.labels.map(label => colorMap[label]);
+  return { marker: { colors }};
+};
+
 const PieVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
-  <GenericPlot chartData={chartData(config, data, 'pie', _generateSeries)} />
+  <GenericPlot chartData={chartData(config, data, 'pie', _generateSeries)}
+               getChartColor={getChartColor}
+               setChartColor={setChartColor} />
 );
 
 PieVisualization.propTypes = {

@@ -16,6 +16,17 @@ type ChartDefinition = {
   opacity: number,
 };
 
+const getChartColor = (fullData, name) => {
+  const data = fullData.find(d => (d.name === name)).marker;
+  if (data && data.marker && data.marker.color) {
+    const { marker: color } = data;
+    return color;
+  }
+  return undefined;
+};
+
+const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
+
 const BarVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
   const { visualizationConfig } = config;
   const layout = {};
@@ -32,6 +43,8 @@ const BarVisualization: VisualizationComponent = ({ config, data }: Visualizatio
   return (
     <XYPlot config={config}
             chartData={chartData(config, data, 'bar', _seriesGenerator)}
+            getChartColor={getChartColor}
+            setChartColor={setChartColor}
             plotLayout={layout} />
   );
 };

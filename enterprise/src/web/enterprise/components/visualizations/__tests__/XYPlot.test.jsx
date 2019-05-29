@@ -24,6 +24,8 @@ describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
   const currentUser = { timezone: 'GMT' };
   const timestampPivot = new Pivot('timestamp', 'time', {});
+  const getChartColor = () => {};
+  const setChartColor = () => {};
 
   beforeEach(() => {
     QueriesActions.timerange.mockReturnValueOnce(Promise.resolve());
@@ -35,6 +37,8 @@ describe('XYPlot', () => {
     const wrapper = mount((
       <XYPlot chartData={[23, 42]}
               config={config}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
               currentUser={currentUser}
               currentQuery={currentQuery}
               effectiveTimerange={timerange} />
@@ -52,6 +56,8 @@ describe('XYPlot', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
     const wrapper = mount((
       <XYPlot chartData={[23, 42]}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
               config={config}
               currentUser={currentUser}
               currentQuery={currentQuery}
@@ -81,6 +87,8 @@ describe('XYPlot', () => {
 
     const wrapper = mount((
       <XYPlot chartData={[23, 42]}
+              getChartColor={getChartColor}
+              setChartColor={setChartColor}
               config={config}
               currentUser={currentUser}
               currentQuery={currentQueryForAllMessages}

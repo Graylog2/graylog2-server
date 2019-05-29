@@ -32,7 +32,7 @@ const onZoom = (config, currentQuery, currentUser, from, to) => {
   return false;
 };
 
-const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimerange, plotLayout = {} }) => {
+const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimerange, getChartColor, setChartColor, plotLayout = {} }) => {
   const layout = merge({
     yaxis: {
       fixedrange: true,
@@ -56,7 +56,11 @@ const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimeran
   }
 
   return (
-    <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} />
+    <GenericPlot chartData={chartData}
+                 layout={layout}
+                 onZoom={_onZoom}
+                 getChartColor={getChartColor}
+                 setChartColor={setChartColor} />
   );
 };
 
@@ -72,6 +76,8 @@ XYPlot.propTypes = {
     to: PropTypes.string.isRequired,
   }).isRequired,
   plotLayout: PropTypes.object,
+  getChartColor: PropTypes.func.isRequired,
+  setChartColor: PropTypes.func.isRequired,
 };
 
 XYPlot.defaultProps = {
