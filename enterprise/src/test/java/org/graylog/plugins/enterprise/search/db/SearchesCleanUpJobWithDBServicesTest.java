@@ -6,6 +6,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.database.MongoConnectionRule;
+import org.graylog.plugins.enterprise.search.views.ViewRequirements;
 import org.graylog.plugins.enterprise.search.views.ViewService;
 import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
@@ -25,6 +26,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+
+import java.util.Collections;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,8 +52,10 @@ public class SearchesCleanUpJobWithDBServicesTest {
     private SearchDbService searchDbService;
 
     static class TestViewService extends ViewService {
-        TestViewService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper, ClusterConfigService clusterConfigService, SearchDbService searchDbService) {
-            super(mongoConnection, mapper, clusterConfigService);
+        TestViewService(MongoConnection mongoConnection,
+                        MongoJackObjectMapperProvider mapper,
+                        ClusterConfigService clusterConfigService) {
+            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view));
         }
     }
 
@@ -59,7 +64,11 @@ public class SearchesCleanUpJobWithDBServicesTest {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
         final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
-        final ViewService viewService = new TestViewService(mongoRule.getMongoConnection(), mapperProvider, clusterConfigService, searchDbService);
+        final ViewService viewService = new TestViewService(
+                mongoRule.getMongoConnection(),
+                mapperProvider,
+                clusterConfigService
+        );
         final ViewSharingService viewSharingService = mock(ViewSharingService.class);
         final IsViewSharedForUser isViewSharedForUser = mock(IsViewSharedForUser.class);
         this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider, viewService, viewSharingService, isViewSharedForUser));

@@ -12,9 +12,14 @@ import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -23,13 +28,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     private static final String COLLECTION_NAME = "views";
 
     private final ClusterConfigService clusterConfigService;
+    private final ViewRequirements.Factory viewRequirementsFactory;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
-                          ClusterConfigService clusterConfigService) {
+                          ClusterConfigService clusterConfigService,
+                          ViewRequirements.Factory viewRequirementsFactory) {
         super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
+        this.viewRequirementsFactory = viewRequirementsFactory;
     }
 
     public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
@@ -37,7 +45,10 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter, getSortBuilder(order, sortField), page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter, getSortBuilder(order, sortField), page, perPage);
+        return viewsList.stream()
+                .map(this::requirementsForView)
+                .collect(Collectors.toCollection(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage)));
     }
 
     public void saveDefault(ViewDTO dto) {
@@ -55,13 +66,31 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     }
 
     public Collection<ViewDTO> forSearch(String searchId) {
-        return this.db.find(DBQuery.is(ViewDTO.FIELD_SEARCH_ID, searchId)).toArray();
+        return this.db.find(DBQuery.is(ViewDTO.FIELD_SEARCH_ID, searchId)).toArray()
+                .stream()
+                .map(this::requirementsForView)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Optional<ViewDTO> get(String id) {
+        return super.get(id).map(this::requirementsForView);
+    }
+
+    @Override
+    public Stream<ViewDTO> streamAll() {
+        return super.streamAll().map(this::requirementsForView);
+    }
+
+    @Override
+    public Stream<ViewDTO> streamByIds(Set<String> idSet) {
+        return super.streamByIds(idSet).map(this::requirementsForView);
     }
 
     @Override
     public ViewDTO save(ViewDTO viewDTO) {
         try {
-            final WriteResult<ViewDTO, ObjectId> save = db.insert(viewDTO);
+            final WriteResult<ViewDTO, ObjectId> save = db.insert(requirementsForView(viewDTO));
             return save.getSavedObject();
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
@@ -70,7 +99,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     public ViewDTO update(ViewDTO viewDTO) {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
-        db.updateById(new ObjectId(viewDTO.id()), viewDTO);
-        return viewDTO;
+        final ViewDTO viewWithRequirements = requirementsForView(viewDTO);
+        db.updateById(new ObjectId(viewWithRequirements.id()), viewWithRequirements);
+        return viewWithRequirements;
+    }
+
+    private ViewDTO requirementsForView(ViewDTO view) {
+        final Map<String, PluginMetadataSummary> requirements = Stream.concat(
+                view.requires().entrySet().stream(),
+                viewRequirementsFactory.create(view).entrySet().stream()
+        ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entry1, entry2) -> entry1));
+        return view.toBuilder().requires(requirements).build();
     }
 }

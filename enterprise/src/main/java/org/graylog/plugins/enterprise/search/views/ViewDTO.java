@@ -13,6 +13,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +28,7 @@ public abstract class ViewDTO {
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SEARCH_ID = "search_id";
     public static final String FIELD_PROPERTIES = "properties";
+    public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_DASHBOARD_STATE = "dashboard_state";
     public static final String FIELD_CREATED_AT = "created_at";
@@ -57,6 +59,9 @@ public abstract class ViewDTO {
 
     @JsonProperty(FIELD_PROPERTIES)
     public abstract ImmutableSet<String> properties();
+
+    @JsonProperty(FIELD_REQUIRES)
+    public abstract Map<String, PluginMetadataSummary> requires();
 
     @JsonProperty(FIELD_STATE)
     public abstract Map<String, ViewStateDTO> state();
@@ -103,6 +108,9 @@ public abstract class ViewDTO {
             return this;
         }
 
+        @JsonProperty(FIELD_REQUIRES)
+        public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
+
         @JsonProperty(FIELD_OWNER)
         @Nullable
         public abstract Builder owner(String owner);
@@ -123,6 +131,7 @@ public abstract class ViewDTO {
                     .description("")
                     .properties(ImmutableSet.of())
                     .dashboardState(ViewDashboardStateDTO.empty())
+                    .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC));
         }
 

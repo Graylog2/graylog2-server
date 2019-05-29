@@ -9,6 +9,12 @@ import type { QueryId } from '../queries/Query';
 
 export type Properties = Immutable.List<any>;
 
+export type PluginMetadata = {
+  name: string,
+  url: string,
+};
+export type Requirements = { [string]: PluginMetadata };
+
 type InternalState = {
   id: string,
   title: string,
@@ -20,6 +26,7 @@ type InternalState = {
   dashboardState: DashboardState,
   createdAt: Date,
   owner: string,
+  requires: Requirements,
 };
 
 export type WidgetMapping = Immutable.Map<string, string>;
@@ -34,6 +41,7 @@ export type ViewJson = {
   dashboard_state: any,
   created_at: Date,
   owner: string,
+  requires: Requirements,
 };
 
 export default class View {
@@ -47,7 +55,9 @@ export default class View {
     properties: Properties,
     state: Immutable.Map<QueryId, ViewState>,
     dashboardState: DashboardState,
-    createdAt: Date, owner: string) {
+    createdAt: Date,
+    owner: string,
+    requires: Requirements) {
     this._value = {
       id,
       title,
@@ -59,6 +69,7 @@ export default class View {
       dashboardState,
       createdAt,
       owner,
+      requires,
     };
   }
 
@@ -111,8 +122,13 @@ export default class View {
     return this._value.owner;
   }
 
+  get requires(): Requirements {
+    return this._value.requires;
+  }
+
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, dashboardState, createdAt, owner } = this._value;
+    const { id, title, summary, description, search, properties, state, dashboardState, createdAt, owner, requires } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({
       id,
@@ -125,6 +141,7 @@ export default class View {
       dashboardState,
       createdAt,
       owner,
+      requires,
     }));
   }
 
@@ -147,7 +164,7 @@ export default class View {
 
   static fromJSON(value: ViewJson): View {
     // eslint-disable-next-line camelcase
-    const { id, title, summary, description, properties, state, dashboard_state, created_at, owner } = value;
+    const { id, title, summary, description, properties, state, dashboard_state, created_at, owner, requires } = value;
     const viewState: Immutable.Map<QueryId, ViewState> = Immutable.Map(state).map(ViewState.fromJSON);
     const dashboardState = DashboardState.fromJSON(dashboard_state);
     return View.create()
@@ -161,9 +178,11 @@ export default class View {
       .dashboardState(dashboardState)
       .createdAt(created_at)
       .owner(owner)
+      .requires(requires)
       .build();
   }
 
+  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder();
@@ -221,8 +240,12 @@ class Builder {
     return new Builder(this.value.set('owner', value));
   }
 
+  requires(value: Requirements): Builder {
+    return new Builder(this.value.set('requires', value));
+  }
+
   build(): View {
-    const { id, title, summary, description, search, properties, state, dashboardState, createdAt, owner } = this.value.toObject();
-    return new View(id, title, summary, description, search, properties, state, dashboardState, createdAt, owner);
+    const { id, title, summary, description, search, properties, state, dashboardState, createdAt, owner, requires } = this.value.toObject();
+    return new View(id, title, summary, description, search, properties, state, dashboardState, createdAt, owner, requires);
   }
 }

@@ -94,6 +94,7 @@ const ViewList = createReactClass({
             createdAt={view.created_at}
             title={view.title}
             summary={view.summary}
+            requires={view.requires}
             description={view.description}>
         {this.itemActionsFactory(view)}
       </View>

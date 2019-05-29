@@ -57,12 +57,13 @@ import ShowDocumentsHandler from 'enterprise/logic/valueactions/ShowDocumentsHan
 import HighlightValueHandler from 'enterprise/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from './components/searchbar/completions/FieldNameCompletion';
 import OperatorCompletion from './components/searchbar/completions/OperatorCompletion';
+import requirementsProvided from './hooks/RequirementsProvided';
 import type { ValueActionHandlerConditionProps } from './logic/valueactions/ValueActionHandler';
 import type { FieldActionHandlerConditionProps } from './logic/fieldactions/FieldActionHandler';
 
-const extendedSearchPath = '/extendedsearch';
-const viewsPath = '/views';
-const showViewsPath = `${viewsPath}/:viewId`;
+export const extendedSearchPath = '/extendedsearch';
+export const viewsPath = '/views';
+export const showViewsPath = `${viewsPath}/:viewId`;
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -268,5 +269,8 @@ export default {
   'views.completers': [
     new FieldNameCompletion(),
     new OperatorCompletion(),
+  ],
+  'views.hooks.loadingView': [
+    requirementsProvided,
   ],
 };

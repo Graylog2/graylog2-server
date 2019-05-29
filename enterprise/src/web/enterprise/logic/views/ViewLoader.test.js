@@ -8,7 +8,6 @@ import Search from '../search/Search';
 import DashboardState from './DashboardState';
 import View from './View';
 import ViewLoader from './ViewLoader';
-import ViewState from './ViewState';
 
 jest.mock('enterprise/stores/ViewManagementStore', () => ({
   ViewManagementActions: {},
@@ -31,6 +30,7 @@ const viewJson = {
   dashboard_state: { widgets: [], positions: [] },
   created_at: new Date('2019-05-24T12:34:04.993Z'),
   owner: 'admin',
+  requires: {},
 };
 
 describe('ViewLoader', () => {
@@ -62,6 +62,7 @@ describe('ViewLoader', () => {
               .queries(Immutable.OrderedSet())
               .build(),
           )
+          .requires({})
           .build(),
       );
     });

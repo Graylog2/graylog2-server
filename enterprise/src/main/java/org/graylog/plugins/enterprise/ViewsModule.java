@@ -15,10 +15,19 @@ import org.graylog.plugins.enterprise.search.engine.QueryBackend;
 import org.graylog.plugins.enterprise.search.rest.SeriesDescription;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.enterprise.search.views.ViewRequirement;
 import org.graylog.plugins.enterprise.search.views.sharing.SharingStrategy;
 import org.graylog2.plugin.PluginModule;
 
 public abstract class ViewsModule extends PluginModule {
+    protected void registerViewRequirement(Class<? extends ViewRequirement> viewRequirement) {
+        viewRequirementBinder().addBinding().to(viewRequirement);
+    }
+
+    protected Multibinder<ViewRequirement> viewRequirementBinder() {
+        return Multibinder.newSetBinder(binder(), ViewRequirement.class);
+    }
+
     protected void registerESQueryDecorator(Class<? extends ESQueryDecorator> esQueryDecorator) {
         esQueryDecoratorBinder().addBinding().to(esQueryDecorator);
     }

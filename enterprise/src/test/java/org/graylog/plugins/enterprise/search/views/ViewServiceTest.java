@@ -57,7 +57,12 @@ public class ViewServiceTest {
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );
-        this.dbService = new ViewService(mongoRule.getMongoConnection(), objectMapperProvider, clusterConfigService);
+        this.dbService = new ViewService(
+                mongoRule.getMongoConnection(),
+                objectMapperProvider,
+                clusterConfigService,
+                view -> new ViewRequirements(Collections.emptySet(), view)
+        );
 
     }
 
@@ -92,7 +97,6 @@ public class ViewServiceTest {
 
         final ViewDTO savedDto1 = dbService.save(dto1);
         final ViewDTO savedDto2 = dbService.save(dto2);
-
 
         assertThat(savedDto1)
                 .satisfies(this::hasValidId)

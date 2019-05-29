@@ -47,6 +47,7 @@ describe('ShowViewPage', () => {
     dashboard_state: { widgets: [], positions: [] },
     created_at: new Date(),
     owner: 'admin',
+    requires: {},
   };
   const SimpleShowViewPage = props => (
     <ShowViewPage location={{ query: {} }}

@@ -69,7 +69,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final IsViewSharedForUser isViewSharedForUser;
 
     @Inject
-    public ViewsResource(ViewService dbService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
+    public ViewsResource(ViewService dbService,
+                         ViewSharingService viewSharingService,
+                         IsViewSharedForUser isViewSharedForUser) {
         this.dbService = dbService;
         this.viewSharingService = viewSharingService;
         this.isViewSharedForUser = isViewSharedForUser;
@@ -79,13 +81,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @GET
     @ApiOperation("Get a list of all views")
     public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                            @ApiParam(name = "sort",
-                                                    value = "The field to sort the result on",
-                                                    required = true,
-                                                    allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                            @ApiParam(name = "query") @QueryParam("query") String query ) {
+                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @ApiParam(name = "sort",
+                                                           value = "The field to sort the result on",
+                                                           required = true,
+                                                           allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
+                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
+                                                   @ApiParam(name = "query") @QueryParam("query") String query) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
