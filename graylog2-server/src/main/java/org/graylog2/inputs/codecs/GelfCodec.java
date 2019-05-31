@@ -45,7 +45,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 @Codec(name = "gelf", displayName = "GELF")
@@ -205,7 +208,15 @@ public class GelfCodec extends AbstractCodec {
             final JsonNode value = entry.getValue();
 
             final Object fieldValue;
-            if (value.isContainerNode()) {
+            if (value.isArray()) {
+                List<String> fieldArray = new ArrayList<>();
+                
+                for (final JsonNode objNode : value) {
+                    fieldArray.add(objNode.asText());
+                }
+                fieldValue = fieldArray;
+            }
+            else if (value.isContainerNode()) {
                 fieldValue = value.toString();
             } else if (value.isFloatingPointNumber()) {
                 fieldValue = value.asDouble();
