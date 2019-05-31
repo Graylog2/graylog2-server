@@ -19,41 +19,36 @@ package org.graylog2.inputs.extractors;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
 import io.krakens.grok.api.Grok;
-import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.Match;
-import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.ConfigurationException;
-import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class GrokExtractor extends Extractor {
     public static final String CONFIG_GROK_PATTERN = "grok_pattern";
-    private static final Logger log = LoggerFactory.getLogger(GrokExtractor.class);
 
-    private final Grok grok;
-    private final GrokCompiler grokCompiler = GrokCompiler.newInstance();
+    private GrokPatternRegistry grokPatternRegistry;
+    private String pattern;
+    private boolean namedCapturesOnly;
 
-    public GrokExtractor(MetricRegistry metricRegistry,
-                         Set<GrokPattern> grokPatterns,
-                         String id,
-                         String title,
-                         long order,
-                         CursorStrategy cursorStrategy,
-                         String sourceField,
-                         String targetField,
-                         Map<String, Object> extractorConfig,
-                         String creatorUserId,
-                         List<Converter> converters,
-                         ConditionType conditionType,
-                         String conditionValue) throws ReservedFieldException, ConfigurationException {
+    GrokExtractor(MetricRegistry metricRegistry,
+                  GrokPatternRegistry grokPatternRegistry,
+                  String id,
+                  String title,
+                  long order,
+                  CursorStrategy cursorStrategy,
+                  String sourceField,
+                  String targetField,
+                  Map<String, Object> extractorConfig,
+                  String creatorUserId,
+                  List<Converter> converters,
+                  ConditionType conditionType,
+                  String conditionValue) throws ReservedFieldException, ConfigurationException {
         super(metricRegistry,
               id,
               title,
@@ -71,23 +66,14 @@ public class GrokExtractor extends Extractor {
             throw new ConfigurationException("grok_pattern not set");
         }
 
-        final boolean namedCapturesOnly = (boolean) extractorConfig.getOrDefault("named_captures_only", false);
-
-        try {
-            // TODO we should really share this somehow, but unfortunately the extractors are reloaded every second.
-            for (final GrokPattern grokPattern : grokPatterns) {
-                grokCompiler.register(grokPattern.name(), grokPattern.pattern());
-            }
-
-            grok = grokCompiler.compile((String) extractorConfig.get(CONFIG_GROK_PATTERN), namedCapturesOnly);
-        } catch (GrokException e) {
-            log.error("Unable to parse grok patterns", e);
-            throw new ConfigurationException("Unable to parse grok patterns");
-        }
+        this.grokPatternRegistry = grokPatternRegistry;
+        this.pattern = (String) extractorConfig.get(CONFIG_GROK_PATTERN);
+        this.namedCapturesOnly = (boolean) extractorConfig.getOrDefault("named_captures_only", false);
     }
 
     @Override
     protected Result[] run(String value) {
+        final Grok grok = grokPatternRegistry.cachedGrokForPattern(this.pattern, this.namedCapturesOnly);
 
         // the extractor instance is rebuilt every second anyway
         final Match match = grok.match(value);

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -46,6 +47,7 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.inputs.Input;
@@ -127,8 +129,6 @@ public class InputFacadeTest {
 
     private InputService inputService;
     private InputFacade facade;
-    private Set<PluginMetaData> pluginMetaData;
-    private Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -137,12 +137,16 @@ public class InputFacadeTest {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final GrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
         grokPatternService.save(GrokPattern.create("GREEDY", ".*"));
-        final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternService, lookupTableService);
+        final EventBus clusterBus = new EventBus();
+        final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
+                grokPatternService,
+                Executors.newScheduledThreadPool(1));
+        final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
         inputService = new InputServiceImpl(mongoRule.getMongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
         final InputRegistry inputRegistry = new InputRegistry();
-        pluginMetaData = new HashSet<>();
-        inputFactories = new HashMap<>();
+        Set<PluginMetaData> pluginMetaData = new HashSet<>();
+        Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();
         final FakeHttpMessageInput.Factory fakeHttpMessageInputFactory = mock(FakeHttpMessageInput.Factory.class);
         final FakeHttpMessageInput.Descriptor fakeHttpMessageInputDescriptor = mock(FakeHttpMessageInput.Descriptor.class);
         when(fakeHttpMessageInputFactory.getDescriptor()).thenReturn(fakeHttpMessageInputDescriptor);
