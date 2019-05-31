@@ -94,10 +94,10 @@ public class JsonExtractorTest {
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("foobar", "object_text", -1, -1),
-                new Extractor.Result(1234.5678, "object_number", -1, -1),
-                new Extractor.Result(true, "object_bool", -1, -1),
-                new Extractor.Result("foobar", "object_nested_text", -1, -1)
+                new Extractor.Result("foobar", "object.text", -1, -1),
+                new Extractor.Result(1234.5678, "object.number", -1, -1),
+                new Extractor.Result(true, "object.bool", -1, -1),
+                new Extractor.Result("foobar", "object.nested.text", -1, -1)
         );
     }
 
@@ -158,7 +158,7 @@ public class JsonExtractorTest {
 
         assertThat(results).contains(
             new Extractor.Result("Myserver#DS", "Source", -1, -1),
-            new Extractor.Result("Purge Vector", "Target_Data_Attribute Name", -1, -1)
+            new Extractor.Result("Purge Vector", "Target.Data.Attribute Name", -1, -1)
         );
     }
 
@@ -213,7 +213,7 @@ public class JsonExtractorTest {
                 "");
 
         assertThat(jsonExtractor.run(value)).containsOnly(
-                new Extractor.Result(42, "foo_b-a-r_b-a-z", -1, -1)
+                new Extractor.Result(42, "foo.b-a-r.b-a-z", -1, -1)
         );
     }
 

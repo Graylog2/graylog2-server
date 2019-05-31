@@ -247,32 +247,7 @@ public class Message implements Messages {
             }
 
             final Object value = entry.getValue();
-            // Elasticsearch does not allow "." characters in keys since version 2.0.
-            // See: https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking_20_mapping_changes.html#_field_names_may_not_contain_dots
-            if (key.contains(".")) {
-                final String newKey = key.replace('.', KEY_REPLACEMENT_CHAR);
-
-                // If the message already contains the transformed key, we skip the field and emit a warning.
-                // This is still not optimal but better than implementing expensive logic with multiple replacement
-                // character options. Conflicts should be rare...
-                if (!obj.containsKey(newKey)) {
-                    obj.put(newKey, value);
-                } else {
-                    LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
-                    LOG.debug("Full message with \".\" in message key: {}", this);
-                }
-            } else {
-                if (obj.containsKey(key)) {
-                    final String newKey = key.replace(KEY_REPLACEMENT_CHAR, '.');
-                    // Deliberate warning duplicates because the key with the "." might be transformed before reaching
-                    // the duplicate original key with a "_". Otherwise we would silently overwrite the transformed key.
-                    LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
-                    LOG.debug("Full message with \".\" in message key: {}", this);
-                }
-                obj.put(key, value);
-            }
+            obj.put(key, value);
         }
 
         obj.put(FIELD_MESSAGE, getMessage());
