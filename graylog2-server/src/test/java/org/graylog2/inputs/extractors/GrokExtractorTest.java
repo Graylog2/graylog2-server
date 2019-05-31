@@ -26,6 +26,7 @@ import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.inputs.Extractor;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -216,6 +217,7 @@ public class GrokExtractorTest {
         return makeExtractor(pattern, new HashMap<>());
     }
 
+    @SuppressForbidden("Allow using default thread factory")
     private GrokExtractor makeExtractor(String pattern, Map<String, Object> config) {
         config.put("grok_pattern", pattern);
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
