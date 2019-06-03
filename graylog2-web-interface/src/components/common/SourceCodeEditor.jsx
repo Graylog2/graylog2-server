@@ -2,20 +2,13 @@ import React from 'react';
 import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
-import 'brace';
-import AceEditor from 'react-ace';
+import AceEditor from 'react-ace-builds';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { ClipboardButton } from 'components/common';
 
-import 'brace/mode/json';
-import 'brace/mode/lua';
-import 'brace/mode/markdown';
-import 'brace/mode/text';
-import 'brace/mode/yaml';
-import 'brace/theme/tomorrow';
-import 'brace/theme/monokai';
 import style from './SourceCodeEditor.css';
+import './webpack-resolver';
 
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector

@@ -70,7 +70,7 @@
     "numeral": "^1.5.3",
     "opensans-npm-webfont": "^1.0.0",
     "qs": "^6.3.0",
-    "react-ace": "^5.9.0",
+    "react-ace-builds": "^7.2.4",
     "react-color": "^2.14.0",
     "react-day-picker": "^5.0.0",
     "react-dnd": "^7.0.2",
