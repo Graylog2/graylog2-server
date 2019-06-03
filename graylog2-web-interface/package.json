@@ -80,7 +80,7 @@
     "react-leaflet": "^2.3.0",
     "react-overlays": "^0.7.0",
     "react-resizable": "^1.8.0",
-    "react-select": "^v1.0.0-rc.10",
+    "react-select": "2.4.3",
     "rickshaw": "^1.5.1",
     "sockjs-client": "1.1.x",
     "superagent": "^3.4.3",
