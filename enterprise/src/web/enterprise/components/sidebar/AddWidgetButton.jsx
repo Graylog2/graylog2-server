@@ -20,6 +20,7 @@ type FunctionalCreator = {|
   func: CreatorFunction,
   title: string,
   type: CreatorType,
+  condition?: () => boolean,
 |};
 
 type CreatorComponentProps = {
@@ -30,6 +31,7 @@ type ComponentCreator = {|
   component: React.ComponentType<CreatorComponentProps>,
   title: string,
   type: CreatorType,
+  condition?: () => boolean,
 |};
 
 type Creator = ComponentCreator | FunctionalCreator;
@@ -64,7 +66,9 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createMenuItem = (creator: Creator): React.Node => (
-    <MenuItem key={creator.title} onSelect={this._createHandlerFor(creator)}>
+    <MenuItem key={creator.title}
+              onSelect={this._createHandlerFor(creator)}
+              disabled={creator.condition ? creator.condition() : false}>
       {creator.title}
     </MenuItem>
   );
@@ -75,6 +79,7 @@ class AddWidgetButton extends React.Component<Props, State> {
       .map(this._createMenuItem);
     const generic = creators.filter(c => (c.type === 'generic'))
       .map(this._createMenuItem);
+    // eslint-disable-next-line react/destructuring-assignment
     const overflowingComponents = Object.values(this.state.overflowingComponents);
     return (
       <React.Fragment>
