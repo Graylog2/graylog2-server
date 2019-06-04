@@ -68,7 +68,7 @@ class AddWidgetButton extends React.Component<Props, State> {
   _createMenuItem = (creator: Creator): React.Node => (
     <MenuItem key={creator.title}
               onSelect={this._createHandlerFor(creator)}
-              disabled={creator.condition ? creator.condition() : false}>
+              disabled={creator.condition ? !creator.condition() : false}>
       {creator.title}
     </MenuItem>
   );
