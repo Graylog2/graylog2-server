@@ -50,7 +50,7 @@
     "react-router": "3.2.1",
     "react-router-bootstrap": "0.23.2",
     "reflux": "0.2.13",
-    "webpack": "4.27.0",
+    "webpack": "4.32.2",
     "webpack-cleanup-plugin": "0.5.1",
     "webpack-cli": "3.1.1",
     "webpack-merge": "4.2.1"
