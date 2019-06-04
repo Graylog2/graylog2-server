@@ -2,20 +2,13 @@ import React from 'react';
 import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
-import 'brace';
-import AceEditor from 'react-ace';
+import AceEditor from 'react-ace-builds';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import { ClipboardButton } from 'components/common';
 
-import 'brace/mode/json';
-import 'brace/mode/lua';
-import 'brace/mode/markdown';
-import 'brace/mode/text';
-import 'brace/mode/yaml';
-import 'brace/theme/tomorrow';
-import 'brace/theme/monokai';
 import style from './SourceCodeEditor.css';
+import './webpack-resolver';
 
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector
@@ -74,7 +67,7 @@ class SourceCodeEditor extends React.Component {
     toolbar: true,
     value: '',
     width: Infinity,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -86,7 +79,8 @@ class SourceCodeEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.height !== prevProps.height || this.props.width !== prevProps.width) {
+    const { height, width } = this.props;
+    if (height !== prevProps.height || width !== prevProps.width) {
       this.reloadEditor();
     }
   }
@@ -94,53 +88,72 @@ class SourceCodeEditor extends React.Component {
   handleResize = (event, { size }) => {
     const { height, width } = size;
     this.setState({ height: height, width: width }, this.reloadEditor);
-  }
+  };
 
   reloadEditor = () => {
-    if (this.props.resizable) {
+    const { resizable } = this.props;
+    if (resizable) {
       this.reactAce.editor.resize();
     }
-  }
+  };
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   isCopyDisabled = () => this.props.readOnly || this.state.selectedText === '';
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   isPasteDisabled = () => this.props.readOnly;
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   isRedoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
 
+  /* eslint-disable-next-line react/destructuring-assignment */
   isUndoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
 
   handleRedo = () => {
     this.reactAce.editor.redo();
     this.focusEditor();
-  }
+  };
 
   handleUndo = () => {
     this.reactAce.editor.undo();
     this.focusEditor();
-  }
+  };
 
   handleSelectionChange = (selection) => {
-    if (!this.reactAce || !this.props.toolbar || this.props.readOnly) {
+    const { toolbar, readOnly } = this.props;
+    if (!this.reactAce || !toolbar || readOnly) {
       return;
     }
     const selectedText = this.reactAce.editor.getSession().getTextRange(selection.getRange());
     this.setState({ selectedText: selectedText });
-  }
+  };
 
   focusEditor = () => {
     this.reactAce.editor.focus();
-  }
+  };
 
   render() {
-    const { height, width } = this.state;
-    const { theme, resizable } = this.props;
+    const { height, width, selectedText } = this.state;
+    const {
+      theme,
+      resizable,
+      toolbar,
+      annotations,
+      focus,
+      fontSize,
+      mode,
+      id,
+      onLoad,
+      onChange,
+      readOnly,
+      value,
+    } = this.props;
     const validCssWidth = lodash.isFinite(width) ? width : '100%';
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
     const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
     return (
       <div>
-        {this.props.toolbar
+        {toolbar
           && (
           <div className={style.toolbar} style={{ width: validCssWidth }}>
             <ButtonToolbar>
@@ -149,7 +162,7 @@ class SourceCodeEditor extends React.Component {
                                  bsStyle="link"
                                  bsSize="sm"
                                  onSuccess={this.focusEditor}
-                                 text={this.state.selectedText}
+                                 text={selectedText}
                                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
                                  disabled={this.isCopyDisabled()} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
@@ -184,19 +197,19 @@ class SourceCodeEditor extends React.Component {
                    onResize={this.handleResize}>
           <div className={containerStyle} style={{ height: height, width: validCssWidth }}>
             <AceEditor ref={(c) => { this.reactAce = c; }}
-                       annotations={this.props.annotations}
+                       annotations={annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
-                       focus={this.props.focus}
-                       fontSize={this.props.fontSize}
-                       mode={this.props.mode}
-                       theme={this.props.theme === 'light' ? 'tomorrow' : 'monokai'}
-                       name={this.props.id}
+                       focus={focus}
+                       fontSize={fontSize}
+                       mode={mode}
+                       theme={theme === 'light' ? 'tomorrow' : 'monokai'}
+                       name={id}
                        height="100%"
-                       onLoad={this.props.onLoad}
-                       onChange={this.props.onChange}
+                       onLoad={onLoad}
+                       onChange={onChange}
                        onSelectionChange={this.handleSelectionChange}
-                       readOnly={this.props.readOnly}
-                       value={this.props.value}
+                       readOnly={readOnly}
+                       value={value}
                        width="100%" />
           </div>
         </Resizable>

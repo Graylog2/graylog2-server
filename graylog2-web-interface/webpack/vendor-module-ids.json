@@ -892,7 +892,9 @@
       "node_modules/moment/locale/mn.js": 13,
       "node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js": 18,
       "node_modules/scheduler/index.js": 20,
-      "node_modules/scheduler/cjs/scheduler.production.min.js": 29
+      "node_modules/scheduler/cjs/scheduler.production.min.js": 29,
+      "node_modules/react-dom/node_modules/scheduler/index.js": 20,
+      "node_modules/react-dom/node_modules/scheduler/cjs/scheduler.production.min.js": 29
     },
     "usedIds": {
       "0": 0,
