@@ -34,8 +34,6 @@ import AggregationControls from 'enterprise/components/aggregationbuilder/Aggreg
 import EditMessageList from 'enterprise/components/widgets/EditMessageList';
 import { ShowViewPage, NewSearchPage, ViewManagementPage } from 'enterprise/pages';
 
-import ViewsLicenseCheck from 'enterprise/components/common/ViewsLicenseCheck';
-
 import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'enterprise/logic/fieldactions/RemoveFromTableActionHandler';
