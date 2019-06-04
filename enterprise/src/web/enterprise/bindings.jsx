@@ -81,9 +81,9 @@ export default {
     // search: { component: ExtendedSearchPage },
   },
   routes: [
-    { path: extendedSearchPath, component: ViewsLicenseCheck(NewSearchPage), permissions: Permissions.ExtendedSearch.Use },
-    { path: viewsPath, component: ViewsLicenseCheck(ViewManagementPage), permissions: Permissions.View.Use },
-    { path: showViewsPath, component: ViewsLicenseCheck(ShowViewPage) },
+    { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
+    { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
+    { path: showViewsPath, component: ShowViewPage },
   ],
   enterpriseWidgets: [
     {
