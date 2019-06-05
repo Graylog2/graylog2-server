@@ -183,7 +183,7 @@ class Select extends React.Component<Props, State> {
   };
 
   render() {
-    const { allowCreate = false, displayKey, size, multi, options, valueKey, onReactSelectChange } = this.props;
+    const { allowCreate = false, delimiter, displayKey, size, multi, options, valueKey, onReactSelectChange } = this.props;
     const { value } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
@@ -191,7 +191,7 @@ class Select extends React.Component<Props, State> {
     if (value && multi && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
-      formattedValue = options.find(option => option[valueKey] === value);
+      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey] === v));
     }
 
     const {
