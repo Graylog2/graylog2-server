@@ -41,11 +41,13 @@ describe('SelectExtractorType', () => {
       </AdditionalContext.Provider>,
     );
     const select = wrapper.find('Select');
+    const { onChange } = select.at(0).props();
+
     const form = wrapper.find('form');
     expect(select).toExist();
     expect(select.at(0)).toHaveProp('placeholder', 'Select extractor type');
-    wrapper.find('.Select-control').simulate('keyDown', { keyCode: 40 }); // arrow down
-    wrapper.find('.Select-control').simulate('keyDown', { keyCode: 13 }); // enter
+
+    onChange('grok');
     form.simulate('submit');
     expect(window.open).toHaveBeenCalled();
     expect(focus).toHaveBeenCalled();
