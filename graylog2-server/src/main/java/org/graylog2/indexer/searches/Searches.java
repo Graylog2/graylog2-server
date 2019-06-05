@@ -95,7 +95,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -697,19 +696,14 @@ public class Searches {
         final double failedShards = shards.path("failed").asDouble();
 
         if (failedShards > 0) {
-            final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
-                .map(failure -> failure.path("reason").path("reason").asText())
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+            final SearchFailure searchFailure = new SearchFailure(shards);
+            final List<String> nonNumericFieldErrors = searchFailure.getNonNumericFieldErrors();
 
-            final List<String> nonNumericFieldErrors = errors.stream()
-                .filter(error -> error.startsWith("Expected numeric type on field"))
-                .collect(Collectors.toList());
             if (!nonNumericFieldErrors.isEmpty()) {
                 throw new FieldTypeException("Unable to perform search query", nonNumericFieldErrors);
             }
 
-            throw new ElasticsearchException("Unable to perform search query", errors);
+            throw new ElasticsearchException("Unable to perform search query", searchFailure.getErrors());
         }
 
         return result;
