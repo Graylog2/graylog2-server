@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 
 import ReactSelect, { components as Components, Creatable } from 'react-select';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import reactSelectSmStyles from '!style/useable!css!./Select.css';
 
 const MultiValueRemove = (props) => {
@@ -211,7 +212,7 @@ class Select extends React.Component<Props, State> {
                          value={formattedValue} />
       </div>
     );
-  };
+  }
 }
 
 export default Select;
