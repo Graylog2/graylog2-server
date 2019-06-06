@@ -1,0 +1,37 @@
+:local(.total-throughput) > a {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  display: flex !important;
+  align-items: center;
+  height: 50px;
+}
+
+:local(.total-throughput__content) {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:local(.total-throughput__content)::after {
+  content: ' ';
+  min-height: 1px;
+  width: 110%;
+  background-color: #d0d0d0;
+  transform: rotate(-2deg);
+  display: block;
+  order: 2;
+}
+
+:local(.total-throughput__content) span {
+  display: block;
+  font-size: 11px;
+  line-height: 13px;
+  order: 3;
+}
+
+:local(.total-throughput__content) span:first-of-type {
+  order: 1;
+  margin-bottom: 2px;
+}

@@ -1,0 +1,8 @@
+:local(.header-meta-nav) .dropdown-toggle {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+:local(.header-meta-nav) .dropdown-toggle > .fa {
+  font-size: 23px;
+}

@@ -23,10 +23,10 @@ import { IfPermitted } from 'components/common';
 import badgeStyles from 'components/bootstrap/Badge.css';
 
 import NavigationBrand from './NavigationBrand';
-import InactiveNavItem from './InactiveNavItem';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import SystemMenu from './SystemMenu';
+import styles from './Navigation.css';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
@@ -108,9 +108,9 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight>
+        <Nav navbar pullRight className={styles['header-meta-nav']}>
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <InactiveNavItem><GlobalThroughput /></InactiveNavItem>
+            <GlobalThroughput />
           </LinkContainer>
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
           <UserMenu fullName={fullName} loginName={loginName} />
