@@ -206,7 +206,8 @@ class Select extends React.Component<Props, State> {
                          onChange={onReactSelectChange || this._onChange}
                          isMulti={isMulti}
                          isDisabled={isDisabled}
-                         labelKey={displayKey}
+                         getOptionLabel={option => option[displayKey]}
+                         getOptionValue={option => option[valueKey]}
                          components={_components}
                          styles={_styles}
                          value={formattedValue} />
