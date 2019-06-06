@@ -26,8 +26,8 @@ const GlobalThroughput = createReactClass({
           ? <Spinner text="" />
           : (
             <strong className={styles['total-throughput__content']}>
-              <span>{numeral(1234).format('0,0')}</span>
-              <span>{numeral(1234).format('0,0')}</span>
+              <span>{numeral(throughput.input).format('0,0')}</span>
+              <span>{numeral(throughput.output).format('0,0')}</span>
             </strong>
           )
         }
