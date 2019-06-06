@@ -40,7 +40,6 @@ const CreateExtractorsPage = createReactClass({
     return {
       extractor: ExtractorsStore.new(query.extractor_type, query.field),
       exampleMessage: undefined,
-      extractorType: query.extractor_type,
       field: query.field,
       exampleIndex: query.example_index,
       exampleId: query.example_id,
