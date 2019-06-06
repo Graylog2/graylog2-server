@@ -12,18 +12,14 @@ const HelpMenu = ({ active }) => (
                id="help-menu-dropdown"
                title={<i className="fa fa-question-circle" />}
                noCaret>
-    <MenuItem>
 
-      <LinkContainer to={Routes.getting_started(true)}>
-        <MenuItem>Getting Started</MenuItem>
-      </LinkContainer>
-    </MenuItem>
+    <LinkContainer to={Routes.getting_started(true)}>
+      <MenuItem>Getting Started</MenuItem>
+    </LinkContainer>
 
     <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
       <ExternalLink>Documentation</ExternalLink>
     </MenuItem>
-
-
   </NavDropdown>
 );
 
