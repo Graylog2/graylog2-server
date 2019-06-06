@@ -22,17 +22,13 @@ const ExportExtractorsPage = createReactClass({
 
   mixins: [Reflux.connect(InputsStore)],
 
-  getInitialState() {
-    return {
-      input: undefined,
-    };
-  },
-
   componentDidMount() {
-    InputsActions.get.triggerPromise(this.props.params.inputId);
+    const { params } = this.props;
+    InputsActions.get.triggerPromise(params.inputId);
   },
 
   _isLoading() {
+    // eslint-disable-next-line react/destructuring-assignment
     return !this.state.input;
   },
 
@@ -41,16 +37,17 @@ const ExportExtractorsPage = createReactClass({
       return <Spinner />;
     }
 
+    const { input } = this.state;
     return (
-      <DocumentTitle title={`Export extractors of ${this.state.input.title}`}>
+      <DocumentTitle title={`Export extractors of ${input.title}`}>
         <div>
-          <PageHeader title={<span>Export extractors of <em>{this.state.input.title}</em></span>}>
+          <PageHeader title={<span>Export extractors of <em>{input.title}</em></span>}>
             <span>
               The extractors of an input can be exported to JSON for importing into other setups
-              or sharing in <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
+              or sharing in <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
             </span>
           </PageHeader>
-          <ExportExtractors input={this.state.input} />
+          <ExportExtractors input={input} />
         </div>
       </DocumentTitle>
     );

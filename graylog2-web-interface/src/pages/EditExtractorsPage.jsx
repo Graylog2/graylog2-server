@@ -33,7 +33,6 @@ const EditExtractorsPage = createReactClass({
   getInitialState() {
     return {
       extractor: undefined,
-      input: undefined,
       exampleMessage: undefined,
     };
   },
