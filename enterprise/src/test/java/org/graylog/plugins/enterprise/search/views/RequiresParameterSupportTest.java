@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search.views;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.enterprise.search.Parameter;
 import org.graylog.plugins.enterprise.search.Search;
+import org.graylog.plugins.enterprise.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.enterprise.search.db.SearchDbService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -37,7 +38,7 @@ public class RequiresParameterSupportTest {
 
     @Before
     public void setUp() throws Exception {
-        this.requiresParameterSupport = new RequiresParameterSupport(searchDbService, new EnterpriseMetadataSummary());
+        this.requiresParameterSupport = new RequiresParameterSupport(searchDbService, new SearchRequiresParameterSupport(new EnterpriseMetadataSummary()));
 
         this.view = ViewDTO.builder()
                 .title("Sample View")

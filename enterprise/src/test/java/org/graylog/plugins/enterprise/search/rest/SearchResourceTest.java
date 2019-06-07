@@ -71,7 +71,7 @@ public class SearchResourceTest {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, StreamService streamService) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService);
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService, Collections.emptyMap());
             this.subject = subject;
         }
 

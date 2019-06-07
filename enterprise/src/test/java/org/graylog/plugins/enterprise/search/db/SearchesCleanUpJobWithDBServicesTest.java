@@ -6,6 +6,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.database.MongoConnectionRule;
+import org.graylog.plugins.enterprise.search.SearchRequirements;
 import org.graylog.plugins.enterprise.search.views.ViewRequirements;
 import org.graylog.plugins.enterprise.search.views.ViewService;
 import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
@@ -71,7 +72,16 @@ public class SearchesCleanUpJobWithDBServicesTest {
         );
         final ViewSharingService viewSharingService = mock(ViewSharingService.class);
         final IsViewSharedForUser isViewSharedForUser = mock(IsViewSharedForUser.class);
-        this.searchDbService = spy(new SearchDbService(mongoRule.getMongoConnection(), mapperProvider, viewService, viewSharingService, isViewSharedForUser));
+        this.searchDbService = spy(
+                new SearchDbService(
+                        mongoRule.getMongoConnection(),
+                        mapperProvider,
+                        viewService,
+                        viewSharingService,
+                        isViewSharedForUser,
+                        dto -> new SearchRequirements(Collections.emptySet(), dto)
+                )
+        );
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4));
     }
 
