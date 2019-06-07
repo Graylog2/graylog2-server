@@ -33,15 +33,15 @@ const EditExtractorsPage = createReactClass({
   getInitialState() {
     return {
       extractor: undefined,
-      input: undefined,
       exampleMessage: undefined,
     };
   },
 
   componentDidMount() {
-    InputsActions.get.triggerPromise(this.props.params.inputId);
-    ExtractorsActions.get.triggerPromise(this.props.params.inputId, this.props.params.extractorId);
-    UniversalSearchstore.search('relative', `gl2_source_input:${this.props.params.inputId} OR gl2_source_radio_input:${this.props.params.inputId}`, { relative: 3600 }, undefined, 1)
+    const { params } = this.props;
+    InputsActions.get.triggerPromise(params.inputId);
+    ExtractorsActions.get.triggerPromise(params.inputId, params.extractorId);
+    UniversalSearchstore.search('relative', `gl2_source_input:${params.inputId} OR gl2_source_radio_input:${params.inputId}`, { relative: 3600 }, undefined, 1)
       .then((response) => {
         if (response.total_results > 0) {
           this.setState({ exampleMessage: response.messages[0] });
@@ -52,15 +52,18 @@ const EditExtractorsPage = createReactClass({
   },
 
   _isLoading() {
+    // eslint-disable-next-line react/destructuring-assignment
     return !(this.state.input && this.state.extractor && this.state.exampleMessage);
   },
 
   _extractorSaved() {
     let url;
-    if (this.state.input.global) {
-      url = Routes.global_input_extractors(this.props.params.inputId);
+    const { input } = this.state;
+    const { params } = this.props;
+    if (input.global) {
+      url = Routes.global_input_extractors(params.inputId);
     } else {
-      url = Routes.local_input_extractors(this.props.params.nodeId, this.props.params.inputId);
+      url = Routes.local_input_extractors(params.nodeId, params.inputId);
     }
 
     history.push(url);
@@ -74,10 +77,11 @@ const EditExtractorsPage = createReactClass({
       return <Spinner />;
     }
 
+    const { extractor, exampleMessage, input } = this.state;
     return (
-      <DocumentTitle title={`Edit extractor ${this.state.extractor.title}`}>
+      <DocumentTitle title={`Edit extractor ${extractor.title}`}>
         <div>
-          <PageHeader title={<span>Edit extractor <em>{this.state.extractor.title}</em> for input <em>{this.state.input.title}</em></span>}>
+          <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}>
             <span>
               Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
               any text data into fields that allow you easy filtering and analysis later on.
@@ -89,9 +93,9 @@ const EditExtractorsPage = createReactClass({
             </span>
           </PageHeader>
           <EditExtractor action="edit"
-                         extractor={this.state.extractor}
-                         inputId={this.state.input.id}
-                         exampleMessage={this.state.exampleMessage.fields ? this.state.exampleMessage.fields[this.state.extractor.source_field] : undefined}
+                         extractor={extractor}
+                         inputId={input.id}
+                         exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
                          onSave={this._extractorSaved} />
         </div>
       </DocumentTitle>
