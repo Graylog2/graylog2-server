@@ -14,7 +14,6 @@ import org.mongojack.WriteResult;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -105,10 +104,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     }
 
     private ViewDTO requirementsForView(ViewDTO view) {
-        final Map<String, PluginMetadataSummary> requirements = Stream.concat(
-                view.requires().entrySet().stream(),
-                viewRequirementsFactory.create(view).entrySet().stream()
-        ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entry1, entry2) -> entry1));
-        return view.toBuilder().requires(requirements).build();
+        return viewRequirementsFactory.create(view)
+                .rebuildRequirements(ViewDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
     }
 }
