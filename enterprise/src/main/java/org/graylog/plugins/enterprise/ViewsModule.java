@@ -5,6 +5,7 @@ import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import io.searchbox.core.search.aggregation.Aggregation;
+import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.ESQueryDecorator;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
@@ -15,17 +16,34 @@ import org.graylog.plugins.enterprise.search.engine.QueryBackend;
 import org.graylog.plugins.enterprise.search.rest.SeriesDescription;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.enterprise.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.enterprise.search.views.ViewRequirement;
+import org.graylog.plugins.enterprise.search.views.ViewDTO;
 import org.graylog.plugins.enterprise.search.views.sharing.SharingStrategy;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 
 public abstract class ViewsModule extends PluginModule {
-    protected void registerViewRequirement(Class<? extends ViewRequirement> viewRequirement) {
+    protected void registerProvidedViewsCapability(String capability, PluginMetaData plugin) {
+        viewsCapabilityBinder().addBinding(capability).toInstance(plugin);
+    }
+
+    protected MapBinder<String, PluginMetaData> viewsCapabilityBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, PluginMetaData.class);
+    }
+
+    protected void registerViewRequirement(Class<? extends Requirement<ViewDTO>> viewRequirement) {
         viewRequirementBinder().addBinding().to(viewRequirement);
     }
 
-    protected Multibinder<ViewRequirement> viewRequirementBinder() {
-        return Multibinder.newSetBinder(binder(), ViewRequirement.class);
+    protected Multibinder<Requirement<ViewDTO>> viewRequirementBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<Requirement<ViewDTO>>() {});
+    }
+
+    protected void registerSearchRequirement(Class<? extends Requirement<Search>> searchRequirement) {
+        searchRequirementBinder().addBinding().to(searchRequirement);
+    }
+
+    protected Multibinder<Requirement<Search>> searchRequirementBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<Requirement<Search>>() {});
     }
 
     protected void registerESQueryDecorator(Class<? extends ESQueryDecorator> esQueryDecorator) {
