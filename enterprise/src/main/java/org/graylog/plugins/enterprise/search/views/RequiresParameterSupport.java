@@ -1,31 +1,28 @@
 package org.graylog.plugins.enterprise.search.views;
 
+import org.graylog.plugins.enterprise.Requirement;
 import org.graylog.plugins.enterprise.search.Search;
+import org.graylog.plugins.enterprise.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.enterprise.search.db.SearchDbService;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-public class RequiresParameterSupport implements ViewRequirement {
-    public static final String Parameters = "parameters";
-
+public class RequiresParameterSupport implements Requirement<ViewDTO> {
     private final SearchDbService searchDbService;
-    private final EnterpriseMetadataSummary enterpriseMetadataSummary;
+    private final SearchRequiresParameterSupport searchRequiresParameterSupport;
 
     @Inject
-    public RequiresParameterSupport(SearchDbService searchDbService, EnterpriseMetadataSummary enterpriseMetadataSummary) {
+    public RequiresParameterSupport(SearchDbService searchDbService, SearchRequiresParameterSupport searchRequiresParameterSupport) {
         this.searchDbService = searchDbService;
-        this.enterpriseMetadataSummary = enterpriseMetadataSummary;
+        this.searchRequiresParameterSupport = searchRequiresParameterSupport;
     }
 
     @Override
     public Map<String, PluginMetadataSummary> test(ViewDTO view) {
         final Optional<Search> optionalSearch = searchDbService.get(view.searchId());
-        return optionalSearch.map(search -> search.parameters().isEmpty()
-                ? Collections.<String, PluginMetadataSummary>emptyMap()
-                : Collections.<String, PluginMetadataSummary>singletonMap(Parameters, enterpriseMetadataSummary))
+        return optionalSearch.map(searchRequiresParameterSupport::test)
                 .orElseThrow(() -> new IllegalStateException("Search " + view.searchId() + " for view " + view + " is missing."));
     }
 }
