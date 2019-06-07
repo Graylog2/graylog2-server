@@ -35,3 +35,19 @@
   order: 1;
   margin-bottom: 2px;
 }
+
+@media (max-width: 991px) {
+  :local(.total-throughput__content),
+  :local(.total-throughput) > a {
+    height: auto;
+  }
+
+  :local(.total-throughput__content)::before {
+    content: attr(aria-label);
+    font-weight: normal;
+  }
+  :local(.total-throughput__content) span,
+  :local(.total-throughput__content)::after {
+    display: none;
+  }
+}

@@ -2,7 +2,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
-import _ from 'lodash';
 import { NavItem } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -17,20 +16,31 @@ const GlobalThroughput = createReactClass({
   displayName: 'GlobalThroughput',
   mixins: [Reflux.connect(GlobalThroughputStore)],
 
+  getInitialState() {
+    return { throughput: { loading: true } };
+  },
+
   render() {
     const { throughput } = this.state;
+    let output = <Spinner text="" />;
+
+    if (!throughput.loading) {
+      const inputNumeral = numeral(throughput.input).format('0,0');
+      const outputNumeral = numeral(throughput.output).format('0,0');
+
+      output = (
+        <strong className={styles['total-throughput__content']}
+                aria-label={`In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
+          <span>{inputNumeral}</span>
+          <span>{outputNumeral}</span>
+        </strong>
+      );
+    }
+
 
     return (
       <NavItem className={styles['total-throughput']} {...this.props}>
-        {(_.isNil(throughput) || _.isEmpty(throughput)) === true
-          ? <Spinner text="" />
-          : (
-            <strong className={styles['total-throughput__content']}>
-              <span>{numeral(throughput.input).format('0,0')}</span>
-              <span>{numeral(throughput.output).format('0,0')}</span>
-            </strong>
-          )
-        }
+        {output}
       </NavItem>
     );
   },

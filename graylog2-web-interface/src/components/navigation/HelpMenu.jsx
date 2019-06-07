@@ -10,7 +10,7 @@ import Routes from 'routing/Routes';
 const HelpMenu = ({ active }) => (
   <NavDropdown active={active}
                id="help-menu-dropdown"
-               title={<i className="fa fa-question-circle" />}
+               title={<i className="fa fa-question-circle" aria-label="Help" />}
                noCaret>
 
     <LinkContainer to={Routes.getting_started(true)}>
