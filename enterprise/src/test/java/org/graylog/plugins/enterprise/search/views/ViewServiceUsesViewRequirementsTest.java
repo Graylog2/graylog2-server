@@ -74,7 +74,7 @@ public class ViewServiceUsesViewRequirementsTest {
                 clusterConfigService,
                 viewRequirementsFactory
         );
-        when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> viewRequirements);
+        when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
     }
 
     @After
