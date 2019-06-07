@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -27,8 +28,10 @@ import org.graylog.plugins.enterprise.search.engine.QueryEngine;
 import org.graylog.plugins.enterprise.search.filter.AndFilter;
 import org.graylog.plugins.enterprise.search.filter.OrFilter;
 import org.graylog.plugins.enterprise.search.filter.StreamFilter;
+import org.graylog.plugins.enterprise.search.views.PluginMetadataSummary;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -82,18 +85,21 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchJobService searchJobService;
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
+    private final Map<String, PluginMetaData> providedCapabilities;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
                           SearchDbService searchDbService,
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
-                          StreamService streamService) {
+                          StreamService streamService,
+                          Map<String, PluginMetaData> providedCapabilities) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
         this.streamService = streamService;
+        this.providedCapabilities = providedCapabilities;
     }
 
     @VisibleForTesting
@@ -192,6 +198,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
             search = search.toBuilder().queries(newQueries).build();
         }
 
+        final Map<String, PluginMetadataSummary> missingRequirements = missingRequirementsForEach(search);
+        if (!missingRequirements.isEmpty()) {
+            final Map<String, Object> error = ImmutableMap.of(
+                    "error", "Unable to execute this search, the following capabilities are missing:",
+                    "missing", missingRequirements
+            );
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
+        }
+
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
         final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
@@ -203,6 +218,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
                 .entity(runningSearchJob)
                 .build();
+    }
+
+    private Map<String, PluginMetadataSummary> missingRequirementsForEach(Search search) {
+        return search.requires().entrySet().stream()
+                .filter(entry -> !this.providedCapabilities.containsKey(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Filter addStreamIdsToFilter(Set<String> allAvailableStreamIds, Filter filter) {
