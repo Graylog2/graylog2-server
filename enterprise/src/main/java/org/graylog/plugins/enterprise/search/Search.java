@@ -12,12 +12,14 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.enterprise.search.views.PluginMetadataSummary;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,6 +29,7 @@ import static com.google.common.collect.ImmutableSet.of;
 @JsonAutoDetect
 @JsonDeserialize(builder = Search.Builder.class)
 public abstract class Search {
+    public static final String FIELD_REQUIRES = "requires";
     private static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
@@ -47,6 +50,9 @@ public abstract class Search {
 
     @JsonProperty
     public abstract ImmutableSet<Parameter> parameters();
+
+    @JsonProperty(FIELD_REQUIRES)
+    public abstract Map<String, PluginMetadataSummary> requires();
 
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
@@ -103,6 +109,9 @@ public abstract class Search {
         @JsonProperty
         public abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
+        @JsonProperty(FIELD_REQUIRES)
+        public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
+
         @JsonProperty(FIELD_OWNER)
         public abstract Builder owner(String owner);
 
@@ -114,6 +123,7 @@ public abstract class Search {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_Search.Builder()
+                    .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
                     .parameters(of());
         }
