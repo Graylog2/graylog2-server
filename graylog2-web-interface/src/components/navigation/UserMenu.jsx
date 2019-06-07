@@ -29,7 +29,9 @@ class UserMenu extends React.Component {
     const { fullName, loginName } = this.props;
 
     return (
-      <NavDropdown title={<i className="fa fa-user" aria-label={fullName} />} id="user-menu-dropdown" noCaret>
+      <NavDropdown title={<i className="fa fa-user" aria-label={fullName} />}
+                   id="user-menu-dropdown"
+                   noCaret>
         <MenuItem header>{fullName}</MenuItem>
         <MenuItem divider />
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(loginName))}>

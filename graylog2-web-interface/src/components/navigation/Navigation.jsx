@@ -116,7 +116,11 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
         <Nav navbar pullRight className={styles['header-meta-nav']}>
           {
           AppConfig.gl2DevMode()
-            && (<MenuItem className={styles['dev-badge-wrap']}><Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge></MenuItem>)
+            && (
+              <MenuItem className={styles['dev-badge-wrap']}>
+                <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+              </MenuItem>
+            )
           }
 
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
