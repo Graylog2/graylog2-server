@@ -12,8 +12,6 @@ import org.graylog.plugins.enterprise.search.QueryMetadata;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.params.QueryReferenceBinding;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.Set;
@@ -27,8 +25,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.graylog.plugins.enterprise.search.util.GraphToDot.toDot;
 
 public class QueryPlan {
-    private static final Logger LOG = LoggerFactory.getLogger(QueryPlan.class);
-
     private final QueryEngine queryEngine;
     private final SearchJob searchJob;
     private ImmutableGraph<Query> plan;

@@ -58,7 +58,7 @@ public class QueryPlanTest {
 
         final QueryStringParser queryStringParser = new QueryStringParser();
         ElasticsearchBackend backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake());
-        queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend));
+        queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend), Collections.emptySet());
     }
 
     private static String randomUUID() {
@@ -162,7 +162,7 @@ public class QueryPlanTest {
                 .when(esBackend).run(eq(job), argThat(argument -> subQuery.id().equals(argument.id())), any(), any());
 
         final ImmutableMap<String, QueryBackend<?>> elasticsearch = ImmutableMap.of("elasticsearch", esBackend);
-        QueryEngine engine = new QueryEngine(elasticsearch);
+        QueryEngine engine = new QueryEngine(elasticsearch, Collections.emptySet());
 
         final SearchJob execute = engine.execute(job);
         execute.getResultFuture().join();

@@ -8,6 +8,7 @@ import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.ESQueryDecorator;
+import org.graylog.plugins.enterprise.search.elasticsearch.QueryMetadataDecorator;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.plugins.enterprise.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
@@ -22,6 +23,14 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 
 public abstract class ViewsModule extends PluginModule {
+    protected void registerQueryMetadataDecorator(Class<? extends QueryMetadataDecorator> queryMetadataDecorator) {
+        queryMetadataDecoratorBinder().addBinding().to(queryMetadataDecorator);
+    }
+
+    protected Multibinder<QueryMetadataDecorator> queryMetadataDecoratorBinder() {
+        return Multibinder.newSetBinder(binder(), QueryMetadataDecorator.class);
+    }
+
     protected void registerProvidedViewsCapability(String capability, PluginMetaData plugin) {
         viewsCapabilityBinder().addBinding(capability).toInstance(plugin);
     }

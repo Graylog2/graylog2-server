@@ -14,13 +14,17 @@ public abstract class QueryMetadata {
     @JsonProperty("used_parameters_names")
     public abstract ImmutableSet<String> usedParameterNames();
 
+    @JsonProperty("referenced_queries")
+    public abstract ImmutableSet<String> referencedQueries();
+
     public static QueryMetadata empty() {
         return QueryMetadata.builder().build();
     }
 
     public static Builder builder() {
         return new AutoValue_QueryMetadata.Builder()
-                .usedParameterNames(of());
+                .usedParameterNames(of())
+                .referencedQueries(of());
     }
 
     public abstract Builder toBuilder();
@@ -29,6 +33,9 @@ public abstract class QueryMetadata {
     public abstract static class Builder {
         @JsonProperty("used_parameters_names")
         public abstract Builder usedParameterNames(Set<String> usedParameterNames);
+
+        @JsonProperty("referenced_queries")
+        public abstract Builder referencedQueries(Set<String> referencedQueries);
 
         public abstract QueryMetadata build();
     }
