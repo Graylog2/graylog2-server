@@ -44,7 +44,7 @@ public abstract class PluginMetadataSummary {
     }
 
     @JsonCreator
-    static PluginMetadataSummary create(
+    public static PluginMetadataSummary create(
             @JsonProperty("unique_id") String uniqueId,
             @JsonProperty("name") String name,
             @JsonProperty("author") String author,
