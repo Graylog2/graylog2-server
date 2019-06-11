@@ -3,20 +3,17 @@ package org.graylog.plugins.views.search.engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
-import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
-import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.QueryPlan;
 import org.graylog.plugins.views.search.searchtypes.DateHistogram;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -24,8 +21,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Provider;
 import java.util.Collections;
@@ -34,7 +29,6 @@ import java.util.UUID;
 
 import static com.google.common.collect.ImmutableSet.of;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.plugins.enterprise.search.params.ValueBinding.bindToValue;
 import static org.mockito.Mockito.mock;
 
 public class QueryPlanTest {
@@ -67,23 +61,6 @@ public class QueryPlanTest {
 
         ImmutableList<Query> queries = queryPlan.queries();
         assertThat(queries).doesNotContain(Query.emptyRoot());
-    }
-
-    @Test
-    public void singleQueryValueParam() {
-        Search search = Search.builder()
-                .queries(of(wildcardQueryBuilder().build()))
-                .parameters(of(Parameter.builder()
-                        .name("PARAM1")
-                        .dataType("string")
-                        .binding(bindToValue("hello parameter"))
-                        .build()))
-                .build();
-        SearchJob job = new SearchJob(randomUUID(), search, "admin");
-        final QueryPlan queryPlan = new QueryPlan(queryEngine, job);
-
-        ImmutableList<Query> elements = queryPlan.queries();
-        assertThat(elements).doesNotContain(Query.emptyRoot());
     }
 
     private Query.Builder stringQueryBuilder(String queryString, String id) {
