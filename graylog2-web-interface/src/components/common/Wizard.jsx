@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
+import lodash from 'lodash';
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'react-bootstrap';
 
 import WizardStyle from './Wizard.css';
@@ -27,6 +27,11 @@ class Wizard extends React.Component {
      */
     steps: PropTypes.arrayOf(PropTypes.object).isRequired,
     /**
+     * Indicates the active step that should be rendered, in case the step state is stored outside this
+     * component, and it is being used in a controlled way.
+     */
+    activeStep: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /**
      * Callback which is called when the user changes the step. As an argument the callback gets the key
      * of the next step.
      */
@@ -45,6 +50,7 @@ class Wizard extends React.Component {
 
   static defaultProps = {
     children: undefined,
+    activeStep: undefined,
     onStepChange: () => {},
     horizontal: false,
     justified: false,
@@ -61,17 +67,20 @@ class Wizard extends React.Component {
   }
 
   _wizardChanged = (eventKey) => {
-    const { onStepChange } = this.props;
+    const { activeStep, onStepChange } = this.props;
     onStepChange(eventKey);
-    this.setState({ selectedStep: eventKey });
+    // If activeStep is given, component should behave in a controlled way and let consumer decide which step to render.
+    if (!activeStep) {
+      this.setState({ selectedStep: eventKey });
+    }
   };
 
   _disableButton = (direction) => {
     const { steps } = this.props;
-    const { selectedStep } = this.state;
+    const selectedStep = this._getSelectedStep();
     const len = steps.length;
     const disabledPosition = direction === 'next' ? (len - 1) : 0;
-    const currentPosition = steps.findIndex(step => step.key === selectedStep);
+    const currentPosition = steps.findIndex(step => step.key === this._getSelectedStep());
     const otherPosition = direction === 'next' ? (currentPosition + 1) : (currentPosition - 1);
     const otherStep = (steps[otherPosition] || {});
     return steps[disabledPosition].key === selectedStep || otherStep.disabled;
@@ -89,13 +98,13 @@ class Wizard extends React.Component {
 
   _getSelectedIndex = () => {
     const { steps } = this.props;
-    const { selectedStep } = this.state;
+    const selectedStep = this._getSelectedStep();
     return steps.map(step => step.key).indexOf(selectedStep);
   };
 
   _renderVerticalStepNav = () => {
     const { justified, navigationClassName, steps } = this.props;
-    const { selectedStep } = this.state;
+    const selectedStep = this._getSelectedStep();
     return (
       <Col md={2} className={WizardStyle.subnavigation}>
         <Nav stacked
@@ -124,7 +133,7 @@ class Wizard extends React.Component {
   };
 
   _renderHorizontalStepNav = () => {
-    const { selectedStep } = this.state;
+    const selectedStep = this._getSelectedStep();
     const { justified, navigationClassName, steps } = this.props;
     return (
       <Col sm={12} className={WizardStyle.horizontal}>
@@ -151,6 +160,12 @@ class Wizard extends React.Component {
       </Col>
     );
   };
+
+  _getSelectedStep() {
+    const { activeStep } = this.props;
+    const { selectedStep } = this.state;
+    return lodash.defaultTo(activeStep, selectedStep);
+  }
 
   render() {
     const { steps, horizontal, containerClassName, children } = this.props;

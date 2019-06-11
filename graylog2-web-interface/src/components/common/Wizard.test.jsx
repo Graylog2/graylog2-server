@@ -32,58 +32,84 @@ describe('<Wizard />', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-  it('should render step 1 when nothing was clicked', () => {
-    const wrapper = mount(<Wizard steps={steps} />);
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-    expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(true);
-    expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+  describe('When used in an uncontrolled way', () => {
+    it('should render step 1 when nothing was clicked', () => {
+      const wrapper = mount(<Wizard steps={steps} />);
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(true);
+      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+    });
+
+    it('should render step 2 when clicked on step 2', () => {
+      const wrapper = mount(<Wizard steps={steps} />);
+      wrapper.find('a[children="Title2"]').simulate('click');
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
+      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+    });
+
+    it('should render step 2 when clicked on next', () => {
+      const wrapper = mount(<Wizard steps={steps} />);
+      wrapper.find('button[children="Next"]').simulate('click');
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
+      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+    });
+
+    it('should render step 3 when two times clicked on next', () => {
+      const wrapper = mount(<Wizard steps={steps} />);
+      wrapper.find('button[children="Next"]').simulate('click');
+      wrapper.find('button[children="Next"]').simulate('click');
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(true);
+      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
+      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(true);
+    });
+
+    it('should render step 2 when two times clicked on next and one time clicked on previous', () => {
+      const changeFn = jest.fn(() => {});
+      const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
+      wrapper.find('button[children="Next"]').simulate('click');
+      wrapper.find('button[children="Next"]').simulate('click');
+      wrapper.find('button[children="Previous"]').simulate('click');
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
+      expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
+      expect(changeFn.mock.calls.length).toBe(3);
+    });
   });
 
-  it('should render step 2 when clicked on step 2', () => {
-    const wrapper = mount(<Wizard steps={steps} />);
-    wrapper.find('a[children="Title2"]').simulate('click');
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-    expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-    expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
-  });
+  describe('When used in a controlled way', () => {
+    it('should render active step given from prop', () => {
+      const wrapper = mount(<Wizard steps={steps} activeStep="Key2" />);
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      wrapper.find('button[children="Next"]').simulate('click');
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+    });
 
-  it('should render step 2 when clicked on next', () => {
-    const wrapper = mount(<Wizard steps={steps} />);
-    wrapper.find('button[children="Next"]').simulate('click');
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-    expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-    expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
-  });
-
-  it('should render step 3 when two times clicked on next', () => {
-    const wrapper = mount(<Wizard steps={steps} />);
-    wrapper.find('button[children="Next"]').simulate('click');
-    wrapper.find('button[children="Next"]').simulate('click');
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(true);
-    expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-    expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(true);
-  });
-
-  it('should render step 2 when two times clicked on next and one time clicked on previous', () => {
-    const changeFn = jest.fn(() => {});
-    const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
-    wrapper.find('button[children="Next"]').simulate('click');
-    wrapper.find('button[children="Next"]').simulate('click');
-    wrapper.find('button[children="Previous"]').simulate('click');
-    expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
-    expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
-    expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
-    expect(wrapper.find('button[children="Previous"]').prop('disabled')).toBe(false);
-    expect(wrapper.find('button[children="Next"]').prop('disabled')).toBe(false);
-    expect(changeFn.mock.calls.length).toBe(3);
+    it('should change the active step when prop changes', () => {
+      const wrapper = mount(<Wizard steps={steps} activeStep="Key2" />);
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      wrapper.setProps({ activeStep: 'Key1' });
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+    });
   });
 
   it('should give callback step when changing the step', () => {
@@ -94,6 +120,10 @@ describe('<Wizard />', () => {
     const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
     wrapper.find('button[children="Next"]').simulate('click');
     expect(changeFn.mock.calls.length).toBe(1);
+
+    const controlledWrapped = mount(<Wizard steps={steps} onStepChange={changeFn} activeStep="Key1" />);
+    controlledWrapped.find('button[children="Next"]').simulate('click');
+    expect(changeFn.mock.calls.length).toBe(2);
   });
 
   it('should respect disabled flag for a step', () => {
