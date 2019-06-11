@@ -74,7 +74,7 @@ import static java.util.stream.Collectors.toSet;
 @Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_USE)
+@RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_USE)
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
@@ -111,7 +111,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
-    @RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_CREATE)
+    @RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_CREATE)
     @AuditEvent(type = EnterpriseAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
         final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
@@ -133,7 +133,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDbService.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, viewId))
+        return searchDbService.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(ViewsRestPermissions.VIEW_READ, viewId))
                 .orElseThrow(() -> new NotFoundException("No such search " + searchId));
     }
 

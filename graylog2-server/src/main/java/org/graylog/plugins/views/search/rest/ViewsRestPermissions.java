@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static org.graylog2.plugin.security.Permission.create;
 
-public class EnterpriseSearchRestPermissions implements PluginPermissions {
+public class ViewsRestPermissions implements PluginPermissions {
     public static final String VIEW_CREATE = "view:create";
     public static final String VIEW_READ = "view:read";
     public static final String VIEW_EDIT = "view:edit";

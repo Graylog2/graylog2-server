@@ -17,7 +17,7 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.rest.EnterpriseSearchRestPermissions;
+import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.SearchResource;
@@ -76,7 +76,7 @@ public class ViewsBindings extends ViewsModule {
         addRestResource(PivotSeriesFunctionsResource.class);
         addRestResource(ViewSharingResource.class);
 
-        addPermissions(EnterpriseSearchRestPermissions.class);
+        addPermissions(ViewsRestPermissions.class);
 
         // filter
         registerJacksonSubtype(AndFilter.class);

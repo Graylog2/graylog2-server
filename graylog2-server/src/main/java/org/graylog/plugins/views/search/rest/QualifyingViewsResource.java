@@ -9,11 +9,6 @@ import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharing;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
-import org.graylog.plugins.views.search.views.QualifyingViewsService;
-import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharing;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -31,7 +26,7 @@ import java.util.stream.Collectors;
 @Path("/views/forValue")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(EnterpriseSearchRestPermissions.VIEW_USE)
+@RequiresPermissions(ViewsRestPermissions.VIEW_USE)
 public class QualifyingViewsResource extends RestResource implements PluginRestResource {
     private final QualifyingViewsService qualifyingViewsService;
     private final ViewSharingService viewSharingService;
@@ -55,7 +50,7 @@ public class QualifyingViewsResource extends RestResource implements PluginRestR
                 .filter(view -> {
                     final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
 
-                    return isPermitted(EnterpriseSearchRestPermissions.VIEW_READ, view.id())
+                    return isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
                             || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
                 })
                 .collect(Collectors.toSet());

@@ -32,7 +32,7 @@ public abstract class ViewParameterSummaryDTO {
     @JsonProperty(FIELD_PARAMETERS)
     public abstract Collection<Parameter> parameters();
 
-    static ViewParameterSummaryDTO create(ViewDTO view, Search search) {
+    public static ViewParameterSummaryDTO create(ViewDTO view, Search search) {
         return new AutoValue_ViewParameterSummaryDTO(view.id(), view.title(), view.summary(), view.description(), search.parameters());
     }
 }
