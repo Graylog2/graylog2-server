@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
 @Api(value = "Enterprise/Search/Functions", description = "Definitions for aggregation functions")
-@Path("/functions")
+@Path("/views/functions")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PivotSeriesFunctionsResource extends RestResource implements PluginRestResource {

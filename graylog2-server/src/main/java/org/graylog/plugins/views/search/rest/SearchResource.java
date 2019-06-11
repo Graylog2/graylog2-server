@@ -29,21 +29,6 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
-import org.graylog.plugins.views.audit.EnterpriseAuditEventTypes;
-import org.graylog.plugins.views.search.Filter;
-import org.graylog.plugins.views.search.Parameter;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryMetadata;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.SearchMetadata;
-import org.graylog.plugins.views.search.db.SearchDbService;
-import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.filter.AndFilter;
-import org.graylog.plugins.views.search.filter.OrFilter;
-import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.PluginMetaData;
@@ -86,7 +71,7 @@ import static java.util.stream.Collectors.toSet;
 
 // TODO permission system
 @Api(value = "Enterprise/Search", description = "Searching")
-@Path("/search")
+@Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 @RequiresPermissions(EnterpriseSearchRestPermissions.EXTENDEDSEARCH_USE)

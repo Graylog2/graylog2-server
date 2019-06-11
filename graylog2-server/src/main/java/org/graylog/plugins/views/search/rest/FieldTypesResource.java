@@ -33,7 +33,7 @@ import static com.google.common.collect.ImmutableSet.of;
 import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
 
 @Api(value = "Enterprise/Field Types", description = "Field Types")
-@Path("/fields")
+@Path("/views/fields")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class FieldTypesResource extends RestResource implements PluginRestResource {
