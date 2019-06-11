@@ -13,6 +13,10 @@ modes.forEach((mode) => {
   );
 });
 
+ace.config.setModuleUrl(
+  `ace/mode/graylog`, require(`file-loader!components/common/SourceCodeMode-graylog.js`)
+);
+
 const themes = [
   'tomorrow',
   'monokai',

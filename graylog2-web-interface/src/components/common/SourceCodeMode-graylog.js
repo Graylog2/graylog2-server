@@ -1,9 +1,9 @@
+import * as ace from 'ace-builds/src-min-noconflict/ace.js';
+
+/* eslint-disable */
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import * as ace from 'ace-builds/src-min-noconflict/ace.js';
-
-// import 'brace/mode/java';
 
 const loadFunctions = () => {
   const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
@@ -16,22 +16,21 @@ const builtinConstants = 'all|either|during|when|then|end';
 
 let builtinFunctions = '';
 
-export class PipelineHighlightRules extends ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules {
-  constructor() {
-    super();
+ace.define("ace/mode/graylog_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/java_highlight_rules"], function(require, exports, module) {
+  "use strict";
 
-    const keywordMapper = this.createKeywordMapper(
-      {
-        'constant.language': builtinConstants,
-        keyword: keywords,
-        'support.function': builtinFunctions,
-        'support.type': '$message',
-        'variable.language': 'stage',
-        'language.support.class': operators,
-      },
-      'identifier',
-      true,
-    );
+  var oop = require("../lib/oop");
+  var JavaHighlightRules = require("./java_highlight_rules").JavaHighlightRules;
+
+  var GraylogHighlightRules = function() {
+    var keywordMapper = this.createKeywordMapper({
+      'constant.language': builtinConstants,
+      keyword: keywords,
+      'support.function': builtinFunctions,
+      'support.type': '$message',
+      'variable.language': 'stage',
+      'language.support.class': operators,
+    }, "identifier", true);
 
     this.$rules = {
       start: [
@@ -87,18 +86,39 @@ export class PipelineHighlightRules extends ace.acequire('ace/mode/text_highligh
         },
       ],
     };
-  }
-}
 
-export default class PipelineRulesMode extends ace.acequire('ace/mode/java').Mode {
-  constructor() {
-    super();
+    this.normalizeRules();
+  };
 
-    return loadFunctions().then((res) => {
-      builtinFunctions = res;
-      this.HighlightRules = PipelineHighlightRules;
+  oop.inherits(GraylogHighlightRules, JavaHighlightRules);
 
-      return this;
-    });
-  }
-}
+  exports.GraylogHighlightRules = GraylogHighlightRules;
+});
+
+ace.define("ace/mode/graylog",["require","exports","module","ace/lib/oop","ace/mode/java","ace/mode/graylog_highlight_rules","ace/range"], function(require, exports, module) {
+  "use strict";
+
+  var oop = require("../lib/oop");
+  var TextMode = require("./java").Mode;
+  var GraylogHighlightRules = require("./graylog_highlight_rules").GraylogHighlightRules;
+  var Range = require("../range").Range;
+
+  var Mode = function() {
+    this.HighlightRules = GraylogHighlightRules;
+  };
+  oop.inherits(Mode, TextMode);
+
+  loadFunctions().then((res) => {
+    builtinFunctions = res;
+
+    (function() {
+      this.lineCommentStart = "//";
+
+      this.$id = "ace/mode/graylog";
+    }).call(Mode.prototype);
+
+    return this;
+  });
+
+  exports.Mode = Mode;
+});
