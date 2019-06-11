@@ -2,8 +2,6 @@ package org.graylog.plugins.views.search.db;
 
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -25,7 +23,7 @@ public class SearchesCleanUpJob extends Periodical {
     @Inject
     public SearchesCleanUpJob(ViewService viewService,
                               SearchDbService searchDbService,
-                              @Named("enterprise_search_maximum_search_age") Duration maximumSearchAge) {
+                              @Named("views_maximum_search_age") Duration maximumSearchAge) {
         this.viewService = viewService;
         this.searchDbService = searchDbService;
         this.mustNotBeOlderThan = Instant.now().minus(maximumSearchAge);
