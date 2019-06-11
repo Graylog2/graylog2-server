@@ -1,10 +1,11 @@
 package org.graylog.plugins.enterprise.search.rest;
 
 import org.apache.shiro.subject.Subject;
-import org.graylog.plugins.enterprise.search.views.ViewDTO;
-import org.graylog.plugins.enterprise.search.views.ViewService;
-import org.graylog.plugins.enterprise.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
+import org.graylog.plugins.views.search.rest.ViewsResource;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
+import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;

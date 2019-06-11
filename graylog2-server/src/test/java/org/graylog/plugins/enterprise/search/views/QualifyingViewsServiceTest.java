@@ -2,9 +2,13 @@ package org.graylog.plugins.enterprise.search.views;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.enterprise.search.Parameter;
-import org.graylog.plugins.enterprise.search.Search;
-import org.graylog.plugins.enterprise.search.db.SearchDbService;
+import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.views.QualifyingViewsService;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

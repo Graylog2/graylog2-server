@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.rest;
 
-import org.graylog.plugins.enterprise.search.Search;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.rest.SearchResource;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

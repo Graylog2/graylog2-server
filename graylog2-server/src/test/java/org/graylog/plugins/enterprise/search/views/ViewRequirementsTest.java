@@ -3,6 +3,10 @@ package org.graylog.plugins.enterprise.search.views;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.views.search.views.EnterpriseMetadataSummary;
+import org.graylog.plugins.views.search.views.PluginMetadataSummary;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.junit.Test;
 
 import java.net.URI;

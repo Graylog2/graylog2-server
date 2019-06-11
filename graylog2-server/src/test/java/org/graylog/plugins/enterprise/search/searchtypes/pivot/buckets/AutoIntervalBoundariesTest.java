@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search.searchtypes.pivot.buckets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.junit.Test;
 
 import java.time.Duration;

@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.searchtypes.pivot.buckets;
 
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;

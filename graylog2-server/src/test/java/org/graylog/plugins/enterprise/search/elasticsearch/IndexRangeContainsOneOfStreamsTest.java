@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.elasticsearch;
 
+import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Rule;

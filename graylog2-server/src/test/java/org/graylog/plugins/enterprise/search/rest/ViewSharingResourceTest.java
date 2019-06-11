@@ -1,9 +1,10 @@
 package org.graylog.plugins.enterprise.search.rest;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog.plugins.enterprise.search.views.ViewService;
-import org.graylog.plugins.enterprise.search.views.sharing.UserShortSummary;
-import org.graylog.plugins.enterprise.search.views.sharing.ViewSharingService;
+import org.graylog.plugins.views.search.rest.ViewSharingResource;
+import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.plugins.views.search.views.sharing.UserShortSummary;
+import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.junit.Before;

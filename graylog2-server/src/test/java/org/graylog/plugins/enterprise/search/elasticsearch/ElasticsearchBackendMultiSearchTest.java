@@ -1,15 +1,17 @@
 package org.graylog.plugins.enterprise.search.elasticsearch;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog.plugins.enterprise.search.Query;
-import org.graylog.plugins.enterprise.search.QueryResult;
-import org.graylog.plugins.enterprise.search.SearchJob;
-import org.graylog.plugins.enterprise.search.SearchType;
-import org.graylog.plugins.enterprise.search.errors.SearchTypeError;
-import org.graylog.plugins.enterprise.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.enterprise.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.enterprise.search.searchtypes.pivot.series.Average;
-import org.graylog.plugins.enterprise.search.searchtypes.pivot.series.Max;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.errors.SearchTypeError;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

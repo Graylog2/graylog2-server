@@ -9,7 +9,7 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.database.MongoConnectionRule;
-import org.graylog.plugins.enterprise.migrations.V20190304102700_MigrateMessageListStructure;
+import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.Before;

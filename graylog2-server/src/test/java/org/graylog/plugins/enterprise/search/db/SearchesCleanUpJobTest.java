@@ -1,8 +1,10 @@
 package org.graylog.plugins.enterprise.search.db;
 
-import org.graylog.plugins.enterprise.search.Search;
-import org.graylog.plugins.enterprise.search.views.ViewDTO;
-import org.graylog.plugins.enterprise.search.views.ViewService;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.junit.Before;
