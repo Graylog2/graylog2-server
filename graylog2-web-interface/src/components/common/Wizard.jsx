@@ -29,6 +29,7 @@ class Wizard extends React.Component {
     /**
      * Indicates the active step that should be rendered, in case the step state is stored outside this
      * component, and it is being used in a controlled way.
+     * The prop **must** take the value of one of the keys in `steps`, otherwise a warning is logged in the console.
      */
     activeStep: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /**
@@ -65,6 +66,12 @@ class Wizard extends React.Component {
       selectedStep: props.steps[0].key,
     };
   }
+
+  _getSelectedStep = () => {
+    const { activeStep } = this.props;
+    const { selectedStep } = this.state;
+    return lodash.defaultTo(activeStep, selectedStep);
+  };
 
   _wizardChanged = (eventKey) => {
     const { activeStep, onStepChange } = this.props;
@@ -160,12 +167,6 @@ class Wizard extends React.Component {
       </Col>
     );
   };
-
-  _getSelectedStep() {
-    const { activeStep } = this.props;
-    const { selectedStep } = this.state;
-    return lodash.defaultTo(activeStep, selectedStep);
-  }
 
   render() {
     const { steps, horizontal, containerClassName, children } = this.props;
