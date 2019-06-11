@@ -156,4 +156,24 @@ describe('<Wizard />', () => {
     expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
     expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
   });
+
+  it('should render next/previous buttons by default', () => {
+    const wrapperV = mount(<Wizard steps={steps} />);
+    expect(wrapperV.find('button[children="Next"]').exists()).toBe(true);
+    expect(wrapperV.find('button[children="Previous"]').exists()).toBe(true);
+
+    const wrapperH = mount(<Wizard steps={steps} horizontal />);
+    expect(wrapperH.find('button > i.fa-caret-left').exists()).toBe(true);
+    expect(wrapperH.find('button > i.fa-caret-right').exists()).toBe(true);
+  });
+
+  it('should hide next/previous buttons if hidePreviousNextButtons is set', () => {
+    const wrapperV = mount(<Wizard steps={steps} hidePreviousNextButtons />);
+    expect(wrapperV.find('button[children="Next"]').exists()).toBe(false);
+    expect(wrapperV.find('button[children="Previous"]').exists()).toBe(false);
+
+    const wrapperH = mount(<Wizard steps={steps} horizontal hidePreviousNextButtons />);
+    expect(wrapperH.find('button > i.fa-caret-left').exists()).toBe(false);
+    expect(wrapperH.find('button > i.fa-caret-right').exists()).toBe(false);
+  });
 });

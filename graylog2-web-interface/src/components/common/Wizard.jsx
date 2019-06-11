@@ -47,6 +47,8 @@ class Wizard extends React.Component {
     containerClassName: PropTypes.string,
     /** Customize the navigation CSS class used by this component */
     navigationClassName: PropTypes.string,
+    /** Indicates if wizard should render next/previous buttons or not */
+    hidePreviousNextButtons: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -57,6 +59,7 @@ class Wizard extends React.Component {
     justified: false,
     containerClassName: 'content',
     navigationClassName: '',
+    hidePreviousNextButtons: false,
   };
 
   constructor(props) {
@@ -132,7 +135,7 @@ class Wizard extends React.Component {
   };
 
   _renderVerticalStepNav = () => {
-    const { justified, navigationClassName, steps } = this.props;
+    const { justified, navigationClassName, steps, hidePreviousNextButtons } = this.props;
     const selectedStep = this._getSelectedStep();
     return (
       <Col md={2} className={WizardStyle.subnavigation}>
@@ -148,34 +151,51 @@ class Wizard extends React.Component {
             );
           })}
         </Nav>
-        <br />
-        <Row>
-          <Col xs={6}>
-            <Button onClick={this._onPrevious} bsSize="small" bsStyle="info" disabled={this._disableButton('previous')}>Previous</Button>
-          </Col>
-          <Col className="text-right" xs={6}>
-            <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>Next</Button>
-          </Col>
-        </Row>
+        {!hidePreviousNextButtons && (
+          <React.Fragment>
+            <br />
+            <Row>
+              <Col xs={6}>
+                <Button onClick={this._onPrevious}
+                        bsSize="small"
+                        bsStyle="info"
+                        disabled={this._disableButton('previous')}>Previous
+                </Button>
+              </Col>
+              <Col className="text-right" xs={6}>
+                <Button onClick={this._onNext}
+                        bsSize="small"
+                        bsStyle="info"
+                        disabled={this._disableButton('next')}>Next
+                </Button>
+              </Col>
+            </Row>
+          </React.Fragment>
+        )}
       </Col>
     );
   };
 
   _renderHorizontalStepNav = () => {
     const selectedStep = this._getSelectedStep();
-    const { justified, navigationClassName, steps } = this.props;
+    const { justified, navigationClassName, steps, hidePreviousNextButtons } = this.props;
     return (
       <Col sm={12} className={WizardStyle.horizontal}>
-        <div className="pull-right">
-          <ButtonToolbar className={WizardStyle.horizontalPreviousNextButtons}>
-            <Button onClick={this._onPrevious} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('previous')}>
-              <i className="fa fa-caret-left" />
-            </Button>
-            <Button onClick={this._onNext} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('next')}>
-              <i className="fa fa-caret-right" />
-            </Button>
-          </ButtonToolbar>
-        </div>
+        {!hidePreviousNextButtons && (
+          <div className="pull-right">
+            <ButtonToolbar className={WizardStyle.horizontalPreviousNextButtons}>
+              <Button onClick={this._onPrevious}
+                      bsSize="xsmall"
+                      bsStyle="info"
+                      disabled={this._disableButton('previous')}>
+                <i className="fa fa-caret-left" />
+              </Button>
+              <Button onClick={this._onNext} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('next')}>
+                <i className="fa fa-caret-right" />
+              </Button>
+            </ButtonToolbar>
+          </div>
+        )}
         <Nav bsStyle="pills"
              className={navigationClassName}
              activeKey={selectedStep}

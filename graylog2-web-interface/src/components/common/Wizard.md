@@ -49,7 +49,7 @@ const WizardExample = createReactClass({
 
 ```
 
-Using `Wizard` as controlled component:
+Using `Wizard` as controlled component with no previous/next buttons:
 ```js
 const createReactClass = require('create-react-class');
 
@@ -92,7 +92,7 @@ const ControlledWizardExample = createReactClass({
     ];
  
     return (
-      <Wizard activeStep={this.state.activeStep} steps={steps} horizontal={this.props.horizontal} onStepChange={this.changeStep}>
+      <Wizard activeStep={this.state.activeStep} steps={steps} horizontal={this.props.horizontal} onStepChange={this.changeStep} hidePreviousNextButtons>
         <div>Preview: {this.state.input_value}</div>
       </Wizard>
     );
