@@ -62,15 +62,37 @@ class Wizard extends React.Component {
   constructor(props) {
     super(props);
 
+    this._warnOnInvalidActiveStep(props.activeStep, props.steps);
     this.state = {
       selectedStep: props.steps[0].key,
     };
   }
 
+  componentDidUpdate() {
+    const { activeStep, steps } = this.props;
+    this._warnOnInvalidActiveStep(activeStep, steps);
+  }
+
+  _warnOnInvalidActiveStep = (activeStep, steps) => {
+    if (activeStep === undefined || activeStep === null) {
+      return;
+    }
+    if (!this._isValidActiveStep(activeStep, steps)) {
+      console.warn(`activeStep ${activeStep} is not a key in any element of the 'steps' prop!`);
+    }
+  };
+
+  _isValidActiveStep = (activeStep, steps) => {
+    if (activeStep === undefined || activeStep === null) {
+      return false;
+    }
+    return lodash.find(steps, { key: activeStep });
+  };
+
   _getSelectedStep = () => {
-    const { activeStep } = this.props;
+    const { activeStep, steps } = this.props;
     const { selectedStep } = this.state;
-    return lodash.defaultTo(activeStep, selectedStep);
+    return (this._isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
   };
 
   _wizardChanged = (eventKey) => {

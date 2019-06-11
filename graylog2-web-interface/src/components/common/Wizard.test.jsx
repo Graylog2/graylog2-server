@@ -110,6 +110,22 @@ describe('<Wizard />', () => {
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
     });
+
+    it('should show a warning when activeStep is not a key in steps', () => {
+      const consoleWarn = console.warn;
+      console.warn = jest.fn();
+      const wrapper = mount(<Wizard steps={steps} activeStep={0} />);
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      expect(console.warn.mock.calls.length).toBe(1);
+      wrapper.setProps({ activeStep: 'Key12314' });
+      expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
+      expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
+      expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+      expect(console.warn.mock.calls.length).toBe(2);
+      console.warn = consoleWarn;
+    });
   });
 
   it('should give callback step when changing the step', () => {
