@@ -1,0 +1,23 @@
+[include]
+src
+
+[ignore]
+.*/build/.*
+.*/target/.*
+.*json$
+
+[libs]
+flow-typed
+
+[strict]
+untyped-type-import
+unnecessary-invariant 
+sketchy-number
+
+[options]
+emoji=true
+module.name_mapper='^!style/useable!.*\.css$' -> '<PROJECT_ROOT>/src/flow/css-useable-modules.js'
+module.name_mapper='.*\.css$' -> '<PROJECT_ROOT>/src/flow/css-modules.js'
+
+[untyped]
+
