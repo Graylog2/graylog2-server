@@ -7,15 +7,6 @@ import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'rea
 
 import { ClipboardButton } from 'components/common';
 
-import 'brace/mode/json';
-import 'brace/mode/lua';
-import 'brace/mode/markdown';
-import 'brace/mode/text';
-import 'brace/mode/yaml';
-import 'brace/theme/tomorrow';
-import 'brace/theme/monokai';
-
-import PipelineRulesMode from './SourceCodeMode-pipleline';
 import style from './SourceCodeEditor.css';
 // import PipelineRulesMode from './SourceCodeMode-pipeline';
 import './webpack-resolver';
@@ -107,23 +98,17 @@ class SourceCodeEditor extends React.Component {
     }
   };
 
-  // eslint-disable-next-line react/destructuring-assignment
+  /* eslint-disable-next-line react/destructuring-assignment */
   isCopyDisabled = () => this.props.readOnly || this.state.selectedText === '';
 
-  // eslint-disable-next-line react/destructuring-assignment
+  /* eslint-disable-next-line react/destructuring-assignment */
   isPasteDisabled = () => this.props.readOnly;
 
-  isRedoDisabled = () => {
-    const { readOnly } = this.props;
+  /* eslint-disable-next-line react/destructuring-assignment */
+  isRedoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
 
-    return readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
-  }
-
-  isUndoDisabled = () => {
-    const { readOnly } = this.props;
-
-    return readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
-  }
+  /* eslint-disable-next-line react/destructuring-assignment */
+  isUndoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
 
   handleRedo = () => {
     this.reactAce.editor.redo();

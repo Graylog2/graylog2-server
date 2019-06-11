@@ -1,8 +1,9 @@
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import * as ace from 'ace-builds/src-min-noconflict/ace.js';
 
-import 'brace/mode/java';
+// import 'brace/mode/java';
 
 const loadFunctions = () => {
   const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
@@ -15,7 +16,7 @@ const builtinConstants = 'all|either|during|when|then|end';
 
 let builtinFunctions = '';
 
-export class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules {
+export class PipelineHighlightRules extends ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules {
   constructor() {
     super();
 
@@ -89,7 +90,7 @@ export class PipelineHighlightRules extends window.ace.acequire('ace/mode/text_h
   }
 }
 
-export default class PipelineRulesMode extends window.ace.acequire('ace/mode/java').Mode {
+export default class PipelineRulesMode extends ace.acequire('ace/mode/java').Mode {
   constructor() {
     super();
 
