@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router';
 
-import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
+import { Badge, Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -23,10 +23,10 @@ import { IfPermitted } from 'components/common';
 import badgeStyles from 'components/bootstrap/Badge.css';
 
 import NavigationBrand from './NavigationBrand';
-import InactiveNavItem from './InactiveNavItem';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import SystemMenu from './SystemMenu';
+import styles from './Navigation.css';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
@@ -74,6 +74,11 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
         </Navbar.Brand>
         <Navbar.Toggle />
+
+        {
+        AppConfig.gl2DevMode()
+          && <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+        }
       </Navbar.Header>
       <Navbar.Collapse>
         <Nav navbar>
@@ -108,19 +113,21 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         <NotificationBadge />
 
-        <Nav navbar pullRight>
+        <Nav navbar pullRight className={styles['header-meta-nav']}>
+          {
+          AppConfig.gl2DevMode()
+            && (
+              <MenuItem className={styles['dev-badge-wrap']}>
+                <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+              </MenuItem>
+            )
+          }
+
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <InactiveNavItem><GlobalThroughput /></InactiveNavItem>
+            <GlobalThroughput />
           </LinkContainer>
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
           <UserMenu fullName={fullName} loginName={loginName} />
-          {AppConfig.gl2DevMode()
-            ? (
-              <NavItem className="notification-badge-link">
-                <Badge className={badgeStyles.badgeDanger}>DEV</Badge>
-              </NavItem>
-            )
-            : null}
         </Nav>
       </Navbar.Collapse>
     </Navbar>
