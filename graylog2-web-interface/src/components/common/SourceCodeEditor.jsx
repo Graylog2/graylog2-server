@@ -82,13 +82,13 @@ class SourceCodeEditor extends React.Component {
   componentDidMount() {
     const { mode } = this.props;
 
-    if (mode === 'java') {
-      const pipelineRulesMode = new PipelineRulesMode();
+    // if (mode === 'java') {
+    //   const pipelineRulesMode = new PipelineRulesMode();
 
-      pipelineRulesMode.then((pipelineMode) => {
-        this.reactAce.editor.getSession().setMode(pipelineMode);
-      });
-    }
+    //   pipelineRulesMode.then((pipelineMode) => {
+    //     this.reactAce.editor.getSession().setMode(pipelineMode);
+    //   });
+    // }
   }
 
 
