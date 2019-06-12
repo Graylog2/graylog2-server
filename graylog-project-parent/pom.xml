@@ -511,6 +511,16 @@
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
             </dependency>
+            <dependency>
+                <groupId>one.util</groupId>
+                <artifactId>streamex</artifactId>
+                <version>${streamex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>info.leadinglight</groupId>
+                <artifactId>jdot</artifactId>
+                <version>${jdot.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>
