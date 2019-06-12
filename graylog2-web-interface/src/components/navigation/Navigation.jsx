@@ -88,6 +88,11 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
             </LinkContainer>
           </IfPermitted>
 
+          <NavDropdown title="Views">
+            <NavigationLink path={Routes.EXTENDEDSEARCH} description="Create new" />
+            <NavigationLink path={Routes.VIEWS.LIST} description="Load existing" />
+          </NavDropdown>
+
           <LinkContainer to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>
           </LinkContainer>
