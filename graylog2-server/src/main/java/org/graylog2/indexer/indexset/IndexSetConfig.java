@@ -53,9 +53,11 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
-    public static final String DEFAULT_INDEX_TEMPLATE_TYPE = "messages";
 
-    private static final Set<String> AVAILABLE_INDEX_TEMPLATE_TYPES = ImmutableSet.of(DEFAULT_INDEX_TEMPLATE_TYPE, "events");
+    private static final String INDEX_TEMPLATE_TYPE_MESSAGES = "messages";
+    public static final String INDEX_TEMPLATE_TYPE_EVENTS = "events";
+    private static final String DEFAULT_INDEX_TEMPLATE_TYPE = INDEX_TEMPLATE_TYPE_MESSAGES;
+    private static final Set<String> AVAILABLE_INDEX_TEMPLATE_TYPES = ImmutableSet.of(INDEX_TEMPLATE_TYPE_MESSAGES, INDEX_TEMPLATE_TYPE_EVENTS);
 
     private static Consumer<String> INDEX_TEMPLATE_TYPE_VALIDATOR = (indexTemplateType) -> {
         if (!AVAILABLE_INDEX_TEMPLATE_TYPES.contains(indexTemplateType)) {
