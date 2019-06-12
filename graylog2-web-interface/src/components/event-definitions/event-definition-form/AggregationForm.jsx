@@ -13,28 +13,28 @@ import styles from './AggregationForm.css';
 
 class AggregationForm extends React.Component {
   static propTypes = {
-    alertDefinition: PropTypes.object.isRequired,
+    eventDefinition: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
   handleConfigChange = (event) => {
-    const { alertDefinition, onChange } = this.props;
+    const { eventDefinition, onChange } = this.props;
     const { name } = event.target;
-    const config = lodash.cloneDeep(alertDefinition.config);
+    const config = lodash.cloneDeep(eventDefinition.config);
     config[name] = FormsUtils.getValueFromInput(event.target);
     onChange('config', config);
   };
 
   handleGroupByChange = (nextValue) => {
-    const { alertDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(alertDefinition.config);
+    const { eventDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
     config.group_by = nextValue;
     onChange('config', config);
   };
 
   handleCustomTimerangeChange = (nextValue, nextUnit) => {
-    const { alertDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(alertDefinition.config);
+    const { eventDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
     config.aggregation_timerange = {
       value: nextValue,
       unit: nextUnit,
@@ -43,9 +43,9 @@ class AggregationForm extends React.Component {
   };
 
   render() {
-    const { alertDefinition } = this.props;
-    const useScheduleTimerange = lodash.defaultTo(alertDefinition.config.use_schedule_timerange, true);
-    const aggregationTimerange = lodash.defaultTo(alertDefinition.config.aggregation_timerange, {});
+    const { eventDefinition } = this.props;
+    const useScheduleTimerange = lodash.defaultTo(eventDefinition.config.use_schedule_timerange, true);
+    const aggregationTimerange = lodash.defaultTo(eventDefinition.config.aggregation_timerange, {});
 
     return (
       <fieldset>
@@ -58,7 +58,7 @@ class AggregationForm extends React.Component {
                            matchProp="label"
                            onChange={selected => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
                            options={[]}
-                           value={lodash.defaultTo(alertDefinition.config.group_by, []).join(',')} />
+                           value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')} />
               <HelpBlock>Aggregate on groups of identical Field values. Example: count failed login attempts per username.</HelpBlock>
             </FormGroup>
           </Col>
@@ -76,7 +76,7 @@ class AggregationForm extends React.Component {
                       placeholder="Select Aggregation"
                       onChange={() => {}}
                       options={[]}
-                      value={alertDefinition.config.aggregation} />
+                      value={eventDefinition.config.aggregation} />
             </FormGroup>
           </Col>
           <Col md={4}>
@@ -92,7 +92,7 @@ class AggregationForm extends React.Component {
                         { label: '=', value: 'equals' },
                         { label: '≠', value: 'not-equal' },
                       ]}
-                      value={alertDefinition.config.condition} />
+                      value={eventDefinition.config.condition} />
             </FormGroup>
           </Col>
           <Col md={4}>
@@ -100,7 +100,7 @@ class AggregationForm extends React.Component {
                    name="threshold"
                    label="Threshold"
                    type="number"
-                   value={lodash.defaultTo(alertDefinition.config.threshold, 0)}
+                   value={lodash.defaultTo(eventDefinition.config.threshold, 0)}
                    onChange={this.handleConfigChange} />
           </Col>
         </Row>

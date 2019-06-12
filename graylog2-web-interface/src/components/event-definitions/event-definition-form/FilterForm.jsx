@@ -13,28 +13,28 @@ import commonStyles from '../common/commonStyles.css';
 
 class FilterForm extends React.Component {
   static propTypes = {
-    alertDefinition: PropTypes.object.isRequired,
+    eventDefinition: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
   handleConfigChange = (event) => {
-    const { alertDefinition, onChange } = this.props;
+    const { eventDefinition, onChange } = this.props;
     const { name } = event.target;
-    const config = lodash.cloneDeep(alertDefinition.config);
+    const config = lodash.cloneDeep(eventDefinition.config);
     config[name] = FormsUtils.getValueFromInput(event.target);
     onChange('config', config);
   };
 
   handleStreamsChange = (nextValue) => {
-    const { alertDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(alertDefinition.config);
+    const { eventDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
     config.selected_streams = nextValue;
     onChange('config', config);
   };
 
   render() {
-    const { alertDefinition, streams } = this.props;
+    const { eventDefinition, streams } = this.props;
     const formattedStreams = streams
       .map(stream => ({ label: stream.title, value: stream.id }))
       .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
@@ -47,7 +47,7 @@ class FilterForm extends React.Component {
                label="Search Query"
                type="text"
                help="Search query that Messages should match. You can use the same syntax as in the Search page."
-               value={lodash.defaultTo(alertDefinition.config.query, '')}
+               value={lodash.defaultTo(eventDefinition.config.query, '')}
                onChange={this.handleConfigChange} />
 
         <FormGroup controlId="filter-streams">
@@ -56,7 +56,7 @@ class FilterForm extends React.Component {
                        matchProp="label"
                        onChange={selected => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
                        options={formattedStreams}
-                       value={lodash.defaultTo(alertDefinition.config.selected_streams, []).join(',')} />
+                       value={lodash.defaultTo(eventDefinition.config.selected_streams, []).join(',')} />
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
       </fieldset>

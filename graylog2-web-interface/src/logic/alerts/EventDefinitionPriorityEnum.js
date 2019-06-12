@@ -1,4 +1,4 @@
-const AlertDefinitionPriorityEnum = {
+const EventDefinitionPriorityEnum = {
   LOW: 1,
   NORMAL: 2,
   HIGH: 3,
@@ -9,4 +9,4 @@ const AlertDefinitionPriorityEnum = {
   },
 };
 
-export default AlertDefinitionPriorityEnum;
+export default EventDefinitionPriorityEnum;

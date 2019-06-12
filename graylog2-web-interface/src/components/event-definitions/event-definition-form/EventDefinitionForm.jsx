@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Wizard } from 'components/common';
-import AlertDetailsForm from './AlertDetailsForm';
+import EventDetailsForm from './EventDetailsForm';
 import ConditionForm from './ConditionForm';
 import FieldsForm from './FieldsForm';
 
-import styles from './AlertDefinitionForm.css';
+import styles from './EventDefinitionForm.css';
 
-class AlertDefinitionForm extends React.Component {
+class EventDefinitionForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
-    alertDefinition: PropTypes.object.isRequired,
+    eventDefinition: PropTypes.object.isRequired,
     streams: PropTypes.array,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -30,23 +30,23 @@ class AlertDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, alertDefinition, streams, onCancel, onChange } = this.props;
+    const { action, eventDefinition, streams, onCancel, onChange } = this.props;
 
     const steps = [
       {
-        key: 'alert-details',
-        title: 'Alert Details',
-        component: <AlertDetailsForm alertDefinition={alertDefinition} onChange={onChange} />,
+        key: 'event-details',
+        title: 'Event Details',
+        component: <EventDetailsForm eventDefinition={eventDefinition} onChange={onChange} />,
       },
       {
         key: 'condition',
         title: 'Condition',
-        component: <ConditionForm alertDefinition={alertDefinition} streams={streams} onChange={onChange} />,
+        component: <ConditionForm eventDefinition={eventDefinition} streams={streams} onChange={onChange} />,
       },
       {
         key: 'fields',
         title: 'Fields',
-        component: <FieldsForm alertDefinition={alertDefinition} onChange={onChange} />,
+        component: <FieldsForm eventDefinition={eventDefinition} onChange={onChange} />,
       },
       {
         key: 'notifications',
@@ -66,4 +66,4 @@ class AlertDefinitionForm extends React.Component {
   }
 }
 
-export default AlertDefinitionForm;
+export default EventDefinitionForm;

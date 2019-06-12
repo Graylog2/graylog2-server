@@ -6,16 +6,16 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 
-import AlertDefinitionPriorityEnum from 'logic/alerts/AlertDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../common/commonStyles.css';
 
-const priorityOptions = lodash.map(AlertDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: lodash.upperFirst(value.name) }));
+const priorityOptions = lodash.map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: lodash.upperFirst(value.name) }));
 
-class AlertDetailsForm extends React.Component {
+class EventDetailsForm extends React.Component {
   static propTypes = {
-    alertDefinition: PropTypes.object.isRequired,
+    eventDefinition: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -35,40 +35,40 @@ class AlertDetailsForm extends React.Component {
   };
 
   render() {
-    const { alertDefinition } = this.props;
+    const { eventDefinition } = this.props;
 
     return (
       <Row>
         <Col md={10} lg={7}>
-          <h2 className={commonStyles.title}>Alert Details</h2>
+          <h2 className={commonStyles.title}>Event Details</h2>
           <form onSubmit={this.handleSubmit}>
             <fieldset>
-              <Input id="alert-definition-title"
+              <Input id="event-definition-title"
                      name="title"
                      label="Title"
                      type="text"
-                     help="Title for this Alert Definition, Events and Alerts created from it."
-                     value={alertDefinition.title}
+                     help="Title for this Event Definition, Events and Alerts created from it."
+                     value={eventDefinition.title}
                      onChange={this.handleChange}
                      required />
 
-              <Input id="alert-definition-description"
+              <Input id="event-definition-description"
                      name="description"
                      label={<span>Description <small className="text-muted">(Optional)</small></span>}
                      type="textarea"
-                     help="Longer description for this Alert Definition."
-                     value={alertDefinition.description}
+                     help="Longer description for this Event Definition."
+                     value={eventDefinition.description}
                      onChange={this.handleChange}
                      rows={2} />
 
-              <FormGroup controlId="alert-definition-priority">
+              <FormGroup controlId="event-definition-priority">
                 <ControlLabel>Priority</ControlLabel>
                 <Select options={priorityOptions}
-                        value={lodash.toString(alertDefinition.priority)}
+                        value={lodash.toString(eventDefinition.priority)}
                         onChange={this.handlePriorityChange}
                         clearable={false}
                         required />
-                <HelpBlock>Choose the priority for Alerts created from this Definition.</HelpBlock>
+                <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
               </FormGroup>
             </fieldset>
           </form>
@@ -78,4 +78,4 @@ class AlertDetailsForm extends React.Component {
   }
 }
 
-export default AlertDetailsForm;
+export default EventDetailsForm;

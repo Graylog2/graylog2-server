@@ -1,20 +1,20 @@
 import loadAsync from 'routing/loadAsync';
 
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
-const AlertDefinitionsPage = loadAsync(() => import('./AlertDefinitionsPage'));
+const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
-const CreateAlertDefinitionPage = loadAsync(() => import('./CreateAlertDefinitionPage'));
+const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
 const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
-const EditAlertDefinitionPage = loadAsync(() => import('./EditAlertDefinitionPage'));
+const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
@@ -77,20 +77,20 @@ const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
   AlertConditionsPage,
-  AlertDefinitionsPage,
+  EventDefinitionsPage,
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
   ConfigurationsPage,
   ContentPacksPage,
-  CreateAlertDefinitionPage,
+  CreateEventDefinitionPage,
   CreateContentPackPage,
   CreateExtractorsPage,
   CreateUsersPage,
   DashboardsPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
-  EditAlertDefinitionPage,
+  EditEventDefinitionPage,
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,

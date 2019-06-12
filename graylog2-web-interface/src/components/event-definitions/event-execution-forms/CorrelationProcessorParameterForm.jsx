@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
-import { Select } from 'components/common';
-import CombinedProvider from 'injection/CombinedProvider';
 
-import SimpleTimerangeSelector from 'components/alert-definitions/common/SimpleTimerangeSelector';
-
-const { StreamsStore } = CombinedProvider.get('Streams');
+import SimpleTimerangeSelector from 'components/event-definitions/common/SimpleTimerangeSelector';
 
 // TODO: Defaults should come from the backend
 const DEFAULTS = {
@@ -17,10 +12,9 @@ const DEFAULTS = {
     type: 'relative',
     range: 300,
   },
-  streams: [],
 };
 
-export default class FilterProcessorParameterForm extends React.Component {
+export default class CorrelationProcessorParameterForm extends React.Component {
   static propTypes = {
     // eslint-disable-next-line react/no-unused-prop-types
     eventDefinition: PropTypes.object.isRequired,
@@ -33,12 +27,8 @@ export default class FilterProcessorParameterForm extends React.Component {
     availableStreams: [],
   };
 
-  componentDidMount() {
-    StreamsStore.load(streams => this.setState({ availableStreams: streams }));
-  }
-
   validate = (parameters) => {
-    this.props.onSubmittable(parameters.streams.length > 0 && parameters.batch_size > 0);
+    this.props.onSubmittable(parameters.batch_size > 0);
   };
 
   propagateChange = (key, value) => {
@@ -59,15 +49,7 @@ export default class FilterProcessorParameterForm extends React.Component {
     });
   };
 
-  handleStreamsChange = (nextStreams) => {
-    const selectedStreams = nextStreams === '' ? [] : nextStreams.split(',');
-    this.propagateChange('streams', selectedStreams);
-  };
-
   render() {
-    const streamOptions = this.state.availableStreams.sort((s1, s2) => s1.title.localeCompare(s2.title))
-      .map(stream => ({ label: stream.title, value: stream.id }));
-
     return (
       <React.Fragment>
         <Input id="timerange-selector"
@@ -76,18 +58,6 @@ export default class FilterProcessorParameterForm extends React.Component {
           <SimpleTimerangeSelector value={lodash.get(this.props.parameters, 'timerange.range', DEFAULTS.timerange.range)}
                                    onChange={this.handleTimerangeChange} />
         </Input>
-        <FormGroup>
-          <ControlLabel>Stream</ControlLabel>
-          <Select placeholder="Select Streams"
-                  onChange={this.handleStreamsChange}
-                  options={streamOptions}
-                  value={lodash.defaultTo(this.props.parameters.streams, []).join(',')}
-                  matchProp={'label'}
-                  multi />
-          <HelpBlock>
-            Select Streams the messages/events should be searched in. Leave it empty to search in all Streams.
-          </HelpBlock>
-        </FormGroup>
         <Input id="batch-size"
                name="batch_size"
                label="Batch size"

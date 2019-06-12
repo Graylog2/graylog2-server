@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 
-const AlertDefinitionsActions = Reflux.createActions({
+const EventDefinitionsActions = Reflux.createActions({
   list: { asyncResult: true },
   get: { asyncResult: true },
   create: { asyncResult: true },
@@ -9,4 +9,4 @@ const AlertDefinitionsActions = Reflux.createActions({
   execute: { asyncResult: true },
 });
 
-export default AlertDefinitionsActions;
+export default EventDefinitionsActions;

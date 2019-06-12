@@ -13,25 +13,25 @@ import Routes from 'routing/Routes';
 
 import {
   AlertConditionsPage,
-  AlertDefinitionsPage,
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
   ConfigurationsPage,
   ContentPacksPage,
-  CreateAlertDefinitionPage,
   CreateContentPackPage,
+  CreateEventDefinitionPage,
   CreateExtractorsPage,
   CreateUsersPage,
   DashboardsPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
-  EditAlertDefinitionPage,
+  EditEventDefinitionPage,
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,
   EditUsersPage,
   EnterprisePage,
+  EventDefinitionsPage,
   ExportExtractorsPage,
   ExtractorsPage,
   GettingStartedPage,
@@ -116,9 +116,9 @@ const AppRouter = () => {
             <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
             <Route path={Routes.ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
             <Route path={Routes.ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
-            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={AlertDefinitionsPage} />
-            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateAlertDefinitionPage} />
-            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditAlertDefinitionPage} />
+            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
+            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
+            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage} />

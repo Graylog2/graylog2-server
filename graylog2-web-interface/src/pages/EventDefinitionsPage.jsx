@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, Col, DropdownButton, MenuItem, Row } from 'react
 import lodash from 'lodash';
 
 import { DocumentTitle, EmptyEntity, EntityList, EntityListItem, PageHeader } from 'components/common';
-import EventExecutionContainer from 'components/alert-definitions/event-execution-forms/EventExecutionContainer';
+import EventExecutionContainer from 'components/event-definitions/event-execution-forms/EventExecutionContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import connect from 'stores/connect';
@@ -13,11 +13,11 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';
 
-const { AlertDefinitionsStore, AlertDefinitionsActions } = CombinedProvider.get('AlertDefinitions');
+const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
-class AlertDefinitionsPage extends React.Component {
+class EventDefinitionsPage extends React.Component {
   static propTypes = {
-    alertDefinitions: PropTypes.object.isRequired,
+    eventDefinitions: PropTypes.object.isRequired,
   };
 
   state = {
@@ -25,13 +25,13 @@ class AlertDefinitionsPage extends React.Component {
   };
 
   componentDidMount() {
-    AlertDefinitionsActions.list();
+    EventDefinitionsActions.list();
   }
 
   handleDelete = (definition) => {
     return () => {
       if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
-        AlertDefinitionsActions.delete(definition);
+        EventDefinitionsActions.delete(definition);
       }
     };
   };
@@ -40,8 +40,8 @@ class AlertDefinitionsPage extends React.Component {
     return () => this.setState({ executeDefinition: definition });
   };
 
-  handleExecutionSubmit = (alertDefinition, payload) => {
-    AlertDefinitionsActions.execute(alertDefinition, payload)
+  handleExecutionSubmit = (eventDefinition, payload) => {
+    EventDefinitionsActions.execute(eventDefinition, payload)
       .then(() => {
         this.setState({ executeDefinition: null });
       });
@@ -57,8 +57,8 @@ class AlertDefinitionsPage extends React.Component {
         <Col md={4} mdOffset={4}>
           <EmptyEntity>
             <p>
-              Create Alert Definitions that are able to search, aggregate or correlate Messages and other
-              Events, allowing you to record significant Events in Graylog and send Notifications on them.
+              Create Event Definitions that are able to search, aggregate or correlate Messages and other
+              Events, allowing you to record significant Events in Graylog and alert on them.
             </p>
             <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
               <Button bsStyle="success">Get Started!</Button>
@@ -70,10 +70,10 @@ class AlertDefinitionsPage extends React.Component {
   };
 
   renderContent = () => {
-    const { alertDefinitions } = this.props;
-    const definitions = alertDefinitions.list;
+    const { eventDefinitions } = this.props;
+    const definitions = eventDefinitions.list;
 
-    if (alertDefinitions.list.length < 1) {
+    if (eventDefinitions.list.length < 1) {
       return this.renderEmptyContent();
     }
 
@@ -109,12 +109,11 @@ class AlertDefinitionsPage extends React.Component {
     const { executeDefinition } = this.state;
 
     return (
-      <DocumentTitle title="Alert Definitions">
+      <DocumentTitle title="Event Definitions">
         <span>
-          <PageHeader title="Alert Definitions">
+          <PageHeader title="Event Definitions">
             <span>
-              Create new Alert Definitions that will allow you to search for different Conditions and send Notifications
-              on them.
+              Create new Event Definitions that will allow you to search for different Conditions and alert on them.
             </span>
 
             <span>
@@ -125,10 +124,10 @@ class AlertDefinitionsPage extends React.Component {
 
             <ButtonToolbar>
               <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
-                <Button bsStyle="success">Create Alert Definition</Button>
+                <Button bsStyle="success">Create Event Definition</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info" className="active">Alert Definitions</Button>
+                <Button bsStyle="info" className="active">Event Definitions</Button>
               </LinkContainer>
             </ButtonToolbar>
           </PageHeader>
@@ -151,4 +150,4 @@ class AlertDefinitionsPage extends React.Component {
   }
 }
 
-export default connect(AlertDefinitionsPage, { alertDefinitions: AlertDefinitionsStore });
+export default connect(EventDefinitionsPage, { eventDefinitions: EventDefinitionsStore });
