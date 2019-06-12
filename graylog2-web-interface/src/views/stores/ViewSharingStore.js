@@ -10,7 +10,7 @@ import URLUtils from 'util/URLUtils';
 import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
 import UserShortSummary from '../logic/views/sharing/UserShortSummary';
 
-const viewSharingUrl = viewId => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/views/${viewId}/share`);
+const viewSharingUrl = viewId => URLUtils.qualifyUrl(`/views/${viewId}/share`);
 
 type ViewSharingActionsType = {
   get: (string) => Promise<ViewSharing>,

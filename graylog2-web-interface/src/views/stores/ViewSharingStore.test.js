@@ -10,7 +10,7 @@ describe('ViewSharingStore', () => {
   it('uses correct URL when removing view sharing config', (done) => {
     fetch.mockImplementation((method, url) => {
       expect(method).toEqual('DELETE');
-      expect(url).toEqual('gl2ServerUrl/plugins/org.graylog.plugins.enterprise/views/viewId/share');
+      expect(url).toEqual('gl2ServerUrl/views/viewId/share');
       done();
       return Promise.resolve(null);
     });

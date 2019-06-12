@@ -21,7 +21,7 @@ import View from 'enterprise/logic/views/View';
 import Parameter from 'enterprise/logic/parameters/Parameter';
 import type { WidgetMapping } from 'enterprise/logic/views/View';
 
-const createSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
+const createSearchUrl = URLUtils.qualifyUrl('/views/search');
 
 const displayError = (error) => {
   // eslint-disable-next-line no-console
@@ -30,7 +30,7 @@ const displayError = (error) => {
 
 Bluebird.config({ cancellation: true });
 
-const searchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
+const searchUrl = URLUtils.qualifyUrl('/views/search');
 
 export { SearchActions };
 

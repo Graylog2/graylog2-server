@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-const functionsUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/functions');
+const functionsUrl = URLUtils.qualifyUrl('/views/functions');
 
 export default Reflux.createStore({
   init() {

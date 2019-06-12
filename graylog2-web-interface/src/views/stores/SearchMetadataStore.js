@@ -7,8 +7,8 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import SearchMetadata from 'enterprise/logic/search/SearchMetadata';
 
-const parseSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search/metadata');
-const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/metadata/${id}`);
+const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
+const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
 
 export type SearchMetadataActionsType = {
   parseSearch: (any) => Promise<SearchMetadata>,

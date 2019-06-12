@@ -54,9 +54,9 @@ const ViewManagementActions: ViewManagementActionsType = Reflux.createActions({
   update: { asyncResult: true },
 });
 
-const viewsUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/views');
-const viewsIdUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/views/${id}`);
-const forValueUrl = () => URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/views/forValue');
+const viewsUrl = URLUtils.qualifyUrl('/views');
+const viewsIdUrl = id => URLUtils.qualifyUrl(`/views/${id}`);
+const forValueUrl = () => URLUtils.qualifyUrl('/views/forValue');
 
 const ViewManagementStore = Reflux.createStore({
   listenables: [ViewManagementActions],

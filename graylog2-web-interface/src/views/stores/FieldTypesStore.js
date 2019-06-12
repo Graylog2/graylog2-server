@@ -10,7 +10,7 @@ import URLUtils from 'util/URLUtils';
 import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
 import { QueryFiltersStore } from './QueryFiltersStore';
 
-const fieldTypesUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/fields');
+const fieldTypesUrl = URLUtils.qualifyUrl('/views/fields');
 
 type FieldTypesActionsType = {
   all: () => Promise<void>,

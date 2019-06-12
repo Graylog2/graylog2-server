@@ -9,8 +9,8 @@ import URLUtils from 'util/URLUtils';
 import Search from 'enterprise/logic/search/Search';
 import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
 
-const executeQueryUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/${id}/execute`);
-const jobStatusUrl = jobId => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/status/${jobId}`);
+const executeQueryUrl = id => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
+const jobStatusUrl = jobId => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
 
 type InternalState = {};
 
