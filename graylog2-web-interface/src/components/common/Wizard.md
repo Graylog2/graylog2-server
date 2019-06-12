@@ -32,7 +32,7 @@ const WizardExample = createReactClass({
       { key: 'Key2', title: 'Title2', component: (<div>Component2</div>), disabled: this.enableNext() },
       { key: 'Key3', title: 'Title3', component: (<div>Component3</div>), disabled: this.enableNext() },
     ];
- 
+
     return (
       <Wizard steps={steps} horizontal={this.props.horizontal}>
         <div>Preview: {this.state.input_value}</div>
@@ -73,7 +73,7 @@ const ControlledWizardExample = createReactClass({
   onChange(e) {
     this.setState({ input_value: e.target.value });
   },
-  
+
   changeStep(nextStep) {
     if (nextStep === 'Key2') {
       this.setState({ activeStep: 'Key3' });
@@ -90,7 +90,7 @@ const ControlledWizardExample = createReactClass({
       { key: 'Key3', title: 'Title3', component: (<div>Component3</div>), disabled: false },
       { key: 'Key4', title: 'Title4', component: (<div>Component4</div>), disabled: false },
     ];
- 
+
     return (
       <Wizard activeStep={this.state.activeStep} steps={steps} horizontal={this.props.horizontal} onStepChange={this.changeStep} hidePreviousNextButtons>
         <div>Preview: {this.state.input_value}</div>
