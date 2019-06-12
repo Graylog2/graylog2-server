@@ -19,6 +19,12 @@ class FieldsForm extends React.Component {
     onChange('field_spec', nextFieldSpec);
   };
 
+  removeCustomField = (fieldName) => {
+    const { eventDefinition, onChange } = this.props;
+    const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
+    onChange('field_spec', nextFieldSpec);
+  };
+
   handleFieldChange = (fieldName, key, value) => {
     const { eventDefinition, onChange } = this.props;
     if (key === 'keys') {
@@ -51,18 +57,20 @@ class FieldsForm extends React.Component {
             used in Alert Notifications.
           </p>
 
-          {Object.entries(eventDefinition.field_spec).map(([fieldName, config], idx) => {
-            return (
-              // Cannot use fieldName as key, since changing it will remove focus from the input. For now this was
-              // the easiest way of working around that issue.
-              // eslint-disable-next-line react/no-array-index-key
-              <FieldForm key={`${eventDefinition.title}-field-${idx}`}
-                         fieldName={fieldName}
-                         config={config}
-                         keys={eventDefinition.key_spec}
-                         onChange={this.handleFieldChange} />
-            );
-          })}
+          {Object.entries(eventDefinition.field_spec)
+            .map(([fieldName, config], idx) => {
+              return (
+                // Cannot use fieldName as key, since changing it will remove focus from the input. For now this was
+                // the easiest way of working around that issue.
+                // eslint-disable-next-line react/no-array-index-key
+                <FieldForm key={`${eventDefinition.title}-field-${idx}`}
+                           fieldName={fieldName}
+                           config={config}
+                           keys={eventDefinition.key_spec}
+                           onChange={this.handleFieldChange}
+                           onRemoveField={this.removeCustomField} />
+              );
+            })}
 
           <Button bsStyle="success" onClick={this.addCustomField}>Add Custom Field</Button>
         </Col>

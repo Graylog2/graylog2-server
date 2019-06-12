@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, ControlLabel, FormControl, FormGroup, InputGroup, Row } from 'react-bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, InputGroup, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -17,12 +17,18 @@ class FieldForm extends React.Component {
     config: PropTypes.object,
     keys: PropTypes.array,
     onChange: PropTypes.func.isRequired,
+    onRemoveField: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     fieldName: '',
     config: {},
     keys: [],
+  };
+
+  handleRemoveField = () => {
+    const { fieldName, onRemoveField } = this.props;
+    onRemoveField(fieldName);
   };
 
   handleFieldNameChange = (event) => {
@@ -91,7 +97,12 @@ class FieldForm extends React.Component {
     return (
       <form onSubmit={this.handleSubmit}>
         <fieldset>
-          <legend>Custom Field</legend>
+          <legend>
+            Custom Field
+            <span className="pull-right">
+              <Button bsSize="xsmall" bsStyle="primary" onClick={this.handleRemoveField}>Remove</Button>
+            </span>
+          </legend>
 
           <Row className="row-sm">
             <Col md={4}>
