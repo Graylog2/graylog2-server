@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router';
 
-import { Badge, Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -27,6 +27,7 @@ import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
 import SystemMenu from './SystemMenu';
 import styles from './Navigation.css';
+import InactiveNavItem from './InactiveNavItem';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
@@ -117,9 +118,9 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           {
           AppConfig.gl2DevMode()
             && (
-              <MenuItem className={styles['dev-badge-wrap']}>
+              <InactiveNavItem className={styles['dev-badge-wrap']}>
                 <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
-              </MenuItem>
+              </InactiveNavItem>
             )
           }
 
