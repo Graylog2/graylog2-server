@@ -40,7 +40,7 @@ describe('SearchBar', () => {
   jest.doMock('injection/StoreProvider', () => storeProviderMock);
 
   // eslint-disable-next-line global-require
-  const SearchBar = require('./SearchBar').default;
+  const SearchBar = require('./SearchBar');
 
   const config = {
     analysis_disabled_fields: ['full_message', 'message'],

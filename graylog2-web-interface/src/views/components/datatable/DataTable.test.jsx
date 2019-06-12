@@ -23,7 +23,7 @@ describe('DataTable', () => {
   jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
 
   /* eslint-disable-next-line global-require */
-  const DataTable = require('./DataTable').default;
+  const DataTable = require('./DataTable');
 
   const currentView = { activeQuery: 'deadbeef-23' };
 

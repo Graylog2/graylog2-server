@@ -68,7 +68,7 @@ describe('MessageList', () => {
   let MessageList;
   beforeEach(() => {
     // eslint-disable-next-line global-require
-    MessageList = require('./MessageList').default;
+    MessageList = require('./MessageList');
   });
 
   it('should render with and without fields', () => {

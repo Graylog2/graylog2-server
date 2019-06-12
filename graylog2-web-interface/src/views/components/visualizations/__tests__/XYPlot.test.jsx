@@ -14,7 +14,7 @@ import SearchActions from 'views/actions/SearchActions';
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: {},
   // eslint-disable-next-line global-require
-  SearchActions: require('enterprise/actions/SearchActions').default,
+  SearchActions: require('views/actions/SearchActions'),
 }));
 jest.mock('stores/connect', () => x => x);
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));

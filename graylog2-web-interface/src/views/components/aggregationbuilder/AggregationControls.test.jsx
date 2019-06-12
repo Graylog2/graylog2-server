@@ -19,7 +19,7 @@ describe('AggregationControls', () => {
   jest.doMock('views/stores/FieldTypesStore', () => { return { FieldTypesStore: FieldTypesStore }; });
 
   /* eslint-disable-next-line global-require */
-  const AggregationControls = require('./AggregationControls').default;
+  const AggregationControls = require('./AggregationControls');
   // eslint-disable-next-line no-unused-vars, react/prop-types
   const DummyComponent = ({ onVisualizationConfigChange }) => <div>The spice must flow.</div>;
   const children = <DummyComponent />;

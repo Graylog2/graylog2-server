@@ -31,7 +31,7 @@ describe('SearchDetails', () => {
   }));
 
   // eslint-disable-next-line global-require
-  const SearchDetails = require('./SearchDetails').default;
+  const SearchDetails = require('./SearchDetails');
 
   const updateCurrentUser = (newCurrentUser) => {
     const cb = CurrentUserStore.listen.mock.calls[0][0];

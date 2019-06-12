@@ -7,7 +7,7 @@ import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mock
 import QueryResult from '../../logic/QueryResult';
 
 // eslint-disable-next-line global-require
-const loadSUT = () => require('./SideBar').default;
+const loadSUT = () => require('./SideBar');
 
 describe('<Sidebar />', () => {
   let TestComponent;

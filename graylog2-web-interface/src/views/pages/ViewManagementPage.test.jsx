@@ -31,7 +31,7 @@ describe('ViewManagementPage', () => {
   });
   it('passes retrieved views to list component', () => {
     // eslint-disable-next-line global-require
-    const ViewManagementPage = require('./ViewManagementPage').default;
+    const ViewManagementPage = require('./ViewManagementPage');
     const wrapper = shallow(<ViewManagementPage />);
 
     const viewList = wrapper.find('view-list');
@@ -41,7 +41,7 @@ describe('ViewManagementPage', () => {
   });
   it('asks for confirmation when deleting view', () => {
     // eslint-disable-next-line global-require
-    const ViewManagementPage = require('./ViewManagementPage').default;
+    const ViewManagementPage = require('./ViewManagementPage');
     const wrapper = mount(<ViewManagementPage />);
 
     const viewList = wrapper.find('view-list');

@@ -21,7 +21,7 @@ describe('KeywordTimeRangeSelector', () => {
       },
     }));
     // eslint-disable-next-line global-require
-    KeywordTimeRangeSelector = require('./KeywordTimeRangeSelector').default;
+    KeywordTimeRangeSelector = require('./KeywordTimeRangeSelector');
   });
 
   it('renders value passed to it', () => {

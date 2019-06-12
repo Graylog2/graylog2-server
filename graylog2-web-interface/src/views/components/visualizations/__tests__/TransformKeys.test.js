@@ -8,7 +8,7 @@ jest.doMock('injection/CombinedProvider', () => ({
 }));
 
 // eslint-disable-next-line global-require
-const loadSUT = () => require('../TransformKeys').default;
+const loadSUT = () => require('../TransformKeys');
 describe('TransformKeys', () => {
   beforeEach(() => {
     jest.resetAllMocks();

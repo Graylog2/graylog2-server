@@ -3,7 +3,7 @@ import View from './View';
 jest.mock('routing/Routes', () => ({ pluginRoute: () => (viewId => `/views/${viewId}`) }));
 
 // eslint-disable-next-line global-require
-const loadSUT = () => require('./OnSaveAsViewAction').default;
+const loadSUT = () => require('./OnSaveAsViewAction');
 
 const mockActions = () => {
   const ViewActions = { load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load') };
