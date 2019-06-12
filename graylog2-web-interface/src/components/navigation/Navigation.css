@@ -5,10 +5,11 @@
 
 :local(.dev-badge-wrap) > a {
   padding: 0 !important;
+  cursor: default;
 }
 
 :local(.dev-badge-wrap) .dev-badge {
-  margin: 0 15px;
+  margin: 0 10px;
 }
 
 @media (max-width: 991px) {
