@@ -18,7 +18,7 @@ jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
-    exports: () => ([
+    exports: key => (key !== 'enterpriseWidgets' ? [] : [
       {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',
