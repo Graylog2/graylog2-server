@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -35,6 +36,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -50,7 +53,15 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
-    private static final String DEFAULT_INDEX_TEMPLATE_TYPE = "messages";
+    public static final String DEFAULT_INDEX_TEMPLATE_TYPE = "messages";
+
+    private static final Set<String> AVAILABLE_INDEX_TEMPLATE_TYPES = ImmutableSet.of(DEFAULT_INDEX_TEMPLATE_TYPE, "events");
+
+    private static Consumer<String> INDEX_TEMPLATE_TYPE_VALIDATOR = (indexTemplateType) -> {
+        if (!AVAILABLE_INDEX_TEMPLATE_TYPES.contains(indexTemplateType)) {
+            throw new IllegalArgumentException("Invalid index template type: " + indexTemplateType + " (available: " + String.join(", ", AVAILABLE_INDEX_TEMPLATE_TYPES) + ")");
+        }
+    };
 
     @JsonProperty("id")
     @Nullable
@@ -154,6 +165,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval) {
 
+        final String templateType = isNullOrEmpty(indexTemplateType) ? DEFAULT_INDEX_TEMPLATE_TYPE : indexTemplateType;
+
+        INDEX_TEMPLATE_TYPE_VALIDATOR.accept(templateType);
+
         final boolean writableValue = isWritable == null ? true : isWritable;
 
         Duration fieldTypeRefreshIntervalValue = fieldTypeRefreshInterval;
@@ -179,7 +194,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .creationDate(creationDate)
                 .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
                 .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
-                .indexTemplateType(isNullOrEmpty(indexTemplateType) ? DEFAULT_INDEX_TEMPLATE_TYPE : indexTemplateType)
+                .indexTemplateType(templateType)
                 .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
                 .indexOptimizationDisabled(indexOptimizationDisabled == null ? false : indexOptimizationDisabled)
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
@@ -341,6 +356,14 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder fieldTypeRefreshInterval(Duration fieldTypeRefreshInterval);
 
-        public abstract IndexSetConfig build();
+        abstract IndexSetConfig autoBuild();
+
+        public IndexSetConfig build() {
+            final IndexSetConfig indexSetConfig = autoBuild();
+
+            INDEX_TEMPLATE_TYPE_VALIDATOR.accept(indexSetConfig.indexTemplateType());
+
+            return indexSetConfig;
+        }
     }
 }

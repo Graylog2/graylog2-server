@@ -26,6 +26,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class IndexSetConfigTest {
     @Test
@@ -63,7 +64,7 @@ public class IndexSetConfigTest {
                 .replicas(0)
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
                 .indexTemplateName("graylog2-template")
-                .indexTemplateType("yolo")
+                .indexTemplateType("events")
                 .indexAnalyzer("standard")
                 .indexOptimizationMaxNumSegments(1)
                 .indexOptimizationDisabled(false)
@@ -84,7 +85,7 @@ public class IndexSetConfigTest {
                 ZonedDateTime.now(ZoneOffset.UTC),
                 "standard",
                 "graylog3-template",
-                "template-type",
+                "events",
                 1,
                 false
         );
@@ -114,10 +115,56 @@ public class IndexSetConfigTest {
         assertThat(config1.indexTemplateType()).isEqualTo("messages");
 
         // Types can be set with the builder and the create() method
-        assertThat(config2.indexTemplateType()).isEqualTo("yolo");
-        assertThat(config3.indexTemplateType()).isEqualTo("template-type");
+        assertThat(config2.indexTemplateType()).isEqualTo("events");
+        assertThat(config3.indexTemplateType()).isEqualTo("events");
 
         // A template type value of "null" should result in the default value
         assertThat(config4.indexTemplateType()).isEqualTo("messages");
+    }
+
+    @Test
+    public void indexTemplateTypeWithInvalidValue() {
+        assertThatThrownBy(() -> IndexSetConfig.builder()
+                .isWritable(false)
+                .title("Test 1")
+                .description("A test index-set.")
+                .indexPrefix("graylog1")
+                .indexWildcard("graylog1_*")
+                .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
+                .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
+                .shards(4)
+                .replicas(0)
+                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .indexTemplateName("graylog1-template")
+                .indexTemplateType("yolo")
+                .indexAnalyzer("standard")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .build()
+        ).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("yolo");
+
+        assertThatThrownBy(() -> IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test 2",
+                "A test index-set.",
+                true,
+                "graylog2",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "graylog2-template",
+                "yolo",
+                1,
+                false
+        )).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("yolo");
     }
 }
