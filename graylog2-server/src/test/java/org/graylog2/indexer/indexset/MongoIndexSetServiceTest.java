@@ -110,6 +110,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_1",
+                                "messages",
                                 1,
                                 false
                         )
@@ -138,6 +139,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_1",
+                                "messages",
                                 1,
                                 false
                         )
@@ -185,7 +187,7 @@ public class MongoIndexSetServiceTest {
 
         assertThat(configs)
                 .isNotEmpty()
-                .hasSize(2)
+                .hasSize(3)
                 .containsExactly(
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750001",
@@ -202,6 +204,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_1",
+                                "messages",
                                 1,
                                 false
                         ),
@@ -220,6 +223,26 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_2",
+                                "messages",
+                                1,
+                                false
+                        ),
+                        IndexSetConfig.create(
+                                "57f3d721a43c2d59cb750003",
+                                "Test 3",
+                                "This is the index set configuration for Test 3 - with an index set index template",
+                                true,
+                                "test_3",
+                                1,
+                                0,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
+                                MessageCountRotationStrategyConfig.create(2500),
+                                NoopRetentionStrategy.class.getCanonicalName(),
+                                NoopRetentionStrategyConfig.create(25),
+                                ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
+                                "standard",
+                                "test_3",
+                                "events",
                                 1,
                                 false
                         )
@@ -245,6 +268,7 @@ public class MongoIndexSetServiceTest {
                 ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
+                "messages",
                 1,
                 false
         );
@@ -296,11 +320,11 @@ public class MongoIndexSetServiceTest {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
 
-        final int deletedEntries = indexSetService.delete("57f3d721a43c2d59cb750003");
+        final int deletedEntries = indexSetService.delete("57f3d721a43c2d59cb750009");
         assertThat(deletedEntries).isEqualTo(0);
         assertThat(indexSetService.get("57f3d721a43c2d59cb750001")).isPresent();
-        assertThat(indexSetService.get("57f3d721a43c2d59cb750003")).isEmpty();
-        assertThat(indexSetService.findAll()).hasSize(2);
+        assertThat(indexSetService.get("57f3d721a43c2d59cb750009")).isEmpty();
+        assertThat(indexSetService.findAll()).hasSize(3);
 
         assertThat(subscriber.getEvents()).isEmpty();
     }
@@ -321,7 +345,7 @@ public class MongoIndexSetServiceTest {
         final int deletedEntries = indexSetService.delete(streamId);
         assertThat(deletedEntries).isEqualTo(0);
         assertThat(indexSetService.get(streamId)).isPresent();
-        assertThat(indexSetService.findAll()).hasSize(2);
+        assertThat(indexSetService.findAll()).hasSize(3);
 
         assertThat(subscriber.getEvents()).isEmpty();
     }

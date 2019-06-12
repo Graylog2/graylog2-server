@@ -50,6 +50,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
+    private static final String DEFAULT_INDEX_TEMPLATE_TYPE = "messages";
 
     @JsonProperty("id")
     @Nullable
@@ -117,6 +118,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotBlank
     public abstract String indexTemplateName();
 
+    @JsonProperty("index_template_type")
+    @NotBlank
+    public abstract String indexTemplateType();
+
     @JsonProperty("index_optimization_max_num_segments")
     @Min(1L)
     public abstract int indexOptimizationMaxNumSegments();
@@ -144,6 +149,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
                                         @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
                                         @JsonProperty("index_template_name") @Nullable String indexTemplateName,
+                                        @JsonProperty("index_template_type") @Nullable String indexTemplateType,
                                         @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval) {
@@ -173,6 +179,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .creationDate(creationDate)
                 .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
                 .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
+                .indexTemplateType(isNullOrEmpty(indexTemplateType) ? DEFAULT_INDEX_TEMPLATE_TYPE : indexTemplateType)
                 .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
                 .indexOptimizationDisabled(indexOptimizationDisabled == null ? false : indexOptimizationDisabled)
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
@@ -193,12 +200,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled,
                                         Duration fieldTypeRefreshInterval) {
         return create(id, title, description, isWritable, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
+                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 fieldTypeRefreshInterval);
     }
 
@@ -215,12 +223,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled,
                                         Duration fieldTypeRefreshInterval) {
         return create(null, title, description, isWritable, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
+                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 fieldTypeRefreshInterval);
     }
 
@@ -239,11 +248,12 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
         return create(id, title, description, isWritable, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
+                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
     }
 
@@ -261,11 +271,12 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         ZonedDateTime creationDate,
                                         String indexAnalyzer,
                                         String indexTemplateName,
+                                        String indexTemplateType,
                                         int indexOptimizationMaxNumSegments,
                                         boolean indexOptimizationDisabled) {
         return create(null, title, description, isWritable, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
+                indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
     }
 
@@ -284,6 +295,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return new AutoValue_IndexSetConfig.Builder()
                 // Index sets are writable by default.
                 .isWritable(true)
+                .indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE)
                 .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
     }
 
@@ -320,6 +332,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder indexAnalyzer(String analyzer);
 
         public abstract Builder indexTemplateName(String templateName);
+
+        public abstract Builder indexTemplateType(String templateType);
 
         public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
 
