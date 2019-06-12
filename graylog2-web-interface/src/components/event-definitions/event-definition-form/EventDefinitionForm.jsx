@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Wizard } from 'components/common';
 import EventDetailsForm from './EventDetailsForm';
-import ConditionForm from './ConditionForm';
+import FilterAggregationForm from './FilterAggregationForm';
 import FieldsForm from './FieldsForm';
 
 import styles from './EventDefinitionForm.css';
@@ -39,9 +39,9 @@ class EventDefinitionForm extends React.Component {
         component: <EventDetailsForm eventDefinition={eventDefinition} onChange={onChange} />,
       },
       {
-        key: 'condition',
-        title: 'Condition',
-        component: <ConditionForm eventDefinition={eventDefinition} streams={streams} onChange={onChange} />,
+        key: 'filter-aggregation',
+        title: 'Filter & Aggregation',
+        component: <FilterAggregationForm eventDefinition={eventDefinition} streams={streams} onChange={onChange} />,
       },
       {
         key: 'fields',

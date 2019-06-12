@@ -9,7 +9,7 @@ import AggregationForm from './AggregationForm';
 
 import commonStyles from '../common/commonStyles.css';
 
-class AlertDetailsForm extends React.Component {
+class FilterAggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
@@ -118,4 +118,4 @@ class AlertDetailsForm extends React.Component {
   }
 }
 
-export default AlertDetailsForm;
+export default FilterAggregationForm;
