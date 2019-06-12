@@ -1,4 +1,4 @@
-import useableCssProxy from 'enterprise/test/useable-css-proxy';
+import useableCssProxy from 'css/useable-css-proxy';
 
 describe('useable-css-proxy', () => {
   it('should return a proxy object', () => {
