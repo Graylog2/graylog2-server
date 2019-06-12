@@ -19,11 +19,13 @@ class Wizard extends React.Component {
      * a 'component' attribute which will hold the component which is to render for the step.
      *
      * e.g:
-     * [\[<br />
-     * &nbsp;&nbsp;{key: 'key1', title: 'General Information', component: (&lt;Acomponent1 /&gt;)},<br />
-     * &nbsp;&nbsp;{key: 'key2', title: 'Details', component: (&lt;Acomponent2 /&gt;), disabled: true},<br />
-     * &nbsp;&nbsp;{key: 'key3', title: 'Preview', component: (&lt;Acomponent3 /&gt;), disabled: true},<br />
-     * \]]
+     * <pre>
+     * [
+     *   {key: 'key1', title: 'General Information', component: (<Acomponent1 />)},
+     *   {key: 'key2', title: 'Details', component: (<Acomponent2 />), disabled: true},
+     *   {key: 'key3', title: 'Preview', component: (<Acomponent3 />), disabled: true},
+     * ]
+     * </pre>
      */
     steps: PropTypes.arrayOf(PropTypes.object).isRequired,
     /**
