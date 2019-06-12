@@ -78,7 +78,7 @@ import static java.util.stream.Collectors.toSet;
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
-    private static final String BASE_PATH = "plugins/org.graylog.plugins.enterprise/search";
+    private static final String BASE_PATH = "views/search";
 
     private final QueryEngine queryEngine;
     private final SearchDbService searchDbService;
