@@ -19,7 +19,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const formatTitle = (title, id, disabled = false) => (disabled
   ? <h2>{title}</h2>
-  : <Link to={Routes.pluginRoute('VIEWS_VIEWID')(id)}>{title}</Link>);
+  : <Link to={Routes.VIEWS.VIEWID(id)}>{title}</Link>);
 
 // eslint-disable-next-line react/prop-types
 const _OwnerTag = ({ owner, currentUser }) => {

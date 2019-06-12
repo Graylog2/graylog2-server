@@ -45,7 +45,7 @@ const ViewManagementPage = createReactClass({
             {null}
 
             <span>
-              <LinkContainer to={Routes.pluginRoute('EXTENDEDSEARCH')}>
+              <LinkContainer to={Routes.EXTENDEDSEARCH}>
                 <Button bsStyle="success" bsSize="lg">Create new view</Button>
               </LinkContainer>
             </span>
