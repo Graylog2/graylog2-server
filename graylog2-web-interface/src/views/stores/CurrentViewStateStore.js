@@ -3,10 +3,10 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
-import { widgetDefinition } from 'enterprise/logic/Widget';
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import FormattingSettings from 'enterprise/logic/views/formatting/FormattingSettings';
-import Widget from 'enterprise/logic/widgets/Widget';
+import { widgetDefinition } from 'views/logic/Widget';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import Widget from 'views/logic/widgets/Widget';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';

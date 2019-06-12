@@ -1,6 +1,6 @@
 // @flow strict
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import type { ActionContexts } from 'enterprise/logic/ActionContext';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import type { ActionContexts } from 'views/logic/ActionContext';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 import type {

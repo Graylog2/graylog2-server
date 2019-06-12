@@ -1,10 +1,10 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import Widget from 'enterprise/logic/widgets/Widget';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
+import Widget from 'views/logic/widgets/Widget';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
 import FieldType from '../fieldtypes/FieldType';
 import ChartActionHandler from './ChartActionHandler';

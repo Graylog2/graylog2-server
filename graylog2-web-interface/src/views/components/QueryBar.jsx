@@ -6,16 +6,16 @@ import { withRouter } from 'react-router';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import { TitlesActions } from 'enterprise/stores/TitlesStore';
-import { ViewActions } from 'enterprise/stores/ViewStore';
-import NewQueryActionHandler from 'enterprise/logic/NewQueryActionHandler';
-import onSaveView from 'enterprise/logic/views/OnSaveViewAction';
-import onSaveAsView from 'enterprise/logic/views/OnSaveAsViewAction';
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import { QueryIdsStore } from 'enterprise/stores/QueryIdsStore';
-import { QueryTitlesStore } from 'enterprise/stores/QueryTitlesStore';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
-import { ViewStatesActions } from 'enterprise/stores/ViewStatesStore';
+import { TitlesActions } from 'views/stores/TitlesStore';
+import { ViewActions } from 'views/stores/ViewStore';
+import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
+import onSaveView from 'views/logic/views/OnSaveViewAction';
+import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import { QueryIdsStore } from 'views/stores/QueryIdsStore';
+import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 import QueryTabs from './QueryTabs';
 import CustomPropTypes from './CustomPropTypes';
 

@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import { get, isEqual } from 'lodash';
 
-import Widget from 'enterprise/logic/widgets/Widget';
+import Widget from 'views/logic/widgets/Widget';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type WidgetActionsType = {

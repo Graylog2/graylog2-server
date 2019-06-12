@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
 import ColorPickerPopover from 'components/common/ColorPickerPopover';
 
-import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'enterprise/Constants';
-import Rule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'enterprise/stores/HighlightingRulesStore';
+import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
+import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 
 import styles from './HighlightingRules.css';
 

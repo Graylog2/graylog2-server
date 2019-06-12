@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import HighlightingRule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingRules from './HighlightingRules';
 
 jest.mock('stores/connect', () => x => x);

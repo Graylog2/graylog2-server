@@ -1,13 +1,13 @@
 // @flow strict
 import Reflux from 'reflux';
 
-import Search from 'enterprise/logic/search/Search';
-import SearchResult from 'enterprise/logic/SearchResult';
-import type { WidgetMapping } from 'enterprise/logic/views/View';
-import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
-import Parameter from 'enterprise/logic/parameters/Parameter';
-import View from 'enterprise/logic/views/View';
-import type { SearchJson } from 'enterprise/logic/search/Search';
+import Search from 'views/logic/search/Search';
+import SearchResult from 'views/logic/SearchResult';
+import type { WidgetMapping } from 'views/logic/views/View';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import Parameter from 'views/logic/parameters/Parameter';
+import View from 'views/logic/views/View';
+import type { SearchJson } from 'views/logic/search/Search';
 
 export type CreateSearchResponse = {
   search: Search,

@@ -1,5 +1,5 @@
 // @flow strict
-import type { PluginMetadata, Requirements } from 'enterprise/logic/views/View';
+import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -8,9 +8,9 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
-import fixup from 'enterprise/pages/StyleFixups.css';
-import View from 'enterprise/logic/views/View';
-import { viewsPath } from 'enterprise/bindings';
+import fixup from 'views/pages/StyleFixups.css';
+import View from 'views/logic/views/View';
+import { viewsPath } from 'views/bindings';
 
 type Props = {
   view: View,

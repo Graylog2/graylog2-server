@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import Rule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'enterprise/stores/HighlightingRulesStore';
+import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule from './HighlightingRule';
 
 jest.mock('components/common/ColorPickerPopover', () => 'color-picker-popover');

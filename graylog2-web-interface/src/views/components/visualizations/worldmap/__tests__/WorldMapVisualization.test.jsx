@@ -3,9 +3,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'enzyme';
 
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import Viewport from 'enterprise/logic/aggregationbuilder/visualizations/Viewport';
-import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import WorldMapVisualization from '../WorldMapVisualization';
 
 jest.mock('../MapVisualization', () => 'map-visualization');

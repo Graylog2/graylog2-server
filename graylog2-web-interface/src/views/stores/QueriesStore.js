@@ -4,15 +4,15 @@ import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 import moment from 'moment';
 
-import Search from 'enterprise/logic/search/Search';
-import { QueriesActions } from 'enterprise/actions/QueriesActions';
-import type { QueryId, TimeRange, TimeRangeTypes } from 'enterprise/logic/queries/Query';
-import Query from 'enterprise/logic/queries/Query';
+import Search from 'views/logic/search/Search';
+import { QueriesActions } from 'views/actions/QueriesActions';
+import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
+import Query from 'views/logic/queries/Query';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
 
-export { QueriesActions } from 'enterprise/actions/QueriesActions';
+export { QueriesActions } from 'views/actions/QueriesActions';
 export const QueriesStore = Reflux.createStore({
   listenables: [QueriesActions],
   queries: new Immutable.OrderedMap<QueryId, Query>(),

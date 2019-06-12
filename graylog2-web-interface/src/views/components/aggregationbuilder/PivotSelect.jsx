@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
 
-import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import ConfigurableElement from './ConfigurableElement';
 import SortableSelect from './SortableSelect';

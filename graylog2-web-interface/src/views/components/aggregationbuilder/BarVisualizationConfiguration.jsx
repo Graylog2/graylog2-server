@@ -2,9 +2,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import Select from 'enterprise/components/Select';
-import type { BarMode } from 'enterprise/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-import BarVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import Select from 'views/components/Select';
+import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import HoverForHelp from './HoverForHelp';
 
 type Props = {

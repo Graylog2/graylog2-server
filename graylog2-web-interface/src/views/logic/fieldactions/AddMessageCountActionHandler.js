@@ -1,9 +1,9 @@
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import NumberVisualization from 'enterprise/components/visualizations/number/NumberVisualization';
-import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import SeriesConfig from 'enterprise/logic/aggregationbuilder/SeriesConfig';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Series from 'views/logic/aggregationbuilder/Series';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 
 export default () => {
   const series = Series.forFunction('count()')

@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 export type ValueRendererProps = {
   field: string,

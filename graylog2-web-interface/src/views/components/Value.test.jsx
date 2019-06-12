@@ -2,8 +2,8 @@ import React from 'react';
 import { mount } from 'enzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import UserTimezoneTimestamp from 'enterprise/components/common/UserTimezoneTimestamp';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 
 import Value from './Value';
 import EmptyValue from './EmptyValue';

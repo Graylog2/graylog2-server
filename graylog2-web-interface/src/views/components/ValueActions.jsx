@@ -4,8 +4,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { MenuItem } from 'react-bootstrap';
 import uuid from 'uuid/v4';
 
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import { ActionContext } from 'enterprise/logic/ActionContext';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import { ActionContext } from 'views/logic/ActionContext';
 import OverlayDropdown from './OverlayDropdown';
 import style from './Value.css';
 import CustomPropTypes from './CustomPropTypes';

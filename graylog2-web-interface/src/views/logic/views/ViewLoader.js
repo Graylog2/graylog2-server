@@ -4,7 +4,7 @@ import Routes from 'routing/Routes';
 // $FlowFixMe: imports from core need to be fixed in flow
 import history from 'util/History';
 
-import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 import View from './View';
 import ViewDeserializer from './ViewDeserializer';

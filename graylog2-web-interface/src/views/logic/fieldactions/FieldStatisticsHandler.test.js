@@ -1,7 +1,7 @@
 // @flow strict
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import Widget from 'enterprise/logic/widgets/Widget';
-import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import Widget from 'views/logic/widgets/Widget';
+import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import handler from './FieldStatisticsHandler';
 import FieldType from '../fieldtypes/FieldType';
 

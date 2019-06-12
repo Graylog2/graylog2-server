@@ -3,7 +3,7 @@
 // $FlowFixMe: imports from core need to be fixed in flow
 import fetch from 'logic/rest/FetchProvider';
 
-import Search from 'enterprise/logic/search/Search';
+import Search from 'views/logic/search/Search';
 import { SearchActions } from './SearchStore';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());

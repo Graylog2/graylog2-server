@@ -1,5 +1,5 @@
 // @flow strict
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import * as fixtures from './TransformKeys.fixtures';
 
 const CurrentUserStore = { get: jest.fn() };

@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ActionContext } from 'enterprise/logic/ActionContext';
+import { ActionContext } from 'views/logic/ActionContext';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import ExtractorUtils from 'util/ExtractorUtils';

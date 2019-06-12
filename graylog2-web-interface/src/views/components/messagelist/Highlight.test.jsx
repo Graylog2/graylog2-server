@@ -2,7 +2,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import { AdditionalContext } from 'enterprise/logic/ActionContext';
+import { AdditionalContext } from 'views/logic/ActionContext';
 import Highlight from './Highlight';
 
 const messageFor = ranges => ({ highlight_ranges: ranges });

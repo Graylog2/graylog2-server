@@ -2,8 +2,8 @@
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import TFieldType from 'enterprise/logic/fieldtypes/FieldType';
-import TFieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import TFieldType from 'views/logic/fieldtypes/FieldType';
+import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 const TimeRangeType = PropTypes.oneOf(['relative', 'absolute', 'keyword']);
 const FieldType = PropTypes.instanceOf(TFieldType);

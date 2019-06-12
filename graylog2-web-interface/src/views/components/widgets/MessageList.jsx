@@ -12,17 +12,17 @@ import CombinedProvider from 'injection/CombinedProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
-import { Messages } from 'enterprise/Constants';
-import { MessageTableEntry } from 'enterprise/components/messagelist';
-import Field from 'enterprise/components/Field';
+import { Messages } from 'views/Constants';
+import { MessageTableEntry } from 'views/components/messagelist';
+import Field from 'views/components/Field';
 
-import { AdditionalContext } from 'enterprise/logic/ActionContext';
-import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import CustomPropTypes from 'enterprise/components/CustomPropTypes';
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import { RefreshActions } from 'enterprise/stores/RefreshStore';
-import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import { ViewStore } from 'views/stores/ViewStore';
+import { RefreshActions } from 'views/stores/RefreshStore';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import styles from './MessageList.css';
 

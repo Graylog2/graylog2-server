@@ -4,10 +4,10 @@ import React from 'react';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import Field from 'enterprise/components/Field';
-import Value from 'enterprise/components/Value';
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import Field from 'views/components/Field';
+import Value from 'views/components/Value';
+import { ViewStore } from 'views/stores/ViewStore';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import CustomPropTypes from '../CustomPropTypes';
 import DecoratedValue from './decoration/DecoratedValue';

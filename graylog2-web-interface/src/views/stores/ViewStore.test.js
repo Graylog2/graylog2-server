@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
 
-import ViewState from 'enterprise/logic/views/ViewState';
-import SearchActions from 'enterprise/actions/SearchActions';
-import Search from 'enterprise/logic/search/Search';
-import Query from 'enterprise/logic/queries/Query';
-import View from 'enterprise/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
+import SearchActions from 'views/actions/SearchActions';
+import Search from 'views/logic/search/Search';
+import Query from 'views/logic/queries/Query';
+import View from 'views/logic/views/View';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewManagementActions } from './ViewManagementStore';

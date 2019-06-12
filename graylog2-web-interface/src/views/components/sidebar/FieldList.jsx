@@ -9,9 +9,9 @@ import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-import Field from 'enterprise/components/Field';
-import FieldTypeIcon from 'enterprise/components/sidebar/FieldTypeIcon';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import Field from 'views/components/Field';
+import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import styles from './FieldList.css';

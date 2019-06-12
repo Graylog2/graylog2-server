@@ -5,8 +5,8 @@ import { mount } from 'enzyme';
 // $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
 
-import SearchMetadata from 'enterprise/logic/search/SearchMetadata';
-import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
+import SearchMetadata from 'views/logic/search/SearchMetadata';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SearchBarWithStatus from './SearchBarWithStatus';
 
 jest.mock('stores/connect', () => (Component, _, propsMapper) => props => <Component {...(Object.assign({}, props, propsMapper(props)))} />);

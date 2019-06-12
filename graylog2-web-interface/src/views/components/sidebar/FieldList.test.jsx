@@ -2,8 +2,8 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { List } from 'immutable';
 
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldList from './FieldList';
 
 jest.mock('enterprise/stores/ViewMetadataStore', () => ({

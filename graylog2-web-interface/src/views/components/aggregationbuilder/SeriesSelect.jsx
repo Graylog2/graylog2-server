@@ -2,10 +2,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import Select from 'enterprise/components/Select';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
+import Select from 'views/components/Select';
+import Series from 'views/logic/aggregationbuilder/Series';
 
-import { parameterOptionsForType } from 'enterprise/components/aggregationbuilder/SeriesParameterOptions';
+import { parameterOptionsForType } from 'views/components/aggregationbuilder/SeriesParameterOptions';
 import ConfigurableElement from './ConfigurableElement';
 import SeriesConfiguration from './SeriesConfiguration';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';

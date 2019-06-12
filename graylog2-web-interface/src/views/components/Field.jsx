@@ -4,7 +4,7 @@ import { MenuItem } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { ActionContext } from 'enterprise/logic/ActionContext';
+import { ActionContext } from 'views/logic/ActionContext';
 
 import OverlayDropdown from './OverlayDropdown';
 import style from './Field.css';

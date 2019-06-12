@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import { Row, Col, Checkbox } from 'react-bootstrap';
 import * as Immutable from 'immutable';
 
-import SortableSelect from 'enterprise/components/aggregationbuilder/SortableSelect';
-import CustomPropTypes from 'enterprise/components/CustomPropTypes';
-import { defaultCompare } from 'enterprise/logic/DefaultCompare';
-import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
-import DescriptionBox from 'enterprise/components/aggregationbuilder/DescriptionBox';
+import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import { defaultCompare } from 'views/logic/DefaultCompare';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 
 import style from './EditMessageList.css';
 

@@ -1,5 +1,5 @@
 import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 
 export default (view) => {
   return ViewManagementActions.update(view)

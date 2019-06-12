@@ -5,10 +5,10 @@ import { mount } from 'enzyme';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import WidgetModel from 'enterprise/logic/widgets/Widget';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import WidgetModel from 'views/logic/widgets/Widget';
 
 import Widget from './Widget';
 import LoadingWidget from './LoadingWidget';

@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
 
-import MessageField from 'enterprise/components/messagelist/MessageField';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import MessageField from 'views/components/messagelist/MessageField';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import styles from './MessageFields.css';
 import CustomHighlighting from './CustomHighlighting';

@@ -3,9 +3,9 @@ import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
 import { mount } from 'enzyme';
 
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import Widget from 'enterprise/components/widgets/Widget';
-import _Widget from 'enterprise/logic/widgets/Widget';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import Widget from 'views/components/widgets/Widget';
+import _Widget from 'views/logic/widgets/Widget';
 import WidgetGrid from './WidgetGrid';
 
 jest.mock('./widgets/Widget', () => () => 'widget');

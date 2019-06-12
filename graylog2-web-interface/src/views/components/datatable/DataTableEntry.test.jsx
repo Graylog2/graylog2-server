@@ -6,9 +6,9 @@ import { mount } from 'enzyme';
 // $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
 
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
-import { FieldTypes } from 'enterprise/logic/fieldtypes/FieldType';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import Series from 'views/logic/aggregationbuilder/Series';
 import DataTableEntry from './DataTableEntry';
 
 jest.mock('enterprise/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));

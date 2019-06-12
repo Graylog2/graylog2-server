@@ -3,7 +3,7 @@ import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
 
-import { RefreshActions } from 'enterprise/stores/RefreshStore';
+import { RefreshActions } from 'views/stores/RefreshStore';
 import RefreshControls from './RefreshControls';
 
 jest.useFakeTimers();

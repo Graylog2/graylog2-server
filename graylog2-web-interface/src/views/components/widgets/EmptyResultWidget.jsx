@@ -2,7 +2,7 @@ import React from 'react';
 
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
-import PortaledPopover from 'enterprise/components/common/PortaledPopover';
+import PortaledPopover from 'views/components/common/PortaledPopover';
 import styles from './MessageWidgets.css';
 
 const popover = (

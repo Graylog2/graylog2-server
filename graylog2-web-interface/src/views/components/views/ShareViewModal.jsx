@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Button, FormGroup, HelpBlock, Modal, Radio } from 'react-bootstrap';
 import { get } from 'lodash';
 
-import Select from 'enterprise/components/Select';
+import Select from 'views/components/Select';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import Spinner from 'components/common/Spinner';
@@ -12,13 +12,13 @@ import StoreProvider from 'injection/StoreProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-import View from 'enterprise/logic/views/View';
-import { ViewSharingActions } from 'enterprise/stores/ViewSharingStore';
-import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
-import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstance';
-import SpecificRoles from 'enterprise/logic/views/sharing/SpecificRoles';
-import SpecificUsers from 'enterprise/logic/views/sharing/SpecificUsers';
-import UserShortSummary from 'enterprise/logic/views/sharing/UserShortSummary';
+import View from 'views/logic/views/View';
+import { ViewSharingActions } from 'views/stores/ViewSharingStore';
+import ViewSharing from 'views/logic/views/sharing/ViewSharing';
+import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
+import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
+import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
+import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const RolesStore = StoreProvider.getStore('Roles');

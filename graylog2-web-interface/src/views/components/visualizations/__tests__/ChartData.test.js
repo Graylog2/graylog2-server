@@ -4,7 +4,7 @@ import { dirname } from 'path';
 import md5 from 'md5';
 import { flow } from 'lodash';
 
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { chartData, extractSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 

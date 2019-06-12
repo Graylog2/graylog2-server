@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import { ViewActions } from 'enterprise/stores/ViewStore';
-import Query from 'enterprise/logic/queries/Query';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import { ViewActions } from 'views/stores/ViewStore';
+import Query from 'views/logic/queries/Query';
 import QueryTitle from './QueryTitle';
 
 jest.mock('enterprise/stores/QueriesStore', () => ({ QueriesActions: {} }));

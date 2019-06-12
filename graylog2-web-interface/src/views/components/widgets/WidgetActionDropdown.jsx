@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import ActionDropdown from 'enterprise/components/common/ActionDropdown';
+import ActionDropdown from 'views/components/common/ActionDropdown';
 
 import styles from './Widget.css';
 

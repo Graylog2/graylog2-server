@@ -9,7 +9,7 @@ import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
 import AppConfig from 'util/AppConfig';
 
-import { ViewStore } from 'enterprise/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 
 type Router = {
   setRouteLeaveHook: (any, () => ?string) => () => void,

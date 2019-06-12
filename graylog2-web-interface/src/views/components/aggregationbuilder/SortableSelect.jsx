@@ -5,7 +5,7 @@ import { components } from 'react-select';
 import { SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 import { findIndex } from 'lodash';
 
-import Select from 'enterprise/components/Select';
+import Select from 'views/components/Select';
 import styles from './SortableSelect.css';
 
 const SortableValueList = SortableContainer(components.ValueContainer);

@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import { Link } from 'react-router';
 
 import StreamLink from 'components/streams/StreamLink';
-import { MessageFields } from 'enterprise/components/messagelist';
+import { MessageFields } from 'views/components/messagelist';
 import { Spinner, Timestamp } from 'components/common';
 
 import Routes from 'routing/Routes';

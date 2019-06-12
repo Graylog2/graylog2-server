@@ -1,6 +1,6 @@
 // @flow strict
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 export default (fieldName: string, type: FieldType) => {
   switch (type.type) {

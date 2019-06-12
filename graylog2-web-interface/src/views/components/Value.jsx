@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import type { ValueRenderer, ValueRendererProps } from 'enterprise/components/messagelist/decoration/ValueRenderer';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 
 import ValueActions from './ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';

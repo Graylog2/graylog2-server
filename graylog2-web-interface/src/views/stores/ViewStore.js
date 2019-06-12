@@ -3,17 +3,17 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
-import ViewGenerator from 'enterprise/logic/views/ViewGenerator';
-import SearchTypesGenerator from 'enterprise/logic/searchtypes/SearchTypesGenerator';
-import { QueriesActions } from 'enterprise/actions/QueriesActions';
-import View from 'enterprise/logic/views/View';
-import DashboardState from 'enterprise/logic/views/DashboardState';
-import Search from 'enterprise/logic/search/Search';
-import ViewState from 'enterprise/logic/views/ViewState';
-import type { Properties } from 'enterprise/logic/views/View';
-import type { QuerySet } from 'enterprise/logic/search/Search';
-import Query from 'enterprise/logic/queries/Query';
-import SearchActions from 'enterprise/actions/SearchActions';
+import ViewGenerator from 'views/logic/views/ViewGenerator';
+import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
+import { QueriesActions } from 'views/actions/QueriesActions';
+import View from 'views/logic/views/View';
+import DashboardState from 'views/logic/views/DashboardState';
+import Search from 'views/logic/search/Search';
+import ViewState from 'views/logic/views/ViewState';
+import type { Properties } from 'views/logic/views/View';
+import type { QuerySet } from 'views/logic/search/Search';
+import Query from 'views/logic/queries/Query';
+import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from './ViewManagementStore';
 
 type ViewStoreState = {

@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import { TIMESTAMP_FIELD } from 'enterprise/Constants';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 import Pivot from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';

@@ -5,17 +5,17 @@ import { mount } from 'enzyme';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
-import { StreamsActions } from 'enterprise/stores/StreamsStore';
-import { WidgetStore } from 'enterprise/stores/WidgetStore';
-import { QueryFiltersStore } from 'enterprise/stores/QueryFiltersStore';
-import SearchActions from 'enterprise/actions/SearchActions';
-import { SearchExecutionStateStore } from 'enterprise/stores/SearchExecutionStateStore';
-import { SearchConfigActions } from 'enterprise/stores/SearchConfigStore';
-import { ViewActions, ViewStore } from 'enterprise/stores/ViewStore';
-import { FieldTypesActions } from 'enterprise/stores/FieldTypesStore';
-import { SearchMetadataActions, SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
-import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
-import View from 'enterprise/logic/views/View';
+import { StreamsActions } from 'views/stores/StreamsStore';
+import { WidgetStore } from 'views/stores/WidgetStore';
+import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
+import SearchActions from 'views/actions/SearchActions';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { SearchConfigActions } from 'views/stores/SearchConfigStore';
+import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import { FieldTypesActions } from 'views/stores/FieldTypesStore';
+import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import View from 'views/logic/views/View';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 

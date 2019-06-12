@@ -1,9 +1,9 @@
 // @flow strict
 import { get } from 'lodash';
 
-import { DEFAULT_MESSAGE_FIELDS } from 'enterprise/Constants';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { escape, addToQuery } from 'enterprise/logic/queries/QueryHelper';
+import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 
 import FieldType from '../fieldtypes/FieldType';
 import type { ActionContexts } from '../ActionContext';

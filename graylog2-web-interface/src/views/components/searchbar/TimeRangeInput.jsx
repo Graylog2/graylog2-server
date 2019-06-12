@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import RelativeTimeRangeSelector from 'enterprise/components/searchbar/RelativeTimeRangeSelector';
-import AbsoluteTimeRangeSelector from 'enterprise/components/searchbar/AbsoluteTimeRangeSelector';
-import KeywordTimeRangeSelector from 'enterprise/components/searchbar/KeywordTimeRangeSelector';
+import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
+import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
+import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 
 export default function TimeRangeInput({ rangeType, rangeParams, config, onChange }) {
   switch (rangeType) {

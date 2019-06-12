@@ -3,9 +3,9 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import { ViewActions } from 'enterprise/stores/ViewStore';
-import type { QueryId } from 'enterprise/logic/queries/Query';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import { ViewActions } from 'views/stores/ViewStore';
+import type { QueryId } from 'views/logic/queries/Query';
 
 import QueryActionDropdown from './QueryActionDropdown';
 

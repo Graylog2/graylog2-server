@@ -1,7 +1,7 @@
 import { flatten } from 'lodash';
 
-import AggregationFunctionsStore from 'enterprise/stores/AggregationFunctionsStore';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
+import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
+import Series from 'views/logic/aggregationbuilder/Series';
 
 import { parameterNeededForType } from './SeriesParameterOptions';
 

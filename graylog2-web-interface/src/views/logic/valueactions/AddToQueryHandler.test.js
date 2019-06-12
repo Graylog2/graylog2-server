@@ -1,9 +1,9 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import { QueriesActions, QueriesStore } from 'enterprise/stores/QueriesStore';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import Query from 'enterprise/logic/queries/Query';
+import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import Query from 'views/logic/queries/Query';
 import AddToQueryHandler from './AddToQueryHandler';
 
 jest.mock('enterprise/stores/QueriesStore', () => ({ QueriesStore: {}, QueriesActions: {} }));

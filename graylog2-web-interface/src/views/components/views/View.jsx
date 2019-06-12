@@ -12,8 +12,8 @@ import connect from 'stores/connect';
 import { EntityListItem } from 'components/common';
 // $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
-import UserTimezoneTimestamp from 'enterprise/components/common/UserTimezoneTimestamp';
-import withPluginEntities from 'enterprise/logic/withPluginEntities';
+import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
+import withPluginEntities from 'views/logic/withPluginEntities';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 

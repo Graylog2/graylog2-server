@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 
 import { isString, trim, truncate as trunc } from 'lodash';
 
-import UserTimezoneTimestamp from 'enterprise/components/common/UserTimezoneTimestamp';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';

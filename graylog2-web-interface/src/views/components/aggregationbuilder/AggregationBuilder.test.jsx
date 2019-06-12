@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AggregationBuilder from './AggregationBuilder';
 import EmptyResultWidget from '../widgets/EmptyResultWidget';
 import EmptyAggregationContent from './EmptyAggregationContent';

@@ -3,8 +3,8 @@ import * as React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import SeriesParameterOptions from 'enterprise/components/aggregationbuilder/SeriesParameterOptions';
+import Series from 'views/logic/aggregationbuilder/Series';
+import SeriesParameterOptions from 'views/components/aggregationbuilder/SeriesParameterOptions';
 
 import SeriesSelect from './SeriesSelect';
 

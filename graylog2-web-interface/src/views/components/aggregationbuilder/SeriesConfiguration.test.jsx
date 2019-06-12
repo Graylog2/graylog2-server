@@ -2,8 +2,8 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import SeriesConfig from 'enterprise/logic/aggregationbuilder/SeriesConfig';
+import Series from 'views/logic/aggregationbuilder/Series';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import SeriesConfiguration from './SeriesConfiguration';
 
 describe('SeriesConfiguration', () => {

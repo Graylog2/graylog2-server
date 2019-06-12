@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import { FieldTypes } from 'enterprise/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import Series from 'views/logic/aggregationbuilder/Series';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import Headers from './Headers';
 

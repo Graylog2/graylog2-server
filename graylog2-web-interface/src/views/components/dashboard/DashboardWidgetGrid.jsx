@@ -7,7 +7,7 @@ import Immutable from 'immutable';
 import connect from 'stores/connect';
 import style from 'pages/ShowDashboardPage.css';
 import { ReactGridContainer } from 'components/common';
-import { widgetDefinition } from 'enterprise/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widget';
 import DashboardWidget from './DashboardWidget';
 import { ImmutablePositionsMap, WidgetsMap, WidgetDataMap } from '../widgets/WidgetPropTypes';
 import { TitlesStore } from '../../stores/TitlesStore';

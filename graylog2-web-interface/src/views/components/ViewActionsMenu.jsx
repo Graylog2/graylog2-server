@@ -15,11 +15,11 @@ import PermissionsMixin from 'util/PermissionsMixin';
 // $FlowFixMe: imports from core need to be fixed in flow
 import AppConfig from 'util/AppConfig';
 
-import DebugOverlay from 'enterprise/components/DebugOverlay';
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import { SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
-import SearchMetadata from 'enterprise/logic/search/SearchMetadata';
-import * as Permissions from 'enterprise/Permissions';
+import DebugOverlay from 'views/components/DebugOverlay';
+import { ViewStore } from 'views/stores/ViewStore';
+import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import SearchMetadata from 'views/logic/search/SearchMetadata';
+import * as Permissions from 'views/Permissions';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import ShareViewModal from './views/ShareViewModal';
 

@@ -5,10 +5,10 @@ import { Col } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 
-import { widgetDefinition } from 'enterprise/logic/Widget';
-import WidgetGrid from 'enterprise/components/WidgetGrid';
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import { CurrentViewStateActions } from 'enterprise/stores/CurrentViewStateStore';
+import { widgetDefinition } from 'views/logic/Widget';
+import WidgetGrid from 'views/components/WidgetGrid';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 
 const MAXIMUM_GRID_SIZE = 12;

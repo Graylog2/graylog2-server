@@ -7,7 +7,7 @@ import fetch from 'logic/rest/FetchProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
 
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { QueryFiltersStore } from './QueryFiltersStore';
 
 const fieldTypesUrl = URLUtils.qualifyUrl('/views/fields');

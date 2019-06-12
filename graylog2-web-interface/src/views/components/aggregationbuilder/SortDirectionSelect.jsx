@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 
-import Direction from 'enterprise/logic/aggregationbuilder/Direction';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
   direction: string,

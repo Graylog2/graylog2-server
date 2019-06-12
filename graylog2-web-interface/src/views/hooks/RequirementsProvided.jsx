@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import MissingRequirements from 'enterprise/components/views/MissingRequirements';
-import type { ViewHook } from 'enterprise/logic/hooks/ViewHook';
-import type { Requirements } from 'enterprise/logic/views/View';
+import MissingRequirements from 'views/components/views/MissingRequirements';
+import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { Requirements } from 'views/logic/views/View';
 
 const _missingRequirements = (requirements, requirementsProvided): Requirements => Object.entries(requirements)
   .filter(([require]) => !requirementsProvided.includes(require))

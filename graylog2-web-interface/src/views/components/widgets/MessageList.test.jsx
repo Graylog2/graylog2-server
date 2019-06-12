@@ -5,11 +5,11 @@ import Immutable from 'immutable';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
 
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import { AdditionalContext } from 'enterprise/logic/ActionContext';
-import MessagesWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
-import { TIMESTAMP_FIELD } from 'enterprise/Constants';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 
 jest.mock('enterprise/components/messagelist/MessageTableEntry', () => ({}));
 

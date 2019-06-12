@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'enzyme';
-import { AdditionalContext } from 'enterprise/logic/ActionContext';
+import { AdditionalContext } from 'views/logic/ActionContext';
 
 import SelectExtractorType from './SelectExtractorType';
 

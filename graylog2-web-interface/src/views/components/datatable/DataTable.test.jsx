@@ -8,11 +8,11 @@ import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 // $FlowFixMe: imports from core need to be fixed in flow
 import 'helpers/mocking/react-dom_mock';
 
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import { FieldTypes } from 'enterprise/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Series from 'views/logic/aggregationbuilder/Series';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 describe('DataTable', () => {
   const CurrentUserStore = StoreMock('listen', 'get');

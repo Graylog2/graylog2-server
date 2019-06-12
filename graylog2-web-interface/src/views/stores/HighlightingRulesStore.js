@@ -4,10 +4,10 @@ import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 import type { RecordFactory, RecordOf } from 'immutable';
 
-import ViewState from 'enterprise/logic/views/ViewState';
-import FormattingSettings from 'enterprise/logic/views/formatting/FormattingSettings';
-import HighlightingRule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
-import type { Value } from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
+import ViewState from 'views/logic/views/ViewState';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type HighlightingRulesActionsType = {

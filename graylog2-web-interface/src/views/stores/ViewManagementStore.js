@@ -10,9 +10,9 @@ import URLUtils from 'util/URLUtils';
 // $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
 
-import View from 'enterprise/logic/views/View';
-import Parameter from 'enterprise/logic/parameters/Parameter';
-import type { ViewJson } from 'enterprise/logic/views/View';
+import View from 'views/logic/views/View';
+import Parameter from 'views/logic/parameters/Parameter';
+import type { ViewJson } from 'views/logic/views/View';
 
 type SortOrder = 'asc' | 'desc';
 

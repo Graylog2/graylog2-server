@@ -1,7 +1,7 @@
 import React from 'react';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 
-import PropTypes from 'enterprise/components/CustomPropTypes';
+import PropTypes from 'views/components/CustomPropTypes';
 
 export default function TimeRangeTypeSelector({ onSelect, value }) {
   return (

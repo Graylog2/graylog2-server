@@ -2,20 +2,20 @@ import React from 'react';
 import { isEqual } from 'lodash';
 
 import Spinner from 'components/common/Spinner';
-import { FieldList } from 'enterprise/components/sidebar';
-import Query from 'enterprise/components/Query';
-import SideBar from 'enterprise/components/sidebar/SideBar';
+import { FieldList } from 'views/components/sidebar';
+import Query from 'views/components/Query';
+import SideBar from 'views/components/sidebar/SideBar';
 
 import connect from 'stores/connect';
 
-import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import { SearchStore } from 'enterprise/stores/SearchStore';
-import { CurrentViewStateStore } from 'enterprise/stores/CurrentViewStateStore';
-import { SelectedFieldsStore } from 'enterprise/stores/SelectedFieldsStore';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
-import { WidgetStore } from 'enterprise/stores/WidgetStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import { SearchStore } from 'views/stores/SearchStore';
+import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { WidgetStore } from 'views/stores/WidgetStore';
 import LoadingIndicator from 'components/common/LoadingIndicator';
-import { SearchLoadingStateStore } from 'enterprise/stores/SearchLoadingStateStore';
+import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),

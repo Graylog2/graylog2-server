@@ -9,11 +9,11 @@ import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { SearchActions, SearchStore } from 'enterprise/stores/SearchStore';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import { CurrentQueryStore } from 'enterprise/stores/CurrentQueryStore';
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import Query from 'enterprise/logic/queries/Query';
+import { SearchActions, SearchStore } from 'views/stores/SearchStore';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import Query from 'views/logic/queries/Query';
 
 import GenericPlot from './GenericPlot';
 

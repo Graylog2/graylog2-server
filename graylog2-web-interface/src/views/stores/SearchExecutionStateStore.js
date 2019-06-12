@@ -2,9 +2,9 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
-import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
-import ParameterBinding from 'enterprise/logic/parameters/ParameterBinding';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 const defaultExecutionState = SearchExecutionState.empty();
 

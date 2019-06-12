@@ -1,10 +1,10 @@
 // @flow strict
-import type { PluginMetadata } from 'enterprise/logic/views/View';
+import type { PluginMetadata } from 'views/logic/views/View';
 import * as React from 'react';
 import { mount } from 'enzyme';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import View from 'enterprise/logic/views/View';
+import View from 'views/logic/views/View';
 import Search from '../logic/search/Search';
 
 import RequirementsProvided from './RequirementsProvided';

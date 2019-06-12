@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import Widget from 'enterprise/logic/widgets/Widget';
+import Widget from 'views/logic/widgets/Widget';
 
 export const Position = {
   col: PropTypes.number.isRequired,

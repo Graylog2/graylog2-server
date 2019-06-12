@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import * as Immutable from 'immutable';
 
-import CustomPropTypes from 'enterprise/components/CustomPropTypes';
-import { defaultCompare } from 'enterprise/logic/DefaultCompare';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import { defaultCompare } from 'views/logic/DefaultCompare';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';

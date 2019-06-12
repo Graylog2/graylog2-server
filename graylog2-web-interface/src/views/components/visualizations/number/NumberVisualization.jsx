@@ -2,16 +2,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import type { Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
-import type { CurrentViewType } from 'enterprise/components/CustomPropTypes';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { CurrentViewType } from 'views/components/CustomPropTypes';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import fieldTypeFor from 'enterprise/logic/fieldtypes/FieldTypeFor';
-import Value from 'enterprise/components/Value';
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import DecoratedValue from 'enterprise/components/messagelist/decoration/DecoratedValue';
-import CustomHighlighting from 'enterprise/components/messagelist/CustomHighlighting';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import Value from 'views/components/Value';
+import { ViewStore } from 'views/stores/ViewStore';
+import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
+import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
 import style from './NumberVisualization.css';
 
 type Props = {

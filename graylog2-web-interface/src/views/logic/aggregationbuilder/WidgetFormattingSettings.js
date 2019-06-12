@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { Color } from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
+import type { Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 type InternalState = {
   chartColors: { [string]: Color },

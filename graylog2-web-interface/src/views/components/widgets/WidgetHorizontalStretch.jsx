@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { widgetDefinition } from 'enterprise/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widget';
 import style from './WidgetHorizontalStretch.css';
 
 class WidgetHorizontalStretch extends React.Component {

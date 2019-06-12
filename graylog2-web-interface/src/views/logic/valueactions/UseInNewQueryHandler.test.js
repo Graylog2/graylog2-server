@@ -1,5 +1,5 @@
 // @flow strict
-import { QueriesActions } from 'enterprise/actions/QueriesActions';
+import { QueriesActions } from 'views/actions/QueriesActions';
 import UseInNewQueryHandler from './UseInNewQueryHandler';
 import Query from '../queries/Query';
 import FieldType from '../fieldtypes/FieldType';

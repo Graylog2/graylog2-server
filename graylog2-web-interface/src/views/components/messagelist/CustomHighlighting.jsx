@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-import { HighlightingRulesStore } from 'enterprise/stores/HighlightingRulesStore';
-import DecoratorContext from 'enterprise/components/messagelist/decoration/DecoratorContext';
-import HighlightingRule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
+import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
+import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 import PossiblyHighlight from './PossiblyHighlight';
 import Highlight from './Highlight';

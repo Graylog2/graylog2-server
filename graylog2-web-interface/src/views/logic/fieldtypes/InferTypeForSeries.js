@@ -1,6 +1,6 @@
 // @flow strict
 
-import Series, { parseSeries } from 'enterprise/logic/aggregationbuilder/Series';
+import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';

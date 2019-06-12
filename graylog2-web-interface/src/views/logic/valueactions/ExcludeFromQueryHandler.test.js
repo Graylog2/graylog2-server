@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import { QueriesActions, QueriesStore } from 'enterprise/stores/QueriesStore';
+import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import Query from '../queries/Query';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';

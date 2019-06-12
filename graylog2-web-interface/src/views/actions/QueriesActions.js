@@ -2,9 +2,9 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
-import type { QueryId, TimeRange, TimeRangeTypes } from 'enterprise/logic/queries/Query';
-import Query from 'enterprise/logic/queries/Query';
-import ViewState from 'enterprise/logic/views/ViewState';
+import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
+import Query from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
 
 type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 

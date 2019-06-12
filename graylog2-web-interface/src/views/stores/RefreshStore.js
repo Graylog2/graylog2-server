@@ -1,6 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
-import SearchActions from 'enterprise/actions/SearchActions';
+import SearchActions from 'views/actions/SearchActions';
 
 type RefreshActionsType = {
   enable: () => void,

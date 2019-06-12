@@ -1,5 +1,5 @@
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { DEFAULT_MESSAGE_FIELDS } from 'enterprise/Constants';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';

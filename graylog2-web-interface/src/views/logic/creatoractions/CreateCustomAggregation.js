@@ -1,7 +1,7 @@
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'enterprise/components/datatable/DataTable';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import DataTable from 'views/components/datatable/DataTable';
 
 export default function () {
   const newWidget = AggregationWidget.builder()

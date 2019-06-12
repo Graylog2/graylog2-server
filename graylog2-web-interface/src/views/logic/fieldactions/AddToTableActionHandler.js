@@ -1,5 +1,5 @@
 // @flow strict
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';

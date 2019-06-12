@@ -1,7 +1,7 @@
 // @flow strict
 import Immutable from 'immutable';
 import uuid from 'uuid/v4';
-import Widget from 'enterprise/logic/widgets/Widget';
+import Widget from 'views/logic/widgets/Widget';
 
 import { widgetDefinition } from '../Widget';
 import searchTypeDefinition from '../SearchType';

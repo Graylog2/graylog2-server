@@ -8,18 +8,18 @@ import URLUtils from 'util/URLUtils';
 // $FlowFixMe: imports from core need to be fixed in flow
 import fetch from 'logic/rest/FetchProvider';
 
-import { SearchExecutionStateStore } from 'enterprise/stores/SearchExecutionStateStore';
-import { SearchMetadataActions } from 'enterprise/stores/SearchMetadataStore';
-import { SearchJobActions } from 'enterprise/stores/SearchJobStore';
-import { ViewStore, ViewActions } from 'enterprise/stores/ViewStore';
-import SearchResult from 'enterprise/logic/SearchResult';
-import SearchActions from 'enterprise/actions/SearchActions';
-import Search from 'enterprise/logic/search/Search';
-import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'enterprise/actions/SearchActions';
-import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
-import View from 'enterprise/logic/views/View';
-import Parameter from 'enterprise/logic/parameters/Parameter';
-import type { WidgetMapping } from 'enterprise/logic/views/View';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
+import { SearchJobActions } from 'views/stores/SearchJobStore';
+import { ViewStore, ViewActions } from 'views/stores/ViewStore';
+import SearchResult from 'views/logic/SearchResult';
+import SearchActions from 'views/actions/SearchActions';
+import Search from 'views/logic/search/Search';
+import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import View from 'views/logic/views/View';
+import Parameter from 'views/logic/parameters/Parameter';
+import type { WidgetMapping } from 'views/logic/views/View';
 
 const createSearchUrl = URLUtils.qualifyUrl('/views/search');
 

@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import { ChartColorRulesStore, ChartColorRulesActions } from 'enterprise/stores/ChartColorRulesStore';
-import type { ColorRule } from 'enterprise/stores/ChartColorRulesStore';
+import { ChartColorRulesStore, ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
+import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import ChartColorContext from '../visualizations/ChartColorContext';
 
 type Props = {

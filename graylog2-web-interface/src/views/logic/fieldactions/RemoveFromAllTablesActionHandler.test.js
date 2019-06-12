@@ -1,10 +1,10 @@
 // @flow strict
 import { Map } from 'immutable';
-import Widget from 'enterprise/logic/widgets/Widget';
-import RemoveFromAllTablesActionHandler from 'enterprise/logic/fieldactions/RemoveFromAllTablesActionHandler';
-import { FieldTypes } from 'enterprise/logic/fieldtypes/FieldType';
-import MessageWidgetConfig from 'enterprise/logic/widgets/MessagesWidgetConfig';
-import { WidgetActions, WidgetStore } from 'enterprise/stores/WidgetStore';
+import Widget from 'views/logic/widgets/Widget';
+import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import MessageWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
 
 describe('RemoveFromAllTablesActionHandler', () => {
   it('should add a field to all message widgets', () => {

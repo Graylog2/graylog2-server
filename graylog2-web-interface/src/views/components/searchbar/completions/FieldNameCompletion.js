@@ -1,9 +1,9 @@
 // @flow strict
 import * as Immutable from 'immutable';
-import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
-import type { FieldTypesStoreState } from 'enterprise/stores/FieldTypesStore';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypesStoreState } from 'views/stores/FieldTypesStore';
 
 import type { CompletionResult, Token } from '../ace-types';
 import type { Completer } from '../SearchBarAutocompletions';

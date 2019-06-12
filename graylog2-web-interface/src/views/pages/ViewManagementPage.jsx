@@ -11,8 +11,8 @@ import Routes from 'routing/Routes';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { DocumentTitle, PageHeader } from 'components/common';
 
-import { ViewManagementStore, ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
-import ViewList from 'enterprise/components/views/ViewList';
+import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
+import ViewList from 'views/components/views/ViewList';
 
 const ViewManagementPage = createReactClass({
   mixins: [

@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import type { ColorRule } from 'enterprise/stores/ChartColorRulesStore';
-import { ChartColorRulesActions } from 'enterprise/stores/ChartColorRulesStore';
+import type { ColorRule } from 'views/stores/ChartColorRulesStore';
+import { ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import ChartColorContext from '../visualizations/ChartColorContext';
 import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
 

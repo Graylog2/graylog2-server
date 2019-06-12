@@ -5,10 +5,10 @@ import { trim } from 'lodash';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
-import { getParameterBindingsAsMap } from 'enterprise/logic/search/SearchExecutionState';
-import { SearchMetadataStore } from 'enterprise/stores/SearchMetadataStore';
-import { SearchExecutionStateStore } from 'enterprise/stores/SearchExecutionStateStore';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
+import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import SearchBar from './SearchBar';
 
 const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {

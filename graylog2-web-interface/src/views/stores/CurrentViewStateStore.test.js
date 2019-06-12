@@ -2,9 +2,9 @@
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import ViewState from 'enterprise/logic/views/ViewState';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import ViewState from 'views/logic/views/ViewState';
 import { CurrentViewStateStore } from './CurrentViewStateStore';
 import { ViewStatesActions } from './ViewStatesStore';
 

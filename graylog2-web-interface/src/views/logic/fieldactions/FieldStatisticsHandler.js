@@ -1,10 +1,10 @@
 // @flow strict
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import Widget from 'enterprise/logic/widgets/Widget';
-import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Widget from 'views/logic/widgets/Widget';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import Series from 'views/logic/aggregationbuilder/Series';
+import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 import type { ActionContexts } from '../ActionContext';

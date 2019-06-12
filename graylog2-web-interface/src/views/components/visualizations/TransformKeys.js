@@ -4,8 +4,8 @@ import moment from 'moment-timezone';
 // $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import type { ColLeaf, Leaf, Key, Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 

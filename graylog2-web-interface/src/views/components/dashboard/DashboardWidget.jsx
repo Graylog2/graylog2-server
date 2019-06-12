@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { BootstrapModalConfirm } from 'components/bootstrap';
-import { widgetDefinition } from 'enterprise/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widget';
 
 import WidgetFrame from '../widgets/WidgetFrame';
 import DashboardWidgetHeader from './DashboardWidgetHeader';

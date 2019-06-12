@@ -7,12 +7,12 @@ import Routes from 'routing/Routes';
 // $FlowFixMe: imports from core need to be fixed in flow
 import history from 'util/History';
 
-import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
-import ViewDeserializer from 'enterprise/logic/views/ViewDeserializer';
-import View from 'enterprise/logic/views/View';
-import Search from 'enterprise/logic/search/Search';
-import type { ViewJson } from 'enterprise/logic/views/View';
-import { SearchExecutionStateActions } from 'enterprise/stores/SearchExecutionStateStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import ViewDeserializer from 'views/logic/views/ViewDeserializer';
+import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
+import type { ViewJson } from 'views/logic/views/View';
+import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateStore';
 
 import ShowViewPage from './ShowViewPage';
 

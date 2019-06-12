@@ -1,4 +1,4 @@
-import { parseSeries } from 'enterprise/logic/aggregationbuilder/Series';
+import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
 const formatPivot = (pivot) => {
   const { type, field, config } = pivot;

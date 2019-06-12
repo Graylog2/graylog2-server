@@ -13,19 +13,19 @@ import DocsHelper from 'util/DocsHelper';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { Spinner } from 'components/common';
 
-import SearchButton from 'enterprise/components/searchbar/SearchButton';
-import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
-import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
-import QueryInput from 'enterprise/components/searchbar/QueryInput';
-import StreamsFilter from 'enterprise/components/searchbar/StreamsFilter';
-import RefreshControls from 'enterprise/components/searchbar/RefreshControls';
-import ScrollToHint from 'enterprise/components/common/ScrollToHint';
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import { CurrentQueryStore } from 'enterprise/stores/CurrentQueryStore';
-import { StreamsStore } from 'enterprise/stores/StreamsStore';
-import { QueryFiltersActions, QueryFiltersStore } from 'enterprise/stores/QueryFiltersStore';
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import View from 'enterprise/logic/views/View';
+import SearchButton from 'views/components/searchbar/SearchButton';
+import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
+import QueryInput from 'views/components/searchbar/QueryInput';
+import StreamsFilter from 'views/components/searchbar/StreamsFilter';
+import RefreshControls from 'views/components/searchbar/RefreshControls';
+import ScrollToHint from 'views/components/common/ScrollToHint';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import { QueryFiltersActions, QueryFiltersStore } from 'views/stores/QueryFiltersStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import View from 'views/logic/views/View';
 
 
 // eslint-disable-next-line no-undef

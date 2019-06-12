@@ -1,10 +1,10 @@
 // @flow strict
-import { QueriesActions } from 'enterprise/actions/QueriesActions';
-import QueryGenerator from 'enterprise/logic/queries/QueryGenerator';
-import ViewStateGenerator from 'enterprise/logic/views/ViewStateGenerator';
-import Query from 'enterprise/logic/queries/Query';
-import ViewState from 'enterprise/logic/views/ViewState';
-import { escape } from 'enterprise/logic/queries/QueryHelper';
+import { QueriesActions } from 'views/actions/QueriesActions';
+import QueryGenerator from 'views/logic/queries/QueryGenerator';
+import ViewStateGenerator from 'views/logic/views/ViewStateGenerator';
+import Query from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
+import { escape } from 'views/logic/queries/QueryHelper';
 import type { ValueActionHandlerWithContext } from './ValueActionHandler';
 
 const UseInNewQueryHandler: ValueActionHandlerWithContext = (queryId: string, field: string, value: string) => {

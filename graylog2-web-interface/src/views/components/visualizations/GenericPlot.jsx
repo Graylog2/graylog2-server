@@ -9,7 +9,7 @@ import { Popover } from 'react-bootstrap';
 import ColorPicker from 'components/common/ColorPicker';
 
 import createPlotlyComponent from 'react-plotly.js/factory';
-import Plotly from 'enterprise/custom-plotly';
+import Plotly from 'views/custom-plotly';
 import ChartColorContext from './ChartColorContext';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style/useable!css!./GenericPlot.css';

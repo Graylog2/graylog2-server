@@ -1,7 +1,7 @@
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
-import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
-import { ViewActions } from 'enterprise/stores/ViewStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import { ViewActions } from 'views/stores/ViewStore';
 
 export default (view, router) => {
   return ViewManagementActions.create(view)

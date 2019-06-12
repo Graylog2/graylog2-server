@@ -2,10 +2,10 @@
 
 import { List, Map, Collection, fromJS, is } from 'immutable';
 
-import Widget from 'enterprise/logic/widgets/Widget';
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
-import TitleTypes from 'enterprise/stores/TitleTypes';
-import type { TitlesMap } from 'enterprise/stores/TitleTypes';
+import Widget from 'views/logic/widgets/Widget';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import TitleTypes from 'views/stores/TitleTypes';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 

@@ -6,8 +6,8 @@ import fetch from 'logic/rest/FetchProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
 
-import Search from 'enterprise/logic/search/Search';
-import SearchExecutionState from 'enterprise/logic/search/SearchExecutionState';
+import Search from 'views/logic/search/Search';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 const executeQueryUrl = id => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
 const jobStatusUrl = jobId => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);

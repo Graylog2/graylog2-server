@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Select from 'components/common/Select';
-import { defaultCompare } from 'enterprise/logic/DefaultCompare';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 const VisualizationTypeSelect = ({ onChange, value }) => {
   const visualizationTypes = PluginStore.exports('visualizationTypes')

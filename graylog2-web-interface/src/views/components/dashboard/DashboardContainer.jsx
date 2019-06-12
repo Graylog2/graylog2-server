@@ -6,9 +6,9 @@ import Immutable from 'immutable';
 import { Col } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
-import DashboardWidgetGrid from 'enterprise/components/dashboard/DashboardWidgetGrid';
-import { widgetDefinition } from 'enterprise/logic/Widget';
-import { DashboardWidgetsActions } from 'enterprise/stores/DashboardWidgetsStore';
+import DashboardWidgetGrid from 'views/components/dashboard/DashboardWidgetGrid';
+import { widgetDefinition } from 'views/logic/Widget';
+import { DashboardWidgetsActions } from 'views/stores/DashboardWidgetsStore';
 import EmptyDashboardHelpMessage from './EmptyDashboardHelpMessage';
 import * as WidgetPropTypes from '../widgets/WidgetPropTypes';
 

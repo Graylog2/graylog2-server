@@ -2,8 +2,8 @@
 // $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
 
-import View from 'enterprise/logic/views/View';
-import Search from 'enterprise/logic/search/Search';
+import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
 import { ViewManagementActions } from './ViewManagementStore';
 
 jest.mock('injection/StoreProvider', () => ({ getStore: jest.fn() }));

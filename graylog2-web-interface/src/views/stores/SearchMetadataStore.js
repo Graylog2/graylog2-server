@@ -5,7 +5,7 @@ import Reflux from 'reflux';
 import fetch from 'logic/rest/FetchProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
-import SearchMetadata from 'enterprise/logic/search/SearchMetadata';
+import SearchMetadata from 'views/logic/search/SearchMetadata';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
 const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);

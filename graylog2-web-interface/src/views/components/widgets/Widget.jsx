@@ -5,15 +5,15 @@ import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import { widgetDefinition } from 'enterprise/logic/Widget';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import { TitlesActions, TitleTypes } from 'enterprise/stores/TitlesStore';
-import { ViewMetadataStore } from 'enterprise/stores/ViewMetadataStore';
-import { RefreshActions } from 'enterprise/stores/RefreshStore';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
-import WidgetModel from 'enterprise/logic/widgets/Widget';
-import WidgetConfig from 'enterprise/logic/widgets/WidgetConfig';
-import WidgetPosition from 'enterprise/logic/widgets/WidgetPosition';
+import { widgetDefinition } from 'views/logic/Widget';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { RefreshActions } from 'views/stores/RefreshStore';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import WidgetModel from 'views/logic/widgets/Widget';
+import WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';

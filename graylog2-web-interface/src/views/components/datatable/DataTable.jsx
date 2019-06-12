@@ -3,15 +3,15 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 
-import expandRows from 'enterprise/logic/ExpandRows';
-import { defaultCompare } from 'enterprise/logic/DefaultCompare';
+import expandRows from 'views/logic/ExpandRows';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
-import type { Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
+import { ViewStore } from 'views/stores/ViewStore';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import DataTableEntry from './DataTableEntry';
 
 import deduplicateValues from './DeduplicateValues';

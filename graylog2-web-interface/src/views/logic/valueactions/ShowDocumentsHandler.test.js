@@ -1,7 +1,7 @@
 // @flow strict
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
 import ShowDocumentsHandler from './ShowDocumentsHandler';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';

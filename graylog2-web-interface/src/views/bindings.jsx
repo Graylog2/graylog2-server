@@ -1,58 +1,58 @@
 // @flow strict
-import * as Permissions from 'enterprise/Permissions';
+import * as Permissions from 'views/Permissions';
 
-import { MessageListHandler } from 'enterprise/logic/searchtypes';
-import { MessageList } from 'enterprise/components/widgets';
+import { MessageListHandler } from 'views/logic/searchtypes';
+import { MessageList } from 'views/components/widgets';
 
-import AddToTableActionHandler from 'enterprise/logic/fieldactions/AddToTableActionHandler';
-import AddToAllTablesActionHandler from 'enterprise/logic/fieldactions/AddToAllTablesActionHandler';
-import AddToQueryHandler from 'enterprise/logic/valueactions/AddToQueryHandler';
-import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
-import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
+import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
+import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
+import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
+import AggregateActionHandler from 'views/logic/fieldactions/AggregateActionHandler';
+import ChartActionHandler from 'views/logic/fieldactions/ChartActionHandler';
 
-import AggregationBuilder from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+import AggregationBuilder from 'views/components/aggregationbuilder/AggregationBuilder';
 
-import BarVisualization from 'enterprise/components/visualizations/bar/BarVisualization';
-import LineVisualization from 'enterprise/components/visualizations/line/LineVisualization';
-import NumberVisualization from 'enterprise/components/visualizations/number/NumberVisualization';
-import PieVisualization from 'enterprise/components/visualizations/pie/PieVisualization';
-import ScatterVisualization from 'enterprise/components/visualizations/scatter/ScatterVisualization';
-import WorldMapVisualization from 'enterprise/components/visualizations/worldmap/WorldMapVisualization';
+import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
+import LineVisualization from 'views/components/visualizations/line/LineVisualization';
+import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
+import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
+import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
+import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 
-import PivotConfigGenerator from 'enterprise/logic/searchtypes/aggregation/PivotConfigGenerator';
-import PivotHandler from 'enterprise/logic/searchtypes/pivot/PivotHandler';
-import PivotTransformer from 'enterprise/logic/searchresulttransformers/PivotTransformer';
+import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
+import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
+import PivotTransformer from 'views/logic/searchresulttransformers/PivotTransformer';
 
-import Widget from 'enterprise/logic/widgets/Widget';
-import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
-import MessagesWidget from 'enterprise/logic/widgets/MessagesWidget';
-import DataTable from 'enterprise/components/datatable/DataTable';
-import FieldStatisticsHandler from 'enterprise/logic/fieldactions/FieldStatisticsHandler';
-import ExcludeFromQueryHandler from 'enterprise/logic/valueactions/ExcludeFromQueryHandler';
-import { isFunction } from 'enterprise/logic/aggregationbuilder/Series';
-import AggregationControls from 'enterprise/components/aggregationbuilder/AggregationControls';
-import EditMessageList from 'enterprise/components/widgets/EditMessageList';
-import { ShowViewPage, NewSearchPage, ViewManagementPage } from 'enterprise/pages';
+import Widget from 'views/logic/widgets/Widget';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import DataTable from 'views/components/datatable/DataTable';
+import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
+import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
+import { isFunction } from 'views/logic/aggregationbuilder/Series';
+import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
+import EditMessageList from 'views/components/widgets/EditMessageList';
+import { ShowViewPage, NewSearchPage, ViewManagementPage } from 'views/pages';
 
-import AddMessageCountActionHandler from 'enterprise/logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler from 'enterprise/logic/fieldactions/AddMessageTableActionHandler';
-import RemoveFromTableActionHandler from 'enterprise/logic/fieldactions/RemoveFromTableActionHandler';
-import RemoveFromAllTablesActionHandler from 'enterprise/logic/fieldactions/RemoveFromAllTablesActionHandler';
-import CreateCustomAggregation from 'enterprise/logic/creatoractions/CreateCustomAggregation';
-import SelectExtractorType from 'enterprise/logic/valueactions/SelectExtractorType';
+import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
+import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
+import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
+import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
+import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 
-import VisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
-import BarVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
-import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
-import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstance';
-import SpecificRoles from 'enterprise/logic/views/sharing/SpecificRoles';
-import SpecificUsers from 'enterprise/logic/views/sharing/SpecificUsers';
+import ViewSharing from 'views/logic/views/sharing/ViewSharing';
+import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
+import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
+import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 
-import UseInNewQueryHandler from 'enterprise/logic/valueactions/UseInNewQueryHandler';
-import ShowDocumentsHandler from 'enterprise/logic/valueactions/ShowDocumentsHandler';
-import HighlightValueHandler from 'enterprise/logic/valueactions/HighlightValueHandler';
+import UseInNewQueryHandler from 'views/logic/valueactions/UseInNewQueryHandler';
+import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
+import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from './components/searchbar/completions/FieldNameCompletion';
 import OperatorCompletion from './components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from './hooks/RequirementsProvided';

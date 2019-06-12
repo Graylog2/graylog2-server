@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import ActionDropdown from 'enterprise/components/common/ActionDropdown';
+import ActionDropdown from 'views/components/common/ActionDropdown';
 
 type Props = {
   children: React.Node,

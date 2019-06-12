@@ -2,8 +2,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { VisualizationComponent, VisualizationComponentProps } from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';

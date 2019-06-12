@@ -1,8 +1,8 @@
 // @flow strict
 import { flatten, flow, isEqual, set } from 'lodash';
 
-import type { Key, Leaf, Rows } from 'enterprise/logic/searchtypes/pivot/PivotHandler';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { Key, Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import transformKeys from './TransformKeys';
 
 export type ChartDefinition = {

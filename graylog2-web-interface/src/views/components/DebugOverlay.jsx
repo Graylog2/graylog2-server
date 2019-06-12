@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import { Modal } from 'react-bootstrap';
 
-import { ViewStore } from 'enterprise/stores/ViewStore';
-import { SearchStore } from 'enterprise/stores/SearchStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import { SearchStore } from 'views/stores/SearchStore';
 import connect from 'stores/connect';
 
 const DebugOverlay = createReactClass({

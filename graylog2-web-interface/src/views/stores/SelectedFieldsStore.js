@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import { Set } from 'immutable';
 import { get, isEqual } from 'lodash';
 
-import type ViewState from 'enterprise/logic/views/ViewState';
+import type ViewState from 'views/logic/views/ViewState';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type StateUpdate = {

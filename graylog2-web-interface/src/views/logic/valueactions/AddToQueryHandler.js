@@ -1,10 +1,10 @@
 // @flow strict
 import moment from 'moment-timezone';
 
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import Query from 'enterprise/logic/queries/Query';
-import { escape, addToQuery } from 'enterprise/logic/queries/QueryHelper';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import Query from 'views/logic/queries/Query';
+import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import QueryManipulationHandler from './QueryManipulationHandler';
 import type { ValueActionHandler } from './ValueActionHandler';
 

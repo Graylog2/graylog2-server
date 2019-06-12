@@ -8,12 +8,12 @@ import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { StreamsStore } from 'enterprise/stores/StreamsStore';
-import { SearchConfigStore } from 'enterprise/stores/SearchConfigStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'enterprise/logic/fieldtypes/FieldTypeMapping';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageDetail from './MessageDetail';
 import TypeSpecificValue from '../TypeSpecificValue';

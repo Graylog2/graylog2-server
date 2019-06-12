@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import Select from 'react-select';
 import * as Immutable from 'immutable';
 
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import { defaultCompare } from 'enterprise/logic/DefaultCompare';
-import SortConfig from 'enterprise/logic/aggregationbuilder/SortConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Series from 'views/logic/aggregationbuilder/Series';
+import { defaultCompare } from 'views/logic/DefaultCompare';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { PivotList, SeriesList, SortList } from './AggregationBuilderPropTypes';
 
 const mapFields = fields => fields.sort(defaultCompare)

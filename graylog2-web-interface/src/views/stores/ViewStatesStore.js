@@ -3,8 +3,8 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
-import type { QueryId } from 'enterprise/logic/queries/Query';
-import ViewState from 'enterprise/logic/views/ViewState';
+import type { QueryId } from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
 import { ViewActions, ViewStore } from './ViewStore';
 
 type ViewStatesActionsTypes = {

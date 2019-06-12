@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-import { DEFAULT_HIGHLIGHT_COLOR } from 'enterprise/Constants';
-import { HighlightingRulesStore } from 'enterprise/stores/HighlightingRulesStore';
-import Rule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
+import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
+import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 import HighlightingRule from './HighlightingRule';
 import ColorBox from './ColorBox';

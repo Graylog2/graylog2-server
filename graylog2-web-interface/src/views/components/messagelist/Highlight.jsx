@@ -3,8 +3,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
-import { AdditionalContext } from 'enterprise/logic/ActionContext';
-import { DEFAULT_HIGHLIGHT_COLOR } from 'enterprise/Constants';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import PossiblyHighlight from './PossiblyHighlight';
 
 type Props = {

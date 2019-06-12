@@ -4,12 +4,12 @@ import { mount } from 'enzyme';
 // $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
 
-import XYPlot from 'enterprise/components/visualizations/XYPlot';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import Query from 'enterprise/logic/queries/Query';
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
-import SearchActions from 'enterprise/actions/SearchActions';
+import XYPlot from 'views/components/visualizations/XYPlot';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Query from 'views/logic/queries/Query';
+import { QueriesActions } from 'views/stores/QueriesStore';
+import SearchActions from 'views/actions/SearchActions';
 
 jest.mock('enterprise/stores/SearchStore', () => ({
   SearchStore: {},

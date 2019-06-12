@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import { StoreMock, StoreProviderMock } from 'helpers/mocking';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 describe('AggregationControls', () => {
   const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');

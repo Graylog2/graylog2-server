@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tab, Tabs } from 'react-bootstrap';
 
-import ViewActionsMenu from 'enterprise/components/ViewActionsMenu';
-import QueryTitle from 'enterprise/components/queries/QueryTitle';
+import ViewActionsMenu from 'views/components/ViewActionsMenu';
+import QueryTitle from 'views/components/queries/QueryTitle';
 
 const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selectedQuery, titles, onSaveView, onSaveAsView }) => {
   const queryTitles = titles;

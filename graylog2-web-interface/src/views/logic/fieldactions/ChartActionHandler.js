@@ -1,14 +1,14 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import Widget from 'enterprise/logic/widgets/Widget';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import pivotForField from 'enterprise/logic/searchtypes/aggregation/PivotGenerator';
-import AggregationWidgetConfig from 'enterprise/logic/aggregationbuilder/AggregationWidgetConfig';
-import AggregationWidget from 'enterprise/logic/aggregationbuilder/AggregationWidget';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import { FieldTypesStore } from 'enterprise/stores/FieldTypesStore';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
+import Widget from 'views/logic/widgets/Widget';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import Series from 'views/logic/aggregationbuilder/Series';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';

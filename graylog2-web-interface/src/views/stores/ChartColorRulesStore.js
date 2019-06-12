@@ -3,9 +3,9 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
-import Widget from 'enterprise/logic/widgets/Widget';
-import { WidgetActions } from 'enterprise/stores/WidgetStore';
-import WidgetFormattingSettings from 'enterprise/logic/aggregationbuilder/WidgetFormattingSettings';
+import Widget from 'views/logic/widgets/Widget';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 
 import { WidgetStore } from './WidgetStore';
 

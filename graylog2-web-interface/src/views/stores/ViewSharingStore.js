@@ -7,7 +7,7 @@ import fetch from 'logic/rest/FetchProvider';
 // $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
 
-import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
+import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import UserShortSummary from '../logic/views/sharing/UserShortSummary';
 
 const viewSharingUrl = viewId => URLUtils.qualifyUrl(`/views/${viewId}/share`);

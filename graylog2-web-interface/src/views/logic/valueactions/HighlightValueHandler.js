@@ -1,7 +1,7 @@
 // @flow strict
-import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'enterprise/Constants';
-import { HighlightingRulesActions, HighlightingRulesStore } from 'enterprise/stores/HighlightingRulesStore';
-import HighlightingRule from 'enterprise/logic/views/formatting/highlighting/HighlightingRule';
+import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
+import { HighlightingRulesActions, HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { ValueActionHandler, ValueActionHandlerCondition, ValueActionHandlerConditionProps } from './ValueActionHandler';
 
 const randomColor = () => DEFAULT_CUSTOM_HIGHLIGHT_RANGE[

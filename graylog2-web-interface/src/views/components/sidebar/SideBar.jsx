@@ -8,7 +8,7 @@ import { AutoAffix } from 'react-overlays';
 // $FlowFixMe: imports from core need to be fixed in flow
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import { Panel, PanelGroup } from 'react-bootstrap';
-import { AddWidgetButton, SearchResultOverview } from 'enterprise/components/sidebar';
+import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 
 import styles from './SideBar.css';
 import SearchDetails from './SearchDetails';

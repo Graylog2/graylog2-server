@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
 
-import { QueriesActions } from 'enterprise/stores/QueriesStore';
+import { QueriesActions } from 'views/stores/QueriesStore';
 
 jest.mock('enterprise/stores/ViewManagementStore', () => ({
   ViewManagementActions: {

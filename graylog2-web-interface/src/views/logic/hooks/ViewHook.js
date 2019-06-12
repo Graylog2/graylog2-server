@@ -1,5 +1,5 @@
 // @flow strict
-import View from 'enterprise/logic/views/View';
+import View from 'views/logic/views/View';
 
 export type ViewHookArguments = {
   view: View,

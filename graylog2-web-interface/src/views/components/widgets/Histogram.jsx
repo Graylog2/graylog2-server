@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import moment from 'moment';
 
-import Plotly from 'enterprise/custom-plotly';
+import Plotly from 'views/custom-plotly';
 import createPlotlyComponent from 'react-plotly.js/factory';
 
 const Plot = createPlotlyComponent(Plotly);

@@ -9,7 +9,7 @@ import connect from 'stores/connect';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import Pluralize from 'components/common/Pluralize';
-import { RefreshActions, RefreshStore } from 'enterprise/stores/RefreshStore';
+import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
 import styles from './RefreshControls.css';
 

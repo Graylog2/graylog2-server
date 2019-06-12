@@ -1,6 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
-import { QueriesStore } from 'enterprise/stores/QueriesStore';
+import { QueriesStore } from 'views/stores/QueriesStore';
 import Query from '../queries/Query';
 
 export default class QueryManipulationHandler {

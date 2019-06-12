@@ -1,9 +1,9 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import { ViewManagementActions } from 'enterprise/stores/ViewManagementStore';
-import { SearchActions } from 'enterprise/stores/SearchStore';
-import { ViewActions } from 'enterprise/stores/ViewStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import { SearchActions } from 'views/stores/SearchStore';
+import { ViewActions } from 'views/stores/ViewStore';
 import Search from '../search/Search';
 import DashboardState from './DashboardState';
 import View from './View';

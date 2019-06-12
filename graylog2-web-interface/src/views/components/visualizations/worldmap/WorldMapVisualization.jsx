@@ -3,10 +3,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip } from 'lodash';
 
-import { AggregationType } from 'enterprise/components/aggregationbuilder/AggregationBuilderPropTypes';
-import WorldMapVisualizationConfig from 'enterprise/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
-import Viewport from 'enterprise/logic/aggregationbuilder/visualizations/Viewport';
-import type { VisualizationComponent, VisualizationComponentProps } from 'enterprise/components/aggregationbuilder/AggregationBuilder';
+import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import MapVisualization from './MapVisualization';
 import { extractSeries } from '../ChartData';

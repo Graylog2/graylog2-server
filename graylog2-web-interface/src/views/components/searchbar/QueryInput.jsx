@@ -1,5 +1,5 @@
 // @flow strict
-import withPluginEntities from 'enterprise/logic/withPluginEntities';
+import withPluginEntities from 'views/logic/withPluginEntities';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import type { AutoCompleter, Editor } from './ace-types';

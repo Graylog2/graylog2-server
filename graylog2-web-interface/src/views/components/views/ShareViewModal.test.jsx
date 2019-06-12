@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import { ViewSharingActions } from 'enterprise/stores/ViewSharingStore';
-import AllUsersOfInstance from 'enterprise/logic/views/sharing/AllUsersOfInstance';
-import ViewSharing from 'enterprise/logic/views/sharing/ViewSharing';
+import { ViewSharingActions } from 'views/stores/ViewSharingStore';
+import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
+import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import ShareViewModal from './ShareViewModal';
 
 const mockLoadRoles = jest.fn(() => Promise.resolve([]));

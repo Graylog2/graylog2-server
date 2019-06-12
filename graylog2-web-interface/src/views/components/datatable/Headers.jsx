@@ -2,13 +2,13 @@
 import React from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
 
-import Field from 'enterprise/components/Field';
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import Value from 'enterprise/components/Value';
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
-import Series from 'enterprise/logic/aggregationbuilder/Series';
-import type { FieldTypeMappingsList } from 'enterprise/stores/FieldTypesStore';
-import fieldTypeFor from 'enterprise/logic/fieldtypes/FieldTypeFor';
+import Field from 'views/components/Field';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import Value from 'views/components/Value';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Series from 'views/logic/aggregationbuilder/Series';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
 import styles from './DataTable.css';
 

@@ -1,6 +1,6 @@
 // @flow strict
-import FieldType from 'enterprise/logic/fieldtypes/FieldType';
-import Pivot from 'enterprise/logic/aggregationbuilder/Pivot';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import PivotGenerator from './PivotGenerator';
 
 describe('PivotGenerator', () => {
