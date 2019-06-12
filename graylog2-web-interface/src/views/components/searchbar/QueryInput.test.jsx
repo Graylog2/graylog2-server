@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 import QueryInput from './QueryInput';
 
 jest.mock('./SearchBarAutocompletions', () => ({}));
-jest.mock('enterprise/stores/FieldTypesStore', () => ({
+jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: {
     getInitialState: jest.fn(),
     listen: jest.fn(),

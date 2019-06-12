@@ -7,8 +7,8 @@ import { ViewActions } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
 import QueryTitle from './QueryTitle';
 
-jest.mock('enterprise/stores/QueriesStore', () => ({ QueriesActions: {} }));
-jest.mock('enterprise/stores/ViewStore', () => ({ ViewActions: {} }));
+jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));
+jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
 
 describe('QueryTitle', () => {
   beforeEach(() => {

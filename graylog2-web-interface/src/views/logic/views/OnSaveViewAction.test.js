@@ -10,8 +10,8 @@ const mockActions = () => {
   const ViewManagementActions = {
     update: jest.fn(() => Promise.resolve()).mockName('update'),
   };
-  jest.doMock('enterprise/stores/ViewManagementStore', () => ({ ViewManagementActions }));
-  jest.doMock('enterprise/stores/ViewStore', () => ({ ViewActions }));
+  jest.doMock('views/stores/ViewManagementStore', () => ({ ViewManagementActions }));
+  jest.doMock('views/stores/ViewStore', () => ({ ViewActions }));
 
   return { ViewActions, ViewManagementActions };
 };

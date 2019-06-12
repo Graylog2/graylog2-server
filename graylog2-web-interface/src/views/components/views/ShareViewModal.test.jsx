@@ -25,7 +25,7 @@ jest.mock('injection/StoreProvider', () => ({
     return null;
   },
 }));
-jest.mock('enterprise/stores/ViewSharingStore', () => ({
+jest.mock('views/stores/ViewSharingStore', () => ({
   ViewSharingActions: {
     create: jest.fn(() => Promise.resolve()),
     get: jest.fn(() => Promise.resolve()),

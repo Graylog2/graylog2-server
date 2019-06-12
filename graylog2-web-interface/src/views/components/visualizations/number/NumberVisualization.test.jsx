@@ -8,14 +8,14 @@ import FieldTypes from 'views/logic/fieldtypes/FieldType';
 import NumberVisualization from './NumberVisualization';
 
 jest.mock('stores/connect', () => x => x);
-jest.mock('enterprise/components/messagelist/CustomHighlighting', () => {
+jest.mock('views/components/messagelist/CustomHighlighting', () => {
   /* eslint-disable-next-line react/prop-types */
   return ({ children }) => {
     return <div>{children}</div>;
   };
 });
 
-jest.mock('enterprise/components/Value', () => {
+jest.mock('views/components/Value', () => {
   /* eslint-disable-next-line react/prop-types */
   return ({ value }) => {
     return <div>{value}</div>;

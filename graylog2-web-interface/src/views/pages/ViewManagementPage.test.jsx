@@ -4,7 +4,7 @@ import { StoreMock } from 'helpers/mocking';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: x => x }));
-jest.mock('enterprise/components/views/ViewList', () => 'view-list');
+jest.mock('views/components/views/ViewList', () => 'view-list');
 jest.mock('components/common', () => ({
   DocumentTitle: mockComponent('DocumentTitle'),
   PageHeader: mockComponent('PageHeader'),
@@ -12,7 +12,7 @@ jest.mock('components/common', () => ({
 
 const mockViewManagementStore = StoreMock('listen', 'getInitialState');
 const mockViewManagementActions = { search: jest.fn(), delete: jest.fn() };
-jest.mock('enterprise/stores/ViewManagementStore', () => ({
+jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementStore: mockViewManagementStore,
   ViewManagementActions: mockViewManagementActions,
 }));

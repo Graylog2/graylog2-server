@@ -7,7 +7,7 @@ import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule from './HighlightingRule';
 
 jest.mock('components/common/ColorPickerPopover', () => 'color-picker-popover');
-jest.mock('enterprise/stores/HighlightingRulesStore', () => ({ HighlightingRulesActions: {} }));
+jest.mock('views/stores/HighlightingRulesStore', () => ({ HighlightingRulesActions: {} }));
 
 describe('HighlightingRule', () => {
   const rule = Rule.create('response_time', '250', undefined, '#f44242');

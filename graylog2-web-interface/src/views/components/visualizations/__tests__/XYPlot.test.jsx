@@ -11,14 +11,14 @@ import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import SearchActions from 'views/actions/SearchActions';
 
-jest.mock('enterprise/stores/SearchStore', () => ({
+jest.mock('views/stores/SearchStore', () => ({
   SearchStore: {},
   // eslint-disable-next-line global-require
   SearchActions: require('enterprise/actions/SearchActions').default,
 }));
 jest.mock('stores/connect', () => x => x);
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
-jest.mock('enterprise/stores/QueriesStore');
+jest.mock('views/stores/QueriesStore');
 
 describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });

@@ -11,7 +11,7 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 
-jest.mock('enterprise/components/messagelist/MessageTableEntry', () => ({}));
+jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
 
 describe('MessageList', () => {
   const ViewStore = StoreMock('listen', ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })]);
@@ -43,12 +43,12 @@ describe('MessageList', () => {
   jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
   jest.doMock('injection/StoreProvider', () => storeProviderMock);
   jest.doMock('legacy/result-histogram', () => 'Histogram');
-  jest.doMock('enterprise/stores/SearchConfigStore', () => ({ SearchConfigStore: SearchConfigStore }));
-  jest.doMock('enterprise/stores/ViewStore', () => ({ ViewStore: ViewStore }));
+  jest.doMock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: SearchConfigStore }));
+  jest.doMock('views/stores/ViewStore', () => ({ ViewStore: ViewStore }));
   jest.doMock('components/search/MessageTablePaginator', () => 'message-table-paginator');
-  jest.doMock('enterprise/stores/WidgetStore', () => WidgetActions);
-  jest.doMock('enterprise/stores/SelectedFieldsStore', () => ({ SelectedFieldsStore: SelectedFieldsStore }));
-  jest.doMock('enterprise/components/messagelist', () => ({ MessageTableEntry }));
+  jest.doMock('views/stores/WidgetStore', () => WidgetActions);
+  jest.doMock('views/stores/SelectedFieldsStore', () => ({ SelectedFieldsStore: SelectedFieldsStore }));
+  jest.doMock('views/components/messagelist', () => ({ MessageTableEntry }));
 
   const data = {
     id: '6ec30961-2519-45f5-80b6-849e3deb1c32',

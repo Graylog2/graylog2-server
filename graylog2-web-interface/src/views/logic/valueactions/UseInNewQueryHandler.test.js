@@ -4,7 +4,7 @@ import UseInNewQueryHandler from './UseInNewQueryHandler';
 import Query from '../queries/Query';
 import FieldType from '../fieldtypes/FieldType';
 
-jest.mock('enterprise/actions/QueriesActions', () => ({ QueriesActions: {} }));
+jest.mock('views/actions/QueriesActions', () => ({ QueriesActions: {} }));
 describe('UseInNewQueryHandler', () => {
   it('creates new query with generated query string', () => {
     QueriesActions.create = jest.fn(() => Promise.resolve());

@@ -17,7 +17,7 @@ import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateSt
 import ShowViewPage from './ShowViewPage';
 
 jest.mock('stores/connect', () => x => x);
-jest.mock('enterprise/stores/ViewManagementStore', () => ({
+jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.reject()),
     update: {
@@ -27,8 +27,8 @@ jest.mock('enterprise/stores/ViewManagementStore', () => ({
     },
   },
 }));
-jest.mock('enterprise/logic/views/ViewDeserializer', () => jest.fn(x => Promise.resolve(x)));
-jest.mock('enterprise/stores/SearchExecutionStateStore', () => ({
+jest.mock('views/logic/views/ViewDeserializer', () => jest.fn(x => Promise.resolve(x)));
+jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateActions: {},
   SearchExecutionStateStore: { listen: jest.fn() },
 }));

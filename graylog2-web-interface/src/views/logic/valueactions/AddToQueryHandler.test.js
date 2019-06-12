@@ -6,7 +6,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
 import AddToQueryHandler from './AddToQueryHandler';
 
-jest.mock('enterprise/stores/QueriesStore', () => ({ QueriesStore: {}, QueriesActions: {} }));
+jest.mock('views/stores/QueriesStore', () => ({ QueriesStore: {}, QueriesActions: {} }));
 
 describe('AddToQueryHandler', () => {
   let queriesStoreListen;

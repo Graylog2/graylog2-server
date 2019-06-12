@@ -6,7 +6,7 @@ const AggregationFunctionsStore = {
 describe('SeriesFunctionsSuggester', () => {
   let SeriesFunctionsSuggester;
   beforeEach(() => {
-    jest.doMock('enterprise/stores/AggregationFunctionsStore', () => AggregationFunctionsStore);
+    jest.doMock('views/stores/AggregationFunctionsStore', () => AggregationFunctionsStore);
 
     // eslint-disable-next-line global-require
     SeriesFunctionsSuggester = require('./SeriesFunctionsSuggester').default;

@@ -9,7 +9,7 @@ import RefreshControls from './RefreshControls';
 jest.useFakeTimers();
 
 jest.mock('stores/connect', () => Component => props => <Component {...(Object.assign({}, props, {}))} />);
-jest.mock('enterprise/stores/RefreshStore', () => ({
+jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
     enable: jest.fn(),
     disable: jest.fn(),

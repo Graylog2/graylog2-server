@@ -16,7 +16,7 @@ describe('AggregationControls', () => {
   });
 
   jest.doMock('injection/StoreProvider', () => storeProviderMock);
-  jest.doMock('enterprise/stores/FieldTypesStore', () => { return { FieldTypesStore: FieldTypesStore }; });
+  jest.doMock('views/stores/FieldTypesStore', () => { return { FieldTypesStore: FieldTypesStore }; });
 
   /* eslint-disable-next-line global-require */
   const AggregationControls = require('./AggregationControls').default;

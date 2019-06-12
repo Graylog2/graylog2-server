@@ -19,16 +19,16 @@ import View from 'views/logic/views/View';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
-jest.mock('enterprise/components/QueryBar', () => mockComponent('QueryBar'));
-jest.mock('enterprise/components/SearchResult', () => mockComponent('SearchResult'));
-jest.mock('enterprise/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
-jest.mock('enterprise/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
+jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
+jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
+jest.mock('views/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
+jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
 jest.mock('stores/connect', () => x => x);
-jest.mock('enterprise/components/SearchBarWithStatus', () => mockComponent('SearchBar'));
-jest.mock('enterprise/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
-jest.mock('enterprise/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
-jest.mock('enterprise/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
-jest.mock('enterprise/logic/withPluginEntities', () => x => x);
+jest.mock('views/components/SearchBarWithStatus', () => mockComponent('SearchBar'));
+jest.mock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
+jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
+jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
+jest.mock('views/logic/withPluginEntities', () => x => x);
 
 describe('ExtendedSearchPage', () => {
   beforeEach(() => {

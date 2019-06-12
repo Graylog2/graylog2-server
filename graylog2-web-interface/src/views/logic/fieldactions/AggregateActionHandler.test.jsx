@@ -6,8 +6,8 @@ import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import Pivot from '../aggregationbuilder/Pivot';
 import Widget from '../widgets/Widget';
 
-jest.mock('enterprise/stores/WidgetStore', () => ({ WidgetActions: {} }));
-jest.mock('enterprise/components/datatable/DataTable', () => ({ type: 'table' }));
+jest.mock('views/stores/WidgetStore', () => ({ WidgetActions: {} }));
+jest.mock('views/components/datatable/DataTable', () => ({ type: 'table' }));
 
 describe('AggregateActionHandler', () => {
   beforeEach(() => {

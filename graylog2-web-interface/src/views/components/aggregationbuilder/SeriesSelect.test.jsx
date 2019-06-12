@@ -8,9 +8,9 @@ import SeriesParameterOptions from 'views/components/aggregationbuilder/SeriesPa
 
 import SeriesSelect from './SeriesSelect';
 
-jest.mock('enterprise/stores/AggregationFunctionsStore', () => ({ getInitialState: jest.fn(), listen: jest.fn() }));
+jest.mock('views/stores/AggregationFunctionsStore', () => ({ getInitialState: jest.fn(), listen: jest.fn() }));
 
-jest.mock('enterprise/components/aggregationbuilder/SeriesParameterOptions', () => ({
+jest.mock('views/components/aggregationbuilder/SeriesParameterOptions', () => ({
   parameterOptionsForType: jest.fn(),
 }));
 

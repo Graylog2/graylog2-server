@@ -6,7 +6,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldList from './FieldList';
 
-jest.mock('enterprise/stores/ViewMetadataStore', () => ({
+jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: {
     getInitialState: () => ({
       activeQuery: 'aQueryId',

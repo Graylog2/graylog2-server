@@ -9,8 +9,8 @@ import FieldType from '../../logic/fieldtypes/FieldType';
 import FieldTypeMapping from '../../logic/fieldtypes/FieldTypeMapping';
 
 jest.mock('stores/connect', () => x => x);
-jest.mock('enterprise/stores/FieldTypesStore', () => ({}));
-jest.mock('enterprise/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
+jest.mock('views/stores/FieldTypesStore', () => ({}));
+jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
 
 describe('PivotSelect', () => {
   it('renders properly with minimal parameters', () => {

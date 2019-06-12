@@ -9,13 +9,13 @@ import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
 import FieldType from '../fieldtypes/FieldType';
 import ChartActionHandler from './ChartActionHandler';
 
-jest.mock('enterprise/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
-jest.mock('enterprise/stores/WidgetStore', () => ({
+jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
+jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     create: jest.fn(widget => Promise.resolve(widget)),
   },
 }));
-jest.mock('enterprise/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
+jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
 
 describe('ChartActionHandler', () => {
   const emptyFieldType = new FieldType('empty', [], []);

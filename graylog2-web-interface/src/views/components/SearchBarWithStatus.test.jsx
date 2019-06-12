@@ -10,8 +10,8 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SearchBarWithStatus from './SearchBarWithStatus';
 
 jest.mock('stores/connect', () => (Component, _, propsMapper) => props => <Component {...(Object.assign({}, props, propsMapper(props)))} />);
-jest.mock('enterprise/stores/SearchConfigStore', () => ({}));
-jest.mock('enterprise/components/SearchBar', () => mockComponent('SearchBar'));
+jest.mock('views/stores/SearchConfigStore', () => ({}));
+jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 
 describe('SearchBarWithStatus', () => {
   const configurations = { searchesClusterConfig: {} };

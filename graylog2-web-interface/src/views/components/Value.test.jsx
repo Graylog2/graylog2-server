@@ -9,7 +9,7 @@ import Value from './Value';
 import EmptyValue from './EmptyValue';
 
 jest.mock('./ValueActions', () => mockComponent('ValueActions'));
-jest.mock('enterprise/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
+jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
 describe('Value', () => {
   it('render without type information but no children', () => {

@@ -29,11 +29,11 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
-jest.mock('enterprise/stores/ChartColorRulesStore', () => ({
+jest.mock('views/stores/ChartColorRulesStore', () => ({
   ChartColorRulesStore: {},
 }));
-jest.mock('enterprise/stores/WidgetStore');
-jest.mock('enterprise/stores/TitlesStore');
+jest.mock('views/stores/WidgetStore');
+jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
 const createNodeMock = (element) => {

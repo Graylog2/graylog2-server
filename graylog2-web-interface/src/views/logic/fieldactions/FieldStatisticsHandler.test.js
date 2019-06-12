@@ -5,13 +5,13 @@ import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import handler from './FieldStatisticsHandler';
 import FieldType from '../fieldtypes/FieldType';
 
-jest.mock('enterprise/stores/WidgetStore', () => ({
+jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     create: jest.fn(widget => Promise.resolve(widget)),
   },
 }));
 
-jest.mock('enterprise/stores/TitlesStore', () => ({
+jest.mock('views/stores/TitlesStore', () => ({
   TitlesActions: {
     set: jest.fn(() => Promise.resolve()),
   },

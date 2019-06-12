@@ -9,8 +9,8 @@ import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewManagementActions } from './ViewManagementStore';
 
-jest.mock('enterprise/actions/SearchActions');
-jest.mock('enterprise/logic/Widget', () => ({
+jest.mock('views/actions/SearchActions');
+jest.mock('views/logic/Widget', () => ({
   widgetDefinition: () => ({
     searchTypes: () => [],
   }),

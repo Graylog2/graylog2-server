@@ -9,13 +9,13 @@ import DashboardState from './DashboardState';
 import View from './View';
 import ViewLoader from './ViewLoader';
 
-jest.mock('enterprise/stores/ViewManagementStore', () => ({
+jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {},
 }));
-jest.mock('enterprise/stores/SearchStore', () => ({
+jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {},
 }));
-jest.mock('enterprise/stores/ViewStore', () => ({
+jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {},
 }));
 

@@ -9,7 +9,7 @@ import type { ChangeColorFunction, ChartColorMap } from '../visualizations/Chart
 
 import WidgetColorContext from './WidgetColorContext';
 
-jest.mock('enterprise/stores/ChartColorRulesStore', () => ({
+jest.mock('views/stores/ChartColorRulesStore', () => ({
   ChartColorRulesActions: {
     set: jest.fn(),
   },

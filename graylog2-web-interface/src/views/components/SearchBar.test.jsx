@@ -7,7 +7,7 @@ import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mock
 
 import { QueriesActions } from 'views/stores/QueriesStore';
 
-jest.mock('enterprise/stores/ViewManagementStore', () => ({
+jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.reject()),
     update: {
@@ -17,7 +17,7 @@ jest.mock('enterprise/stores/ViewManagementStore', () => ({
     },
   },
 }));
-jest.mock('enterprise/components/searchbar/QueryInput', () => 'query-input');
+jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
 
 describe('SearchBar', () => {
   const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');

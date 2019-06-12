@@ -14,7 +14,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
     exports: jest.fn(),
   },
 }));
-jest.mock('enterprise/bindings', () => ({
+jest.mock('views/bindings', () => ({
   viewsPath: '/path/to/views',
 }));
 

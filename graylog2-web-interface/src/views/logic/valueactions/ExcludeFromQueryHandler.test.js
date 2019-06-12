@@ -6,7 +6,7 @@ import Query from '../queries/Query';
 
 import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
-jest.mock('enterprise/stores/QueriesStore', () => ({
+jest.mock('views/stores/QueriesStore', () => ({
   QueriesStore: {
     getInitialState: jest.fn(),
     listen: jest.fn(),

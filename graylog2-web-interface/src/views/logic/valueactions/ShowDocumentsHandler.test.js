@@ -7,7 +7,7 @@ import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
 import PivotGenerator from '../searchtypes/aggregation/PivotGenerator';
 
-jest.mock('enterprise/stores/WidgetStore', () => ({
+jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     create: jest.fn(widget => Promise.resolve(widget)),
   },

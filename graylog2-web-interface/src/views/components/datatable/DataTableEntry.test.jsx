@@ -11,7 +11,7 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
 import DataTableEntry from './DataTableEntry';
 
-jest.mock('enterprise/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
+jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
 const fields = Immutable.OrderedSet(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
 const item = {
