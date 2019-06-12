@@ -15,7 +15,7 @@ import java.util.List;
 
 @AutoValue
 @JsonTypeName(MessageList.NAME)
-@JsonDeserialize(builder = MessageList.Builder.class)
+@JsonDeserialize(builder = AutoValue_MessageList.Builder.class)
 public abstract class MessageList implements SearchType {
     public static final String NAME = "messages";
 

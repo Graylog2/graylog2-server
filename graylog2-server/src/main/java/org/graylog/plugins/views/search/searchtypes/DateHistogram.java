@@ -17,7 +17,7 @@ import java.util.Map;
 
 @AutoValue
 @JsonTypeName(DateHistogram.NAME)
-@JsonDeserialize(builder = DateHistogram.Builder.class)
+@JsonDeserialize(builder = AutoValue_DateHistogram.Builder.class)
 public abstract class DateHistogram implements SearchType {
     public static final String NAME = "date_histogram";
 

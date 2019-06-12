@@ -12,7 +12,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonTypeName(AndFilter.NAME)
-@JsonDeserialize(builder = AndFilter.Builder.class)
+@JsonDeserialize(builder = AutoValue_AndFilter.Builder.class)
 public abstract class AndFilter implements Filter {
     public static final String NAME = "and";
 

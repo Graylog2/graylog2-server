@@ -16,7 +16,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-@JsonDeserialize(builder = QueryResult.Builder.class)
+@JsonDeserialize(builder = AutoValue_QueryResult.Builder.class)
 public abstract class QueryResult {
 
     public static QueryResult incomplete() {

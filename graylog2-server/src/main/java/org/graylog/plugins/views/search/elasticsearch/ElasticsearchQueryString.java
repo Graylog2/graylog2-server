@@ -8,7 +8,7 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 
 @AutoValue
 @JsonTypeName(ElasticsearchQueryString.NAME)
-@JsonDeserialize(builder = ElasticsearchQueryString.Builder.class)
+@JsonDeserialize(builder = AutoValue_ElasticsearchQueryString.Builder.class)
 public abstract class ElasticsearchQueryString implements BackendQuery {
 
     public static final String NAME = "elasticsearch";
