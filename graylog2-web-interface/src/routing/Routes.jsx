@@ -143,6 +143,11 @@ const Routes = {
       EDIT_COLLECTOR: collectorId => `/system/sidecars/collector/edit/${collectorId}`,
     },
   },
+  VIEWS: {
+    LIST: '/views',
+    VIEWID: id => `/views/${id}`,
+  },
+  EXTENDEDSEARCH: '/extendedsearch',
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);
     const queryParams = {
