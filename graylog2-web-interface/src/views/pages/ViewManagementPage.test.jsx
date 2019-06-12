@@ -3,7 +3,10 @@ import { mount, shallow } from 'enzyme';
 import { StoreMock } from 'helpers/mocking';
 import mockComponent from 'helpers/mocking/MockComponent';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: x => x }));
+jest.mock('routing/Routes', () => ({
+  VIEWS: '/views',
+  EXTENDEDSEARCH: '/extendedsearch',
+}));
 jest.mock('views/components/views/ViewList', () => 'view-list');
 jest.mock('components/common', () => ({
   DocumentTitle: mockComponent('DocumentTitle'),
