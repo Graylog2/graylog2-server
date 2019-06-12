@@ -41,6 +41,8 @@ public class IndexMappingFactoryTest {
 
     @Mock
     private Node node;
+    @Mock
+    private IndexSet indexSet;
 
     private IndexMappingFactory indexMappingFactory;
 
@@ -53,7 +55,7 @@ public class IndexMappingFactoryTest {
     public void createIndexMappingFailsIfElasticsearch1VersionIsTooLow() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("1.7.3")));
 
-        assertThatThrownBy(indexMappingFactory::createIndexMapping)
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping("messages"))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: 1.7.3")
                 .hasNoCause();
@@ -63,7 +65,7 @@ public class IndexMappingFactoryTest {
     public void createIndexMappingFailsIfElasticsearch2VersionIsTooLow() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("2.0.0")));
 
-        assertThatThrownBy(indexMappingFactory::createIndexMapping)
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping("messages"))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: 2.0.0")
                 .hasNoCause();
@@ -73,7 +75,7 @@ public class IndexMappingFactoryTest {
     public void createIndexMappingFailsIfElasticsearch6VersionIsTooHigh() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("7.0.0")));
 
-        assertThatThrownBy(indexMappingFactory::createIndexMapping)
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping("messages"))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: 7.0.0")
                 .hasNoCause();
@@ -84,12 +86,24 @@ public class IndexMappingFactoryTest {
         @Parameterized.Parameters
         public static Collection<Object[]> data() {
             return Arrays.asList(new Object[][]{
-                    {"5.0.0", IndexMapping5.class},
-                    {"5.1.0", IndexMapping5.class},
-                    {"5.2.0", IndexMapping5.class},
-                    {"5.3.0", IndexMapping5.class},
-                    {"5.4.0", IndexMapping5.class},
-                    {"6.3.1", IndexMapping6.class},
+                    {"5.0.0", "messages", IndexMapping5.class},
+                    {"5.1.0", "messages", IndexMapping5.class},
+                    {"5.2.0", "messages", IndexMapping5.class},
+                    {"5.3.0", "messages", IndexMapping5.class},
+                    {"5.4.0", "messages", IndexMapping5.class},
+                    {"6.3.1", "messages", IndexMapping6.class},
+                    {"6.8.1", "messages", IndexMapping6.class},
+
+                    {"5.0.0", "events", EventsIndexMapping.class},
+                    {"5.1.0", "events", EventsIndexMapping.class},
+                    {"5.2.0", "events", EventsIndexMapping.class},
+                    {"5.3.0", "events", EventsIndexMapping.class},
+                    {"5.4.0", "events", EventsIndexMapping.class},
+                    {"6.3.1", "events", EventsIndexMapping.class},
+                    {"6.8.1", "events", EventsIndexMapping.class},
+
+                    {"5.0.0", "__does_not_exist__", IndexMapping5.class},
+                    {"6.0.0", "__does_not_exist__", IndexMapping6.class},
             });
         }
 
@@ -97,6 +111,7 @@ public class IndexMappingFactoryTest {
         public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
         private final String version;
+        private final String templateType;
         private final Class<? extends IndexMapping> expectedMapping;
 
         @Mock
@@ -105,8 +120,9 @@ public class IndexMappingFactoryTest {
         private IndexMappingFactory indexMappingFactory;
 
 
-        public ParameterizedTest(String version, Class<? extends IndexMapping> expectedMapping) {
+        public ParameterizedTest(String version, String templateType, Class<? extends IndexMapping> expectedMapping) {
             this.version = version;
+            this.templateType = templateType;
             this.expectedMapping = expectedMapping;
         }
 
@@ -118,7 +134,7 @@ public class IndexMappingFactoryTest {
 
         @Test
         public void test() throws Exception {
-            assertThat(indexMappingFactory.createIndexMapping()).isInstanceOf(expectedMapping);
+            assertThat(indexMappingFactory.createIndexMapping(templateType)).isInstanceOf(expectedMapping);
         }
     }
 }

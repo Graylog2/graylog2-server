@@ -71,6 +71,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
@@ -360,8 +361,8 @@ public class Indices {
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMapping indexMapping = indexMappingFactory.createIndexMapping();
-        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer(), -1);
+        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType());
+        final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
 
         final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
 
@@ -380,9 +381,8 @@ public class Indices {
      */
     public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
         final String indexWildcard = indexSet.getIndexWildcard();
-        final String analyzer = indexSet.getConfig().indexAnalyzer();
 
-        return indexMappingFactory.createIndexMapping().messageTemplate(indexWildcard, analyzer);
+        return indexMappingFactory.createIndexMapping(indexSet.getConfig().indexTemplateType()).toTemplate(indexSet.getConfig(), indexWildcard);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {

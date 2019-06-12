@@ -305,7 +305,7 @@ public class IndicesIT extends ElasticsearchBase {
             assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
 
             final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
-            final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
+            final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping("messages").toTemplate(indexSetConfig, indexSet.getIndexWildcard());
             assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
         } finally {
             deleteTemplate(templateName);
