@@ -2,11 +2,24 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
-import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
-
+import { StoreMock as MockStore } from 'helpers/mocking';
 import { QueriesActions } from 'views/stores/QueriesStore';
+import SearchBar from './SearchBar';
 
+jest.mock('stores/sessions/SessionStore', () => MockStore(['isLoggedIn', () => { return true; }], 'getSessionId'));
+jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
+jest.mock('actions/sessions/SessionActions', () => ({
+  logout: {
+    completed: {
+      listen: jest.fn(),
+    },
+  },
+}));
+jest.mock('stores/streams/StreamsStore', () => MockStore(
+  'listen',
+  ['listStreams', () => ({ then: jest.fn() })],
+  'availableStreams'
+));
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.reject()),
@@ -20,28 +33,6 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
 
 describe('SearchBar', () => {
-  const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');
-  const CurrentUserStore = StoreMock('listen', 'get');
-  const SessionActions = {
-    logout: { completed: { listen: jest.fn() } },
-  };
-  const storeProviderMock = new StoreProviderMock({
-    Session: SessionStore,
-    CurrentUser: CurrentUserStore,
-  });
-
-  const StreamsStore = StoreMock('listen', ['listStreams', () => { return { then: jest.fn() }; }], 'availableStreams');
-  const combinedProviderMock = new CombinedProviderMock({
-    Streams: { StreamsStore },
-    Session: { SessionStore, SessionActions },
-  });
-
-  jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
-  jest.doMock('injection/StoreProvider', () => storeProviderMock);
-
-  // eslint-disable-next-line global-require
-  const SearchBar = require('./SearchBar');
-
   const config = {
     analysis_disabled_fields: ['full_message', 'message'],
     query_time_range_limit: 'PT0S',
