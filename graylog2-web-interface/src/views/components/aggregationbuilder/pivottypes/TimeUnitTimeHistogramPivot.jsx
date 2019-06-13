@@ -2,10 +2,9 @@
 import * as React from 'react';
 import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'react-bootstrap';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import FormsUtils from 'util/FormsUtils';
 
-import type { Interval, TimeUnitInterval } from './TimeHistogramPivot';
+import type { Interval, TimeUnitInterval } from './Interval';
 
 import styles from './TimeUnitTimeHistogramPivot.css';
 

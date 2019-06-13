@@ -2,9 +2,8 @@
 import * as React from 'react';
 import { FormControl, HelpBlock } from 'react-bootstrap';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import FormsUtils from 'util/FormsUtils';
-import type { AutoInterval, Interval } from './TimeHistogramPivot';
+import type { AutoInterval, Interval } from './Interval';
 
 import styles from './AutoTimeHistogramPivot.css';
 

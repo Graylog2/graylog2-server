@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import type { Interval } from './TimeHistogramPivot';
+import type { Interval } from './Interval';
 import TimeUnitTimeHistogramPivot from './TimeUnitTimeHistogramPivot';
 import AutoTimeHistogramPivot from './AutoTimeHistogramPivot';
 

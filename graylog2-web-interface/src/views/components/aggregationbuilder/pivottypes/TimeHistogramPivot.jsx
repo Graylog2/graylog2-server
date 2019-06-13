@@ -6,19 +6,8 @@ import { Checkbox, ControlLabel, FormGroup } from 'react-bootstrap';
 import TypeSpecificTimeHistogramConfiguration from './TypeSpecificTimeHistogramConfiguration';
 
 import styles from './TimeHistogramPivot.css';
+import type { Interval } from './Interval';
 
-export type AutoInterval = {|
-  type: 'auto',
-  scaling?: number,
-|};
-
-export type TimeUnitInterval = {|
-  type: 'timeunit',
-  value: number,
-  unit: string,
-|};
-
-export type Interval = AutoInterval | TimeUnitInterval;
 export type IntervalConfig = {|
   interval: Interval,
 |};
