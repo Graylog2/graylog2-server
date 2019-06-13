@@ -6,6 +6,7 @@ import EventDetailsForm from './EventDetailsForm';
 import FilterAggregationForm from './FilterAggregationForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
+import EventDefinitionSummary from './EventDefinitionSummary';
 
 import styles from './EventDefinitionForm.css';
 
@@ -57,7 +58,7 @@ class EventDefinitionForm extends React.Component {
       {
         key: 'summary',
         title: 'Summary',
-        component: <div>TBD</div>,
+        component: <EventDefinitionSummary eventDefinition={eventDefinition} />,
       },
     ];
 
