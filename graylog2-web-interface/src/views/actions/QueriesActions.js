@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+import { singletonActions } from 'views/logic/singleton';
 
 type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
@@ -20,13 +21,16 @@ type QueriesActionsType = {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const QueriesActions: QueriesActionsType = Reflux.createActions({
-  create: { asyncResult: true },
-  duplicate: { asyncResult: true },
-  query: { asyncResult: true },
-  rangeType: { asyncResult: true },
-  rangeParams: { asyncResult: true },
-  remove: { asyncResult: true },
-  timerange: { asyncResult: true },
-  update: { asyncResult: true },
-});
+export const QueriesActions: QueriesActionsType = singletonActions(
+  'views.Queries',
+  () => Reflux.createActions({
+    create: { asyncResult: true },
+    duplicate: { asyncResult: true },
+    query: { asyncResult: true },
+    rangeType: { asyncResult: true },
+    rangeParams: { asyncResult: true },
+    remove: { asyncResult: true },
+    timerange: { asyncResult: true },
+    update: { asyncResult: true },
+  }),
+);

@@ -1,13 +1,12 @@
 // @flow strict
 import Reflux from 'reflux';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import fetch from 'logic/rest/FetchProvider';
-// $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
 
 import Search from 'views/logic/search/Search';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { singletonActions, singletonStore } from 'views/logic/singleton';
 
 const executeQueryUrl = id => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
 const jobStatusUrl = jobId => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
@@ -36,38 +35,44 @@ type SearchJobActionsType = {
   jobStatus: (SearchJobId) => Promise<SearchJobType>,
 };
 
-export const SearchJobActions: SearchJobActionsType = Reflux.createActions({
-  create: { asyncResult: true },
-  run: { asyncResult: true },
-  jobStatus: { asyncResult: true },
-  remove: { asyncResult: true },
-});
+export const SearchJobActions: SearchJobActionsType = singletonActions(
+  'views.SearchJob',
+  () => Reflux.createActions({
+    create: { asyncResult: true },
+    run: { asyncResult: true },
+    jobStatus: { asyncResult: true },
+    remove: { asyncResult: true },
+  }),
+);
 
-export const SearchJobStore = Reflux.createStore({
-  listenables: [SearchJobActions],
+export const SearchJobStore = singletonStore(
+  'views.SearchJob',
+  () => Reflux.createStore({
+    listenables: [SearchJobActions],
 
-  state: {
-    searches: {},
-    jobs: {},
-  },
+    state: {
+      searches: {},
+      jobs: {},
+    },
 
-  getInitialState(): InternalState {
-    return {
-      searches: this.state.searches,
-      jobs: this.state.jobs,
-    };
-  },
+    getInitialState(): InternalState {
+      return {
+        searches: this.state.searches,
+        jobs: this.state.jobs,
+      };
+    },
 
-  run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
-    const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
-    SearchJobActions.run.promise(promise);
-    return promise;
-  },
+    run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
+      const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
+      SearchJobActions.run.promise(promise);
+      return promise;
+    },
 
-  jobStatus(jobId: SearchJobId): Promise<SearchJobType> {
-    const promise = fetch('GET', jobStatusUrl(jobId));
-    SearchJobActions.jobStatus.promise(promise);
-    return promise;
-  },
+    jobStatus(jobId: SearchJobId): Promise<SearchJobType> {
+      const promise = fetch('GET', jobStatusUrl(jobId));
+      SearchJobActions.jobStatus.promise(promise);
+      return promise;
+    },
 
-});
+  }),
+);

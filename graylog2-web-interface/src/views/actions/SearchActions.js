@@ -8,6 +8,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import Parameter from 'views/logic/parameters/Parameter';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
+import { singletonActions } from 'views/logic/singleton';
 
 export type CreateSearchResponse = {
   search: Search,
@@ -29,25 +30,28 @@ type SearchActionsType = {
   parameters: (Array<Parameter>) => Promise<View>,
 };
 
-const SearchActions: SearchActionsType = Reflux.createActions({
-  create: {
-    asyncResult: true,
-  },
-  get: {
-    asyncResult: true,
-  },
-  execute: {
-    asyncResult: true,
-  },
-  executeWithCurrentState: {
-    asyncResult: true,
-  },
-  parameters: {
-    asyncResult: true,
-  },
-  refresh: {
-    asyncResult: true,
-  },
-});
+const SearchActions: SearchActionsType = singletonActions(
+  'views.Search',
+  () => Reflux.createActions({
+    create: {
+      asyncResult: true,
+    },
+    get: {
+      asyncResult: true,
+    },
+    execute: {
+      asyncResult: true,
+    },
+    executeWithCurrentState: {
+      asyncResult: true,
+    },
+    parameters: {
+      asyncResult: true,
+    },
+    refresh: {
+      asyncResult: true,
+    },
+  }),
+);
 
 export default SearchActions;
