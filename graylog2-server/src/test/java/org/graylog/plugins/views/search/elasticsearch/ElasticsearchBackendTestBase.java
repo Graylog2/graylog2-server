@@ -17,13 +17,13 @@
 package org.graylog.plugins.views.search.elasticsearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
 import io.searchbox.core.MultiSearchResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +48,7 @@ abstract class ElasticsearchBackendTestBase {
             final URL resource = this.getClass().getResource(filename);
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);
-            return new String(bytes, Charsets.UTF_8);
+            return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
