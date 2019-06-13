@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import * as Immutable from 'immutable';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import QueryBar from 'views/components/QueryBar';
 import SearchBarWithStatus from 'views/components/SearchBarWithStatus';

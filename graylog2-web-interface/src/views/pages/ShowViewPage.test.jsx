@@ -2,9 +2,7 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import Routes from 'routing/Routes';
-// $FlowFixMe: imports from core need to be fixed in flow
 import history from 'util/History';
 
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';

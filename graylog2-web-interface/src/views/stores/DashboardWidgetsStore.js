@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
 import DashboardWidget from 'views/logic/views/DashboardWidget';
-import { singletonActions } from 'views/logic/singleton';
+import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewActions, ViewStore } from './ViewStore';
 import { WidgetActions } from './WidgetStore';
 

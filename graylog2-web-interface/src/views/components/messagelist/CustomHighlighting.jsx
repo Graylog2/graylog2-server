@@ -64,5 +64,4 @@ export default connect(CustomHighlighting,
     const highlightingRulesMap = highlightingRules
       .reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
     return { highlightingRules: highlightingRulesMap };
-  },
-);
+  });

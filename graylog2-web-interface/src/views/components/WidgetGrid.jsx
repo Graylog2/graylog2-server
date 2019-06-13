@@ -11,11 +11,11 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widget';
-import { TitlesStore } from 'views/stores/TitlesStore';
+import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
-import { TitleTypes } from '../stores/TitlesStore';
+
 
 const defaultTitleGenerator = w => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 

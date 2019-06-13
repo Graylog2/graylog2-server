@@ -5,11 +5,8 @@ import { get } from 'lodash';
 
 import Select from 'views/components/Select';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import Spinner from 'components/common/Spinner';
-// $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
 import View from 'views/logic/views/View';

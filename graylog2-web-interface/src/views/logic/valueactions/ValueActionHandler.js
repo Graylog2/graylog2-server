@@ -14,4 +14,3 @@ export type ValueActionHandlerConditionProps = {
 };
 
 export type ValueActionHandlerCondition = (ValueActionHandlerConditionProps) => boolean;
-

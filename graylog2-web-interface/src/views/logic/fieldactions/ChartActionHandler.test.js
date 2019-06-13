@@ -41,7 +41,7 @@ describe('ChartActionHandler', () => {
       ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
-    })
+    });
     it('from query field types if present', () => {
       const timestampFieldType = new FieldType('date', [], []);
       FieldTypesStore.getInitialState.mockReturnValue({

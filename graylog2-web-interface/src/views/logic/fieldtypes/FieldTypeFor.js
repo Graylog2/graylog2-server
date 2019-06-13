@@ -1,9 +1,9 @@
 // @flow strict
 
-import { isFunction } from 'views/logic/aggregationbuilder/Series';
+import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
-import Series from '../aggregationbuilder/Series';
+
 import inferTypeForSeries from './InferTypeForSeries';
 import FieldType from './FieldType';
 

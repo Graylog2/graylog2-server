@@ -20,6 +20,7 @@ type InternalState = {
 
 export default class SortConfig {
   static PIVOT_TYPE = 'pivot';
+
   static SERIES_TYPE = 'series';
 
   _value: InternalState;

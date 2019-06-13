@@ -5,4 +5,3 @@ import View from 'views/logic/views/View';
 
 export type SearchRefreshConditionArguments = { view: View, searchMetadata: SearchMetadata, executionState: SearchExecutionState };
 export type SearchRefreshCondition = (SearchRefreshConditionArguments) => boolean;
-

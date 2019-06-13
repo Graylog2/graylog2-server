@@ -23,7 +23,6 @@ jest.mock('views/components/Value', () => {
 });
 
 describe('NumberVisualization', () => {
-
   const data = [{
     key: [],
     source: 'leaf',

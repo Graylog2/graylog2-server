@@ -78,14 +78,12 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
                 <Row className="no-bm extended-search-query-metadata">
                   <Col md={4}>
-                    <TimeRangeTypeSelector
-                      onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
-                      value={rangeType} />
-                    <TimeRangeInput
-                      onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
-                      rangeType={rangeType}
-                      rangeParams={rangeParams}
-                      config={config} />
+                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
+                                           value={rangeType} />
+                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
+                                    rangeType={rangeType}
+                                    rangeParams={rangeParams}
+                                    config={config} />
                   </Col>
 
                   <Col md={6}>

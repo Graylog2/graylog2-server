@@ -54,7 +54,7 @@ const getChartColor = (fullDataArray, name) => {
 
 const setChartColor = (chart, colorMap) => {
   const colors = chart.labels.map(label => colorMap[label]);
-  return { marker: { colors }};
+  return { marker: { colors } };
 };
 
 const PieVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (

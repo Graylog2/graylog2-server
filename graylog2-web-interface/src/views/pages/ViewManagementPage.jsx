@@ -6,9 +6,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import Routes from 'routing/Routes';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { DocumentTitle, PageHeader } from 'components/common';
 
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';

@@ -80,9 +80,7 @@ const ChartColorRulesStore = singletonStore(
         .config(widget.config.toBuilder()
           .formattingSettings(formattingSettings.toBuilder()
             .chartColors({ ...chartColors, [name]: color })
-            .build(),
-          ).build(),
-        ).build();
+            .build()).build()).build();
 
       const promise = WidgetActions.update(widgetId, newWidget);
       ChartColorRulesActions.set.promise(promise);

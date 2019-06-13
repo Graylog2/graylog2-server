@@ -1,5 +1,4 @@
 // @flow strict
-// $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
 
 import View from 'views/logic/views/View';

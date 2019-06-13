@@ -6,11 +6,10 @@ import { Button, Col, Row } from 'react-bootstrap';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import URLUtils from 'util/URLUtils';
 import fixup from 'views/pages/StyleFixups.css';
 import View from 'views/logic/views/View';
-import { viewsPath } from 'views/bindings';
+import { viewsPath } from 'views/Constants';
 
 type Props = {
   view: View,

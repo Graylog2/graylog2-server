@@ -20,7 +20,7 @@ const getChartColor = (fullData, name) => {
   return undefined;
 };
 
-const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] }});
+const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
 const LineVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
   <XYPlot config={config}

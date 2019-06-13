@@ -3,14 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { ActionContext } from 'views/logic/ActionContext';
-
-// $FlowFixMe: imports from core need to be fixed in flow
 import ExtractorUtils from 'util/ExtractorUtils';
-
-// $FlowFixMe: imports from core need to be fixed in flow
 import Select from 'components/common/Select';
-
-// $FlowFixMe: imports from core need to be fixed in flow
 import { BootstrapModalForm } from 'components/bootstrap';
 
 type Props = {
