@@ -1,0 +1,3772 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491344e"
+      },
+      "title" : "Empty",
+      "summary" : "empty",
+      "description" : "empty",
+      "search_id" : "5cb59c1cf442da26074b3f0b",
+      "properties" : [],
+      "state" : {
+        "a2a804b7-27cf-4cac-8015-58d9a9640d33" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "92c58423-ef1c-4715-93a7-87cb415095ae" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "92c58423-ef1c-4715-93a7-87cb415095ae",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "92c58423-ef1c-4715-93a7-87cb415095ae" : [
+              "62ce962f-4cf3-4f23-9c07-6974c568a449"
+            ]
+          },
+          "positions" : {
+            "92c58423-ef1c-4715-93a7-87cb415095ae" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            }
+          }
+        }
+      },
+      "dashboard_state" : {
+        "widgets" : {},
+        "positions" : {}
+      },
+      "owner" : "admin",
+      "created_at" : "2019-04-16T09:10:52.604Z"
+    },
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491344f"
+      },
+      "title" : "Graylog Git",
+      "summary" : "Git log of graylog",
+      "description" : "",
+      "search_id" : "5cacad51df507b36a6aed392",
+      "properties" : [],
+      "state" : {
+        "7c042319-530a-41b9-9dbb-9676fb1da1a4" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "3abb8197-348a-4575-aedb-79acecbc64ae" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "73ff13f1-9651-4478-a229-e84f5ce58636",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "767257b1-c7f8-4a05-b3bb-156692819ce4",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "89cdd8dd-48ef-4fdf-964c-583ba3eb5671",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "3abb8197-348a-4575-aedb-79acecbc64ae",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "38b53821-3dc8-45c8-91a4-a08212f226eb",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "3abb8197-348a-4575-aedb-79acecbc64ae" : [
+              "312e9101-ffe6-4800-aa79-095a4f43b8b6"
+            ],
+            "767257b1-c7f8-4a05-b3bb-156692819ce4" : [
+              "9069db63-7670-42a0-ad1e-9395d4c572f9"
+            ],
+            "89cdd8dd-48ef-4fdf-964c-583ba3eb5671" : [
+              "acdaf0d9-c2c9-4f90-b39e-c473b620451e"
+            ],
+            "38b53821-3dc8-45c8-91a4-a08212f226eb" : [
+              "6278dd3d-cc6e-4160-925b-bb6e5f48b4fc"
+            ],
+            "73ff13f1-9651-4478-a229-e84f5ce58636" : [
+              "2b64dde2-dcab-48ed-84a5-7ca37ec74f1f"
+            ]
+          },
+          "positions" : {
+            "3abb8197-348a-4575-aedb-79acecbc64ae" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "89cdd8dd-48ef-4fdf-964c-583ba3eb5671" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "38b53821-3dc8-45c8-91a4-a08212f226eb" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "767257b1-c7f8-4a05-b3bb-156692819ce4" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "73ff13f1-9651-4478-a229-e84f5ce58636" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "9e5144be-a445-4289-a4cc-0f55142524bc" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "4f9e2ecc-366c-4965-b9d7-4dc1c052b7df" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "4f9e2ecc-366c-4965-b9d7-4dc1c052b7df",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "31bbc039-5a74-4967-a79e-0af010840bcb",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "354dff0b-5023-4fd3-bf11-8b0de19d2a77",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "8fbe3131-8d37-444c-a31e-3c5497aca150",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "692dc87f-7fa7-46ce-a96e-361e3c377b27",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "4f9e2ecc-366c-4965-b9d7-4dc1c052b7df" : [
+              "dc0a4892-d59e-432d-8b8d-8ebeb7d75e53"
+            ],
+            "31bbc039-5a74-4967-a79e-0af010840bcb" : [
+              "106535ae-13c4-48c1-84f7-f9992c74d086"
+            ],
+            "354dff0b-5023-4fd3-bf11-8b0de19d2a77" : [
+              "27a9b42b-567e-4ece-a8d0-d1720452950a"
+            ],
+            "8fbe3131-8d37-444c-a31e-3c5497aca150" : [
+              "9896f731-a8fa-4ae2-9c61-7a8ae90f9099"
+            ],
+            "692dc87f-7fa7-46ce-a96e-361e3c377b27" : [
+              "3cc3952b-c5c9-43cc-94a8-1511f91be884"
+            ]
+          },
+          "positions" : {
+            "4f9e2ecc-366c-4965-b9d7-4dc1c052b7df" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "354dff0b-5023-4fd3-bf11-8b0de19d2a77" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "8fbe3131-8d37-444c-a31e-3c5497aca150" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "31bbc039-5a74-4967-a79e-0af010840bcb" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "692dc87f-7fa7-46ce-a96e-361e3c377b27" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "c13b2482-60e7-4b1e-98c9-0df8d6da8230" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "db51a8d0-ffac-4612-99d8-5e24873390f0" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "5b18c149-2e50-4fa2-9c70-a1dec42b2dc0",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "1a1ec8de-5c9b-4481-bbb7-b731b0fa6b5c",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "2cb9b3ee-553f-4640-9b25-29b069ba5d73",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "ec1531fc-ea7d-4d03-913e-8fd159104b92",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "db51a8d0-ffac-4612-99d8-5e24873390f0",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "db51a8d0-ffac-4612-99d8-5e24873390f0" : [
+              "df3d5990-dfe0-4e4a-84f3-37eecf33cbf9"
+            ],
+            "2cb9b3ee-553f-4640-9b25-29b069ba5d73" : [
+              "92b44cf9-b712-430a-ae72-b896ab734f81"
+            ],
+            "1a1ec8de-5c9b-4481-bbb7-b731b0fa6b5c" : [
+              "c0db0a36-23d3-4b0b-9b95-e24ceb1b7a8e"
+            ],
+            "5b18c149-2e50-4fa2-9c70-a1dec42b2dc0" : [
+              "4142bf9b-5de5-45e2-96fb-b935d35aa649"
+            ],
+            "ec1531fc-ea7d-4d03-913e-8fd159104b92" : [
+              "3df47946-deef-4b19-b0b6-4378d0397432"
+            ]
+          },
+          "positions" : {
+            "db51a8d0-ffac-4612-99d8-5e24873390f0" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "1a1ec8de-5c9b-4481-bbb7-b731b0fa6b5c" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "5b18c149-2e50-4fa2-9c70-a1dec42b2dc0" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "2cb9b3ee-553f-4640-9b25-29b069ba5d73" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "ec1531fc-ea7d-4d03-913e-8fd159104b92" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "5adc9297-dfc8-4fd9-b422-cbb097715a62" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "ce3c6b8c-d68f-4eb8-bbe6-3286de069bb4" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "2a5262ef-52ca-4758-86d8-c2778482a510",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "7e45ba15-3638-4744-a273-d60a50c4be27",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "7c90c08c-d634-4334-804b-01cf9bcaeb95",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "247c0e34-32e9-42ad-bfd1-b1dd39cb8110",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "ce3c6b8c-d68f-4eb8-bbe6-3286de069bb4",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "ce3c6b8c-d68f-4eb8-bbe6-3286de069bb4" : [
+              "89c8e19e-3168-49f9-8156-2d1f64ffbfc1"
+            ],
+            "7e45ba15-3638-4744-a273-d60a50c4be27" : [
+              "67448ca7-6b93-4537-9932-6e2183762c19"
+            ],
+            "2a5262ef-52ca-4758-86d8-c2778482a510" : [
+              "8aadfb75-ebf1-4fc3-976a-9be767d76331"
+            ],
+            "7c90c08c-d634-4334-804b-01cf9bcaeb95" : [
+              "cfc1a739-c526-4c38-ba96-357e81761b4e"
+            ],
+            "247c0e34-32e9-42ad-bfd1-b1dd39cb8110" : [
+              "756f26f7-79dd-4612-9a7c-67e0e8bdd568"
+            ]
+          },
+          "positions" : {
+            "ce3c6b8c-d68f-4eb8-bbe6-3286de069bb4" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "2a5262ef-52ca-4758-86d8-c2778482a510" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "7c90c08c-d634-4334-804b-01cf9bcaeb95" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "7e45ba15-3638-4744-a273-d60a50c4be27" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "247c0e34-32e9-42ad-bfd1-b1dd39cb8110" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "ade8c853-503c-407f-b125-efbe2d368973" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "83c65a9d-e35a-4ab5-aba3-3c94b74763b1" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "83c65a9d-e35a-4ab5-aba3-3c94b74763b1",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "f4a0f8da-bdf1-42e9-acf1-670bb38b720d",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "de924def-a6c5-4606-9f27-19b14d37425d",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "e5ddc0fe-cf7b-4bcc-bacb-931f05cf6db3",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "98be5d26-c9b8-4a90-abe6-6140101ce0b4",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "83c65a9d-e35a-4ab5-aba3-3c94b74763b1" : [
+              "fdc1656f-3d59-47f9-ad1b-4039ed1c417c"
+            ],
+            "98be5d26-c9b8-4a90-abe6-6140101ce0b4" : [
+              "6085fa90-b1db-4352-a2ec-f4f5027c0158"
+            ],
+            "e5ddc0fe-cf7b-4bcc-bacb-931f05cf6db3" : [
+              "bdd7a410-3d6a-48b1-8551-bf69e28d5c56"
+            ],
+            "f4a0f8da-bdf1-42e9-acf1-670bb38b720d" : [
+              "1f748cde-011a-4f65-8b35-a9cb71a2106e"
+            ],
+            "de924def-a6c5-4606-9f27-19b14d37425d" : [
+              "24632a8f-8978-42a6-8285-7c56ab7bdeac"
+            ]
+          },
+          "positions" : {
+            "83c65a9d-e35a-4ab5-aba3-3c94b74763b1" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "e5ddc0fe-cf7b-4bcc-bacb-931f05cf6db3" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "f4a0f8da-bdf1-42e9-acf1-670bb38b720d" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "98be5d26-c9b8-4a90-abe6-6140101ce0b4" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "de924def-a6c5-4606-9f27-19b14d37425d" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "cc2bf983-b398-4295-bf01-1c10ed1a97e1" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "ddb5b098-0342-4d15-a1cd-f65959caa941" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "ddb5b098-0342-4d15-a1cd-f65959caa941",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "d43058d4-e997-4f44-89a4-afa5ce4d7c0f",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "9822b813-45bf-4ebf-8c3d-34012395fa48",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "4bc0cdd0-8b59-48cb-9f3e-9c5dd3fdf4df",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "992ce456-6577-48e9-8d3c-851259955b94",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "ddb5b098-0342-4d15-a1cd-f65959caa941" : [
+              "6b999881-a208-4c41-8880-ce4043159ecc"
+            ],
+            "4bc0cdd0-8b59-48cb-9f3e-9c5dd3fdf4df" : [
+              "59aea89a-9c27-4c5e-8700-e128b6863be7"
+            ],
+            "d43058d4-e997-4f44-89a4-afa5ce4d7c0f" : [
+              "42417dd0-273e-491c-9ab1-c9044aabd361"
+            ],
+            "9822b813-45bf-4ebf-8c3d-34012395fa48" : [
+              "e89878d7-3884-4359-a83b-71db617a9b92"
+            ],
+            "992ce456-6577-48e9-8d3c-851259955b94" : [
+              "c71c78bf-4f52-4d62-9e68-91abbe74e040"
+            ]
+          },
+          "positions" : {
+            "ddb5b098-0342-4d15-a1cd-f65959caa941" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "d43058d4-e997-4f44-89a4-afa5ce4d7c0f" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "9822b813-45bf-4ebf-8c3d-34012395fa48" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "4bc0cdd0-8b59-48cb-9f3e-9c5dd3fdf4df" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "992ce456-6577-48e9-8d3c-851259955b94" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "64feccae-9447-40ef-a401-79a7972078a2" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "d5ebedf5-5eb3-4c4e-8df4-ecae40c9b863" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "0a63754b-34e0-4f1f-a410-87dbd63d7f19",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "d5ebedf5-5eb3-4c4e-8df4-ecae40c9b863",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "b4de4a6f-5912-41b9-bbe0-570c3b5e503c",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "b1bf7df1-ac69-479d-a758-c6142873559a",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "fae8a20b-3b55-409b-b683-11f8b2fcb26d",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "d5ebedf5-5eb3-4c4e-8df4-ecae40c9b863" : [
+              "3debd8f2-9537-4b56-8761-e89dd6d04b02"
+            ],
+            "b4de4a6f-5912-41b9-bbe0-570c3b5e503c" : [
+              "76ae7e4c-927c-4301-b29a-cf5cad2b8da6"
+            ],
+            "0a63754b-34e0-4f1f-a410-87dbd63d7f19" : [
+              "59f56443-5e1d-4268-8453-bfea64c70bca"
+            ],
+            "b1bf7df1-ac69-479d-a758-c6142873559a" : [
+              "72c86a55-bca8-490e-ab40-56ac6ad097fd"
+            ],
+            "fae8a20b-3b55-409b-b683-11f8b2fcb26d" : [
+              "9604dd2d-e52b-411f-ba9b-3a549c553543"
+            ]
+          },
+          "positions" : {
+            "d5ebedf5-5eb3-4c4e-8df4-ecae40c9b863" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "0a63754b-34e0-4f1f-a410-87dbd63d7f19" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "b1bf7df1-ac69-479d-a758-c6142873559a" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "b4de4a6f-5912-41b9-bbe0-570c3b5e503c" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "fae8a20b-3b55-409b-b683-11f8b2fcb26d" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "7c7e04c6-f9f0-495c-91cc-865f60687f8c" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "97c3ec61-2eeb-4fcf-ad0f-9951839c9bc6" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "a4615b7c-daf2-4d99-8af5-2c322ccc7a05",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "4178188e-10c8-46e5-b5e2-9fa532e4c6f6",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "97c3ec61-2eeb-4fcf-ad0f-9951839c9bc6",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "4db17f4a-bb3a-4aa1-998a-ce52414f0664",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "6f5ee379-2f60-40f3-8ddb-5fb6a7e425fb",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "97c3ec61-2eeb-4fcf-ad0f-9951839c9bc6" : [
+              "1ce98a23-9c6f-434c-884c-7ae7d8041ad6"
+            ],
+            "6f5ee379-2f60-40f3-8ddb-5fb6a7e425fb" : [
+              "e513b32a-04d1-45f5-91c8-728c4f0c2002"
+            ],
+            "a4615b7c-daf2-4d99-8af5-2c322ccc7a05" : [
+              "5f97fe8b-c824-4816-968c-a9df592f5ba4"
+            ],
+            "4db17f4a-bb3a-4aa1-998a-ce52414f0664" : [
+              "6631904e-292c-41c6-958e-29754620fb9d"
+            ],
+            "4178188e-10c8-46e5-b5e2-9fa532e4c6f6" : [
+              "5c0fcad2-b7cf-4f93-ae4c-071da501dd72"
+            ]
+          },
+          "positions" : {
+            "97c3ec61-2eeb-4fcf-ad0f-9951839c9bc6" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "a4615b7c-daf2-4d99-8af5-2c322ccc7a05" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "4db17f4a-bb3a-4aa1-998a-ce52414f0664" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "6f5ee379-2f60-40f3-8ddb-5fb6a7e425fb" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "4178188e-10c8-46e5-b5e2-9fa532e4c6f6" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "eeaa8838-616f-40c0-88c0-1059ac64f37e" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "34b260e9-ab2a-49df-98ea-545de74371cb" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "34b260e9-ab2a-49df-98ea-545de74371cb",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "34e18439-f4c6-494e-a3e0-223f1fe3527f",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "ecf8465d-f6f7-48a2-b774-813837288400",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "f4ca7425-5708-46d9-9f0f-0e258fab93f7",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "8646fa75-ccb5-4b2d-a0cc-663c755c7f20",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "34b260e9-ab2a-49df-98ea-545de74371cb" : [
+              "8a6b3c9c-01f9-4983-8f70-4e8b3de0bd55"
+            ],
+            "8646fa75-ccb5-4b2d-a0cc-663c755c7f20" : [
+              "54a4adf1-610a-4a35-9cdc-685607b3ebf4"
+            ],
+            "ecf8465d-f6f7-48a2-b774-813837288400" : [
+              "611ee5f4-1587-46f4-b615-8ad2ff57bee6"
+            ],
+            "34e18439-f4c6-494e-a3e0-223f1fe3527f" : [
+              "87b60514-4f24-48e7-8109-86d7b68f4bc5"
+            ],
+            "f4ca7425-5708-46d9-9f0f-0e258fab93f7" : [
+              "61fa7c9c-db7a-4050-93e8-048e7aef8043"
+            ]
+          },
+          "positions" : {
+            "34b260e9-ab2a-49df-98ea-545de74371cb" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "ecf8465d-f6f7-48a2-b774-813837288400" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "34e18439-f4c6-494e-a3e0-223f1fe3527f" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "8646fa75-ccb5-4b2d-a0cc-663c755c7f20" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "f4ca7425-5708-46d9-9f0f-0e258fab93f7" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "91c6f8c9-024c-48ec-a869-90548fad218a" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "ebcd3401-25f6-4057-b293-57c6018feeae" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "ebcd3401-25f6-4057-b293-57c6018feeae",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "acf442e1-a185-44c0-96e7-d8aea802076e",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "50458c0b-6115-4bb7-b617-c0bf17f8fbc3",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "7ec96afc-1d3d-45ef-9ade-acb6052463ab",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "7d6c5e69-2523-492e-a00b-c5490d6c8ae3",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "ebcd3401-25f6-4057-b293-57c6018feeae" : [
+              "e0e7193c-8280-4342-ad01-b004018d5b41"
+            ],
+            "50458c0b-6115-4bb7-b617-c0bf17f8fbc3" : [
+              "6d2d27f6-7a66-45a6-8c7e-5778b64061f9"
+            ],
+            "7ec96afc-1d3d-45ef-9ade-acb6052463ab" : [
+              "50c3acfe-8824-4f13-a99e-931fdb1c7624"
+            ],
+            "7d6c5e69-2523-492e-a00b-c5490d6c8ae3" : [
+              "4d374c53-6c87-41e8-aa05-853c6b25c15f"
+            ],
+            "acf442e1-a185-44c0-96e7-d8aea802076e" : [
+              "f9731adf-68aa-49b9-b484-76544f2ef8c2"
+            ]
+          },
+          "positions" : {
+            "ebcd3401-25f6-4057-b293-57c6018feeae" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "7ec96afc-1d3d-45ef-9ade-acb6052463ab" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "7d6c5e69-2523-492e-a00b-c5490d6c8ae3" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "50458c0b-6115-4bb7-b617-c0bf17f8fbc3" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "acf442e1-a185-44c0-96e7-d8aea802076e" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "955a71f2-673a-4e1c-a99f-ef97b1b4ae71" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "6de40865-f08f-412e-a8fb-17405acc81a8" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "6de40865-f08f-412e-a8fb-17405acc81a8",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "e416020a-6722-4c60-9d95-98b75feef074",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "674d7f1e-1333-4411-aa48-d9ba08734abe",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "133fceef-ff4a-4115-977f-7e967d84accb",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "a00ac87b-e2e8-4931-91f3-f808f661af6d",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "6de40865-f08f-412e-a8fb-17405acc81a8" : [
+              "e3ad9eb5-6db1-4279-b5c9-14f5944b25b7"
+            ],
+            "a00ac87b-e2e8-4931-91f3-f808f661af6d" : [
+              "756c50cc-001a-4cfc-9f7d-1a0bf2cb235e"
+            ],
+            "e416020a-6722-4c60-9d95-98b75feef074" : [
+              "af6d8dfd-2b09-4ce6-a273-d27dc39fa06f"
+            ],
+            "133fceef-ff4a-4115-977f-7e967d84accb" : [
+              "6a0cbaaa-c389-48c7-9f00-bb6b0ccc8cf9"
+            ],
+            "674d7f1e-1333-4411-aa48-d9ba08734abe" : [
+              "49348a02-8dcd-46a8-bcde-5005cefa0850"
+            ]
+          },
+          "positions" : {
+            "6de40865-f08f-412e-a8fb-17405acc81a8" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "e416020a-6722-4c60-9d95-98b75feef074" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "133fceef-ff4a-4115-977f-7e967d84accb" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "a00ac87b-e2e8-4931-91f3-f808f661af6d" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "674d7f1e-1333-4411-aa48-d9ba08734abe" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "343ff7b6-4554-49d4-bc0b-1339fdc5dac0" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "e11bd5c6-0e4f-4082-8f0e-b5994e7db967" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "d23a469f-1ab1-4c40-9daf-38c37ded4693",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "e11bd5c6-0e4f-4082-8f0e-b5994e7db967",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "3a5dcf8a-204a-4740-9ab2-132a49e755db",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "cacf8cf5-c28c-40fa-9c25-55eb002c90c8",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "733d36bb-67be-40f9-a4ca-5c8ba0f5968a",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "e11bd5c6-0e4f-4082-8f0e-b5994e7db967" : [
+              "0081ffe6-f52b-45b7-a40b-7345bcf57cab"
+            ],
+            "cacf8cf5-c28c-40fa-9c25-55eb002c90c8" : [
+              "e83ba3ee-70fd-477c-87f9-df0a4de7f8be"
+            ],
+            "d23a469f-1ab1-4c40-9daf-38c37ded4693" : [
+              "6f2775ef-5879-4d22-a1b9-1f9dbcaa5271"
+            ],
+            "733d36bb-67be-40f9-a4ca-5c8ba0f5968a" : [
+              "2c56bdd2-0e70-4917-a425-e47bbf485e53"
+            ],
+            "3a5dcf8a-204a-4740-9ab2-132a49e755db" : [
+              "5b062b36-1bac-44a5-8c4f-d6ab88246d45"
+            ]
+          },
+          "positions" : {
+            "e11bd5c6-0e4f-4082-8f0e-b5994e7db967" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "d23a469f-1ab1-4c40-9daf-38c37ded4693" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "733d36bb-67be-40f9-a4ca-5c8ba0f5968a" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "cacf8cf5-c28c-40fa-9c25-55eb002c90c8" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "3a5dcf8a-204a-4740-9ab2-132a49e755db" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        },
+        "7a84d053-e40a-48c1-a433-97521f7ce7ef" : {
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {
+              "866438a8-d340-4913-a715-93bc049d045f" : "Message Count"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "6666682c-769a-441b-9550-be325d16fa17",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {
+                      "name" : "Message Count"
+                    },
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "numeric",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "72aee16d-e3b3-413f-beed-2e5a8c221351",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "author",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "table",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "e73c897c-3db9-4840-8fe6-4aeab8b12cc0",
+              "type" : "messages",
+              "filter" : "author:\"Konrad Merz\"",
+              "config" : {
+                "fields" : [
+                  "author",
+                  "source",
+                  "message"
+                ],
+                "show_message_row" : true
+              }
+            },
+            {
+              "id" : "866438a8-d340-4913-a715-93bc049d045f",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "cb9eba67-ae3a-4d68-bc90-76cd2373db95",
+              "type" : "aggregation",
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "weekday",
+                    "type" : "values",
+                    "config" : {
+                      "limit" : 15
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "866438a8-d340-4913-a715-93bc049d045f" : [
+              "945e2cda-9fa2-4b44-a5a7-279bf41bac37"
+            ],
+            "72aee16d-e3b3-413f-beed-2e5a8c221351" : [
+              "548e80d0-1ec0-4d44-842d-c1ac94c1cc60"
+            ],
+            "6666682c-769a-441b-9550-be325d16fa17" : [
+              "8593f0c8-ce17-4397-a409-116f46ed95a8"
+            ],
+            "cb9eba67-ae3a-4d68-bc90-76cd2373db95" : [
+              "0e5146cb-7d89-4dc3-a587-93185a04b49b"
+            ],
+            "e73c897c-3db9-4840-8fe6-4aeab8b12cc0" : [
+              "8db52099-d858-4b56-a43a-ab0882614aad"
+            ]
+          },
+          "positions" : {
+            "866438a8-d340-4913-a715-93bc049d045f" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : 6
+            },
+            "6666682c-769a-441b-9550-be325d16fa17" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 4,
+              "width" : 4
+            },
+            "cb9eba67-ae3a-4d68-bc90-76cd2373db95" : {
+              "col" : 5,
+              "row" : 3,
+              "height" : 5,
+              "width" : 4
+            },
+            "72aee16d-e3b3-413f-beed-2e5a8c221351" : {
+              "col" : 1,
+              "row" : 7,
+              "height" : 4,
+              "width" : 4
+            },
+            "e73c897c-3db9-4840-8fe6-4aeab8b12cc0" : {
+              "col" : 5,
+              "row" : 8,
+              "height" : 5,
+              "width" : 6
+            }
+          }
+        }
+      },
+      "dashboard_state" : {
+        "widgets" : {},
+        "positions" : {}
+      },
+      "owner" : "admin",
+      "created_at" : "2019-04-09T08:06:28.254Z"
+    }
+  ],
+  "searches": [
+    {
+      "_id": {
+        "$oid": "5cb59c1cf442da26074b3f0b"
+      },
+      "queries" : [
+        {
+          "id" : "a2a804b7-27cf-4cac-8015-58d9a9640d33",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 300
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : ""
+          },
+          "search_types" : [
+            {
+              "id" : "62ce962f-4cf3-4f23-9c07-6974c568a449",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "1d0d960c-8549-486c-9b55-b62a75efb896",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            }
+          ]
+        }
+      ],
+      "parameters" : [],
+      "owner" : "admin",
+      "created_at" : "2019-04-16T09:10:52.614Z"
+    },
+    {
+      "_id": {
+        "$oid": "5cacad51df507b36a6aed392"
+      },
+      "queries" : [
+        {
+          "id" : "64feccae-9447-40ef-a401-79a7972078a2",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "d1eeb626-b1ca-4257-9faf-fbc31e684af4",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "72c86a55-bca8-490e-ab40-56ac6ad097fd",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "76ae7e4c-927c-4301-b29a-cf5cad2b8da6",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "3debd8f2-9537-4b56-8761-e89dd6d04b02",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "9604dd2d-e52b-411f-ba9b-3a549c553543",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "59f56443-5e1d-4268-8453-bfea64c70bca",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "ade8c853-503c-407f-b125-efbe2d368973",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "6085fa90-b1db-4352-a2ec-f4f5027c0158",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "24632a8f-8978-42a6-8285-7c56ab7bdeac",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "bdd7a410-3d6a-48b1-8551-bf69e28d5c56",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "fdc1656f-3d59-47f9-ad1b-4039ed1c417c",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "afc70ae0-79ad-41b8-ba91-fc1d8018d7e4",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "1f748cde-011a-4f65-8b35-a9cb71a2106e",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "cc2bf983-b398-4295-bf01-1c10ed1a97e1",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "6b999881-a208-4c41-8880-ce4043159ecc",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "c71c78bf-4f52-4d62-9e68-91abbe74e040",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "59aea89a-9c27-4c5e-8700-e128b6863be7",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "e89878d7-3884-4359-a83b-71db617a9b92",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "42417dd0-273e-491c-9ab1-c9044aabd361",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "75385855-793d-4f4d-b8a0-bd740211d844",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            }
+          ]
+        },
+        {
+          "id" : "343ff7b6-4554-49d4-bc0b-1339fdc5dac0",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "419765d9-76ee-4570-b2e1-eddf6f68bacf",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "6f2775ef-5879-4d22-a1b9-1f9dbcaa5271",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "0081ffe6-f52b-45b7-a40b-7345bcf57cab",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "2c56bdd2-0e70-4917-a425-e47bbf485e53",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "e83ba3ee-70fd-477c-87f9-df0a4de7f8be",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "5b062b36-1bac-44a5-8c4f-d6ab88246d45",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            }
+          ]
+        },
+        {
+          "id" : "91c6f8c9-024c-48ec-a869-90548fad218a",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "50c3acfe-8824-4f13-a99e-931fdb1c7624",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "99bdb619-9842-4fb4-9642-019227e19c0c",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "f9731adf-68aa-49b9-b484-76544f2ef8c2",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "e0e7193c-8280-4342-ad01-b004018d5b41",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "4d374c53-6c87-41e8-aa05-853c6b25c15f",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "6d2d27f6-7a66-45a6-8c7e-5778b64061f9",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "9e5144be-a445-4289-a4cc-0f55142524bc",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "c68a3aab-ab04-45b0-b49f-3e37fda71b61",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "dc0a4892-d59e-432d-8b8d-8ebeb7d75e53",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "27a9b42b-567e-4ece-a8d0-d1720452950a",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "3cc3952b-c5c9-43cc-94a8-1511f91be884",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "106535ae-13c4-48c1-84f7-f9992c74d086",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "9896f731-a8fa-4ae2-9c61-7a8ae90f9099",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "c13b2482-60e7-4b1e-98c9-0df8d6da8230",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "92b44cf9-b712-430a-ae72-b896ab734f81",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "a142319b-98a9-4e59-9e52-7c07b36b45c0",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "4142bf9b-5de5-45e2-96fb-b935d35aa649",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "3df47946-deef-4b19-b0b6-4378d0397432",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "df3d5990-dfe0-4e4a-84f3-37eecf33cbf9",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "c0db0a36-23d3-4b0b-9b95-e24ceb1b7a8e",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "eeaa8838-616f-40c0-88c0-1059ac64f37e",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "8cf619d7-ffbd-4851-a4f0-2dfae794b392",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "8a6b3c9c-01f9-4983-8f70-4e8b3de0bd55",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "54a4adf1-610a-4a35-9cdc-685607b3ebf4",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "611ee5f4-1587-46f4-b615-8ad2ff57bee6",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "87b60514-4f24-48e7-8109-86d7b68f4bc5",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "61fa7c9c-db7a-4050-93e8-048e7aef8043",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            }
+          ]
+        },
+        {
+          "id" : "7a84d053-e40a-48c1-a433-97521f7ce7ef",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "548e80d0-1ec0-4d44-842d-c1ac94c1cc60",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "8593f0c8-ce17-4397-a409-116f46ed95a8",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "8db52099-d858-4b56-a43a-ab0882614aad",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "945e2cda-9fa2-4b44-a5a7-279bf41bac37",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "0e5146cb-7d89-4dc3-a587-93185a04b49b",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "4261f8dd-e236-4645-8285-c0fb5962b1fc",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            }
+          ]
+        },
+        {
+          "id" : "5adc9297-dfc8-4fd9-b422-cbb097715a62",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "89c8e19e-3168-49f9-8156-2d1f64ffbfc1",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "756f26f7-79dd-4612-9a7c-67e0e8bdd568",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "67448ca7-6b93-4537-9932-6e2183762c19",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "0c46211c-ac5b-495c-973e-a5f805fa971b",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "8aadfb75-ebf1-4fc3-976a-9be767d76331",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "cfc1a739-c526-4c38-ba96-357e81761b4e",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "7c7e04c6-f9f0-495c-91cc-865f60687f8c",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "5c0fcad2-b7cf-4f93-ae4c-071da501dd72",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "5f97fe8b-c824-4816-968c-a9df592f5ba4",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "bfec8369-a6e6-4df9-8b71-19a54ee69814",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "e513b32a-04d1-45f5-91c8-728c4f0c2002",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "1ce98a23-9c6f-434c-884c-7ae7d8041ad6",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "6631904e-292c-41c6-958e-29754620fb9d",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "955a71f2-673a-4e1c-a99f-ef97b1b4ae71",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "657dccfe-3fb8-44a4-91e4-e5f74d2eb3ee",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "e3ad9eb5-6db1-4279-b5c9-14f5944b25b7",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "756c50cc-001a-4cfc-9f7d-1a0bf2cb235e",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "6a0cbaaa-c389-48c7-9f00-bb6b0ccc8cf9",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "49348a02-8dcd-46a8-bcde-5005cefa0850",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            },
+            {
+              "id" : "af6d8dfd-2b09-4ce6-a273-d27dc39fa06f",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            }
+          ]
+        },
+        {
+          "id" : "7c042319-530a-41b9-9dbb-9676fb1da1a4",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "gl2_source_input:5c87b5c93d27464b669c717b"
+          },
+          "search_types" : [
+            {
+              "id" : "acdaf0d9-c2c9-4f90-b39e-c473b620451e",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "Message Count"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [],
+              "column_groups" : []
+            },
+            {
+              "id" : "312e9101-ffe6-4800-aa79-095a4f43b8b6",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "efb576aa-e81b-4f78-b678-59b0a92cb4a1",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            },
+            {
+              "id" : "9069db63-7670-42a0-ad1e-9395d4c572f9",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "author",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "6278dd3d-cc6e-4160-925b-bb6e5f48b4fc",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "values",
+                  "field" : "weekday",
+                  "limit" : 15
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "id" : "2b64dde2-dcab-48ed-84a5-7ca37ec74f1f",
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages",
+              "filter" : {
+                "type" : "query_string",
+                "query" : "author:\"Konrad Merz\""
+              }
+            }
+          ]
+        }
+      ],
+      "parameters" : [],
+      "owner" : "admin",
+      "created_at" : "2019-04-09T14:33:53.179Z"
+    }
+  ]
+}
