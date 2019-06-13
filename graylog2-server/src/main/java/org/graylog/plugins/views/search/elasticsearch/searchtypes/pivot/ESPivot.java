@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -172,8 +173,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final Double from = queryResult.getAggregations().getMinAggregation("timestamp-min").getMin();
         final Double to = queryResult.getAggregations().getMaxAggregation("timestamp-max").getMax();
         final AbsoluteRange effectiveTimerange = AbsoluteRange.create(
-                from == null ? query.timerange().getFrom() : new DateTime(from.longValue()),
-                to == null ? query.timerange().getTo() : new DateTime(to.longValue())
+                from == null ? query.timerange().getFrom() : new DateTime(from.longValue(), DateTimeZone.UTC),
+                to == null ? query.timerange().getTo() : new DateTime(to.longValue(), DateTimeZone.UTC)
         );
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
