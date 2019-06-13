@@ -83,7 +83,7 @@ public class StreamMock implements Stream {
                 ZonedDateTime.of(2017, 3, 29, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false));
     }

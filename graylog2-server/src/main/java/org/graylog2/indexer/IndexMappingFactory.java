@@ -32,10 +32,10 @@ public class IndexMappingFactory {
         this.node = node;
     }
 
-    public IndexMappingTemplate createIndexMapping(String templateType) {
+    public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
-        if (IndexSetConfig.INDEX_TEMPLATE_TYPE_EVENTS.equals(templateType)) {
+        if (IndexSetConfig.TemplateType.EVENTS.equals(templateType)) {
             return new EventsIndexMapping(elasticsearchVersion);
         }
 

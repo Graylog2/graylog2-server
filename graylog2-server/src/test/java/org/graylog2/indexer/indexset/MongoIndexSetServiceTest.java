@@ -110,7 +110,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_1",
-                                "messages",
+                                IndexSetConfig.TemplateType.MESSAGES,
                                 1,
                                 false
                         )
@@ -139,7 +139,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_1",
-                                "messages",
+                                IndexSetConfig.TemplateType.MESSAGES,
                                 1,
                                 false
                         )
@@ -204,7 +204,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_1",
-                                "messages",
+                                IndexSetConfig.TemplateType.MESSAGES,
                                 1,
                                 false
                         ),
@@ -223,7 +223,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_2",
-                                "messages",
+                                IndexSetConfig.TemplateType.MESSAGES,
                                 1,
                                 false
                         ),
@@ -242,7 +242,7 @@ public class MongoIndexSetServiceTest {
                                 ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
                                 "standard",
                                 "test_3",
-                                "events",
+                                IndexSetConfig.TemplateType.EVENTS,
                                 1,
                                 false
                         )
@@ -268,7 +268,7 @@ public class MongoIndexSetServiceTest {
                 ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.EVENTS,
                 1,
                 false
         );

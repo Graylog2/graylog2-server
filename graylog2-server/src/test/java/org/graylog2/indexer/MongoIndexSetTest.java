@@ -92,7 +92,7 @@ public class MongoIndexSetTest {
             ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC),
             "standard",
             "index-template",
-            "messages",
+            IndexSetConfig.TemplateType.MESSAGES,
             1,
             false
     );

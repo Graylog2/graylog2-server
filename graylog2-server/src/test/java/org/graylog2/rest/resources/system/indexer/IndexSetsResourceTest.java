@@ -129,7 +129,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -164,7 +164,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -211,7 +211,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -311,7 +311,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "prefix-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -348,7 +348,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -380,7 +380,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -423,7 +423,7 @@ public class IndexSetsResourceTest {
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
                 "index-template",
-                "messages",
+                IndexSetConfig.TemplateType.MESSAGES,
                 1,
                 false
         );
@@ -456,7 +456,7 @@ public class IndexSetsResourceTest {
             ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
             "standard",
             "index-template",
-             "messages",
+             IndexSetConfig.TemplateType.MESSAGES,
             1,
             false
         );
@@ -642,7 +642,7 @@ public class IndexSetsResourceTest {
             ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
             "standard",
             "index-template",
-            "messages",
+            IndexSetConfig.TemplateType.MESSAGES,
             1,
             false
         );
@@ -710,7 +710,7 @@ public class IndexSetsResourceTest {
             ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
             "standard",
             "index-template",
-            "messages",
+            IndexSetConfig.TemplateType.MESSAGES,
             1,
             false
         );
