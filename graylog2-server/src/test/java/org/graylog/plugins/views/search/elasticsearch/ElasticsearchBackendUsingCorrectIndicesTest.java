@@ -41,6 +41,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -164,8 +165,8 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final ArgumentCaptor<DateTime> toCapture = ArgumentCaptor.forClass(DateTime.class);
         verify(indexRangeService, times(1)).find(fromCapture.capture(), toCapture.capture());
 
-        assertThat(fromCapture.getValue().isEqual(new DateTime(datetimeFixture).minusSeconds(600))).isTrue();
-        assertThat(toCapture.getValue().isEqual(new DateTime(datetimeFixture))).isTrue();
+        assertThat(fromCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC).minusSeconds(600))).isTrue();
+        assertThat(toCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC))).isTrue();
     }
 
     private SortedSet<IndexRange> sortedSetOf(IndexRange... indexRanges) {
