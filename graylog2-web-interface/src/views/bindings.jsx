@@ -58,10 +58,7 @@ import OperatorCompletion from './components/searchbar/completions/OperatorCompl
 import requirementsProvided from './hooks/RequirementsProvided';
 import type { ValueActionHandlerConditionProps } from './logic/valueactions/ValueActionHandler';
 import type { FieldActionHandlerConditionProps } from './logic/fieldactions/FieldActionHandler';
-
-export const extendedSearchPath = '/extendedsearch';
-export const viewsPath = '/views';
-export const showViewsPath = `${viewsPath}/:viewId`;
+import { extendedSearchPath, showViewsPath, viewsPath } from './Constants';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
