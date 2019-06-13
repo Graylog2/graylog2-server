@@ -62,7 +62,12 @@ class EventDefinitionForm extends React.Component {
     ];
 
     return (
-      <Wizard steps={steps} horizontal justified navigationClassName={styles.steps} containerClassName="" />
+      <Wizard steps={steps}
+              horizontal
+              justified
+              navigationClassName={styles.steps}
+              containerClassName=""
+              hidePreviousNextButtons />
     );
   }
 }
