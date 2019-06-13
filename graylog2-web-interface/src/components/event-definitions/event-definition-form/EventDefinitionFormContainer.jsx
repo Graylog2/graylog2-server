@@ -52,7 +52,9 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   handleCancel = () => {
-    history.goBack();
+    if (window.confirm('Do you really want to abandon this page and lose your changes? This action cannot be undone.')) {
+      history.goBack();
+    }
   };
 
   handleSubmit = () => {

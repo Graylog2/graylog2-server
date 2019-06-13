@@ -39,19 +39,22 @@ class EventDefinitionForm extends React.Component {
   };
 
   handleSubmit = (event) => {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
     const { onSubmit } = this.props;
     onSubmit();
   };
 
   renderButtons = (activeStep) => {
     if (activeStep === lodash.last(STEP_KEYS)) {
+      const { onCancel } = this.props;
       return (
         <Row>
           <Col md={2} mdOffset={7}>
             <ButtonToolbar>
-              <Button bsStyle="primary">Done</Button>
-              <Button>Cancel</Button>
+              <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
+              <Button onClick={onCancel}>Cancel</Button>
             </ButtonToolbar>
           </Col>
         </Row>
@@ -61,7 +64,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, eventDefinition, streams, onCancel, onChange } = this.props;
+    const { action, eventDefinition, streams, onChange } = this.props;
     const { activeStep } = this.state;
 
     const steps = [
