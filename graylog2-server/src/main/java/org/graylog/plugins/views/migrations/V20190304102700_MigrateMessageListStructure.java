@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,13 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
-
-import com.mongodb.client.MongoCollection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,7 @@ import java.util.stream.Collectors;
 
 public class V20190304102700_MigrateMessageListStructure extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190304102700_MigrateMessageListStructure.class);
+    private static final String LEGACY_MIGRATION_NAME = "org.graylog.plugins.enterprise.migrations.V20190304102700_MigrateMessageListStructure.MigrationCompleted";
 
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<Document> viewsCollections;
@@ -65,7 +65,8 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(MigrationCompleted.class) != null) {
+        if (clusterConfigService.get(MigrationCompleted.class) != null
+                || clusterConfigService.get(LEGACY_MIGRATION_NAME, MigrationCompleted.class) != null) {
             LOG.debug("Migration already completed.");
             return;
         }
@@ -111,8 +112,7 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
         final String widgetId = UUID.randomUUID().toString();
 
         /* Preparations */
-        @SuppressWarnings("unchecked")
-        final List<String> selectedFields = (List) state.get("selected_fields");
+        @SuppressWarnings("unchecked") final List<String> selectedFields = (List) state.get("selected_fields");
         selectedFields.add(0, "timestamp");
         final boolean showMessageRow = selectedFields.contains("message");
         if (showMessageRow) {
@@ -126,8 +126,7 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
 
 
         /* Add widget */
-        @SuppressWarnings("unchecked")
-        final List<Document> widgets = (List) state.get("widgets");
+        @SuppressWarnings("unchecked") final List<Document> widgets = (List) state.get("widgets");
         final Document newMessageList = createMessageList(widgetId, selectedFields, showMessageRow);
         widgets.add(newMessageList);
 
@@ -179,8 +178,7 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
     private List<String> getWidgetMappingSearchTypeIds(Document widgetMappings) {
         final List<String> widgetMappingSearchTypeIds = new ArrayList<>();
         for (final Map.Entry mapping : widgetMappings.entrySet()) {
-            @SuppressWarnings("unchecked")
-            final List<String> searchIds = (ArrayList) mapping.getValue();
+            @SuppressWarnings("unchecked") final List<String> searchIds = (ArrayList) mapping.getValue();
             widgetMappingSearchTypeIds.addAll(searchIds);
         }
         return widgetMappingSearchTypeIds;
@@ -197,12 +195,10 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
 
         final List<String> searchTypeId = new ArrayList<>();
 
-        @SuppressWarnings("unchecked")
-        final List<Document> queries = (ArrayList) search.get("queries");
+        @SuppressWarnings("unchecked") final List<Document> queries = (ArrayList) search.get("queries");
         for (final Document query : queries) {
             if (query.getString("id").equals(stateId)) {
-                @SuppressWarnings("unchecked")
-                final List<Document> searchTypes = (ArrayList) query.get("search_types");
+                @SuppressWarnings("unchecked") final List<Document> searchTypes = (ArrayList) query.get("search_types");
                 searchTypeId.addAll(searchTypes.stream().map(searchType -> searchType.getString("id"))
                         .filter(search_id -> !widgetMappingSearchTypeIds.contains(search_id)).collect(Collectors.toList()));
             }
