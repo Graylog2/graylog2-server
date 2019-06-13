@@ -53,19 +53,19 @@ class FieldForm extends React.Component {
 
   handleProviderTypeChange = (nextProvider) => {
     const { config } = this.props;
-    const nextConfig = Object.assign({}, config, { providers: [nextProvider] });
+    const nextConfig = Object.assign({}, config, { providers: [{ type: nextProvider }] });
     this.propagateConfigChange(nextConfig);
   };
 
   renderFieldValueProviderForm = () => {
-    const { fieldName, config, onChange } = this.props;
+    const { fieldName, config } = this.props;
     if (!config.providers || !Array.isArray(config.providers)) {
       return null;
     }
 
-    switch (config.providers[0]) {
+    switch (config.providers[0].type) {
       case 'template-v1':
-        return <TemplateFieldValueProviderForm fieldName={fieldName} config={config} onChange={onChange} />;
+        return <TemplateFieldValueProviderForm fieldName={fieldName} config={config} onChange={this.propagateConfigChange} />;
       case 'lookup-v1':
         return <div>TBD</div>;
       default:
@@ -140,7 +140,7 @@ class FieldForm extends React.Component {
                           { value: 'template-v1', label: 'Template' },
                           { value: 'lookup-v1', label: 'Lookup Table' },
                         ]}
-                        value={Array.isArray(config.providers) ? config.providers[0] : ''}
+                        value={Array.isArray(config.providers) ? config.providers[0].type : ''}
                         matchProp="label"
                         required />
               </FormGroup>
