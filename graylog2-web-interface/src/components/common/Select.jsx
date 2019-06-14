@@ -53,20 +53,20 @@ type Props = {
   onChange: (string) => void,
   placeholder: string,
   clearable: boolean,
-  displayKey: string,
-  valueKey: string,
-  delimiter: string,
+  displayKey?: string,
+  valueKey?: string,
+  delimiter?: string,
   options: Array<Option>,
-  matchProp: string,
-  value: Option | Array<Option>,
-  autoFocus: boolean,
-  size: 'normal' | 'small',
+  matchProp?: string,
+  value?: Option | Array<Option>,
+  autoFocus?: boolean,
+  size?: 'normal' | 'small',
   optionRenderer: (any) => React.Node,
-  disabled: boolean,
-  addLabelText: string,
-  allowCreate: boolean,
-  multi: boolean,
-  onReactSelectChange: (Option | Array<Option>) => void,
+  disabled?: boolean,
+  addLabelText?: string,
+  allowCreate?: boolean,
+  multi?: boolean,
+  onReactSelectChange?: (Option | Array<Option>) => void,
 };
 
 type State = {
@@ -115,6 +115,11 @@ class Select extends React.Component<Props, State> {
     delimiter: ',',
     allowCreate: false,
     value: undefined,
+    matchProp: undefined,
+    autoFocus: false,
+    disabled: false,
+    addLabelText: undefined,
+    onReactSelectChange: undefined,
   };
 
   constructor(props: Props) {
@@ -153,7 +158,7 @@ class Select extends React.Component<Props, State> {
     const { multi, valueKey, delimiter } = this.props;
 
     if (option) {
-      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey];
+      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey || ''];
     }
     return '';
   };
@@ -175,8 +180,8 @@ class Select extends React.Component<Props, State> {
 
     return value.split(delimiter).map((v: string) => {
       const predicate: Option = {
-        [valueKey]: v,
-        [displayKey]: v,
+        [valueKey || '']: v,
+        [displayKey || '']: v,
       };
       const option = lodash.find(options, predicate);
 
@@ -193,7 +198,7 @@ class Select extends React.Component<Props, State> {
     if (value && multi && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
-      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey] === v));
+      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey || ''] === v));
     }
 
     const {
