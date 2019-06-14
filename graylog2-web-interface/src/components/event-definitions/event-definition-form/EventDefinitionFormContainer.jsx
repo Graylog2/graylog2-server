@@ -25,7 +25,7 @@ class EventDefinitionFormContainer extends React.Component {
       description: '',
       priority: EventDefinitionPriorityEnum.NORMAL,
       config: {},
-      field_spec: [],
+      field_spec: {},
       key_spec: [],
       actions: [],
     },
