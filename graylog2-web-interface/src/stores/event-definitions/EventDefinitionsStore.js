@@ -45,7 +45,19 @@ const EventDefinitionsStore = Reflux.createStore({
   },
 
   create(eventDefinition) {
-    const promise = fetch('POST', this.eventDefinitionsUrl({}), eventDefinition);
+    // TODO: Handle this in a better way once the new endpoint is implemented
+    const transformEventDefinition = (definition) => {
+      /* eslint-disable camelcase */
+      const { data_source, config, ...definitionToKeep } = definition;
+      const { selected_streams, ...configToKeep } = config;
+      return {
+        ...definitionToKeep,
+        config: { ...configToKeep },
+      };
+      /* eslint-enable camelcase */
+    };
+
+    const promise = fetch('POST', this.eventDefinitionsUrl({}), transformEventDefinition(eventDefinition));
     promise.then(
       (response) => {
         UserNotification.success('Event Definition created successfully', `Event Definition "${eventDefinition.title}" was created successfully.`);
