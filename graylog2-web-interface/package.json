@@ -12,6 +12,7 @@
   "scripts": {
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server",
+    "flow-check": "flow check",
     "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "lint": "eslint --ext js,jsx src",
