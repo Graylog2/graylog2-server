@@ -1,15 +1,32 @@
+// @flow strict
+type InternalState = {
+  viewId: string,
+};
+
+export type ViewSharingJson = {
+  view_id: string,
+  type: string,
+};
+
 export default class ViewSharing {
-  constructor(viewId) {
+  _value: InternalState;
+
+  constructor(viewId: string) {
     this._value = { viewId };
   }
 
   static __registrations: { [string]: typeof ViewSharing } = {};
 
+  // eslint-disable-next-line class-methods-use-this
+  get type(): string {
+    return 'unknown';
+  }
+
   get viewId() {
     return this._value.viewId;
   }
 
-  static create(viewId) {
+  static create(viewId: string) {
     return new ViewSharing(viewId);
   }
 
@@ -22,7 +39,7 @@ export default class ViewSharing {
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: ViewSharingJson) {
     // eslint-disable-next-line camelcase
     const { type, view_id } = value;
 

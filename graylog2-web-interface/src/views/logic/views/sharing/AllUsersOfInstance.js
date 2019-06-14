@@ -1,18 +1,20 @@
+// @flow strict
 import ViewSharing from './ViewSharing';
 
 type AllUsersOfInstanceJson = {
-  type: 'all_of_instance',
+  type: string,
   view_id: string,
 };
 
 export default class AllUsersOfInstance extends ViewSharing {
   static Type = 'all_of_instance';
 
+  // eslint-disable-next-line class-methods-use-this
   get type() {
     return AllUsersOfInstance.Type;
   }
 
-  static create(viewId) {
+  static create(viewId: string) {
     return new AllUsersOfInstance(viewId);
   }
 
@@ -23,7 +25,7 @@ export default class AllUsersOfInstance extends ViewSharing {
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: AllUsersOfInstanceJson) {
     // eslint-disable-next-line camelcase
     const { view_id } = value;
     return AllUsersOfInstance.create(view_id);

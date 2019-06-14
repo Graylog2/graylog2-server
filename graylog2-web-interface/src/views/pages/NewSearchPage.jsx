@@ -1,3 +1,4 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -5,13 +6,21 @@ import { Spinner } from 'components/common';
 import { ViewActions } from 'views/stores/ViewStore';
 import ExtendedSearchPage from './ExtendedSearchPage';
 
-export default class NewSearchPage extends React.Component {
+type Props = {
+  route: {}
+};
+
+type State = {
+  loaded: boolean,
+};
+
+export default class NewSearchPage extends React.Component<Props, State> {
   static propTypes = {
     route: PropTypes.object.isRequired,
   };
 
-  constructor(props, context) {
-    super(props, context);
+  constructor(props: Props) {
+    super(props);
     this.state = {
       loaded: false,
     };
@@ -22,8 +31,10 @@ export default class NewSearchPage extends React.Component {
   }
 
   render() {
-    if (this.state.loaded) {
-      return <ExtendedSearchPage route={this.props.route} />;
+    const { loaded } = this.state;
+    if (loaded) {
+      const { route } = this.props;
+      return <ExtendedSearchPage route={route} />;
     }
     return <Spinner />;
   }

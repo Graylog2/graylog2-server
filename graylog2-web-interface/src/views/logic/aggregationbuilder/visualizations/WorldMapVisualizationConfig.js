@@ -50,6 +50,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
       .build();
   }
 
+  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder();

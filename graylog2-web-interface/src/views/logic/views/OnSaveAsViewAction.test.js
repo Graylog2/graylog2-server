@@ -73,7 +73,7 @@ describe('OnSaveAsViewAction', () => {
 
   it('does not do anything if saving fails', () => {
     const { ViewManagementActions, ViewActions } = mockActions();
-    ViewManagementActions.create = jest.fn(() => Promise.reject('Something bad happened!'));
+    ViewManagementActions.create = jest.fn(() => Promise.reject(new Error('Something bad happened!')));
     const UserNotification = {
       success: jest.fn().mockName('success'),
       error: jest.fn().mockName('error'),
@@ -89,7 +89,7 @@ describe('OnSaveAsViewAction', () => {
       expect(router).toEqual([]);
       expect(UserNotification.success).not.toHaveBeenCalled();
       expect(UserNotification.error).toHaveBeenCalledTimes(1);
-      expect(UserNotification.error.mock.calls[0][0]).toEqual('Saving view failed: Something bad happened!');
+      expect(UserNotification.error.mock.calls[0][0]).toEqual('Saving view failed: Error: Something bad happened!');
       expect(UserNotification.error.mock.calls[0][1]).toEqual('Error!');
     });
   });

@@ -91,6 +91,7 @@ export default class Parameter {
     return Parameter.create(name, title, description, data_type, default_value, optional, binding);
   }
 
+  // eslint-disable-next-line no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder()

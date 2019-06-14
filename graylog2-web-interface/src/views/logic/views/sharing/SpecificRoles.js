@@ -1,6 +1,8 @@
+// @flow strict
 import { Map } from 'immutable';
 
 import ViewSharing from './ViewSharing';
+import SpecificUsers from './SpecificUsers';
 
 type SpecificRolesJson = {
   type: 'roles',
@@ -11,11 +13,12 @@ type SpecificRolesJson = {
 export default class SpecificRoles extends ViewSharing {
   static Type = 'roles';
 
-  constructor(viewId, roles) {
+  constructor(viewId: string, roles: Array<string>) {
     super(viewId);
     this._value.roles = roles;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get type() {
     return SpecificRoles.Type;
   }
@@ -24,6 +27,7 @@ export default class SpecificRoles extends ViewSharing {
     return this._value.roles;
   }
 
+  // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { viewId, roles } = this;
     // eslint-disable-next-line no-use-before-define
@@ -38,11 +42,11 @@ export default class SpecificRoles extends ViewSharing {
     };
   }
 
-  static create(viewId, roles) {
+  static create(viewId: string, roles: Array<string>) {
     return new SpecificRoles(viewId, roles);
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: SpecificRolesJson) {
     // eslint-disable-next-line camelcase
     const { view_id, roles } = value;
     return SpecificRoles.create(view_id, roles);

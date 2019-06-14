@@ -1,9 +1,15 @@
+// @flow strict
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewActions } from 'views/stores/ViewStore';
+import View from './View';
 
-export default (view, router) => {
+type Router = {
+  push: (string) => Promise<void>,
+};
+
+export default (view: View, router: Router) => {
   return ViewManagementActions.create(view)
     .then(() => ViewActions.load(view))
     .then(state => router.push(Routes.VIEWS.VIEWID(state.view.id)))

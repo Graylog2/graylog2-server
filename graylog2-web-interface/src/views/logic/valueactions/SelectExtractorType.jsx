@@ -28,6 +28,8 @@ class SelectExtractorType extends React.Component<Props, State> {
     selectedExtractor: undefined,
   };
 
+  extractorRoutes = {};
+
   componentDidMount() {
     /* eslint-disable-next-line camelcase */
     const { gl2_source_node, gl2_source_input } = this.context.message.fields;
@@ -35,16 +37,16 @@ class SelectExtractorType extends React.Component<Props, State> {
       gl2_source_input, this.props.field, this.context.message.index, this.context.message.id);
   }
 
-  extractorRoutes = {};
-
   /* eslint-disable-next-line react/no-unused-prop-types */
   _renderOption = ({ label }: { label: string }) => <React.Fragment><strong>{label}</strong></React.Fragment>;
 
   _onSubmit = () => {
-    this.props.onClose();
+    const { onClose } = this.props;
+    onClose();
 
-    if (this.state.selectedExtractor) {
-      const uri = this.extractorRoutes[this.state.selectedExtractor];
+    const { selectedExtractor } = this.state;
+    if (selectedExtractor) {
+      const uri = this.extractorRoutes[selectedExtractor];
       const newWindow = window.open(uri, '_blank');
       newWindow.focus();
     }
@@ -61,9 +63,10 @@ class SelectExtractorType extends React.Component<Props, State> {
   };
 
   render() {
+    const { selectedExtractor } = this.state;
     return (
       <BootstrapModalForm title="Select extractor type"
-                          submitButtonDisabled={!this.state.selectedExtractor}
+                          submitButtonDisabled={!selectedExtractor}
                           show
                           onSubmitForm={this._onSubmit}>
         <Select placeholder="Select extractor type"
