@@ -7,6 +7,7 @@ import * as fixtures from './MapVisualization.fixtures';
 describe('MapVisualization', () => {
   it('renders with minimal props', () => {
     const wrapper = mount(<MapVisualization id="somemap"
+                                            onChange={() => {}}
                                             data={[]}
                                             height={1600}
                                             width={900} />);
@@ -14,6 +15,7 @@ describe('MapVisualization', () => {
   });
   it('does not render circle markers for invalid data', () => {
     const wrapper = mount(<MapVisualization id="somemap"
+                                            onChange={() => {}}
                                             data={fixtures.invalidData}
                                             height={1600}
                                             width={900} />);
