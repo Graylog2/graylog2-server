@@ -5,7 +5,6 @@ import { Button, ButtonToolbar, Col, DropdownButton, MenuItem, Row } from 'react
 import lodash from 'lodash';
 
 import { DocumentTitle, EmptyEntity, EntityList, EntityListItem, PageHeader } from 'components/common';
-import EventExecutionContainer from 'components/event-definitions/event-execution-forms/EventExecutionContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import connect from 'stores/connect';
@@ -20,10 +19,6 @@ class EventDefinitionsPage extends React.Component {
     eventDefinitions: PropTypes.object.isRequired,
   };
 
-  state = {
-    executeDefinition: undefined,
-  };
-
   componentDidMount() {
     EventDefinitionsActions.list();
   }
@@ -34,21 +29,6 @@ class EventDefinitionsPage extends React.Component {
         EventDefinitionsActions.delete(definition);
       }
     };
-  };
-
-  handleExecute = (definition) => {
-    return () => this.setState({ executeDefinition: definition });
-  };
-
-  handleExecutionSubmit = (eventDefinition, payload) => {
-    EventDefinitionsActions.execute(eventDefinition, payload)
-      .then(() => {
-        this.setState({ executeDefinition: null });
-      });
-  };
-
-  handleExecutionCancellation = () => {
-    this.setState({ executeDefinition: null });
   };
 
   renderEmptyContent = () => {
@@ -84,19 +64,17 @@ class EventDefinitionsPage extends React.Component {
           <Button bsStyle="info">Edit</Button>
         </LinkContainer>,
         <DropdownButton key={`actions-${definition.id}`} id="more-dropdown" title="More" pullRight>
-          <MenuItem onClick={this.handleExecute(definition)}>Execute</MenuItem>
-          <MenuItem divider />
           <MenuItem onClick={this.handleDelete(definition)}>Delete</MenuItem>
         </DropdownButton>,
       ];
 
       // TODO: Show something more useful ;)
-      const titleSuffix = lodash.get(definition, 'config.type', '')
+      const titleSuffix = lodash.get(definition, 'config.type', 'Not available')
         .replace(/-v\d+/, '');
       return (
         <EntityListItem key={`event-definition-${definition.id}`}
                         title={definition.title}
-                        titleSuffix={titleSuffix}
+                        titleSuffix={`${titleSuffix}`}
                         description={definition.description}
                         actions={actions} />
       );
@@ -106,8 +84,6 @@ class EventDefinitionsPage extends React.Component {
   };
 
   render() {
-    const { executeDefinition } = this.state;
-
     return (
       <DocumentTitle title="Event Definitions">
         <span>
@@ -137,9 +113,6 @@ class EventDefinitionsPage extends React.Component {
               <Row>
                 <Col md={12}>
                   {this.renderContent()}
-                  <EventExecutionContainer eventDefinition={executeDefinition}
-                                           onSubmit={this.handleExecutionSubmit}
-                                           onCancel={this.handleExecutionCancellation} />
                 </Col>
               </Row>
             </Col>
