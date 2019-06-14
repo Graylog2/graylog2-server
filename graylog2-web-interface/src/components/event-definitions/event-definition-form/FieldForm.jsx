@@ -73,6 +73,28 @@ class FieldForm extends React.Component {
     }
   };
 
+  handleKeySortChange = (event) => {
+    const { fieldName, keys, onChange } = this.props;
+    const nextPosition = FormsUtils.getValueFromInput(event.target) - 1;
+
+    if (nextPosition < 0 || nextPosition >= keys.length) {
+      // TODO: Display an error when this happens
+      return;
+    }
+
+    // Remove fieldName from previous position and add it to the given one
+    let nextKeys = lodash.without(keys, fieldName);
+    if (nextPosition === 0) {
+      nextKeys.unshift(fieldName);
+    } else if (nextPosition >= nextKeys.length) {
+      nextKeys.push(fieldName);
+    } else {
+      nextKeys = [...nextKeys.slice(0, nextPosition), fieldName, ...nextKeys.slice(nextPosition)];
+    }
+
+    onChange(fieldName, 'keys', nextKeys);
+  };
+
   toggleKey = (event) => {
     const { fieldName, keys, onChange } = this.props;
     const checked = FormsUtils.getValueFromInput(event.target);
@@ -125,7 +147,7 @@ class FieldForm extends React.Component {
                                name="key"
                                type="number"
                                value={keyValue}
-                               onChange={this.handleConfigChange}
+                               onChange={this.handleKeySortChange}
                                disabled={!isKeyEnabled} />
                 </InputGroup>
               </FormGroup>
