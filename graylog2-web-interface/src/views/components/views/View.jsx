@@ -4,13 +4,9 @@ import PropTypes from 'prop-types';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { Link } from 'react-router';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import Routes from 'routing/Routes';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { EntityListItem } from 'components/common';
-// $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
 import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 import withPluginEntities from 'views/logic/withPluginEntities';
@@ -40,19 +36,43 @@ const Description = ({ description, owner, createdAt }) => (
   </React.Fragment>
 );
 
-const missingRequirements = (requires, requirementsProvided) => Object.entries(requires)
+type Plugin = {
+  name: string,
+  url: string,
+};
+
+type RequirementsList = { [string]: Plugin };
+
+const missingRequirements = (requires, requirementsProvided): RequirementsList => Object.entries(requires)
   .filter(([require]) => !requirementsProvided.includes(require))
   .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+
 const isMissingRequirements = (requires, requirementsProvided) => Object.keys(missingRequirements(requires, requirementsProvided)).length > 0;
 
 type RequirementsProps = {
-  requires: Array<string>,
+  requires: RequirementsList,
   requirementsProvided: Array<string>,
 };
 
+type MissingRequirementProps = {
+  plugin: Plugin,
+};
+
+const MissingRequirement = ({ plugin }: MissingRequirementProps) => (
+  <a href={plugin.url} target="_blank" rel="noopener noreferrer"><strong>{plugin.name}</strong></a>
+);
+
 const Requirements = ({ requires, requirementsProvided }: RequirementsProps) => {
   const missing = missingRequirements(requires, requirementsProvided);
-  return Object.keys(missing).length > 0 ? <h5>Missing requirement(s): <strong>{Object.keys(missing).join(', ')}</strong></h5> : null;
+  return Object.keys(missing).length > 0
+    ? (
+      <h5>
+        Missing requirement(s): {Object.values(missing)
+        // $FlowFixMe: plugin is of type Plugin, not mixed.
+        .map((plugin: Plugin) => <MissingRequirement key={plugin.name} plugin={plugin} />)}
+      </h5>
+    )
+    : null;
 };
 
 const View = ({ children, id, title, summary, description, owner, requires, createdAt, requirementsProvided }) => (
