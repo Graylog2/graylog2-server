@@ -2,11 +2,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Map, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
-
-import {} from 'leaflet/dist/leaflet.css';
 import style from 'components/maps/widgets/MapVisualization.css';
 
 const DEFAULT_VIEWPORT = {
@@ -26,6 +24,7 @@ const MapVisualization = createReactClass({
     attribution: PropTypes.string,
     interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     locked: PropTypes.bool, // Disables zoom and dragging
     viewport: PropTypes.shape({
       center: PropTypes.arrayOf(PropTypes.number),
@@ -50,7 +49,8 @@ const MapVisualization = createReactClass({
   },
 
   componentDidUpdate(prevProps) {
-    if (this.props.height !== prevProps.height || this.props.width !== prevProps.width) {
+    const { height, width } = this.props;
+    if (height !== prevProps.height || width !== prevProps.width) {
       this._forceMapUpdate();
     }
   },
@@ -65,12 +65,14 @@ const MapVisualization = createReactClass({
   _forceMapUpdate() {
     if (this._map) {
       window.dispatchEvent(new Event('resize'));
-      this._map.leafletElement.invalidateSize(this.props.interactive);
+      const { interactive } = this.props;
+      this._map.leafletElement.invalidateSize(interactive);
     }
   },
 
   // Coordinates are given as "lat,long"
   _formatMarker(coordinates, value, min, max, increment, color, name, keys) {
+    // eslint-disable-next-line no-restricted-globals
     const formattedCoordinates = coordinates.split(',').map(component => Number(component)).filter(n => !isNaN(n));
     if (formattedCoordinates.length !== 2) {
       return null;
@@ -111,7 +113,8 @@ const MapVisualization = createReactClass({
 
   _handleRenderComplete() {
     if (this._areTilesReady && this._isMapReady) {
-      this.props.onRenderComplete();
+      const { onRenderComplete } = this.props;
+      onRenderComplete();
     }
   },
 

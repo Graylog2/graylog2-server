@@ -9,7 +9,6 @@ import { BootstrapModalForm } from 'components/bootstrap';
 
 type Props = {
   onClose: () => void,
-  value: any,
   field: any,
 };
 
@@ -31,12 +30,12 @@ class SelectExtractorType extends React.Component<Props, State> {
   extractorRoutes = {};
 
   componentDidMount() {
-    /* eslint-disable-next-line camelcase */
     const { message } = this.context;
     // eslint-disable-next-line camelcase
     const { gl2_source_node, gl2_source_input } = message.fields;
+    const { field } = this.props;
     this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(gl2_source_node,
-      gl2_source_input, this.props.field, message.index, message.id);
+      gl2_source_input, field, message.index, message.id);
   }
 
   /* eslint-disable-next-line react/no-unused-prop-types */

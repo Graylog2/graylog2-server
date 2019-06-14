@@ -5,7 +5,6 @@ import { flatten, isEqual, uniqWith } from 'lodash';
 
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
 import { ViewStore } from 'views/stores/ViewStore';
@@ -81,6 +80,7 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
     const valuePath = rowFieldNames.map(pivotField => ({ [pivotField]: expandedRows[idx][pivotField] }));
     // eslint-disable-next-line react/no-array-index-key
     return (
+      // eslint-disable-next-line react/no-array-index-key
       <DataTableEntry key={`datatableentry-${idx}`}
                       fields={effectiveFields}
                       item={reducedItem}

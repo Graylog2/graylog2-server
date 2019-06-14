@@ -3,8 +3,7 @@ import { mount } from 'enzyme';
 import { List } from 'immutable';
 import renderer from 'react-test-renderer';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldTypes from 'views/logic/fieldtypes/FieldType';
-// $FlowFixMe: imports from core need to be fixed in flow
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import NumberVisualization from './NumberVisualization';
 
 jest.mock('stores/connect', () => x => x);

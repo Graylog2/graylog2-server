@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { CurrentViewType } from 'views/components/CustomPropTypes';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import Value from 'views/components/Value';
@@ -34,6 +33,8 @@ class NumberVisualization extends React.Component<Props, State> {
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
     fields: PropTypes.object.isRequired,
   };
+
+  container: HTMLElement | null;
 
   constructor(props) {
     super(props);
@@ -98,8 +99,6 @@ class NumberVisualization extends React.Component<Props, State> {
     }
     return { value: undefined, field: undefined };
   };
-
-  container: HTMLElement | null;
 
   render() {
     const { fontSize } = this.state;

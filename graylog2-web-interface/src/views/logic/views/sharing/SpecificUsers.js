@@ -10,6 +10,7 @@ type SpecificUsersJson = {|
 
 export default class SpecificUsers extends ViewSharing {
   static Type = 'users';
+
   _users: Array<string>;
 
   constructor(viewId: string, users: Array<string>) {
