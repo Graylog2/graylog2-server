@@ -117,7 +117,7 @@ class Select extends React.Component<Props, State> {
     value: undefined,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     const { value } = props;
     this.state = {
@@ -129,7 +129,7 @@ class Select extends React.Component<Props, State> {
     reactSelectSmStyles.use();
   };
 
-  componentWillReceiveProps = (nextProps) => {
+  componentWillReceiveProps = (nextProps: Props) => {
     const { value } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
@@ -149,7 +149,7 @@ class Select extends React.Component<Props, State> {
     this.setState({ value: undefined });
   };
 
-  _extractOptionValue = (option) => {
+  _extractOptionValue = (option: Option) => {
     const { multi, valueKey, delimiter } = this.props;
 
     if (option) {
@@ -158,26 +158,28 @@ class Select extends React.Component<Props, State> {
     return '';
   };
 
-  _onChange = (selectedOption) => {
+  _onChange = (selectedOption: Option) => {
     const value = this._extractOptionValue(selectedOption);
     this.setState({ value: value });
 
-    const { onChange = () => {} } = this.props;
+    // eslint-disable-next-line no-unused-vars
+    const { onChange = (v: string) => {} } = this.props;
 
     onChange(value);
   };
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
-  _formatInputValue = (value) => {
+  _formatInputValue = (value: string): Array<Option> => {
     const { options, displayKey, valueKey, delimiter } = this.props;
 
-    return value.split(delimiter).map((v) => {
-      const predicate = {};
-      predicate[valueKey] = v;
+    return value.split(delimiter).map((v: string) => {
+      const predicate: Option = {
+        [valueKey]: v,
+        [displayKey]: v,
+      };
       const option = lodash.find(options, predicate);
 
-      predicate[displayKey] = v;
       return option || predicate;
     });
   };
