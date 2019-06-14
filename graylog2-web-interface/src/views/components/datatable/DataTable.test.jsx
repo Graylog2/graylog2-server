@@ -3,9 +3,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
-// $FlowFixMe: imports from core need to be fixed in flow
-import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
-// $FlowFixMe: imports from core need to be fixed in flow
+import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -13,18 +11,11 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import DataTable from 'views/components/datatable/DataTable';
+
+jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 
 describe('DataTable', () => {
-  const CurrentUserStore = StoreMock('listen', 'get');
-  const combinedProviderMock = new CombinedProviderMock({
-    CurrentUser: CurrentUserStore,
-  });
-
-  jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
-
-  /* eslint-disable-next-line global-require */
-  const DataTable = require('./DataTable');
-
   const currentView = { activeQuery: 'deadbeef-23' };
 
   const data = [{
