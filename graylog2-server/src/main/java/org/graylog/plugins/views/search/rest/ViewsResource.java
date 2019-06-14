@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.views.audit.EnterpriseAuditEventTypes;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
@@ -153,7 +153,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @RequiresPermissions(ViewsRestPermissions.VIEW_CREATE)
-    @AuditEvent(type = EnterpriseAuditEventTypes.VIEW_CREATE)
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
         final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
         final ViewDTO savedDto = dbService.save(dto.toBuilder().owner(username).build());
@@ -164,7 +164,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @PUT
     @Path("{id}")
     @ApiOperation("Update view")
-    @AuditEvent(type = EnterpriseAuditEventTypes.VIEW_UPDATE)
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
     public ViewDTO update(@ApiParam @PathParam("id") @NotEmpty String id,
                           @ApiParam @Valid ViewDTO dto) {
         checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
@@ -175,7 +175,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @PUT
     @Path("{id}/default")
     @ApiOperation("Configures the view as default view")
-    @AuditEvent(type = EnterpriseAuditEventTypes.DEFAULT_VIEW_SET)
+    @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
     public void setDefault(@ApiParam @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
@@ -185,7 +185,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @DELETE
     @Path("{id}")
     @ApiOperation("Delete view")
-    @AuditEvent(type = EnterpriseAuditEventTypes.VIEW_DELETE)
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
     public ViewDTO delete(@ApiParam @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_DELETE, id);
         final ViewDTO dto = loadView(id);

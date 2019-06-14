@@ -21,7 +21,7 @@ import org.graylog2.audit.PluginAuditEventTypes;
 
 import java.util.Set;
 
-public class EnterpriseAuditEventTypes implements PluginAuditEventTypes {
+public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     public static final String NAMESPACE = "views";
     private static final String PREFIX = NAMESPACE + ":";
 

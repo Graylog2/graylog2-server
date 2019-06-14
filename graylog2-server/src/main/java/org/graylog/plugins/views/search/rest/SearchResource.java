@@ -30,7 +30,7 @@ import io.swagger.annotations.ApiParam;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.views.audit.EnterpriseAuditEventTypes;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
@@ -128,7 +128,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     @RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_CREATE)
-    @AuditEvent(type = EnterpriseAuditEventTypes.SEARCH_CREATE)
+    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
         final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
         final boolean isAdmin = getCurrentUser() != null && (getCurrentUser().isLocalAdmin() || isPermitted("*"));
@@ -183,7 +183,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Execute the referenced search query asynchronously",
             notes = "Starts a new search, irrespective whether or not another is already running")
     @Path("{id}/execute")
-    @AuditEvent(type = EnterpriseAuditEventTypes.SEARCH_JOB_CREATE)
+    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_JOB_CREATE)
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam Map<String, Object> executionState) {
         Search search = getSearch(id);
@@ -283,7 +283,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
     @Path("sync")
-    @AuditEvent(type = EnterpriseAuditEventTypes.SEARCH_EXECUTE)
+    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_EXECUTE)
     public SearchJob executeSyncJob(@ApiParam Search search,
                                     @ApiParam(name = "timeout", defaultValue = "60000")
                                     @QueryParam("timeout") @DefaultValue("60000") long timeout) {
