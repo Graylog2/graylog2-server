@@ -1,21 +1,15 @@
 // @flow strict
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import CurrentUserStore from 'stores/users/CurrentUserStore';
+
+import transformKeys from '../TransformKeys';
 import * as fixtures from './TransformKeys.fixtures';
 
-const CurrentUserStore = { get: jest.fn() };
-jest.doMock('injection/CombinedProvider', () => ({
-  get: () => ({ CurrentUserStore }),
-}));
+jest.mock('stores/users/CurrentUserStore', () => ({ get: jest.fn() }));
 
 // eslint-disable-next-line global-require
-const loadSUT = () => require('../TransformKeys');
 describe('TransformKeys', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-    jest.resetModules();
-  });
   it('returns original result when no aggregations are present', () => {
-    const transformKeys = loadSUT();
     const rows = [{
       source: 'row-leaf',
       value: 42,
@@ -27,7 +21,6 @@ describe('TransformKeys', () => {
   });
 
   it('returns original result when no time aggregations are present', () => {
-    const transformKeys = loadSUT();
     const rows = [{
       source: 'row-leaf',
       value: 42,
@@ -39,9 +32,7 @@ describe('TransformKeys', () => {
   });
 
   it('transforms row keys using current user\'s timezone', () => {
-    const transformKeys = loadSUT();
-
-    CurrentUserStore.get.mockImplementationOnce(() => ({ timezone: 'Europe/Berlin' }));
+    CurrentUserStore.get.mockReturnValue({ timezone: 'Europe/Berlin' });
     const input = [
       {
         source: 'leaf',
@@ -71,9 +62,7 @@ describe('TransformKeys', () => {
   });
 
   it('transforms column keys using current user\'s timezone', () => {
-    const transformKeys = loadSUT();
-
-    CurrentUserStore.get.mockImplementationOnce(() => ({ timezone: 'Europe/Berlin' }));
+    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'Europe/Berlin' });
     const input = [
       {
         source: 'leaf',
@@ -103,9 +92,7 @@ describe('TransformKeys', () => {
   });
 
   it('transforms column keys using UTC if user\'s timezone is null', () => {
-    const transformKeys = loadSUT();
-
-    CurrentUserStore.get.mockImplementationOnce(() => ({ timezone: null }));
+    CurrentUserStore.get.mockReturnValueOnce({ timezone: null });
     const input = [
       {
         source: 'leaf',
@@ -135,9 +122,8 @@ describe('TransformKeys', () => {
   });
 
   it('transforms complete results using current user\'s timezone', () => {
-    CurrentUserStore.get.mockImplementationOnce(() => ({ timezone: 'America/New_York' }));
+    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/New_York' });
     const { rowPivots, columnPivots, input, output } = fixtures.singleRowPivot;
-    const transformKeys = loadSUT();
     const result = transformKeys(rowPivots, columnPivots)(input);
 
     expect(result).toEqual(output);
@@ -145,7 +131,6 @@ describe('TransformKeys', () => {
 
   it('does not transform complete results without time pivots', () => {
     const { rowPivots, columnPivots, input, output } = fixtures.noTimePivots;
-    const transformKeys = loadSUT();
     const result = transformKeys(rowPivots, columnPivots)(input);
 
     expect(result).toEqual(output);

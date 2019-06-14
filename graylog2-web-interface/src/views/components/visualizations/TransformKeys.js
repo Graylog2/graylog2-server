@@ -1,7 +1,6 @@
 // @flow strict
 import moment from 'moment-timezone';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
