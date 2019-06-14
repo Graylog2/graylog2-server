@@ -1,55 +1,53 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import { mount } from 'enzyme';
-import Immutable from 'immutable';
-// $FlowFixMe: imports from core need to be fixed in flow
-import { CombinedProviderMock, StoreMock, StoreProviderMock } from 'helpers/mocking';
+import * as Immutable from 'immutable';
+import { StoreMock as MockStore } from 'helpers/mocking';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { TIMESTAMP_FIELD } from 'views/Constants';
+import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
+import InputsStore from 'stores/inputs/InputsStore';
+import * as messageList from 'views/components/messagelist';
+import MessageList from './MessageList';
+
+const MessageTableEntry = () => (
+  <AdditionalContext.Consumer>
+    {({ message }) => (
+      <tbody>
+        <tr><td>{JSON.stringify(message)}</td></tr>
+      </tbody>
+    )}
+  </AdditionalContext.Consumer>
+);
 
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
+jest.mock('stores/search/SearchStore', () => MockStore('searchSurroundingMessages'));
+jest.mock('views/stores/ViewStore', () => ({
+  ViewStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
+  ),
+}));
+jest.mock('stores/inputs/InputsStore', () => ({
+  InputsStore: MockStore('listen', 'getInitialState'),
+  InputsActions: { list: jest.fn() },
+}));
+jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
+jest.mock('views/stores/SelectedFieldsStore', () => ({
+  SelectedFieldsStore: MockStore('listen', 'selectedFields'),
+}));
+jest.mock('views/stores/SearchConfigStore', () => ({
+  SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
+}));
+jest.mock('legacy/result-histogram', () => 'Histogram');
+jest.mock('components/search/MessageTablePaginator', () => 'message-table-paginator');
+jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {
-  const ViewStore = StoreMock('listen', ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })]);
-  const CurrentUserStore = StoreMock('listen', 'get');
-  const SelectedFieldsStore = StoreMock('listen', 'selectedFields');
-  const storeProviderMock = new StoreProviderMock({
-    CurrentUser: CurrentUserStore,
-  });
-  const SearchStore = StoreMock('searchSurroundingMessages');
-
-  const InputsStore = StoreMock('listen', 'getInitialState');
-  const combinedProviderMock = new CombinedProviderMock({
-    Search: { SearchStore },
-    Inputs: { InputsActions: { list: jest.fn() }, InputsStore },
-  });
-  const SearchConfigStore = StoreMock('listSearchesClusterConfig', 'configurations', 'listen');
-  const WidgetActions = StoreMock('updateConfig');
-
-  const MessageTableEntry = () => (
-    <AdditionalContext.Consumer>
-      {({ message }) => (
-        <tbody>
-          <tr><td>{JSON.stringify(message)}</td></tr>
-        </tbody>
-      )}
-    </AdditionalContext.Consumer>
-  );
-
-  jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
-  jest.doMock('injection/StoreProvider', () => storeProviderMock);
-  jest.doMock('legacy/result-histogram', () => 'Histogram');
-  jest.doMock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: SearchConfigStore }));
-  jest.doMock('views/stores/ViewStore', () => ({ ViewStore: ViewStore }));
-  jest.doMock('components/search/MessageTablePaginator', () => 'message-table-paginator');
-  jest.doMock('views/stores/WidgetStore', () => WidgetActions);
-  jest.doMock('views/stores/SelectedFieldsStore', () => ({ SelectedFieldsStore: SelectedFieldsStore }));
-  jest.doMock('views/components/messagelist', () => ({ MessageTableEntry }));
-
   const data = {
     id: '6ec30961-2519-45f5-80b6-849e3deb1c32',
     type: 'messages',
@@ -64,11 +62,9 @@ describe('MessageList', () => {
         },
       }],
   };
-
-  let MessageList;
   beforeEach(() => {
-    // eslint-disable-next-line global-require
-    MessageList = require('./MessageList');
+    // eslint-disable-next-line import/namespace
+    messageList.MessageTableEntry = MessageTableEntry;
   });
 
   it('should render with and without fields', () => {
