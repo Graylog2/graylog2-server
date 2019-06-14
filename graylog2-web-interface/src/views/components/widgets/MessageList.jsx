@@ -3,13 +3,9 @@ import * as React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-// $FlowFixMe: imports from core need to be fixed in flow
 import MessageTablePaginator from 'components/search/MessageTablePaginator';
-// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
-// $FlowFixMe: imports from core need to be fixed in flow
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import { Messages } from 'views/Constants';
