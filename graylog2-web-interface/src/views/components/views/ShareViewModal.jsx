@@ -81,9 +81,11 @@ class ShareViewModal extends React.Component<Props, State> {
     } else {
       promise = ViewSharingActions.remove(view.id);
     }
-    promise.then(() => this.props.onClose(viewSharing));
+    const { onClose } = this.props;
+    promise.then(() => onClose(viewSharing));
   };
 
+  // eslint-disable-next-line react/destructuring-assignment
   _onClose = () => this.props.onClose();
 
   // eslint-disable-next-line no-undef
@@ -95,15 +97,25 @@ class ShareViewModal extends React.Component<Props, State> {
   };
 
   _onRolesChange = (newRoles) => {
-    const { viewSharing }: { viewSharing: SpecificRoles } = this.state;
+    const { viewSharing } = this.state;
+    if (viewSharing === null || viewSharing.type !== SpecificRoles.Type) {
+      return;
+    }
+    // $FlowFixMe: At this point we have a SpecificRoles instance.
+    const specificRoles: SpecificRoles = viewSharing;
     const roles = newRoles.map(extractValue);
-    this.setState({ viewSharing: viewSharing.toBuilder().roles(roles).build() });
+    this.setState({ viewSharing: specificRoles.toBuilder().roles(roles).build() });
   };
 
   _onUsersChange = (newUsers) => {
-    const { viewSharing }: { viewSharing: SpecificUsers } = this.state;
+    const { viewSharing } = this.state;
+    if (viewSharing === null || viewSharing.type !== SpecificUsers.Type) {
+      return;
+    }
+    // $FlowFixMe: At this point we have a SpecificUsers instance.
+    const specificUsers: SpecificUsers = viewSharing;
     const users = newUsers.map(extractValue);
-    this.setState({ viewSharing: viewSharing.toBuilder().users(users).build() });
+    this.setState({ viewSharing: specificUsers.toBuilder().users(users).build() });
   };
 
   _isAdmin = (user: User) => (user.roles.includes('Admin') || user.permissions.includes('*'));
