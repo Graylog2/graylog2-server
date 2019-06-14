@@ -8,7 +8,6 @@ import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'rea
 import { ClipboardButton } from 'components/common';
 
 import style from './SourceCodeEditor.css';
-// import PipelineRulesMode from './SourceCodeMode-pipeline';
 import './webpack-resolver';
 
 /**
