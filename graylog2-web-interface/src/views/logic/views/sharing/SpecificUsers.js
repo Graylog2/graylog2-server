@@ -2,18 +2,19 @@
 import { Map } from 'immutable';
 import ViewSharing from './ViewSharing';
 
-type SpecificUsersJson = {
-  type: 'users',
+type SpecificUsersJson = {|
+  type: string,
   view_id: string,
   users: Array<string>,
-};
+|};
 
 export default class SpecificUsers extends ViewSharing {
   static Type = 'users';
+  _users: Array<string>;
 
   constructor(viewId: string, users: Array<string>) {
     super(viewId);
-    this._value.users = users;
+    this._users = users;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -22,7 +23,7 @@ export default class SpecificUsers extends ViewSharing {
   }
 
   get users() {
-    return this._value.users;
+    return this._users;
   }
 
   // eslint-disable-next-line no-use-before-define

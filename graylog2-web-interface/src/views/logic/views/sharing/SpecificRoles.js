@@ -4,18 +4,20 @@ import { Map } from 'immutable';
 import ViewSharing from './ViewSharing';
 import SpecificUsers from './SpecificUsers';
 
-type SpecificRolesJson = {
-  type: 'roles',
+type SpecificRolesJson = {|
+  type: string,
   view_id: string,
   roles: Array<string>,
-};
+|};
 
 export default class SpecificRoles extends ViewSharing {
   static Type = 'roles';
 
+  _roles: Array<string>;
+
   constructor(viewId: string, roles: Array<string>) {
     super(viewId);
-    this._value.roles = roles;
+    this._roles = roles;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -24,7 +26,7 @@ export default class SpecificRoles extends ViewSharing {
   }
 
   get roles() {
-    return this._value.roles;
+    return this._roles;
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -65,7 +67,7 @@ class Builder {
     return this;
   }
 
-  build(): SpecificUsers {
+  build() {
     const { viewId, roles } = this.value.toObject();
     return SpecificRoles.create(viewId, roles);
   }

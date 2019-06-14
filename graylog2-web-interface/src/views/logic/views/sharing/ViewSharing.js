@@ -3,10 +3,11 @@ type InternalState = {
   viewId: string,
 };
 
-export type ViewSharingJson = {
+export type ViewSharingJson = {|
   view_id: string,
   type: string,
-};
+  [string]: any,
+|};
 
 export default class ViewSharing {
   _value: InternalState;
@@ -26,7 +27,8 @@ export default class ViewSharing {
     return this._value.viewId;
   }
 
-  static create(viewId: string) {
+  // eslint-disable-next-line no-unused-vars
+  static create(viewId: string, ...rest: any) {
     return new ViewSharing(viewId);
   }
 
