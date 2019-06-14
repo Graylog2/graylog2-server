@@ -18,11 +18,10 @@ jest.mock('actions/sessions/SessionActions', () => ({
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   'listen',
   ['listStreams', () => ({ then: jest.fn() })],
-  'availableStreams'
+  'availableStreams',
 ));
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
-    get: jest.fn(() => Promise.reject()),
     update: {
       completed: {
         listen: jest.fn(),
