@@ -32,9 +32,11 @@ class SelectExtractorType extends React.Component<Props, State> {
 
   componentDidMount() {
     /* eslint-disable-next-line camelcase */
-    const { gl2_source_node, gl2_source_input } = this.context.message.fields;
+    const { message } = this.context;
+    // eslint-disable-next-line camelcase
+    const { gl2_source_node, gl2_source_input } = message.fields;
     this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(gl2_source_node,
-      gl2_source_input, this.props.field, this.context.message.index, this.context.message.id);
+      gl2_source_input, this.props.field, message.index, message.id);
   }
 
   /* eslint-disable-next-line react/no-unused-prop-types */
