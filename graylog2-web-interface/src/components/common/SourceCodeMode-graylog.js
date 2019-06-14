@@ -1,5 +1,5 @@
 // Used https://github.com/ajaxorg/ace-builds/blob/master/src-noconflict/mode-java.js as template
-
+/* eslint-disable */
 ace.define('ace/mode/doc_comment_highlight_rules', ['require', 'exports', 'module', 'ace/lib/oop', 'ace/mode/text_highlight_rules'], (require, exports, module) => {
   const oop = require('../lib/oop');
   const { TextHighlightRules } = require('./text_highlight_rules');
