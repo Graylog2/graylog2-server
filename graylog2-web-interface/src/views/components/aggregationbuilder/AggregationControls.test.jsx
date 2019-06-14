@@ -3,23 +3,13 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'enzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
-import { StoreMock, StoreProviderMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import AggregationControls from './AggregationControls';
+
+jest.mock('stores/connect', () => x => x);
+jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select');
 
 describe('AggregationControls', () => {
-  const SessionStore = StoreMock(['isLoggedIn', () => { return true; }], 'getSessionId');
-  const FieldTypesStore = StoreMock('listen', ['getInitialState', () => Immutable.List()]);
-
-  const storeProviderMock = new StoreProviderMock({
-    Session: SessionStore,
-  });
-
-  jest.doMock('injection/StoreProvider', () => storeProviderMock);
-  jest.doMock('views/stores/FieldTypesStore', () => { return { FieldTypesStore: FieldTypesStore }; });
-
-  /* eslint-disable-next-line global-require */
-  const AggregationControls = require('./AggregationControls');
   // eslint-disable-next-line no-unused-vars, react/prop-types
   const DummyComponent = ({ onVisualizationConfigChange }) => <div>The spice must flow.</div>;
   const children = <DummyComponent />;
