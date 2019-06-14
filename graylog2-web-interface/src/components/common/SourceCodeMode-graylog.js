@@ -822,6 +822,10 @@ ace.define('ace/mode/graylog_highlight_rules', ['require', 'exports', 'module', 
           regex: '(?:true|false)\\b',
         },
         {
+          token: 'language.support.class',
+          regex: '&&',
+        },
+        {
           token: keywordMapper,
           regex: '[a-zA-Z_$][a-zA-Z0-9_$]*\\b',
         },
@@ -840,7 +844,6 @@ ace.define('ace/mode/graylog_highlight_rules', ['require', 'exports', 'module', 
         },
       ],
     };
-
 
     this.embedRules(DocCommentHighlightRules, 'doc-',
       [DocCommentHighlightRules.getEndRule('start')]);
