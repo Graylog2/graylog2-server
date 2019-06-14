@@ -2,7 +2,6 @@
 import { Map } from 'immutable';
 
 import ViewSharing from './ViewSharing';
-import SpecificUsers from './SpecificUsers';
 
 type SpecificRolesJson = {|
   type: string,
