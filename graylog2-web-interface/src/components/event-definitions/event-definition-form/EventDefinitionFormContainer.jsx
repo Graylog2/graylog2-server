@@ -63,7 +63,7 @@ class EventDefinitionFormContainer extends React.Component {
 
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
-        .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.CREATE));
+        .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST));
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
         .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST));
