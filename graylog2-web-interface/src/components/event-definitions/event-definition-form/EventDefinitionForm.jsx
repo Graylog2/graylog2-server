@@ -67,31 +67,37 @@ class EventDefinitionForm extends React.Component {
     const { action, eventDefinition, streams, onChange } = this.props;
     const { activeStep } = this.state;
 
+    const defaultStepProps = {
+      action,
+      eventDefinition,
+      onChange,
+    };
+
     const steps = [
       {
         key: STEP_KEYS[0],
         title: 'Event Details',
-        component: <EventDetailsForm eventDefinition={eventDefinition} onChange={onChange} />,
+        component: <EventDetailsForm {...defaultStepProps} />,
       },
       {
         key: STEP_KEYS[1],
         title: 'Filter & Aggregation',
-        component: <FilterAggregationForm eventDefinition={eventDefinition} streams={streams} onChange={onChange} />,
+        component: <FilterAggregationForm {...defaultStepProps} streams={streams} />,
       },
       {
         key: STEP_KEYS[2],
         title: 'Fields',
-        component: <FieldsForm eventDefinition={eventDefinition} onChange={onChange} />,
+        component: <FieldsForm {...defaultStepProps} />,
       },
       {
         key: STEP_KEYS[3],
         title: 'Notifications',
-        component: <NotificationsForm eventDefinition={eventDefinition} onChange={onChange} />,
+        component: <NotificationsForm {...defaultStepProps} />,
       },
       {
         key: STEP_KEYS[4],
         title: 'Summary',
-        component: <EventDefinitionSummary eventDefinition={eventDefinition} />,
+        component: <EventDefinitionSummary action={action} eventDefinition={eventDefinition} />,
       },
     ];
 
