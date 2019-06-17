@@ -31,9 +31,17 @@ class FilterAggregationForm extends React.Component {
     super(props);
 
     const defaultDataSource = props.action === 'edit' ? dataSources.LOG_MESSAGES : undefined;
+    // eslint-disable-next-line camelcase
+    const { group_by, conditions, series } = props.eventDefinition.config;
+    let defaultConditionType;
+    if (props.action === 'edit') {
+      defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(conditions) && lodash.isEmpty(series)
+        ? conditionTypes.FILTER : conditionTypes.AGGREGATION);
+    }
+
     this.state = {
       dataSource: defaultDataSource,
-      conditionType: undefined,
+      conditionType: defaultConditionType,
     };
   }
 
@@ -43,20 +51,6 @@ class FilterAggregationForm extends React.Component {
     config.type = 'aggregation-v1';
     this.propagateChange('config', config);
   }
-
-  isAggregationSelected = () => {
-    const { eventDefinition } = this.props;
-    const { conditionType } = this.state;
-
-    if (conditionType === conditionTypes.AGGREGATION) {
-      return true;
-    }
-
-    // eslint-disable-next-line camelcase
-    const { group_by, conditions, series } = eventDefinition.config;
-    return conditionType === undefined
-      && (!lodash.isEmpty(group_by) || !lodash.isEmpty(conditions) || !lodash.isEmpty(series));
-  };
 
   handleTypeChange = (event) => {
     const stateChange = {};
@@ -81,8 +75,6 @@ class FilterAggregationForm extends React.Component {
   renderDataSourceForm = (dataSource) => {
     const { eventDefinition, streams } = this.props;
     const { conditionType } = this.state;
-    const isFilterSelected = conditionType === conditionTypes.FILTER;
-    const isAggregationSelected = this.isAggregationSelected();
 
     if (dataSource === dataSources.LOG_MESSAGES) {
       return (
@@ -94,23 +86,23 @@ class FilterAggregationForm extends React.Component {
               <FormGroup>
                 <ControlLabel>Create Events for Alert if...</ControlLabel>
                 <Radio id="filter-type"
-                       name="type"
+                       name="conditionType"
                        value={conditionTypes.FILTER}
-                       checked={isFilterSelected}
+                       checked={conditionType === conditionTypes.FILTER}
                        onChange={this.handleTypeChange}>
                   Filter has results
                 </Radio>
                 <Radio id="aggregation-type"
-                       name="type"
+                       name="conditionType"
                        value={conditionTypes.AGGREGATION}
-                       checked={isAggregationSelected}
+                       checked={conditionType === conditionTypes.AGGREGATION}
                        onChange={this.handleTypeChange}>
                   Aggregation of results reaches a threshold
                 </Radio>
               </FormGroup>
             </Col>
           </Row>
-          {isAggregationSelected && (
+          {conditionType === conditionTypes.AGGREGATION && (
             <Row>
               <Col md={12}>
                 <AggregationForm eventDefinition={eventDefinition} onChange={this.propagateChange} />
