@@ -49,7 +49,6 @@ class FilterAggregationForm extends React.Component {
     const { eventDefinition } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
     config.type = 'aggregation-v1';
-    this.propagateChange('config', config);
   }
 
   handleTypeChange = (event) => {

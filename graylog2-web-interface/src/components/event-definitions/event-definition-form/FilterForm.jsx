@@ -29,7 +29,7 @@ class FilterForm extends React.Component {
   handleStreamsChange = (nextValue) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
-    config.selected_streams = nextValue;
+    config.streams = nextValue;
     onChange('config', config);
   };
 
@@ -56,7 +56,7 @@ class FilterForm extends React.Component {
                        matchProp="label"
                        onChange={selected => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
                        options={formattedStreams}
-                       value={lodash.defaultTo(eventDefinition.config.selected_streams, []).join(',')} />
+                       value={lodash.defaultTo(eventDefinition.config.streams, []).join(',')} />
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
       </fieldset>
