@@ -14,16 +14,28 @@ const conditionTypes = {
   FILTER: 1,
 };
 
+const dataSources = {
+  LOG_MESSAGES: 0,
+  EVENTS: 1,
+};
+
 class FilterAggregationForm extends React.Component {
   static propTypes = {
+    action: PropTypes.oneOf(['create', 'edit']).isRequired,
     eventDefinition: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
-  state = {
-    conditionType: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    const defaultDataSource = props.action === 'edit' ? dataSources.LOG_MESSAGES : undefined;
+    this.state = {
+      dataSource: defaultDataSource,
+      conditionType: undefined,
+    };
+  }
 
   componentDidMount() {
     const { eventDefinition } = this.props;
@@ -46,9 +58,10 @@ class FilterAggregationForm extends React.Component {
       && (!lodash.isEmpty(group_by) || !lodash.isEmpty(conditions) || !lodash.isEmpty(series));
   };
 
-  handleConditionTypeChange = (event) => {
-    const selectedConditionType = Number(FormsUtils.getValueFromInput(event.target));
-    this.setState({ conditionType: selectedConditionType });
+  handleTypeChange = (event) => {
+    const stateChange = {};
+    stateChange[event.target.name] = Number(FormsUtils.getValueFromInput(event.target));
+    this.setState(stateChange);
   };
 
   handleSubmit = (event) => {
@@ -71,7 +84,7 @@ class FilterAggregationForm extends React.Component {
     const isFilterSelected = conditionType === conditionTypes.FILTER;
     const isAggregationSelected = this.isAggregationSelected();
 
-    if (dataSource === 'log-messages') {
+    if (dataSource === dataSources.LOG_MESSAGES) {
       return (
         <React.Fragment>
           <Row>
@@ -84,14 +97,14 @@ class FilterAggregationForm extends React.Component {
                        name="type"
                        value={conditionTypes.FILTER}
                        checked={isFilterSelected}
-                       onChange={this.handleConditionTypeChange}>
+                       onChange={this.handleTypeChange}>
                   Filter has results
                 </Radio>
                 <Radio id="aggregation-type"
                        name="type"
                        value={conditionTypes.AGGREGATION}
                        checked={isAggregationSelected}
-                       onChange={this.handleConditionTypeChange}>
+                       onChange={this.handleTypeChange}>
                   Aggregation of results reaches a threshold
                 </Radio>
               </FormGroup>
@@ -112,7 +125,7 @@ class FilterAggregationForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition } = this.props;
+    const { dataSource } = this.state;
 
     return (
       <Row>
@@ -122,25 +135,25 @@ class FilterAggregationForm extends React.Component {
             <fieldset>
               <FormGroup>
                 <Radio id="data-source-log-messages"
-                       name="data_source"
-                       value="log-messages"
-                       checked={eventDefinition.data_source === 'log-messages'}
-                       onChange={this.handleChange}>
+                       name="dataSource"
+                       value={dataSources.LOG_MESSAGES}
+                       checked={dataSource === dataSources.LOG_MESSAGES}
+                       onChange={this.handleTypeChange}>
                   Log Messages
                 </Radio>
                 <HelpBlock>Select this option to create an Alert from Log Messages.</HelpBlock>
                 <Radio id="data-source-events"
-                       name="data_source"
-                       value="events"
-                       checked={eventDefinition.data_source === 'events'}
-                       onChange={this.handleChange}>
+                       name="dataSource"
+                       value={dataSources.EVENTS}
+                       checked={dataSource === dataSources.EVENTS}
+                       onChange={this.handleTypeChange}>
                   Events
                 </Radio>
                 <HelpBlock>Select this option to create an Alert from Events created by other Event Definitions.</HelpBlock>
               </FormGroup>
             </fieldset>
 
-            {eventDefinition.data_source && this.renderDataSourceForm(eventDefinition.data_source)}
+            {dataSource !== undefined && this.renderDataSourceForm(dataSource)}
           </form>
         </Col>
       </Row>
