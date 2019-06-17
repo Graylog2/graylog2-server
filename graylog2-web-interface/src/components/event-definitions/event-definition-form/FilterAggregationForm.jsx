@@ -9,11 +9,46 @@ import AggregationForm from './AggregationForm';
 
 import commonStyles from '../common/commonStyles.css';
 
+const conditionTypes = {
+  AGGREGATION: 0,
+  FILTER: 1,
+};
+
 class FilterAggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
+  };
+
+  state = {
+    conditionType: undefined,
+  };
+
+  componentDidMount() {
+    const { eventDefinition } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
+    config.type = 'aggregation-v1';
+    this.propagateChange('config', config);
+  }
+
+  isAggregationSelected = () => {
+    const { eventDefinition } = this.props;
+    const { conditionType } = this.state;
+
+    if (conditionType === conditionTypes.AGGREGATION) {
+      return true;
+    }
+
+    // eslint-disable-next-line camelcase
+    const { group_by, conditions, series } = eventDefinition.config;
+    return conditionType === undefined
+      && (!lodash.isEmpty(group_by) || !lodash.isEmpty(conditions) || !lodash.isEmpty(series));
+  };
+
+  handleConditionTypeChange = (event) => {
+    const selectedConditionType = Number(FormsUtils.getValueFromInput(event.target));
+    this.setState({ conditionType: selectedConditionType });
   };
 
   handleSubmit = (event) => {
@@ -30,16 +65,11 @@ class FilterAggregationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
-  handleConfigChange = (event) => {
-    const { eventDefinition } = this.props;
-    const { name } = event.target;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    config[name] = FormsUtils.getValueFromInput(event.target);
-    this.propagateChange('config', config);
-  };
-
   renderDataSourceForm = (dataSource) => {
     const { eventDefinition, streams } = this.props;
+    const { conditionType } = this.state;
+    const isFilterSelected = conditionType === conditionTypes.FILTER;
+    const isAggregationSelected = this.isAggregationSelected();
 
     if (dataSource === 'log-messages') {
       return (
@@ -52,22 +82,22 @@ class FilterAggregationForm extends React.Component {
                 <ControlLabel>Create Events for Alert if...</ControlLabel>
                 <Radio id="filter-type"
                        name="type"
-                       value="filter-v1"
-                       checked={eventDefinition.config.type === 'filter-v1'}
-                       onChange={this.handleConfigChange}>
+                       value={conditionTypes.FILTER}
+                       checked={isFilterSelected}
+                       onChange={this.handleConditionTypeChange}>
                   Filter has results
                 </Radio>
                 <Radio id="aggregation-type"
                        name="type"
-                       value="aggregation-v1"
-                       checked={eventDefinition.config.type === 'aggregation-v1'}
-                       onChange={this.handleConfigChange}>
+                       value={conditionTypes.AGGREGATION}
+                       checked={isAggregationSelected}
+                       onChange={this.handleConditionTypeChange}>
                   Aggregation of results reaches a threshold
                 </Radio>
               </FormGroup>
             </Col>
           </Row>
-          {eventDefinition.config.type === 'aggregation-v1' && (
+          {isAggregationSelected && (
             <Row>
               <Col md={12}>
                 <AggregationForm eventDefinition={eventDefinition} onChange={this.propagateChange} />
