@@ -86,10 +86,12 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderNotifications = (actions) => {
+    const notifications = actions.filter(action => action.type === 'trigger-notification-v1');
+
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Notifications</h3>
-        {actions.length === 0
+        {notifications.length === 0
         && <p>This Event is not configured to trigger any Notifications.</p>}
       </React.Fragment>
     );
