@@ -826,8 +826,8 @@
       "node_modules/moment/locale/uz-latn.js": 823,
       "node_modules/moment/locale/yo.js": 824,
       "node_modules/moment/locale/zh-hk.js": 825,
-      "node_modules/moment-timezone/node_modules/moment/locale/ug-cn.js": 13,
-      "node_modules/moment-timezone/node_modules/moment/locale/tg.js": 29,
+      "node_modules/moment-timezone/node_modules/moment/locale/ug-cn.js": 46,
+      "node_modules/moment-timezone/node_modules/moment/locale/tg.js": 45,
       "node_modules/moment-timezone/node_modules/moment/locale/mt.js": 30,
       "node_modules/moment-timezone/node_modules/moment/locale/mn.js": 43,
       "node_modules/moment-timezone/node_modules/moment/locale/en-il.js": 57,
@@ -894,7 +894,11 @@
       "node_modules/scheduler/index.js": 20,
       "node_modules/scheduler/cjs/scheduler.production.min.js": 29,
       "node_modules/react-dom/node_modules/scheduler/index.js": 20,
-      "node_modules/react-dom/node_modules/scheduler/cjs/scheduler.production.min.js": 29
+      "node_modules/react-dom/node_modules/scheduler/cjs/scheduler.production.min.js": 29,
+      "node_modules/moment/locale/en-SG.js": 33,
+      "node_modules/moment/locale/ga.js": 37,
+      "node_modules/moment/locale/it-ch.js": 38,
+      "node_modules/moment/locale/ku.js": 42
     },
     "usedIds": {
       "0": 0,
