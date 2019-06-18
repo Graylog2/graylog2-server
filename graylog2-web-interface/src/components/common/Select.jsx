@@ -58,7 +58,7 @@ type Props = {
   delimiter?: string,
   options: Array<Option>,
   matchProp?: string,
-  value?: Option | Array<Option>,
+  value?: string,
   autoFocus?: boolean,
   size?: 'normal' | 'small',
   optionRenderer: (any) => React.Node,
