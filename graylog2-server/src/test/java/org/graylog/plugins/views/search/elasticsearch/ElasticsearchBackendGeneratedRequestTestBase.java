@@ -100,7 +100,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
 
     TimeRange timeRangeForTest() {
         try {
-            return AbsoluteRange.create("2018-08-23 10:02:00.247", "2018-08-23 10:07:00.252");
+            return AbsoluteRange.create("2018-08-23T10:02:00.247+02:00", "2018-08-23T10:07:00.252+02:00");
         } catch (InvalidRangeParametersException ignored) {
         }
         return null;
