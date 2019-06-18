@@ -1,0 +1,152 @@
+[
+  {
+    "key": [
+      "2018-05-28T11:48:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 7813,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 587008,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:49:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8657,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:50:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8645,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 646728,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:51:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 792102,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:52:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8630,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 579708,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-28T11:53:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 702,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 62596,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 43041,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 3354574,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  }
+]

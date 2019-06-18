@@ -1,0 +1,10 @@
+/* Restore bootstrap heading margins because our stylesheet is :shit: */
+:local(.bootstrapHeading) h1, :local(.bootstrapHeading) h2, :local(.bootstrapHeading) h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+:local(.bootstrapHeading) h4, :local(.bootstrapHeading) h5, :local(.bootstrapHeading) h6 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

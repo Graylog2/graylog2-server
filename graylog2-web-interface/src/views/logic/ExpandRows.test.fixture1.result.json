@@ -1,0 +1,300 @@
+[
+  {
+    "timestamp": "2018-05-24T14:03:00.000Z",
+    "controller": "PostsController",
+    "action": {
+      "index": {
+        "count()": 2696,
+        "sum(took_ms)": 239622
+      },
+      "show": {
+        "count()": 866,
+        "sum(took_ms)": 81082
+      },
+      "edit": {
+        "count()": 118,
+        "sum(took_ms)": 6580
+      }
+    },
+    "count()": 3680,
+    "sum(took_ms)": 327284
+  },
+  {
+    "timestamp": "2018-05-24T14:03:00.000Z",
+    "controller": "LoginController",
+    "action": {
+      "login": {
+        "count()": 650,
+        "sum(took_ms)": 48344
+      }
+    },
+    "count()": 650,
+    "sum(took_ms)": 48344
+  },
+  {
+    "timestamp": "2018-05-24T14:03:00.000Z",
+    "controller": "UsersController",
+    "action": {
+      "index": {
+        "count()": 160,
+        "sum(took_ms)": 9114
+      }
+    },
+    "count()": 160,
+    "sum(took_ms)": 9114
+  },
+  {
+    "timestamp": "2018-05-24T14:03:00.000Z",
+    "count()": 4490,
+    "sum(took_ms)": 384742
+  },
+  {
+    "timestamp": "2018-05-24T14:04:00.000Z",
+    "controller": "PostsController",
+    "action": {
+      "index": {
+        "count()": 4976,
+        "sum(took_ms)": 416328
+      },
+      "show": {
+        "count()": 1612,
+        "sum(took_ms)": 113494
+      },
+      "edit": {
+        "count()": 256,
+        "sum(took_ms)": 14024
+      }
+    },
+    "count()": 6844,
+    "sum(took_ms)": 543846
+  },
+  {
+    "timestamp": "2018-05-24T14:04:00.000Z",
+    "controller": "LoginController",
+    "action": {
+      "login": {
+        "count()": 1370,
+        "sum(took_ms)": 120588
+      }
+    },
+    "count()": 1370,
+    "sum(took_ms)": 120588
+  },
+  {
+    "timestamp": "2018-05-24T14:04:00.000Z",
+    "controller": "UsersController",
+    "action": {
+      "index": {
+        "count()": 350,
+        "sum(took_ms)": 21064
+      }
+    },
+    "count()": 350,
+    "sum(took_ms)": 21064
+  },
+  {
+    "timestamp": "2018-05-24T14:04:00.000Z",
+    "count()": 8572,
+    "sum(took_ms)": 685498
+  },
+  {
+    "timestamp": "2018-05-24T14:05:00.000Z",
+    "controller": "PostsController",
+    "action": {
+      "index": {
+        "count()": 4116,
+        "sum(took_ms)": 324634
+      },
+      "show": {
+        "count()": 1284,
+        "sum(took_ms)": 98342
+      },
+      "edit": {
+        "count()": 180,
+        "sum(took_ms)": 9502
+      }
+    },
+    "count()": 5580,
+    "sum(took_ms)": 432478
+  },
+  {
+    "timestamp": "2018-05-24T14:05:00.000Z",
+    "controller": "LoginController",
+    "action": {
+      "login": {
+        "count()": 1050,
+        "sum(took_ms)": 70628
+      }
+    },
+    "count()": 1050,
+    "sum(took_ms)": 70628
+  },
+  {
+    "timestamp": "2018-05-24T14:05:00.000Z",
+    "controller": "UsersController",
+    "action": {
+      "index": {
+        "count()": 278,
+        "sum(took_ms)": 28304
+      }
+    },
+    "count()": 278,
+    "sum(took_ms)": 28304
+  },
+  {
+    "timestamp": "2018-05-24T14:05:00.000Z",
+    "count()": 6911,
+    "sum(took_ms)": 531410
+  },
+  {
+    "timestamp": "2018-05-24T14:06:00.000Z",
+    "controller": "PostsController",
+    "action": {
+      "index": {
+        "count()": 4376,
+        "sum(took_ms)": 365608
+      },
+      "show": {
+        "count()": 1468,
+        "sum(took_ms)": 106826
+      },
+      "edit": {
+        "count()": 234,
+        "sum(took_ms)": 14754
+      }
+    },
+    "count()": 6078,
+    "sum(took_ms)": 487188
+  },
+  {
+    "timestamp": "2018-05-24T14:06:00.000Z",
+    "controller": "LoginController",
+    "action": {
+      "login": {
+        "count()": 1220,
+        "sum(took_ms)": 93726
+      }
+    },
+    "count()": 1220,
+    "sum(took_ms)": 93726
+  },
+  {
+    "timestamp": "2018-05-24T14:06:00.000Z",
+    "controller": "UsersController",
+    "action": {
+      "index": {
+        "count()": 290,
+        "sum(took_ms)": 16740
+      }
+    },
+    "count()": 290,
+    "sum(took_ms)": 16740
+  },
+  {
+    "timestamp": "2018-05-24T14:06:00.000Z",
+    "count()": 7591,
+    "sum(took_ms)": 597654
+  },
+  {
+    "timestamp": "2018-05-24T14:07:00.000Z",
+    "controller": "PostsController",
+    "action": {
+      "index": {
+        "count()": 4994,
+        "sum(took_ms)": 348632
+      },
+      "show": {
+        "count()": 1564,
+        "sum(took_ms)": 93924
+      },
+      "edit": {
+        "count()": 272,
+        "sum(took_ms)": 26008
+      }
+    },
+    "count()": 6830,
+    "sum(took_ms)": 468564
+  },
+  {
+    "timestamp": "2018-05-24T14:07:00.000Z",
+    "controller": "LoginController",
+    "action": {
+      "login": {
+        "count()": 1348,
+        "sum(took_ms)": 97570
+      }
+    },
+    "count()": 1348,
+    "sum(took_ms)": 97570
+  },
+  {
+    "timestamp": "2018-05-24T14:07:00.000Z",
+    "controller": "UsersController",
+    "action": {
+      "index": {
+        "count()": 326,
+        "sum(took_ms)": 29552
+      }
+    },
+    "count()": 326,
+    "sum(took_ms)": 29552
+  },
+  {
+    "timestamp": "2018-05-24T14:07:00.000Z",
+    "count()": 8507,
+    "sum(took_ms)": 595686
+  },
+  {
+    "timestamp": "2018-05-24T14:08:00.000Z",
+    "controller": "PostsController",
+    "action": {
+      "index": {
+        "count()": 2354,
+        "sum(took_ms)": 188596
+      },
+      "show": {
+        "count()": 744,
+        "sum(took_ms)": 43342
+      },
+      "edit": {
+        "count()": 92,
+        "sum(took_ms)": 5758
+      }
+    },
+    "count()": 3190,
+    "sum(took_ms)": 237696
+  },
+  {
+    "timestamp": "2018-05-24T14:08:00.000Z",
+    "controller": "LoginController",
+    "action": {
+      "login": {
+        "count()": 608,
+        "sum(took_ms)": 46502
+      }
+    },
+    "count()": 608,
+    "sum(took_ms)": 46502
+  },
+  {
+    "timestamp": "2018-05-24T14:08:00.000Z",
+    "controller": "UsersController",
+    "action": {
+      "index": {
+        "count()": 200,
+        "sum(took_ms)": 21690
+      }
+    },
+    "count()": 200,
+    "sum(took_ms)": 21690
+  },
+  {
+    "timestamp": "2018-05-24T14:08:00.000Z",
+    "count()": 4002,
+    "sum(took_ms)": 305888
+  },
+  {
+    "count()": 40073,
+    "sum(took_ms)": 3100878
+  }
+]

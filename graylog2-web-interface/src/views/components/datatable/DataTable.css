@@ -1,0 +1,8 @@
+:local(.container) {
+    overflow: auto;
+    height: 100%;
+}
+
+:local(.leftAligned) {
+    left: 0px;
+}

@@ -1,0 +1,5 @@
+:local(.button) {
+    opacity: 0.3;
+    position: relative;
+    top: 3px;
+}

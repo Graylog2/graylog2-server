@@ -1,0 +1,42 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "5ced4df1d6e8104c16f50e00"
+      },
+      "title": "View with a parameter and requirements",
+      "summary": "",
+      "description": "",
+      "search_id": "5ced4deed6e8104c16f50df9",
+      "properties": [],
+      "requires": {
+        "parameters": {
+          "name": "Graylog Enterprise",
+          "version": "3.1.0",
+          "description": "Graylog Enterprise",
+          "url": "https://www.graylog.org/enterprise",
+          "author": "Graylog, Inc.",
+          "unique_id": "org.graylog.plugins.enterprise.EnterprisePlugin"
+        }
+      },
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2019-05-28T15:04:05.814Z"
+      }
+    },
+    {
+      "_id" : { "$oid": "5ced4a4485b52a86b96a0a63" },
+      "title" : "New View",
+      "summary" : "",
+      "description" : "",
+      "search_id" : "5ced4a3e85b52a86b96a0a59",
+      "properties" : [],
+      "requires" : {},
+      "state" : {
+      },
+      "owner" : "admin",
+      "created_at" : { "$date": "2019-05-28T14:48:23.474Z" }
+    }
+  ]
+}

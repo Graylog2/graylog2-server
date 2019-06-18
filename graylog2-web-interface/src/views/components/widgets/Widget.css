@@ -1,0 +1,16 @@
+:local(.widgetActionDropdownCaret) {
+    cursor: pointer;
+    font-size: 14px !important;
+}
+
+:local(.tonedDown) {
+    opacity: 0.3;
+}
+
+:local(.filterNotSet) {
+    opacity: 0.3;
+}
+
+:local(.filterSet) {
+    opacity: 1.0;
+}

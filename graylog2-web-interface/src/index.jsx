@@ -7,6 +7,12 @@ import Promise from 'bluebird';
 import Reflux from 'reflux';
 import AppFacade from 'routing/AppFacade';
 
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
+import ViewsBindings from 'views/bindings';
+
+PluginStore.register(new PluginManifest({}, ViewsBindings));
+
 Promise.config({ cancellation: true });
 Reflux.setPromiseFactory(handlers => new Promise(handlers));
 

@@ -53,20 +53,20 @@ type Props = {
   onChange: (string) => void,
   placeholder: string,
   clearable: boolean,
-  displayKey: string,
-  valueKey: string,
-  delimiter: string,
+  displayKey?: string,
+  valueKey?: string,
+  delimiter?: string,
   options: Array<Option>,
-  matchProp: string,
-  value: Option | Array<Option>,
-  autoFocus: boolean,
-  size: 'normal' | 'small',
+  matchProp?: string,
+  value?: string,
+  autoFocus?: boolean,
+  size?: 'normal' | 'small',
   optionRenderer: (any) => React.Node,
-  disabled: boolean,
-  addLabelText: string,
-  allowCreate: boolean,
-  multi: boolean,
-  onReactSelectChange: (Option | Array<Option>) => void,
+  disabled?: boolean,
+  addLabelText?: string,
+  allowCreate?: boolean,
+  multi?: boolean,
+  onReactSelectChange?: (Option | Array<Option>) => void,
 };
 
 type State = {
@@ -115,9 +115,14 @@ class Select extends React.Component<Props, State> {
     delimiter: ',',
     allowCreate: false,
     value: undefined,
+    matchProp: undefined,
+    autoFocus: false,
+    disabled: false,
+    addLabelText: undefined,
+    onReactSelectChange: undefined,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     const { value } = props;
     this.state = {
@@ -129,7 +134,7 @@ class Select extends React.Component<Props, State> {
     reactSelectSmStyles.use();
   };
 
-  componentWillReceiveProps = (nextProps) => {
+  componentWillReceiveProps = (nextProps: Props) => {
     const { value } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
@@ -149,35 +154,37 @@ class Select extends React.Component<Props, State> {
     this.setState({ value: undefined });
   };
 
-  _extractOptionValue = (option) => {
+  _extractOptionValue = (option: Option) => {
     const { multi, valueKey, delimiter } = this.props;
 
     if (option) {
-      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey];
+      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey || ''];
     }
     return '';
   };
 
-  _onChange = (selectedOption) => {
+  _onChange = (selectedOption: Option) => {
     const value = this._extractOptionValue(selectedOption);
     this.setState({ value: value });
 
-    const { onChange = () => {} } = this.props;
+    // eslint-disable-next-line no-unused-vars
+    const { onChange = (v: string) => {} } = this.props;
 
     onChange(value);
   };
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
-  _formatInputValue = (value) => {
+  _formatInputValue = (value: string): Array<Option> => {
     const { options, displayKey, valueKey, delimiter } = this.props;
 
-    return value.split(delimiter).map((v) => {
-      const predicate = {};
-      predicate[valueKey] = v;
+    return value.split(delimiter).map((v: string) => {
+      const predicate: Option = {
+        [valueKey || '']: v,
+        [displayKey || '']: v,
+      };
       const option = lodash.find(options, predicate);
 
-      predicate[displayKey] = v;
       return option || predicate;
     });
   };
@@ -191,7 +198,7 @@ class Select extends React.Component<Props, State> {
     if (value && multi && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
-      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey] === v));
+      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey || ''] === v));
     }
 
     const {

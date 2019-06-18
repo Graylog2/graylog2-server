@@ -1,0 +1,1200 @@
+[
+  {
+    "key": [
+      "2018-05-25T10:35:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 4942,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 435742,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 334,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "sum(took_ms)"
+        ],
+        "value": 30016,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5276,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 465758,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1456,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 138716,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1456,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 138716,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1340,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "sum(took_ms)"
+        ],
+        "value": 105948,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1340,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 105948,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 238,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 24160,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 238,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 24160,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8314,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 734582,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-25T10:36:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 5114,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 370602,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 430,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "sum(took_ms)"
+        ],
+        "value": 24190,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5544,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 394792,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1582,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 134140,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1582,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 134140,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1308,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "sum(took_ms)"
+        ],
+        "value": 107398,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1308,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 107398,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 220,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 12642,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 220,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 12642,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8658,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 648972,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-25T10:37:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 4998,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 392122,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 370,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "sum(took_ms)"
+        ],
+        "value": 31762,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5368,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 423884,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1620,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 105150,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1620,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 105150,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1444,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "sum(took_ms)"
+        ],
+        "value": 115202,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1444,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 115202,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 250,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 24670,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 250,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 24670,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8686,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 668906,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-25T10:38:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 5068,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 428178,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 402,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "sum(took_ms)"
+        ],
+        "value": 24810,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5470,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 452988,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1578,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 118682,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1578,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 118682,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1372,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "sum(took_ms)"
+        ],
+        "value": 111332,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1372,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 111332,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 212,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 12180,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 212,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 12180,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8635,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 695182,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-25T10:39:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 4994,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 397446,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 356,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "sum(took_ms)"
+        ],
+        "value": 21814,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 5350,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 419260,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 1684,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 136228,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1684,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 136228,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 1330,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "sum(took_ms)"
+        ],
+        "value": 78042,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1330,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 78042,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 252,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 24262,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 252,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 24262,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8617,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 657792,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-25T10:40:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "count()"
+        ],
+        "value": 58,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 3474,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "count()"
+        ],
+        "value": 2,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "UsersController",
+          "sum(took_ms)"
+        ],
+        "value": 86,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 60,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 3560,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "count()"
+        ],
+        "value": 16,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 818,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 16,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 818,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "count()"
+        ],
+        "value": 12,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "LoginController",
+          "sum(took_ms)"
+        ],
+        "value": 968,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 12,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 968,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "count()"
+        ],
+        "value": 2,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "PostsController",
+          "sum(took_ms)"
+        ],
+        "value": 90,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 2,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 90,
+        "rollup": true,
+        "source": "col-inner"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 90,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 5436,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 43000,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 3410870,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  }
+]

@@ -1,0 +1,1378 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: false and interval: 1000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-play"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        Not updating
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: false and interval: 300000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-play"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        Not updating
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 1000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            1
+             
+            <span>
+              second
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 2000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            2
+             
+            <span>
+              seconds
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 5000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            5
+             
+            <span>
+              seconds
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 10000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            10
+             
+            <span>
+              seconds
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 30000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            30
+             
+            <span>
+              seconds
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 60000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            1
+             
+            <span>
+              minute
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 300000 1`] = `
+<div
+  className="position pull-right"
+>
+  <div
+    className="btn-group"
+  >
+    <button
+      className="btn btn-default"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      <i
+        className="fa fa-pause"
+      />
+    </button>
+    <div
+      className="dropdown btn-group"
+    >
+      <button
+        aria-expanded={false}
+        aria-haspopup={true}
+        className="dropdown-toggle btn btn-default"
+        disabled={false}
+        id="refresh-options-dropdown"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="button"
+        type="button"
+      >
+        <span>
+          Update every 
+          <span>
+            5
+             
+            <span>
+              minutes
+            </span>
+          </span>
+        </span>
+         
+        <span
+          className="caret"
+        />
+      </button>
+      <ul
+        aria-labelledby="refresh-options-dropdown"
+        className="dropdown-menu"
+        role="menu"
+      >
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Second
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            2 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            10 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            30 Seconds
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            1 Minute
+          </a>
+        </li>
+        <li
+          className=""
+          role="presentation"
+        >
+          <a
+            href="#"
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="menuitem"
+            tabIndex="-1"
+          >
+            5 Minutes
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+`;

@@ -143,6 +143,11 @@ const Routes = {
       EDIT_COLLECTOR: collectorId => `/system/sidecars/collector/edit/${collectorId}`,
     },
   },
+  VIEWS: {
+    LIST: '/views',
+    VIEWID: id => `/views/${id}`,
+  },
+  EXTENDEDSEARCH: '/extendedsearch',
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);
     const queryParams = {
@@ -249,6 +254,7 @@ window.pluginRoutes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, A
 defaultExport.pluginRoute = (key) => {
   const route = window.pluginRoutes[key];
   if (!route) {
+    // eslint-disable-next-line no-console
     console.error(`Could not find plugin route '${key}'.`);
   }
 

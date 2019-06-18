@@ -1,0 +1,16 @@
+:local(.widgetHeader) {
+    font-size: 18px;
+    height: 25px;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+}
+
+:local(.widgetActionDropdown) {
+    position: relative;
+    z-index: 1;
+}
+
+:local(.widgetDragHandle) {
+    cursor: move;
+    opacity: 0.3;
+}

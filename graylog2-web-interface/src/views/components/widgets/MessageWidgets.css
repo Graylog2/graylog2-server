@@ -1,0 +1,10 @@
+:local(.spinnerContainer) {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+:local(.iconMargin) {
+    margin-right: 1rem;
+}

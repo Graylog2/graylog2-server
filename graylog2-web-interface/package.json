@@ -12,6 +12,7 @@
   "scripts": {
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server",
+    "flow-check": "flow check",
     "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "lint": "eslint --ext js,jsx src",
@@ -38,9 +39,14 @@
       "ts"
     ],
     "moduleNameMapper": {
+      "^file-loader!(.+)$": "$1",
+      "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
       "\\.(css|less)$": "identity-obj-proxy",
       "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx"
     },
+    "testPathIgnorePatterns": [
+      ".fixtures.js$"
+    ],
     "transform": {
       "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
       "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest"
@@ -146,7 +152,6 @@
     "less-loader": "^4.1.0",
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^1.14.0",
-    "react-immutable-proptypes": "^2.1.0",
     "react-styleguidist": "^7.0.7",
     "react-test-renderer": "^16.8.6",
     "script-loader": "^0.7.0",
