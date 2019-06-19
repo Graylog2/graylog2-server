@@ -44,39 +44,39 @@ class AggregationForm extends React.Component {
     return config.series[0] || {};
   };
 
-  handleConfigChange = (event) => {
+  propagateConfigChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
+    const nextConfig = lodash.cloneDeep(eventDefinition.config);
+    nextConfig[key] = value;
+    onChange('config', nextConfig);
+  };
+
+  handleConfigChange = (event) => {
     const { name } = event.target;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    config[name] = FormsUtils.getValueFromInput(event.target);
-    onChange('config', config);
+    const value = FormsUtils.getValueFromInput(event.target);
+    this.propagateConfigChange(name, value);
   };
 
   handleGroupByChange = (nextValue) => {
-    const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    config.group_by = nextValue;
-    onChange('config', config);
+    this.propagateConfigChange('group_by', nextValue);
   };
 
   handleAggregationFunctionChange = (nextFunction) => {
-    const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    // For now we only support one series here
-    const nextSeries = this.getSeries(config);
+    const { eventDefinition } = this.props;
+    const series = lodash.cloneDeep(eventDefinition.config.series);
+    const nextSeries = lodash.cloneDeep(this.getSeries(eventDefinition.config));
     nextSeries.function = nextFunction;
-    config.series[0] = nextSeries;
-    onChange('config', config);
+    series[0] = nextSeries;
+    this.propagateConfigChange('series', nextSeries);
   };
 
   handleAggregationFieldChange = (nextField) => {
-    const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    // For now we only support one series here
-    const nextSeries = this.getSeries(config);
+    const { eventDefinition } = this.props;
+    const series = lodash.cloneDeep(eventDefinition.config.series);
+    const nextSeries = lodash.cloneDeep(this.getSeries(eventDefinition.config));
     nextSeries.field = nextField;
-    config.series[0] = nextSeries;
-    onChange('config', config);
+    series[0] = nextSeries;
+    this.propagateConfigChange('series', nextSeries);
   };
 
   handleCustomTimerangeChange = (nextValue, nextUnit) => {
