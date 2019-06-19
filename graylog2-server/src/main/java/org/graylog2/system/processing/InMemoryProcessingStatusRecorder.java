@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.joda.time.DateTimeZone.UTC;
 
+/**
+ * This {@link ProcessingStatusRecorder} implementation should only be used for tests.
+ */
 @Singleton
 public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorder {
     private final AtomicReference<DateTime> preJournalMaxReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
