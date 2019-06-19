@@ -5,6 +5,10 @@ import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace-builds';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+
 import { ClipboardButton } from 'components/common';
 
 import style from './SourceCodeEditor.css';
@@ -77,6 +81,22 @@ class SourceCodeEditor extends React.Component {
       selectedText: '',
     };
   }
+
+  componentDidMount() {
+    const { mode } = this.props;
+
+    if (mode === 'pipeline') {
+      const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
+
+      fetch('GET', url).then((response) => {
+        const functions = response.map(res => res.name).join('|');
+        window.pipelineRulesFunctions = functions; // set to global so mode can access it
+
+        return functions;
+      });
+    }
+  }
+
 
   componentDidUpdate(prevProps) {
     const { height, width } = this.props;
