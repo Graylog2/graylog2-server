@@ -55,6 +55,8 @@ class FilterAggregationForm extends React.Component {
       group_by: [],
       series: [],
       conditions: {},
+      search_within_ms: 60 * 1000,
+      execute_every_ms: 60 * 1000,
     };
     const defaultConfig = Object.assign({}, initialConfig, eventDefinition.config);
     this.propagateChange('config', defaultConfig);
