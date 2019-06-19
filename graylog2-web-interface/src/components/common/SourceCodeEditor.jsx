@@ -34,7 +34,7 @@ class SourceCodeEditor extends React.Component {
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
-    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'graylog']),
+    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */

@@ -14,7 +14,7 @@ modes.forEach((mode) => {
 });
 
 ace.config.setModuleUrl(
-  `ace/mode/graylog`, require(`file-loader!components/common/SourceCodeMode-graylog.js`)
+  `ace/mode/pipeline`, require(`file-loader!components/rules/mode-pipeline.js`)
 );
 
 const themes = [
