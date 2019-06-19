@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import naturalSort from 'javascript-natural-sort';
 import { Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { MultiSelect, Select, TimeUnitInput } from 'components/common';
@@ -15,6 +16,7 @@ class AggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     allFieldTypes: PropTypes.array.isRequired,
+    aggregationFunctions: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -31,6 +33,17 @@ class AggregationForm extends React.Component {
     fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
   );
 
+  formatFunctions = (functions) => {
+    return functions
+      .sort(naturalSort)
+      .map(fn => ({ label: `${fn.toLowerCase()}()`, value: fn }));
+  };
+
+  getSeries = (config) => {
+    // For now we only support one series in the UI
+    return config.series[0] || {};
+  };
+
   handleConfigChange = (event) => {
     const { eventDefinition, onChange } = this.props;
     const { name } = event.target;
@@ -46,6 +59,26 @@ class AggregationForm extends React.Component {
     onChange('config', config);
   };
 
+  handleAggregationFunctionChange = (nextFunction) => {
+    const { eventDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
+    // For now we only support one series here
+    const nextSeries = this.getSeries(config);
+    nextSeries.function = nextFunction;
+    config.series[0] = nextSeries;
+    onChange('config', config);
+  };
+
+  handleAggregationFieldChange = (nextField) => {
+    const { eventDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
+    // For now we only support one series here
+    const nextSeries = this.getSeries(config);
+    nextSeries.field = nextField;
+    config.series[0] = nextSeries;
+    onChange('config', config);
+  };
+
   handleCustomTimerangeChange = (nextValue, nextUnit) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
@@ -57,9 +90,11 @@ class AggregationForm extends React.Component {
   };
 
   render() {
-    const { allFieldTypes, eventDefinition } = this.props;
+    const { allFieldTypes, aggregationFunctions, eventDefinition } = this.props;
     const useScheduleTimerange = lodash.defaultTo(eventDefinition.config.use_schedule_timerange, true);
     const aggregationTimerange = lodash.defaultTo(eventDefinition.config.aggregation_timerange, {});
+    const formattedFields = this.formatFields(allFieldTypes);
+    const series = this.getSeries(eventDefinition.config);
 
     return (
       <fieldset>
@@ -71,7 +106,7 @@ class AggregationForm extends React.Component {
               <MultiSelect id="group-by"
                            matchProp="label"
                            onChange={selected => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
-                           options={this.formatFields(allFieldTypes)}
+                           options={formattedFields}
                            value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')} />
               <HelpBlock>Aggregate on groups of identical Field values. Example: count failed login attempts per username.</HelpBlock>
             </FormGroup>
@@ -82,18 +117,30 @@ class AggregationForm extends React.Component {
 
         <h3 className={commonStyles.title}>Trigger Alert</h3>
         <Row className="row-sm">
-          <Col md={4}>
+          <Col md={6}>
             <FormGroup controlId="aggregation-function">
               <ControlLabel>If</ControlLabel>
-              <Select id="aggregation-function"
-                      matchProp="label"
-                      placeholder="Select Aggregation"
-                      onChange={() => {}}
-                      options={[]}
-                      value={eventDefinition.config.aggregation} />
+              <Row className="row-sm">
+                <Col md={6}>
+                  <Select id="aggregation-function"
+                          matchProp="label"
+                          placeholder="Select Function"
+                          onChange={this.handleAggregationFunctionChange}
+                          options={this.formatFunctions(aggregationFunctions)}
+                          value={series.function} />
+                </Col>
+                <Col md={6}>
+                  <Select id="aggregation-function-field"
+                          matchProp="label"
+                          placeholder="Select Field (Optional)"
+                          onChange={this.handleAggregationFieldChange}
+                          options={formattedFields}
+                          value={series.field} />
+                </Col>
+              </Row>
             </FormGroup>
           </Col>
-          <Col md={4}>
+          <Col md={3}>
             <FormGroup controlId="aggregation-condition">
               <ControlLabel>Is</ControlLabel>
               <Select id="aggregation-condition"
@@ -109,7 +156,7 @@ class AggregationForm extends React.Component {
                       value={eventDefinition.config.condition} />
             </FormGroup>
           </Col>
-          <Col md={4}>
+          <Col md={3}>
             <Input id="aggregation-threshold"
                    name="threshold"
                    label="Threshold"

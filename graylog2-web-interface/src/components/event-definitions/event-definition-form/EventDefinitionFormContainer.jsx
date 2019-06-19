@@ -14,6 +14,7 @@ import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import EventDefinitionForm from './EventDefinitionForm';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
+const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
 class EventDefinitionFormContainer extends React.Component {
@@ -21,6 +22,7 @@ class EventDefinitionFormContainer extends React.Component {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object,
     fieldTypes: PropTypes.object.isRequired,
+    entityTypes: PropTypes.object,
   };
 
   static defaultProps = {
@@ -34,6 +36,7 @@ class EventDefinitionFormContainer extends React.Component {
       key_spec: [],
       actions: [],
     },
+    entityTypes: undefined,
   };
 
   constructor(props) {
@@ -76,10 +79,11 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, fieldTypes } = this.props;
+    const { action, fieldTypes, entityTypes } = this.props;
     const { eventDefinition, availableStreams } = this.state;
+    const isLoading = typeof fieldTypes.all !== 'object' || !entityTypes;
 
-    if (typeof fieldTypes.all !== 'object') {
+    if (isLoading) {
       return <Spinner text="Loading Event information..." />;
     }
 
@@ -87,6 +91,7 @@ class EventDefinitionFormContainer extends React.Component {
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
                            allFieldTypes={fieldTypes.all.toJS()}
+                           entityTypes={entityTypes}
                            streams={availableStreams}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
@@ -95,4 +100,7 @@ class EventDefinitionFormContainer extends React.Component {
   }
 }
 
-export default connect(EventDefinitionFormContainer, { fieldTypes: FieldTypesStore });
+export default connect(EventDefinitionFormContainer, {
+  fieldTypes: FieldTypesStore,
+  entityTypes: AvailableEventDefinitionTypesStore,
+});

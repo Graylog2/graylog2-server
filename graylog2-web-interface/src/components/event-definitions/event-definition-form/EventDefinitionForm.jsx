@@ -19,6 +19,7 @@ class EventDefinitionForm extends React.Component {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
     allFieldTypes: PropTypes.array.isRequired,
+    entityTypes: PropTypes.object.isRequired,
     streams: PropTypes.array,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -65,11 +66,12 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, allFieldTypes, eventDefinition, streams, onChange } = this.props;
+    const { action, allFieldTypes, entityTypes, eventDefinition, streams, onChange } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
       action,
+      entityTypes,
       eventDefinition,
       onChange,
     };

@@ -5,8 +5,9 @@ import lodash from 'lodash';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import EventDefinitionsActions from 'actions/event-definitions/EventDefinitionsActions';
+const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
 const EventDefinitionsStore = Reflux.createStore({
   listenables: [EventDefinitionsActions],
