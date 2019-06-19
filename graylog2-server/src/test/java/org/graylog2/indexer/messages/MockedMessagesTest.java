@@ -23,6 +23,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.BulkResult;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -72,7 +73,7 @@ public class MockedMessagesTest {
 
     @Before
     public void setUp() throws Exception {
-        this.messages = new Messages(new MetricRegistry(), jestClient);
+        this.messages = new Messages(new MetricRegistry(), jestClient, new InMemoryProcessingStatusRecorder());
     }
 
     @Test

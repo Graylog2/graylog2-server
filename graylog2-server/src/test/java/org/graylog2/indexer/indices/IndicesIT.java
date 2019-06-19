@@ -50,6 +50,7 @@ import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -115,7 +116,7 @@ public class IndicesIT extends ElasticsearchBase {
         indices = new Indices(client(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), client()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);

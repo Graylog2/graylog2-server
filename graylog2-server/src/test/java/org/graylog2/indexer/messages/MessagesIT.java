@@ -23,6 +23,7 @@ import io.searchbox.core.Index;
 import org.graylog2.ElasticsearchBase;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ public class MessagesIT extends ElasticsearchBase {
 
     @Before
     public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), client());
+        messages = new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder());
     }
 
     @Test

@@ -27,10 +27,12 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +51,20 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final OrderedMessageProcessors orderedMessageProcessors;
 
     private final OutputBuffer outputBuffer;
+    private final ProcessingStatusRecorder processingStatusRecorder;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
 
     @AssistedInject
-    public ProcessBufferProcessor(MetricRegistry metricRegistry, OrderedMessageProcessors orderedMessageProcessors, OutputBuffer outputBuffer,
-                                  @Assisted DecodingProcessor decodingProcessor, @DefaultStream Provider<Stream> defaultStreamProvider) {
+    public ProcessBufferProcessor(MetricRegistry metricRegistry,
+                                  OrderedMessageProcessors orderedMessageProcessors,
+                                  OutputBuffer outputBuffer,
+                                  ProcessingStatusRecorder processingStatusRecorder,
+                                  @Assisted DecodingProcessor decodingProcessor,
+                                  @DefaultStream Provider<Stream> defaultStreamProvider) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
+        this.processingStatusRecorder = processingStatusRecorder;
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
 
@@ -114,6 +122,10 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             messages = messageProcessor.process(messages);
         }
         for (Message message : messages) {
+            // The processing time should only be set once all message processors have finished
+            message.setProcessingTime(Tools.nowUTC());
+            processingStatusRecorder.updatePostProcessingMaxReceiveTime(message.getReceiveTime());
+
             outputBuffer.insertBlocking(message);
         }
     }

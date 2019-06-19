@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
 import java.time.Instant;
@@ -226,6 +227,9 @@ public class Message implements Messages {
      * was involved.
      */
     private long journalOffset = Long.MIN_VALUE;
+
+    private DateTime receiveTime;
+    private DateTime processingTime;
 
     private ArrayList<Recording> recordings;
 
@@ -752,6 +756,30 @@ public class Message implements Messages {
 
     public long getJournalOffset() {
         return journalOffset;
+    }
+
+    @Nullable
+    public DateTime getReceiveTime() {
+        return receiveTime;
+    }
+
+    public void setReceiveTime(DateTime receiveTime) {
+        // TODO: In Graylog 3.2 we can set this as field in the message because at that point we have a mapping entry
+        if (receiveTime != null) {
+            this.receiveTime = receiveTime;
+        }
+    }
+
+    @Nullable
+    public DateTime getProcessingTime() {
+        return processingTime;
+    }
+
+    public void setProcessingTime(DateTime processingTime) {
+        // TODO: In Graylog 3.2 we can set this as field in the message because at that point we have a mapping entry
+        if (processingTime != null) {
+            this.processingTime = processingTime;
+        }
     }
 
     // helper methods to optionally record timing information per message, useful for debugging or benchmarking
