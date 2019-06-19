@@ -14,8 +14,22 @@ import styles from './AggregationForm.css';
 class AggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    allFieldTypes: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
+
+  // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
+  formatFields = lodash.memoize(
+    (fieldTypes) => {
+      return fieldTypes.map((fieldType) => {
+        return {
+          label: `${fieldType.name} – ${fieldType.value.type.type}`,
+          value: fieldType.name,
+        };
+      });
+    },
+    fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
+  );
 
   handleConfigChange = (event) => {
     const { eventDefinition, onChange } = this.props;
@@ -43,7 +57,7 @@ class AggregationForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition } = this.props;
+    const { allFieldTypes, eventDefinition } = this.props;
     const useScheduleTimerange = lodash.defaultTo(eventDefinition.config.use_schedule_timerange, true);
     const aggregationTimerange = lodash.defaultTo(eventDefinition.config.aggregation_timerange, {});
 
@@ -57,7 +71,7 @@ class AggregationForm extends React.Component {
               <MultiSelect id="group-by"
                            matchProp="label"
                            onChange={selected => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
-                           options={[]}
+                           options={this.formatFields(allFieldTypes)}
                            value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')} />
               <HelpBlock>Aggregate on groups of identical Field values. Example: count failed login attempts per username.</HelpBlock>
             </FormGroup>

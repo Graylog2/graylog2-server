@@ -23,6 +23,7 @@ class FilterAggregationForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']).isRequired,
     eventDefinition: PropTypes.object.isRequired,
+    allFieldTypes: PropTypes.array.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
@@ -83,7 +84,7 @@ class FilterAggregationForm extends React.Component {
   };
 
   renderDataSourceForm = (dataSource) => {
-    const { eventDefinition, streams } = this.props;
+    const { allFieldTypes, eventDefinition, streams } = this.props;
     const { conditionType } = this.state;
 
     if (dataSource === dataSources.LOG_MESSAGES) {
@@ -115,7 +116,9 @@ class FilterAggregationForm extends React.Component {
           {conditionType === conditionTypes.AGGREGATION && (
             <Row>
               <Col md={12}>
-                <AggregationForm eventDefinition={eventDefinition} onChange={this.propagateChange} />
+                <AggregationForm eventDefinition={eventDefinition}
+                                 allFieldTypes={allFieldTypes}
+                                 onChange={this.propagateChange} />
               </Col>
             </Row>
           )}

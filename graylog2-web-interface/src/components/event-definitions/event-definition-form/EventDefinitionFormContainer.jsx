@@ -4,9 +4,13 @@ import lodash from 'lodash';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
+import connect from 'stores/connect';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import CombinedProvider from 'injection/CombinedProvider';
+
+import { Spinner } from 'components/common';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import EventDefinitionForm from './EventDefinitionForm';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
@@ -16,6 +20,7 @@ class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object,
+    fieldTypes: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -71,12 +76,17 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action } = this.props;
+    const { action, fieldTypes } = this.props;
     const { eventDefinition, availableStreams } = this.state;
+
+    if (typeof fieldTypes.all !== 'object') {
+      return <Spinner text="Loading Event information..." />;
+    }
 
     return (
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
+                           allFieldTypes={fieldTypes.all.toJS()}
                            streams={availableStreams}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
@@ -85,4 +95,4 @@ class EventDefinitionFormContainer extends React.Component {
   }
 }
 
-export default EventDefinitionFormContainer;
+export default connect(EventDefinitionFormContainer, { fieldTypes: FieldTypesStore });

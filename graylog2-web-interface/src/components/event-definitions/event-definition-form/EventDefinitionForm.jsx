@@ -18,6 +18,7 @@ class EventDefinitionForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
+    allFieldTypes: PropTypes.array.isRequired,
     streams: PropTypes.array,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -64,7 +65,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, eventDefinition, streams, onChange } = this.props;
+    const { action, allFieldTypes, eventDefinition, streams, onChange } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
@@ -82,7 +83,7 @@ class EventDefinitionForm extends React.Component {
       {
         key: STEP_KEYS[1],
         title: 'Filter & Aggregation',
-        component: <FilterAggregationForm {...defaultStepProps} streams={streams} />,
+        component: <FilterAggregationForm {...defaultStepProps} allFieldTypes={allFieldTypes} streams={streams} />,
       },
       {
         key: STEP_KEYS[2],
