@@ -22,10 +22,12 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.system.processing.DBProcessingStatusService;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -36,16 +38,28 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class SystemProcessingStatusResource extends RestResource {
     private final ProcessingStatusRecorder processingStatusRecorder;
+    private final DBProcessingStatusService dbService;
 
     @Inject
-    public SystemProcessingStatusResource(ProcessingStatusRecorder processingStatusRecorder) {
+    public SystemProcessingStatusResource(ProcessingStatusRecorder processingStatusRecorder,
+                                          DBProcessingStatusService dbService) {
         this.processingStatusRecorder = processingStatusRecorder;
+        this.dbService = dbService;
     }
 
     @GET
     @Timed
     @ApiOperation(value = "Get processing status summary from node")
-    public ProcessingStatusSummary getProgress() {
+    public ProcessingStatusSummary getStatus() {
         return ProcessingStatusSummary.of(processingStatusRecorder);
+    }
+
+    @GET
+    @Path("/persisted")
+    @Timed
+    @ApiOperation(value = "Get persisted processing status summary from node")
+    public ProcessingStatusSummary getPersistedStatus() {
+        return dbService.get().map(ProcessingStatusSummary::of)
+                .orElseThrow(() -> new NotFoundException("No processing status persisted yet"));
     }
 }

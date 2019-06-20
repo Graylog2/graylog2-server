@@ -129,4 +129,14 @@ public class DBProcessingStatusServiceTest {
         // The save() should be an upsert so we should only have one document
         assertThat(dbService.all()).hasSize(1);
     }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void get() {
+        assertThat(dbService.get()).isNotPresent();
+
+        dbService.save(new InMemoryProcessingStatusRecorder());
+
+        assertThat(dbService.get()).isPresent();
+    }
 }

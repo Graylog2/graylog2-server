@@ -78,6 +78,7 @@ import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +108,7 @@ public class Server extends ServerBootstrap {
     private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
     private final PipelineConfig pipelineConfiguration = new PipelineConfig();
     private final ViewsConfig viewsConfiguration = new ViewsConfig();
+    private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
 
     public Server() {
         super("server", configuration);
@@ -170,7 +172,8 @@ public class Server extends ServerBootstrap {
                 kafkaJournalConfiguration,
                 nettyTransportConfiguration,
                 pipelineConfiguration,
-                viewsConfiguration);
+                viewsConfiguration,
+                processingStatusConfig);
     }
 
     @Override

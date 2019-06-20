@@ -23,4 +23,7 @@ import retrofit2.http.GET;
 public interface RemoteSystemProcessingStatusResource {
     @GET("system/processing/status")
     Call<ProcessingStatusSummary> getStatus();
+
+    @GET("system/processing/status/persisted")
+    Call<ProcessingStatusSummary> getPersistedStatus();
 }

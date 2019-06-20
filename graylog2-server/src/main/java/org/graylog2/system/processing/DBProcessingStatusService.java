@@ -31,7 +31,11 @@ import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * Manages the database collection for processing status.
+ */
 public class DBProcessingStatusService {
     private static final String COLLECTION_NAME = "processing_status";
 
@@ -51,10 +55,31 @@ public class DBProcessingStatusService {
         db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
     }
 
+    /**
+     * Rerturns all existing processing status entries from the database.
+     *
+     * @return a list of all processing status entries
+     */
     public List<ProcessingStatusDto> all() {
         return ImmutableList.copyOf(db.find().sort(DBSort.desc("_id")).iterator());
     }
 
+    /**
+     * Returns the processing status entry for the calling node.
+     *
+     * @return the processing status entry or an empty optional if none exists
+     */
+    public Optional<ProcessingStatusDto> get() {
+        return Optional.ofNullable(db.findOne(DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId)));
+    }
+
+    /**
+     * Create or update (upsert) a processing status entry for the given {@link ProcessingStatusRecorder} using the
+     * caller's node ID.
+     *
+     * @param processingStatusRecorder the processing recorder object to create/update
+     * @return the created/updated entry
+     */
     public ProcessingStatusDto save(ProcessingStatusRecorder processingStatusRecorder) {
         return save(processingStatusRecorder, DateTime.now(DateTimeZone.UTC));
     }

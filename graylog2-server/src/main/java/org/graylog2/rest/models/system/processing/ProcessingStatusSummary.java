@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.system.processing.ProcessingStatusDto;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 
@@ -41,6 +42,16 @@ public abstract class ProcessingStatusSummary {
                         .preJournal(processingStatusRecorder.getPreJournalMaxReceiveTime())
                         .postProcessing(processingStatusRecorder.getPostProcessingMaxReceiveTime())
                         .postIndexing(processingStatusRecorder.getPostIndexingMaxReceiveTime())
+                        .build())
+                .build();
+    }
+
+    public static ProcessingStatusSummary of(ProcessingStatusDto dto) {
+        return builder()
+                .maxReceiveTimes(MaxReceiveTimes.builder()
+                        .preJournal(dto.maxReceiveTimes().preJournal())
+                        .postProcessing(dto.maxReceiveTimes().postProcessing())
+                        .postIndexing(dto.maxReceiveTimes().postIndexing())
                         .build())
                 .build();
     }
