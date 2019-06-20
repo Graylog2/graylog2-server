@@ -14,7 +14,7 @@ modes.forEach((mode) => {
 });
 
 ace.config.setModuleUrl(
-  `ace/mode/pipeline`, require(`file-loader!components/rules/mode-pipeline.js`)
+  `ace/mode/pipeline`, require(`file-loader!components/rules/mode-pipeline-hax.js`)
 );
 
 const themes = [

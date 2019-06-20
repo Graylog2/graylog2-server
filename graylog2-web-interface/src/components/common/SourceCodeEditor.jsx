@@ -10,6 +10,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import { ClipboardButton } from 'components/common';
+import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import style from './SourceCodeEditor.css';
 import './webpack-resolver';
@@ -90,7 +91,9 @@ class SourceCodeEditor extends React.Component {
 
       fetch('GET', url).then((response) => {
         const functions = response.map(res => res.name).join('|');
-        window.pipelineRulesFunctions = functions; // set to global so mode can access it
+        const pipelineRulesMode = new PipelineRulesMode(functions);
+
+        this.reactAce.editor.getSession().setMode(pipelineRulesMode);
 
         return functions;
       });

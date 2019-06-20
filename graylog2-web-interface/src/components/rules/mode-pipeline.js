@@ -1,16 +1,13 @@
-// Used https://github.com/ajaxorg/ace-builds/blob/master/src-noconflict/mode-java.js as template
-/* eslint-disable */
+/* global ace */
 
-ace.define('ace/mode/pipeline_highlight_rules', ['require', 'exports', 'module', 'ace/lib/oop', 'ace/mode/doc_comment_highlight_rules', 'ace/mode/text_highlight_rules'], (require, exports, module) => {
-  const oop = require('../lib/oop');
-  const { TextHighlightRules } = require('./text_highlight_rules');
+let builtinFunctions = '';
 
-  const PipelineHighlightRules = function () {
+export class PipelineHighlightRules extends ace.require('ace/mode/text_highlight_rules').TextHighlightRules {
+  constructor() {
+    super();
     const keywords = 'let|when|then|rule|end';
 
     const builtinConstants = 'and|or|not|during';
-
-    const builtinFunctions = window.pipelineRulesFunctions; // set in SourceCodeEditor#componentDidMount
 
     const keywordMapper = this.createKeywordMapper({
       'variable.language': 'stage',
@@ -74,38 +71,14 @@ ace.define('ace/mode/pipeline_highlight_rules', ['require', 'exports', 'module',
         },
       ],
     };
+  }
+}
 
-    this.normalizeRules();
-  };
+export default class PipelineRulesMode extends ace.require('ace/mode/text').Mode {
+  constructor(args) {
+    super(args);
 
-  oop.inherits(PipelineHighlightRules, TextHighlightRules);
-
-  exports.PipelineHighlightRules = PipelineHighlightRules;
-});
-
-ace.define('ace/mode/pipeline', ['require', 'exports', 'module', 'ace/lib/oop', 'ace/mode/text', 'ace/mode/pipeline_highlight_rules'], (require, exports, module) => {
-  const oop = require('../lib/oop');
-  const TextMode = require('./text').Mode;
-  const { PipelineHighlightRules } = require('./pipeline_highlight_rules');
-  const Mode = function () {
-    TextMode.call(this);
+    builtinFunctions = args;
     this.HighlightRules = PipelineHighlightRules;
-  };
-  oop.inherits(Mode, TextMode);
-
-  (function () {
-    this.createWorker = function (session) {
-      return null;
-    };
-
-    this.$id = 'ace/mode/pipeline';
-  }).call(Mode.prototype);
-
-  exports.Mode = Mode;
-}); (function () {
-  ace.require(['ace/mode/pipeline'], (m) => {
-    if (typeof module === 'object' && typeof exports === 'object' && module) {
-      module.exports = m;
-    }
-  });
-}());
+  }
+}
