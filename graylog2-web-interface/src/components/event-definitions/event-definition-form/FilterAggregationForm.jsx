@@ -37,7 +37,7 @@ class FilterAggregationForm extends React.Component {
     const { group_by, conditions, series } = props.eventDefinition.config;
     let defaultConditionType;
     if (props.action === 'edit') {
-      defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(conditions) && lodash.isEmpty(series)
+      defaultConditionType = (lodash.isEmpty(group_by) && conditions.expression === null && lodash.isEmpty(series)
         ? conditionTypes.FILTER : conditionTypes.AGGREGATION);
     }
 
