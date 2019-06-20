@@ -9,6 +9,7 @@ import { MultiSelect, Select, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
+import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 
 import commonStyles from '../common/commonStyles.css';
 import styles from './AggregationForm.css';
@@ -93,6 +94,25 @@ class AggregationForm extends React.Component {
     this.propagateConfigChange('series', series);
   };
 
+  handleExpressionOperatorChange = (nextOperator) => {
+    const { eventDefinition } = this.props;
+    const series = this.getOrCreateSeries(eventDefinition.config);
+    const { value } = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
+
+    const nextExpression = AggregationExpressionParser.generateExpression(series.id, nextOperator, value);
+    this.propagateConfigChange('conditions', nextExpression);
+  };
+
+  handleExpressionThresholdChange = (event) => {
+    const { eventDefinition } = this.props;
+    const series = this.getOrCreateSeries(eventDefinition.config);
+    const { operator } = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
+    const nextThreshold = FormsUtils.getValueFromInput(event.target);
+
+    const nextExpression = AggregationExpressionParser.generateExpression(series.id, operator, nextThreshold);
+    this.propagateConfigChange('conditions', nextExpression);
+  };
+
   handleCustomTimerangeChange = (nextValue, nextUnit) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
@@ -109,6 +129,7 @@ class AggregationForm extends React.Component {
     const aggregationTimerange = lodash.defaultTo(eventDefinition.config.aggregation_timerange, {});
     const formattedFields = this.formatFields(allFieldTypes);
     const series = this.getSeries(eventDefinition.config) || {};
+    const expressionResults = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
 
     return (
       <fieldset>
@@ -160,14 +181,15 @@ class AggregationForm extends React.Component {
               <Select id="aggregation-condition"
                       matchProp="label"
                       placeholder="Select Condition"
-                      onChange={() => {}}
+                      onChange={this.handleExpressionOperatorChange}
                       options={[
-                        { label: '<', value: 'less' },
-                        { label: '>', value: 'greater' },
-                        { label: '=', value: 'equals' },
-                        { label: '≠', value: 'not-equal' },
+                        { label: '<', value: '<' },
+                        { label: '<=', value: '<=' },
+                        { label: '>', value: '>' },
+                        { label: '>=', value: '>=' },
+                        { label: '=', value: '==' },
                       ]}
-                      value={eventDefinition.config.condition} />
+                      value={expressionResults.operator} />
             </FormGroup>
           </Col>
           <Col md={3}>
@@ -175,8 +197,8 @@ class AggregationForm extends React.Component {
                    name="threshold"
                    label="Threshold"
                    type="number"
-                   value={lodash.defaultTo(eventDefinition.config.threshold, 0)}
-                   onChange={this.handleConfigChange} />
+                   value={lodash.defaultTo(expressionResults.value, 0)}
+                   onChange={this.handleExpressionThresholdChange} />
           </Col>
         </Row>
 
