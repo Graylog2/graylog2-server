@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
+import uuid from 'uuid/v4';
 import { Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { MultiSelect, Select, TimeUnitInput } from 'components/common';
@@ -41,7 +42,20 @@ class AggregationForm extends React.Component {
 
   getSeries = (config) => {
     // For now we only support one series in the UI
-    return config.series[0] || {};
+    return config.series[0];
+  };
+
+  createSeries = () => {
+    const { eventDefinition } = this.props;
+    const series = lodash.cloneDeep(eventDefinition.config.series);
+    const nextSeries = { id: uuid() };
+    series.push(nextSeries);
+    this.propagateConfigChange('series', series);
+    return { id: uuid() };
+  };
+
+  getOrCreateSeries = (config) => {
+    return this.getSeries(config) || this.createSeries();
   };
 
   propagateConfigChange = (key, value) => {
@@ -64,19 +78,19 @@ class AggregationForm extends React.Component {
   handleAggregationFunctionChange = (nextFunction) => {
     const { eventDefinition } = this.props;
     const series = lodash.cloneDeep(eventDefinition.config.series);
-    const nextSeries = lodash.cloneDeep(this.getSeries(eventDefinition.config));
+    const nextSeries = lodash.cloneDeep(this.getOrCreateSeries(eventDefinition.config));
     nextSeries.function = nextFunction;
     series[0] = nextSeries;
-    this.propagateConfigChange('series', nextSeries);
+    this.propagateConfigChange('series', series);
   };
 
   handleAggregationFieldChange = (nextField) => {
     const { eventDefinition } = this.props;
     const series = lodash.cloneDeep(eventDefinition.config.series);
-    const nextSeries = lodash.cloneDeep(this.getSeries(eventDefinition.config));
+    const nextSeries = lodash.cloneDeep(this.getOrCreateSeries(eventDefinition.config));
     nextSeries.field = nextField;
     series[0] = nextSeries;
-    this.propagateConfigChange('series', nextSeries);
+    this.propagateConfigChange('series', series);
   };
 
   handleCustomTimerangeChange = (nextValue, nextUnit) => {
@@ -94,7 +108,7 @@ class AggregationForm extends React.Component {
     const useScheduleTimerange = lodash.defaultTo(eventDefinition.config.use_schedule_timerange, true);
     const aggregationTimerange = lodash.defaultTo(eventDefinition.config.aggregation_timerange, {});
     const formattedFields = this.formatFields(allFieldTypes);
-    const series = this.getSeries(eventDefinition.config);
+    const series = this.getSeries(eventDefinition.config) || {};
 
     return (
       <fieldset>
