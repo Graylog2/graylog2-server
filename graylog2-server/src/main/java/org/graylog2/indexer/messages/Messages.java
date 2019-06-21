@@ -172,7 +172,7 @@ public class Messages {
     }
 
     private void recordTimestamp(List<Map.Entry<IndexSet, Message>> messageList, Set<String> failedIds) {
-        for (Map.Entry<IndexSet, Message> entry : messageList) {
+        for (final Map.Entry<IndexSet, Message> entry : messageList) {
             final Message message = entry.getValue();
 
             if (failedIds.contains(message.getId())) {
