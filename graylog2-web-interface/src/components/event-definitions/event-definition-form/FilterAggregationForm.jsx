@@ -96,7 +96,7 @@ class FilterAggregationForm extends React.Component {
               <FilterForm eventDefinition={eventDefinition} streams={streams} onChange={this.propagateChange} />
 
               <FormGroup>
-                <ControlLabel>Create Events for Alert if...</ControlLabel>
+                <ControlLabel>Create Events for Definition if...</ControlLabel>
                 <Radio id="filter-type"
                        name="conditionType"
                        value={conditionTypes.FILTER}

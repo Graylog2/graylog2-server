@@ -131,7 +131,7 @@ class AggregationForm extends React.Component {
 
         <hr />
 
-        <h3 className={commonStyles.title}>Trigger Alert</h3>
+        <h3 className={commonStyles.title}>Create Events for Definition</h3>
         <Row className="row-sm">
           <Col md={6}>
             <FormGroup controlId="aggregation-function">
