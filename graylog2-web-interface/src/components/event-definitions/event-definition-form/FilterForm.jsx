@@ -31,26 +31,25 @@ class FilterForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  handleConfigChange = (event) => {
+  propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
-    const { name } = event.target;
     const config = lodash.cloneDeep(eventDefinition.config);
-    config[name] = FormsUtils.getValueFromInput(event.target);
+    config[key] = value;
     onChange('config', config);
+  };
+
+  handleConfigChange = (event) => {
+    const { name } = event.target;
+    this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
   handleStreamsChange = (nextValue) => {
-    const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    config.streams = nextValue;
-    onChange('config', config);
+    this.propagateChange('streams', nextValue);
   };
 
   handleSearchWithinChange = (nextValue, nextUnit) => {
-    const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    config.search_within_ms = moment.duration(nextValue, nextUnit).asMilliseconds();
-    onChange('config', config);
+    const durationInMs = moment.duration(nextValue, nextUnit).asMilliseconds();
+    this.propagateChange('search_within_ms', durationInMs);
   };
 
   render() {
