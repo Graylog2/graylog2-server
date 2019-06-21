@@ -197,22 +197,22 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             switch (node.type) {
                 case SERVER:
                     // Always use the last source node.
-                    if (message.getField("gl2_source_input") != null) {
+                    if (message.getField(Message.FIELD_GL2_SOURCE_INPUT) != null) {
                         LOG.debug("Multiple server nodes ({} {}) set for message id {}",
-                                message.getField("gl2_source_input"), node.nodeId, message.getId());
+                                message.getField(Message.FIELD_GL2_SOURCE_INPUT), node.nodeId, message.getId());
                     }
-                    message.addField("gl2_source_input", node.inputId);
-                    message.addField("gl2_source_node", node.nodeId);
+                    message.addField(Message.FIELD_GL2_SOURCE_INPUT, node.inputId);
+                    message.addField(Message.FIELD_GL2_SOURCE_NODE, node.nodeId);
                     break;
                 // TODO Due to be removed in Graylog 3.x
                 case RADIO:
                     // Always use the last source node.
-                    if (message.getField("gl2_source_radio_input") != null) {
+                    if (message.getField(Message.FIELD_GL2_SOURCE_RADIO_INPUT) != null) {
                         LOG.debug("Multiple radio nodes ({} {}) set for message id {}",
-                                message.getField("gl2_source_radio_input"), node.nodeId, message.getId());
+                                message.getField(Message.FIELD_GL2_SOURCE_RADIO_INPUT), node.nodeId, message.getId());
                     }
-                    message.addField("gl2_source_radio_input", node.inputId);
-                    message.addField("gl2_source_radio", node.nodeId);
+                    message.addField(Message.FIELD_GL2_SOURCE_RADIO_INPUT, node.inputId);
+                    message.addField(Message.FIELD_GL2_SOURCE_RADIO, node.nodeId);
                     break;
             }
         }
@@ -228,12 +228,12 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
         if (remoteAddress != null) {
             final String addrString = InetAddresses.toAddrString(remoteAddress.getAddress());
-            message.addField("gl2_remote_ip", addrString);
+            message.addField(Message.FIELD_GL2_REMOTE_IP, addrString);
             if (remoteAddress.getPort() > 0) {
-                message.addField("gl2_remote_port", remoteAddress.getPort());
+                message.addField(Message.FIELD_GL2_REMOTE_PORT, remoteAddress.getPort());
             }
             if (remoteAddress.isReverseLookedUp()) { // avoid reverse lookup if the hostname is available
-                message.addField("gl2_remote_hostname", remoteAddress.getHostName());
+                message.addField(Message.FIELD_GL2_REMOTE_HOSTNAME, remoteAddress.getHostName());
             }
             if (Strings.isNullOrEmpty(message.getSource())) {
                 message.setSource(addrString);

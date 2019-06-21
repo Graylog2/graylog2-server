@@ -271,6 +271,7 @@ public class RawMessage implements Serializable {
 
         public enum Type {
             SERVER,
+            @Deprecated
             RADIO
         }
 

@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.Message;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
@@ -59,7 +60,7 @@ public abstract class SearchesClusterConfig {
             .build();
     private static final Set<String> DEFAULT_SURROUNDING_FILTER_FIELDS = ImmutableSet.<String>builder()
             .add("source")
-            .add("gl2_source_input")
+            .add(Message.FIELD_GL2_SOURCE_INPUT)
             .add("file")
             .add("source_file")
             .build();

@@ -43,7 +43,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
-    private static final String INTERNAL_FIELD_PREFIX = "gl2_";
 
     private final Timer resolveTime;
     private DatabaseReader databaseReader;
@@ -75,7 +74,7 @@ public class GeoIpResolverEngine {
 
         for (Map.Entry<String, Object> field : message.getFields().entrySet()) {
             final String key = field.getKey();
-            if (!key.startsWith(INTERNAL_FIELD_PREFIX)) {
+            if (!key.startsWith(Message.INTERNAL_FIELD_PREFIX)) {
                 final Optional<GeoLocationInformation> geoLocationInformation = extractGeoLocationInformation(field.getValue());
                 geoLocationInformation.ifPresent(locationInformation -> {
                     // We will store the coordinates as a "lat,long" string

@@ -132,7 +132,7 @@ public class GeoIpResolverEngineTest {
         messageFields.put("source", "192.168.0.1");
         messageFields.put("message", "Hello from 1.2.3.4");
         messageFields.put("extracted_ip", "1.2.3.4");
-        messageFields.put("gl2_remote_ip", "1.2.3.4");
+        messageFields.put(Message.FIELD_GL2_REMOTE_IP, "1.2.3.4");
         messageFields.put("ipv6", "2001:4860:4860::8888");
 
         final Message message = new Message(messageFields);

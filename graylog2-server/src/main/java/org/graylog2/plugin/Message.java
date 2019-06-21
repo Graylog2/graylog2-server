@@ -75,23 +75,87 @@ public class Message implements Messages {
     public static final String FIELD_TIMESTAMP = "timestamp";
     public static final String FIELD_LEVEL = "level";
     public static final String FIELD_STREAMS = "streams";
+
+    /**
+     * Graylog is writing internal metadata to messages using this field prefix. Users must not use this prefix for
+     * custom message fields.
+     */
+    public static final String INTERNAL_FIELD_PREFIX = "gl2_";
+
+    /**
+     * Can be set when a message timestamp gets modified to preserve the original timestamp. (e.g. "clone_message" pipeline function)
+     */
+    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
+
+    /**
+     * Can be set to indicate a message processing error. (e.g. set by the pipeline interpreter when an error occurs)
+     */
+    public static final String FIELD_GL2_PROCESSING_ERROR = "gl2_processing_error";
+
+    /**
+     * Will be set to the hostname of the source node that sent a message. (if reverse lookup is enabled)
+     */
+    public static final String FIELD_GL2_REMOTE_HOSTNAME = "gl2_remote_hostname";
+
+    /**
+     * Will be set to the IP address of the source node that sent a message.
+     */
+    public static final String FIELD_GL2_REMOTE_IP = "gl2_remote_ip";
+
+    /**
+     * Will be set to the socket port of the source node that sent a message.
+     */
+    public static final String FIELD_GL2_REMOTE_PORT = "gl2_remote_port";
+
+    /**
+     * Can be set to the collector ID that sent a message. (e.g. used in the beats codec)
+     */
     public static final String FIELD_GL2_SOURCE_COLLECTOR = "gl2_source_collector";
+
+    /**
+     * @deprecated This was used in the legacy collector/sidecar system and contained the database ID of the collector input.
+     */
+    @Deprecated
+    public static final String FIELD_GL2_SOURCE_COLLECTOR_INPUT = "gl2_source_collector_input";
+
+    /**
+     * Will be set to the ID of the input that received the message.
+     */
+    public static final String FIELD_GL2_SOURCE_INPUT = "gl2_source_input";
+
+    /**
+     * Will be set to the ID of the node that received the message.
+     */
+    public static final String FIELD_GL2_SOURCE_NODE = "gl2_source_node";
+
+    /**
+     * @deprecated This was used with the now removed radio system and contained the ID of a radio node.
+     */
+    @Deprecated
+    public static final String FIELD_GL2_SOURCE_RADIO = "gl2_source_radio";
+
+    /**
+     * @deprecated This was used with the now removed radio system and contained the input ID of a radio node.
+     */
+    @Deprecated
+    public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
 
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
-        "gl2_source_node",
-        "gl2_source_input",
+        FIELD_GL2_SOURCE_NODE,
+        FIELD_GL2_SOURCE_INPUT,
+
         // TODO Due to be removed in Graylog 3.x
-        "gl2_source_radio",
-        "gl2_source_radio_input",
+        FIELD_GL2_SOURCE_RADIO,
+        FIELD_GL2_SOURCE_RADIO_INPUT,
 
         FIELD_GL2_SOURCE_COLLECTOR,
-        "gl2_source_collector_input",
-        "gl2_remote_ip",
-        "gl2_remote_port",
-        "gl2_remote_hostname"
+        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+        FIELD_GL2_REMOTE_IP,
+        FIELD_GL2_REMOTE_PORT,
+        FIELD_GL2_REMOTE_HOSTNAME
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -652,14 +716,14 @@ public class Message implements Messages {
     // drools seems to need the "get" prefix
     @Deprecated
     public boolean getIsSourceInetAddress() {
-        return fields.containsKey("gl2_remote_ip");
+        return fields.containsKey(FIELD_GL2_REMOTE_IP);
     }
 
     public InetAddress getInetAddress() {
-        if (!fields.containsKey("gl2_remote_ip")) {
+        if (!fields.containsKey(FIELD_GL2_REMOTE_IP)) {
             return null;
         }
-        final String ipAddr = (String) fields.get("gl2_remote_ip");
+        final String ipAddr = (String) fields.get(FIELD_GL2_REMOTE_IP);
         try {
             return InetAddresses.forString(ipAddr);
         } catch (IllegalArgumentException ignored) {

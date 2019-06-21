@@ -53,7 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
@@ -69,8 +68,6 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
     private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
-
-    public static final String GL2_PROCESSING_ERROR = "gl2_processing_error";
 
     private final Journal journal;
     private final Meter filteredOutMessages;
@@ -422,10 +419,10 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private void appendProcessingError(Rule rule, Message message, String errorString) {
         final String msg = "For rule '" + rule.name() + "': " + errorString;
-        if (message.hasField(GL2_PROCESSING_ERROR)) {
-            message.addField(GL2_PROCESSING_ERROR, message.getFieldAs(String.class, GL2_PROCESSING_ERROR) + "," + msg);
+        if (message.hasField(Message.FIELD_GL2_PROCESSING_ERROR)) {
+            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, message.getFieldAs(String.class, Message.FIELD_GL2_PROCESSING_ERROR) + "," + msg);
         } else {
-            message.addField(GL2_PROCESSING_ERROR, msg);
+            message.addField(Message.FIELD_GL2_PROCESSING_ERROR, msg);
         }
     }
 
