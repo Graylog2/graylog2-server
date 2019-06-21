@@ -93,6 +93,18 @@ public class Message implements Messages {
     public static final String FIELD_GL2_PROCESSING_ERROR = "gl2_processing_error";
 
     /**
+     * Will be set to the message processing time after all message processors have been run.
+     * TODO: To be done in Graylog 3.2
+     */
+    public static final String FIELD_GL2_PROCESSING_TIMESTAMP = "gl2_processing_timestamp";
+
+    /**
+     * Will be set to the message receive time at the input.
+     * TODO: To be done in Graylog 3.2
+     */
+    public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
+
+    /**
      * Will be set to the hostname of the source node that sent a message. (if reverse lookup is enabled)
      */
     public static final String FIELD_GL2_REMOTE_HOSTNAME = "gl2_remote_hostname";
@@ -148,6 +160,8 @@ public class Message implements Messages {
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
         FIELD_GL2_ORIGINAL_TIMESTAMP,
         FIELD_GL2_PROCESSING_ERROR,
+        FIELD_GL2_PROCESSING_TIMESTAMP,
+        FIELD_GL2_RECEIVE_TIMESTAMP,
         FIELD_GL2_REMOTE_HOSTNAME,
         FIELD_GL2_REMOTE_IP,
         FIELD_GL2_REMOTE_PORT,
