@@ -47,9 +47,11 @@ class FilterForm extends React.Component {
     this.propagateChange('streams', nextValue);
   };
 
-  handleSearchWithinChange = (nextValue, nextUnit) => {
-    const durationInMs = moment.duration(nextValue, nextUnit).asMilliseconds();
-    this.propagateChange('search_within_ms', durationInMs);
+  handleTimeRangeChange = (fieldName) => {
+    return (nextValue, nextUnit) => {
+      const durationInMs = moment.duration(nextValue, nextUnit).asMilliseconds();
+      this.propagateChange(fieldName, durationInMs);
+    };
   };
 
   render() {
@@ -59,6 +61,7 @@ class FilterForm extends React.Component {
       .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
 
     const searchWithin = durationFromMs(eventDefinition.config.search_within_ms);
+    const executeEvery = durationFromMs(eventDefinition.config.execute_every_ms);
 
     return (
       <fieldset>
@@ -83,7 +86,7 @@ class FilterForm extends React.Component {
 
         <FormGroup controlId="search-within">
           <TimeUnitInput label="Search within the last"
-                         update={this.handleSearchWithinChange}
+                         update={this.handleTimeRangeChange('search_within_ms')}
                          value={searchWithin.duration}
                          unit={searchWithin.timeUnit}
                          units={TIME_UNITS}
@@ -91,6 +94,12 @@ class FilterForm extends React.Component {
         </FormGroup>
 
         <FormGroup controlId="execute-every">
+          <TimeUnitInput label="Execute search every"
+                         update={this.handleTimeRangeChange('execute_every_ms')}
+                         value={executeEvery.duration}
+                         unit={executeEvery.timeUnit}
+                         units={TIME_UNITS}
+                         required />
         </FormGroup>
       </fieldset>
     );
