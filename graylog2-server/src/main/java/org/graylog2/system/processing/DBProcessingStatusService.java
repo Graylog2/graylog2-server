@@ -21,10 +21,13 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
@@ -32,6 +35,8 @@ import org.mongojack.JacksonDBCollection;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Manages the database collection for processing status.
@@ -40,13 +45,16 @@ public class DBProcessingStatusService {
     private static final String COLLECTION_NAME = "processing_status";
 
     private final String nodeId;
+    private final NodeService nodeService;
     private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
 
     @Inject
     public DBProcessingStatusService(MongoConnection mongoConnection,
                                      NodeId nodeId,
+                                     NodeService nodeService,
                                      MongoJackObjectMapperProvider mapper) {
         this.nodeId = nodeId.toString();
+        this.nodeService = nodeService;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
@@ -61,7 +69,7 @@ public class DBProcessingStatusService {
      * @return a list of all processing status entries
      */
     public List<ProcessingStatusDto> all() {
-        return ImmutableList.copyOf(db.find().sort(DBSort.desc("_id")).iterator());
+        return ImmutableList.copyOf(db.find().sort(DBSort.asc("_id")).iterator());
     }
 
     /**
@@ -71,6 +79,36 @@ public class DBProcessingStatusService {
      */
     public Optional<ProcessingStatusDto> get() {
         return Optional.ofNullable(db.findOne(DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId)));
+    }
+
+    /**
+     * Returns the oldest max post-indexing receive timestamp of all active Graylog nodes in the cluster.
+     * This can be used to find out if a certain timerange is already searchable in Elasticsearch.
+     * <p>
+     * Beware: This only takes the message receive time into account. It doesn't help when log sources send their
+     * messages late.
+     *
+     * @return max post-indexing timestamp or empty optional if no processing status entries exist
+     */
+    public Optional<DateTime> maxIndexedTimestamp() {
+        final String sortField = ProcessingStatusDto.FIELD_MAX_RECEIVE_TIMES + "." + ProcessingStatusDto.MaxReceiveTimes.FIELD_POST_INDEXING;
+
+        // We only check the min indexed timestamp for all active nodes to make sure we don't look at old status entries
+        final Set<String> activeNodes = nodeService.allActive().values()
+                .stream()
+                .map(Node::getNodeId)
+                .collect(Collectors.toSet());
+
+        final DBQuery.Query query = DBQuery.in(ProcessingStatusDto.FIELD_NODE_ID, activeNodes);
+        // Get the oldest timestamp of the post-indexing max receive timestamp by sorting and returning the first one.
+        // We use the oldest max timestamp because some nodes can be faster than others and we need to make sure
+        // to return the max timestamp of the slowest one.
+        try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
+            if (cursor.hasNext()) {
+                return Optional.of(cursor.next().maxReceiveTimes().postIndexing());
+            }
+            return Optional.empty();
+        }
     }
 
     /**

@@ -32,7 +32,7 @@ public abstract class ProcessingStatusDto {
     private static final String FIELD_ID = "id";
     static final String FIELD_NODE_ID = "node_id";
     static final String FIELD_UPDATED_AT = "updated_at";
-    private static final String FIELD_MAX_RECEIVE_TIMES = "max_receive_times";
+    static final String FIELD_MAX_RECEIVE_TIMES = "max_receive_times";
 
     @Id
     @ObjectId
@@ -94,9 +94,9 @@ public abstract class ProcessingStatusDto {
     @AutoValue
     @JsonDeserialize(builder = MaxReceiveTimes.Builder.class)
     public static abstract class MaxReceiveTimes {
-        public static final String FIELD_PRE_JOURNAL = "pre_journal";
-        public static final String FIELD_POST_PROCESSING = "post_processing";
-        public static final String FIELD_POST_INDEXING = "post_indexing";
+        private static final String FIELD_PRE_JOURNAL = "pre_journal";
+        private static final String FIELD_POST_PROCESSING = "post_processing";
+        static final String FIELD_POST_INDEXING = "post_indexing";
 
         @JsonProperty(FIELD_PRE_JOURNAL)
         public abstract DateTime preJournal();
