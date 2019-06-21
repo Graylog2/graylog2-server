@@ -13,6 +13,9 @@ import { Spinner } from 'components/common';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import EventDefinitionForm from './EventDefinitionForm';
 
+// Import built-in Event Definition Types
+import {} from './event-definition-types';
+
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 const { StreamsStore } = CombinedProvider.get('Streams');

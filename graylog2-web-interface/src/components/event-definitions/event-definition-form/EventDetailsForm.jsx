@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -32,6 +33,17 @@ class EventDetailsForm extends React.Component {
   handlePriorityChange = (nextPriority) => {
     const { onChange } = this.props;
     onChange('priority', lodash.toNumber(nextPriority));
+  };
+
+  handleEventDefinitionTypeChange = (nextType) => {
+    const { onChange } = this.props;
+    const nextConfig = { type: nextType };
+    onChange('config', nextConfig);
+  };
+
+  formattedEventDefinitionTypes = () => {
+    return PluginStore.exports('eventDefinitionTypes')
+      .map(type => ({ label: type.displayName, value: type.type }));
   };
 
   render() {
@@ -69,6 +81,17 @@ class EventDetailsForm extends React.Component {
                         clearable={false}
                         required />
                 <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
+              </FormGroup>
+
+              <FormGroup controlId="event-definition-priority">
+                <ControlLabel>Condition Type</ControlLabel>
+                <Select placeholder="Select a Condition Type"
+                        options={this.formattedEventDefinitionTypes()}
+                        value={eventDefinition.config.type}
+                        onChange={this.handleEventDefinitionTypeChange}
+                        clearable={false}
+                        required />
+                <HelpBlock>Choose the type of Condition the Event will use.</HelpBlock>
               </FormGroup>
             </fieldset>
           </form>
