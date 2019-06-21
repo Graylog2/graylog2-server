@@ -5,7 +5,12 @@ import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace-builds';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+
 import { ClipboardButton } from 'components/common';
+import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import style from './SourceCodeEditor.css';
 import './webpack-resolver';
@@ -34,7 +39,7 @@ class SourceCodeEditor extends React.Component {
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
-    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml']),
+    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */
@@ -77,6 +82,24 @@ class SourceCodeEditor extends React.Component {
       selectedText: '',
     };
   }
+
+  componentDidMount() {
+    const { mode } = this.props;
+
+    if (mode === 'pipeline') {
+      const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
+
+      fetch('GET', url).then((response) => {
+        const functions = response.map(res => res.name).join('|');
+        const pipelineRulesMode = new PipelineRulesMode(functions);
+
+        this.reactAce.editor.getSession().setMode(pipelineRulesMode);
+
+        return functions;
+      });
+    }
+  }
+
 
   componentDidUpdate(prevProps) {
     const { height, width } = this.props;
@@ -124,6 +147,7 @@ class SourceCodeEditor extends React.Component {
     if (!this.reactAce || !toolbar || readOnly) {
       return;
     }
+
     const selectedText = this.reactAce.editor.getSession().getTextRange(selection.getRange());
     this.setState({ selectedText: selectedText });
   };
