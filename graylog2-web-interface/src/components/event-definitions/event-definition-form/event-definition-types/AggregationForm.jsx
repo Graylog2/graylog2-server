@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 import uuid from 'uuid/v4';
-import { Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { MultiSelect, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -11,7 +11,7 @@ import { Input } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
 import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 
-import commonStyles from '../common/commonStyles.css';
+import commonStyles from '../../common/commonStyles.css';
 
 class AggregationForm extends React.Component {
   static propTypes = {

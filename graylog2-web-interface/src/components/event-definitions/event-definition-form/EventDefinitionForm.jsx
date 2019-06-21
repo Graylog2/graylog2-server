@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { Wizard } from 'components/common';
 import EventDetailsForm from './EventDetailsForm';
-import FilterAggregationForm from './FilterAggregationForm';
+import FilterAggregationForm from './event-definition-types/FilterAggregationForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';

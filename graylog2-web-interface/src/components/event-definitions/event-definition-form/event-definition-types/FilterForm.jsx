@@ -10,7 +10,7 @@ import { Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
 
-import commonStyles from '../common/commonStyles.css';
+import commonStyles from '../../common/commonStyles.css';
 
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 

@@ -7,7 +7,7 @@ import FormsUtils from 'util/FormsUtils';
 import FilterForm from './FilterForm';
 import AggregationForm from './AggregationForm';
 
-import commonStyles from '../common/commonStyles.css';
+import commonStyles from '../../common/commonStyles.css';
 
 const conditionTypes = {
   AGGREGATION: 0,
@@ -51,7 +51,6 @@ class FilterAggregationForm extends React.Component {
     // Set initial config for this type
     const { eventDefinition } = this.props;
     const initialConfig = {
-      type: 'aggregation-v1',
       query: '',
       streams: [],
       group_by: [],
