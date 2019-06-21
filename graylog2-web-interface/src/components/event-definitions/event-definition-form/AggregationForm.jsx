@@ -3,16 +3,15 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 import uuid from 'uuid/v4';
-import { Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
-import { MultiSelect, Select, TimeUnitInput } from 'components/common';
+import { MultiSelect, Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
 import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 
 import commonStyles from '../common/commonStyles.css';
-import styles from './AggregationForm.css';
 
 class AggregationForm extends React.Component {
   static propTypes = {
@@ -66,12 +65,6 @@ class AggregationForm extends React.Component {
     onChange('config', nextConfig);
   };
 
-  handleConfigChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    this.propagateConfigChange(name, value);
-  };
-
   handleGroupByChange = (nextValue) => {
     this.propagateConfigChange('group_by', nextValue);
   };
@@ -113,20 +106,8 @@ class AggregationForm extends React.Component {
     this.propagateConfigChange('conditions', nextExpression);
   };
 
-  handleCustomTimerangeChange = (nextValue, nextUnit) => {
-    const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    config.aggregation_timerange = {
-      value: nextValue,
-      unit: nextUnit,
-    };
-    onChange('config', config);
-  };
-
   render() {
     const { allFieldTypes, aggregationFunctions, eventDefinition } = this.props;
-    const useScheduleTimerange = lodash.defaultTo(eventDefinition.config.use_schedule_timerange, true);
-    const aggregationTimerange = lodash.defaultTo(eventDefinition.config.aggregation_timerange, {});
     const formattedFields = this.formatFields(allFieldTypes);
     const series = this.getSeries(eventDefinition.config) || {};
     const expressionResults = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
@@ -200,33 +181,8 @@ class AggregationForm extends React.Component {
                    value={lodash.defaultTo(expressionResults.value, 0)}
                    onChange={this.handleExpressionThresholdChange} />
           </Col>
-        </Row>
 
-        <Row className="row-sm">
-          <Col md={6}>
-            <TimeUnitInput label="In the last"
-                           update={this.handleCustomTimerangeChange}
-                           enabled={!useScheduleTimerange}
-                           value={lodash.defaultTo(aggregationTimerange.value, 1)}
-                           unit={aggregationTimerange.unit}
-                           units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
-                           hideCheckbox />
-          </Col>
-          <Col md={6}>
-            <FormGroup className={styles.checkbox}>
-              <Checkbox name="use_schedule_timerange"
-                        checked={useScheduleTimerange}
-                        onChange={this.handleConfigChange}
-                        inline>
-                Use schedule time range
-              </Checkbox>
-              <span className={styles.helpButton}>
-                <i className="fa fa-question-circle" />
-              </span>
-            </FormGroup>
-          </Col>
         </Row>
-
       </fieldset>
     );
   }
