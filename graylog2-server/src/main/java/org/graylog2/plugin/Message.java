@@ -130,12 +130,14 @@ public class Message implements Messages {
 
     /**
      * @deprecated This was used with the now removed radio system and contained the ID of a radio node.
+     * TODO: Due to be removed in Graylog 3.x
      */
     @Deprecated
     public static final String FIELD_GL2_SOURCE_RADIO = "gl2_source_radio";
 
     /**
      * @deprecated This was used with the now removed radio system and contained the input ID of a radio node.
+     * TODO: Due to be removed in Graylog 3.x
      */
     @Deprecated
     public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
@@ -144,18 +146,17 @@ public class Message implements Messages {
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
-        FIELD_GL2_SOURCE_NODE,
-        FIELD_GL2_SOURCE_INPUT,
-
-        // TODO Due to be removed in Graylog 3.x
-        FIELD_GL2_SOURCE_RADIO,
-        FIELD_GL2_SOURCE_RADIO_INPUT,
-
-        FIELD_GL2_SOURCE_COLLECTOR,
-        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+        FIELD_GL2_ORIGINAL_TIMESTAMP,
+        FIELD_GL2_PROCESSING_ERROR,
+        FIELD_GL2_REMOTE_HOSTNAME,
         FIELD_GL2_REMOTE_IP,
         FIELD_GL2_REMOTE_PORT,
-        FIELD_GL2_REMOTE_HOSTNAME
+        FIELD_GL2_SOURCE_COLLECTOR,
+        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+        FIELD_GL2_SOURCE_INPUT,
+        FIELD_GL2_SOURCE_NODE,
+        FIELD_GL2_SOURCE_RADIO,
+        FIELD_GL2_SOURCE_RADIO_INPUT
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
