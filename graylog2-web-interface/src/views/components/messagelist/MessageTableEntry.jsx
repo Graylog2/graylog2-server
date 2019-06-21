@@ -2,10 +2,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -49,13 +47,19 @@ const ConnectedMessageDetail = connect(
   },
 );
 
+type Message = {|
+  id: string,
+  index: string,
+  fields: { [string]: any },
+|};
+
 type Props = {
   disableSurroundingSearch?: boolean,
   expandAllRenderAsync: boolean,
   expanded: boolean,
   fields: FieldTypeMappingsList,
   highlightMessage?: string,
-  message: { [string]: any },
+  message: Message,
   selectedFields?: Immutable.OrderedSet<string>,
   showMessageRow?: boolean,
   toggleDetail: (string) => void,
@@ -92,12 +96,12 @@ const MessageTableEntry = ({
   if (message.id === highlightMessage) {
     classes += ' message-highlight';
   }
-  const messageFieldType = fields.find(type => type.name === 'message', FieldTypeMapping.create('message', FieldType.Unknown)).type;
+  const messageFieldType = fields.find(type => type.name === 'message', undefined, FieldTypeMapping.create('message', FieldType.Unknown)).type;
   return (
     <tbody className={classes}>
       <tr className="fields-row" onClick={_toggleDetail}>
         { selectedFields.toArray().map((selectedFieldName, idx) => {
-          const { type } = fields.find(t => t.name === selectedFieldName, FieldTypeMapping.create(selectedFieldName, FieldType.Unknown));
+          const { type } = fields.find(t => t.name === selectedFieldName, undefined, FieldTypeMapping.create(selectedFieldName, FieldType.Unknown));
           return (
             <td className={style.fieldsRowField} key={selectedFieldName}>
               {_renderStrong(

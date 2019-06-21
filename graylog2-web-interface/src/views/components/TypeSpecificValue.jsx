@@ -21,7 +21,7 @@ const _formatValue = (field, value, truncate, render, type) => {
 
 type Props = {
   field: string,
-  value: any,
+  value?: any,
   type: FieldType,
   truncate?: boolean,
   render?: React.ComponentType<ValueRendererProps>,
@@ -43,11 +43,12 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
 TypeSpecificValue.propTypes = {
   truncate: PropTypes.bool,
   type: CustomPropTypes.FieldType,
-  value: PropTypes.any.isRequired,
+  value: PropTypes.any,
 };
 
 TypeSpecificValue.defaultProps = {
   render: defaultComponent,
+  value: undefined,
 };
 
 export default TypeSpecificValue;
