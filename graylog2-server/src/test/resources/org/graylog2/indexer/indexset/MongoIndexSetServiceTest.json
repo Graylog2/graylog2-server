@@ -52,6 +52,34 @@
       "index_template_name": "test_2",
       "index_optimization_max_num_segments": 1,
       "index_optimization_disabled": false
+    },
+    {
+      "_id": {
+        "$oid": "57f3d721a43c2d59cb750003"
+      },
+      "title": "Test 3",
+      "description": "This is the index set configuration for Test 3 - with an index set index template",
+      "index_prefix": "test_3",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 2500
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 25
+      },
+      "creation_date": {
+        "$date": "2016-10-04T18:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "test_3",
+      "index_template_type": "events",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false
     }
   ]
 }

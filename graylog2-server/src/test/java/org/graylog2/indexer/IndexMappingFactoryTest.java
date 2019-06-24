@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +42,8 @@ public class IndexMappingFactoryTest {
 
     @Mock
     private Node node;
+    @Mock
+    private IndexSet indexSet;
 
     private IndexMappingFactory indexMappingFactory;
 
@@ -53,7 +56,7 @@ public class IndexMappingFactoryTest {
     public void createIndexMappingFailsIfElasticsearch1VersionIsTooLow() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("1.7.3")));
 
-        assertThatThrownBy(indexMappingFactory::createIndexMapping)
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: 1.7.3")
                 .hasNoCause();
@@ -63,7 +66,7 @@ public class IndexMappingFactoryTest {
     public void createIndexMappingFailsIfElasticsearch2VersionIsTooLow() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("2.0.0")));
 
-        assertThatThrownBy(indexMappingFactory::createIndexMapping)
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: 2.0.0")
                 .hasNoCause();
@@ -73,7 +76,7 @@ public class IndexMappingFactoryTest {
     public void createIndexMappingFailsIfElasticsearch6VersionIsTooHigh() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("7.0.0")));
 
-        assertThatThrownBy(indexMappingFactory::createIndexMapping)
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: 7.0.0")
                 .hasNoCause();
@@ -84,12 +87,21 @@ public class IndexMappingFactoryTest {
         @Parameterized.Parameters
         public static Collection<Object[]> data() {
             return Arrays.asList(new Object[][]{
-                    {"5.0.0", IndexMapping5.class},
-                    {"5.1.0", IndexMapping5.class},
-                    {"5.2.0", IndexMapping5.class},
-                    {"5.3.0", IndexMapping5.class},
-                    {"5.4.0", IndexMapping5.class},
-                    {"6.3.1", IndexMapping6.class},
+                    {"5.0.0", IndexSetConfig.TemplateType.MESSAGES, IndexMapping5.class},
+                    {"5.1.0", IndexSetConfig.TemplateType.MESSAGES, IndexMapping5.class},
+                    {"5.2.0", IndexSetConfig.TemplateType.MESSAGES, IndexMapping5.class},
+                    {"5.3.0", IndexSetConfig.TemplateType.MESSAGES, IndexMapping5.class},
+                    {"5.4.0", IndexSetConfig.TemplateType.MESSAGES, IndexMapping5.class},
+                    {"6.3.1", IndexSetConfig.TemplateType.MESSAGES, IndexMapping6.class},
+                    {"6.8.1", IndexSetConfig.TemplateType.MESSAGES, IndexMapping6.class},
+
+                    {"5.0.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"5.1.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"5.2.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"5.3.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"5.4.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"6.3.1", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"6.8.1", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
             });
         }
 
@@ -97,6 +109,7 @@ public class IndexMappingFactoryTest {
         public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
         private final String version;
+        private final IndexSetConfig.TemplateType templateType;
         private final Class<? extends IndexMapping> expectedMapping;
 
         @Mock
@@ -105,8 +118,9 @@ public class IndexMappingFactoryTest {
         private IndexMappingFactory indexMappingFactory;
 
 
-        public ParameterizedTest(String version, Class<? extends IndexMapping> expectedMapping) {
+        public ParameterizedTest(String version, IndexSetConfig.TemplateType templateType, Class<? extends IndexMapping> expectedMapping) {
             this.version = version;
+            this.templateType = templateType;
             this.expectedMapping = expectedMapping;
         }
 
@@ -118,7 +132,7 @@ public class IndexMappingFactoryTest {
 
         @Test
         public void test() throws Exception {
-            assertThat(indexMappingFactory.createIndexMapping()).isInstanceOf(expectedMapping);
+            assertThat(indexMappingFactory.createIndexMapping(templateType)).isInstanceOf(expectedMapping);
         }
     }
 }
