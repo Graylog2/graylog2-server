@@ -12,7 +12,7 @@ describe('MessageTableEntry', () => {
       index: 'test_0',
       fields: {
         message: 'Something happened!',
-      }
+      },
     };
     const wrapper = mount((
       <table>
