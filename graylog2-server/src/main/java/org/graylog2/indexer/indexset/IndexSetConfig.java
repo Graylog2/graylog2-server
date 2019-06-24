@@ -35,6 +35,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -50,7 +51,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
-    private static final TemplateType DEFAULT_INDEX_TEMPLATE_TYPE = TemplateType.MESSAGES;
+    public static final TemplateType DEFAULT_INDEX_TEMPLATE_TYPE = TemplateType.MESSAGES;
 
     public enum TemplateType {
         @JsonProperty("messages")
@@ -127,7 +128,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     @JsonProperty("index_template_type")
     @NotBlank
-    public abstract TemplateType indexTemplateType();
+    public abstract Optional<TemplateType> indexTemplateType();
 
     @JsonProperty("index_optimization_max_num_segments")
     @Min(1L)
@@ -161,8 +162,6 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval) {
 
-        final TemplateType templateType = indexTemplateType == null ? DEFAULT_INDEX_TEMPLATE_TYPE : indexTemplateType;
-
         final boolean writableValue = isWritable == null ? true : isWritable;
 
         Duration fieldTypeRefreshIntervalValue = fieldTypeRefreshInterval;
@@ -188,7 +187,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .creationDate(creationDate)
                 .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
                 .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
-                .indexTemplateType(templateType)
+                .indexTemplateType(indexTemplateType)
                 .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
                 .indexOptimizationDisabled(indexOptimizationDisabled == null ? false : indexOptimizationDisabled)
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
@@ -304,7 +303,6 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return new AutoValue_IndexSetConfig.Builder()
                 // Index sets are writable by default.
                 .isWritable(true)
-                .indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE)
                 .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
     }
 
@@ -342,7 +340,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder indexTemplateName(String templateName);
 
-        public abstract Builder indexTemplateType(TemplateType templateType);
+        public abstract Builder indexTemplateType(@Nullable TemplateType templateType);
 
         public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
 

@@ -110,14 +110,14 @@ public class IndexSetConfigTest {
         );
 
 
-        // Not using the indexTemplateType(String) builder method should result in the default value
-        assertThat(config1.indexTemplateType()).isEqualTo(IndexSetConfig.TemplateType.MESSAGES);
+        // Not using the indexTemplateType(String) builder method should result in an empty template type
+        assertThat(config1.indexTemplateType()).isNotPresent();
 
         // Types can be set with the builder and the create() method
-        assertThat(config2.indexTemplateType()).isEqualTo(IndexSetConfig.TemplateType.EVENTS);
-        assertThat(config3.indexTemplateType()).isEqualTo(IndexSetConfig.TemplateType.EVENTS);
+        assertThat(config2.indexTemplateType()).isPresent().get().isEqualTo(IndexSetConfig.TemplateType.EVENTS);
+        assertThat(config3.indexTemplateType()).isPresent().get().isEqualTo(IndexSetConfig.TemplateType.EVENTS);
 
-        // A template type value of "null" should result in the default value
-        assertThat(config4.indexTemplateType()).isEqualTo(IndexSetConfig.TemplateType.MESSAGES);
+        // A template type value of "null" should result in an empty template type
+        assertThat(config4.indexTemplateType()).isNotPresent();
     }
 }

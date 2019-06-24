@@ -361,7 +361,7 @@ public class Indices {
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType());
+        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE));
         final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
 
         final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
@@ -382,7 +382,7 @@ public class Indices {
     public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
         final String indexWildcard = indexSet.getIndexWildcard();
 
-        return indexMappingFactory.createIndexMapping(indexSet.getConfig().indexTemplateType()).toTemplate(indexSet.getConfig(), indexWildcard);
+        return indexMappingFactory.createIndexMapping(indexSet.getConfig().indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE)).toTemplate(indexSet.getConfig(), indexWildcard);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
