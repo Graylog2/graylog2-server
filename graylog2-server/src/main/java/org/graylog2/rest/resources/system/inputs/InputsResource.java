@@ -75,19 +75,18 @@ import java.util.stream.Collectors;
 @Path("/system/inputs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class InputsResource extends RestResource {
+public class InputsResource extends AbstractInputsResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
-    private final Map<String, InputDescription> availableInputs;
 
     @Inject
     public InputsResource(InputService inputService, MessageInputFactory messageInputFactory) {
+        super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
-        this.availableInputs = messageInputFactory.getAvailableInputs();
     }
 
     @GET
@@ -202,50 +201,5 @@ public class InputsResource extends RestResource {
                 .build(input.getId());
 
         return Response.created(inputUri).entity(InputCreated.create(input.getId())).build();
-    }
-
-    private InputSummary getInputSummary(Input input) {
-        final InputDescription inputDescription = this.availableInputs.get(input.getType());
-        final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
-        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
-        final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) ?
-                input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
-        return InputSummary.create(input.getTitle(),
-                input.isGlobal(),
-                name,
-                input.getContentPack(),
-                input.getId(),
-                input.getCreatedAt(),
-                input.getType(),
-                input.getCreatorUserId(),
-                configuration,
-                input.getStaticFields(),
-                input.getNodeId()
-        );
-    }
-
-    @VisibleForTesting
-    Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
-        if (configuration == null || configurationRequest == null) {
-            return configuration;
-        }
-        return configuration.entrySet()
-                .stream()
-                .collect(
-                        HashMap::new,
-                        (map, entry) -> {
-                            final ConfigurationField field = configurationRequest.getField(entry.getKey());
-                            if (field instanceof TextField) {
-                                final TextField textField = (TextField) field;
-                                if (textField.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH))
-                                        && !Strings.isNullOrEmpty((String) entry.getValue())) {
-                                    map.put(entry.getKey(), "<password set>");
-                                    return;
-                                }
-                            }
-                            map.put(entry.getKey(), entry.getValue());
-                        },
-                        HashMap::putAll
-                );
     }
 }
