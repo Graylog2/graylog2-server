@@ -4,16 +4,26 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 
 import ReactSelect, { components as Components, Creatable } from 'react-select';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import reactSelectSmStyles from '!style/useable!css!./Select.css';
 
-const MultiValueRemove = (props) => {
-  return (
-    <Components.MultiValueRemove {...props}>
-      ×
-    </Components.MultiValueRemove>
-  );
-};
+const MultiValueRemove = props => (
+  <Components.MultiValueRemove {...props}>
+    ×
+  </Components.MultiValueRemove>
+);
+
+const IndicatorSeparator = () => null;
+
+const IndicatorsContainerClosed = () => (
+  <div style={{ marginRight: '1rem' }}>
+    <i className="fa fa-caret-down" />
+  </div>
+);
+
+const IndicatorsContainerOpen = () => (
+  <div style={{ marginRight: '1rem' }}>
+    <i className="fa fa-caret-up" />
+  </div>
+);
 
 const multiValue = base => ({
   ...base,
@@ -39,13 +49,40 @@ const multiValueRemove = base => ({
   },
 });
 
+const controlSmall = base => ({
+  ...base,
+  minHeight: '30px',
+  height: '30px',
+});
+
+const controlNormal = base => ({
+  ...base,
+  minHeight: '36px',
+  height: '36px',
+});
+
+const menu = base => ({
+  ...base,
+  zIndex: 5,
+});
+
+const singleValueAndPlaceholder = base => ({
+  ...base,
+  lineHeight: '28px',
+});
+
 const _components = {
   MultiValueRemove,
+  IndicatorSeparator,
 };
+
 const _styles = {
   multiValue,
   multiValueLabel,
   multiValueRemove,
+  menu,
+  singleValue: singleValueAndPlaceholder,
+  placeholder: singleValueAndPlaceholder,
 };
 
 type Option = { [string]: any };
@@ -71,6 +108,7 @@ type Props = {
 
 type State = {
   value: any,
+  isMenuOpen: boolean,
 };
 
 class Select extends React.Component<Props, State> {
@@ -127,22 +165,15 @@ class Select extends React.Component<Props, State> {
     const { value } = props;
     this.state = {
       value,
+      isMenuOpen: false,
     };
   }
-
-  componentDidMount = () => {
-    reactSelectSmStyles.use();
-  };
 
   componentWillReceiveProps = (nextProps: Props) => {
     const { value } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
-  };
-
-  componentWillUnmount = () => {
-    reactSelectSmStyles.unuse();
   };
 
   getValue = () => {
@@ -173,6 +204,10 @@ class Select extends React.Component<Props, State> {
     onChange(value);
   };
 
+  _onMenuOpen = () => this.setState({ isMenuOpen: true });
+
+  _onMenuClose = () => this.setState({ isMenuOpen: false });
+
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: string): Array<Option> => {
@@ -191,7 +226,7 @@ class Select extends React.Component<Props, State> {
 
   render() {
     const { allowCreate = false, delimiter, displayKey, size, multi, options, valueKey, onReactSelectChange } = this.props;
-    const { value } = this.state;
+    const { value, isMenuOpen } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
     let formattedValue = value;
@@ -208,17 +243,23 @@ class Select extends React.Component<Props, State> {
     } = this.props;
 
     return (
-      <div className={`${size === 'small' ? 'select-sm' : ''} ${reactSelectSmStyles.locals.increaseZIndex}`}>
-        <SelectComponent {...rest}
-                         onChange={onReactSelectChange || this._onChange}
-                         isMulti={isMulti}
-                         isDisabled={isDisabled}
-                         getOptionLabel={option => option[displayKey]}
-                         getOptionValue={option => option[valueKey]}
-                         components={_components}
-                         styles={_styles}
-                         value={formattedValue} />
-      </div>
+      <SelectComponent {...rest}
+                       onChange={onReactSelectChange || this._onChange}
+                       isMulti={isMulti}
+                       isDisabled={isDisabled}
+                       getOptionLabel={option => option[displayKey]}
+                       getOptionValue={option => option[valueKey]}
+                       components={{
+                         ..._components,
+                         IndicatorsContainer: isMenuOpen ? IndicatorsContainerOpen : IndicatorsContainerClosed,
+                       }}
+                       onMenuOpen={this._onMenuOpen}
+                       onMenuClose={this._onMenuClose}
+                       styles={{
+                         ..._styles,
+                         control: size === 'small' ? controlSmall : controlNormal,
+                       }}
+                       value={formattedValue} />
     );
   }
 }
