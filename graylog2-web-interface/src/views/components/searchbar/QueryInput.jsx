@@ -30,6 +30,7 @@ type Props = {
 
 type State = {
   value: string,
+  lastValue: string,
 };
 
 class QueryInput extends Component<Props, State> {
@@ -40,10 +41,19 @@ class QueryInput extends Component<Props, State> {
     placeholder: '',
   };
 
+  completer: AutoCompleter;
+
+  editor: {
+    editor: Editor,
+  } | typeof undefined;
+
+  isFocussed: boolean;
+
   constructor(props: Props) {
     super(props);
     this.state = {
       value: props.value,
+      lastValue: props.value,
     };
     this.editor = undefined;
     const CompleterClass = props.completerClass;
@@ -75,7 +85,7 @@ class QueryInput extends Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     const { value } = this.state;
     if (nextProps.value !== value) {
-      this.setState({ value: nextProps.value });
+      this.setState({ value: nextProps.value, lastValue: nextProps.value });
     }
     if (this.editor) {
       const { editor } = this.editor;
@@ -113,7 +123,7 @@ class QueryInput extends Component<Props, State> {
   };
 
   _onChange = (newValue: string) => {
-    this.setState({ value: newValue });
+    return new Promise(resolve => this.setState({ value: newValue }, resolve));
   };
 
   _onBlur = () => {
@@ -126,8 +136,14 @@ class QueryInput extends Component<Props, State> {
       }
     }
     const { onBlur, onChange } = this.props;
-    const { value } = this.state;
-    onChange(value).then(onBlur);
+    const { value, lastValue } = this.state;
+    const promise = (value !== lastValue)
+      ? new Promise((resolve) => {
+        this.setState({ lastValue: value }, () => onChange(value).then(resolve));
+      })
+      : Promise.resolve(value);
+
+    return promise.then(onBlur);
   };
 
   _onFocus = () => {
@@ -152,14 +168,6 @@ class QueryInput extends Component<Props, State> {
       this.editor = editor;
     }
   }
-
-  completer: AutoCompleter;
-
-  editor: {
-    editor: Editor,
-  } | typeof undefined;
-
-  isFocussed: boolean;
 
   render() {
     const { onBlur, onChange, onExecute, placeholder, value: propsValue, ...rest } = this.props;
