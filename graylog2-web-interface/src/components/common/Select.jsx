@@ -7,7 +7,7 @@ import ReactSelect, { components as Components, Creatable } from 'react-select';
 
 const MultiValueRemove = props => (
   <Components.MultiValueRemove {...props}>
-    ×
+    &times;
   </Components.MultiValueRemove>
 );
 
