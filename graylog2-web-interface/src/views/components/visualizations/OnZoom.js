@@ -1,7 +1,6 @@
 // @flow strict
 import moment from 'moment-timezone';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import CombinedProvider from 'injection/CombinedProvider';
 import Query from 'views/logic/queries/Query';
 
@@ -16,7 +15,7 @@ const onZoom = (currentQuery: Query, from: string, to: string) => {
     to: moment.tz(to, timezone).toISOString(),
   };
 
-  QueriesActions.timerange(currentQuery.id, newTimerange).then(SearchActions.executeWithCurrentState);
+  QueriesActions.timerange(currentQuery.id, newTimerange);
   return false;
 };
 
