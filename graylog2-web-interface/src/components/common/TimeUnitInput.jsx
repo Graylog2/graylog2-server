@@ -11,6 +11,7 @@ import {
   MenuItem,
 } from 'react-bootstrap';
 import lodash from 'lodash';
+import moment from 'moment';
 
 import { InputWrapper } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
@@ -25,6 +26,28 @@ const unitValues = [
   'DAYS',
 ];
 const unitType = PropTypes.oneOf(unitValues);
+
+/**
+ * Returns a duration and unit compatible with `TimeUnitInput` from a duration accepted by `moment.duration()`
+ * and a list of time units.
+ *
+ * Accepted durations include a number of milliseconds and an ISO 8601 duration string.
+ */
+export const extractDurationAndUnit = (duration, timeUnits) => {
+  if (duration === undefined) {
+    return {
+      duration: 1,
+      unit: lodash.last(timeUnits),
+    };
+  }
+  const momentDuration = moment.duration(duration);
+  const timeUnit = timeUnits.find(unit => lodash.isInteger(momentDuration.as(unit))) || lodash.last(timeUnits);
+  const durationInUnit = momentDuration.as(timeUnit);
+  return {
+    duration: durationInUnit,
+    unit: timeUnit,
+  };
+};
 
 /**
  * Component that renders a form field for a time unit value. The field has
