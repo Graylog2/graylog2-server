@@ -2,6 +2,7 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
+import type { IndicatorProps } from 'react-select/src/components/indicators';
 
 import ReactSelect, { components as Components, Creatable } from 'react-select';
 
@@ -13,17 +14,26 @@ const MultiValueRemove = props => (
 
 const IndicatorSeparator = () => null;
 
-const IndicatorsContainerClosed = () => (
-  <div style={{ marginRight: '1rem' }}>
-    <i className="fa fa-caret-down" />
-  </div>
-);
+const DropdownIndicator = (props: IndicatorProps) => {
+  const {
+    children = <i className="fa fa-caret-down" />,
+    getStyles,
+    innerProps: { ref, ...restInnerProps },
+  } = props;
+  return (
+    <div style={getStyles('dropdownIndicator', props)}
+         ref={ref}
+         {...restInnerProps}>
+      {children}
+    </div>
+  );
+};
 
-const IndicatorsContainerOpen = () => (
-  <div style={{ marginRight: '1rem' }}>
-    <i className="fa fa-caret-up" />
-  </div>
-);
+const dropdownIndicator = (base, state) => ({
+  ...base,
+  marginRight: '1rem',
+  transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
+});
 
 const multiValue = base => ({
   ...base,
@@ -72,11 +82,13 @@ const singleValueAndPlaceholder = base => ({
 });
 
 const _components = {
+  DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
 };
 
 const _styles = {
+  dropdownIndicator,
   multiValue,
   multiValueLabel,
   multiValueRemove,
@@ -108,7 +120,6 @@ type Props = {
 
 type State = {
   value: any,
-  isMenuOpen: boolean,
 };
 
 class Select extends React.Component<Props, State> {
@@ -165,7 +176,6 @@ class Select extends React.Component<Props, State> {
     const { value } = props;
     this.state = {
       value,
-      isMenuOpen: false,
     };
   }
 
@@ -204,10 +214,6 @@ class Select extends React.Component<Props, State> {
     onChange(value);
   };
 
-  _onMenuOpen = () => this.setState({ isMenuOpen: true });
-
-  _onMenuClose = () => this.setState({ isMenuOpen: false });
-
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: string): Array<Option> => {
@@ -226,7 +232,7 @@ class Select extends React.Component<Props, State> {
 
   render() {
     const { allowCreate = false, delimiter, displayKey, size, multi, options, valueKey, onReactSelectChange } = this.props;
-    const { value, isMenuOpen } = this.state;
+    const { value } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
     let formattedValue = value;
@@ -251,10 +257,7 @@ class Select extends React.Component<Props, State> {
                        getOptionValue={option => option[valueKey]}
                        components={{
                          ..._components,
-                         IndicatorsContainer: isMenuOpen ? IndicatorsContainerOpen : IndicatorsContainerClosed,
                        }}
-                       onMenuOpen={this._onMenuOpen}
-                       onMenuClose={this._onMenuClose}
                        styles={{
                          ..._styles,
                          control: size === 'small' ? controlSmall : controlNormal,
