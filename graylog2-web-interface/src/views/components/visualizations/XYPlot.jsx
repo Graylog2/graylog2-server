@@ -2,51 +2,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
-import { get, merge } from 'lodash';
+import { get, isFinite, merge } from 'lodash';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-// $FlowFixMe: imports from core need to be fixed in flow
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { SearchActions, SearchStore } from 'views/stores/SearchStore';
+import { SearchStore } from 'views/stores/SearchStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import { QueriesActions } from 'views/stores/QueriesStore';
 import Query from 'views/logic/queries/Query';
 
 import GenericPlot from './GenericPlot';
+import OnZoom from './OnZoom';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const onZoom = (config, currentQuery, currentUser, from, to) => {
-  const { timezone } = currentUser;
+const XYPlot = ({ config, chartData, currentQuery, timezone, effectiveTimerange, getChartColor, setChartColor, plotLayout = {}, onZoom = OnZoom }) => {
+  const yaxis = { fixedrange: true, rangemode: 'tozero' };
 
-  const newTimerange = {
-    type: 'absolute',
-    from: moment.tz(from, timezone).toISOString(),
-    to: moment.tz(to, timezone).toISOString(),
-  };
+  const layout = merge({ yaxis }, plotLayout);
 
-  QueriesActions.timerange(currentQuery.id, newTimerange).then(SearchActions.executeWithCurrentState);
-  return false;
-};
-
-const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimerange, getChartColor, setChartColor, plotLayout = {} }) => {
-  const layout = merge({
-    yaxis: {
-      fixedrange: true,
-    },
-  }, plotLayout);
-  let _onZoom = () => true;
+  const _onZoom = config.isTimeline ? (from, to) => onZoom(currentQuery, from, to) : () => true;
   if (config.isTimeline) {
-    const { timezone } = currentUser;
     const normalizedFrom = moment.tz(effectiveTimerange.from, timezone).format();
     const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();
     layout.xaxis = {
       range: [normalizedFrom, normalizedTo],
     };
-    _onZoom = (from, to) => onZoom(config, currentQuery, currentUser, from, to);
   } else {
     layout.xaxis = {
       fixedrange: true,
@@ -67,9 +49,7 @@ const XYPlot = ({ config, chartData, currentQuery, currentUser, effectiveTimeran
 XYPlot.propTypes = {
   chartData: PropTypes.array.isRequired,
   config: PropTypes.instanceOf(AggregationWidgetConfig).isRequired,
-  currentUser: PropTypes.shape({
-    timezone: PropTypes.string.isRequired,
-  }).isRequired,
+  timezone: PropTypes.string.isRequired,
   currentQuery: PropTypes.instanceOf(Query).isRequired,
   effectiveTimerange: PropTypes.shape({
     from: PropTypes.string.isRequired,
@@ -78,10 +58,12 @@ XYPlot.propTypes = {
   plotLayout: PropTypes.object,
   getChartColor: PropTypes.func.isRequired,
   setChartColor: PropTypes.func.isRequired,
+  onZoom: PropTypes.func,
 };
 
 XYPlot.defaultProps = {
   plotLayout: {},
+  onZoom: OnZoom,
 };
 
 export default connect(XYPlot, {
@@ -90,6 +72,6 @@ export default connect(XYPlot, {
   searches: SearchStore,
 }, ({ currentQuery, currentUser, searches }) => ({
   currentQuery,
-  currentUser: currentUser.currentUser,
+  timezone: get(currentUser, ['currentUser', 'timezone'], 'UTC'),
   effectiveTimerange: get(searches.result.forId(currentQuery.id), ['effectiveTimerange'], {}),
 }));
