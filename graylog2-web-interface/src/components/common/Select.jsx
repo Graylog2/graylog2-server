@@ -31,6 +31,8 @@ const DropdownIndicator = (props: IndicatorProps) => {
 
 const dropdownIndicator = (base, state) => ({
   ...base,
+  padding: '0px',
+  fontSize: '150%',
   marginRight: '1rem',
   transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
 });
