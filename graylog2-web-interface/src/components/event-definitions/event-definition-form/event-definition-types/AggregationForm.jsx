@@ -112,6 +112,7 @@ class AggregationForm extends React.Component {
     const series = this.getSeries(eventDefinition.config) || {};
     const expressionResults = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
 
+    console.log(series);
     return (
       <fieldset>
         <h2 className={commonStyles.title}>Aggregation</h2>
@@ -123,7 +124,8 @@ class AggregationForm extends React.Component {
                            matchProp="label"
                            onChange={selected => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
                            options={formattedFields}
-                           value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')} />
+                           value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
+                           allowCreate />
               <HelpBlock>Aggregate on groups of identical Field values. Example: count failed login attempts per username.</HelpBlock>
             </FormGroup>
           </Col>
@@ -151,7 +153,8 @@ class AggregationForm extends React.Component {
                           placeholder="Select Field (Optional)"
                           onChange={this.handleAggregationFieldChange}
                           options={formattedFields}
-                          value={series.field} />
+                          value={series.field}
+                          allowCreate />
                 </Col>
               </Row>
             </FormGroup>
