@@ -5,6 +5,9 @@ import { Button, Col, Row } from 'react-bootstrap';
 
 import FieldForm from './FieldForm';
 
+// Import built-in Field Value Providers
+import {} from './field-value-providers';
+
 import commonStyles from '../common/commonStyles.css';
 
 class FieldsForm extends React.Component {

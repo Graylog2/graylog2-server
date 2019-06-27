@@ -2,14 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Button, Col, ControlLabel, FormControl, FormGroup, InputGroup, Row } from 'react-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 import FormsUtils from 'util/FormsUtils';
-
-// TODO: Make this pluggable
-import TemplateFieldValueProviderForm from './field-value-providers/TemplateFieldValueProviderForm';
 
 class FieldForm extends React.Component {
   static propTypes = {
@@ -57,20 +55,27 @@ class FieldForm extends React.Component {
     this.propagateConfigChange(nextConfig);
   };
 
+  getProviderPlugin = (type) => {
+    if (type === undefined) {
+      return {};
+    }
+    return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type);
+  };
+
   renderFieldValueProviderForm = () => {
     const { fieldName, config } = this.props;
     if (!config.providers || !Array.isArray(config.providers)) {
       return null;
     }
 
-    switch (config.providers[0].type) {
-      case 'template-v1':
-        return <TemplateFieldValueProviderForm fieldName={fieldName} config={config} onChange={this.propagateConfigChange} />;
-      case 'lookup-v1':
-        return <div>TBD</div>;
-      default:
-        return <div>Selected provider is not available</div>;
-    }
+    const providerPlugin = this.getProviderPlugin(config.providers[0].type);
+    return providerPlugin.formComponent
+      ? React.createElement(providerPlugin.formComponent, {
+        fieldName: fieldName,
+        config: config,
+        onChange: this.propagateConfigChange,
+      })
+      : <div>Selected provider is not available.</div>;
   };
 
   handleKeySortChange = (event) => {
@@ -108,6 +113,11 @@ class FieldForm extends React.Component {
     }
 
     onChange(fieldName, 'keys', nextKeys);
+  };
+
+  formatFieldValueProviders = () => {
+    return PluginStore.exports('fieldValueProviders')
+      .map(type => ({ label: type.displayName, value: type.type }));
   };
 
   render() {
@@ -157,10 +167,7 @@ class FieldForm extends React.Component {
               <Select name="event-field-provider"
                       placeholder="Select Value Source"
                       onChange={this.handleProviderTypeChange}
-                      options={[
-                        { value: 'template-v1', label: 'Template' },
-                        { value: 'lookup-v1', label: 'Lookup Table' },
-                      ]}
+                      options={this.formatFieldValueProviders()}
                       value={Array.isArray(config.providers) ? config.providers[0].type : ''}
                       matchProp="label"
                       required />
