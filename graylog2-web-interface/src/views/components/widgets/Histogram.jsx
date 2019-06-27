@@ -19,9 +19,9 @@ const _generateSeries = (results) => {
   }];
 };
 
-export default function Histogram(props) {
+export default function Histogram({ data }) {
   return (
-    <Plot data={_generateSeries(props.data.results)}
+    <Plot data={_generateSeries(data.results)}
           style={{ position: 'absolute' }}
           fit
           layout={{

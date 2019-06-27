@@ -4,8 +4,8 @@ import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import connect from 'stores/connect';
 
+import { SearchStore } from 'views/stores/SearchStore';
 import QueryInput from '../searchbar/AsyncQueryInput';
-import { SearchStore } from '../../stores/SearchStore';
 
 import style from './WidgetFilterMenu.css';
 
@@ -28,19 +28,25 @@ class WidgetFilterMenu extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value) {
+    const { value } = this.props;
+    if (value !== nextProps.value) {
       this.setState({ filter: nextProps.value });
     }
   }
 
   _onUpdate = () => {
-    this.props.onChange(this.state.filter);
+    const { onChange } = this.props;
+    const { filter } = this.state;
+    onChange(filter);
     this.overlayTrigger.hide();
   };
 
+  // eslint-disable-next-line react/destructuring-assignment
   _onClose = () => this.setState({ filter: this.props.value });
 
   render() {
+    const { children } = this.props;
+    const { filter } = this.state;
     const popoverBottom = (
       <Popover id="popover-positioned-bottom" title="Widget Filter">
         <div className={style.flavorText}>
@@ -53,7 +59,7 @@ class WidgetFilterMenu extends React.Component {
                       maxLines={10}
                       tabSize={0}
                       wrapEnabled
-                      value={this.state.filter} />
+                      value={filter} />
         </div>
         <div className="pull-right" style={{ marginBottom: '10px', marginTop: '10px' }}>
           <Button bsStyle="success" onClick={this._onUpdate}>Done</Button>
@@ -67,7 +73,7 @@ class WidgetFilterMenu extends React.Component {
                       overlay={popoverBottom}
                       onExited={this._onClose}
                       rootClose>
-        {this.props.children}
+        {children}
       </OverlayTrigger>
     );
   }
