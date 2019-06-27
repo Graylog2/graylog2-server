@@ -4,16 +4,39 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 
 import ReactSelect, { components as Components, Creatable } from 'react-select';
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import reactSelectSmStyles from '!style/useable!css!./Select.css';
 
-const MultiValueRemove = (props) => {
+const MultiValueRemove = props => (
+  <Components.MultiValueRemove {...props}>
+    &times;
+  </Components.MultiValueRemove>
+);
+
+const IndicatorSeparator = () => null;
+
+const DropdownIndicator = (props) => {
+  const {
+    /* eslint-disable react/prop-types */
+    children = <i className="fa fa-caret-down" />,
+    getStyles,
+    innerProps: { ref, ...restInnerProps },
+    /* eslint-enable react/prop-types */
+  } = props;
   return (
-    <Components.MultiValueRemove {...props}>
-      ×
-    </Components.MultiValueRemove>
+    <div style={getStyles('dropdownIndicator', props)}
+         ref={ref}
+         {...restInnerProps}>
+      {children}
+    </div>
   );
 };
+
+const dropdownIndicator = (base, state) => ({
+  ...base,
+  padding: '0px',
+  fontSize: '150%',
+  marginRight: '1rem',
+  transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
+});
 
 const multiValue = base => ({
   ...base,
@@ -39,13 +62,42 @@ const multiValueRemove = base => ({
   },
 });
 
+const controlSmall = base => ({
+  ...base,
+  minHeight: '30px',
+  height: '30px',
+});
+
+const controlNormal = base => ({
+  ...base,
+  minHeight: '36px',
+  height: '36px',
+});
+
+const menu = base => ({
+  ...base,
+  zIndex: 5,
+});
+
+const singleValueAndPlaceholder = base => ({
+  ...base,
+  lineHeight: '28px',
+});
+
 const _components = {
+  DropdownIndicator,
   MultiValueRemove,
+  IndicatorSeparator,
 };
+
 const _styles = {
+  dropdownIndicator,
   multiValue,
   multiValueLabel,
   multiValueRemove,
+  menu,
+  singleValue: singleValueAndPlaceholder,
+  placeholder: singleValueAndPlaceholder,
 };
 
 type Option = { [string]: any };
@@ -130,19 +182,11 @@ class Select extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount = () => {
-    reactSelectSmStyles.use();
-  };
-
   componentWillReceiveProps = (nextProps: Props) => {
     const { value } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
-  };
-
-  componentWillUnmount = () => {
-    reactSelectSmStyles.unuse();
   };
 
   getValue = () => {
@@ -208,17 +252,20 @@ class Select extends React.Component<Props, State> {
     } = this.props;
 
     return (
-      <div className={`${size === 'small' ? 'select-sm' : ''} ${reactSelectSmStyles.locals.increaseZIndex}`}>
-        <SelectComponent {...rest}
-                         onChange={onReactSelectChange || this._onChange}
-                         isMulti={isMulti}
-                         isDisabled={isDisabled}
-                         getOptionLabel={option => option[displayKey]}
-                         getOptionValue={option => option[valueKey]}
-                         components={_components}
-                         styles={_styles}
-                         value={formattedValue} />
-      </div>
+      <SelectComponent {...rest}
+                       onChange={onReactSelectChange || this._onChange}
+                       isMulti={isMulti}
+                       isDisabled={isDisabled}
+                       getOptionLabel={option => option[displayKey]}
+                       getOptionValue={option => option[valueKey]}
+                       components={{
+                         ..._components,
+                       }}
+                       styles={{
+                         ..._styles,
+                         control: size === 'small' ? controlSmall : controlNormal,
+                       }}
+                       value={formattedValue} />
     );
   }
 }
