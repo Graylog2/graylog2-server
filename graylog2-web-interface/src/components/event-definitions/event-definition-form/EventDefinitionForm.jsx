@@ -18,9 +18,7 @@ class EventDefinitionForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
-    allFieldTypes: PropTypes.array.isRequired,
     entityTypes: PropTypes.object.isRequired,
-    streams: PropTypes.array,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -28,7 +26,6 @@ class EventDefinitionForm extends React.Component {
 
   static defaultProps = {
     action: 'edit',
-    streams: [],
   };
 
   state = {
@@ -77,7 +74,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, allFieldTypes, entityTypes, eventDefinition, streams, onChange } = this.props;
+    const { action, entityTypes, eventDefinition, onChange } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
@@ -89,11 +86,7 @@ class EventDefinitionForm extends React.Component {
 
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
     const eventDefinitionTypeComponent = eventDefinitionType.formComponent
-      ? React.createElement(eventDefinitionType.formComponent, {
-        ...defaultStepProps,
-        allFieldTypes: allFieldTypes,
-        streams: streams,
-      })
+      ? React.createElement(eventDefinitionType.formComponent, defaultStepProps)
       : null;
 
     const steps = [

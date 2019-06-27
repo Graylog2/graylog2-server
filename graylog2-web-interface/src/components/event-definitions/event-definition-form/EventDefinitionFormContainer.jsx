@@ -10,7 +10,6 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { Spinner } from 'components/common';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import EventDefinitionForm from './EventDefinitionForm';
 
 // Import built-in Event Definition Types
@@ -18,13 +17,11 @@ import {} from './event-definition-types';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
-const { StreamsStore } = CombinedProvider.get('Streams');
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object,
-    fieldTypes: PropTypes.object.isRequired,
     entityTypes: PropTypes.object,
   };
 
@@ -47,12 +44,7 @@ class EventDefinitionFormContainer extends React.Component {
 
     this.state = {
       eventDefinition: props.eventDefinition,
-      availableStreams: undefined,
     };
-  }
-
-  componentDidMount() {
-    StreamsStore.load(streams => this.setState({ availableStreams: streams }));
   }
 
   handleChange = (key, value) => {
@@ -82,9 +74,9 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, fieldTypes, entityTypes } = this.props;
-    const { eventDefinition, availableStreams } = this.state;
-    const isLoading = typeof fieldTypes.all !== 'object' || !entityTypes;
+    const { action, entityTypes } = this.props;
+    const { eventDefinition } = this.state;
+    const isLoading = !entityTypes;
 
     if (isLoading) {
       return <Spinner text="Loading Event information..." />;
@@ -93,9 +85,7 @@ class EventDefinitionFormContainer extends React.Component {
     return (
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
-                           allFieldTypes={fieldTypes.all.toJS()}
                            entityTypes={entityTypes}
-                           streams={availableStreams}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
                            onSubmit={this.handleSubmit} />
@@ -103,7 +93,4 @@ class EventDefinitionFormContainer extends React.Component {
   }
 }
 
-export default connect(EventDefinitionFormContainer, {
-  fieldTypes: FieldTypesStore,
-  entityTypes: AvailableEventDefinitionTypesStore,
-});
+export default connect(EventDefinitionFormContainer, { entityTypes: AvailableEventDefinitionTypesStore });
