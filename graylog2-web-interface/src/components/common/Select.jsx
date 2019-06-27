@@ -212,7 +212,7 @@ class Select extends React.Component<Props, State> {
     this.setState({ value: value });
 
     // eslint-disable-next-line no-unused-vars
-    const { onChange = () => {} } = this.props;
+    const { onChange = (v: string) => {} } = this.props;
 
     onChange(value);
   };
