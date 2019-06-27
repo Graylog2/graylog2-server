@@ -898,7 +898,10 @@
       "node_modules/moment/locale/en-SG.js": 33,
       "node_modules/moment/locale/ga.js": 37,
       "node_modules/moment/locale/it-ch.js": 38,
-      "node_modules/moment/locale/ku.js": 42
+      "node_modules/moment/locale/ku.js": 42,
+      "node_modules/d3/d3.js": 47,
+      "node_modules/c3/c3.js": 48,
+      "node_modules/leaflet/dist/leaflet-src.js": 49
     },
     "usedIds": {
       "0": 0,

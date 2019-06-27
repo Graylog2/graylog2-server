@@ -12,4 +12,7 @@ module.exports = [
   'reflux-core',
   'moment',
   'moment-timezone',
+  'c3',
+  'd3',
+  'leaflet',
 ];
