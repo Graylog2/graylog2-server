@@ -91,7 +91,7 @@ class FilterAggregationForm extends React.Component {
       return (
         <React.Fragment>
           <Row>
-            <Col md={12} lg={7}>
+            <Col md={7} lg={6}>
               <FilterForm eventDefinition={eventDefinition} streams={streams} onChange={this.propagateChange} />
 
               <FormGroup>

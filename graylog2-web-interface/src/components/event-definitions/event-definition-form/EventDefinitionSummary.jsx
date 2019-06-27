@@ -104,19 +104,16 @@ class EventDefinitionSummary extends React.Component {
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Summary</h2>
           <Row>
-            <Col md={4}>
+            <Col md={3}>
               {this.renderDetails(eventDefinition)}
             </Col>
-            <Col md={4} mdOffset={1}>
+            <Col md={3}>
               {this.renderFilterAndAggregation(eventDefinition.config)}
             </Col>
-          </Row>
-
-          <Row>
-            <Col md={4}>
+            <Col md={3}>
               {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
             </Col>
-            <Col md={4} mdOffset={1}>
+            <Col md={3}>
               {this.renderNotifications(eventDefinition.actions)}
             </Col>
           </Row>

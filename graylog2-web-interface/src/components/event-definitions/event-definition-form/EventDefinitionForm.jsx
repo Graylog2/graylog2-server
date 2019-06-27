@@ -61,7 +61,7 @@ class EventDefinitionForm extends React.Component {
       const { onCancel } = this.props;
       return (
         <Row>
-          <Col md={2} mdOffset={7}>
+          <Col md={2} mdOffset={10}>
             <ButtonToolbar>
               <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
               <Button onClick={onCancel}>Cancel</Button>
