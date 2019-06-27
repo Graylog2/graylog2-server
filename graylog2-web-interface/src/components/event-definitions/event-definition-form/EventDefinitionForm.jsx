@@ -65,17 +65,36 @@ class EventDefinitionForm extends React.Component {
     if (activeStep === lodash.last(STEP_KEYS)) {
       const { onCancel } = this.props;
       return (
-        <Row>
-          <Col md={2} mdOffset={10}>
-            <ButtonToolbar>
-              <Button bsStyle="primary" type="submit">Done</Button>
-              <Button onClick={onCancel}>Cancel</Button>
-            </ButtonToolbar>
-          </Col>
-        </Row>
+        <div className="pull-right">
+          <ButtonToolbar>
+            <Button onClick={onCancel}>Cancel</Button>
+            <Button bsStyle="primary" type="submit">Done</Button>
+          </ButtonToolbar>
+        </div>
       );
     }
-    return null;
+
+    const { eventDefinition } = this.props;
+    const activeStepIndex = STEP_KEYS.indexOf(activeStep);
+    const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
+    const nextStep = STEP_KEYS[activeStepIndex + 1];
+
+    return (
+      <div>
+        <Button bsStyle="info"
+                onClick={() => this.handleStepChange(previousStep)}
+                disabled={activeStepIndex === 0}>
+          Previous
+        </Button>
+        <div className="pull-right">
+          <Button bsStyle="info"
+                  onClick={() => this.handleStepChange(nextStep)}
+                  disabled={this.areStepsDisabled(eventDefinition)}>
+            Next
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   render() {
