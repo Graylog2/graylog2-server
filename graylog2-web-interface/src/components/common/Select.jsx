@@ -15,9 +15,11 @@ const IndicatorSeparator = () => null;
 
 const DropdownIndicator = (props) => {
   const {
+    /* eslint-disable react/prop-types */
     children = <i className="fa fa-caret-down" />,
     getStyles,
     innerProps: { ref, ...restInnerProps },
+    /* eslint-enable react/prop-types */
   } = props;
   return (
     <div style={getStyles('dropdownIndicator', props)}
@@ -210,7 +212,7 @@ class Select extends React.Component<Props, State> {
     this.setState({ value: value });
 
     // eslint-disable-next-line no-unused-vars
-    const { onChange = (v: string) => {} } = this.props;
+    const { onChange = () => {} } = this.props;
 
     onChange(value);
   };
