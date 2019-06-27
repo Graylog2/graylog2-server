@@ -20,10 +20,6 @@ class EventDetailsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-  };
-
   handleChange = (event) => {
     const { name } = event.target;
     const { onChange } = this.props;
@@ -53,48 +49,46 @@ class EventDetailsForm extends React.Component {
       <Row>
         <Col md={7} lg={6}>
           <h2 className={commonStyles.title}>Event Details</h2>
-          <form onSubmit={this.handleSubmit}>
-            <fieldset>
-              <Input id="event-definition-title"
-                     name="title"
-                     label="Title"
-                     type="text"
-                     help="Title for this Event Definition, Events and Alerts created from it."
-                     value={eventDefinition.title}
-                     onChange={this.handleChange}
-                     required />
+          <fieldset>
+            <Input id="event-definition-title"
+                   name="title"
+                   label="Title"
+                   type="text"
+                   help="Title for this Event Definition, Events and Alerts created from it."
+                   value={eventDefinition.title}
+                   onChange={this.handleChange}
+                   required />
 
-              <Input id="event-definition-description"
-                     name="description"
-                     label={<span>Description <small className="text-muted">(Optional)</small></span>}
-                     type="textarea"
-                     help="Longer description for this Event Definition."
-                     value={eventDefinition.description}
-                     onChange={this.handleChange}
-                     rows={2} />
+            <Input id="event-definition-description"
+                   name="description"
+                   label={<span>Description <small className="text-muted">(Optional)</small></span>}
+                   type="textarea"
+                   help="Longer description for this Event Definition."
+                   value={eventDefinition.description}
+                   onChange={this.handleChange}
+                   rows={2} />
 
-              <FormGroup controlId="event-definition-priority">
-                <ControlLabel>Priority</ControlLabel>
-                <Select options={priorityOptions}
-                        value={lodash.toString(eventDefinition.priority)}
-                        onChange={this.handlePriorityChange}
-                        clearable={false}
-                        required />
-                <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
-              </FormGroup>
+            <FormGroup controlId="event-definition-priority">
+              <ControlLabel>Priority</ControlLabel>
+              <Select options={priorityOptions}
+                      value={lodash.toString(eventDefinition.priority)}
+                      onChange={this.handlePriorityChange}
+                      clearable={false}
+                      required />
+              <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
+            </FormGroup>
 
-              <FormGroup controlId="event-definition-priority">
-                <ControlLabel>Condition Type</ControlLabel>
-                <Select placeholder="Select a Condition Type"
-                        options={this.formattedEventDefinitionTypes()}
-                        value={eventDefinition.config.type}
-                        onChange={this.handleEventDefinitionTypeChange}
-                        clearable={false}
-                        required />
-                <HelpBlock>Choose the type of Condition the Event will use.</HelpBlock>
-              </FormGroup>
-            </fieldset>
-          </form>
+            <FormGroup controlId="event-definition-priority">
+              <ControlLabel>Condition Type</ControlLabel>
+              <Select placeholder="Select a Condition Type"
+                      options={this.formattedEventDefinitionTypes()}
+                      value={eventDefinition.config.type}
+                      onChange={this.handleEventDefinitionTypeChange}
+                      clearable={false}
+                      required />
+              <HelpBlock>Choose the type of Condition the Event will use.</HelpBlock>
+            </FormGroup>
+          </fieldset>
         </Col>
       </Row>
     );

@@ -38,11 +38,16 @@ class EventDefinitionForm extends React.Component {
   };
 
   handleSubmit = (event) => {
+    const { activeStep } = this.state;
+
     if (event) {
       event.preventDefault();
     }
-    const { onSubmit } = this.props;
-    onSubmit();
+
+    if (activeStep === lodash.last(STEP_KEYS)) {
+      const { onSubmit } = this.props;
+      onSubmit();
+    }
   };
 
   areStepsDisabled = (eventDefinition) => {
@@ -63,7 +68,7 @@ class EventDefinitionForm extends React.Component {
         <Row>
           <Col md={2} mdOffset={10}>
             <ButtonToolbar>
-              <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
+              <Button bsStyle="primary" type="submit">Done</Button>
               <Button onClick={onCancel}>Cancel</Button>
             </ButtonToolbar>
           </Col>
@@ -124,15 +129,17 @@ class EventDefinitionForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <Wizard steps={steps}
-                  activeStep={activeStep}
-                  onStepChange={this.handleStepChange}
-                  horizontal
-                  justified
-                  navigationClassName={styles.steps}
-                  containerClassName=""
-                  hidePreviousNextButtons />
-          {this.renderButtons(activeStep)}
+          <form onSubmit={this.handleSubmit}>
+            <Wizard steps={steps}
+                    activeStep={activeStep}
+                    onStepChange={this.handleStepChange}
+                    horizontal
+                    justified
+                    navigationClassName={styles.steps}
+                    containerClassName=""
+                    hidePreviousNextButtons />
+            {this.renderButtons(activeStep)}
+          </form>
         </Col>
       </Row>
     );

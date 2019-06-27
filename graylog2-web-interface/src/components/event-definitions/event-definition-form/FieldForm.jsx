@@ -117,60 +117,58 @@ class FieldForm extends React.Component {
     const keyValue = (keys.indexOf(fieldName) < 0 ? keys.length : keys.indexOf(fieldName)) + 1;
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <fieldset>
-          <legend>
-            Custom Field
-            <span className="pull-right">
-              <Button bsSize="xsmall" bsStyle="primary" onClick={this.handleRemoveField}>Remove</Button>
-            </span>
-          </legend>
+      <fieldset>
+        <legend>
+          Custom Field
+          <span className="pull-right">
+            <Button bsSize="xsmall" bsStyle="primary" onClick={this.handleRemoveField}>Remove</Button>
+          </span>
+        </legend>
 
-          <Row className="row-sm">
-            <Col md={4}>
-              <Input id="field-name"
-                     name="name"
-                     label="Name"
-                     type="text"
-                     value={fieldName}
-                     onChange={this.handleFieldNameChange}
-                     required />
-            </Col>
-            <Col md={4}>
-              <FormGroup>
-                <ControlLabel>Use as key <span className="fa fa-question-circle" /></ControlLabel>
-                <InputGroup>
-                  <InputGroup.Addon>
-                    <input type="checkbox" onChange={this.toggleKey} checked={isKeyEnabled} />
-                  </InputGroup.Addon>
-                  <FormControl id="field-key"
-                               name="key"
-                               type="number"
-                               value={keyValue}
-                               onChange={this.handleKeySortChange}
-                               disabled={!isKeyEnabled} />
-                </InputGroup>
-              </FormGroup>
-            </Col>
-            <Col md={4}>
-              <FormGroup controlId="event-field-provider">
-                <ControlLabel>Set Value From</ControlLabel>
-                <Select name="event-field-provider"
-                        placeholder="Select Value Source"
-                        onChange={this.handleProviderTypeChange}
-                        options={[
-                          { value: 'template-v1', label: 'Template' },
-                          { value: 'lookup-v1', label: 'Lookup Table' },
-                        ]}
-                        value={Array.isArray(config.providers) ? config.providers[0].type : ''}
-                        matchProp="label"
-                        required />
-              </FormGroup>
-            </Col>
-          </Row>
-          {this.renderFieldValueProviderForm()}
-        </fieldset>
-      </form>
+        <Row className="row-sm">
+          <Col md={4}>
+            <Input id="field-name"
+                   name="name"
+                   label="Name"
+                   type="text"
+                   value={fieldName}
+                   onChange={this.handleFieldNameChange}
+                   required />
+          </Col>
+          <Col md={4}>
+            <FormGroup>
+              <ControlLabel>Use as key <span className="fa fa-question-circle" /></ControlLabel>
+              <InputGroup>
+                <InputGroup.Addon>
+                  <input type="checkbox" onChange={this.toggleKey} checked={isKeyEnabled} />
+                </InputGroup.Addon>
+                <FormControl id="field-key"
+                             name="key"
+                             type="number"
+                             value={keyValue}
+                             onChange={this.handleKeySortChange}
+                             disabled={!isKeyEnabled} />
+              </InputGroup>
+            </FormGroup>
+          </Col>
+          <Col md={4}>
+            <FormGroup controlId="event-field-provider">
+              <ControlLabel>Set Value From</ControlLabel>
+              <Select name="event-field-provider"
+                      placeholder="Select Value Source"
+                      onChange={this.handleProviderTypeChange}
+                      options={[
+                        { value: 'template-v1', label: 'Template' },
+                        { value: 'lookup-v1', label: 'Lookup Table' },
+                      ]}
+                      value={Array.isArray(config.providers) ? config.providers[0].type : ''}
+                      matchProp="label"
+                      required />
+            </FormGroup>
+          </Col>
+        </Row>
+        {this.renderFieldValueProviderForm()}
+      </fieldset>
     );
   }
 }

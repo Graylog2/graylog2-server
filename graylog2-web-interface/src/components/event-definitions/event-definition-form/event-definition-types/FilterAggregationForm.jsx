@@ -69,10 +69,6 @@ class FilterAggregationForm extends React.Component {
     this.setState(stateChange);
   };
 
-  handleSubmit = (event) => {
-    event.preventDefault();
-  };
-
   propagateChange = (key, value) => {
     const { onChange } = this.props;
     onChange(key, value);
@@ -137,30 +133,30 @@ class FilterAggregationForm extends React.Component {
       <Row>
         <Col md={12}>
           <h2 className={commonStyles.title}>Select Data Source</h2>
-          <form onSubmit={this.handleSubmit}>
-            <fieldset>
-              <FormGroup>
-                <Radio id="data-source-log-messages"
-                       name="dataSource"
-                       value={dataSources.LOG_MESSAGES}
-                       checked={dataSource === dataSources.LOG_MESSAGES}
-                       onChange={this.handleTypeChange}>
-                  Log Messages
-                </Radio>
-                <HelpBlock>Select this option to create an Alert from Log Messages.</HelpBlock>
-                <Radio id="data-source-events"
-                       name="dataSource"
-                       value={dataSources.EVENTS}
-                       checked={dataSource === dataSources.EVENTS}
-                       onChange={this.handleTypeChange}>
-                  Events
-                </Radio>
-                <HelpBlock>Select this option to create an Alert from Events created by other Event Definitions.</HelpBlock>
-              </FormGroup>
-            </fieldset>
+          <fieldset>
+            <FormGroup>
+              <Radio id="data-source-log-messages"
+                     name="dataSource"
+                     value={dataSources.LOG_MESSAGES}
+                     checked={dataSource === dataSources.LOG_MESSAGES}
+                     onChange={this.handleTypeChange}>
+                Log Messages
+              </Radio>
+              <HelpBlock>Select this option to create an Alert from Log Messages.</HelpBlock>
+              <Radio id="data-source-events"
+                     name="dataSource"
+                     value={dataSources.EVENTS}
+                     checked={dataSource === dataSources.EVENTS}
+                     onChange={this.handleTypeChange}>
+                Events
+              </Radio>
+              <HelpBlock>
+                Select this option to create an Alert from Events created by other Event Definitions.
+              </HelpBlock>
+            </FormGroup>
+          </fieldset>
 
-            {dataSource !== undefined && this.renderDataSourceForm(dataSource)}
-          </form>
+          {dataSource !== undefined && this.renderDataSourceForm(dataSource)}
         </Col>
       </Row>
     );
