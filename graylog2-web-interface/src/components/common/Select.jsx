@@ -2,7 +2,6 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
-import type { IndicatorProps } from 'react-select/src/components/indicators';
 
 import ReactSelect, { components as Components, Creatable } from 'react-select';
 
@@ -14,7 +13,7 @@ const MultiValueRemove = props => (
 
 const IndicatorSeparator = () => null;
 
-const DropdownIndicator = (props: IndicatorProps) => {
+const DropdownIndicator = (props) => {
   const {
     children = <i className="fa fa-caret-down" />,
     getStyles,
