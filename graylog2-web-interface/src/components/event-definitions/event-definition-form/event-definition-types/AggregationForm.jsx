@@ -112,7 +112,6 @@ class AggregationForm extends React.Component {
     const series = this.getSeries(eventDefinition.config) || {};
     const expressionResults = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
 
-    console.log(series);
     return (
       <fieldset>
         <h2 className={commonStyles.title}>Aggregation</h2>
