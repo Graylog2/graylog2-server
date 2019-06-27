@@ -2,19 +2,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 import { Popover } from 'react-bootstrap';
-// $FlowFixMe: imports from core need to be fixed in flow
 import ColorPicker from 'components/common/ColorPicker';
+import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 
-import createPlotlyComponent from 'react-plotly.js/factory';
-import Plotly from 'views/custom-plotly';
 import ChartColorContext from './ChartColorContext';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style/useable!css!./GenericPlot.css';
-
-const Plot = createPlotlyComponent(Plotly);
 
 type LegendConfig = {
   name: string,
