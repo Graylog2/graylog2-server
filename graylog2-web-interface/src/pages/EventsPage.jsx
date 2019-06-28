@@ -26,7 +26,7 @@ class EventsPage extends React.Component {
                 <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info">Notification</Button>
+                <Button bsStyle="info">Notifications</Button>
               </LinkContainer>
             </ButtonToolbar>
           </PageHeader>

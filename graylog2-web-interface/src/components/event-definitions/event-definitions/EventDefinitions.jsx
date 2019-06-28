@@ -63,7 +63,20 @@ class EventDefinitions extends React.Component {
       );
     });
 
-    return (<EntityList items={items} />);
+    return (
+      <Row>
+        <Col md={12}>
+          <div className="pull-right">
+            <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
+              <Button bsStyle="success">Create Event Definition</Button>
+            </LinkContainer>
+          </div>
+        </Col>
+        <Col md={12}>
+          <EntityList items={items} />
+        </Col>
+      </Row>
+    );
   }
 }
 
