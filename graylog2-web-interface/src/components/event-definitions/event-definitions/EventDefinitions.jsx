@@ -6,7 +6,7 @@ import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
 
-import { EmptyEntity, EntityList, EntityListItem, } from 'components/common';
+import { EmptyEntity, EntityList, EntityListItem } from 'components/common';
 
 class EventDefinitions extends React.Component {
   static propTypes = {

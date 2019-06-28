@@ -10,8 +10,10 @@ import commonStyles from '../common/commonStyles.css';
 
 class NotificationsForm extends React.Component {
   static propTypes = {
+    /* eslint-disable react/no-unused-prop-types */
     eventDefinition: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    /* eslint-enable react/no-unused-prop-types */
   };
 
   render() {

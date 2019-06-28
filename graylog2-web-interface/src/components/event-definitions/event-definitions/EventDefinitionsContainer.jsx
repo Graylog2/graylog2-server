@@ -30,7 +30,6 @@ class EventDefinitionsContainer extends React.Component {
       <EventDefinitions eventDefinitions={eventDefinitions} onDelete={this.handleDelete} />
     );
   }
-
 }
 
 export default connect(EventDefinitionsContainer, { eventDefinitions: EventDefinitionsStore });
