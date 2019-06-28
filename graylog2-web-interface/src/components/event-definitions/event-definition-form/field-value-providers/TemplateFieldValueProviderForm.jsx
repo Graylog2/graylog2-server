@@ -53,7 +53,7 @@ class TemplateFieldValueProviderForm extends React.Component {
                 <MenuItem eventKey="string" active={config.data_type === 'string'}>String</MenuItem>
               </DropdownButton>
             </InputGroup>
-            <HelpBlock>Type a text Field Value or use Freemarker syntax to add a dynamic Value.</HelpBlock>
+            <HelpBlock>Type a literal text Field Value or use Freemarker syntax to add a dynamic Value.</HelpBlock>
           </FormGroup>
         </Col>
       </Row>

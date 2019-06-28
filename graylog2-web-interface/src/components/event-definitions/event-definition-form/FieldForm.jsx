@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Col, ControlLabel, FormControl, FormGroup, InputGroup, Row } from 'react-bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Input } from 'components/bootstrap';
@@ -143,6 +143,7 @@ class FieldForm extends React.Component {
                    type="text"
                    value={fieldName}
                    onChange={this.handleFieldNameChange}
+                   help="Name for this Field."
                    required />
           </Col>
           <Col md={4}>
@@ -159,6 +160,7 @@ class FieldForm extends React.Component {
                              onChange={this.handleKeySortChange}
                              disabled={!isKeyEnabled} />
               </InputGroup>
+              <HelpBlock>Indicates if this Field should be a Key and its order.</HelpBlock>
             </FormGroup>
           </Col>
           <Col md={4}>
@@ -171,6 +173,7 @@ class FieldForm extends React.Component {
                       value={Array.isArray(config.providers) ? config.providers[0].type : ''}
                       matchProp="label"
                       required />
+              <HelpBlock>Select a source for the value of this Field.</HelpBlock>
             </FormGroup>
           </Col>
         </Row>
