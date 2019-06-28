@@ -66,6 +66,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
         final Map<String, Object> defaultInternal = ImmutableMap.of(
                 "match", "gl2_*",
+                "match_mapping_type", "string",
                 "mapping", notAnalyzedString());
         final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
 

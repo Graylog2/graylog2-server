@@ -116,7 +116,7 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString("$.mappings.message.properties.priority.type").isEqualTo("long");
         at.jsonPathAsString("$.mappings.message.properties.fields.type").isEqualTo("object");
         at.jsonPathAsBoolean("$.mappings.message.properties.fields.dynamic").isTrue();
-        at.jsonPathAsString("$.mappings.message.properties.triggered_tasks.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.mappings.message.properties.triggered_jobs.type").isEqualTo("keyword");
     }
 
     @Test

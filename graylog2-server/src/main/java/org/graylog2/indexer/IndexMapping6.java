@@ -47,6 +47,7 @@ public class IndexMapping6 extends IndexMapping {
         final Map<String, Map<String, Object>> templateInternal =
             ImmutableMap.of("internal_fields", ImmutableMap.of(
                 "match", "gl2_*",
+                "match_mapping_type", "string",
                 "mapping", notAnalyzedString()));
 
         final Map<String, Object> dynamicStrings = ImmutableMap.of(

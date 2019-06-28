@@ -201,7 +201,7 @@ public class EventsIndexMapping implements IndexMappingTemplate {
                                                         .build())
                                                 .build())
                                          */
-                                        .put("triggered_tasks", map()
+                                        .put("triggered_jobs", map()
                                                 .put("type", "keyword")
                                                 .build())
                                         .build())
