@@ -117,7 +117,7 @@
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@types/bluebird": "^3.5.8",
-    "@types/jquery": "^2.0.0",
+    "@types/jquery": "^3.3.30",
     "@types/node": "^11.11.0",
     "@types/sockjs-client": "^1.0.31",
     "@types/toastr": "^2.1.34",
