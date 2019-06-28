@@ -53,6 +53,7 @@ import {
   NodeInputsPage,
   NodesPage,
   NotFoundPage,
+  NotificationsPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   RolesPage,
@@ -121,6 +122,7 @@ const AppRouter = () => {
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
+            <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} component={NotificationsPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage} />

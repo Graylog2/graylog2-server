@@ -44,6 +44,7 @@ const NewAlertNotificationPage = loadAsync(() => import('./NewAlertNotificationP
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
+const NotificationsPage = loadAsync(() => import('./NotificationsPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
 const RolesPage = loadAsync(() => import('./RolesPage'));
@@ -121,6 +122,7 @@ export {
   NodeInputsPage,
   NodesPage,
   NotFoundPage,
+  NotificationsPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   RolesPage,

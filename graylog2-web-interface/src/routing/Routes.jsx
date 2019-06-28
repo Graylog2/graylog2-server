@@ -60,6 +60,11 @@ const Routes = {
       CREATE: '/next/alerts/definitions/new',
       edit: definitionId => `/next/alerts/definitions/${definitionId}`,
     },
+    NOTIFICATIONS: {
+      LIST: '/next/alerts/notifications',
+      CREATE: '/next/alerts/notifications/new',
+      edit: notificationId => `/next/alerts/notifications/${notificationId}`,
+    },
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
