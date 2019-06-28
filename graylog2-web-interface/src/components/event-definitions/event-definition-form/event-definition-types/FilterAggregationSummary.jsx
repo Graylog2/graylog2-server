@@ -12,6 +12,14 @@ class FilterAggregationSummary extends React.Component {
     config: PropTypes.object.isRequired,
   };
 
+  getConditionType = (config) => {
+    const { group_by: groupBy, series, conditions } = config;
+    return (lodash.isEmpty(groupBy)
+    && (!conditions || lodash.isEmpty(conditions) || conditions.expression === null)
+    && lodash.isEmpty(series)
+      ? 'filter' : 'aggregation');
+  };
+
   render() {
     const { config } = this.props;
     const {
@@ -24,8 +32,7 @@ class FilterAggregationSummary extends React.Component {
       conditions,
     } = config;
 
-    const conditionType = (lodash.isEmpty(groupBy) && (!conditions || conditions.expression === null) && lodash.isEmpty(series)
-      ? 'filter' : 'aggregation');
+    const conditionType = this.getConditionType(config);
 
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
