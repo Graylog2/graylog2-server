@@ -96,6 +96,7 @@
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.4.2</disruptor.version>
         <elasticsearch.version>5.6.12</elasticsearch.version>
+        <embedded-elasticsearch.version>2.7.0</embedded-elasticsearch.version>
         <freemarker.version>2.3.28</freemarker.version>
         <jest.version>2.4.15+jackson</jest.version>
         <gelfclient.version>1.4.4</gelfclient.version>

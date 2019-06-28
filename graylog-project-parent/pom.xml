@@ -668,6 +668,12 @@
                 <version>${pkts.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>pl.allegro.tech</groupId>
+                <artifactId>embedded-elasticsearch</artifactId>
+                <version>${embedded-elasticsearch.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
