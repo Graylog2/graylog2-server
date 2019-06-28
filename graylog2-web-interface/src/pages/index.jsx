@@ -20,6 +20,7 @@ const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
 const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
+const EventsPage = loadAsync(() => import('./EventsPage'));
 const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
 const GettingStartedPage = loadAsync(() => import('./GettingStartedPage'));
@@ -96,6 +97,7 @@ export {
   EditTokensPage,
   EditUsersPage,
   EnterprisePage,
+  EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
   GettingStartedPage,

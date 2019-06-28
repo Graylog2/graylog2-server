@@ -102,7 +102,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
             <NavItem>Alerts</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
+          <LinkContainer to={Routes.NEXT_ALERTS.LIST}>
             <NavItem>Next Alerts</NavItem>
           </LinkContainer>
 

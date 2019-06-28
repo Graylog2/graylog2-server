@@ -54,6 +54,7 @@ const Routes = {
     NEW_NOTIFICATION: '/alerts/notifications/new',
   },
   NEXT_ALERTS: {
+    LIST: '/next/alerts',
     DEFINITIONS: {
       LIST: '/next/alerts/definitions',
       CREATE: '/next/alerts/definitions/new',

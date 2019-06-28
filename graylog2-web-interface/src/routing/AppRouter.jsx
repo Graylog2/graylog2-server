@@ -31,6 +31,7 @@ import {
   EditTokensPage,
   EditUsersPage,
   EnterprisePage,
+  EventsPage,
   EventDefinitionsPage,
   ExportExtractorsPage,
   ExtractorsPage,
@@ -116,6 +117,7 @@ const AppRouter = () => {
             <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
             <Route path={Routes.ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
             <Route path={Routes.ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+            <Route path={Routes.NEXT_ALERTS.LIST} component={EventsPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
