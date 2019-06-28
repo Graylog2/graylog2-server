@@ -5,9 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.revinate.assertj.json.JsonPathAssert;
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
+import io.searchbox.indices.mapping.GetMapping;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.audit.AuditEventSender;
@@ -125,6 +130,24 @@ public class IndexMappingTest {
         assertThat(searchFor("gl2_number:[23 TO 42]").getTotal()).isEqualTo(1);
         assertThat(searchFor("gl2_array:23").getTotal()).isEqualTo(1);
         assertThat(searchFor("gl2_array:42").getTotal()).isEqualTo(1);
+
+        final String currentMapping = mapping(currentIndex);
+        final DocumentContext read = JsonPath.parse(currentMapping);
+        jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_boolean")).isEqualTo("boolean");
+        jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_number")).isEqualTo("long");
+        jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_array")).isEqualTo("array");
+    }
+
+    private JsonPathAssert jp(DocumentContext ctx) {
+        return JsonPathAssert.assertThat(ctx);
+    }
+
+    private String mapping(String index) throws IOException {
+        final JestResult mappingResult = jestClient.execute(new GetMapping.Builder().addIndex(index).build());
+
+        assertThat(mappingResult).isNotNull();
+
+        return mappingResult.getJsonString();
     }
 
     private void indexMessage(Map<String, Object> additionalFields) throws InterruptedException, IOException {
@@ -150,5 +173,9 @@ public class IndexMappingTest {
                 .addType(IndexMapping.TYPE_MESSAGE)
                 .build();
         return jestClient.execute(search);
+    }
+
+    private String fieldTypeMappingPath(String index, String field) {
+        return "$." + index + ".mappings.message.properties." + field + ".type";
     }
 }
