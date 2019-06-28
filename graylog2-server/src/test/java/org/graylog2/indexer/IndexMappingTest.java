@@ -4,6 +4,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
@@ -25,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.AbstractMap;
@@ -63,8 +65,9 @@ public class IndexMappingTest {
                 .withSetting(TRANSPORT_TCP_PORT, 0)
                 .withSetting(CLUSTER_NAME, "test")
                 .withEsJavaOpts("-Xms128m -Xmx512m")
-                //.withIndex(indexName, indexSettings)
                 .withStartTimeout(1, MINUTES)
+                .withDownloadDirectory(new File("/tmp/embedded-elasticsearch-downloads"))
+                .withCleanInstallationDirectoryOnStop(false)
                 .build()
                 .start();
         jestClient = new JestClientProvider(
@@ -110,40 +113,27 @@ public class IndexMappingTest {
     }
 
     @Test
-    public void ensureBooleanIndexing() throws IOException {
-        indexMessage(Collections.singletonMap("gl2_boolean", true));
+    public void verifyProperTypingForIndexedMessages() throws Exception {
+        indexMessage(ImmutableMap.of(
+                "gl2_boolean", true,
+                "gl2_number", 42,
+                "gl2_array", ImmutableList.of(23, 42)
+                ));
 
-        final SearchResult result = searchFor("gl2_number:true");
-
-        assertThat(result.isSucceeded()).isTrue();
-        assertThat(result.getTotal()).isEqualTo(1);
+        assertThat(searchFor("gl2_boolean:true").getTotal()).isEqualTo(1);
+        assertThat(searchFor("gl2_number:[1 TO 23]").getTotal()).isEqualTo(0);
+        assertThat(searchFor("gl2_number:[23 TO 42]").getTotal()).isEqualTo(1);
+        assertThat(searchFor("gl2_array:23").getTotal()).isEqualTo(1);
+        assertThat(searchFor("gl2_array:42").getTotal()).isEqualTo(1);
     }
 
-    @Test
-    public void ensureNumberIndexing() throws IOException {
-        indexMessage(Collections.singletonMap("gl2_number", 42));
-
-        final SearchResult result = searchFor("gl2_number >= 42");
-
-        assertThat(result.isSucceeded()).isTrue();
-        assertThat(result.getTotal()).isEqualTo(1);
-    }
-
-    @Test
-    public void ensureArrayIndexing() throws IOException {
-        indexMessage(Collections.singletonMap("gl2_array", ImmutableList.of(23, "fourtytwo")));
-
-        final SearchResult result = searchFor("gl2_array:23");
-
-        assertThat(result.isSucceeded()).isTrue();
-        assertThat(result.getTotal()).isEqualTo(1);
-    }
-
-    private void indexMessage(Map<String, Object> additionalFields) {
+    private void indexMessage(Map<String, Object> additionalFields) throws InterruptedException, IOException {
         final Message message = new Message("foo", "bar", DateTime.now());
         additionalFields.forEach(message::addField);
         final List<Map.Entry<IndexSet, Message>> messageList = Collections.singletonList(new AbstractMap.SimpleEntry<>(indexSet, message));
         final List<String> messageIds = messages.bulkIndex(messageList);
+
+        embeddedElastic.refreshIndices();
 
         assertThat(messageIds).isEmpty();
     }
