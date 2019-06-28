@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import lodash from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -29,26 +30,24 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderFilterAndAggregation = (config) => {
-    // TODO: Make each type render its own config
+  getPlugin = (name, type) => {
+    if (type === undefined) {
+      return {};
+    }
+    return PluginStore.exports(name).find(edt => edt.type === type);
+  };
+
+  renderCondition = (config) => {
+    const conditionPlugin = this.getPlugin('eventDefinitionTypes', config.type);
+    const component = (conditionPlugin.summaryComponent
+      ? React.createElement(conditionPlugin.summaryComponent, { config: config })
+      : <span>Condition plugin <em>{config.type}</em> does not provide a summary.</span>
+    );
+
     return (
       <React.Fragment>
-        <h3 className={commonStyles.title}>Filter & Aggregation</h3>
-        {config.type
-          ? (
-            <dl>
-              <dt>Type</dt>
-              <dd>{config.type}</dd>
-              <dt>Query</dt>
-              <dd>{config.query || '*'}</dd>
-              <dt>Streams</dt>
-              <dd>{config.selected_streams ? config.selected_streams.join(', ') : 'No streams selected'}</dd>
-              <dt>Time range</dt>
-              <dd>N/A</dd>
-            </dl>
-          )
-          : <p>Not configured.</p>
-        }
+        <h3 className={commonStyles.title}>{conditionPlugin.displayName || config.type}</h3>
+        {component}
       </React.Fragment>
     );
   };
@@ -103,12 +102,12 @@ class EventDefinitionSummary extends React.Component {
       <Row>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Summary</h2>
-          <Row>
+          <Row className={styles.eventSummary}>
             <Col md={3}>
               {this.renderDetails(eventDefinition)}
             </Col>
             <Col md={3}>
-              {this.renderFilterAndAggregation(eventDefinition.config)}
+              {this.renderCondition(eventDefinition.config)}
             </Col>
             <Col md={3}>
               {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}

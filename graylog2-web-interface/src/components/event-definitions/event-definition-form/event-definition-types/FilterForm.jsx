@@ -13,8 +13,7 @@ import FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../../common/commonStyles.css';
 
-const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
-
+export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 class FilterForm extends React.Component {
   static propTypes = {
