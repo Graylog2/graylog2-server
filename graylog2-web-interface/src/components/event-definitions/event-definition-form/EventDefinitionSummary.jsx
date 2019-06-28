@@ -53,21 +53,25 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderField = (fieldName, config, keys) => {
-    // TODO: Make each type render its own config
+    if (!config.providers || config.providers.length === 0) {
+      return <span key={fieldName}>No field value provider configured.</span>;
+    }
+    const provider = config.providers[0] || {};
+    const fieldProviderPlugin = this.getPlugin('fieldValueProviders', provider.type);
+    const component = (fieldProviderPlugin.summaryComponent
+      ? React.createElement(fieldProviderPlugin.summaryComponent, {
+        fieldName: fieldName,
+        config: config,
+        keys: keys,
+      })
+      : <span>Condition plugin <em>{provider.type}</em> does not provide a summary.</span>
+    );
+
     return (
-      <div key={fieldName}>
-        <h4>{fieldName}</h4>
-        <dl className={styles.innerList}>
-          <dt>Is Key?</dt>
-          <dd>{keys.includes(fieldName) ? 'Yes' : 'No'}</dd>
-          <dt>Data Type</dt>
-          <dd>{config.data_type}</dd>
-          <dt>Value comes from</dt>
-          <dd>{config.providers[0].type}</dd>
-          <dt>Template</dt>
-          <dd>{config.providers[0].template}</dd>
-        </dl>
-      </div>
+      <React.Fragment key={fieldName}>
+        <h4 className={commonStyles.title}>{fieldName}</h4>
+        {component}
+      </React.Fragment>
     );
   };
 
