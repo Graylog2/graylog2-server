@@ -48,7 +48,20 @@ public final class ReferenceMapUtils {
     }
 
     private static ReferenceList toReferenceList(Collection<Object> list) {
-        // TODO: Support nested objects in list
+        if (list.size() == 0) {
+            return new ReferenceList();
+        }
+
+        if (list.iterator().next() instanceof Map) {
+            return list.stream()
+                    .map(r -> {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> value = (Map) r;
+                        return ReferenceMapUtils.toReferenceMap(value);
+                    })
+                    .collect(Collectors.toCollection(ReferenceList::new));
+        }
+
         return list.stream()
                 .map(ValueReference::of)
                 .filter(Objects::nonNull)
