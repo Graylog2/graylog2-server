@@ -9,7 +9,7 @@ class EmailNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    usernames: PropTypes.array.isRequired,
+    users: PropTypes.array.isRequired,
   };
 
   componentDidMount() {
@@ -31,27 +31,27 @@ class EmailNotificationForm extends React.Component {
     };
   };
 
-  formatUsernames = (usernames) => {
-    return usernames.map(username => ({ label: username, value: username }));
+  formatUsers = (users) => {
+    return users.map(user => ({ label: `${user.username} (${user.full_name})`, value: user.username }));
   };
 
   render() {
-    const { config, usernames } = this.props;
+    const { config, users } = this.props;
 
     return (
       <React.Fragment>
         <FormGroup id="notification-user-recipients">
-          <ControlLabel>User recipients</ControlLabel>
+          <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
           <MultiSelect id="notification-user-recipients"
                        value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
-                       placeholder="Type username"
-                       options={this.formatUsernames(usernames)}
+                       placeholder="Select user(s)..."
+                       options={this.formatUsers(users)}
                        onChange={this.handleRecipientsChange('user_recipients')} />
-          <HelpBlock>Select Graylog usernames that will receive this Notification.</HelpBlock>
+          <HelpBlock>Select Graylog users that will receive this Notification.</HelpBlock>
         </FormGroup>
 
         <FormGroup id="notification-email-recipients">
-          <ControlLabel>Email recipients</ControlLabel>
+          <ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
           <MultiSelect id="notification-email-recipients"
                        value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
                        addLabelText={'Add email "{label}"?'}
