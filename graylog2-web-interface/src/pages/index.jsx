@@ -8,6 +8,7 @@ const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
+const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
@@ -86,6 +87,7 @@ export {
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
+  CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
   CreateUsersPage,

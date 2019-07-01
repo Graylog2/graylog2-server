@@ -20,6 +20,7 @@ import {
   ContentPacksPage,
   CreateContentPackPage,
   CreateEventDefinitionPage,
+  CreateEventNotificationPage,
   CreateExtractorsPage,
   CreateUsersPage,
   DashboardsPage,
@@ -123,6 +124,7 @@ const AppRouter = () => {
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
             <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} component={NotificationsPage} />
+            <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage} />
