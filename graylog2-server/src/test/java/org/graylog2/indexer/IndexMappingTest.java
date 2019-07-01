@@ -50,6 +50,7 @@ import static pl.allegro.tech.embeddedelasticsearch.PopularProperties.TRANSPORT_
 
 @RunWith(Parameterized.class)
 public class IndexMappingTest {
+    private static final String TEMP_DIR = System.getProperty("java.io.tmpdir", "/tmp");
     private static final String indexName = "testmessages";
     private static final String currentIndex = "testmessages_0";
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -71,7 +72,7 @@ public class IndexMappingTest {
                 .withSetting(CLUSTER_NAME, "test")
                 .withEsJavaOpts("-Xms128m -Xmx512m")
                 .withStartTimeout(1, MINUTES)
-                .withDownloadDirectory(new File("/tmp/embedded-elasticsearch-downloads"))
+                .withDownloadDirectory(new File(TEMP_DIR + File.separator + "embedded-elasticsearch-downloads"))
                 .withCleanInstallationDirectoryOnStop(false)
                 .build()
                 .start();
