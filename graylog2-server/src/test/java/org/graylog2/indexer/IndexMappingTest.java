@@ -41,6 +41,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -174,7 +175,7 @@ public class IndexMappingTest {
     }
 
     private void indexMessage(Map<String, Object> additionalFields) throws InterruptedException, IOException {
-        final Message message = new Message("foo", "bar", DateTime.now());
+        final Message message = new Message("foo", "bar", DateTime.now(DateTimeZone.UTC));
         additionalFields.forEach(message::addField);
         final List<Map.Entry<IndexSet, Message>> messageList = Collections.singletonList(new AbstractMap.SimpleEntry<>(indexSet, message));
         final List<String> messageIds = messages.bulkIndex(messageList);
