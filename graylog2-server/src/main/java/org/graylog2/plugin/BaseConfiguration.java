@@ -74,6 +74,9 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter("disable_sigar")
     private boolean disableSigar = false;
 
+    @Parameter("enable_oshi")
+    private boolean enableOshi = false;
+
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
 
@@ -164,6 +167,10 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public boolean isDisableSigar() {
         return disableSigar;
+    }
+
+    public boolean isEnableOshi() {
+        return enableOshi;
     }
 
     public URI getHttpProxyUri() {
