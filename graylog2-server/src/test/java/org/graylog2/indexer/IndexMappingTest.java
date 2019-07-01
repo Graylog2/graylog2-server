@@ -123,7 +123,11 @@ public class IndexMappingTest {
         indexMessage(ImmutableMap.of(
                 "gl2_boolean", true,
                 "gl2_number", 42,
-                "gl2_array", ImmutableList.of(23, 42)
+                "gl2_array", ImmutableList.of(23, 42),
+                "gl2_object", ImmutableMap.of(
+                        "the_fish", true,
+                        "how_much", 17
+                )
                 ));
 
         assertThat(searchFor("gl2_boolean:true").getTotal()).isEqualTo(1);
@@ -136,7 +140,9 @@ public class IndexMappingTest {
         final DocumentContext read = JsonPath.parse(currentMapping);
         jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_boolean")).isEqualTo("boolean");
         jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_number")).isEqualTo("long");
-        jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_array")).isEqualTo("array");
+        jp(read).jsonPathAsString(fieldTypeMappingPath(currentIndex, "gl2_array")).isEqualTo("long");
+        jp(read).jsonPathAsString(fieldTypeMappingPathPrefix(currentIndex, "gl2_object") + ".properties.the_fish.type").isEqualTo("boolean");
+        jp(read).jsonPathAsString(fieldTypeMappingPathPrefix(currentIndex, "gl2_object") + ".properties.how_much.type").isEqualTo("long");
     }
 
     private JsonPathAssert jp(DocumentContext ctx) {
@@ -177,6 +183,10 @@ public class IndexMappingTest {
     }
 
     private String fieldTypeMappingPath(String index, String field) {
-        return "$." + index + ".mappings.message.properties." + field + ".type";
+        return fieldTypeMappingPathPrefix(index, field) + ".type";
+    }
+
+    private String fieldTypeMappingPathPrefix(String index, String field) {
+        return "$." + index + ".mappings.message.properties." + field;
     }
 }
