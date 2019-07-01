@@ -8,6 +8,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+
 class CreateEventDefinitionPage extends React.Component {
   render() {
     return (
@@ -40,7 +42,7 @@ class CreateEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              TBD
+              <EventNotificationFormContainer action="create" />
             </Col>
           </Row>
         </span>
