@@ -62,7 +62,7 @@ class EventNotificationForm extends React.Component {
     const notificationFormComponent = notificationPlugin.formComponent
       ? React.createElement(notificationPlugin.formComponent, {
         config: notification.config,
-        onChange: this.handleConfigChange
+        onChange: this.handleConfigChange,
       })
       : null;
 
