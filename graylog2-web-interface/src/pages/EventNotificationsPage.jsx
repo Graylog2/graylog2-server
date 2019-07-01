@@ -8,7 +8,7 @@ import EventNotificationsContainer from 'components/event-notifications/event-no
 
 import Routes from 'routing/Routes';
 
-class NotificationsPage extends React.Component {
+class EventNotificationsPage extends React.Component {
   static propTypes = {};
 
   render() {
@@ -53,4 +53,4 @@ class NotificationsPage extends React.Component {
   }
 }
 
-export default NotificationsPage;
+export default EventNotificationsPage;

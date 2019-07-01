@@ -1,7 +1,6 @@
 import loadAsync from 'routing/loadAsync';
 
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
-const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
@@ -21,6 +20,8 @@ const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
 const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
+const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
+const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
 const EventsPage = loadAsync(() => import('./EventsPage'));
 const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
@@ -45,7 +46,6 @@ const NewAlertNotificationPage = loadAsync(() => import('./NewAlertNotificationP
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
-const NotificationsPage = loadAsync(() => import('./NotificationsPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
 const RolesPage = loadAsync(() => import('./RolesPage'));
@@ -80,7 +80,6 @@ const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
   AlertConditionsPage,
-  EventDefinitionsPage,
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
@@ -100,6 +99,8 @@ export {
   EditTokensPage,
   EditUsersPage,
   EnterprisePage,
+  EventDefinitionsPage,
+  EventNotificationsPage,
   EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
@@ -124,7 +125,6 @@ export {
   NodeInputsPage,
   NodesPage,
   NotFoundPage,
-  NotificationsPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   RolesPage,
