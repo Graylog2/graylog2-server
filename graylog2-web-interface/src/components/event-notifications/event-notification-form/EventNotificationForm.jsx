@@ -8,11 +8,10 @@ import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
 
-class EventDefinitionForm extends React.Component {
+class EventNotificationForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     notification: PropTypes.object.isRequired,
-    entityTypes: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -113,4 +112,4 @@ class EventDefinitionForm extends React.Component {
   }
 }
 
-export default EventDefinitionForm;
+export default EventNotificationForm;

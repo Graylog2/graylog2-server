@@ -4,24 +4,20 @@ import lodash from 'lodash';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
-import connect from 'stores/connect';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { Spinner } from 'components/common';
 import EventNotificationForm from './EventNotificationForm';
 
 // Import built-in Event Notification Types
 import {} from './event-notification-types';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
-const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 
 class EventNotificationFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     notification: PropTypes.object,
-    entityTypes: PropTypes.object,
   };
 
   static defaultProps = {
@@ -31,7 +27,6 @@ class EventNotificationFormContainer extends React.Component {
       description: '',
       config: {},
     },
-    entityTypes: undefined,
   };
 
   constructor(props) {
@@ -69,18 +64,12 @@ class EventNotificationFormContainer extends React.Component {
   };
 
   render() {
-    const { action, entityTypes } = this.props;
+    const { action } = this.props;
     const { notification } = this.state;
-    const isLoading = !entityTypes;
-
-    if (isLoading) {
-      return <Spinner text="Loading Notification information..." />;
-    }
 
     return (
       <EventNotificationForm action={action}
                              notification={notification}
-                             entityTypes={entityTypes}
                              onChange={this.handleChange}
                              onCancel={this.handleCancel}
                              onSubmit={this.handleSubmit} />
@@ -88,4 +77,4 @@ class EventNotificationFormContainer extends React.Component {
   }
 }
 
-export default connect(EventNotificationFormContainer, { entityTypes: AvailableEventDefinitionTypesStore });
+export default EventNotificationFormContainer;
