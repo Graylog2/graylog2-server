@@ -2,7 +2,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
 import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
@@ -16,7 +15,7 @@ type Props = {
   children: React.Node,
   field: string,
   highlightingRules: { [string]: Array<HighlightingRule> },
-  value: any,
+  value?: any,
 };
 
 const CustomHighlighting = ({ children, field: fieldName, value: fieldValue, highlightingRules }: Props) => {
@@ -53,7 +52,11 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue, hig
 CustomHighlighting.propTypes = {
   children: PropTypes.node.isRequired,
   field: PropTypes.string.isRequired,
-  value: PropTypes.any.isRequired,
+  value: PropTypes.any,
+};
+
+CustomHighlighting.defaultProps = {
+  value: undefined,
 };
 
 export default connect(CustomHighlighting,
