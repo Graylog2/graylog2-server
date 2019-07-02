@@ -30,6 +30,7 @@ type Props = {
 
 type State = {
   value: string,
+  lastValue: string,
 };
 
 class QueryInput extends Component<Props, State> {
@@ -40,10 +41,19 @@ class QueryInput extends Component<Props, State> {
     placeholder: '',
   };
 
+  completer: AutoCompleter;
+
+  editor: {
+    editor: Editor,
+  } | typeof undefined;
+
+  isFocussed: boolean;
+
   constructor(props: Props) {
     super(props);
     this.state = {
       value: props.value,
+      lastValue: props.value,
     };
     this.editor = undefined;
     const CompleterClass = props.completerClass;
@@ -75,12 +85,12 @@ class QueryInput extends Component<Props, State> {
   componentWillReceiveProps(nextProps: Props) {
     const { value } = this.state;
     if (nextProps.value !== value) {
-      this.setState({ value: nextProps.value });
+      this.setState({ value: nextProps.value, lastValue: nextProps.value });
     }
     if (this.editor) {
       const { editor } = this.editor;
       if (nextProps.value && this._placeholderExists(editor)) {
-        this._removePlaceholder(this.editor.editor);
+        this._removePlaceholder(editor);
       }
 
       if (!nextProps.value && !this.isFocussed && !this._placeholderExists(editor)) {
@@ -112,12 +122,7 @@ class QueryInput extends Component<Props, State> {
     return emptyMessageNode !== undefined && emptyMessageNode !== null;
   };
 
-  _onChange = (newValue: string) => {
-    this.setState({ value: newValue });
-  };
-
-  _onBlur = () => {
-    this.isFocussed = false;
+  _addPlaceholderIfEmptyQuery = () => {
     const editor = this.editor && this.editor.editor;
     if (editor) {
       const shouldShow = !editor.session.getValue().length;
@@ -125,17 +130,37 @@ class QueryInput extends Component<Props, State> {
         this._addPlaceholder(editor);
       }
     }
-    const { onBlur, onChange } = this.props;
-    const { value } = this.state;
-    onChange(value).then(onBlur);
   };
 
-  _onFocus = () => {
-    this.isFocussed = true;
+  _removePlaceholderOnFocus = () => {
     const editor = this.editor && this.editor.editor;
     if (editor && this._placeholderExists(editor)) {
       this._removePlaceholder(editor);
     }
+  };
+
+  _onChange = (newValue: string) => {
+    return new Promise(resolve => this.setState({ value: newValue }, resolve));
+  };
+
+  _onBlur = () => {
+    this.isFocussed = false;
+    this._addPlaceholderIfEmptyQuery();
+
+    const { onBlur, onChange } = this.props;
+    const { value, lastValue } = this.state;
+    const promise = (value !== lastValue)
+      ? new Promise((resolve) => {
+        this.setState({ lastValue: value }, () => onChange(value).then(resolve));
+      })
+      : Promise.resolve(value);
+
+    return promise.then(onBlur);
+  };
+
+  _onFocus = () => {
+    this.isFocussed = true;
+    this._removePlaceholderOnFocus();
   };
 
   _onExecute = (editor: Editor) => {
@@ -144,7 +169,9 @@ class QueryInput extends Component<Props, State> {
       editor.completer.popup.hide();
     }
     const { value } = this.state;
-    onChange(value).then(onExecute);
+    new Promise(resolve => this.setState({ lastValue: value }, resolve))
+      .then(() => onChange(value))
+      .then(onExecute);
   };
 
   _bindEditor(editor: { editor: Editor }) {
@@ -152,14 +179,6 @@ class QueryInput extends Component<Props, State> {
       this.editor = editor;
     }
   }
-
-  completer: AutoCompleter;
-
-  editor: {
-    editor: Editor,
-  } | typeof undefined;
-
-  isFocussed: boolean;
 
   render() {
     const { onBlur, onChange, onExecute, placeholder, value: propsValue, ...rest } = this.props;

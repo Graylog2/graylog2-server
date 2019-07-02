@@ -24,12 +24,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 
 
-// eslint-disable-next-line no-undef
-const _performSearch = (event, onExecute) => {
-  if (event && event.preventDefault) {
-    // $FlowFixMe: Checking for presence of preventDefault before
-    event.preventDefault();
-  }
+const _performSearch = (onExecute) => {
   const { view } = ViewStore.getInitialState();
   onExecute(view);
 };
@@ -53,8 +48,11 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
   if (!currentQuery || !config) {
     return <Spinner />;
   }
-  // eslint-disable-next-line no-undef
-  const performSearch = e => _performSearch(e, onExecute);
+  const performSearch = () => _performSearch(onExecute);
+  const submitForm = (event) => {
+    event.preventDefault();
+    performSearch();
+  };
   const { timerange, query, id } = currentQuery;
   const { type, ...rest } = timerange;
   const rangeParams = Immutable.Map(rest);
@@ -70,7 +68,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
         <Col md={12}>
           <Row className="no-bm">
             <Col md={12}>
-              <form method="GET" onSubmit={performSearch}>
+              <form method="GET" onSubmit={submitForm}>
 
                 <Row className="no-bm extended-search-query-metadata">
                   <Col md={4}>
@@ -103,8 +101,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
                     <QueryInput value={query.query_string}
                                 placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                onChange={value => QueriesActions.query(id, value)}
-                                onBlur={performSearch}
+                                onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
                                 onExecute={performSearch} />
                   </Col>
                 </Row>

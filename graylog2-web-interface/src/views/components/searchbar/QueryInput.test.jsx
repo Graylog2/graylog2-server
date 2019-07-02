@@ -19,7 +19,13 @@ class Completer {
 }
 
 describe('QueryInput', () => {
-  const SimpleQueryInput = props => <QueryInput value="*" onChange={s => Promise.resolve(s)} onExecute={() => {}} completerClass={Completer} {...props} />;
+  const SimpleQueryInput = props => (
+    <QueryInput value="*"
+                onChange={s => Promise.resolve(s)}
+                onExecute={() => {}}
+                completerClass={Completer}
+                {...props} />
+  );
 
   it('should update its state when props change', () => {
     const wrapper = mount(<SimpleQueryInput />);
@@ -42,5 +48,42 @@ describe('QueryInput', () => {
       expect(onExecute).toHaveBeenCalledWith('*');
       done();
     });
+  });
+  it('does not trigger onChange/onExecute if input receives blur without changed value', () => {
+    const onBlur = jest.fn();
+    const onChange = jest.fn();
+    const onExecute = jest.fn();
+    const currentQueryString = 'source:example.com';
+    const wrapper = mount((<SimpleQueryInput onExecute={onExecute}
+                                             onChange={onChange}
+                                             onBlur={onBlur}
+                                             value={currentQueryString} />));
+
+    const { onBlur: _onBlur } = wrapper.find('ReactAce').props();
+
+    _onBlur().then(() => {
+      expect(onExecute).not.toHaveBeenCalled();
+      expect(onChange).not.toHaveBeenCalled();
+      expect(onBlur).toHaveBeenCalledWith(currentQueryString);
+    });
+  });
+  it('does trigger onChange/onExecute if input receives blur with changed value', () => {
+    const onBlur = jest.fn();
+    const onChange = jest.fn(newQuery => Promise.resolve(newQuery));
+    const onExecute = jest.fn();
+    const currentQueryString = 'source:example.com';
+    const wrapper = mount((<SimpleQueryInput onExecute={onExecute}
+                                             onChange={onChange}
+                                             onBlur={onBlur}
+                                             value={currentQueryString} />));
+
+    const { onBlur: _onBlur, onChange: _onChange } = wrapper.find('ReactAce').props();
+
+    return _onChange('source:foobar')
+      .then(_onBlur)
+      .then(() => {
+        expect(onChange).toHaveBeenCalledWith('source:foobar');
+        expect(onBlur).toHaveBeenCalledWith('source:foobar');
+      });
   });
 });
