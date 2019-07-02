@@ -8,6 +8,8 @@ import { EmptyEntity, EntityList, EntityListItem, PaginatedList } from 'componen
 
 import Routes from 'routing/Routes';
 
+import styles from './EventNotifications.css';
+
 class EventNotifications extends React.Component {
   static propTypes = {
     notifications: PropTypes.array.isRequired,
@@ -62,7 +64,7 @@ class EventNotifications extends React.Component {
         <EntityListItem key={`event-definition-${notification.id}`}
                         title={notification.title}
                         titleSuffix={plugin.displayName || notification.config.type}
-                        description={notification.description}
+                        description={notification.description || <em>No description given</em>}
                         actions={actions} />
       );
     });
@@ -93,7 +95,9 @@ class EventNotifications extends React.Component {
                            pageSizes={[10, 25, 50]}
                            totalItems={pagination.total}
                            onChange={onPageChange}>
-              <EntityList items={this.formatNotification(notifications)} />
+              <div className={styles.notificationList}>
+                <EntityList items={this.formatNotification(notifications)} />
+              </div>
             </PaginatedList>
           </Col>
         </Row>
