@@ -38,7 +38,7 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
 
     private static final DateTime DEFAULT_RECEIVE_TIME = new DateTime(0L, UTC);
 
-    private final AtomicReference<DateTime> preJournalReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
+    private final AtomicReference<DateTime> ingestReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
     private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
     private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
 
@@ -66,7 +66,7 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
                 // Do not directly set the timestamps on the atomic reference to make sure latestTimestamp() is used.
                 // The timestamps could already have been updated once the database call is finished.
                 final ProcessingStatusDto.ReceiveTimes receiveTimes = processingStatus.receiveTimes();
-                updatePreJournalReceiveTime(receiveTimes.preJournal());
+                updateIngestReceiveTime(receiveTimes.ingest());
                 updatePostProcessingReceiveTime(receiveTimes.postProcessing());
                 updatePostIndexingReceiveTime(receiveTimes.postIndexing());
             });
@@ -97,8 +97,8 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     }
 
     @Override
-    public DateTime getPreJournalReceiveTime() {
-        return preJournalReceiveTime.get();
+    public DateTime getIngestReceiveTime() {
+        return ingestReceiveTime.get();
     }
 
     @Override
@@ -112,9 +112,9 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     }
 
     @Override
-    public void updatePreJournalReceiveTime(DateTime newTimestamp) {
+    public void updateIngestReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            preJournalReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
+            ingestReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 

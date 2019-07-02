@@ -23,14 +23,14 @@ import org.joda.time.DateTime;
  */
 public interface ProcessingStatusRecorder {
     /**
-     * Update the receive time for the "pre-journal" measurement point. This is done right before a raw messages gets
+     * Update the receive time for the "ingest" measurement point. This is done right before a raw messages gets
      * written to the disk journal.
      *
      * @param newTimestamp the new timestamp to record
      */
-    void updatePreJournalReceiveTime(DateTime newTimestamp);
+    void updateIngestReceiveTime(DateTime newTimestamp);
 
-    DateTime getPreJournalReceiveTime();
+    DateTime getIngestReceiveTime();
 
     /**
      * Update the receive time for the "post-processing" measurement point. This is done right after all message

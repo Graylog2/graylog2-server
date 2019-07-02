@@ -105,7 +105,7 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
                 // The converter computed the latest receive timestamp of all messages in the batch so we don't have to
                 // call the update on the recorder service for every message. (less contention)
-                processingStatusRecorder.updatePreJournalReceiveTime(converter.getLatestReceiveTime());
+                processingStatusRecorder.updateIngestReceiveTime(converter.getLatestReceiveTime());
             } catch (Exception e) {
                 log.error("Unable to write to journal - retrying", e);
 

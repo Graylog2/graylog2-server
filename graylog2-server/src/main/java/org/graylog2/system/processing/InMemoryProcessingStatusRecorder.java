@@ -28,13 +28,13 @@ import static org.joda.time.DateTimeZone.UTC;
  */
 @Singleton
 public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorder {
-    private final AtomicReference<DateTime> preJournalReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
+    private final AtomicReference<DateTime> ingestReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
     private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
     private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
 
     @Override
-    public DateTime getPreJournalReceiveTime() {
-        return preJournalReceiveTime.get();
+    public DateTime getIngestReceiveTime() {
+        return ingestReceiveTime.get();
     }
 
     @Override
@@ -48,9 +48,9 @@ public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorde
     }
 
     @Override
-    public void updatePreJournalReceiveTime(DateTime newTimestamp) {
+    public void updateIngestReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            preJournalReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
+            ingestReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 

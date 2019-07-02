@@ -88,7 +88,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
-                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
+                assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:02:00.000Z"));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
             });
@@ -100,7 +100,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
-                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
+                assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:02:00.000Z"));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:01:00.000Z"));
             });
@@ -112,7 +112,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
-                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
+                assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:02:00.000Z"));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
             });
@@ -125,7 +125,7 @@ public class DBProcessingStatusServiceTest {
         final InMemoryProcessingStatusRecorder statusRecorder = new InMemoryProcessingStatusRecorder();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
 
-        statusRecorder.updatePreJournalReceiveTime(now);
+        statusRecorder.updateIngestReceiveTime(now);
         statusRecorder.updatePostProcessingReceiveTime(now.minusSeconds(1));
         statusRecorder.updatePostIndexingReceiveTime(now.minusSeconds(2));
 
@@ -135,7 +135,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.updatedAt()).isEqualByComparingTo(now);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
-                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(now);
+                assertThat(receiveTimes.ingest()).isEqualByComparingTo(now);
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(now.minusSeconds(1));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(now.minusSeconds(2));
             });
@@ -146,7 +146,7 @@ public class DBProcessingStatusServiceTest {
         // Advance time and update the status recorder
         final DateTime tomorrow = now.plusDays(1);
 
-        statusRecorder.updatePreJournalReceiveTime(tomorrow);
+        statusRecorder.updateIngestReceiveTime(tomorrow);
         statusRecorder.updatePostProcessingReceiveTime(tomorrow.minusSeconds(1));
         statusRecorder.updatePostIndexingReceiveTime(tomorrow.minusSeconds(2));
 
@@ -157,7 +157,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.updatedAt()).isEqualByComparingTo(tomorrow);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
-                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(tomorrow);
+                assertThat(receiveTimes.ingest()).isEqualByComparingTo(tomorrow);
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(tomorrow.minusSeconds(1));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(tomorrow.minusSeconds(2));
             });

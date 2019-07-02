@@ -54,7 +54,7 @@ public abstract class ProcessingStatusDto {
                 .nodeId(nodeId)
                 .updatedAt(updatedAt)
                 .receiveTimes(ReceiveTimes.builder()
-                        .preJournal(processingStatusRecorder.getPreJournalReceiveTime())
+                        .ingest(processingStatusRecorder.getIngestReceiveTime())
                         .postProcessing(processingStatusRecorder.getPostProcessingReceiveTime())
                         .postIndexing(processingStatusRecorder.getPostIndexingReceiveTime())
                         .build())
@@ -94,12 +94,12 @@ public abstract class ProcessingStatusDto {
     @AutoValue
     @JsonDeserialize(builder = ReceiveTimes.Builder.class)
     public static abstract class ReceiveTimes {
-        private static final String FIELD_PRE_JOURNAL = "pre_journal";
+        private static final String FIELD_INGEST = "ingest";
         private static final String FIELD_POST_PROCESSING = "post_processing";
         static final String FIELD_POST_INDEXING = "post_indexing";
 
-        @JsonProperty(FIELD_PRE_JOURNAL)
-        public abstract DateTime preJournal();
+        @JsonProperty(FIELD_INGEST)
+        public abstract DateTime ingest();
 
         @JsonProperty(FIELD_POST_PROCESSING)
         public abstract DateTime postProcessing();
@@ -118,8 +118,8 @@ public abstract class ProcessingStatusDto {
                 return new AutoValue_ProcessingStatusDto_ReceiveTimes.Builder();
             }
 
-            @JsonProperty(FIELD_PRE_JOURNAL)
-            public abstract Builder preJournal(DateTime timestamp);
+            @JsonProperty(FIELD_INGEST)
+            public abstract Builder ingest(DateTime timestamp);
 
             @JsonProperty(FIELD_POST_PROCESSING)
             public abstract Builder postProcessing(DateTime timestamp);

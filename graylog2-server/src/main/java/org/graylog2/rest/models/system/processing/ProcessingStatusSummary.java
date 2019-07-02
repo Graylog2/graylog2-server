@@ -39,7 +39,7 @@ public abstract class ProcessingStatusSummary {
     public static ProcessingStatusSummary of(ProcessingStatusRecorder processingStatusRecorder) {
         return builder()
                 .receiveTimes(ReceiveTimes.builder()
-                        .preJournal(processingStatusRecorder.getPreJournalReceiveTime())
+                        .ingest(processingStatusRecorder.getIngestReceiveTime())
                         .postProcessing(processingStatusRecorder.getPostProcessingReceiveTime())
                         .postIndexing(processingStatusRecorder.getPostIndexingReceiveTime())
                         .build())
@@ -49,7 +49,7 @@ public abstract class ProcessingStatusSummary {
     public static ProcessingStatusSummary of(ProcessingStatusDto dto) {
         return builder()
                 .receiveTimes(ReceiveTimes.builder()
-                        .preJournal(dto.receiveTimes().preJournal())
+                        .ingest(dto.receiveTimes().ingest())
                         .postProcessing(dto.receiveTimes().postProcessing())
                         .postIndexing(dto.receiveTimes().postIndexing())
                         .build())
@@ -74,12 +74,12 @@ public abstract class ProcessingStatusSummary {
     @AutoValue
     @JsonDeserialize(builder = ReceiveTimes.Builder.class)
     public static abstract class ReceiveTimes {
-        public static final String FIELD_PRE_JOURNAL = "pre_journal";
+        public static final String FIELD_INGEST = "ingest";
         public static final String FIELD_POST_PROCESSING = "post_processing";
         public static final String FIELD_POST_INDEXING = "post_indexing";
 
-        @JsonProperty(FIELD_PRE_JOURNAL)
-        public abstract DateTime preJournal();
+        @JsonProperty(FIELD_INGEST)
+        public abstract DateTime ingest();
 
         @JsonProperty(FIELD_POST_PROCESSING)
         public abstract DateTime postProcessing();
@@ -98,8 +98,8 @@ public abstract class ProcessingStatusSummary {
                 return new AutoValue_ProcessingStatusSummary_ReceiveTimes.Builder();
             }
 
-            @JsonProperty(FIELD_PRE_JOURNAL)
-            public abstract Builder preJournal(DateTime timestamp);
+            @JsonProperty(FIELD_INGEST)
+            public abstract Builder ingest(DateTime timestamp);
 
             @JsonProperty(FIELD_POST_PROCESSING)
             public abstract Builder postProcessing(DateTime timestamp);

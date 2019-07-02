@@ -9,7 +9,7 @@
         "$date": "2019-01-01T00:03:00.000Z"
       },
       "receive_times": {
-        "pre_journal": {
+        "ingest": {
           "$date": "2019-01-01T00:03:00.000Z"
         },
         "post_processing": {
@@ -29,7 +29,7 @@
         "$date": "2019-01-01T01:03:00.000Z"
       },
       "receive_times": {
-        "pre_journal": {
+        "ingest": {
           "$date": "2019-01-01T01:03:00.000Z"
         },
         "post_processing": {
@@ -49,7 +49,7 @@
         "$date": "2019-01-01T02:03:00.000Z"
       },
       "receive_times": {
-        "pre_journal": {
+        "ingest": {
           "$date": "2019-01-01T02:03:00.000Z"
         },
         "post_processing": {
