@@ -1,28 +1,36 @@
+import UserNotification from 'util/UserNotification';
+import { ViewActions } from 'views/stores/ViewStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+
 import View from './View';
+import onSaveAsView from './OnSaveAsViewAction';
 
 jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: viewId => `/views/${viewId}` } }));
 
-// eslint-disable-next-line global-require
-const loadSUT = () => require('./OnSaveAsViewAction');
-
-const mockActions = () => {
-  const ViewActions = { load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load') };
-  const ViewManagementActions = {
+jest.mock('views/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
     create: jest.fn(() => Promise.resolve()).mockName('create'),
-  };
-  jest.doMock('views/stores/ViewManagementStore', () => ({ ViewManagementActions }));
-  jest.doMock('views/stores/ViewStore', () => ({ ViewActions }));
+  },
+}));
 
-  return { ViewActions, ViewManagementActions };
-};
+jest.mock('views/stores/ViewStore', () => ({
+  ViewActions: {
+    load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load'),
+  },
+}));
+
+jest.mock('util/UserNotification', () => ({
+  success: jest.fn().mockName('success'),
+  error: jest.fn().mockName('error'),
+}));
+
 
 describe('OnSaveAsViewAction', () => {
-  afterEach(() => {
-    jest.resetModules();
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
+
   it('saves a given new view', () => {
-    const { ViewManagementActions } = mockActions();
-    const onSaveAsView = loadSUT();
     const view = View.create();
     const router = [];
 
@@ -33,8 +41,6 @@ describe('OnSaveAsViewAction', () => {
   });
 
   it('loads saved view', () => {
-    const { ViewActions } = mockActions();
-    const onSaveAsView = loadSUT();
     const view = View.create();
     const router = [];
 
@@ -45,8 +51,6 @@ describe('OnSaveAsViewAction', () => {
   });
 
   it('redirects to saved view', () => {
-    mockActions();
-    const onSaveAsView = loadSUT();
     const view = View.create();
     const router = [];
 
@@ -57,10 +61,6 @@ describe('OnSaveAsViewAction', () => {
   });
 
   it('shows notification upon success', () => {
-    mockActions();
-    const UserNotification = { success: jest.fn().mockName('success') };
-    jest.doMock('util/UserNotification', () => UserNotification);
-    const onSaveAsView = loadSUT();
     const view = View.create().toBuilder().title('Test View').build();
     const router = [];
 
@@ -72,15 +72,8 @@ describe('OnSaveAsViewAction', () => {
   });
 
   it('does not do anything if saving fails', () => {
-    const { ViewManagementActions, ViewActions } = mockActions();
-    ViewManagementActions.create = jest.fn(() => Promise.reject(new Error('Something bad happened!')));
-    const UserNotification = {
-      success: jest.fn().mockName('success'),
-      error: jest.fn().mockName('error'),
-    };
-    jest.doMock('util/UserNotification', () => UserNotification);
+    ViewManagementActions.create.mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
 
-    const onSaveAsView = loadSUT();
     const view = View.create();
     const router = [];
 
