@@ -82,16 +82,16 @@ public class DBProcessingStatusService {
     }
 
     /**
-     * Returns the oldest max post-indexing receive timestamp of all active Graylog nodes in the cluster.
+     * Returns the earliest post-indexing receive timestamp of all active Graylog nodes in the cluster.
      * This can be used to find out if a certain timerange is already searchable in Elasticsearch.
      * <p>
      * Beware: This only takes the message receive time into account. It doesn't help when log sources send their
      * messages late.
      *
-     * @return max post-indexing timestamp or empty optional if no processing status entries exist
+     * @return earliest post-indexing timestamp or empty optional if no processing status entries exist
      */
-    public Optional<DateTime> maxIndexedTimestamp() {
-        final String sortField = ProcessingStatusDto.FIELD_MAX_RECEIVE_TIMES + "." + ProcessingStatusDto.MaxReceiveTimes.FIELD_POST_INDEXING;
+    public Optional<DateTime> earliestPostIndexingTimestamp() {
+        final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
 
         // We only check the min indexed timestamp for all active nodes to make sure we don't look at old status entries
         final Set<String> activeNodes = nodeService.allActive().values()
@@ -100,12 +100,12 @@ public class DBProcessingStatusService {
                 .collect(Collectors.toSet());
 
         final DBQuery.Query query = DBQuery.in(ProcessingStatusDto.FIELD_NODE_ID, activeNodes);
-        // Get the oldest timestamp of the post-indexing max receive timestamp by sorting and returning the first one.
-        // We use the oldest max timestamp because some nodes can be faster than others and we need to make sure
-        // to return the max timestamp of the slowest one.
+        // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
+        // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
+        // to return the timestamp of the slowest one.
         try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
             if (cursor.hasNext()) {
-                return Optional.of(cursor.next().maxReceiveTimes().postIndexing());
+                return Optional.of(cursor.next().receiveTimes().postIndexing());
             }
             return Optional.empty();
         }

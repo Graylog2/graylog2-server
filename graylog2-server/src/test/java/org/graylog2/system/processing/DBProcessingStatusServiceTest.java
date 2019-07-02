@@ -87,10 +87,10 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.nodeId()).isEqualTo("abc-123");
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
 
-            assertThat(dto.maxReceiveTimes()).satisfies(maxReceiveTimes -> {
-                assertThat(maxReceiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
-                assertThat(maxReceiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:02:00.000Z"));
-                assertThat(maxReceiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
+            assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
+                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
+                assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:02:00.000Z"));
+                assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
             });
         });
 
@@ -99,10 +99,10 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.nodeId()).isEqualTo("abc-456");
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
 
-            assertThat(dto.maxReceiveTimes()).satisfies(maxReceiveTimes -> {
-                assertThat(maxReceiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
-                assertThat(maxReceiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:02:00.000Z"));
-                assertThat(maxReceiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:01:00.000Z"));
+            assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
+                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
+                assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:02:00.000Z"));
+                assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:01:00.000Z"));
             });
         });
 
@@ -111,10 +111,10 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.nodeId()).isEqualTo("abc-789");
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
 
-            assertThat(dto.maxReceiveTimes()).satisfies(maxReceiveTimes -> {
-                assertThat(maxReceiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
-                assertThat(maxReceiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:02:00.000Z"));
-                assertThat(maxReceiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
+            assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
+                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
+                assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:02:00.000Z"));
+                assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
             });
         });
     }
@@ -125,19 +125,19 @@ public class DBProcessingStatusServiceTest {
         final InMemoryProcessingStatusRecorder statusRecorder = new InMemoryProcessingStatusRecorder();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
 
-        statusRecorder.updatePreJournalMaxReceiveTime(now);
-        statusRecorder.updatePostProcessingMaxReceiveTime(now.minusSeconds(1));
-        statusRecorder.updatePostIndexingMaxReceiveTime(now.minusSeconds(2));
+        statusRecorder.updatePreJournalReceiveTime(now);
+        statusRecorder.updatePostProcessingReceiveTime(now.minusSeconds(1));
+        statusRecorder.updatePostIndexingReceiveTime(now.minusSeconds(2));
 
         assertThat(dbService.save(statusRecorder, now)).satisfies(dto -> {
             assertThat(dto.id()).isNotBlank();
             assertThat(dto.nodeId()).isEqualTo(NODE_ID);
             assertThat(dto.updatedAt()).isEqualByComparingTo(now);
 
-            assertThat(dto.maxReceiveTimes()).satisfies(maxReceiveTimes -> {
-                assertThat(maxReceiveTimes.preJournal()).isEqualByComparingTo(now);
-                assertThat(maxReceiveTimes.postProcessing()).isEqualByComparingTo(now.minusSeconds(1));
-                assertThat(maxReceiveTimes.postIndexing()).isEqualByComparingTo(now.minusSeconds(2));
+            assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
+                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(now);
+                assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(now.minusSeconds(1));
+                assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(now.minusSeconds(2));
             });
         });
 
@@ -146,9 +146,9 @@ public class DBProcessingStatusServiceTest {
         // Advance time and update the status recorder
         final DateTime tomorrow = now.plusDays(1);
 
-        statusRecorder.updatePreJournalMaxReceiveTime(tomorrow);
-        statusRecorder.updatePostProcessingMaxReceiveTime(tomorrow.minusSeconds(1));
-        statusRecorder.updatePostIndexingMaxReceiveTime(tomorrow.minusSeconds(2));
+        statusRecorder.updatePreJournalReceiveTime(tomorrow);
+        statusRecorder.updatePostProcessingReceiveTime(tomorrow.minusSeconds(1));
+        statusRecorder.updatePostIndexingReceiveTime(tomorrow.minusSeconds(2));
 
         // Save the updated recorder
         assertThat(dbService.save(statusRecorder, tomorrow)).satisfies(dto -> {
@@ -156,10 +156,10 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.nodeId()).isEqualTo(NODE_ID);
             assertThat(dto.updatedAt()).isEqualByComparingTo(tomorrow);
 
-            assertThat(dto.maxReceiveTimes()).satisfies(maxReceiveTimes -> {
-                assertThat(maxReceiveTimes.preJournal()).isEqualByComparingTo(tomorrow);
-                assertThat(maxReceiveTimes.postProcessing()).isEqualByComparingTo(tomorrow.minusSeconds(1));
-                assertThat(maxReceiveTimes.postIndexing()).isEqualByComparingTo(tomorrow.minusSeconds(2));
+            assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
+                assertThat(receiveTimes.preJournal()).isEqualByComparingTo(tomorrow);
+                assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(tomorrow.minusSeconds(1));
+                assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(tomorrow.minusSeconds(2));
             });
         });
 
@@ -179,7 +179,7 @@ public class DBProcessingStatusServiceTest {
 
     @Test
     @UsingDataSet(locations = "processing-status.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void maxIndexedTimestamp() {
+    public void earliestPostIndexingTimestamp() {
         when(node1.getNodeId()).thenReturn("abc-123");
         when(node2.getNodeId()).thenReturn("abc-456");
         when(node3.getNodeId()).thenReturn("abc-789");
@@ -189,29 +189,29 @@ public class DBProcessingStatusServiceTest {
                 "abc-789", node3
         ));
 
-        // With all three nodes, abc-123 has the oldest max indexed timestamp
-        assertThat(dbService.maxIndexedTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
+        // With all three nodes, abc-123 has the earliest indexed timestamp
+        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
 
         when(nodeService.allActive()).thenReturn(ImmutableMap.of(
                 "abc-456", node2,
                 "abc-789", node3
         ));
 
-        // With only abc-456 and abc-789 nodes, the last one has the oldest max indexed timestamp
-        assertThat(dbService.maxIndexedTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
+        // With only abc-456 and abc-789 nodes, the last one has the earliest indexed timestamp
+        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
     }
 
     @Test
     @UsingDataSet(locations = "processing-status.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void maxIndexedTimestampWithoutAnyNodes() {
+    public void earliestPostIndexingTimestampWithoutAnyNodes() {
         when(nodeService.allActive()).thenReturn(ImmutableMap.of());
 
-        assertThat(dbService.maxIndexedTimestamp()).isNotPresent();
+        assertThat(dbService.earliestPostIndexingTimestamp()).isNotPresent();
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void maxIndexedTimestampWithoutData() {
+    public void earliestPostIndexingTimestampWithoutData() {
         when(node1.getNodeId()).thenReturn("abc-123");
         when(node2.getNodeId()).thenReturn("abc-456");
         when(node3.getNodeId()).thenReturn("abc-789");
@@ -221,6 +221,6 @@ public class DBProcessingStatusServiceTest {
                 "abc-789", node3
         ));
 
-        assertThat(dbService.maxIndexedTimestamp()).isNotPresent();
+        assertThat(dbService.earliestPostIndexingTimestamp()).isNotPresent();
     }
 }

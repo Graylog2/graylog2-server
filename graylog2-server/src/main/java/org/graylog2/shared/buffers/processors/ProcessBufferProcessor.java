@@ -124,7 +124,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         for (Message message : messages) {
             // The processing time should only be set once all message processors have finished
             message.setProcessingTime(Tools.nowUTC());
-            processingStatusRecorder.updatePostProcessingMaxReceiveTime(message.getReceiveTime());
+            processingStatusRecorder.updatePostProcessingReceiveTime(message.getReceiveTime());
 
             outputBuffer.insertBlocking(message);
         }

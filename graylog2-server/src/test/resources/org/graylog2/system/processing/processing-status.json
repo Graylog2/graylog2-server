@@ -8,7 +8,7 @@
       "updated_at": {
         "$date": "2019-01-01T00:03:00.000Z"
       },
-      "max_receive_times": {
+      "receive_times": {
         "pre_journal": {
           "$date": "2019-01-01T00:03:00.000Z"
         },
@@ -28,7 +28,7 @@
       "updated_at": {
         "$date": "2019-01-01T01:03:00.000Z"
       },
-      "max_receive_times": {
+      "receive_times": {
         "pre_journal": {
           "$date": "2019-01-01T01:03:00.000Z"
         },
@@ -48,7 +48,7 @@
       "updated_at": {
         "$date": "2019-01-01T02:03:00.000Z"
       },
-      "max_receive_times": {
+      "receive_times": {
         "pre_journal": {
           "$date": "2019-01-01T02:03:00.000Z"
         },

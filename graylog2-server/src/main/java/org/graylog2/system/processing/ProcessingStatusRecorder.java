@@ -23,32 +23,32 @@ import org.joda.time.DateTime;
  */
 public interface ProcessingStatusRecorder {
     /**
-     * Update max receive time for the "pre-journal" measurement point. This is done right before a raw messages gets
+     * Update the receive time for the "pre-journal" measurement point. This is done right before a raw messages gets
      * written to the disk journal.
      *
      * @param newTimestamp the new timestamp to record
      */
-    void updatePreJournalMaxReceiveTime(DateTime newTimestamp);
+    void updatePreJournalReceiveTime(DateTime newTimestamp);
 
-    DateTime getPreJournalMaxReceiveTime();
+    DateTime getPreJournalReceiveTime();
 
     /**
-     * Update max receive time for the "post-processing" measurement point. This is done right after all message
+     * Update the receive time for the "post-processing" measurement point. This is done right after all message
      * processors have run.
      *
      * @param newTimestamp the new timestamp to record
      */
-    void updatePostProcessingMaxReceiveTime(DateTime newTimestamp);
+    void updatePostProcessingReceiveTime(DateTime newTimestamp);
 
-    DateTime getPostProcessingMaxReceiveTime();
+    DateTime getPostProcessingReceiveTime();
 
     /**
-     * Update max receive time for the "post-indexing" measurement point. This is done right after messages
+     * Update receive time for the "post-indexing" measurement point. This is done right after messages
      * have been written to Elasticsearch.
      *
      * @param newTimestamp the new timestamp to record
      */
-    void updatePostIndexingMaxReceiveTime(DateTime newTimestamp);
+    void updatePostIndexingReceiveTime(DateTime newTimestamp);
 
-    DateTime getPostIndexingMaxReceiveTime();
+    DateTime getPostIndexingReceiveTime();
 }

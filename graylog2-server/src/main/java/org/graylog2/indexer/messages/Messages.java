@@ -179,7 +179,7 @@ public class Messages {
                 continue;
             }
 
-            processingStatusRecorder.updatePostIndexingMaxReceiveTime(message.getReceiveTime());
+            processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
         }
     }
 

@@ -28,47 +28,47 @@ import static org.joda.time.DateTimeZone.UTC;
  */
 @Singleton
 public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorder {
-    private final AtomicReference<DateTime> preJournalMaxReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
-    private final AtomicReference<DateTime> postProcessingMaxReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
-    private final AtomicReference<DateTime> postIndexMaxReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
+    private final AtomicReference<DateTime> preJournalReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
+    private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
+    private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
 
     @Override
-    public DateTime getPreJournalMaxReceiveTime() {
-        return preJournalMaxReceiveTime.get();
+    public DateTime getPreJournalReceiveTime() {
+        return preJournalReceiveTime.get();
     }
 
     @Override
-    public DateTime getPostProcessingMaxReceiveTime() {
-        return postProcessingMaxReceiveTime.get();
+    public DateTime getPostProcessingReceiveTime() {
+        return postProcessingReceiveTime.get();
     }
 
     @Override
-    public DateTime getPostIndexingMaxReceiveTime() {
-        return postIndexMaxReceiveTime.get();
+    public DateTime getPostIndexingReceiveTime() {
+        return postIndexReceiveTime.get();
     }
 
     @Override
-    public void updatePreJournalMaxReceiveTime(DateTime newTimestamp) {
+    public void updatePreJournalReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            preJournalMaxReceiveTime.updateAndGet(timestamp -> maxTimestamp(timestamp, newTimestamp));
+            preJournalReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 
     @Override
-    public void updatePostProcessingMaxReceiveTime(DateTime newTimestamp) {
+    public void updatePostProcessingReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            postProcessingMaxReceiveTime.updateAndGet(timestamp -> maxTimestamp(timestamp, newTimestamp));
+            postProcessingReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 
     @Override
-    public void updatePostIndexingMaxReceiveTime(DateTime newTimestamp) {
+    public void updatePostIndexingReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            postIndexMaxReceiveTime.updateAndGet(timestamp -> maxTimestamp(timestamp, newTimestamp));
+            postIndexReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 
-    private DateTime maxTimestamp(DateTime timestamp, DateTime newTimestamp) {
+    private DateTime latestTimestamp(DateTime timestamp, DateTime newTimestamp) {
         return newTimestamp.isAfter(timestamp) ? newTimestamp : timestamp;
     }
 }

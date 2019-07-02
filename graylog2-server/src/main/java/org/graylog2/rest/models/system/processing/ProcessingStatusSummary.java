@@ -27,10 +27,10 @@ import org.joda.time.DateTime;
 @AutoValue
 @JsonDeserialize(builder = ProcessingStatusSummary.Builder.class)
 public abstract class ProcessingStatusSummary {
-    public static final String FIELD_MAX_RECEIVE_TIMES = "max_receive_times";
+    public static final String FIELD_RECEIVE_TIMES = "receive_times";
 
-    @JsonProperty(FIELD_MAX_RECEIVE_TIMES)
-    public abstract MaxReceiveTimes maxReceiveTimes();
+    @JsonProperty(FIELD_RECEIVE_TIMES)
+    public abstract ReceiveTimes receiveTimes();
 
     public static Builder builder() {
         return Builder.create();
@@ -38,20 +38,20 @@ public abstract class ProcessingStatusSummary {
 
     public static ProcessingStatusSummary of(ProcessingStatusRecorder processingStatusRecorder) {
         return builder()
-                .maxReceiveTimes(MaxReceiveTimes.builder()
-                        .preJournal(processingStatusRecorder.getPreJournalMaxReceiveTime())
-                        .postProcessing(processingStatusRecorder.getPostProcessingMaxReceiveTime())
-                        .postIndexing(processingStatusRecorder.getPostIndexingMaxReceiveTime())
+                .receiveTimes(ReceiveTimes.builder()
+                        .preJournal(processingStatusRecorder.getPreJournalReceiveTime())
+                        .postProcessing(processingStatusRecorder.getPostProcessingReceiveTime())
+                        .postIndexing(processingStatusRecorder.getPostIndexingReceiveTime())
                         .build())
                 .build();
     }
 
     public static ProcessingStatusSummary of(ProcessingStatusDto dto) {
         return builder()
-                .maxReceiveTimes(MaxReceiveTimes.builder()
-                        .preJournal(dto.maxReceiveTimes().preJournal())
-                        .postProcessing(dto.maxReceiveTimes().postProcessing())
-                        .postIndexing(dto.maxReceiveTimes().postIndexing())
+                .receiveTimes(ReceiveTimes.builder()
+                        .preJournal(dto.receiveTimes().preJournal())
+                        .postProcessing(dto.receiveTimes().postProcessing())
+                        .postIndexing(dto.receiveTimes().postIndexing())
                         .build())
                 .build();
     }
@@ -65,15 +65,15 @@ public abstract class ProcessingStatusSummary {
             return new AutoValue_ProcessingStatusSummary.Builder();
         }
 
-        @JsonProperty(FIELD_MAX_RECEIVE_TIMES)
-        public abstract Builder maxReceiveTimes(MaxReceiveTimes maxReceiveTimes);
+        @JsonProperty(FIELD_RECEIVE_TIMES)
+        public abstract Builder receiveTimes(ReceiveTimes receiveTimes);
 
         public abstract ProcessingStatusSummary build();
     }
 
     @AutoValue
-    @JsonDeserialize(builder = MaxReceiveTimes.Builder.class)
-    public static abstract class MaxReceiveTimes {
+    @JsonDeserialize(builder = ReceiveTimes.Builder.class)
+    public static abstract class ReceiveTimes {
         public static final String FIELD_PRE_JOURNAL = "pre_journal";
         public static final String FIELD_POST_PROCESSING = "post_processing";
         public static final String FIELD_POST_INDEXING = "post_indexing";
@@ -95,7 +95,7 @@ public abstract class ProcessingStatusSummary {
         public static abstract class Builder {
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_ProcessingStatusSummary_MaxReceiveTimes.Builder();
+                return new AutoValue_ProcessingStatusSummary_ReceiveTimes.Builder();
             }
 
             @JsonProperty(FIELD_PRE_JOURNAL)
@@ -107,7 +107,7 @@ public abstract class ProcessingStatusSummary {
             @JsonProperty(FIELD_POST_INDEXING)
             public abstract Builder postIndexing(DateTime timestamp);
 
-            public abstract MaxReceiveTimes build();
+            public abstract ReceiveTimes build();
         }
     }
 }

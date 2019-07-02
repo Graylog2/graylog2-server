@@ -103,9 +103,9 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             try {
                 writeToJournal(converter, entries);
 
-                // The converter computed the max receive timestamp of all messages in the batch so we don't have to
+                // The converter computed the latest receive timestamp of all messages in the batch so we don't have to
                 // call the update on the recorder service for every message. (less contention)
-                processingStatusRecorder.updatePreJournalMaxReceiveTime(converter.getMaxReceiveTime());
+                processingStatusRecorder.updatePreJournalReceiveTime(converter.getLatestReceiveTime());
             } catch (Exception e) {
                 log.error("Unable to write to journal - retrying", e);
 
@@ -131,14 +131,14 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
     private class Converter implements Function<RawMessageEvent, Journal.Entry> {
         private long bytesWritten = 0;
-        private DateTime maxReceiveTime = new DateTime(0L, DateTimeZone.UTC);
+        private DateTime latestReceiveTime = new DateTime(0L, DateTimeZone.UTC);
 
         public long getBytesWritten() {
             return bytesWritten;
         }
 
-        public DateTime getMaxReceiveTime() {
-            return maxReceiveTime;
+        public DateTime getLatestReceiveTime() {
+            return latestReceiveTime;
         }
 
         @Nullable
@@ -158,7 +158,7 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
                 final DateTime messageTimestamp = input.getMessageTimestamp();
                 if (messageTimestamp != null) {
-                    maxReceiveTime = maxReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : maxReceiveTime;
+                    latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
                 }
 
                 // clear for gc and to avoid promotion to tenured space

@@ -32,7 +32,7 @@ public abstract class ProcessingStatusDto {
     private static final String FIELD_ID = "id";
     static final String FIELD_NODE_ID = "node_id";
     static final String FIELD_UPDATED_AT = "updated_at";
-    static final String FIELD_MAX_RECEIVE_TIMES = "max_receive_times";
+    static final String FIELD_RECEIVE_TIMES = "receive_times";
 
     @Id
     @ObjectId
@@ -46,17 +46,17 @@ public abstract class ProcessingStatusDto {
     @JsonProperty(FIELD_UPDATED_AT)
     public abstract DateTime updatedAt();
 
-    @JsonProperty(FIELD_MAX_RECEIVE_TIMES)
-    public abstract MaxReceiveTimes maxReceiveTimes();
+    @JsonProperty(FIELD_RECEIVE_TIMES)
+    public abstract ReceiveTimes receiveTimes();
 
     public static ProcessingStatusDto of(String nodeId, ProcessingStatusRecorder processingStatusRecorder, DateTime updatedAt) {
         return builder()
                 .nodeId(nodeId)
                 .updatedAt(updatedAt)
-                .maxReceiveTimes(MaxReceiveTimes.builder()
-                        .preJournal(processingStatusRecorder.getPreJournalMaxReceiveTime())
-                        .postProcessing(processingStatusRecorder.getPostProcessingMaxReceiveTime())
-                        .postIndexing(processingStatusRecorder.getPostIndexingMaxReceiveTime())
+                .receiveTimes(ReceiveTimes.builder()
+                        .preJournal(processingStatusRecorder.getPreJournalReceiveTime())
+                        .postProcessing(processingStatusRecorder.getPostProcessingReceiveTime())
+                        .postIndexing(processingStatusRecorder.getPostIndexingReceiveTime())
                         .build())
                 .build();
     }
@@ -85,15 +85,15 @@ public abstract class ProcessingStatusDto {
         @JsonProperty(FIELD_UPDATED_AT)
         public abstract Builder updatedAt(DateTime updatedAt);
 
-        @JsonProperty(FIELD_MAX_RECEIVE_TIMES)
-        public abstract Builder maxReceiveTimes(MaxReceiveTimes maxReceiveTimes);
+        @JsonProperty(FIELD_RECEIVE_TIMES)
+        public abstract Builder receiveTimes(ReceiveTimes receiveTimes);
 
         public abstract ProcessingStatusDto build();
     }
 
     @AutoValue
-    @JsonDeserialize(builder = MaxReceiveTimes.Builder.class)
-    public static abstract class MaxReceiveTimes {
+    @JsonDeserialize(builder = ReceiveTimes.Builder.class)
+    public static abstract class ReceiveTimes {
         private static final String FIELD_PRE_JOURNAL = "pre_journal";
         private static final String FIELD_POST_PROCESSING = "post_processing";
         static final String FIELD_POST_INDEXING = "post_indexing";
@@ -115,7 +115,7 @@ public abstract class ProcessingStatusDto {
         public static abstract class Builder {
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_ProcessingStatusDto_MaxReceiveTimes.Builder();
+                return new AutoValue_ProcessingStatusDto_ReceiveTimes.Builder();
             }
 
             @JsonProperty(FIELD_PRE_JOURNAL)
@@ -127,7 +127,7 @@ public abstract class ProcessingStatusDto {
             @JsonProperty(FIELD_POST_INDEXING)
             public abstract Builder postIndexing(DateTime timestamp);
 
-            public abstract MaxReceiveTimes build();
+            public abstract ReceiveTimes build();
         }
     }
 }

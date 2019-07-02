@@ -38,9 +38,9 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
 
     private static final DateTime DEFAULT_RECEIVE_TIME = new DateTime(0L, UTC);
 
-    private final AtomicReference<DateTime> preJournalMaxReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
-    private final AtomicReference<DateTime> postProcessingMaxReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
-    private final AtomicReference<DateTime> postIndexMaxReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
+    private final AtomicReference<DateTime> preJournalReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
+    private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
+    private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
 
     private final DBProcessingStatusService dbService;
     private final Duration persistInterval;
@@ -63,12 +63,12 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
             dbService.get().ifPresent(processingStatus -> {
                 LOG.debug("Loaded persisted processing status: {}", processingStatus);
 
-                // Do not directly set the timestamps on the atomic reference to make sure maxTimestamp() is used.
+                // Do not directly set the timestamps on the atomic reference to make sure latestTimestamp() is used.
                 // The timestamps could already have been updated once the database call is finished.
-                final ProcessingStatusDto.MaxReceiveTimes maxReceiveTimes = processingStatus.maxReceiveTimes();
-                updatePreJournalMaxReceiveTime(maxReceiveTimes.preJournal());
-                updatePostProcessingMaxReceiveTime(maxReceiveTimes.postProcessing());
-                updatePostIndexingMaxReceiveTime(maxReceiveTimes.postIndexing());
+                final ProcessingStatusDto.ReceiveTimes receiveTimes = processingStatus.receiveTimes();
+                updatePreJournalReceiveTime(receiveTimes.preJournal());
+                updatePostProcessingReceiveTime(receiveTimes.postProcessing());
+                updatePostIndexingReceiveTime(receiveTimes.postIndexing());
             });
         } catch (Exception e) {
             LOG.error("Couldn't load persisted processing status", e);
@@ -97,42 +97,42 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     }
 
     @Override
-    public DateTime getPreJournalMaxReceiveTime() {
-        return preJournalMaxReceiveTime.get();
+    public DateTime getPreJournalReceiveTime() {
+        return preJournalReceiveTime.get();
     }
 
     @Override
-    public DateTime getPostProcessingMaxReceiveTime() {
-        return postProcessingMaxReceiveTime.get();
+    public DateTime getPostProcessingReceiveTime() {
+        return postProcessingReceiveTime.get();
     }
 
     @Override
-    public DateTime getPostIndexingMaxReceiveTime() {
-        return postIndexMaxReceiveTime.get();
+    public DateTime getPostIndexingReceiveTime() {
+        return postIndexReceiveTime.get();
     }
 
     @Override
-    public void updatePreJournalMaxReceiveTime(DateTime newTimestamp) {
+    public void updatePreJournalReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            preJournalMaxReceiveTime.updateAndGet(timestamp -> maxTimestamp(timestamp, newTimestamp));
+            preJournalReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 
     @Override
-    public void updatePostProcessingMaxReceiveTime(DateTime newTimestamp) {
+    public void updatePostProcessingReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            postProcessingMaxReceiveTime.updateAndGet(timestamp -> maxTimestamp(timestamp, newTimestamp));
+            postProcessingReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 
     @Override
-    public void updatePostIndexingMaxReceiveTime(DateTime newTimestamp) {
+    public void updatePostIndexingReceiveTime(DateTime newTimestamp) {
         if (newTimestamp != null) {
-            postIndexMaxReceiveTime.updateAndGet(timestamp -> maxTimestamp(timestamp, newTimestamp));
+            postIndexReceiveTime.updateAndGet(timestamp -> latestTimestamp(timestamp, newTimestamp));
         }
     }
 
-    private DateTime maxTimestamp(DateTime timestamp, DateTime newTimestamp) {
+    private DateTime latestTimestamp(DateTime timestamp, DateTime newTimestamp) {
         return newTimestamp.isAfter(timestamp) ? newTimestamp : timestamp;
     }
 }
