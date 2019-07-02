@@ -169,7 +169,9 @@ class QueryInput extends Component<Props, State> {
       editor.completer.popup.hide();
     }
     const { value } = this.state;
-    onChange(value).then(onExecute);
+    new Promise(resolve => this.setState({ lastValue: value }, resolve))
+      .then(() => onChange(value))
+      .then(onExecute);
   };
 
   _bindEditor(editor: { editor: Editor }) {
