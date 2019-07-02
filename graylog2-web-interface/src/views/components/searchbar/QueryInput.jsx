@@ -90,7 +90,7 @@ class QueryInput extends Component<Props, State> {
     if (this.editor) {
       const { editor } = this.editor;
       if (nextProps.value && this._placeholderExists(editor)) {
-        this._removePlaceholder(this.editor.editor);
+        this._removePlaceholder(editor);
       }
 
       if (!nextProps.value && !this.isFocussed && !this._placeholderExists(editor)) {
