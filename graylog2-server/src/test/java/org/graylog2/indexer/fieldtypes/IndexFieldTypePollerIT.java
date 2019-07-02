@@ -125,6 +125,8 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
                     FieldTypeDTO.create("http_status", "keyword"),
                     FieldTypeDTO.create("http_response_time", "long"),
                     FieldTypeDTO.create("timestamp", "date"),
+                    FieldTypeDTO.create("gl2_receive_timestamp", "date"),
+                    FieldTypeDTO.create("gl2_processing_timestamp", "date"),
                     FieldTypeDTO.create("streams", "keyword")
             );
         } finally {
@@ -152,6 +154,8 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
                     FieldTypeDTO.create("http_status", "keyword"),
                     FieldTypeDTO.create("http_response_time", "long"),
                     FieldTypeDTO.create("timestamp", "date"),
+                    FieldTypeDTO.create("gl2_receive_timestamp", "date"),
+                    FieldTypeDTO.create("gl2_processing_timestamp", "date"),
                     FieldTypeDTO.create("streams", "keyword")
             );
         } finally {
