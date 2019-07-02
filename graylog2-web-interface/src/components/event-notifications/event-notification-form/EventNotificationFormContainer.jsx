@@ -10,7 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import EventNotificationForm from './EventNotificationForm';
 
 // Import built-in Event Notification Types
-import {} from './event-notification-types';
+import {} from '../event-notification-types';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
