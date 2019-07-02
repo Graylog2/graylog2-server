@@ -38,6 +38,10 @@ const EventNotificationsStore = Reflux.createStore({
     return URLUtils.qualifyUrl(uri.resource());
   },
 
+  refresh() {
+    this.listPaginated({ page: this.page, pageSize: this.pageSize });
+  },
+
   listAll() {
     const promise = fetch('GET', this.eventNotificationsUrl({ query: { per_page: 0 } }));
 
@@ -83,7 +87,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then(
       (response) => {
         UserNotification.success('Notification created successfully', `Notification "${notification.title}" was created successfully.`);
-        this.list();
+        this.refresh();
         return response;
       },
       (error) => {
@@ -115,7 +119,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then(
       () => {
         UserNotification.success('Notification deleted successfully', `Notification "${notification.title}" was deleted successfully.`);
-        this.list();
+        this.refresh();
       },
       (error) => {
         UserNotification.error(`Deleting Notification "${notification.title}" failed with status: ${error}`,
