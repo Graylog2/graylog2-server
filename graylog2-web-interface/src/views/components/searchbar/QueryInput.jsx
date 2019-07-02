@@ -122,12 +122,7 @@ class QueryInput extends Component<Props, State> {
     return emptyMessageNode !== undefined && emptyMessageNode !== null;
   };
 
-  _onChange = (newValue: string) => {
-    return new Promise(resolve => this.setState({ value: newValue }, resolve));
-  };
-
-  _onBlur = () => {
-    this.isFocussed = false;
+  _addPlaceholderIfEmptyQuery = () => {
     const editor = this.editor && this.editor.editor;
     if (editor) {
       const shouldShow = !editor.session.getValue().length;
@@ -135,6 +130,23 @@ class QueryInput extends Component<Props, State> {
         this._addPlaceholder(editor);
       }
     }
+  };
+
+  _removePlaceholderOnFocus = () => {
+    const editor = this.editor && this.editor.editor;
+    if (editor && this._placeholderExists(editor)) {
+      this._removePlaceholder(editor);
+    }
+  };
+
+  _onChange = (newValue: string) => {
+    return new Promise(resolve => this.setState({ value: newValue }, resolve));
+  };
+
+  _onBlur = () => {
+    this.isFocussed = false;
+    this._addPlaceholderIfEmptyQuery();
+
     const { onBlur, onChange } = this.props;
     const { value, lastValue } = this.state;
     const promise = (value !== lastValue)
@@ -148,10 +160,7 @@ class QueryInput extends Component<Props, State> {
 
   _onFocus = () => {
     this.isFocussed = true;
-    const editor = this.editor && this.editor.editor;
-    if (editor && this._placeholderExists(editor)) {
-      this._removePlaceholder(editor);
-    }
+    this._removePlaceholderOnFocus();
   };
 
   _onExecute = (editor: Editor) => {
