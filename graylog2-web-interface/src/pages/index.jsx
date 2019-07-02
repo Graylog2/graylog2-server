@@ -15,6 +15,7 @@ const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
+const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
@@ -94,6 +95,7 @@ export {
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
+  EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,

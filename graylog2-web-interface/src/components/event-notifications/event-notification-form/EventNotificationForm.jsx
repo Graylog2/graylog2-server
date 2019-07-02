@@ -56,7 +56,7 @@ class EventNotificationForm extends React.Component {
   };
 
   render() {
-    const { notification, onCancel } = this.props;
+    const { action, notification, onCancel } = this.props;
 
     const notificationPlugin = this.getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
@@ -92,7 +92,7 @@ class EventNotificationForm extends React.Component {
               <ControlLabel>Notification Type</ControlLabel>
               <Select id="notification-type"
                       options={this.formattedEventNotificationTypes()}
-                      value={notification.type}
+                      value={notification.config.type}
                       onChange={this.handleTypeChange}
                       clearable={false}
                       required />
@@ -102,7 +102,7 @@ class EventNotificationForm extends React.Component {
             {notificationFormComponent}
 
             <ButtonToolbar>
-              <Button bsStyle="primary" type="submit">Create</Button>
+              <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
               <Button onClick={onCancel}>Cancel</Button>
             </ButtonToolbar>
           </form>

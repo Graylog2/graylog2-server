@@ -27,6 +27,7 @@ import {
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
+  EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,
@@ -125,6 +126,7 @@ const AppRouter = () => {
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
             <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
             <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
+            <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.edit(':notificationId')} component={EditEventNotificationPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage} />
