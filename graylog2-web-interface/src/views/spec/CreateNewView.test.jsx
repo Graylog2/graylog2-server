@@ -118,22 +118,19 @@ jest.mock('stores/sessions/SessionStore', () => ({
 jest.mock('components/navigation/Navigation', () => 'navigation-bar');
 jest.mock('routing/AppGlobalNotifications', () => 'app-global-notifications');
 
-jest.setTimeout(30000);
-
 describe('Create a new view', () => {
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, viewsBindings));
   });
 
   it('using Views Page', async () => {
-    const { getByText, getAllByText, prettyDOM, container } = render(<AppRouter />);
+    const { getByText, getAllByText } = render(<AppRouter />);
     history.push(Routes.VIEWS.LIST);
 
     await wait(() => getAllByText('Create new view'));
     const button = getAllByText('Create new view')[0];
     fireEvent.click(button);
     await wait(() => getByText('Query#1'));
-    await wait(() => getByText('New View'), { timeout: 25000 });
-    console.log(prettyDOM(container, 15000));
+    await wait(() => getByText('New View'));
   });
 });
