@@ -38,6 +38,10 @@ public class ReferenceMapUtilsTest {
                 .put("string", "String")
                 .put("enum", TestEnum.A)
                 .put("list", ImmutableList.of(1, 2.0f, "3", true))
+                .put("nestedList", ImmutableList.of(
+                        ImmutableMap.of( "k1", "v1", "k2", 2),
+                        ImmutableMap.of( "k1", "v2", "k2", 4)
+                ))
                 .put("map", ImmutableMap.of(
                         "k1", "v1",
                         "k2", 2))
@@ -55,6 +59,13 @@ public class ReferenceMapUtilsTest {
                         ValueReference.of(2.0f),
                         ValueReference.of("3"),
                         ValueReference.of(true))))
+                .put("nestedList", new ReferenceList(ImmutableList.of(
+                        new ReferenceMap(ImmutableMap.of(
+                        "k1", ValueReference.of("v1"),
+                        "k2", ValueReference.of(2))),
+                        new ReferenceMap(ImmutableMap.of(
+                                "k1", ValueReference.of("v2"),
+                                "k2", ValueReference.of(4))))))
                 .put("map", new ReferenceMap(ImmutableMap.of(
                         "k1", ValueReference.of("v1"),
                         "k2", ValueReference.of(2))))
@@ -90,6 +101,13 @@ public class ReferenceMapUtilsTest {
                         ValueReference.of("3"),
                         ValueReference.of(true),
                         ValueReference.createParameter("STRING"))))
+                .put("nestedList", new ReferenceList(ImmutableList.of(
+                        new ReferenceMap(ImmutableMap.of(
+                                "k1", ValueReference.of("v1"),
+                                "k2", ValueReference.of(2))),
+                        new ReferenceMap(ImmutableMap.of(
+                                "k1", ValueReference.of("v2"),
+                                "k2", ValueReference.of(4))))))
                 .put("map", new ReferenceMap(ImmutableMap.of(
                         "k1", ValueReference.of("v1"),
                         "k2", ValueReference.of(2),
@@ -107,6 +125,10 @@ public class ReferenceMapUtilsTest {
                 .put("enum", "A")
                 .put("param_enum", "A")
                 .put("list", ImmutableList.of(1, 2.0f, "3", true, "String"))
+                .put("nestedList", ImmutableList.of(
+                        ImmutableMap.of( "k1", "v1", "k2", 2),
+                        ImmutableMap.of( "k1", "v2", "k2", 4)
+                ))
                 .put("map", ImmutableMap.of(
                         "k1", "v1",
                         "k2", 2,
