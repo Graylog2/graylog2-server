@@ -1,7 +1,8 @@
 import Reflux from 'reflux';
 
 const EventNotificationsActions = Reflux.createActions({
-  list: { asyncResult: true },
+  listAll: { asyncResult: true },
+  listPaginated: { asyncResult: true },
   get: { asyncResult: true },
   create: { asyncResult: true },
   update: { asyncResult: true },

@@ -12,11 +12,21 @@ const { EventNotificationsActions } = CombinedProvider.get('EventNotifications')
 const EventNotificationsStore = Reflux.createStore({
   listenables: [EventNotificationsActions],
   sourceUrl: '/plugins/org.graylog.events/notifications',
+  all: undefined,
+  notifications: undefined,
+  pagination: {
+    count: undefined,
+    page: undefined,
+    pageSize: undefined,
+    total: undefined,
+  },
 
-  getInitialState() {
-    return {
-      list: [],
-    };
+  propagateChanges() {
+    this.trigger({
+      all: this.all,
+      notifications: this.notifications,
+      pagination: this.pagination,
+    });
   },
 
   eventNotificationsUrl({ segments = [], query = {} }) {
@@ -28,16 +38,39 @@ const EventNotificationsStore = Reflux.createStore({
     return URLUtils.qualifyUrl(uri.resource());
   },
 
-  list() {
-    // TODO: This needs to user proper pagination instead of requesting 1000 items
-    const promise = fetch('GET', this.eventNotificationsUrl({ query: { per_page: 1000 } }));
+  listAll() {
+    const promise = fetch('GET', this.eventNotificationsUrl({ query: { per_page: 0 } }));
 
     promise.then((response) => {
-      this.trigger({ list: response.notifications });
+      this.all = response.notifications;
+      this.propagateChanges();
       return response;
     });
 
-    EventNotificationsActions.list.promise(promise);
+    EventNotificationsActions.listAll.promise(promise);
+  },
+
+  listPaginated({ page = 1, pageSize = 10 }) {
+    const promise = fetch('GET', this.eventNotificationsUrl({
+      query: {
+        page: page,
+        per_page: pageSize,
+      },
+    }));
+
+    promise.then((response) => {
+      this.notifications = response.notifications;
+      this.pagination = {
+        count: response.count,
+        page: response.page,
+        pageSize: response.per_page,
+        total: response.total,
+      };
+      this.propagateChanges();
+      return response;
+    });
+
+    EventNotificationsActions.listPaginated.promise(promise);
   },
 
   get(notificationId) {
