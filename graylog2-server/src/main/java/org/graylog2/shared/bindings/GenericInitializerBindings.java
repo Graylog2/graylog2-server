@@ -19,18 +19,23 @@ package org.graylog2.shared.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.JerseyService;
 import org.graylog2.shared.initializers.PeriodicalsService;
+import org.graylog2.system.processing.MongoDBProcessingStatusRecorderService;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 
 public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
+        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
+
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(InputSetupService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(JerseyService.class);
         serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
+        serviceBinder.addBinding().to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
     }
 }

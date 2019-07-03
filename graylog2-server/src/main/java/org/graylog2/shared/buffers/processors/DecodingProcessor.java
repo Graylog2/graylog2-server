@@ -249,6 +249,10 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             message.setSource("unknown");
         }
 
+        // The raw message timestamp is the receive time of the message. It has been created before writing the raw
+        // message to the journal.
+        message.setReceiveTime(raw.getTimestamp());
+
         metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
         decodedTrafficCounter.inc(message.getSize());
         return message;

@@ -1,0 +1,139 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.graylog2.system.processing;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.mongodb.BasicDBObject;
+import org.bson.types.ObjectId;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.system.NodeId;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.mongojack.DBCursor;
+import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
+import org.mongojack.JacksonDBCollection;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Manages the database collection for processing status.
+ */
+public class DBProcessingStatusService {
+    private static final String COLLECTION_NAME = "processing_status";
+
+    private final String nodeId;
+    private final NodeService nodeService;
+    private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
+
+    @Inject
+    public DBProcessingStatusService(MongoConnection mongoConnection,
+                                     NodeId nodeId,
+                                     NodeService nodeService,
+                                     MongoJackObjectMapperProvider mapper) {
+        this.nodeId = nodeId.toString();
+        this.nodeService = nodeService;
+        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+                ProcessingStatusDto.class,
+                ObjectId.class,
+                mapper.get());
+
+        db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
+    }
+
+    /**
+     * Rerturns all existing processing status entries from the database.
+     *
+     * @return a list of all processing status entries
+     */
+    public List<ProcessingStatusDto> all() {
+        return ImmutableList.copyOf(db.find().sort(DBSort.asc("_id")).iterator());
+    }
+
+    /**
+     * Returns the processing status entry for the calling node.
+     *
+     * @return the processing status entry or an empty optional if none exists
+     */
+    public Optional<ProcessingStatusDto> get() {
+        return Optional.ofNullable(db.findOne(DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId)));
+    }
+
+    /**
+     * Returns the earliest post-indexing receive timestamp of all active Graylog nodes in the cluster.
+     * This can be used to find out if a certain timerange is already searchable in Elasticsearch.
+     * <p>
+     * Beware: This only takes the message receive time into account. It doesn't help when log sources send their
+     * messages late.
+     *
+     * @return earliest post-indexing timestamp or empty optional if no processing status entries exist
+     */
+    public Optional<DateTime> earliestPostIndexingTimestamp() {
+        final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
+
+        // We only check the min indexed timestamp for all active nodes to make sure we don't look at old status entries
+        final Set<String> activeNodes = nodeService.allActive().values()
+                .stream()
+                .map(Node::getNodeId)
+                .collect(Collectors.toSet());
+
+        final DBQuery.Query query = DBQuery.in(ProcessingStatusDto.FIELD_NODE_ID, activeNodes);
+        // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
+        // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
+        // to return the timestamp of the slowest one.
+        try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
+            if (cursor.hasNext()) {
+                return Optional.of(cursor.next().receiveTimes().postIndexing());
+            }
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Create or update (upsert) a processing status entry for the given {@link ProcessingStatusRecorder} using the
+     * caller's node ID.
+     *
+     * @param processingStatusRecorder the processing recorder object to create/update
+     * @return the created/updated entry
+     */
+    public ProcessingStatusDto save(ProcessingStatusRecorder processingStatusRecorder) {
+        return save(processingStatusRecorder, DateTime.now(DateTimeZone.UTC));
+    }
+
+    @VisibleForTesting
+    ProcessingStatusDto save(ProcessingStatusRecorder processingStatusRecorder, DateTime updatedAt) {
+        // TODO: Using a timestamp provided by the node for "updated_at" can be bad if the node clock is skewed.
+        //       Ideally we would use MongoDB's "$currentDate" but there doesn't seem to be a way to use that
+        //       with mongojack.
+        return db.findAndModify(
+                DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId),
+                null,
+                null,
+                false,
+                ProcessingStatusDto.of(nodeId, processingStatusRecorder, updatedAt),
+                true, // We want to return the updated document to the caller
+                true);
+    }
+}

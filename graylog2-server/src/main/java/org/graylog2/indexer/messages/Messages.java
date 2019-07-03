@@ -42,6 +42,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -81,17 +83,20 @@ public class Messages {
 
     private final Meter invalidTimestampMeter;
     private final JestClient client;
+    private final ProcessingStatusRecorder processingStatusRecorder;
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
     private final Counter outputByteCounter;
     private final Counter systemTrafficCounter;
 
     @Inject
     public Messages(MetricRegistry metricRegistry,
-                    JestClient client) {
+                    JestClient client,
+                    ProcessingStatusRecorder processingStatusRecorder) {
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
         this.client = client;
+        this.processingStatusRecorder = processingStatusRecorder;
 
         // TODO: Magic number
         this.indexFailureQueue =  new LinkedBlockingQueue<>(1000);
@@ -157,9 +162,24 @@ public class Messages {
         }
 
         if (!failedItems.isEmpty()) {
+            final Set<String> failedIds = failedItems.stream().map(item -> item.id).collect(Collectors.toSet());
+            recordTimestamp(messageList, failedIds);
             return propagateFailure(failedItems, messageList, result.getErrorMessage());
         } else {
+            recordTimestamp(messageList, Collections.emptySet());
             return Collections.emptyList();
+        }
+    }
+
+    private void recordTimestamp(List<Map.Entry<IndexSet, Message>> messageList, Set<String> failedIds) {
+        for (final Map.Entry<IndexSet, Message> entry : messageList) {
+            final Message message = entry.getValue();
+
+            if (failedIds.contains(message.getId())) {
+                continue;
+            }
+
+            processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
         }
     }
 

@@ -27,6 +27,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +64,16 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
     private final List<RawMessageEvent> batch = Lists.newArrayList();
     private final Counter byteCounter;
     private final Journal journal;
+    private final ProcessingStatusRecorder processingStatusRecorder;
     private final Semaphore journalFilled;
 
     @Inject
-    public JournallingMessageHandler(MetricRegistry metrics, Journal journal, @Named("JournalSignal") Semaphore journalFilled) {
+    public JournallingMessageHandler(MetricRegistry metrics,
+                                     Journal journal,
+                                     ProcessingStatusRecorder processingStatusRecorder,
+                                     @Named("JournalSignal") Semaphore journalFilled) {
         this.journal = journal;
+        this.processingStatusRecorder = processingStatusRecorder;
         this.journalFilled = journalFilled;
         byteCounter = metrics.counter(MetricRegistry.name(JournallingMessageHandler.class, "written_bytes"));
     }
@@ -94,6 +102,10 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             // continue.
             try {
                 writeToJournal(converter, entries);
+
+                // The converter computed the latest receive timestamp of all messages in the batch so we don't have to
+                // call the update on the recorder service for every message. (less contention)
+                processingStatusRecorder.updateIngestReceiveTime(converter.getLatestReceiveTime());
             } catch (Exception e) {
                 log.error("Unable to write to journal - retrying", e);
 
@@ -119,9 +131,14 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
     private class Converter implements Function<RawMessageEvent, Journal.Entry> {
         private long bytesWritten = 0;
+        private DateTime latestReceiveTime = new DateTime(0L, DateTimeZone.UTC);
 
         public long getBytesWritten() {
             return bytesWritten;
+        }
+
+        public DateTime getLatestReceiveTime() {
+            return latestReceiveTime;
         }
 
         @Nullable
@@ -139,9 +156,15 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
                 bytesWritten += size;
                 byteCounter.inc(size);
 
+                final DateTime messageTimestamp = input.getMessageTimestamp();
+                if (messageTimestamp != null) {
+                    latestReceiveTime = latestReceiveTime.isBefore(messageTimestamp) ? messageTimestamp : latestReceiveTime;
+                }
+
                 // clear for gc and to avoid promotion to tenured space
                 input.setMessageIdBytes(null);
                 input.setEncodedRawMessage(null);
+                input.setMessageTimestamp(null);
                 // convert to journal entry
                 return journal.createEntry(messageIdBytes, encodedRawMessage);
             } catch (Exception e) {

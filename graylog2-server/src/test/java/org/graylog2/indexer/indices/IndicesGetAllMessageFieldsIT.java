@@ -27,6 +27,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,7 +54,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBase {
         indices = new Indices(client(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), client()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());
