@@ -21,6 +21,13 @@ class NotificationList extends React.Component {
     return PluginStore.exports('eventNotificationTypes').find(n => n.type === type);
   };
 
+  handleRemoveClick = (notificationId) => {
+    return () => {
+      const { onRemoveNotificationClick } = this.props;
+      onRemoveNotificationClick(notificationId);
+    };
+  };
+
   notificationFormatter = (notification) => {
     const plugin = this.getNotificationPlugin(notification.config.type);
 
@@ -28,7 +35,11 @@ class NotificationList extends React.Component {
       <tr key={notification.id}>
         <td>{notification.title}</td>
         <td>{plugin.displayName || notification.config.type}</td>
-        <td className="actions"><Button bsStyle="info" bsSize="xsmall">Remove from Event</Button></td>
+        <td className="actions">
+          <Button bsStyle="info" bsSize="xsmall" onClick={this.handleRemoveClick(notification.id)}>
+            Remove from Event
+          </Button>
+        </td>
       </tr>
     );
   };

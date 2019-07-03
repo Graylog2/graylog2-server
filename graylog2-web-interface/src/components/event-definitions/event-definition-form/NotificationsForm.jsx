@@ -41,7 +41,10 @@ class NotificationsForm extends React.Component {
   };
 
   handleRemoveNotification = (notificationId) => {
-
+    const { onChange, eventDefinition } = this.props;
+    const action = eventDefinition.actions.find(a => a.notification_id === notificationId);
+    const nextActions = lodash.without(eventDefinition.actions, action);
+    onChange('actions', nextActions);
   };
 
   render() {
