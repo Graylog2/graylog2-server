@@ -21,12 +21,20 @@ const EventNotificationsStore = Reflux.createStore({
     total: undefined,
   },
 
+  getInitialState() {
+    return this.getState();
+  },
+
   propagateChanges() {
-    this.trigger({
+    this.trigger(this.getState());
+  },
+
+  getState() {
+    return {
       all: this.all,
       notifications: this.notifications,
       pagination: this.pagination,
-    });
+    };
   },
 
   eventNotificationsUrl({ segments = [], query = {} }) {
