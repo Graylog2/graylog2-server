@@ -44,7 +44,7 @@ class EventNotificationsContainer extends React.Component {
   render() {
     const { notifications } = this.props;
 
-    if (!notifications) {
+    if (!notifications.notifications) {
       return <Spinner text="Loading Notifications information..." />;
     }
 
