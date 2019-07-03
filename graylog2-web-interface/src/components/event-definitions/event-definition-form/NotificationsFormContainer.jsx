@@ -6,6 +6,8 @@ import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import {} from 'components/event-notifications/event-notification-types';
+
 import NotificationsForm from './NotificationsForm';
 
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
