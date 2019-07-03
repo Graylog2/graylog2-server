@@ -4881,6 +4881,7 @@ eslint-config-airbnb@17.1.0:
     eslint-plugin-import "2.18.0"
     eslint-plugin-jsx-a11y "6.2.3"
     eslint-plugin-react "7.14.2"
+    eslint-plugin-react-hooks "^1.6.1"
 
 eslint-import-resolver-node@^0.3.2:
   version "0.3.2"
@@ -4956,6 +4957,11 @@ eslint-plugin-jsx-a11y@6.2.3:
     emoji-regex "^7.0.2"
     has "^1.0.3"
     jsx-ast-utils "^2.2.1"
+
+eslint-plugin-react-hooks@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-1.6.1.tgz#3c66a5515ea3e0a221ffc5d4e75c971c217b1a4c"
+  integrity sha512-wHhmGJyVuijnYIJXZJHDUF2WM+rJYTjulUTqF9k61d3BTk8etydz+M4dXUVH7M76ZRS85rqBTCx0Es/lLsrjnA==
 
 eslint-plugin-react@7.14.2:
   version "7.14.2"
@@ -6628,7 +6634,7 @@ gray-matter@^3.0.8:
   dependencies:
     "@babel/preset-env" "7.4.5"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.1.0-SNAPSHOT-c5c4de7f-4295-4dcf-8548-4b6792461ee0-1562065170641/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.1.0-SNAPSHOT-ab2c0693-9b8f-489f-b34f-5f10e92c4bb0-1562139878823/node_modules/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"

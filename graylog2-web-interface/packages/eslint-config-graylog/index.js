@@ -8,6 +8,7 @@ module.exports = {
   ],
   plugins: [
     'import',
+    'react-hooks',
   ],
   rules: {
     'arrow-body-style': 'off',
