@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import moment from 'moment';
 
-import Plotly from 'views/custom-plotly';
-import createPlotlyComponent from 'react-plotly.js/factory';
-
-const Plot = createPlotlyComponent(Plotly);
+import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 
 const _formatTimestamp = (epoch) => {
   return moment.unix(epoch).format('YYYY-MM-DD HH:mm:ss');
@@ -22,9 +19,9 @@ const _generateSeries = (results) => {
   }];
 };
 
-export default function Histogram(props) {
+export default function Histogram({ data }) {
   return (
-    <Plot data={_generateSeries(props.data.results)}
+    <Plot data={_generateSeries(data.results)}
           style={{ position: 'absolute' }}
           fit
           layout={{

@@ -6,6 +6,8 @@ import ChartColorContext from '../ChartColorContext';
 import GenericPlot from '../GenericPlot';
 
 jest.mock('components/common/ColorPicker', () => 'color-picker');
+// eslint-disable-next-line global-require
+jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot'));
 
 describe('GenericPlot', () => {
   describe('adds onRelayout handler', () => {

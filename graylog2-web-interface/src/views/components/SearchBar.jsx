@@ -12,7 +12,7 @@ import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
-import QueryInput from 'views/components/searchbar/QueryInput';
+import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
