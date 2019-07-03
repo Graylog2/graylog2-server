@@ -340,6 +340,11 @@
                 <artifactId>uuid</artifactId>
                 <version>${uuid.version}</version>
             </dependency>
+            <dependency>
+                <groupId>de.huxhorn.sulky</groupId>
+                <artifactId>de.huxhorn.sulky.ulid</artifactId>
+                <version>${ulid.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.shiro</groupId>

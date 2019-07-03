@@ -146,6 +146,7 @@
         <streamex.version>0.6.8</streamex.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.60</syslog4j.version>
+        <ulid.version>8.2.0</ulid.version>
         <uuid.version>3.2</uuid.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <zkclient.version>0.7</zkclient.version>
