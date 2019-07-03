@@ -7,7 +7,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Wizard } from 'components/common';
 import EventDetailsForm from './EventDetailsForm';
 import FieldsForm from './FieldsForm';
-import NotificationsForm from './NotificationsForm';
+import NotificationsFormContainer from './NotificationsFormContainer';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
 import styles from './EventDefinitionForm.css';
@@ -134,7 +134,7 @@ class EventDefinitionForm extends React.Component {
       {
         key: STEP_KEYS[3],
         title: 'Notifications',
-        component: <NotificationsForm {...defaultStepProps} />,
+        component: <NotificationsFormContainer {...defaultStepProps} />,
         disabled: this.areStepsDisabled(eventDefinition),
       },
       {
