@@ -24,13 +24,13 @@ class AddNotificationForm extends React.Component {
     onChange(selectedNotification);
   };
 
-  handleSelectNotificationChange = (nextNotification) => {
-    if (nextNotification === 'create') {
+  handleSelectNotificationChange = (nextNotificationId) => {
+    if (nextNotificationId === 'create') {
       this.setState({ displayNewNotificationForm: true });
       return;
     }
 
-    this.setState({ selectedNotification: nextNotification });
+    this.setState({ selectedNotification: nextNotificationId });
   };
 
   formatNotifications = (notifications) => {
