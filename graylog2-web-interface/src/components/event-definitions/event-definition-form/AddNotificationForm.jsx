@@ -19,14 +19,15 @@ class AddNotificationForm extends React.Component {
     displayNewNotificationForm: false,
   };
 
-  handleSubmit = (promise) => {
+  handleNewNotificationSubmit = (promise) => {
+    const { onChange } = this.props;
+    promise.then(notification => onChange(notification.id));
+  };
+
+  handleSubmit = () => {
     const { onChange } = this.props;
     const { selectedNotification } = this.state;
-    if (promise) {
-      promise.then(notification => onChange(notification.id));
-    } else {
-      onChange(selectedNotification);
-    }
+    onChange(selectedNotification);
   };
 
   handleSelectNotificationChange = (nextNotificationId) => {
@@ -47,6 +48,9 @@ class AddNotificationForm extends React.Component {
   render() {
     const { notifications, onCancel } = this.props;
     const { displayNewNotificationForm, selectedNotification } = this.state;
+    const doneButton = displayNewNotificationForm
+      ? <Button bsStyle="primary" type="submit" form="new-notification-form">Done</Button>
+      : <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>;
 
     return (
       <Row>
@@ -68,13 +72,13 @@ class AddNotificationForm extends React.Component {
             {displayNewNotificationForm && (
               <EventNotificationFormContainer action="create"
                                               formId="new-notification-form"
-                                              onSubmit={this.handleSubmit}
+                                              onSubmit={this.handleNewNotificationSubmit}
                                               embedded />
             )}
           </fieldset>
 
           <ButtonToolbar>
-            <Button bsStyle="primary" type="submit" form="new-notification-form">Done</Button>
+            {doneButton}
             <Button onClick={onCancel}>Cancel</Button>
           </ButtonToolbar>
         </Col>
