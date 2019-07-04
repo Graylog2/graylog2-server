@@ -47,7 +47,15 @@ const EventNotificationsStore = Reflux.createStore({
   },
 
   refresh() {
-    this.listPaginated({ page: this.page, pageSize: this.pageSize });
+    if (this.all) {
+      this.listAll();
+    }
+    if (this.pagination) {
+      this.listPaginated({
+        page: this.pagination.page,
+        pageSize: this.pagination.pageSize,
+      });
+    }
   },
 
   listAll() {
