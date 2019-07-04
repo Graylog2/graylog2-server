@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { Select } from 'components/common';
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -18,10 +19,14 @@ class AddNotificationForm extends React.Component {
     displayNewNotificationForm: false,
   };
 
-  handleSubmit = () => {
+  handleSubmit = (promise) => {
     const { onChange } = this.props;
     const { selectedNotification } = this.state;
-    onChange(selectedNotification);
+    if (promise) {
+      promise.then(notification => onChange(notification.id));
+    } else {
+      onChange(selectedNotification);
+    }
   };
 
   handleSelectNotificationChange = (nextNotificationId) => {
@@ -61,12 +66,15 @@ class AddNotificationForm extends React.Component {
             </FormGroup>
 
             {displayNewNotificationForm && (
-              <div>TBD</div>
+              <EventNotificationFormContainer action="create"
+                                              formId="new-notification-form"
+                                              onSubmit={this.handleSubmit}
+                                              embedded />
             )}
           </fieldset>
 
           <ButtonToolbar>
-            <Button bsStyle="primary" disabled={!selectedNotification} onClick={this.handleSubmit}>Done</Button>
+            <Button bsStyle="primary" type="submit" form="new-notification-form">Done</Button>
             <Button onClick={onCancel}>Cancel</Button>
           </ButtonToolbar>
         </Col>

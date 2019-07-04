@@ -68,7 +68,7 @@ class EventDefinitionForm extends React.Component {
         <div className="pull-right">
           <ButtonToolbar>
             <Button onClick={onCancel}>Cancel</Button>
-            <Button bsStyle="primary" type="submit">Done</Button>
+            <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
           </ButtonToolbar>
         </div>
       );
@@ -148,17 +148,15 @@ class EventDefinitionForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <form onSubmit={this.handleSubmit}>
-            <Wizard steps={steps}
-                    activeStep={activeStep}
-                    onStepChange={this.handleStepChange}
-                    horizontal
-                    justified
-                    navigationClassName={styles.steps}
-                    containerClassName=""
-                    hidePreviousNextButtons />
-            {this.renderButtons(activeStep)}
-          </form>
+          <Wizard steps={steps}
+                  activeStep={activeStep}
+                  onStepChange={this.handleStepChange}
+                  horizontal
+                  justified
+                  navigationClassName={styles.steps}
+                  containerClassName=""
+                  hidePreviousNextButtons />
+          {this.renderButtons(activeStep)}
         </Col>
       </Row>
     );

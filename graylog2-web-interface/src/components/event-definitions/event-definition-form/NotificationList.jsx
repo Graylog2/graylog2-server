@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Col, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { DataTable } from 'components/common';
+import { DataTable, Spinner } from 'components/common';
 import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
 
 class NotificationList extends React.Component {
@@ -29,6 +29,14 @@ class NotificationList extends React.Component {
   };
 
   notificationFormatter = (notification) => {
+    // Guard in case it is a new Notification, but its information has not been loaded yet
+    if (!notification) {
+      return (
+        <tr>
+          <td><Spinner text="Loading Notification information..." /></td>
+        </tr>
+      );
+    }
     const plugin = this.getNotificationPlugin(notification.config.type);
 
     return (
