@@ -18,6 +18,11 @@ class EventNotificationFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     notification: PropTypes.object,
+    /** Controls whether the form should be embedded into another one, and submitted/cancel externally */
+    embedded: PropTypes.bool,
+    /** Controls the ID of the form, so it can be controlled externally */
+    formId: PropTypes.string,
+    onSubmit: PropTypes.func,
   };
 
   static defaultProps = {
@@ -27,6 +32,9 @@ class EventNotificationFormContainer extends React.Component {
       description: '',
       config: {},
     },
+    embedded: false,
+    formId: undefined,
+    onSubmit: () => {},
   };
 
   constructor(props) {
@@ -51,25 +59,38 @@ class EventNotificationFormContainer extends React.Component {
   };
 
   handleSubmit = () => {
-    const { action } = this.props;
+    const { action, embedded, onSubmit } = this.props;
     const { notification } = this.state;
 
+    let promise;
     if (action === 'create') {
-      EventNotificationsActions.create(notification)
-        .then(() => history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST));
+      promise = EventNotificationsActions.create(notification);
+      promise.then(() => {
+        if (!embedded) {
+          history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
+        }
+      });
     } else {
-      EventNotificationsActions.update(notification.id, notification)
-        .then(() => history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST));
+      promise = EventNotificationsActions.update(notification.id, notification);
+      promise.then(() => {
+        if (!embedded) {
+          history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
+        }
+      });
     }
+
+    onSubmit(promise);
   };
 
   render() {
-    const { action } = this.props;
+    const { action, embedded, formId } = this.props;
     const { notification } = this.state;
 
     return (
       <EventNotificationForm action={action}
                              notification={notification}
+                             formId={formId}
+                             embedded={embedded}
                              onChange={this.handleChange}
                              onCancel={this.handleCancel}
                              onSubmit={this.handleSubmit} />

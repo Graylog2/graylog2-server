@@ -12,6 +12,8 @@ class EventNotificationForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     notification: PropTypes.object.isRequired,
+    formId: PropTypes.string,
+    embedded: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -19,6 +21,7 @@ class EventNotificationForm extends React.Component {
 
   static defaultProps = {
     action: 'edit',
+    formId: undefined,
   };
 
   handleSubmit = (event) => {
@@ -56,7 +59,7 @@ class EventNotificationForm extends React.Component {
   };
 
   render() {
-    const { action, notification, onCancel } = this.props;
+    const { action, embedded, formId, notification, onCancel } = this.props;
 
     const notificationPlugin = this.getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
@@ -69,7 +72,7 @@ class EventNotificationForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={this.handleSubmit} id={formId}>
             <Input id="notification-title"
                    name="title"
                    label="Title"
@@ -101,10 +104,12 @@ class EventNotificationForm extends React.Component {
 
             {notificationFormComponent}
 
-            <ButtonToolbar>
-              <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
-              <Button onClick={onCancel}>Cancel</Button>
-            </ButtonToolbar>
+            {!embedded && (
+              <ButtonToolbar>
+                <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
+                <Button onClick={onCancel}>Cancel</Button>
+              </ButtonToolbar>
+            )}
           </form>
         </Col>
       </Row>
