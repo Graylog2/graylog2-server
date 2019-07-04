@@ -95,8 +95,8 @@ public class EventsIndexMappingTest {
         at.jsonPathAsBoolean("$.mappings.message.dynamic_templates[0]fields.mapping.index").isTrue();
 
         at.jsonPathAsString("$.mappings.message.properties.id.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.creator_type.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.creator_id.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.mappings.message.properties.event_definition_type.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.mappings.message.properties.event_definition_id.type").isEqualTo("keyword");
         at.jsonPathAsString("$.mappings.message.properties.timestamp.type").isEqualTo("date");
         at.jsonPathAsString("$.mappings.message.properties.timestamp.format").isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
         at.jsonPathAsString("$.mappings.message.properties.timestamp_processing.type").isEqualTo("date");
@@ -114,6 +114,7 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString("$.mappings.message.properties.key.type").isEqualTo("keyword");
         at.jsonPathAsString("$.mappings.message.properties.key_tuple.type").isEqualTo("keyword");
         at.jsonPathAsString("$.mappings.message.properties.priority.type").isEqualTo("long");
+        at.jsonPathAsString("$.mappings.message.properties.alert.type").isEqualTo("boolean");
         at.jsonPathAsString("$.mappings.message.properties.fields.type").isEqualTo("object");
         at.jsonPathAsBoolean("$.mappings.message.properties.fields.dynamic").isTrue();
         at.jsonPathAsString("$.mappings.message.properties.triggered_jobs.type").isEqualTo("keyword");
