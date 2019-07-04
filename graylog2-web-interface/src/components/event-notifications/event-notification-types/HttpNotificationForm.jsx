@@ -54,7 +54,7 @@ class HttpNotificationForm extends React.Component {
                required />
 
         <FormGroup controlId="notification-http-body">
-          <ControlLabel>Request JSON body</ControlLabel>
+          <ControlLabel>Request JSON body <small className="text-muted">(Optional)</small></ControlLabel>
           <SourceCodeEditor id="notification-http-body"
                             mode="json"
                             theme="light"
