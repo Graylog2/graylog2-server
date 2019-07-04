@@ -14,6 +14,7 @@ describe('<TimeUnitInput />', () => {
     const checkbox = wrapper.find('input[type="checkbox"]');
     expect(checkbox.prop('checked')).toBe(false);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
+    expect(wrapper.find('li.active a').prop('children')).toBe('seconds');
     checkbox.simulate('click');
   });
 
@@ -29,6 +30,21 @@ describe('<TimeUnitInput />', () => {
     expect(checkbox.prop('checked')).toBe(true);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(42);
     checkbox.simulate('click');
+  });
+
+  it('should use custom unit values', () => {
+    const onUpdate = (value, unit, checked) => {
+      expect(value).toBe(42);
+      expect(unit).toBe('DAYS');
+      expect(checked).toBeTruthy();
+    };
+
+    const wrapper = mount(<TimeUnitInput update={onUpdate} unit="DAYS" defaultEnabled />);
+    const checkbox = wrapper.find('input[type="checkbox"]');
+    expect(checkbox.prop('checked')).toBe(true);
+    expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
+    expect(wrapper.find('li.active a').prop('children')).toBe('days');
+    wrapper.find('input[type="number"]').simulate('change', { target: { value: 42 } });
   });
 
   it('should use values before default values', () => {
@@ -55,5 +71,28 @@ describe('<TimeUnitInput />', () => {
     const wrapper = mount(<TimeUnitInput update={onUpdate} required enabled={false} defaultEnabled={false} />);
     expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
     wrapper.find('input[type="number"]').simulate('change', { target: { value: 42 } });
+  });
+
+  it('should disable all inputs when disabled', () => {
+    const wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} />);
+    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
+    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
+  });
+
+  it('should not display checkbox when hideCheckbox is set', () => {
+    const wrapper = mount(<TimeUnitInput update={() => {}} hideCheckbox />);
+    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+  });
+
+  it('should use required and enabled when hideCheckbox is set', () => {
+    let wrapper = mount(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
+    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeFalsy();
+    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeFalsy();
+
+    wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} defaultEnabled={false} hideCheckbox />);
+    expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+    expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
+    expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
   });
 });

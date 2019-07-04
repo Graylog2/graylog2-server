@@ -221,7 +221,6 @@ class Select extends React.Component<Props, State> {
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: string): Array<Option> => {
     const { options, displayKey, valueKey, delimiter } = this.props;
-
     return value.split(delimiter).map((v: string) => {
       const predicate: Option = {
         [valueKey || '']: v,
@@ -234,12 +233,12 @@ class Select extends React.Component<Props, State> {
   };
 
   render() {
-    const { allowCreate = false, delimiter, displayKey, size, multi, options, valueKey, onReactSelectChange } = this.props;
+    const { allowCreate = false, delimiter, displayKey, size, options, valueKey, onReactSelectChange } = this.props;
     const { value } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
     let formattedValue = value;
-    if (value && multi && allowCreate) {
+    if (value && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
       formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey || ''] === v));

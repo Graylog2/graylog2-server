@@ -2,9 +2,16 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import {
-  InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
+  ControlLabel,
+  DropdownButton,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  InputGroup,
+  MenuItem,
 } from 'react-bootstrap';
 import lodash from 'lodash';
+import moment from 'moment';
 
 import { InputWrapper } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
@@ -19,6 +26,28 @@ const unitValues = [
   'DAYS',
 ];
 const unitType = PropTypes.oneOf(unitValues);
+
+/**
+ * Returns a duration and unit compatible with `TimeUnitInput` from a duration accepted by `moment.duration()`
+ * and a list of time units.
+ *
+ * Accepted durations include a number of milliseconds and an ISO 8601 duration string.
+ */
+export const extractDurationAndUnit = (duration, timeUnits) => {
+  if (duration === undefined) {
+    return {
+      duration: 1,
+      unit: lodash.last(timeUnits),
+    };
+  }
+  const momentDuration = moment.duration(duration);
+  const timeUnit = timeUnits.find(unit => lodash.isInteger(momentDuration.as(unit))) || lodash.last(timeUnits);
+  const durationInUnit = momentDuration.as(timeUnit);
+  return {
+    duration: durationInUnit,
+    unit: timeUnit,
+  };
+};
 
 /**
  * Component that renders a form field for a time unit value. The field has
@@ -59,6 +88,8 @@ const TimeUnitInput = createReactClass({
     labelClassName: PropTypes.string,
     /** Add an additional class to the input wrapper. */
     wrapperClassName: PropTypes.string,
+    /** Specifies if the input should render a checkbox. Use this if the enabled state is controlled by another input */
+    hideCheckbox: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -74,24 +105,28 @@ const TimeUnitInput = createReactClass({
       defaultEnabled: false,
       labelClassName: undefined,
       wrapperClassName: undefined,
+      hideCheckbox: false,
     };
   },
 
   getInitialState() {
+    const { defaultEnabled, enabled, units } = this.props;
     return {
-      enabled: lodash.defaultTo(this.props.enabled, this.props.defaultEnabled),
-      unitOptions: this._getUnitOptions(this.props.units),
+      enabled: lodash.defaultTo(enabled, defaultEnabled),
+      unitOptions: this._getUnitOptions(units),
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!lodash.isEqual(this.props.units, nextProps.units)) {
+    const { units } = this.props;
+    if (!lodash.isEqual(units, nextProps.units)) {
       this.setState({ unitOptions: this._getUnitOptions(nextProps.units) });
     }
   },
 
   _getEffectiveValue() {
-    return lodash.defaultTo(this.props.value, this.props.defaultValue);
+    const { defaultValue, value } = this.props;
+    return lodash.defaultTo(value, defaultValue);
   },
 
   _getUnitOptions(units) {
@@ -101,20 +136,23 @@ const TimeUnitInput = createReactClass({
   },
 
   _isChecked() {
-    if (this.props.required) {
-      return this.props.required;
+    const { required, enabled } = this.props;
+    if (required) {
+      return required;
     }
-    return lodash.defaultTo(this.props.enabled, this.state.enabled);
+    const { enabled: enabledState } = this.state;
+    return lodash.defaultTo(enabled, enabledState);
   },
 
   _propagateInput(update) {
+    const { update: onUpdate, unit } = this.props;
     const previousInput = {
       value: this._getEffectiveValue(),
-      unit: this.props.unit,
+      unit: unit,
       checked: this._isChecked(),
     };
     const nextInput = Object.assign({}, previousInput, update);
-    this.props.update(nextInput.value, nextInput.unit, nextInput.checked);
+    onUpdate(nextInput.value, nextInput.unit, nextInput.checked);
   },
 
   _onToggleEnable(e) {
@@ -124,7 +162,8 @@ const TimeUnitInput = createReactClass({
   },
 
   _onUpdate(e) {
-    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), this.props.defaultValue);
+    const { defaultValue } = this.props;
+    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
     this._propagateInput({ value: value });
   },
 
@@ -133,8 +172,17 @@ const TimeUnitInput = createReactClass({
   },
 
   render() {
-    const options = this.state.unitOptions.map((o) => {
-      return <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)}>{o.label}</MenuItem>;
+    const { unitOptions } = this.state;
+    const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox } = this.props;
+
+    const options = unitOptions.map((o) => {
+      return (
+        <MenuItem key={o.value}
+                  onSelect={() => this._onUnitSelect(o.value)}
+                  active={unit === o.value}>
+          {o.label}
+        </MenuItem>
+      );
     });
 
     const checkbox = (
@@ -145,18 +193,19 @@ const TimeUnitInput = createReactClass({
 
     return (
       <FormGroup>
-        {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
-        <InputWrapper className={this.props.wrapperClassName}>
+        {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
+        <InputWrapper className={wrapperClassName}>
           <InputGroup>
-            {!this.props.required && checkbox}
+            {(!required && !hideCheckbox) && checkbox}
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
-                            title={this.state.unitOptions.filter(o => o.value === this.props.unit)[0].label}>
+                            title={unitOptions.filter(o => o.value === unit)[0].label}
+                            disabled={!this._isChecked()}>
               {options}
             </DropdownButton>
           </InputGroup>
-          {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
+          {help && <HelpBlock>{help}</HelpBlock>}
         </InputWrapper>
       </FormGroup>
     );
