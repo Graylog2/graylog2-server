@@ -12,17 +12,20 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
 import EventDefinitionForm from './EventDefinitionForm';
 
-// Import built-in Event Definition Types
+// Import built-in plugins
 import {} from './event-definition-types';
+import {} from 'components/event-notifications/event-notification-types';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
+const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object,
     entityTypes: PropTypes.object,
+    notifications: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -46,6 +49,14 @@ class EventDefinitionFormContainer extends React.Component {
       eventDefinition: props.eventDefinition,
     };
   }
+
+  componentDidMount() {
+    this.fetchNotifications();
+  }
+
+  fetchNotifications = () => {
+    EventNotificationsActions.listAll();
+  };
 
   handleChange = (key, value) => {
     const { eventDefinition } = this.state;
@@ -74,9 +85,9 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, entityTypes } = this.props;
+    const { action, entityTypes, notifications } = this.props;
     const { eventDefinition } = this.state;
-    const isLoading = !entityTypes;
+    const isLoading = !entityTypes || !notifications.all;
 
     if (isLoading) {
       return <Spinner text="Loading Event information..." />;
@@ -86,6 +97,7 @@ class EventDefinitionFormContainer extends React.Component {
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
                            entityTypes={entityTypes}
+                           notifications={notifications.all}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
                            onSubmit={this.handleSubmit} />
@@ -93,4 +105,7 @@ class EventDefinitionFormContainer extends React.Component {
   }
 }
 
-export default connect(EventDefinitionFormContainer, { entityTypes: AvailableEventDefinitionTypesStore });
+export default connect(EventDefinitionFormContainer, {
+  entityTypes: AvailableEventDefinitionTypesStore,
+  notifications: EventNotificationsStore,
+});

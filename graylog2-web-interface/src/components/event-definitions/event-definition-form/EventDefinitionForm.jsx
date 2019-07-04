@@ -7,7 +7,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Wizard } from 'components/common';
 import EventDetailsForm from './EventDetailsForm';
 import FieldsForm from './FieldsForm';
-import NotificationsFormContainer from './NotificationsFormContainer';
+import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
 import styles from './EventDefinitionForm.css';
@@ -19,6 +19,7 @@ class EventDefinitionForm extends React.Component {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
     entityTypes: PropTypes.object.isRequired,
+    notifications: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -98,7 +99,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, eventDefinition, onChange } = this.props;
+    const { action, entityTypes, eventDefinition, notifications, onChange } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
@@ -134,13 +135,15 @@ class EventDefinitionForm extends React.Component {
       {
         key: STEP_KEYS[3],
         title: 'Notifications',
-        component: <NotificationsFormContainer {...defaultStepProps} />,
+        component: <NotificationsForm {...defaultStepProps} notifications={notifications} />,
         disabled: this.areStepsDisabled(eventDefinition),
       },
       {
         key: STEP_KEYS[4],
         title: 'Summary',
-        component: <EventDefinitionSummary action={action} eventDefinition={eventDefinition} />,
+        component: (
+          <EventDefinitionSummary action={action} eventDefinition={eventDefinition} notifications={notifications} />
+        ),
         disabled: this.areStepsDisabled(eventDefinition),
       },
     ];
