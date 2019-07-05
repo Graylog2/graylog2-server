@@ -125,6 +125,9 @@ public class EventsIndexMapping implements IndexMappingTemplate {
                                         .put("event_definition_id", map()
                                                 .put("type", "keyword")
                                                 .build())
+                                        .put("origin_context", map()
+                                                .put("type", "keyword")
+                                                .build())
                                         .put("timestamp", map()
                                                 .put("type", "date")
                                                 // Use the same format we use for the "message" mapping to make sure we
