@@ -50,7 +50,7 @@ const EventNotificationsStore = Reflux.createStore({
     if (this.all) {
       this.listAll();
     }
-    if (this.pagination) {
+    if (this.pagination.page) {
       this.listPaginated({
         page: this.pagination.page,
         pageSize: this.pagination.pageSize,
