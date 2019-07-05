@@ -10,7 +10,7 @@ import { EmptyEntity, EntityList, EntityListItem } from 'components/common';
 
 class EventDefinitions extends React.Component {
   static propTypes = {
-    eventDefinitions: PropTypes.object.isRequired,
+    eventDefinitions: PropTypes.array.isRequired,
     onDelete: PropTypes.func.isRequired,
   };
 
@@ -34,13 +34,12 @@ class EventDefinitions extends React.Component {
 
   render() {
     const { eventDefinitions, onDelete } = this.props;
-    const definitions = eventDefinitions.list;
 
-    if (eventDefinitions.list.length === 0) {
+    if (eventDefinitions.length === 0) {
       return this.renderEmptyContent();
     }
 
-    const items = definitions.map((definition) => {
+    const items = eventDefinitions.map((definition) => {
       const actions = [
         <LinkContainer key={`edit-button-${definition.id}`}
                        to={Routes.NEXT_ALERTS.DEFINITIONS.edit(definition.id)}>

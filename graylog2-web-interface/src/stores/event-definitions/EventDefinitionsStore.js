@@ -12,10 +12,28 @@ const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const EventDefinitionsStore = Reflux.createStore({
   listenables: [EventDefinitionsActions],
   sourceUrl: '/plugins/org.graylog.events/events/processors',
+  all: undefined,
+  eventDefinitions: undefined,
+  pagination: {
+    count: undefined,
+    page: undefined,
+    pageSize: undefined,
+    total: undefined,
+  },
 
   getInitialState() {
+    return this.getState();
+  },
+
+  propagateChanges() {
+    this.trigger(this.getState());
+  },
+
+  getState() {
     return {
-      list: [],
+      all: this.all,
+      eventDefinitions: this.eventDefinitions,
+      pagination: this.pagination,
     };
   },
 
@@ -28,16 +46,51 @@ const EventDefinitionsStore = Reflux.createStore({
     return URLUtils.qualifyUrl(uri.resource());
   },
 
-  list() {
-    // TODO: This needs to user proper pagination instead of requesting 1000 items
-    const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 1000 } }));
+  refresh() {
+    if (this.all) {
+      this.listAll();
+    }
+    if (this.pagination.page) {
+      this.listPaginated({
+        page: this.pagination.page,
+        pageSize: this.pagination.pageSize,
+      });
+    }
+  },
+
+  listAll() {
+    const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 0 } }));
 
     promise.then((response) => {
-      this.trigger({ list: response.event_processors });
+      this.all = response.event_processors;
+      this.propagateChanges();
       return response;
     });
 
-    EventDefinitionsActions.list.promise(promise);
+    EventDefinitionsActions.listAll.promise(promise);
+  },
+
+  listPaginated({ page = 1, pageSize = 10 }) {
+    const promise = fetch('GET', this.eventDefinitionsUrl({
+      query: {
+        page: page,
+        per_page: pageSize,
+      },
+    }));
+
+    promise.then((response) => {
+      this.eventDefinitions = response.event_processors;
+      this.pagination = {
+        count: response.count,
+        page: response.page,
+        pageSize: response.per_page,
+        total: response.total,
+      };
+      this.propagateChanges();
+      return response;
+    });
+
+    EventDefinitionsActions.listPaginated.promise(promise);
   },
 
   get(eventDefinitionId) {

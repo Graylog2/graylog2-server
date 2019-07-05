@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { Spinner } from 'components/common';
+
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import EventDefinitions from './EventDefinitions';
@@ -13,8 +15,12 @@ class EventDefinitionsContainer extends React.Component {
   };
 
   componentDidMount() {
-    EventDefinitionsActions.list();
+    this.fetchData();
   }
+
+  fetchData = (nextPage, nextPageSize) => {
+    EventDefinitionsActions.listPaginated({ page: nextPage, pageSize: nextPageSize });
+  };
 
   handleDelete = (definition) => {
     return () => {
@@ -26,8 +32,13 @@ class EventDefinitionsContainer extends React.Component {
 
   render() {
     const { eventDefinitions } = this.props;
+
+    if (!eventDefinitions.eventDefinitions) {
+      return <Spinner text="Loading Event Definitions information..." />;
+    }
+
     return (
-      <EventDefinitions eventDefinitions={eventDefinitions} onDelete={this.handleDelete} />
+      <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions} onDelete={this.handleDelete} />
     );
   }
 }
