@@ -22,9 +22,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.mongodb.MongoException;
-import org.graylog2.bundles.BundleService;
-import org.graylog2.bundles.ConfigurationBundle;
-import org.graylog2.bundles.ContentPackLoaderConfig;
+import org.graylog2.contentpacks.ContentPackLoaderConfig;
+import org.graylog2.contentpacks.ContentPackPersistenceService;
+import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.users.UserService;
@@ -37,10 +39,12 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class ContentPackLoaderPeriodical extends Periodical {
@@ -49,7 +53,8 @@ public class ContentPackLoaderPeriodical extends Periodical {
     private static final String FILENAME_GLOB = "*.json";
 
     private final ObjectMapper objectMapper;
-    private final BundleService bundleService;
+    private final ContentPackService contentPackService;
+    private final ContentPackPersistenceService contentPackPersistenceService;
     private final ClusterConfigService clusterConfigService;
     private final UserService userService;
     private final boolean contentPacksLoaderEnabled;
@@ -58,14 +63,16 @@ public class ContentPackLoaderPeriodical extends Periodical {
 
     @Inject
     public ContentPackLoaderPeriodical(ObjectMapper objectMapper,
-                                       BundleService bundleService,
+                                       ContentPackService contentPackService,
+                                       ContentPackPersistenceService contentPackPersistenceService,
                                        ClusterConfigService clusterConfigService,
                                        UserService userService,
                                        @Named("content_packs_loader_enabled") boolean contentPacksLoaderEnabled,
                                        @Named("content_packs_dir") Path contentPacksDir,
                                        @Named("content_packs_auto_load") Set<String> contentPacksAutoLoad) {
         this.objectMapper = objectMapper;
-        this.bundleService = bundleService;
+        this.contentPackService = contentPackService;
+        this.contentPackPersistenceService = contentPackPersistenceService;
         this.clusterConfigService = clusterConfigService;
         this.userService = userService;
         this.contentPacksLoaderEnabled = contentPacksLoaderEnabled;
@@ -119,7 +126,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 clusterConfigService.getOrDefault(ContentPackLoaderConfig.class, ContentPackLoaderConfig.EMPTY);
 
         final List<Path> files = getFiles(contentPacksDir, FILENAME_GLOB);
-        final Map<String, ConfigurationBundle> contentPacks = new HashMap<>(files.size());
+        final Map<String, ContentPack> contentPacks = new HashMap<>(files.size());
 
         final Set<String> loadedContentPacks = new HashSet<>(contentPackLoaderConfig.loadedContentPacks());
         final Set<String> appliedContentPacks = new HashSet<>(contentPackLoaderConfig.appliedContentPacks());
@@ -153,47 +160,52 @@ public class ContentPackLoaderPeriodical extends Periodical {
             }
 
             LOG.debug("Parsing content pack from {}", file);
-            final ConfigurationBundle contentPack;
+            final ContentPack contentPack;
             try {
-                contentPack = objectMapper.readValue(bytes, ConfigurationBundle.class);
+                contentPack = objectMapper.readValue(bytes, ContentPack.class);
             } catch (IOException e) {
                 LOG.warn("Couldn't parse content pack in file " + file + ". Skipping", e);
                 continue;
             }
 
-            final ConfigurationBundle existingContentPack = bundleService.findByNameAndCategory(contentPack.getName(), contentPack.getCategory());
-            if (existingContentPack != null) {
-                LOG.debug("Content pack {}/{} already exists in database. Skipping.", contentPack.getCategory(), contentPack.getName());
-                contentPacks.put(fileName, existingContentPack);
+            if (contentPack instanceof ContentPackV1) {
+                ContentPackV1 contentPackV1 = (ContentPackV1) contentPack;
+                if (contentPackV1.parameters().asList().size() > 0) {
+                    LOG.warn("Cannot accept content packs with parameters. Content Pack {}/{} rejected", contentPack.id(),
+                            contentPack.revision());
+                }
+            }
+
+            final Optional<ContentPack> existingContentPack = contentPackPersistenceService.findByIdAndRevision(contentPack.id(), contentPack.revision());
+            if (existingContentPack.isPresent()) {
+                LOG.debug("Content pack {}/{} already exists in database. Skipping.", contentPack.id(), contentPack.revision());
+                contentPacks.put(fileName, existingContentPack.get());
                 continue;
             }
 
-            final ConfigurationBundle insertedContentPack;
-            try {
-                insertedContentPack = bundleService.insert(contentPack);
-                LOG.debug("Successfully inserted content pack {} into database with ID {}", file, insertedContentPack.getId());
-            } catch (MongoException e) {
+            final Optional<ContentPack> insertedContentPack = contentPackPersistenceService.insert(contentPack);
+            if (!insertedContentPack.isPresent()) {
                 LOG.error("Error while inserting content pack " + file + " into database. Skipping.", e);
                 continue;
             }
 
-            contentPacks.put(fileName, insertedContentPack);
+            contentPacks.put(fileName, insertedContentPack.get());
             loadedContentPacks.add(fileName);
         }
 
         LOG.debug("Applying selected content packs");
-        for (Map.Entry<String, ConfigurationBundle> entry : contentPacks.entrySet()) {
+        for (Map.Entry<String, ContentPack> entry : contentPacks.entrySet()) {
             final String fileName = entry.getKey();
-            final ConfigurationBundle contentPack = entry.getValue();
+            final ContentPack contentPack = entry.getValue();
 
             if (contentPacksAutoLoad.contains(fileName) && appliedContentPacks.contains(fileName)) {
-                LOG.debug("Content pack {}/{} ({}) already applied. Skipping.", contentPack.getName(), contentPack.getCategory(), fileName);
+                LOG.debug("Content pack {}/{} ({}) already applied. Skipping.", contentPack.id(), contentPack.revision(), fileName);
                 continue;
             }
 
             if (contentPacksAutoLoad.contains(fileName)) {
-                LOG.debug("Applying content pack {}/{} ({})", contentPack.getName(), contentPack.getCategory(), fileName);
-                bundleService.applyConfigurationBundle(contentPack, userService.getAdminUser());
+                LOG.debug("Applying content pack {}/{} ({})", contentPack.id(), contentPack.revision(), fileName);
+                contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Installed by auto loader", userService.getAdminUser().getName());
                 appliedContentPacks.add(fileName);
             }
         }
