@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import lodash from 'lodash';
-import { Input } from 'components/bootstrap';
+import Input from 'components/bootstrap/Input';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
