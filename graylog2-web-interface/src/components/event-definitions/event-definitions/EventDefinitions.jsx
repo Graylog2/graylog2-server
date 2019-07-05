@@ -46,15 +46,16 @@ class EventDefinitions extends React.Component {
     }
 
     const items = eventDefinitions.map((definition) => {
-      const actions = [
-        <LinkContainer key={`edit-button-${definition.id}`}
-                       to={Routes.NEXT_ALERTS.DEFINITIONS.edit(definition.id)}>
-          <Button bsStyle="info">Edit</Button>
-        </LinkContainer>,
-        <DropdownButton key={`actions-${definition.id}`} id="more-dropdown" title="More" pullRight>
-          <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
-        </DropdownButton>,
-      ];
+      const actions = (
+        <React.Fragment key={`actions-${definition.id}`}>
+          <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.edit(definition.id)}>
+            <Button bsStyle="info">Edit</Button>
+          </LinkContainer>
+          <DropdownButton id="more-dropdown" title="More" pullRight>
+            <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
+          </DropdownButton>
+        </React.Fragment>
+      );
 
       // TODO: Show something more useful ;)
       const titleSuffix = lodash.get(definition, 'config.type', 'Not available')
