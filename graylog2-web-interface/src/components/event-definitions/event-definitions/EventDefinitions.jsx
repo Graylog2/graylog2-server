@@ -6,11 +6,15 @@ import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
 
-import { EmptyEntity, EntityList, EntityListItem } from 'components/common';
+import { EmptyEntity, EntityList, EntityListItem, PaginatedList } from 'components/common';
+
+import styles from './EventDefinitions.css';
 
 class EventDefinitions extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.array.isRequired,
+    pagination: PropTypes.object.isRequired,
+    onPageChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
   };
 
@@ -33,7 +37,7 @@ class EventDefinitions extends React.Component {
   };
 
   render() {
-    const { eventDefinitions, onDelete } = this.props;
+    const { eventDefinitions, pagination, onPageChange, onDelete } = this.props;
 
     if (eventDefinitions.length === 0) {
       return this.renderEmptyContent();
@@ -63,18 +67,30 @@ class EventDefinitions extends React.Component {
     });
 
     return (
-      <Row>
-        <Col md={12}>
-          <div className="pull-right">
-            <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success">Create Event Definition</Button>
-            </LinkContainer>
-          </div>
-        </Col>
-        <Col md={12}>
-          <EntityList items={items} />
-        </Col>
-      </Row>
+      <React.Fragment>
+        <Row>
+          <Col md={12}>
+            <div className="pull-right">
+              <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
+                <Button bsStyle="success">Create Event Definition</Button>
+              </LinkContainer>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <PaginatedList activePage={pagination.page}
+                           pageSize={pagination.pageSize}
+                           pageSizes={[10, 25, 50]}
+                           totalItems={pagination.total}
+                           onChange={onPageChange}>
+              <div className={styles.definitionList}>
+                <EntityList items={items} />
+              </div>
+            </PaginatedList>
+          </Col>
+        </Row>
+      </React.Fragment>
     );
   }
 }

@@ -22,6 +22,10 @@ class EventDefinitionsContainer extends React.Component {
     EventDefinitionsActions.listPaginated({ page: nextPage, pageSize: nextPageSize });
   };
 
+  handlePageChange = (nextPage, nextPageSize) => {
+    this.fetchData(nextPage, nextPageSize);
+  };
+
   handleDelete = (definition) => {
     return () => {
       if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
@@ -38,7 +42,10 @@ class EventDefinitionsContainer extends React.Component {
     }
 
     return (
-      <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions} onDelete={this.handleDelete} />
+      <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
+                        pagination={eventDefinitions.pagination}
+                        onPageChange={this.handlePageChange}
+                        onDelete={this.handleDelete} />
     );
   }
 }
