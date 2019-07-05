@@ -3,26 +3,26 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
-import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
+
+import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
 
 import Routes from 'routing/Routes';
-import DocsHelper from 'util/DocsHelper';
 
-class EventDefinitionsPage extends React.Component {
+class EventNotificationsPage extends React.Component {
+  static propTypes = {};
+
   render() {
     return (
-      <DocumentTitle title="Event Definitions">
+      <DocumentTitle title="Notifications">
         <span>
-          <PageHeader title="Event Definitions">
+          <PageHeader title="Notifications">
             <span>
-              Create new Event Definitions that will allow you to search for different Conditions and alert on them.
+              Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+              to you or to other systems you use for that purpose.
             </span>
 
             <span>
-              Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                                 text="documentation" />
+              Remember to assign Notifications while creating or editing an Event Definition.
             </span>
 
             <ButtonToolbar>
@@ -30,10 +30,10 @@ class EventDefinitionsPage extends React.Component {
                 <Button bsStyle="info">Events</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info" className="active">Event Definitions</Button>
+                <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info">Notifications</Button>
+                <Button bsStyle="info" className="active">Notifications</Button>
               </LinkContainer>
             </ButtonToolbar>
           </PageHeader>
@@ -42,7 +42,7 @@ class EventDefinitionsPage extends React.Component {
             <Col md={12}>
               <Row>
                 <Col md={12}>
-                  <EventDefinitionsContainer />
+                  <EventNotificationsContainer />
                 </Col>
               </Row>
             </Col>
@@ -53,4 +53,4 @@ class EventDefinitionsPage extends React.Component {
   }
 }
 
-export default EventDefinitionsPage;
+export default EventNotificationsPage;

@@ -19,6 +19,7 @@ class EventDefinitionForm extends React.Component {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
     entityTypes: PropTypes.object.isRequired,
+    notifications: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -68,7 +69,7 @@ class EventDefinitionForm extends React.Component {
         <div className="pull-right">
           <ButtonToolbar>
             <Button onClick={onCancel}>Cancel</Button>
-            <Button bsStyle="primary" type="submit">Done</Button>
+            <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
           </ButtonToolbar>
         </div>
       );
@@ -98,7 +99,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, eventDefinition, onChange } = this.props;
+    const { action, entityTypes, eventDefinition, notifications, onChange } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
@@ -134,13 +135,15 @@ class EventDefinitionForm extends React.Component {
       {
         key: STEP_KEYS[3],
         title: 'Notifications',
-        component: <NotificationsForm {...defaultStepProps} />,
+        component: <NotificationsForm {...defaultStepProps} notifications={notifications} />,
         disabled: this.areStepsDisabled(eventDefinition),
       },
       {
         key: STEP_KEYS[4],
         title: 'Summary',
-        component: <EventDefinitionSummary action={action} eventDefinition={eventDefinition} />,
+        component: (
+          <EventDefinitionSummary action={action} eventDefinition={eventDefinition} notifications={notifications} />
+        ),
         disabled: this.areStepsDisabled(eventDefinition),
       },
     ];
@@ -148,17 +151,15 @@ class EventDefinitionForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <form onSubmit={this.handleSubmit}>
-            <Wizard steps={steps}
-                    activeStep={activeStep}
-                    onStepChange={this.handleStepChange}
-                    horizontal
-                    justified
-                    navigationClassName={styles.steps}
-                    containerClassName=""
-                    hidePreviousNextButtons />
-            {this.renderButtons(activeStep)}
-          </form>
+          <Wizard steps={steps}
+                  activeStep={activeStep}
+                  onStepChange={this.handleStepChange}
+                  horizontal
+                  justified
+                  navigationClassName={styles.steps}
+                  containerClassName=""
+                  hidePreviousNextButtons />
+          {this.renderButtons(activeStep)}
         </Col>
       </Row>
     );

@@ -4,19 +4,21 @@ import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
-class EventDefinitionsPage extends React.Component {
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+
+class CreateEventDefinitionPage extends React.Component {
   render() {
     return (
-      <DocumentTitle title="Event Definitions">
+      <DocumentTitle title="New Notification">
         <span>
-          <PageHeader title="Event Definitions">
+          <PageHeader title="New Notification">
             <span>
-              Create new Event Definitions that will allow you to search for different Conditions and alert on them.
+              Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+              to you or to other systems you use for that purpose.
             </span>
 
             <span>
@@ -30,7 +32,7 @@ class EventDefinitionsPage extends React.Component {
                 <Button bsStyle="info">Events</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info" className="active">Event Definitions</Button>
+                <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
               <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST}>
                 <Button bsStyle="info">Notifications</Button>
@@ -40,11 +42,7 @@ class EventDefinitionsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <Row>
-                <Col md={12}>
-                  <EventDefinitionsContainer />
-                </Col>
-              </Row>
+              <EventNotificationFormContainer action="create" />
             </Col>
           </Row>
         </span>
@@ -53,4 +51,4 @@ class EventDefinitionsPage extends React.Component {
   }
 }
 
-export default EventDefinitionsPage;
+export default CreateEventDefinitionPage;

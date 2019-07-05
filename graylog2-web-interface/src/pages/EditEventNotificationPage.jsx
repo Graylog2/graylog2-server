@@ -4,15 +4,15 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import EventDefinitionFormContainer
-  from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import CombinedProvider from 'injection/CombinedProvider';
 
-const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+
+const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
@@ -20,24 +20,24 @@ class EditEventDefinitionPage extends React.Component {
   };
 
   state = {
-    eventDefinition: undefined,
+    notification: undefined,
   };
 
   componentDidMount() {
     const { params } = this.props;
-    EventDefinitionsActions.get(params.definitionId)
-      .then(eventDefinition => this.setState({ eventDefinition: eventDefinition }));
+    EventNotificationsActions.get(params.notificationId)
+      .then(notification => this.setState({ notification: notification }));
   }
 
   render() {
-    const { eventDefinition } = this.state;
+    const { notification } = this.state;
 
-    if (!eventDefinition) {
+    if (!notification) {
       return (
-        <DocumentTitle title="Edit Event Definition">
+        <DocumentTitle title="Edit Notification">
           <span>
-            <PageHeader title="Edit Event Definition">
-              <Spinner text="Loading Event Definition..." />
+            <PageHeader title="Edit Notification">
+              <Spinner text="Loading Notification information..." />
             </PageHeader>
           </span>
         </DocumentTitle>
@@ -45,11 +45,12 @@ class EditEventDefinitionPage extends React.Component {
     }
 
     return (
-      <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
+      <DocumentTitle title={`Edit "${notification.title}" Notification`}>
         <span>
-          <PageHeader title={`Edit "${eventDefinition.title}" Event Definition`}>
+          <PageHeader title={`Edit "${notification.title}" Notification`}>
             <span>
-              Event Definitions allow you to create Events from different Conditions and alert on them.
+              Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
+              to you or to other systems you use for that purpose.
             </span>
 
             <span>
@@ -73,7 +74,7 @@ class EditEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+              <EventNotificationFormContainer action="edit" notification={notification} />
             </Col>
           </Row>
         </span>

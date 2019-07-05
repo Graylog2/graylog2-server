@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
 
 import styles from './EventDefinitionSummary.css';
 import commonStyles from '../common/commonStyles.css';
@@ -12,6 +13,7 @@ import commonStyles from '../common/commonStyles.css';
 class EventDefinitionSummary extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    notifications: PropTypes.array.isRequired,
   };
 
   renderDetails = (eventDefinition) => {
@@ -88,14 +90,35 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
+  renderNotification = (notificationAction) => {
+    const { notifications } = this.props;
+    const notification = notifications.find(n => n.id === notificationAction.notification_id);
+    const notificationPlugin = this.getPlugin('eventNotificationTypes', notification.config.type);
+    const component = (notificationPlugin.summaryComponent
+      ? React.createElement(notificationPlugin.summaryComponent, {
+        type: notificationPlugin.displayName,
+        notification: notification,
+        action: notificationAction,
+      })
+      : <span>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</span>
+    );
+
+    return (
+      <React.Fragment key={notificationAction.notification_id}>
+        {component}
+      </React.Fragment>
+    );
+  };
+
   renderNotifications = (actions) => {
-    const notifications = actions.filter(action => action.type === 'trigger-notification-v1');
+    const notificationActions = actions.filter(action => action.type === NOTIFICATION_TYPE);
 
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Notifications</h3>
-        {notifications.length === 0
-        && <p>This Event is not configured to trigger any Notifications.</p>}
+        {notificationActions.length === 0
+          ? <p>This Event is not configured to trigger any Notifications.</p>
+          : notificationActions.map(this.renderNotification)}
       </React.Fragment>
     );
   };

@@ -1,13 +1,13 @@
 import loadAsync from 'routing/loadAsync';
 
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
-const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
+const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
@@ -15,11 +15,15 @@ const DashboardsPage = loadAsync(() => import('./DashboardsPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
+const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
 const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
+const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
+const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
+const EventsPage = loadAsync(() => import('./EventsPage'));
 const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
 const GettingStartedPage = loadAsync(() => import('./GettingStartedPage'));
@@ -77,13 +81,13 @@ const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
   AlertConditionsPage,
-  EventDefinitionsPage,
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
+  CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
   CreateUsersPage,
@@ -91,11 +95,15 @@ export {
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
+  EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,
   EditUsersPage,
   EnterprisePage,
+  EventDefinitionsPage,
+  EventNotificationsPage,
+  EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
   GettingStartedPage,
