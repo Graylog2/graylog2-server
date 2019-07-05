@@ -74,7 +74,7 @@ const EventDefinitionsStore = Reflux.createStore({
     EventDefinitionsActions.listAll.promise(promise);
   },
 
-  listPaginated({ query = '', page = 1, pageSize = 1 }) {
+  listPaginated({ query = '', page = 1, pageSize = 10 }) {
     const promise = fetch('GET', this.eventDefinitionsUrl({
       query: {
         query: query,

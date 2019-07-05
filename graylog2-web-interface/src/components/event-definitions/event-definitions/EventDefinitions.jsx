@@ -93,7 +93,7 @@ class EventDefinitions extends React.Component {
 
             <PaginatedList activePage={pagination.page}
                            pageSize={pagination.pageSize}
-                           pageSizes={[1, 10, 25, 50]}
+                           pageSizes={[10, 25, 50]}
                            totalItems={pagination.total}
                            onChange={onPageChange}>
               <div className={styles.definitionList}>
