@@ -5,6 +5,9 @@ import { Spinner } from 'components/common';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+
+import {} from 'components/event-definitions/event-definition-types';
+
 import EventDefinitions from './EventDefinitions';
 
 const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');

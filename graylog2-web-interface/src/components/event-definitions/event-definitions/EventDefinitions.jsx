@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import lodash from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 
@@ -18,6 +18,13 @@ class EventDefinitions extends React.Component {
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+  };
+
+  getConditionPlugin = (type) => {
+    if (type === undefined) {
+      return {};
+    }
+    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type);
   };
 
   renderEmptyContent = () => {
@@ -57,13 +64,12 @@ class EventDefinitions extends React.Component {
         </React.Fragment>
       );
 
-      // TODO: Show something more useful ;)
-      const titleSuffix = lodash.get(definition, 'config.type', 'Not available')
-        .replace(/-v\d+/, '');
+      const plugin = this.getConditionPlugin(definition.config.type);
+      const titleSuffix = plugin.displayName || definition.config.type;
       return (
         <EntityListItem key={`event-definition-${definition.id}`}
                         title={definition.title}
-                        titleSuffix={`${titleSuffix}`}
+                        titleSuffix={titleSuffix}
                         description={definition.description}
                         actions={actions} />
       );

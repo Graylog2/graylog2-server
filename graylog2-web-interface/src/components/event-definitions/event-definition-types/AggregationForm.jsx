@@ -11,7 +11,7 @@ import { Input } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
 import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 
-import commonStyles from '../../common/commonStyles.css';
+import commonStyles from '../common/commonStyles.css';
 
 class AggregationForm extends React.Component {
   static propTypes = {
