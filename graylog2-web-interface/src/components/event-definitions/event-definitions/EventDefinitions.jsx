@@ -6,7 +6,7 @@ import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
 
-import { EmptyEntity, EntityList, EntityListItem, PaginatedList } from 'components/common';
+import { EmptyEntity, EntityList, EntityListItem, PaginatedList, SearchForm } from 'components/common';
 
 import styles from './EventDefinitions.css';
 
@@ -14,7 +14,9 @@ class EventDefinitions extends React.Component {
   static propTypes = {
     eventDefinitions: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
+    query: PropTypes.string.isRequired,
     onPageChange: PropTypes.func.isRequired,
+    onQueryChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
   };
 
@@ -37,7 +39,7 @@ class EventDefinitions extends React.Component {
   };
 
   render() {
-    const { eventDefinitions, pagination, onPageChange, onDelete } = this.props;
+    const { eventDefinitions, pagination, query, onPageChange, onQueryChange, onDelete } = this.props;
 
     if (eventDefinitions.length === 0) {
       return this.renderEmptyContent();
@@ -79,9 +81,19 @@ class EventDefinitions extends React.Component {
         </Row>
         <Row>
           <Col md={12}>
+            <SearchForm query={query}
+                        onSearch={onQueryChange}
+                        onReset={onQueryChange}
+                        searchButtonLabel="Find"
+                        placeholder="Find Event Definitions"
+                        wrapperClass={styles.inline}
+                        queryWidth={200}
+                        topMargin={0}
+                        useLoadingState />
+
             <PaginatedList activePage={pagination.page}
                            pageSize={pagination.pageSize}
-                           pageSizes={[10, 25, 50]}
+                           pageSizes={[1, 10, 25, 50]}
                            totalItems={pagination.total}
                            onChange={onPageChange}>
               <div className={styles.definitionList}>

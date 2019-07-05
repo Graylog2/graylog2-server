@@ -14,6 +14,7 @@ const EventDefinitionsStore = Reflux.createStore({
   sourceUrl: '/plugins/org.graylog.events/events/processors',
   all: undefined,
   eventDefinitions: undefined,
+  query: undefined,
   pagination: {
     count: undefined,
     page: undefined,
@@ -33,6 +34,7 @@ const EventDefinitionsStore = Reflux.createStore({
     return {
       all: this.all,
       eventDefinitions: this.eventDefinitions,
+      query: this.query,
       pagination: this.pagination,
     };
   },
@@ -52,6 +54,7 @@ const EventDefinitionsStore = Reflux.createStore({
     }
     if (this.pagination.page) {
       this.listPaginated({
+        query: this.pagination.query,
         page: this.pagination.page,
         pageSize: this.pagination.pageSize,
       });
@@ -70,9 +73,10 @@ const EventDefinitionsStore = Reflux.createStore({
     EventDefinitionsActions.listAll.promise(promise);
   },
 
-  listPaginated({ page = 1, pageSize = 10 }) {
+  listPaginated({ query = '', page = 1, pageSize = 1 }) {
     const promise = fetch('GET', this.eventDefinitionsUrl({
       query: {
+        query: query,
         page: page,
         per_page: pageSize,
       },
@@ -80,6 +84,7 @@ const EventDefinitionsStore = Reflux.createStore({
 
     promise.then((response) => {
       this.eventDefinitions = response.event_processors;
+      this.query = response.query;
       this.pagination = {
         count: response.count,
         page: response.page,

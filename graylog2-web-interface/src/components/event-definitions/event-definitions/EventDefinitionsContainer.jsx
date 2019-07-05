@@ -15,15 +15,27 @@ class EventDefinitionsContainer extends React.Component {
   };
 
   componentDidMount() {
-    this.fetchData();
+    this.fetchData({});
   }
 
-  fetchData = (nextPage, nextPageSize) => {
-    EventDefinitionsActions.listPaginated({ page: nextPage, pageSize: nextPageSize });
+  fetchData = ({ page, pageSize, query }) => {
+    console.log(query, page, pageSize);
+    return EventDefinitionsActions.listPaginated({
+      query: query,
+      page: page,
+      pageSize: pageSize,
+    });
   };
 
   handlePageChange = (nextPage, nextPageSize) => {
-    this.fetchData(nextPage, nextPageSize);
+    const { eventDefinitions } = this.props;
+    this.fetchData({ page: nextPage, pageSize: nextPageSize, query: eventDefinitions.query });
+  };
+
+  handleQueryChange = (nextQuery, callback = () => {}) => {
+    const { eventDefinitions } = this.props;
+    const promise = this.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
+    promise.finally(callback);
   };
 
   handleDelete = (definition) => {
@@ -44,7 +56,9 @@ class EventDefinitionsContainer extends React.Component {
     return (
       <EventDefinitions eventDefinitions={eventDefinitions.eventDefinitions}
                         pagination={eventDefinitions.pagination}
+                        query={eventDefinitions.query}
                         onPageChange={this.handlePageChange}
+                        onQueryChange={this.handleQueryChange}
                         onDelete={this.handleDelete} />
     );
   }
