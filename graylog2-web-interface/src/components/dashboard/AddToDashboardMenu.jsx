@@ -15,7 +15,7 @@ import { EditDashboardModal } from 'components/dashboard';
 import style from './AddToDashboardMenu.css';
 
 const SearchStore = StoreProvider.getStore('Search');
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+const { DashboardsStore } = CombinedProvider.get('Dashboards');
 const WidgetsStore = StoreProvider.getStore('Widgets');
 
 const AddToDashboardMenu = createReactClass({
@@ -42,19 +42,19 @@ const AddToDashboardMenu = createReactClass({
 
   mixins: [Reflux.connect(DashboardsStore), PermissionsMixin],
 
-  getInitialState() {
-    return {
-      selectedDashboard: '',
-      loading: false,
-    };
-  },
-
   getDefaultProps() {
     return {
       bsStyle: 'default',
       configuration: {},
       hidden: false,
       pullRight: false,
+    };
+  },
+
+  getInitialState() {
+    return {
+      selectedDashboard: '',
+      loading: false,
     };
   },
 
