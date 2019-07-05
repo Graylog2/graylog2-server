@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import connect from 'stores/connect';
@@ -24,10 +23,28 @@ import styles from './MessageList.css';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
-const MessageList = createReactClass({
-  displayName: 'MessageList',
+type State = {
+  currentPage: number,
+  expandedMessages: Immutable.Set,
+}
 
-  propTypes: {
+type Props = {
+  fields: {},
+  pageSize: number,
+  config: MessagesWidgetConfig,
+  data: { messages: [] },
+  containerHeight: number,
+  selectedFields: {},
+  currentView: {
+    activeQuery: {},
+    view: {
+      id: number,
+    },
+  },
+};
+
+class MessageList extends React.Component<Props, State> {
+  static propTypes = {
     fields: CustomPropTypes.FieldListType.isRequired,
     pageSize: PropTypes.number,
     config: PropTypes.instanceOf(MessagesWidgetConfig),
@@ -37,47 +54,43 @@ const MessageList = createReactClass({
     containerHeight: PropTypes.number,
     selectedFields: PropTypes.object,
     currentView: PropTypes.object,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      pageSize: Messages.DEFAULT_LIMIT,
-      containerHeight: undefined,
-      selectedFields: Immutable.Set(),
-      currentView: { view: {}, activeQuery: undefined },
-      config: undefined,
-    };
-  },
+  static defaultProps = {
+    pageSize: Messages.DEFAULT_LIMIT,
+    containerHeight: undefined,
+    selectedFields: Immutable.Set(),
+    currentView: { view: {}, activeQuery: undefined },
+    config: undefined,
+  };
 
-  getInitialState() {
-    return {
-      currentPage: 1,
-      expandedMessages: Immutable.Set(),
-    };
-  },
+  state = {
+    currentPage: 1,
+    expandedMessages: Immutable.Set(),
+  };
 
   componentDidMount() {
     InputsActions.list();
-  },
+  }
 
-  _getSelectedFields() {
+  _getSelectedFields = () => {
     const { selectedFields, config } = this.props;
     if (config) {
       return Immutable.Set(config.fields);
     }
     return selectedFields;
-  },
+  };
 
-  _columnStyle(fieldName) {
+  _columnStyle = (fieldName) => {
     const { fields } = this.props;
     const selectedFields = Immutable.OrderedSet(fields);
     if (fieldName.toLowerCase() === 'source' && selectedFields.size > 1) {
       return { width: 180 };
     }
     return {};
-  },
+  };
 
-  _toggleMessageDetail(id) {
+  _toggleMessageDetail = (id) => {
     let newSet;
     const { expandedMessages } = this.state;
     if (expandedMessages.contains(id)) {
@@ -87,11 +100,11 @@ const MessageList = createReactClass({
       RefreshActions.disable();
     }
     this.setState({ expandedMessages: newSet });
-  },
+  };
 
-  _fieldTypeFor(fieldName, fields) {
+  _fieldTypeFor = (fieldName, fields : Immutable.List) => {
     return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
-  },
+  };
 
   render() {
     const { containerHeight, data, fields, currentView, pageSize = 7, config } = this.props;
@@ -172,8 +185,8 @@ const MessageList = createReactClass({
         </div>
       </span>
     );
-  },
-});
+  }
+}
 
 export default connect(MessageList,
   {
