@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
-import { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';

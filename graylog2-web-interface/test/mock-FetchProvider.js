@@ -2,11 +2,17 @@ const mockResponse = {};
 
 class MockBuilder {
   authenticated = () => this;
+
   session = () => this;
+
   setHeader = () => this;
+
   json = () => this;
+
   plaintext = () => this;
+
   noSessionExtension = () => this;
+
   build = () => Promise.resolve({});
 }
 
