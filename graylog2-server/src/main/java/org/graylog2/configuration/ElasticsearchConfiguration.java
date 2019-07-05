@@ -17,26 +17,19 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.ValidatorMethod;
-import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.jadconfig.validators.FilePathReadableValidator;
-import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
+import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.joda.time.Period;
 
-import javax.validation.constraints.NotNull;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 public class ElasticsearchConfiguration {
+    public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
+    public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
+
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
 
@@ -106,6 +99,12 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "index_field_type_periodical_interval", validator = PositiveDurationValidator.class)
     private Duration indexFieldTypePeriodicalInterval = Duration.hours(1L);
+
+    @Parameter(value = DEFAULT_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
+    private String defaultEventsIndexPrefix = "gl-events";
+
+    @Parameter(value = DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX, validators = StringNotBlankValidator.class)
+    private String defaultSystemEventsIndexPrefix = "gl-system-events";
 
     public boolean isDisableVersionCheck() {
         return disableVersionCheck;
@@ -194,5 +193,13 @@ public class ElasticsearchConfiguration {
 
     public Duration getIndexFieldTypePeriodicalInterval() {
         return indexFieldTypePeriodicalInterval;
+    }
+
+    public String getDefaultEventsIndexPrefix() {
+        return defaultEventsIndexPrefix;
+    }
+
+    public String getDefaultSystemEventsIndexPrefix() {
+        return defaultSystemEventsIndexPrefix;
     }
 }

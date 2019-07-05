@@ -48,6 +48,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_CREATION_DATE = "creation_date";
+    public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     private static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
@@ -126,7 +127,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotBlank
     public abstract String indexTemplateName();
 
-    @JsonProperty("index_template_type")
+    @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE)
     @NotBlank
     public abstract Optional<TemplateType> indexTemplateType();
 
@@ -157,7 +158,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
                                         @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
                                         @JsonProperty("index_template_name") @Nullable String indexTemplateName,
-                                        @JsonProperty("index_template_type") @Nullable TemplateType indexTemplateType,
+                                        @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable TemplateType indexTemplateType,
                                         @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
                                         @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval) {
