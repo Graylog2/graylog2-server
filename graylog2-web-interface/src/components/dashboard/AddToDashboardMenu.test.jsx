@@ -6,8 +6,17 @@ import 'jquery-ui/ui/widgets/mouse';
 import React from 'react';
 import Immutable from 'immutable';
 import { mount } from 'enzyme';
+
+import { StoreMock as MockStore } from 'helpers/mocking';
 import PermissionsMixin from 'util/PermissionsMixin';
 import AddToDashboardMenu from './AddToDashboardMenu';
+
+jest.mock('stores/dashboards/DashboardsStore', () => MockStore('listen'));
+jest.mock('stores/widgets/WidgetsStore', () => ({
+  addWidget: jest.fn(),
+}));
+const mockUser = { timezone: 'UTC' };
+jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', ['get', () => mockUser], ['getInitialState', () => ({ mockUser })]));
 
 describe('<AddToDashboardMenu />', () => {
   const exampleProps = {
