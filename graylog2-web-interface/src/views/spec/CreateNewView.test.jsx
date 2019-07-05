@@ -86,7 +86,13 @@ jest.mock('util/AppConfig', () => ({
       const search = searches[req.params[0]];
       const results = search.queries.map(({ id }) => [id, {
         error: [],
-        execution_stats: {},
+        execution_stats: {
+          timestamp: '2019-07-05T13:37:00Z',
+          effective_timerange: {
+            from: '2019-07-04T13:37:00Z',
+            to: '2019-07-05T13:37:00Z',
+          },
+        },
         search_types: {},
         state: 'COMPLETED',
       }])
