@@ -118,13 +118,16 @@ const MessageList = createReactClass({
 
     return (
       <span>
-        <div className={styles.messageListPaginator}>
-          <MessageTablePaginator currentPage={Number(currentPage)}
-                                 onPageChange={newPage => this.setState({ currentPage: newPage })}
-                                 pageSize={pageSize}
-                                 position="top"
-                                 resultCount={messages.length} />
-        </div>
+        { messages.length > Messages.DEFAULT_LIMIT
+        && (
+          <div className={styles.messageListPaginator}>
+            <MessageTablePaginator currentPage={Number(currentPage)}
+                                   onPageChange={newPage => this.setState({ currentPage: newPage })}
+                                   pageSize={pageSize}
+                                   position="top"
+                                   resultCount={messages.length} />
+          </div>
+        ) }
 
         <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 60px)', maxHeight: maxHeight }}>
           <div className="table-responsive">
