@@ -41,12 +41,14 @@ const NodesStore = Reflux.createStore({
     const promise = this.promises.list || fetchPeriodically('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
       .then((response) => {
         this.nodes = {};
-        response.nodes.forEach((node) => {
-          this.nodes[node.node_id] = node;
-        });
-        this.clusterId = this._clusterId();
-        this.nodeCount = this._nodeCount();
-        this._propagateState();
+        if (response.nodes) {
+          response.nodes.forEach((node) => {
+            this.nodes[node.node_id] = node;
+          });
+          this.clusterId = this._clusterId();
+          this.nodeCount = this._nodeCount();
+          this._propagateState();
+        }
         return response;
       })
       .finally(() => delete this.promises.list);
