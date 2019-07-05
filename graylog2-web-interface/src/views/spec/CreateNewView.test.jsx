@@ -1,3 +1,6 @@
+/**
+ * @jest-environment <rootDir>/test/integration-environment.js
+ */
 // @flow strict
 import * as React from 'react';
 import { wait, render, fireEvent } from '@testing-library/react';
