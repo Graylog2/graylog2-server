@@ -20,6 +20,7 @@ const EventDefinitionsStore = Reflux.createStore({
     page: undefined,
     pageSize: undefined,
     total: undefined,
+    grandTotal: undefined,
   },
 
   getInitialState() {
@@ -90,6 +91,7 @@ const EventDefinitionsStore = Reflux.createStore({
         page: response.page,
         pageSize: response.per_page,
         total: response.total,
+        grandTotal: response.grand_total,
       };
       this.propagateChanges();
       return response;

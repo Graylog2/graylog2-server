@@ -41,7 +41,7 @@ class EventDefinitions extends React.Component {
   render() {
     const { eventDefinitions, pagination, query, onPageChange, onQueryChange, onDelete } = this.props;
 
-    if (eventDefinitions.length === 0) {
+    if (pagination.grandTotal === 0) {
       return this.renderEmptyContent();
     }
 

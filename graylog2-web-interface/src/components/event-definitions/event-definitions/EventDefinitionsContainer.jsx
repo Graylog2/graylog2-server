@@ -19,7 +19,6 @@ class EventDefinitionsContainer extends React.Component {
   }
 
   fetchData = ({ page, pageSize, query }) => {
-    console.log(query, page, pageSize);
     return EventDefinitionsActions.listPaginated({
       query: query,
       page: page,
