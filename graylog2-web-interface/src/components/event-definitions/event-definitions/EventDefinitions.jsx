@@ -3,10 +3,14 @@ import PropTypes from 'prop-types';
 import { Button, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import moment from 'moment';
+import {} from 'moment-duration-format';
+
+import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
 
 import Routes from 'routing/Routes';
 
-import { EmptyEntity, EntityList, EntityListItem, PaginatedList, SearchForm } from 'components/common';
+import { EmptyEntity, EntityList, EntityListItem, PaginatedList, Pluralize, SearchForm } from 'components/common';
 
 import styles from './EventDefinitions.css';
 
@@ -45,6 +49,35 @@ class EventDefinitions extends React.Component {
     );
   };
 
+  renderDescription = (definition) => {
+    let schedulingInformation = 'Not scheduled.';
+    if (definition.config.search_within_ms && definition.config.execute_every_ms) {
+      const executeEveryFormatted = moment.duration(definition.config.execute_every_ms)
+        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
+      const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
+        .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+      schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
+    }
+
+    const notificationActions = definition.actions.filter(action => action.type === NOTIFICATION_TYPE);
+    let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
+    if (notificationActions.length > 0) {
+      notificationsInformation = (
+        <span>
+          Triggers {notificationActions.length}{' '}
+          <Pluralize singular="Notification" plural="Notifications" value={notificationActions.length} />.
+        </span>
+      );
+    }
+
+    return (
+      <React.Fragment>
+        <p>{definition.description}</p>
+        <p>{schedulingInformation} {notificationsInformation}</p>
+      </React.Fragment>
+    );
+  };
+
   render() {
     const { eventDefinitions, pagination, query, onPageChange, onQueryChange, onDelete } = this.props;
 
@@ -70,7 +103,8 @@ class EventDefinitions extends React.Component {
         <EntityListItem key={`event-definition-${definition.id}`}
                         title={definition.title}
                         titleSuffix={titleSuffix}
-                        description={definition.description}
+                        description={this.renderDescription(definition)}
+                        noItemsText="Could not find any items with the given filter."
                         actions={actions} />
       );
     });
