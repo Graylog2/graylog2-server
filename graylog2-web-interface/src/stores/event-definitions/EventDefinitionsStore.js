@@ -92,25 +92,6 @@ const EventDefinitionsStore = Reflux.createStore({
 
     EventDefinitionsActions.delete.promise(promise);
   },
-
-  execute(eventDefinition, payload) {
-    const promise = fetch('POST', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'execute'] }), {
-      ...payload,
-      type: eventDefinition.config.type, // Make sure to set correct type
-    });
-
-    promise.then(
-      () => {
-        UserNotification.success('Event Definition executed successfully', `Event Definition "${eventDefinition.title}" was executed successfully.`);
-      },
-      (error) => {
-        UserNotification.error(`Executing Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not execute Event Definition');
-      },
-    );
-
-    EventDefinitionsActions.execute.promise(promise);
-  },
 });
 
 export default EventDefinitionsStore;
