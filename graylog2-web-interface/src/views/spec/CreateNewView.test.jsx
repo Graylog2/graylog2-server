@@ -126,6 +126,7 @@ jest.mock('stores/sessions/SessionStore', () => ({
 
 jest.mock('components/navigation/Navigation', () => 'navigation-bar');
 jest.mock('routing/AppGlobalNotifications', () => 'app-global-notifications');
+jest.unmock('logic/rest/FetchProvider');
 
 describe('Create a new view', () => {
   beforeAll(() => {
