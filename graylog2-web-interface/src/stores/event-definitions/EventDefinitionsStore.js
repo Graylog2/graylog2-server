@@ -12,10 +12,31 @@ const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const EventDefinitionsStore = Reflux.createStore({
   listenables: [EventDefinitionsActions],
   sourceUrl: '/plugins/org.graylog.events/events/processors',
+  all: undefined,
+  eventDefinitions: undefined,
+  query: undefined,
+  pagination: {
+    count: undefined,
+    page: undefined,
+    pageSize: undefined,
+    total: undefined,
+    grandTotal: undefined,
+  },
 
   getInitialState() {
+    return this.getState();
+  },
+
+  propagateChanges() {
+    this.trigger(this.getState());
+  },
+
+  getState() {
     return {
-      list: [],
+      all: this.all,
+      eventDefinitions: this.eventDefinitions,
+      query: this.query,
+      pagination: this.pagination,
     };
   },
 
@@ -28,16 +49,55 @@ const EventDefinitionsStore = Reflux.createStore({
     return URLUtils.qualifyUrl(uri.resource());
   },
 
-  list() {
-    // TODO: This needs to user proper pagination instead of requesting 1000 items
-    const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 1000 } }));
+  refresh() {
+    if (this.all) {
+      this.listAll();
+    }
+    if (this.pagination.page) {
+      this.listPaginated({
+        query: this.pagination.query,
+        page: this.pagination.page,
+        pageSize: this.pagination.pageSize,
+      });
+    }
+  },
+
+  listAll() {
+    const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 0 } }));
 
     promise.then((response) => {
-      this.trigger({ list: response.event_processors });
+      this.all = response.event_processors;
+      this.propagateChanges();
       return response;
     });
 
-    EventDefinitionsActions.list.promise(promise);
+    EventDefinitionsActions.listAll.promise(promise);
+  },
+
+  listPaginated({ query = '', page = 1, pageSize = 10 }) {
+    const promise = fetch('GET', this.eventDefinitionsUrl({
+      query: {
+        query: query,
+        page: page,
+        per_page: pageSize,
+      },
+    }));
+
+    promise.then((response) => {
+      this.eventDefinitions = response.event_processors;
+      this.query = response.query;
+      this.pagination = {
+        count: response.count,
+        page: response.page,
+        pageSize: response.per_page,
+        total: response.total,
+        grandTotal: response.grand_total,
+      };
+      this.propagateChanges();
+      return response;
+    });
+
+    EventDefinitionsActions.listPaginated.promise(promise);
   },
 
   get(eventDefinitionId) {
@@ -91,25 +151,6 @@ const EventDefinitionsStore = Reflux.createStore({
     );
 
     EventDefinitionsActions.delete.promise(promise);
-  },
-
-  execute(eventDefinition, payload) {
-    const promise = fetch('POST', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'execute'] }), {
-      ...payload,
-      type: eventDefinition.config.type, // Make sure to set correct type
-    });
-
-    promise.then(
-      () => {
-        UserNotification.success('Event Definition executed successfully', `Event Definition "${eventDefinition.title}" was executed successfully.`);
-      },
-      (error) => {
-        UserNotification.error(`Executing Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not execute Event Definition');
-      },
-    );
-
-    EventDefinitionsActions.execute.promise(promise);
   },
 });
 

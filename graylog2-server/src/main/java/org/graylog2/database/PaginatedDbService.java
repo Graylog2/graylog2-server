@@ -120,7 +120,8 @@ public abstract class PaginatedDbService<DTO> {
                 .sort(sort)
                 .limit(perPage)
                 .skip(perPage * Math.max(0, page - 1))) {
-            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+            final long grandTotal = db.count();
+            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage, grandTotal);
         }
     }
 
@@ -167,7 +168,9 @@ public abstract class PaginatedDbService<DTO> {
                     .limit(perPage)
                     .collect(Collectors.toList());
 
-            return new PaginatedList<>(list, total.get(), page, perPage);
+            final long grandTotal = db.count();
+
+            return new PaginatedList<>(list, total.get(), page, perPage, grandTotal);
         }
     }
 

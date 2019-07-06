@@ -47,6 +47,10 @@ public class PaginatedResponse<T> {
             builder.put("query", query);
         }
 
+        if (paginatedList.grandTotal().isPresent()) {
+            builder.put("grand_total", paginatedList.grandTotal().get());
+        }
+
         return builder.build();
     }
 

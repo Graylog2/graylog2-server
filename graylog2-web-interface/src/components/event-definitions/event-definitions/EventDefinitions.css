@@ -1,0 +1,7 @@
+:local(.definitionList) {
+    margin-top: 10px;
+}
+
+:local(.inline) {
+    display: inline-block;
+}
