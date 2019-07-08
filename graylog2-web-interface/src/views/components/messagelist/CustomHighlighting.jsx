@@ -23,7 +23,7 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue, hig
   const rules = highlightingRules[fieldName] || [];
   rules.forEach((rule) => {
     const ranges = [];
-    if (String(fieldValue).includes(rule.value)) {
+    if (String(fieldValue) === String(rule.value)) {
       ranges.push({
         start: String(fieldValue).indexOf(rule.value),
         length: String(rule.value).length,
