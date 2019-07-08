@@ -3,7 +3,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { wait, render, fireEvent } from '@testing-library/react';
+import { waitForElement, render, fireEvent } from '@testing-library/react';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -54,10 +54,9 @@ describe('Create a new view', () => {
     const { getByText, getAllByText } = render(<AppRouter />);
     history.push(Routes.VIEWS.LIST);
 
-    await wait(() => getAllByText('Create new view'));
-    const button = getAllByText('Create new view')[0];
+    const button = await waitForElement(() => getAllByText('Create new view')[0]);
     fireEvent.click(button);
-    await wait(() => getByText('Query#1'));
-    await wait(() => getByText('New View'));
+    await waitForElement(() => getByText('Query#1'));
+    await waitForElement(() => getByText('New View'));
   });
 });
