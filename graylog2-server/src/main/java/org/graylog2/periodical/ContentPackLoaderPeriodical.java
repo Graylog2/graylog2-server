@@ -185,7 +185,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
 
             final Optional<ContentPack> insertedContentPack = contentPackPersistenceService.insert(contentPack);
             if (!insertedContentPack.isPresent()) {
-                LOG.error("Error while inserting content pack " + file + " into database. Skipping.", e);
+                LOG.error("Error while inserting content pack " + file + " into database. Skipping.");
                 continue;
             }
 
