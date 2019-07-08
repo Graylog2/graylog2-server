@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import {} from 'jquery-ui/ui/effect';
 import {} from 'jquery-ui/ui/effects/effect-bounce';
 import Rickshaw from 'rickshaw';
 import NumberUtils from 'util/NumberUtils';
