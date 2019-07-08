@@ -7,6 +7,8 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
+
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
 const EventDefinitionsStore = Reflux.createStore({
@@ -105,8 +107,13 @@ const EventDefinitionsStore = Reflux.createStore({
     EventDefinitionsActions.get.promise(promise);
   },
 
+  setAlertFlag(eventDefinition) {
+    const isAlert = eventDefinition.actions.some(action => action.type === NOTIFICATION_TYPE);
+    return Object.assign({}, eventDefinition, { alert: isAlert });
+  },
+
   create(eventDefinition) {
-    const promise = fetch('POST', this.eventDefinitionsUrl({}), eventDefinition);
+    const promise = fetch('POST', this.eventDefinitionsUrl({}), this.setAlertFlag(eventDefinition));
     promise.then(
       (response) => {
         UserNotification.success('Event Definition created successfully', `Event Definition "${eventDefinition.title}" was created successfully.`);
@@ -122,7 +129,7 @@ const EventDefinitionsStore = Reflux.createStore({
   },
 
   update(eventDefinitionId, eventDefinition) {
-    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }), eventDefinition);
+    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }), this.setAlertFlag(eventDefinition));
     promise.then(
       (response) => {
         UserNotification.success('Event Definition updated successfully', `Event Definition "${eventDefinition.title}" was updated successfully.`);
