@@ -29,7 +29,7 @@
       "<rootDir>/test/mock-FetchProvider.js"
     ],
     "setupFilesAfterEnv": [
-      "./node_modules/jest-enzyme/lib/index.js"
+      "jest-enzyme"
     ],
     "moduleDirectories": [
       "src",
