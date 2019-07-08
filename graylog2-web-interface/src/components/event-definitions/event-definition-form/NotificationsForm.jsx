@@ -5,7 +5,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
-import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationList from './NotificationList';
@@ -31,20 +30,19 @@ class NotificationsForm extends React.Component {
 
   handleAssignNotification = (nextNotification) => {
     const { onChange, eventDefinition } = this.props;
-    const nextActions = lodash.cloneDeep(eventDefinition.actions);
-    nextActions.push({
-      type: NOTIFICATION_TYPE,
+    const nextNotifications = lodash.cloneDeep(eventDefinition.notifications);
+    nextNotifications.push({
       notification_id: nextNotification,
     });
-    onChange('actions', nextActions);
+    onChange('notifications', nextNotifications);
     this.toggleAddNotificationForm();
   };
 
   handleRemoveNotification = (notificationId) => {
     const { onChange, eventDefinition } = this.props;
-    const action = eventDefinition.actions.find(a => a.notification_id === notificationId);
-    const nextActions = lodash.without(eventDefinition.actions, action);
-    onChange('actions', nextActions);
+    const notification = eventDefinition.notifications.find(n => n.notification_id === notificationId);
+    const nextNotifications = lodash.without(eventDefinition.notifications, notification);
+    onChange('notifications', nextNotifications);
   };
 
   render() {

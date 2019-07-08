@@ -36,7 +36,7 @@ class AddNotificationForm extends React.Component {
       return;
     }
 
-    this.setState({ selectedNotification: nextNotificationId });
+    this.setState({ selectedNotification: nextNotificationId, displayNewNotificationForm: false });
   };
 
   formatNotifications = (notifications) => {

@@ -6,7 +6,7 @@ class CommonNotificationSummary extends React.Component {
   static propTypes = {
     type: PropTypes.string.isRequired,
     notification: PropTypes.object.isRequired,
-    action: PropTypes.object.isRequired,
+    definitionNotification: PropTypes.object.isRequired,
     children: PropTypes.element.isRequired,
   };
 
@@ -20,11 +20,11 @@ class CommonNotificationSummary extends React.Component {
   };
 
   render() {
-    const { type, notification, action, children } = this.props;
+    const { type, notification, definitionNotification, children } = this.props;
     const { displayDetails } = this.state;
     return (
       <React.Fragment>
-        <h4>{notification.title || action.notification_id}</h4>
+        <h4>{notification.title || definitionNotification.notification_id}</h4>
         <dl>
           <dd>{type}</dd>
           <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>

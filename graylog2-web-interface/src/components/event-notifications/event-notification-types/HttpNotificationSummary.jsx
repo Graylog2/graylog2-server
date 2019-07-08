@@ -7,7 +7,7 @@ class HttpNotificationSummary extends React.Component {
   static propTypes = {
     type: PropTypes.string.isRequired,
     notification: PropTypes.object,
-    action: PropTypes.object.isRequired,
+    definitionNotification: PropTypes.object.isRequired,
   };
 
   static defaultProps = {

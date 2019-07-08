@@ -6,8 +6,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 import {} from 'moment-duration-format';
 
-import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
-
 import Routes from 'routing/Routes';
 
 import { EmptyEntity, EntityList, EntityListItem, PaginatedList, Pluralize, SearchForm } from 'components/common';
@@ -59,13 +57,12 @@ class EventDefinitions extends React.Component {
       schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
     }
 
-    const notificationActions = definition.actions.filter(action => action.type === NOTIFICATION_TYPE);
     let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
-    if (notificationActions.length > 0) {
+    if (definition.notifications.length > 0) {
       notificationsInformation = (
         <span>
-          Triggers {notificationActions.length}{' '}
-          <Pluralize singular="Notification" plural="Notifications" value={notificationActions.length} />.
+          Triggers {definition.notifications.length}{' '}
+          <Pluralize singular="Notification" plural="Notifications" value={definition.notifications.length} />.
         </span>
       );
     }
