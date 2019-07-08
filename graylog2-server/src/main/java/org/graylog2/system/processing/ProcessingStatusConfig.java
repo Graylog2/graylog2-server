@@ -26,7 +26,7 @@ public class ProcessingStatusConfig {
     public static final String PERSIST_INTERVAL = "processing_status_persist_interval";
 
     @Parameter(value = PERSIST_INTERVAL, validators = {PositiveDurationValidator.class, Minimum1SecondValidator.class})
-    private Duration processingStatusPersistInterval = Duration.seconds(5);
+    private Duration processingStatusPersistInterval = Duration.seconds(1);
 
     public Duration getProcessingStatusPersistInterval() {
         return processingStatusPersistInterval;
