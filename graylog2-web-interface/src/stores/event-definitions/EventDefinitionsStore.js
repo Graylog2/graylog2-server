@@ -7,8 +7,6 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
-
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
 const EventDefinitionsStore = Reflux.createStore({
@@ -108,7 +106,7 @@ const EventDefinitionsStore = Reflux.createStore({
   },
 
   setAlertFlag(eventDefinition) {
-    const isAlert = eventDefinition.actions.some(action => action.type === NOTIFICATION_TYPE);
+    const isAlert = eventDefinition.notifications.length > 0;
     return Object.assign({}, eventDefinition, { alert: isAlert });
   },
 

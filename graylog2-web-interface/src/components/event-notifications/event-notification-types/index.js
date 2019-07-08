@@ -5,9 +5,6 @@ import EmailNotificationSummary from './EmailNotificationSummary';
 import HttpNotificationForm from './HttpNotificationForm';
 import HttpNotificationSummary from './HttpNotificationSummary';
 
-// eslint-disable-next-line import/prefer-default-export
-export const NOTIFICATION_TYPE = 'trigger-notification-v1';
-
 PluginStore.register(new PluginManifest({}, {
   eventNotificationTypes: [
     {

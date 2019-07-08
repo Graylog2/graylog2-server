@@ -4,7 +4,6 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DataTable, Spinner } from 'components/common';
-import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
 
 class NotificationList extends React.Component {
   static propTypes = {
@@ -55,11 +54,10 @@ class NotificationList extends React.Component {
   render() {
     const { eventDefinition, notifications, onAddNotificationClick } = this.props;
 
-    const notificationActions = eventDefinition.actions
-      .filter(action => action.type === NOTIFICATION_TYPE)
-      .map(action => notifications.find(n => n.id === action.notification_id));
+    const definitionNotifications = eventDefinition.notifications
+      .map(edn => notifications.find(n => n.id === edn.notification_id));
 
-    if (notificationActions.length === 0) {
+    if (definitionNotifications.length === 0) {
       return (
         <p>
           This Event is not configured to trigger any Notifications yet.{' '}
@@ -76,7 +74,7 @@ class NotificationList extends React.Component {
                      className="table-striped table-hover"
                      headers={['Notification', 'Type', 'Actions']}
                      sortByKey="title"
-                     rows={notificationActions}
+                     rows={definitionNotifications}
                      dataRowFormatter={this.notificationFormatter}
                      filterKeys={[]} />
           <Button bsStyle="success" onClick={onAddNotificationClick}>

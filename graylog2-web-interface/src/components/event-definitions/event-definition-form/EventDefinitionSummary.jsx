@@ -5,7 +5,6 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import { NOTIFICATION_TYPE } from 'components/event-notifications/event-notification-types';
 
 import styles from './EventDefinitionSummary.css';
 import commonStyles from '../common/commonStyles.css';
@@ -90,35 +89,33 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderNotification = (notificationAction) => {
+  renderNotification = (definitionNotification) => {
     const { notifications } = this.props;
-    const notification = notifications.find(n => n.id === notificationAction.notification_id);
+    const notification = notifications.find(n => n.id === definitionNotification.notification_id);
     const notificationPlugin = this.getPlugin('eventNotificationTypes', notification.config.type);
     const component = (notificationPlugin.summaryComponent
       ? React.createElement(notificationPlugin.summaryComponent, {
         type: notificationPlugin.displayName,
         notification: notification,
-        action: notificationAction,
+        definitionNotification: definitionNotification,
       })
       : <span>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</span>
     );
 
     return (
-      <React.Fragment key={notificationAction.notification_id}>
+      <React.Fragment key={definitionNotification.notification_id}>
         {component}
       </React.Fragment>
     );
   };
 
-  renderNotifications = (actions) => {
-    const notificationActions = actions.filter(action => action.type === NOTIFICATION_TYPE);
-
+  renderNotifications = (definitionNotifications) => {
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Notifications</h3>
-        {notificationActions.length === 0
+        {definitionNotifications.length === 0
           ? <p>This Event is not configured to trigger any Notifications.</p>
-          : notificationActions.map(this.renderNotification)}
+          : definitionNotifications.map(this.renderNotification)}
       </React.Fragment>
     );
   };
@@ -140,7 +137,7 @@ class EventDefinitionSummary extends React.Component {
               {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
             </Col>
             <Col md={3}>
-              {this.renderNotifications(eventDefinition.actions)}
+              {this.renderNotifications(eventDefinition.notifications)}
             </Col>
           </Row>
         </Col>
