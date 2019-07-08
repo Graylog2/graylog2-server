@@ -4,7 +4,7 @@ import { Button, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { EmptyEntity, EntityList, EntityListItem, PaginatedList } from 'components/common';
+import { EmptyEntity, EntityList, EntityListItem, PaginatedList, SearchForm } from 'components/common';
 
 import Routes from 'routing/Routes';
 
@@ -14,7 +14,9 @@ class EventNotifications extends React.Component {
   static propTypes = {
     notifications: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
+    query: PropTypes.string.isRequired,
     onPageChange: PropTypes.func.isRequired,
+    onQueryChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
   };
 
@@ -71,9 +73,9 @@ class EventNotifications extends React.Component {
   };
 
   render() {
-    const { notifications, pagination, onPageChange } = this.props;
+    const { notifications, pagination, query, onPageChange, onQueryChange } = this.props;
 
-    if (notifications.length === 0) {
+    if (pagination.grandTotal === 0) {
       return this.renderEmptyContent();
     }
 
@@ -90,6 +92,16 @@ class EventNotifications extends React.Component {
         </Row>
         <Row>
           <Col md={12}>
+            <SearchForm query={query}
+                        onSearch={onQueryChange}
+                        onReset={onQueryChange}
+                        searchButtonLabel="Find"
+                        placeholder="Find Notifications"
+                        wrapperClass={styles.inline}
+                        queryWidth={200}
+                        topMargin={0}
+                        useLoadingState />
+
             <PaginatedList activePage={pagination.page}
                            pageSize={pagination.pageSize}
                            pageSizes={[10, 25, 50]}

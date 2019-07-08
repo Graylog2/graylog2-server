@@ -57,7 +57,7 @@ const EventDefinitionsStore = Reflux.createStore({
     }
     if (this.pagination.page) {
       this.listPaginated({
-        query: this.pagination.query,
+        query: this.query,
         page: this.pagination.page,
         pageSize: this.pagination.pageSize,
       });

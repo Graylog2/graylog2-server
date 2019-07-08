@@ -14,11 +14,13 @@ const EventNotificationsStore = Reflux.createStore({
   sourceUrl: '/plugins/org.graylog.events/notifications',
   all: undefined,
   notifications: undefined,
+  query: undefined,
   pagination: {
     count: undefined,
     page: undefined,
     pageSize: undefined,
     total: undefined,
+    grandTotal: undefined,
   },
 
   getInitialState() {
@@ -33,6 +35,7 @@ const EventNotificationsStore = Reflux.createStore({
     return {
       all: this.all,
       notifications: this.notifications,
+      query: this.query,
       pagination: this.pagination,
     };
   },
@@ -52,6 +55,7 @@ const EventNotificationsStore = Reflux.createStore({
     }
     if (this.pagination.page) {
       this.listPaginated({
+        query: this.query,
         page: this.pagination.page,
         pageSize: this.pagination.pageSize,
       });
@@ -70,9 +74,10 @@ const EventNotificationsStore = Reflux.createStore({
     EventNotificationsActions.listAll.promise(promise);
   },
 
-  listPaginated({ page = 1, pageSize = 10 }) {
+  listPaginated({ query = '', page = 1, pageSize = 10 }) {
     const promise = fetch('GET', this.eventNotificationsUrl({
       query: {
+        query: query,
         page: page,
         per_page: pageSize,
       },
@@ -80,11 +85,13 @@ const EventNotificationsStore = Reflux.createStore({
 
     promise.then((response) => {
       this.notifications = response.notifications;
+      this.query = response.query;
       this.pagination = {
         count: response.count,
         page: response.page,
         pageSize: response.per_page,
         total: response.total,
+        grandTotal: response.grand_total,
       };
       this.propagateChanges();
       return response;
