@@ -51,4 +51,13 @@ describe('Create a new view', () => {
     await waitForElement(() => getByText('Query#1'));
     await waitForElement(() => getByText('New View'));
   });
+
+  it('by going to the new view endpoint', async () => {
+    const { getByText } = render(<AppRouter />);
+
+    history.push(Routes.EXTENDEDSEARCH);
+
+    await waitForElement(() => getByText('Query#1'));
+    await waitForElement(() => getByText('New View'));
+  });
 });
