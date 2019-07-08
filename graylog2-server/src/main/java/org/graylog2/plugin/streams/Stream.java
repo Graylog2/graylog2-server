@@ -17,6 +17,7 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.database.Persisted;
 
@@ -27,7 +28,22 @@ import java.util.Set;
 import static com.google.common.base.Strings.emptyToNull;
 
 public interface Stream extends Persisted {
+    /**
+     * The ID of the default message stream for all messages.
+     */
     String DEFAULT_STREAM_ID = "000000000000000000000001";
+    /**
+     * The ID of the default events stream for user generated events.
+     */
+    String DEFAULT_EVENTS_STREAM_ID = "000000000000000000000002";
+    /**
+     * The ID of the default events stream for system events.
+     */
+    String DEFAULT_SYSTEM_EVENTS_STREAM_ID = "000000000000000000000003";
+    /**
+     * Contains all default event streams. (e.g. events and system events)
+     */
+    ImmutableSet<String> DEFAULT_EVENT_STREAM_IDS = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
 
     enum MatchingType {
         AND,
