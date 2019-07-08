@@ -22,16 +22,28 @@ class EventNotificationsContainer extends React.Component {
   };
 
   componentDidMount() {
-    this.fetchData();
+    this.fetchData({});
   }
 
-  fetchData = (nextPage, nextPageSize) => {
-    EventNotificationsActions.listPaginated({ page: nextPage, pageSize: nextPageSize });
+  fetchData = ({ page, pageSize, query }) => {
+    return EventNotificationsActions.listPaginated({
+      query: query,
+      page: page,
+      pageSize: pageSize,
+    });
   };
 
   handlePageChange = (nextPage, nextPageSize) => {
-    this.fetchData(nextPage, nextPageSize);
+    const { notifications } = this.props;
+    this.fetchData({ page: nextPage, pageSize: nextPageSize, query: notifications.query });
   };
+
+  handleQueryChange = (nextQuery, callback = () => {}) => {
+    const { notifications } = this.props;
+    const promise = this.fetchData({ query: nextQuery, pageSize: notifications.pagination.pageSize });
+    promise.finally(callback);
+  };
+
 
   handleDelete = (definition) => {
     return () => {
@@ -51,7 +63,9 @@ class EventNotificationsContainer extends React.Component {
     return (
       <EventNotifications notifications={notifications.notifications}
                           pagination={notifications.pagination}
+                          query={notifications.query}
                           onPageChange={this.handlePageChange}
+                          onQueryChange={this.handleQueryChange}
                           onDelete={this.handleDelete} />
     );
   }
