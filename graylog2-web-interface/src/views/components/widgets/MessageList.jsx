@@ -131,7 +131,7 @@ class MessageList extends React.Component<Props, State> {
 
     return (
       <span>
-        { messages.length > Messages.DEFAULT_LIMIT
+        { messages.length > pageSize
         && (
           <div className={styles.messageListPaginator}>
             <MessageTablePaginator currentPage={Number(currentPage)}
