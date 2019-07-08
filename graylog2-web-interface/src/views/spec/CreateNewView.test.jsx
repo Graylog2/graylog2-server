@@ -13,12 +13,6 @@ import AppRouter from 'routing/AppRouter';
 
 import viewsBindings from 'views/bindings';
 
-jest.mock('legacy/analyzers/fieldcharts', () => ({
-  FieldChart: {
-    reload: jest.fn(),
-  },
-}));
-jest.mock('components/search/LegacyHistogram', () => 'legacy-histogram');
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   'listen',
   'get',
@@ -41,8 +35,6 @@ jest.mock('stores/sessions/SessionStore', () => ({
   getSessionId: jest.fn(() => 'foobar'),
 }));
 
-jest.mock('components/navigation/Navigation', () => 'navigation-bar');
-jest.mock('routing/AppGlobalNotifications', () => 'app-global-notifications');
 jest.unmock('logic/rest/FetchProvider');
 
 describe('Create a new view', () => {
