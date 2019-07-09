@@ -40,7 +40,7 @@ const ExtendedSearchPage = createReactClass({
   displayName: 'ExtendedSearchPage',
 
   propTypes: {
-    executionState: CustomPropTypes.instanceOf(SearchExecutionState),
+    executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
     headerElements: PropTypes.arrayOf(PropTypes.func).isRequired,
     queryBarElements: PropTypes.arrayOf(PropTypes.func).isRequired,
     route: PropTypes.object.isRequired,

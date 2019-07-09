@@ -32,9 +32,14 @@ const OneOrMoreChildren = PropTypes.oneOfType([
 const prototypesOf = (target) => {
   let i = target;
   const result = [];
-  while (i && i.__proto__) {
-    result.push(i.__proto__);
-    i = i.__proto__;
+  while (i) {
+    try {
+      const prototype = Object.getPrototypeOf(i);
+      result.push(prototype);
+      i = prototype;
+    } catch {
+      i = undefined;
+    }
   }
 
   return result;
@@ -50,7 +55,7 @@ const createInstanceOf = (expectedClass, required = false) => {
         ? new Error(`Invalid prop ${propName} supplied to ${componentName}: expected to be instance of ${expectedConstructorName} but found ${value} instead`)
         : undefined;
     }
-    const valueConstructorName = get(value, ['__proto__', 'constructor', 'name']);
+    const valueConstructorName = get(prototypesOf(value)[0], ['constructor', 'name']);
     const constructorNames = prototypesOf(value)
       .map(proto => get(proto, ['constructor', 'name']))
       .filter(name => name !== undefined);
