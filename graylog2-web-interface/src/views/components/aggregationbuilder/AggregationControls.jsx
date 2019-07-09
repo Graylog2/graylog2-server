@@ -34,7 +34,7 @@ type State = {
 export default class AggregationControls extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.element.isRequired,
-    config: PropTypes.instanceOf(AggregationWidgetConfig).isRequired,
+    config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     onChange: PropTypes.func.isRequired,
   };

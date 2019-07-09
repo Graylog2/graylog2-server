@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button } from 'react-bootstrap';
+
+import FieldType from 'views/logic/fieldtypes/FieldType';
 import TimeHistogramPivot from './pivottypes/TimeHistogramPivot';
-import FieldType from '../../logic/fieldtypes/FieldType';
 import TermsPivotConfiguration from './pivottypes/TermsPivotConfiguration';
+import CustomPropTypes from '../CustomPropTypes';
 
 const _configurationComponentByType = (type, value, onChange) => {
   switch (type.type) {
@@ -15,7 +17,7 @@ const _configurationComponentByType = (type, value, onChange) => {
 
 export default class PivotConfiguration extends React.Component {
   static propTypes = {
-    type: PropTypes.instanceOf(FieldType).isRequired,
+    type: CustomPropTypes.instanceOf(FieldType).isRequired,
     config: PropTypes.shape({
       type: PropTypes.string.isRequired,
     }).isRequired,
@@ -30,6 +32,7 @@ export default class PivotConfiguration extends React.Component {
     };
   }
 
+  // eslint-disable-next-line react/destructuring-assignment
   _onSubmit = () => this.props.onClose(this.state);
 
   _onChange = config => this.setState({ config });
