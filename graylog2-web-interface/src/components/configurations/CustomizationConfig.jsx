@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Badge } from 'react-bootstrap';
+import { Badge, Button } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { IfPermitted, ColorPickerPopover } from 'components/common';
+import { ColorPickerPopover, IfPermitted } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
@@ -16,6 +16,9 @@ const CustomizationConfig = createReactClass({
       badge_text: PropTypes.string,
       badge_color: PropTypes.string,
       badge_enable: PropTypes.bool,
+    }),
+    error: PropTypes.shape({
+      badge_text: PropTypes.string,
     }),
     updateConfig: PropTypes.func.isRequired,
   },
@@ -34,8 +37,9 @@ const CustomizationConfig = createReactClass({
   },
 
   getInitialState() {
+    const { config } = this.props;
     return {
-      config: ObjectUtils.clone(this.props.config),
+      config: ObjectUtils.clone(config),
     };
   },
 
@@ -57,17 +61,20 @@ const CustomizationConfig = createReactClass({
   },
 
   _saveConfig() {
-    if ((this.state.error || {}).badge_text) {
+    const { error, config } = this.state;
+    const { updateConfig } = this.props;
+    if ((error || {}).badge_text) {
       return;
     }
-    this.props.updateConfig(this.state.config).then(() => {
+    updateConfig(config).then(() => {
       this._closeModal();
     });
   },
 
   _onUpdate(field) {
+    const { config } = this.state;
     return (value) => {
-      const update = ObjectUtils.clone(this.state.config);
+      const update = ObjectUtils.clone(config);
       if (typeof value === 'object') {
         update[field] = FormUtils.getValueFromInput(value.target);
       } else {
@@ -78,15 +85,17 @@ const CustomizationConfig = createReactClass({
   },
 
   handleColorChange(color, _, hidePopover) {
+    const { config } = this.state;
     hidePopover();
-    const update = ObjectUtils.clone(this.state.config);
+    const update = ObjectUtils.clone(config);
     update.badge_color = color;
     this.setState({ config: update });
   },
 
   validate() {
-    const error = this.state.error || {};
-    if (this.state.config.badge_text.length > 5) {
+    const { error = {}, config } = this.state;
+
+    if (config.badge_text.length > 5) {
       error.badge_text = 'Can be maximal 5 characters long';
     } else {
       error.badge_text = null;
@@ -95,17 +104,17 @@ const CustomizationConfig = createReactClass({
   },
 
   render() {
-    const badge = this.state.config.badge_text ?
-      <Badge style={{ backgroundColor: this.state.config.badge_color }} className={this.state.config.badge_color}><span>{this.state.config.badge_text}</span></Badge> :
-      <span>No badge defined</span>;
+    const { error = {}, config } = this.state;
+    const badge = config.badge_text
+      ? <Badge style={{ backgroundColor: config.badge_color }} className={config.badge_color}><span>{config.badge_text}</span></Badge>
+      : <span>No badge defined</span>;
 
-    const error = this.state.error || {};
     return (
       <div>
         <h2>UI Customization</h2>
         <dl className="deflist">
           <dt>Badge Enabled</dt>
-          <dd>{StringUtils.capitalizeFirstLetter(this.state.config.badge_enable.toString())}</dd>
+          <dd>{StringUtils.capitalizeFirstLetter(config.badge_enable.toString())}</dd>
           <dt>Badge</dt>
           <dd>{badge}</dd>
         </dl>
@@ -122,26 +131,25 @@ const CustomizationConfig = createReactClass({
           <Input type="checkbox"
                  id="badge-enable"
                  label="Enable Header Badge"
-                 checked={this.state.config.badge_enable}
+                 checked={config.badge_enable}
                  onChange={this._onUpdate('badge_enable')}
                  help="Activate Header Badge" />
           <Input type="text"
                  id="badge-text"
                  label="Badge Text"
                  bsStyle={error.badge_text ? 'error' : null}
-                 value={this.state.config.badge_text}
+                 value={config.badge_text}
                  onChange={this._onUpdate('badge_text')}
                  help={error.badge_text ? error.badge_text : 'The text of the badge. Not more than five characters.'} />
           <ColorPickerPopover id="badge-color"
                               placement="right"
-                              color={this.state.config.badge_color}
+                              color={config.badge_color}
                               triggerNode={<Button bsStyle="primary">Select background color</Button>}
                               onChange={this.handleColorChange} />
         </BootstrapModalForm>
       </div>
     );
   },
-
 });
 
 export default CustomizationConfig;
