@@ -18,9 +18,7 @@ const _configurationComponentByType = (type, value, onChange) => {
 export default class PivotConfiguration extends React.Component {
   static propTypes = {
     type: CustomPropTypes.instanceOf(FieldType).isRequired,
-    config: PropTypes.shape({
-      type: PropTypes.string.isRequired,
-    }).isRequired,
+    config: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
   };
 
