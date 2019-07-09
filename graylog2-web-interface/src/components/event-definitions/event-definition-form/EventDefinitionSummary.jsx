@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import moment from 'moment';
+import {} from 'moment-duration-format';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -109,13 +111,36 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderNotifications = (definitionNotifications) => {
+  renderNotificationSettings = (notificationSettings) => {
+    const formattedDuration = moment.duration(notificationSettings.grace_period_ms)
+      .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+
+    const formattedGracePeriod = (notificationSettings.grace_period_ms
+      ? `Grace Period is set to ${formattedDuration}`
+      : 'Grace Period is disabled');
+
+    return (
+      <React.Fragment>
+        <h4>Settings</h4>
+        <dl>
+          <dd>{formattedGracePeriod}</dd>
+        </dl>
+      </React.Fragment>
+    );
+  };
+
+  renderNotifications = (definitionNotifications, notificationSettings) => {
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Notifications</h3>
         {definitionNotifications.length === 0
           ? <p>This Event is not configured to trigger any Notifications.</p>
-          : definitionNotifications.map(this.renderNotification)}
+          : (
+            <React.Fragment>
+              {this.renderNotificationSettings(notificationSettings)}
+              {definitionNotifications.map(this.renderNotification)}
+            </React.Fragment>
+          )}
       </React.Fragment>
     );
   };
@@ -137,7 +162,7 @@ class EventDefinitionSummary extends React.Component {
               {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
             </Col>
             <Col md={3}>
-              {this.renderNotifications(eventDefinition.notifications)}
+              {this.renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
             </Col>
           </Row>
         </Col>
