@@ -17,13 +17,19 @@ const formatTitle = (title, id, disabled = false) => (disabled
   ? <h2>{title}</h2>
   : <Link to={Routes.VIEWS.VIEWID(id)}>{title}</Link>);
 
-// eslint-disable-next-line react/prop-types
 const _OwnerTag = ({ owner, currentUser }) => {
   if (!owner || owner === currentUser.username) {
     return <span>Last saved</span>;
   }
 
   return <span>Shared by {owner}, last saved</span>;
+};
+
+_OwnerTag.propTypes = {
+  owner: PropTypes.string.isRequired,
+  currentUser: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 const OwnerTag = connect(_OwnerTag, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
@@ -95,7 +101,10 @@ View.propTypes = {
   description: PropTypes.string,
   owner: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
-  requires: PropTypes.arrayOf(PropTypes.string).isRequired,
+  requires: PropTypes.objectOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+  })).isRequired,
   requirementsProvided: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
