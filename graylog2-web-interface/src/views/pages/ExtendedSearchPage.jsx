@@ -28,10 +28,6 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
 
-type State = {
-  showMessages: boolean,
-};
-
 type Props = {
   headerElements: Array<React.ComponentType<{}>>,
   queryBarElements: Array<React.ComponentType<{}>>,
@@ -50,11 +46,6 @@ const ExtendedSearchPage = createReactClass({
     searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
   },
 
-  getInitialState(): State {
-    return {
-      showMessages: true,
-    };
-  },
   componentDidMount() {
     style.use();
 
@@ -100,12 +91,7 @@ const ExtendedSearchPage = createReactClass({
     });
   },
 
-  _toggleMessages() {
-    this.setState(state => ({ showMessages: !state.showMessages }));
-  },
-
   render() {
-    const { showMessages } = this.state;
     const { headerElements = [], queryBarElements = [], route } = this.props;
     return (
       <React.Fragment>
@@ -119,8 +105,7 @@ const ExtendedSearchPage = createReactClass({
             {/* eslint-disable-next-line react/no-array-index-key */}
             {queryBarElements.map((Component, idx) => <Component key={idx} />)}
 
-            <SearchResult onToggleMessages={this._toggleMessages}
-                          showMessages={showMessages} />
+            <SearchResult />
           </QueryBar>
         </Row>
       </React.Fragment>
