@@ -9,6 +9,7 @@ import { parameterOptionsForType } from 'views/components/aggregationbuilder/Ser
 import ConfigurableElement from './ConfigurableElement';
 import SeriesConfiguration from './SeriesConfiguration';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
+import CustomPropTypes from '../CustomPropTypes';
 
 type Option = {|
   label: string,
@@ -133,7 +134,7 @@ class SeriesSelect extends React.Component<Props, State> {
 
 SeriesSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
-  series: PropTypes.arrayOf(PropTypes.instanceOf(Series)).isRequired,
+  series: PropTypes.arrayOf(CustomPropTypes.instanceOf(Series)).isRequired,
   suggester: PropTypes.any,
 };
 
