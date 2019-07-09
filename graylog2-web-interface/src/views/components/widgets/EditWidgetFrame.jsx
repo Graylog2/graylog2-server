@@ -7,7 +7,6 @@ import { Modal } from 'react-bootstrap';
 import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
-import StopPropagation from '../common/StopPropagation';
 
 const EditWidgetDialog = ({ children, ...rest }) => (
   <Modal.Dialog {...rest}
@@ -40,18 +39,16 @@ export default class EditWidgetFrame extends React.Component<Props> {
   render() {
     const { children } = this.props;
     return (
-      <StopPropagation>
-        <Modal show animation={false} dialogComponentClass={EditWidgetDialog} enforceFocus={false}>
-          <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
-            <div role="presentation" style={{ height: 'calc(100% - 20px)' }}>
-              {children[0]}
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            {children[1]}
-          </Modal.Footer>
-        </Modal>
-      </StopPropagation>
+      <Modal show animation={false} dialogComponentClass={EditWidgetDialog} enforceFocus={false}>
+        <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
+          <div role="presentation" style={{ height: 'calc(100% - 20px)' }}>
+            {children[0]}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          {children[1]}
+        </Modal.Footer>
+      </Modal>
     );
   }
 }
