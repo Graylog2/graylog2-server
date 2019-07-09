@@ -37,7 +37,9 @@ class EventDefinitionFormContainer extends React.Component {
       config: {},
       field_spec: {},
       key_spec: [],
-      notification_settings: { grace_period_ms: 0 },
+      notification_settings: {
+        grace_period_ms: 0,
+      },
       notifications: [],
       alert: false,
     },
