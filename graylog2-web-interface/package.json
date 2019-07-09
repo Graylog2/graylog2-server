@@ -56,6 +56,7 @@
     }
   },
   "dependencies": {
+    "babel-plugin-dynamic-import-node": "2.3.0",
     "bluebird": "^3.4.0",
     "bootstrap": "^3.4.0",
     "bson-objectid": "^1.2.5",
@@ -112,11 +113,11 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/core": "7.5.0",
+    "@babel/plugin-proposal-class-properties": "7.5.0",
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
+    "@babel/polyfill": "7.4.4",
+    "@babel/preset-env": "7.5.2",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@types/bluebird": "^3.5.8",
@@ -126,11 +127,9 @@
     "@types/toastr": "^2.1.34",
     "@types/typeahead": "^0.11.29",
     "assets-webpack-plugin": "^3.5.1",
-    "babel-core": "^7.0.0-0",
     "babel-jest": "^24.8.0",
-    "babel-loader": "^8.0.2",
+    "babel-loader": "8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
-    "babel-plugin-dynamic-import-node": "^2.2.0",
     "clean-webpack-plugin": "^0.1.19",
     "compression": "^1.7.2",
     "connect-history-api-fallback": "^1.4.0",
