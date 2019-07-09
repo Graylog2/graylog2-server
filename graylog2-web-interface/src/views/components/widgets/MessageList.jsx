@@ -30,7 +30,7 @@ const MessageList = createReactClass({
   propTypes: {
     fields: CustomPropTypes.FieldListType.isRequired,
     pageSize: PropTypes.number,
-    config: PropTypes.instanceOf(MessagesWidgetConfig),
+    config: CustomPropTypes.instanceOf(MessagesWidgetConfig),
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     }).isRequired,

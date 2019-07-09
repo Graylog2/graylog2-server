@@ -14,6 +14,7 @@ import Query from 'views/logic/queries/Query';
 
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
+import CustomPropTypes from '../CustomPropTypes';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -48,9 +49,9 @@ const XYPlot = ({ config, chartData, currentQuery, timezone, effectiveTimerange,
 
 XYPlot.propTypes = {
   chartData: PropTypes.array.isRequired,
-  config: PropTypes.instanceOf(AggregationWidgetConfig).isRequired,
+  config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   timezone: PropTypes.string.isRequired,
-  currentQuery: PropTypes.instanceOf(Query).isRequired,
+  currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
   effectiveTimerange: PropTypes.shape({
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,

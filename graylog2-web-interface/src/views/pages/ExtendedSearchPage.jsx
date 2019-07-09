@@ -27,6 +27,7 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import CustomPropTypes from '../components/CustomPropTypes';
 
 type Props = {
   headerElements: Array<React.ComponentType<{}>>,
@@ -39,7 +40,7 @@ const ExtendedSearchPage = createReactClass({
   displayName: 'ExtendedSearchPage',
 
   propTypes: {
-    executionState: PropTypes.instanceOf(SearchExecutionState).isRequired,
+    executionState: CustomPropTypes.instanceOf(SearchExecutionState),
     headerElements: PropTypes.arrayOf(PropTypes.func).isRequired,
     queryBarElements: PropTypes.arrayOf(PropTypes.func).isRequired,
     route: PropTypes.object.isRequired,
