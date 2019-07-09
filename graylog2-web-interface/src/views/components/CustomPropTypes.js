@@ -1,6 +1,7 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { get } from 'lodash';
 
 import TFieldType from 'views/logic/fieldtypes/FieldType';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -28,4 +29,40 @@ const OneOrMoreChildren = PropTypes.oneOfType([
   PropTypes.arrayOf(ValidElements),
 ]);
 
-export default Object.assign({ CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType }, PropTypes);
+const prototypesOf = (target) => {
+  let i = target;
+  const result = [];
+  while (i && i.__proto__) {
+    result.push(i.__proto__);
+    i = i.__proto__;
+  }
+
+  return result;
+};
+
+const createInstanceOf = (expectedClass, required = false) => {
+  const expectedConstructorName = get(expectedClass, 'name');
+  // eslint-disable-next-line consistent-return
+  return (props, propName, componentName) => {
+    const value = props[propName];
+    if (!value) {
+      return required
+        ? new Error(`Invalid prop ${propName} supplied to ${componentName}: expected to be instance of ${expectedConstructorName} but found ${value} instead`)
+        : undefined;
+    }
+    const valueConstructorName = get(value, ['__proto__', 'constructor', 'name']);
+    const constructorNames = prototypesOf(value)
+      .map(proto => get(proto, ['constructor', 'name']))
+      .filter(name => name !== undefined);
+    if (!constructorNames.includes(expectedConstructorName)) {
+      return new Error(`Invalid prop ${propName} supplied to ${componentName}: ${valueConstructorName} expected to be instance of ${expectedConstructorName}`);
+    }
+  };
+};
+
+const instanceOf = expected => Object.assign(
+  createInstanceOf(expected, false),
+  { isRequired: createInstanceOf(expected, true) },
+);
+
+export default Object.assign({}, PropTypes, { CurrentView, FieldListType, FieldType, OneOrMoreChildren, TimeRangeType, instanceOf });
