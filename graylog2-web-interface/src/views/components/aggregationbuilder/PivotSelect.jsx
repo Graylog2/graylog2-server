@@ -42,6 +42,7 @@ const PivotSelect = ({ onChange, fields, value, ...props }) => {
     const element = rest.data;
     const fieldTypes = fields.all.filter(v => v.name === element.label);
     const fieldType = fieldTypes.isEmpty() ? FieldType.Unknown : fieldTypes.first().type;
+    // eslint-disable-next-line react/prop-types
     const { className } = innerProps;
     return (
       <span className={className}>
