@@ -23,15 +23,13 @@ const HeaderBadge = createReactClass({
     const config = configuration[this.CUSTOMIZATION_CONFIG];
     const badgeEnabled = config && config.badge_enable;
 
-    const devBadge = AppConfig.gl2DevMode()
-      ? <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
-      : null;
-
-    if (!badgeEnabled) {
-      return devBadge || null;
+    if (badgeEnabled) {
+      return (<Badge className="dev-badge" style={{ backgroundColor: config.badge_color }}>{config.badge_text}</Badge>);
     }
 
-    return (<Badge className="dev-badge" style={{ backgroundColor: config.badge_color }}>{config.badge_text}</Badge>);
+    return AppConfig.gl2DevMode()
+      ? <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+      : null;
   },
 });
 
