@@ -35,8 +35,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -69,47 +68,22 @@ public class KeyUtil {
     private static final Joiner JOINER = Joiner.on(",").skipNulls();
     private static final Pattern KEY_PATTERN = Pattern.compile("-{5}BEGIN (?:(RSA|DSA|EC)? )?(ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n([A-Z0-9a-z+/\\r\\n]+={0,2})\\r?\\n-{5}END (?:(?:RSA|DSA|EC)? )?(?:ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n$", Pattern.MULTILINE);
 
-    public static TrustManager[] initTrustStore(File tlsClientAuthCertFile)
-            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        final KeyStore trustStore = KeyStore.getInstance("JKS");
-        trustStore.load(null, null);
-        loadCertificates(trustStore, tlsClientAuthCertFile, CertificateFactory.getInstance("X.509"));
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Client authentication certificate file: {}", tlsClientAuthCertFile);
-            LOG.debug("Aliases: {}", join(trustStore.aliases()));
-        }
-
-        final TrustManagerFactory instance = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        instance.init(trustStore);
-
-        return instance.getTrustManagers();
-    }
-
-    private static void loadCertificates(KeyStore trustStore, File certFile, CertificateFactory cf)
-            throws CertificateException, KeyStoreException, IOException {
-        if (certFile.isFile()) {
-            final Collection<? extends Certificate> certificates = loadCertificates(certFile.toPath());
-            int i = 0;
-            for (Certificate cert : certificates) {
-                final String alias = certFile.getAbsolutePath() + "_" + i;
-                trustStore.setCertificateEntry(alias, cert);
-                i++;
-                LOG.debug("Added certificate with alias {} to trust store: {}", alias, cert);
-            }
-        } else if (certFile.isDirectory()) {
-            try (DirectoryStream<Path> ds = Files.newDirectoryStream(certFile.toPath())) {
-                for (Path f : ds) {
-                    loadCertificates(trustStore, f.toFile(), cf);
-                }
-            }
-        }
-    }
-
     public static Collection<? extends Certificate> loadCertificates(Path certificatePath) throws CertificateException, IOException {
         final CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        try (InputStream inputStream = Files.newInputStream(certificatePath)) {
-            return cf.generateCertificates(inputStream);
+        File certFile = certificatePath.toFile();
+
+        if (certFile.isDirectory()) {
+            final ByteArrayOutputStream certStream = new ByteArrayOutputStream();
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(certFile.toPath())) {
+                for (Path f : ds) {
+                    certStream.write(Files.readAllBytes(f));
+                }
+            }
+            return cf.generateCertificates(new ByteArrayInputStream(certStream.toByteArray()));
+        } else {
+            try (InputStream inputStream = Files.newInputStream(certificatePath)) {
+                return cf.generateCertificates(inputStream);
+            }
         }
     }
 
