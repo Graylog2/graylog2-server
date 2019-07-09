@@ -95,7 +95,10 @@ View.propTypes = {
   description: PropTypes.string,
   owner: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,
-  requires: PropTypes.arrayOf(PropTypes.string).isRequired,
+  requires: PropTypes.objectOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+  })).isRequired,
   requirementsProvided: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
