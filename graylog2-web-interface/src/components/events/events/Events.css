@@ -5,3 +5,8 @@
 :local(.inline) {
     display: inline-block;
 }
+
+:local(.priority) {
+    font-size: 1.5em;
+    vertical-align: top;
+}

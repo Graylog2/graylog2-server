@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import lodash from 'lodash';
+import { Col, Label, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DataTable, PaginatedList, SearchForm, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
+import DateTime from 'logic/datetimes/DateTime';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 import styles from './Events.css';
 
@@ -39,14 +42,47 @@ class Events extends React.Component {
     );
   };
 
-  eventsFormatter = (event) => {
-    const { context } = this.props;
+  priorityFormatter = (priority) => {
+    const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
+    let icon;
+    let style;
+    switch (priority) {
+      case EventDefinitionPriorityEnum.LOW:
+        icon = 'fa-thermometer-empty';
+        style = 'text-muted';
+        break;
+      case EventDefinitionPriorityEnum.HIGH:
+        icon = 'fa-thermometer-full';
+        style = 'text-danger';
+        break;
+      default:
+        icon = 'fa-thermometer-half';
+        style = 'text-info';
+    }
+
+    const tooltip = <Tooltip>{priorityName} Priority</Tooltip>;
 
     return (
-      <tr key={event.id}>
-        <td><Timestamp dateTime={event.timestamp} /></td>
-        <td>{event.message}</td>
+      <React.Fragment>
+        <OverlayTrigger placement="top" overlay={tooltip}>
+          <i className={`fa fa-fw ${icon} ${style} ${styles.priority}`} />
+        </OverlayTrigger>
+      </React.Fragment>
+    );
+  };
+
+  eventsFormatter = (event) => {
+    const { context } = this.props;
+    return (
+      <tr key={event.id} className={event.priority === EventDefinitionPriorityEnum.HIGH && 'bg-danger'}>
+        <td>
+          {this.priorityFormatter(event.priority)}
+          &nbsp;
+          {event.message}
+        </td>
+        <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
         <td>{this.eventDefinitionFormatter(event, context.event_definitions[event.event_definition_id])}</td>
+        <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
       </tr>
     );
   };
@@ -70,12 +106,12 @@ class Events extends React.Component {
 
           <PaginatedList activePage={parameters.page}
                          pageSize={parameters.pageSize}
-                         pageSizes={[10, 25, 50]}
+                         pageSizes={[10, 25, 50, 100]}
                          totalItems={totalEvents}
                          onChange={onPageChange}>
             <DataTable id="events-table"
-                       className="table-striped table-hover"
-                       headers={['Timestamp', 'Message', 'Event Definition']}
+                       className="table-hover"
+                       headers={['Information', 'Type', 'Event Definition', 'Timestamp']}
                        rows={eventList}
                        dataRowFormatter={this.eventsFormatter}
                        filterKeys={[]} />

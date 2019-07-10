@@ -55,7 +55,7 @@ const EventsStore = Reflux.createStore({
     });
   },
 
-  search({ query = '', page = 1, pageSize = 10 }) {
+  search({ query = '', page = 1, pageSize = 25 }) {
     const promise = fetch('POST', this.eventsUrl({}), {
       query: query,
       page: page,
