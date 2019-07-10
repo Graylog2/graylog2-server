@@ -68,20 +68,18 @@ class NotificationList extends React.Component {
       );
     }
     return (
-      <Row>
-        <Col md={8} lg={6}>
-          <DataTable id="event-definition-notifications"
-                     className="table-striped table-hover"
-                     headers={['Notification', 'Type', 'Actions']}
-                     sortByKey="title"
-                     rows={definitionNotifications}
-                     dataRowFormatter={this.notificationFormatter}
-                     filterKeys={[]} />
-          <Button bsStyle="success" onClick={onAddNotificationClick}>
-            Add Notification
-          </Button>
-        </Col>
-      </Row>
+      <React.Fragment>
+        <DataTable id="event-definition-notifications"
+                   className="table-striped table-hover"
+                   headers={['Notification', 'Type', 'Actions']}
+                   sortByKey="title"
+                   rows={definitionNotifications}
+                   dataRowFormatter={this.notificationFormatter}
+                   filterKeys={[]} />
+        <Button bsStyle="success" onClick={onAddNotificationClick}>
+          Add Notification
+        </Button>
+      </React.Fragment>
     );
   }
 }

@@ -7,6 +7,7 @@ import lodash from 'lodash';
 import Routes from 'routing/Routes';
 
 import AddNotificationForm from './AddNotificationForm';
+import NotificationSettingsForm from './NotificationSettingsForm';
 import NotificationList from './NotificationList';
 
 import styles from './NotificationsForm.css';
@@ -46,7 +47,7 @@ class NotificationsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition, notifications } = this.props;
+    const { eventDefinition, notifications, onChange } = this.props;
     const { showAddNotificationForm } = this.state;
 
     if (showAddNotificationForm) {
@@ -59,17 +60,22 @@ class NotificationsForm extends React.Component {
 
     return (
       <Row>
-        <Col md={12}>
+        <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
             <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} target="_blank">
               <Button bsStyle="link" bsSize="small">Manage Notifications <i className="fa fa-external-link" /></Button>
             </LinkContainer>
           </span>
           <h2 className={commonStyles.title}>Notifications</h2>
+
           <NotificationList eventDefinition={eventDefinition}
                             notifications={notifications}
                             onAddNotificationClick={this.toggleAddNotificationForm}
                             onRemoveNotificationClick={this.handleRemoveNotification} />
+        </Col>
+        <Col md={4} lg={3} mdOffset={1} className={styles.notificationSettings}>
+          <NotificationSettingsForm eventDefinition={eventDefinition}
+                                    onSettingsChange={onChange} />
         </Col>
       </Row>
     );

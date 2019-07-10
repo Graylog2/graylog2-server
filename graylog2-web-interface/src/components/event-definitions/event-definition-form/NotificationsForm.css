@@ -2,3 +2,7 @@
     float: right;
     margin: 10px 0;
 }
+
+:local(.notificationSettings) {
+    margin-top: 35px;
+}

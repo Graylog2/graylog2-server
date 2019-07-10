@@ -41,7 +41,10 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
     };
   }
   const momentDuration = moment.duration(duration);
-  const timeUnit = timeUnits.find(unit => lodash.isInteger(momentDuration.as(unit))) || lodash.last(timeUnits);
+  const timeUnit = timeUnits.find((unit) => {
+    const durationInUnit = momentDuration.as(unit);
+    return lodash.isInteger(durationInUnit) && durationInUnit !== 0;
+  }) || lodash.last(timeUnits);
   const durationInUnit = momentDuration.as(timeUnit);
   return {
     duration: durationInUnit,

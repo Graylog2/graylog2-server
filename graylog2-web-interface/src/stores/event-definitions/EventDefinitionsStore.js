@@ -114,7 +114,8 @@ const EventDefinitionsStore = Reflux.createStore({
     const promise = fetch('POST', this.eventDefinitionsUrl({}), this.setAlertFlag(eventDefinition));
     promise.then(
       (response) => {
-        UserNotification.success('Event Definition created successfully', `Event Definition "${eventDefinition.title}" was created successfully.`);
+        UserNotification.success('Event Definition created successfully',
+          `Event Definition "${eventDefinition.title}" was created successfully.`);
         this.list();
         return response;
       },
@@ -127,10 +128,12 @@ const EventDefinitionsStore = Reflux.createStore({
   },
 
   update(eventDefinitionId, eventDefinition) {
-    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }), this.setAlertFlag(eventDefinition));
+    const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }),
+      this.setAlertFlag(eventDefinition));
     promise.then(
       (response) => {
-        UserNotification.success('Event Definition updated successfully', `Event Definition "${eventDefinition.title}" was updated successfully.`);
+        UserNotification.success('Event Definition updated successfully',
+          `Event Definition "${eventDefinition.title}" was updated successfully.`);
         return response;
       },
       (error) => {
@@ -146,7 +149,8 @@ const EventDefinitionsStore = Reflux.createStore({
 
     promise.then(
       () => {
-        UserNotification.success('Event Definition deleted successfully', `Event Definition "${eventDefinition.title}" was deleted successfully.`);
+        UserNotification.success('Event Definition deleted successfully',
+          `Event Definition "${eventDefinition.title}" was deleted successfully.`);
         this.list();
       },
       (error) => {
