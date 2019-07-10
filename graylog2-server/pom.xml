@@ -297,6 +297,10 @@
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
         </dependency>
+        <dependency>
+            <groupId>de.huxhorn.sulky</groupId>
+            <artifactId>de.huxhorn.sulky.ulid</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
