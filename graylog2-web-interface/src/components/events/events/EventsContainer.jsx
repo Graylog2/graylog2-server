@@ -8,6 +8,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 import Events from './Events';
 
+import {} from 'components/event-definitions/event-definition-types';
+
 const { EventsStore, EventsActions } = CombinedProvider.get('Events');
 
 class EventsContainer extends React.Component {
@@ -49,6 +51,7 @@ class EventsContainer extends React.Component {
       <Events events={events.events}
               parameters={events.parameters}
               totalEvents={events.totalEvents}
+              context={events.context}
               onQueryChange={this.handleQueryChange}
               onPageChange={this.handlePageChange} />
     );

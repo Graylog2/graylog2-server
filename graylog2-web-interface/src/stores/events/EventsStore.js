@@ -13,6 +13,7 @@ const EventsStore = Reflux.createStore({
   sourceUrl: '/plugins/org.graylog.events/events/search',
   events: undefined,
   totalEvents: undefined,
+  context: undefined,
   parameters: {
     page: undefined,
     pageSize: undefined,
@@ -32,6 +33,7 @@ const EventsStore = Reflux.createStore({
       events: this.events,
       parameters: this.parameters,
       totalEvents: this.totalEvents,
+      context: this.context,
     };
   },
 
@@ -68,6 +70,7 @@ const EventsStore = Reflux.createStore({
         pageSize: response.parameters.per_page,
       };
       this.totalEvents = response.total_events;
+      this.context = response.context;
       this.propagateChanges();
       return response;
     });
