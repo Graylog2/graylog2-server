@@ -24,29 +24,30 @@ class FieldForm extends React.Component {
     keys: [],
   };
 
+  state = {
+    tempFieldName: undefined,
+  };
+
   handleRemoveField = () => {
     const { fieldName, onRemoveField } = this.props;
     onRemoveField(fieldName);
   };
 
   handleFieldNameChange = (event) => {
-    const { fieldName, onChange } = this.props;
     const nextValue = FormsUtils.getValueFromInput(event.target);
-    onChange(fieldName, 'fieldName', nextValue);
+    this.setState({ tempFieldName: nextValue });
+  };
+
+  handleFieldNameBlur = () => {
+    const { fieldName, onChange } = this.props;
+    const { tempFieldName } = this.state;
+    onChange(fieldName, 'fieldName', tempFieldName);
+    this.setState({ tempFieldName: undefined });
   };
 
   propagateConfigChange = (nextConfig) => {
     const { fieldName, onChange } = this.props;
     onChange(fieldName, 'config', nextConfig);
-  };
-
-  handleConfigChange = (event) => {
-    const { config } = this.props;
-    const key = event.target.name;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const nextConfig = lodash.cloneDeep(config);
-    nextConfig[key] = value;
-    this.propagateConfigChange(nextConfig);
   };
 
   handleProviderTypeChange = (nextProvider) => {
@@ -122,6 +123,7 @@ class FieldForm extends React.Component {
 
   render() {
     const { fieldName, config, keys } = this.props;
+    const { tempFieldName } = this.state;
     const isKeyEnabled = keys.includes(fieldName);
     // Get the sorted position this field in the keys or the next available key
     const keyValue = (keys.indexOf(fieldName) < 0 ? keys.length : keys.indexOf(fieldName)) + 1;
@@ -141,8 +143,9 @@ class FieldForm extends React.Component {
                    name="name"
                    label="Name"
                    type="text"
-                   value={fieldName}
+                   value={tempFieldName || fieldName}
                    onChange={this.handleFieldNameChange}
+                   onBlur={this.handleFieldNameBlur}
                    help="Name for this Field."
                    required />
           </Col>
