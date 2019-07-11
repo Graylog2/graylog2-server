@@ -116,7 +116,7 @@ const EventDefinitionsStore = Reflux.createStore({
       (response) => {
         UserNotification.success('Event Definition created successfully',
           `Event Definition "${eventDefinition.title}" was created successfully.`);
-        this.list();
+        this.refresh();
         return response;
       },
       (error) => {
@@ -134,6 +134,7 @@ const EventDefinitionsStore = Reflux.createStore({
       (response) => {
         UserNotification.success('Event Definition updated successfully',
           `Event Definition "${eventDefinition.title}" was updated successfully.`);
+        this.refresh();
         return response;
       },
       (error) => {
@@ -151,7 +152,7 @@ const EventDefinitionsStore = Reflux.createStore({
       () => {
         UserNotification.success('Event Definition deleted successfully',
           `Event Definition "${eventDefinition.title}" was deleted successfully.`);
-        this.list();
+        this.refresh();
       },
       (error) => {
         UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${error}`,
