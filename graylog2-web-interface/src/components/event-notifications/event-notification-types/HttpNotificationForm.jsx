@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import { SourceCodeEditor } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 
 class HttpNotificationForm extends React.Component {
