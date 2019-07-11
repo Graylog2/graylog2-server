@@ -42,7 +42,7 @@ class Events extends React.Component {
     );
   };
 
-  priorityFormatter = (priority) => {
+  priorityFormatter = (eventId, priority) => {
     const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
     let icon;
     let style;
@@ -60,7 +60,7 @@ class Events extends React.Component {
         style = 'text-info';
     }
 
-    const tooltip = <Tooltip>{priorityName} Priority</Tooltip>;
+    const tooltip = <Tooltip id={`priority-${eventId}`}>{priorityName} Priority</Tooltip>;
 
     return (
       <React.Fragment>
@@ -76,7 +76,7 @@ class Events extends React.Component {
     return (
       <tr key={event.id} className={event.priority === EventDefinitionPriorityEnum.HIGH && 'bg-danger'}>
         <td>
-          {this.priorityFormatter(event.priority)}
+          {this.priorityFormatter(event.id, event.priority)}
           &nbsp;
           {event.message}
         </td>
