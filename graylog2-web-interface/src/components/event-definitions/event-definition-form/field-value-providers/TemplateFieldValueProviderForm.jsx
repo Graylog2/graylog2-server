@@ -25,13 +25,7 @@ class TemplateFieldValueProviderForm extends React.Component {
     const nextProviders = lodash.cloneDeep(config.providers);
     const templateProvider = nextProviders.find(provider => provider.type === TemplateFieldValueProviderForm.type);
     templateProvider.template = nextTemplate;
-    templateProvider.dataType = 'string';
-    onChange(Object.assign({}, config, { providers: nextProviders }));
-  };
-
-  handleTypeChange = (nextType) => {
-    const { config, onChange } = this.props;
-    onChange(Object.assign({}, config, { data_type: nextType }));
+    onChange(Object.assign({}, config, { data_type: 'string', providers: nextProviders }));
   };
 
   render() {
