@@ -1,16 +1,31 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { MenuItem } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { ActionContext } from 'views/logic/ActionContext';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import OverlayDropdown from './OverlayDropdown';
 import style from './Field.css';
 import CustomPropTypes from './CustomPropTypes';
 
-export default class Field extends React.Component {
+type Props = {
+  children?: React.Node,
+  disabled?: boolean,
+  name: string,
+  menuContainer: ?HTMLElement,
+  queryId: string,
+  type: FieldType,
+}
+
+type State = {
+  open: boolean,
+}
+
+export default class Field extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.node,
     disabled: PropTypes.bool,
@@ -28,7 +43,7 @@ export default class Field extends React.Component {
 
   static contextType = ActionContext;
 
-  constructor(props, context) {
+  constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
     this.state = {
       open: false,
