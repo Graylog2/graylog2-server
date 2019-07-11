@@ -33,6 +33,10 @@
     padding: 10px 8px 8px 35px !important;
 }
 
+:local(.expandedRow) dd {
+    margin-bottom: 0.25em;
+}
+
 :local(.expandedRow) dl > dl {
-    margin-left: 10px;
+    margin-left: 1.5em;
 }
