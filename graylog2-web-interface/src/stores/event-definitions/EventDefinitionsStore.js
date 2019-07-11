@@ -134,6 +134,7 @@ const EventDefinitionsStore = Reflux.createStore({
       (response) => {
         UserNotification.success('Event Definition updated successfully',
           `Event Definition "${eventDefinition.title}" was updated successfully.`);
+        this.refresh();
         return response;
       },
       (error) => {

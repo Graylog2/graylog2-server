@@ -126,6 +126,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then(
       (response) => {
         UserNotification.success('Notification updated successfully', `Notification "${notification.title}" was updated successfully.`);
+        this.refresh();
         return response;
       },
       (error) => {
