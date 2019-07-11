@@ -16,39 +16,30 @@ type Props = {
   type: FieldType,
 }
 
-type State = {
-  open: boolean,
-}
+const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
+  <FieldActions element={children || name}
+                disabled={disabled}
+                menuContainer={menuContainer}
+                name={name}
+                type={type}
+                queryId={queryId}>
+    {name} = {type.type}
+  </FieldActions>
+);
 
-export default class Field extends React.Component<Props, State> {
-  static propTypes = {
-    children: PropTypes.node,
-    disabled: PropTypes.bool,
-    name: PropTypes.string.isRequired,
-    menuContainer: PropTypes.object,
-    queryId: PropTypes.string.isRequired,
-    type: CustomPropTypes.FieldType.isRequired,
-  };
+Field.propTypes = {
+  children: PropTypes.node,
+  disabled: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  menuContainer: PropTypes.object,
+  queryId: PropTypes.string.isRequired,
+  type: CustomPropTypes.FieldType.isRequired,
+};
 
-  static defaultProps = {
-    children: null,
-    disabled: false,
-    menuContainer: document.body,
-  };
+Field.defaultProps = {
+  children: null,
+  disabled: false,
+  menuContainer: document.body,
+};
 
-  render() {
-    const { children, disabled = false, menuContainer, name, queryId, type } = this.props;
-    const element = children || name;
-
-    return (
-      <FieldActions element={element}
-                    disabled={disabled}
-                    menuContainer={menuContainer}
-                    name={name}
-                    type={type}
-                    queryId={queryId}>
-        {name} = {type.type}
-      </FieldActions>
-    );
-  }
-}
+export default Field;
