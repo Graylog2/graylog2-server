@@ -16,17 +16,12 @@ class HttpNotificationSummary extends React.Component {
 
   render() {
     const { notification } = this.props;
-    const body = notification.config.body
-      ? JSON.stringify(JSON.parse(notification.config.body), null, 2)
-      : <em>Empty body</em>;
 
     return (
       <CommonNotificationSummary {...this.props}>
         <React.Fragment>
           <dt>URL</dt>
           <dd><code>{notification.config.url}</code></dd>
-          <dt>Request JSON body</dt>
-          <dd><pre>{body}</pre></dd>
         </React.Fragment>
       </CommonNotificationSummary>
     );

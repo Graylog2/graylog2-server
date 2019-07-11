@@ -52,16 +52,6 @@ class HttpNotificationForm extends React.Component {
                value={config.url || ''}
                onChange={this.handleChange}
                required />
-
-        <FormGroup controlId="notification-http-body">
-          <ControlLabel>Request JSON body <small className="text-muted">(Optional)</small></ControlLabel>
-          <SourceCodeEditor id="notification-http-body"
-                            mode="json"
-                            theme="light"
-                            value={config.body || ''}
-                            onChange={this.handleBodyChange} />
-          <HelpBlock>Request JSON body Graylog will send in the request.</HelpBlock>
-        </FormGroup>
       </React.Fragment>
     );
   }
