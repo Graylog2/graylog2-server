@@ -121,9 +121,13 @@ class Events extends React.Component {
                 </dd>
                 <dt>Event Definition</dt>
                 <dd>
-                  <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-                    {eventDefinitionContext.title}
-                  </Link>
+                  {eventDefinitionContext ? (
+                    <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
+                      {eventDefinitionContext.title}
+                    </Link>
+                  ) : (
+                    <em>{event.event_definition_id}</em>
+                  )}
                   &emsp;
                   ({plugin.displayName || event.event_definition_type})
                 </dd>
@@ -175,9 +179,13 @@ class Events extends React.Component {
           </td>
           <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
           <td>
-            <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-              {eventDefinitionContext.title}
-            </Link>
+            {eventDefinitionContext ? (
+              <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
+                {eventDefinitionContext.title}
+              </Link>
+            ) : (
+              <em>{event.event_definition_id}</em>
+            )}
           </td>
           <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
         </tr>
