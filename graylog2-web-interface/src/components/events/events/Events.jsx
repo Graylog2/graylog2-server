@@ -87,16 +87,15 @@ class Events extends React.Component {
   renderEventFields = (eventFields) => {
     const fieldNames = Object.keys(eventFields);
     return (
-      <dl>
+      <ul>
         {fieldNames.map((fieldName) => {
           return (
             <React.Fragment key={fieldName}>
-              <dt>{fieldName}</dt>
-              <dd>{eventFields[fieldName]}</dd>
+              <li><b>{fieldName}</b> {eventFields[fieldName]}</li>
             </React.Fragment>
           );
         })}
-      </dl>
+      </ul>
     );
   };
 
