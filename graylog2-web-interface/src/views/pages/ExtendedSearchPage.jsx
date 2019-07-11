@@ -21,17 +21,17 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import CustomPropTypes from 'views/components/CustomPropTypes';
+import HeaderElements from 'views/components/HeaderElements';
+import QueryBarElements from 'views/components/QueryBarElements';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
-import CustomPropTypes from '../components/CustomPropTypes';
 
 type Props = {
-  headerElements: Array<React.ComponentType<{}>>,
-  queryBarElements: Array<React.ComponentType<{}>>,
   route: any,
   searchRefreshHooks: Array<SearchRefreshCondition>,
 };
@@ -41,8 +41,6 @@ const ExtendedSearchPage = createReactClass({
 
   propTypes: {
     executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
-    headerElements: PropTypes.arrayOf(PropTypes.func).isRequired,
-    queryBarElements: PropTypes.arrayOf(PropTypes.func).isRequired,
     route: PropTypes.object.isRequired,
     searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
   },
@@ -93,21 +91,18 @@ const ExtendedSearchPage = createReactClass({
   },
 
   render() {
-    const { headerElements = [], queryBarElements = [], route } = this.props;
+    const { route } = this.props;
     return (
       <React.Fragment>
         <WindowLeaveMessage route={route} />
-        {/* eslint-disable-next-line react/no-array-index-key */}
-        {headerElements.map((Component, idx) => <Component key={idx} />)}
+        <HeaderElements />
         <Row id="main-row">
-          <QueryBar>
-            <SearchBarWithStatus onExecute={this._refreshIfNotUndeclared} />
+          <QueryBar />
+          <SearchBarWithStatus onExecute={this._refreshIfNotUndeclared} />
 
-            {/* eslint-disable-next-line react/no-array-index-key */}
-            {queryBarElements.map((Component, idx) => <Component key={idx} />)}
+          <QueryBarElements />
 
-            <SearchResult />
-          </QueryBar>
+          <SearchResult />
         </Row>
       </React.Fragment>
     );
@@ -117,8 +112,6 @@ const ExtendedSearchPage = createReactClass({
 const ExtendedSearchPageWithExecutionState = connect(ExtendedSearchPage, { executionState: SearchExecutionStateStore });
 
 const mapping = {
-  queryBarElements: 'views.elements.queryBar',
-  headerElements: 'views.elements.header',
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
