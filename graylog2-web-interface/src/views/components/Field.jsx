@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import CustomPropTypes from './CustomPropTypes';
-import FieldActions from './FieldActions';
+import FieldActions from './actions/FieldActions';
 
 type Props = {
   children?: React.Node,

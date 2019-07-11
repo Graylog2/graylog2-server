@@ -9,9 +9,9 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { ValueActionHandlerWithContext } from 'views/logic/valueactions/ValueActionHandler';
-import OverlayDropdown from './OverlayDropdown';
-import style from './Value.css';
-import CustomPropTypes from './CustomPropTypes';
+import OverlayDropdown from '../OverlayDropdown';
+import style from '../Value.css';
+import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   children: React.Node,

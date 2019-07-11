@@ -4,7 +4,7 @@ import * as React from 'react';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 
-import ValueActions from './ValueActions';
+import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 
 type Props = {
