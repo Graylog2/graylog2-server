@@ -35,11 +35,7 @@ class EventsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <Row>
-                <Col md={12}>
-                  <EventsContainer />
-                </Col>
-              </Row>
+              <EventsContainer />
             </Col>
           </Row>
         </span>

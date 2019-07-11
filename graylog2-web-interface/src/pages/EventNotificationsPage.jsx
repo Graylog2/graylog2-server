@@ -40,11 +40,7 @@ class EventNotificationsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <Row>
-                <Col md={12}>
-                  <EventNotificationsContainer />
-                </Col>
-              </Row>
+              <EventNotificationsContainer />
             </Col>
           </Row>
         </span>
