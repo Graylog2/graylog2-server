@@ -83,8 +83,12 @@ class FieldsForm extends React.Component {
       } else if (key === 'fieldName') {
         const config = eventDefinition.field_spec[fieldName];
         nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
-        nextFieldSpec[value] = config;
-        this.syncWithState(value, fieldName);
+        let effectiveValue = value;
+        while (Object.keys(eventDefinition.field_spec).includes(effectiveValue)) {
+          effectiveValue += '_';
+        }
+        nextFieldSpec[effectiveValue] = config;
+        this.syncWithState(effectiveValue, fieldName);
       }
 
       onChange('field_spec', nextFieldSpec);
