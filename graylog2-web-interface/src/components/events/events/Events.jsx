@@ -1,7 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import {
+  Alert,
+  Button,
+  ButtonGroup,
+  Col,
+  Label,
+  OverlayTrigger,
+  Row,
+  Table,
+  Tooltip,
+} from 'react-bootstrap';
 import { Link } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -22,6 +32,7 @@ class Events extends React.Component {
     context: PropTypes.object.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
+    onAlertFilterChange: PropTypes.func.isRequired,
   };
 
   state = {
@@ -175,42 +186,55 @@ class Events extends React.Component {
   };
 
   render() {
-    const { events, parameters, totalEvents, onPageChange, onQueryChange } = this.props;
+    const { events, parameters, totalEvents, onPageChange, onQueryChange, onAlertFilterChange } = this.props;
+
+    const filterAlerts = parameters.filter.alerts;
 
     const eventList = events.map(e => e.event);
     return (
-      <Row>
-        <Col md={12}>
-          <SearchForm query={parameters.query}
-                      onSearch={onQueryChange}
-                      onReset={onQueryChange}
-                      searchButtonLabel="Find"
-                      placeholder="Find Events"
-                      wrapperClass={styles.inline}
-                      queryWidth={200}
-                      topMargin={0}
-                      useLoadingState />
+      <React.Fragment>
+        <Row>
+          <Col md={12}>
+            <SearchForm query={parameters.query}
+                        onSearch={onQueryChange}
+                        onReset={onQueryChange}
+                        searchButtonLabel="Find"
+                        placeholder="Find Events"
+                        wrapperClass={styles.inline}
+                        queryWidth={350}
+                        topMargin={0}
+                        useLoadingState />
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <ButtonGroup>
+              <Button active={filterAlerts === 'only'} onClick={onAlertFilterChange('only')}>Alerts</Button>
+              <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
+              <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>Both</Button>
+            </ButtonGroup>
 
-          <PaginatedList activePage={parameters.page}
-                         pageSize={parameters.pageSize}
-                         pageSizes={[10, 25, 50, 100]}
-                         totalItems={totalEvents}
-                         onChange={onPageChange}>
-            {eventList.length === 0 ? (
-              <Alert bsStyle="info">No Events found for the current search criteria.</Alert>
-            ) : (
-              <Table id="events-table" className={styles.eventsTable}>
-                <thead>
+            <PaginatedList activePage={parameters.page}
+                           pageSize={parameters.pageSize}
+                           pageSizes={[10, 25, 50, 100]}
+                           totalItems={totalEvents}
+                           onChange={onPageChange}>
+              {eventList.length === 0 ? (
+                <Alert bsStyle="info">No Events found for the current search criteria.</Alert>
+              ) : (
+                <Table id="events-table" className={styles.eventsTable}>
+                  <thead>
                   <tr>
                     {HEADERS.map(header => <th key={header}>{header}</th>)}
                   </tr>
-                </thead>
-                {eventList.map(this.renderEvent)}
-              </Table>
-            )}
-          </PaginatedList>
-        </Col>
-      </Row>
+                  </thead>
+                  {eventList.map(this.renderEvent)}
+                </Table>
+              )}
+            </PaginatedList>
+          </Col>
+        </Row>
+      </React.Fragment>
     );
   }
 }

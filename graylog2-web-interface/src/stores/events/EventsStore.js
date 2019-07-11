@@ -18,6 +18,7 @@ const EventsStore = Reflux.createStore({
     page: undefined,
     pageSize: undefined,
     query: undefined,
+    filter: undefined,
   },
 
   getInitialState() {
@@ -47,19 +48,21 @@ const EventsStore = Reflux.createStore({
   },
 
   refresh() {
-    const { query, page, pageSize } = this.parameters;
+    const { query, page, pageSize, filter } = this.parameters;
     this.search({
       query: query,
       page: page,
       pageSize: pageSize,
+      filter: filter,
     });
   },
 
-  search({ query = '', page = 1, pageSize = 25 }) {
+  search({ query = '', page = 1, pageSize = 25, filter = { alerts: 'only' } }) {
     const promise = fetch('POST', this.eventsUrl({}), {
       query: query,
       page: page,
       per_page: pageSize,
+      filter: filter,
     });
 
     promise.then((response) => {
@@ -68,6 +71,7 @@ const EventsStore = Reflux.createStore({
         query: response.parameters.query,
         page: response.parameters.page,
         pageSize: response.parameters.per_page,
+        filter: response.parameters.filter,
       };
       this.totalEvents = response.total_events;
       this.context = response.context;

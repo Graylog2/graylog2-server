@@ -21,23 +21,44 @@ class EventsContainer extends React.Component {
     this.fetchData({});
   }
 
-  fetchData = ({ page, pageSize, query }) => {
+  fetchData = ({ page, pageSize, query, filter }) => {
     return EventsActions.search({
       query: query,
       page: page,
       pageSize: pageSize,
+      filter: filter,
     });
   };
 
   handlePageChange = (nextPage, nextPageSize) => {
     const { events } = this.props;
-    this.fetchData({ page: nextPage, pageSize: nextPageSize, query: events.parameters.query });
+    this.fetchData({
+      page: nextPage,
+      pageSize: nextPageSize,
+      query: events.parameters.query,
+      filter: events.parameters.filter,
+    });
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { events } = this.props;
-    const promise = this.fetchData({ query: nextQuery, pageSize: events.parameters.pageSize });
+    const promise = this.fetchData({
+      query: nextQuery,
+      pageSize: events.parameters.pageSize,
+      filter: events.parameters.filter,
+    });
     promise.finally(callback);
+  };
+
+  handleAlertFilterChange = (nextAlertFilter) => {
+    return () => {
+      const { events } = this.props;
+      this.fetchData({
+        query: events.parameters.query,
+        pageSize: events.parameters.pageSize,
+        filter: { alerts: nextAlertFilter },
+      });
+    };
   };
 
   render() {
@@ -53,7 +74,8 @@ class EventsContainer extends React.Component {
               totalEvents={events.totalEvents}
               context={events.context}
               onQueryChange={this.handleQueryChange}
-              onPageChange={this.handlePageChange} />
+              onPageChange={this.handlePageChange}
+              onAlertFilterChange={this.handleAlertFilterChange} />
     );
   }
 }
