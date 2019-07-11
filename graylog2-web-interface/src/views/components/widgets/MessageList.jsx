@@ -36,7 +36,7 @@ type Props = {
   containerHeight: number,
   selectedFields: {},
   currentView: {
-    activeQuery: {},
+    activeQuery: string,
     view: {
       id: number,
     },
