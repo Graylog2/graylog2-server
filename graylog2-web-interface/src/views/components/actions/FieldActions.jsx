@@ -9,7 +9,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Field.css';
 
-type Props = {
+type Props = {|
   children: React.Node,
   disabled: boolean,
   element: React.Node,
@@ -17,7 +17,7 @@ type Props = {
   name: string,
   queryId: QueryId,
   type: FieldType,
-};
+|};
 
 type State = {
   open: boolean,

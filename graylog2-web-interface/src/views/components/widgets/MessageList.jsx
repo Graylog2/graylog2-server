@@ -152,8 +152,7 @@ class MessageList extends React.Component<Props, State> {
                       return (
                         <th key={selectedFieldName}
                             style={this._columnStyle(selectedFieldName)}>
-                          <Field interactive
-                                 type={this._fieldTypeFor(selectedFieldName, fields)}
+                          <Field type={this._fieldTypeFor(selectedFieldName, fields)}
                                  name={selectedFieldName}
                                  queryId={activeQuery}
                                  viewId={view.id} />

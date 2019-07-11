@@ -17,7 +17,7 @@ type Props = {
   children: React.Node,
   element: React.Node,
   field: string,
-  menuContainer: HTMLElement,
+  menuContainer: ?HTMLElement,
   queryId: QueryId,
   type: FieldType,
   value: React.Node,

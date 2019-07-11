@@ -7,14 +7,14 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import CustomPropTypes from './CustomPropTypes';
 import FieldActions from './actions/FieldActions';
 
-type Props = {
+type Props = {|
   children?: React.Node,
   disabled?: boolean,
   name: string,
   menuContainer: ?HTMLElement,
   queryId: string,
   type: FieldType,
-}
+|}
 
 const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
   <FieldActions element={children || name}

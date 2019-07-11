@@ -2,7 +2,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import Field from 'views/components/Field';
 import Value from 'views/components/Value';
@@ -33,7 +32,7 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }: Pro
   return (
     <React.Fragment>
       <dt>
-        <Field interactive queryId={activeQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
+        <Field queryId={activeQuery} name={fieldName} type={fieldType}>{fieldName}</Field>
       </dt>
       <dd>
         <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} render={DecoratedValue} />

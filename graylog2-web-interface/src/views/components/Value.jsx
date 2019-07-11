@@ -7,13 +7,13 @@ import type { ValueRenderer, ValueRendererProps } from 'views/components/message
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 
-type Props = {
+type Props = {|
   field: string,
   value: *,
   render?: ValueRenderer,
   queryId: string,
   type: FieldType,
-};
+|};
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
