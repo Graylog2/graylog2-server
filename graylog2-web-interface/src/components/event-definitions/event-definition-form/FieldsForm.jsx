@@ -34,29 +34,40 @@ class FieldsForm extends React.Component {
     };
   }
 
+  syncWithState = (nextFieldName, prevFieldName) => {
+    const { fieldMapping, sortedFieldNames } = this.state;
+    const nextFieldMapping = lodash.omit(fieldMapping, prevFieldName);
+    if (nextFieldName !== undefined) {
+      nextFieldMapping[nextFieldName] = prevFieldName === undefined ? uuid() : fieldMapping[prevFieldName];
+    }
+
+    const nextSortedFieldNames = lodash.cloneDeep(sortedFieldNames);
+    if (prevFieldName !== undefined) {
+      if (nextFieldName !== undefined) {
+        const fieldPosition = sortedFieldNames.indexOf(prevFieldName);
+        nextSortedFieldNames[fieldPosition] = nextFieldName;
+      } else {
+        lodash.pull(nextSortedFieldNames, prevFieldName);
+      }
+    } else if (nextFieldName === '' && !nextSortedFieldNames.includes('')) {
+      nextSortedFieldNames.push(nextFieldName);
+    }
+
+    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
+  };
+
   addCustomField = () => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = Object.assign({}, eventDefinition.field_spec, { '': {} });
     onChange('field_spec', nextFieldSpec);
-
-    // Update mapping
-    const { fieldMapping, sortedFieldNames } = this.state;
-    const addedMapping = { '': uuid() };
-    const nextFieldMapping = Object.assign({}, fieldMapping, addedMapping);
-    const nextSortedFieldNames = sortedFieldNames.concat(['']);
-    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
+    this.syncWithState('');
   };
 
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
     onChange('field_spec', nextFieldSpec);
-
-    // Update mapping
-    const { fieldMapping, sortedFieldNames } = this.state;
-    const nextFieldMapping = lodash.omit(fieldMapping, fieldName);
-    const nextSortedFieldNames = lodash.without(sortedFieldNames, fieldName);
-    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
+    this.syncWithState(undefined, fieldName);
   };
 
   handleFieldChange = (fieldName, key, value) => {
@@ -73,16 +84,7 @@ class FieldsForm extends React.Component {
         const config = eventDefinition.field_spec[fieldName];
         nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
         nextFieldSpec[value] = config;
-
-        // Update mapping
-        const { fieldMapping, sortedFieldNames } = this.state;
-        const id = fieldMapping[fieldName];
-        const nextFieldMapping = lodash.omit(fieldMapping, fieldName);
-        nextFieldMapping[value] = id;
-        const nextSortedFieldNames = lodash.cloneDeep(sortedFieldNames);
-        const fieldPosition = sortedFieldNames.indexOf(fieldName);
-        nextSortedFieldNames[fieldPosition] = value;
-        this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
+        this.syncWithState(value, fieldName);
       }
 
       onChange('field_spec', nextFieldSpec);
