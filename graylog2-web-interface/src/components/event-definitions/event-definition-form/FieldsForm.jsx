@@ -30,6 +30,7 @@ class FieldsForm extends React.Component {
     // may be unique and may change.
     this.state = {
       fieldMapping: mapping,
+      sortedFieldNames: fieldNames,
     };
   }
 
@@ -39,10 +40,11 @@ class FieldsForm extends React.Component {
     onChange('field_spec', nextFieldSpec);
 
     // Update mapping
-    const { fieldMapping } = this.state;
+    const { fieldMapping, sortedFieldNames } = this.state;
     const addedMapping = { '': uuid() };
     const nextFieldMapping = Object.assign({}, fieldMapping, addedMapping);
-    this.setState({ fieldMapping: nextFieldMapping });
+    const nextSortedFieldNames = sortedFieldNames.concat(['']);
+    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
   };
 
   removeCustomField = (fieldName) => {
@@ -51,9 +53,10 @@ class FieldsForm extends React.Component {
     onChange('field_spec', nextFieldSpec);
 
     // Update mapping
-    const { fieldMapping } = this.state;
+    const { fieldMapping, sortedFieldNames } = this.state;
     const nextFieldMapping = lodash.omit(fieldMapping, fieldName);
-    this.setState({ fieldMapping: nextFieldMapping });
+    const nextSortedFieldNames = lodash.without(sortedFieldNames, fieldName);
+    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
   };
 
   handleFieldChange = (fieldName, key, value) => {
@@ -72,11 +75,14 @@ class FieldsForm extends React.Component {
         nextFieldSpec[value] = config;
 
         // Update mapping
-        const { fieldMapping } = this.state;
+        const { fieldMapping, sortedFieldNames } = this.state;
         const id = fieldMapping[fieldName];
         const nextFieldMapping = lodash.omit(fieldMapping, fieldName);
         nextFieldMapping[value] = id;
-        this.setState({ fieldMapping: nextFieldMapping });
+        const nextSortedFieldNames = lodash.cloneDeep(sortedFieldNames);
+        const fieldPosition = sortedFieldNames.indexOf(fieldName);
+        nextSortedFieldNames[fieldPosition] = value;
+        this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
       }
 
       onChange('field_spec', nextFieldSpec);
@@ -85,7 +91,7 @@ class FieldsForm extends React.Component {
 
   render() {
     const { eventDefinition } = this.props;
-    const { fieldMapping } = this.state;
+    const { fieldMapping, sortedFieldNames } = this.state;
 
     return (
       <Row>
@@ -96,18 +102,18 @@ class FieldsForm extends React.Component {
             used in Alert Notifications.
           </p>
 
-          {Object.entries(eventDefinition.field_spec)
-            .map(([fieldName, config]) => {
-              const id = fieldMapping[fieldName];
-              return (
-                <FieldForm key={`field-${id}-form`}
-                           fieldName={fieldName}
-                           config={config}
-                           keys={eventDefinition.key_spec}
-                           onChange={this.handleFieldChange}
-                           onRemoveField={this.removeCustomField} />
-              );
-            })}
+          {sortedFieldNames.map((fieldName) => {
+            const config = eventDefinition.field_spec[fieldName];
+            const id = fieldMapping[fieldName];
+            return (
+              <FieldForm key={`field-${id}-form`}
+                         fieldName={fieldName}
+                         config={config}
+                         keys={eventDefinition.key_spec}
+                         onChange={this.handleFieldChange}
+                         onRemoveField={this.removeCustomField} />
+            );
+          })}
 
           <Button bsStyle="success" onClick={this.addCustomField}>Add Custom Field</Button>
         </Col>
