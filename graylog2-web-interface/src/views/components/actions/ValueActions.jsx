@@ -96,23 +96,28 @@ class ValueActions extends React.Component<Props, State> {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
     const { overflowingComponents: overflowingComponents1, open } = this.state;
     const overflowingComponents = Object.values(overflowingComponents1);
-    const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
-      const handler = this._createHandlerFor(valueAction);
-      const onSelect = (event) => {
-        this._onMenuToggle();
-        handler(queryId, event.field, event.value, type, this.context);
-      };
+    const valueActions = PluginStore.exports('valueActions')
+      .filter((action) => {
+        const hide = action.hide || (() => false);
+        return !hide(this.context);
+      })
+      .map((action) => {
+        const handler = this._createHandlerFor(action);
+        const onSelect = (event) => {
+          this._onMenuToggle();
+          handler(queryId, event.field, event.value, type, this.context);
+        };
 
-      const condition = valueAction.condition || (() => true);
-      const actionDisabled = !condition({ field, type, value, context: this.context });
-      return (
-        <MenuItem key={`value-action-${field}-${valueAction.type}`}
-                  disabled={actionDisabled}
-                  eventKey={{ field, value }}
-                  onSelect={onSelect}>{valueAction.title}
-        </MenuItem>
-      );
-    });
+        const condition = action.condition || (() => true);
+        const actionDisabled = !condition({ field, type, value, context: this.context });
+        return (
+          <MenuItem key={`value-action-${field}-${action.type}`}
+                    disabled={actionDisabled}
+                    eventKey={{ field, value }}
+                    onSelect={onSelect}>{action.title}
+          </MenuItem>
+        );
+      });
     return (
       <React.Fragment>
         <OverlayDropdown show={open}
