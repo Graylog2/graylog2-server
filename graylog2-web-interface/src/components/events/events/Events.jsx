@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Alert, Button, ButtonGroup, Col, Label, OverlayTrigger, Row, Table, Tooltip, } from 'react-bootstrap';
+import { Alert, Button, ButtonGroup, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
