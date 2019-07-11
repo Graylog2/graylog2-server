@@ -10,3 +10,29 @@
     font-size: 1.5em;
     vertical-align: top;
 }
+
+:local(.collapsible) {
+    cursor: pointer;
+}
+
+:local(.eventsTable) tr:hover {
+    background-color: #f5f5f5;
+}
+
+:local(.eventsTable) tr:local(.expandedRow):hover {
+    background-color: #FFFFFF;
+}
+
+:local(.expandedMarker) {
+    border-left: 3px solid #16ace3;
+    border-collapse: separate;
+}
+
+:local(.expandedRow) > td {
+    border-top: 1px solid #eee !important;
+    padding: 10px 8px 8px 35px !important;
+}
+
+:local(.expandedRow) dl > dl {
+    margin-left: 10px;
+}
