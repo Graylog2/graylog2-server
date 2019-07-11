@@ -16,7 +16,6 @@ class HttpNotificationForm extends React.Component {
     const { config, onChange } = this.props;
     const initialConfig = {
       url: '',
-      body: '',
     };
     onChange(Object.assign({}, initialConfig, config));
   }
@@ -31,10 +30,6 @@ class HttpNotificationForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
-  };
-
-  handleBodyChange = (nextBody) => {
-    this.propagateChange('body', nextBody);
   };
 
   render() {
