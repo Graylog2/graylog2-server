@@ -21,12 +21,13 @@ class EventsContainer extends React.Component {
     this.fetchData({});
   }
 
-  fetchData = ({ page, pageSize, query, filter }) => {
+  fetchData = ({ page, pageSize, query, filter, timerange }) => {
     return EventsActions.search({
       query: query,
       page: page,
       pageSize: pageSize,
       filter: filter,
+      timerange: timerange,
     });
   };
 
@@ -37,6 +38,7 @@ class EventsContainer extends React.Component {
       pageSize: nextPageSize,
       query: events.parameters.query,
       filter: events.parameters.filter,
+      timerange: events.parameters.timerange,
     });
   };
 
@@ -46,6 +48,7 @@ class EventsContainer extends React.Component {
       query: nextQuery,
       pageSize: events.parameters.pageSize,
       filter: events.parameters.filter,
+      timerange: events.parameters.timerange,
     });
     promise.finally(callback);
   };
@@ -57,8 +60,19 @@ class EventsContainer extends React.Component {
         query: events.parameters.query,
         pageSize: events.parameters.pageSize,
         filter: { alerts: nextAlertFilter },
+        timerange: events.parameters.timerange,
       });
     };
+  };
+
+  handleTimeRangeChange = (timeRangeType, range) => {
+    const { events } = this.props;
+    this.fetchData({
+      query: events.parameters.query,
+      pageSize: events.parameters.pageSize,
+      filter: events.parameters.filter,
+      timerange: { type: timeRangeType, range: range },
+    });
   };
 
   render() {
@@ -75,7 +89,8 @@ class EventsContainer extends React.Component {
               context={events.context}
               onQueryChange={this.handleQueryChange}
               onPageChange={this.handlePageChange}
-              onAlertFilterChange={this.handleAlertFilterChange} />
+              onAlertFilterChange={this.handleAlertFilterChange}
+              onTimeRangeChange={this.handleTimeRangeChange} />
     );
   }
 }

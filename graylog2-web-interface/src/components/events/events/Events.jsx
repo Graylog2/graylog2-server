@@ -1,28 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import {
-  Alert,
-  Button,
-  ButtonGroup,
-  Col,
-  Label,
-  OverlayTrigger,
-  Row,
-  Table,
-  Tooltip,
-} from 'react-bootstrap';
+import { Alert, Button, ButtonGroup, Col, Label, OverlayTrigger, Row, Table, Tooltip, } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import moment from 'moment';
 
-import { PaginatedList, SearchForm, Timestamp } from 'components/common';
+import { PaginatedList, SearchForm, Timestamp, TimeUnitInput } from 'components/common';
+import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 import styles from './Events.css';
 
-const HEADERS = ['Information', 'Type', 'Event Definition', 'Timestamp'];
+const HEADERS = ['Description', 'Type', 'Event Definition', 'Timestamp'];
+
+const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 
 class Events extends React.Component {
   static propTypes = {
@@ -33,6 +27,7 @@ class Events extends React.Component {
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onAlertFilterChange: PropTypes.func.isRequired,
+    onTimeRangeChange: PropTypes.func.isRequired,
   };
 
   state = {
@@ -45,6 +40,12 @@ class Events extends React.Component {
       const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
       this.setState({ expanded: nextExpanded });
     };
+  };
+
+  updateSearchTimeRange = (nextValue, nextUnit) => {
+    const { onTimeRangeChange } = this.props;
+    const durationInSeconds = moment.duration(nextValue, nextUnit).asSeconds();
+    onTimeRangeChange('relative', durationInSeconds);
   };
 
   getConditionPlugin = (type) => {
@@ -189,21 +190,34 @@ class Events extends React.Component {
     const { events, parameters, totalEvents, onPageChange, onQueryChange, onAlertFilterChange } = this.props;
 
     const filterAlerts = parameters.filter.alerts;
+    const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
 
     const eventList = events.map(e => e.event);
     return (
       <React.Fragment>
         <Row>
           <Col md={12}>
-            <SearchForm query={parameters.query}
-                        onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        searchButtonLabel="Find"
-                        placeholder="Find Events"
-                        wrapperClass={styles.inline}
-                        queryWidth={350}
-                        topMargin={0}
-                        useLoadingState />
+            <div className="form-inline">
+              <SearchForm query={parameters.query}
+                          onSearch={onQueryChange}
+                          onReset={onQueryChange}
+                          searchButtonLabel="Find"
+                          placeholder="Find Events"
+                          queryWidth={300}
+                          topMargin={0}
+                          wrapperClass={styles.inline}
+                          useLoadingState />
+
+              <div className="pull-right">
+                <TimeUnitInput id="event-timerange-selector"
+                               update={this.updateSearchTimeRange}
+                               units={TIME_UNITS}
+                               unit={timerangeDuration.unit}
+                               value={timerangeDuration.duration}
+                               label="In the last"
+                               required />
+              </div>
+            </div>
           </Col>
         </Row>
         <Row>
@@ -224,9 +238,9 @@ class Events extends React.Component {
               ) : (
                 <Table id="events-table" className={styles.eventsTable}>
                   <thead>
-                  <tr>
-                    {HEADERS.map(header => <th key={header}>{header}</th>)}
-                  </tr>
+                    <tr>
+                      {HEADERS.map(header => <th key={header}>{header}</th>)}
+                    </tr>
                   </thead>
                   {eventList.map(this.renderEvent)}
                 </Table>
