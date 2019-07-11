@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Button, Col, Row } from 'react-bootstrap';
 import uuid from 'uuid/v4';
+import naturalSort from 'javascript-natural-sort';
 
 import FieldForm from './FieldForm';
 
@@ -20,7 +21,7 @@ class FieldsForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const fieldNames = Object.keys(props.eventDefinition.field_spec);
+    const fieldNames = Object.keys(props.eventDefinition.field_spec).sort(naturalSort);
     const mapping = {};
     fieldNames.forEach((fieldName) => {
       mapping[fieldName] = uuid();
