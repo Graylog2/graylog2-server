@@ -1,3 +1,4 @@
+// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -9,8 +10,36 @@ import { ActionContext } from 'views/logic/ActionContext';
 import OverlayDropdown from './OverlayDropdown';
 import style from './Value.css';
 import CustomPropTypes from './CustomPropTypes';
+import type { QueryId } from '../logic/queries/Query';
+import type { ValueActionHandler, ValueActionHandlerWithContext } from '../logic/valueactions/ValueActionHandler';
 
-class ValueActions extends React.Component {
+type Props = {
+  children: React.Node,
+  element: React.Node,
+  field: string,
+  menuContainer: HTMLElement,
+  queryId: QueryId,
+  type: FieldType,
+  value: React.Node,
+}
+
+type State = {
+  open: boolean,
+  overflowingComponents: { [string]: React.Node },
+}
+
+type HandlerValueAction = {|
+  handler: ValueActionHandlerWithContext,
+|}
+
+type ComponentValueAction = {|
+  title: string,
+  component: React.AbstractComponent<*>,
+|}
+
+type ValueActionDefinition = HandlerValueAction | ComponentValueAction;
+
+class ValueActions extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.node.isRequired,
     element: PropTypes.node.isRequired,
@@ -28,7 +57,7 @@ class ValueActions extends React.Component {
 
   static contextType = ActionContext;
 
-  constructor(props, context) {
+  constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
     this.state = {
       open: false,
@@ -36,7 +65,7 @@ class ValueActions extends React.Component {
     };
   }
 
-  _createHandlerFor = (action) => {
+  _createHandlerFor = (action: ValueActionDefinition): ValueActionHandlerWithContext => {
     if (action.handler) {
       return action.handler;
     }
@@ -55,16 +84,18 @@ class ValueActions extends React.Component {
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
         });
+        return Promise.resolve();
       };
     }
-    throw new Error(`Invalid binding for action: ${action} - has neither 'handler' nor 'component'.`);
+    throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component'.`);
   };
 
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
   render() {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
-    const overflowingComponents = Object.values(this.state.overflowingComponents);
+    const { overflowingComponents: overflowingComponents1, open } = this.state;
+    const overflowingComponents = Object.values(overflowingComponents1);
     const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
       const handler = this._createHandlerFor(valueAction);
       const onSelect = (event) => {
@@ -84,7 +115,7 @@ class ValueActions extends React.Component {
     });
     return (
       <React.Fragment>
-        <OverlayDropdown show={this.state.open}
+        <OverlayDropdown show={open}
                          toggle={element}
                          placement="right"
                          onToggle={this._onMenuToggle}
