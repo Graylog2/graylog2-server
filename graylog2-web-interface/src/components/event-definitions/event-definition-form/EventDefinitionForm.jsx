@@ -103,6 +103,7 @@ class EventDefinitionForm extends React.Component {
     const { activeStep } = this.state;
 
     const defaultStepProps = {
+      key: eventDefinition.id, // Recreate components if ID changed
       action,
       entityTypes,
       eventDefinition,

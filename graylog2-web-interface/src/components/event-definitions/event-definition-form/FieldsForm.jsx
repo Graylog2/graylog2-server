@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Button, Col, Row } from 'react-bootstrap';
+import uuid from 'uuid/v4';
 
 import FieldForm from './FieldForm';
 
@@ -16,16 +17,43 @@ class FieldsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    const fieldNames = Object.keys(props.eventDefinition.field_spec);
+    const mapping = {};
+    fieldNames.forEach((fieldName) => {
+      mapping[fieldName] = uuid();
+    });
+
+    // We need to assign unique IDs to each field, since none of the data in them
+    // may be unique and may change.
+    this.state = {
+      fieldMapping: mapping,
+    };
+  }
+
   addCustomField = () => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = Object.assign({}, eventDefinition.field_spec, { '': {} });
     onChange('field_spec', nextFieldSpec);
+
+    // Update mapping
+    const { fieldMapping } = this.state;
+    const addedMapping = { '': uuid() };
+    const nextFieldMapping = Object.assign({}, fieldMapping, addedMapping);
+    this.setState({ fieldMapping: nextFieldMapping });
   };
 
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
     onChange('field_spec', nextFieldSpec);
+
+    // Update mapping
+    const { fieldMapping } = this.state;
+    const nextFieldMapping = lodash.omit(fieldMapping, fieldName);
+    this.setState({ fieldMapping: nextFieldMapping });
   };
 
   handleFieldChange = (fieldName, key, value) => {
@@ -42,6 +70,13 @@ class FieldsForm extends React.Component {
         const config = eventDefinition.field_spec[fieldName];
         nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
         nextFieldSpec[value] = config;
+
+        // Update mapping
+        const { fieldMapping } = this.state;
+        const id = fieldMapping[fieldName];
+        const nextFieldMapping = lodash.omit(fieldMapping, fieldName);
+        nextFieldMapping[value] = id;
+        this.setState({ fieldMapping: nextFieldMapping });
       }
 
       onChange('field_spec', nextFieldSpec);
@@ -50,6 +85,7 @@ class FieldsForm extends React.Component {
 
   render() {
     const { eventDefinition } = this.props;
+    const { fieldMapping } = this.state;
 
     return (
       <Row>
@@ -61,12 +97,10 @@ class FieldsForm extends React.Component {
           </p>
 
           {Object.entries(eventDefinition.field_spec)
-            .map(([fieldName, config], idx) => {
+            .map(([fieldName, config]) => {
+              const id = fieldMapping[fieldName];
               return (
-                // Cannot use fieldName as key, since changing it will remove focus from the input. For now this was
-                // the easiest way of working around that issue.
-                // eslint-disable-next-line react/no-array-index-key
-                <FieldForm key={`${eventDefinition.title}-field-${idx}`}
+                <FieldForm key={`field-${id}-form`}
                            fieldName={fieldName}
                            config={config}
                            keys={eventDefinition.key_spec}
