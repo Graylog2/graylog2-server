@@ -109,7 +109,7 @@ class Events extends React.Component {
                 </dd>
                 <dt>Event Definition</dt>
                 <dd>
-                  <Link to={Routes.NEXT_ALERTS.DEFINITIONS.show(eventDefinitionContext.id)}>
+                  <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
                     {eventDefinitionContext.title}
                   </Link>
                   &emsp;
@@ -163,7 +163,7 @@ class Events extends React.Component {
           </td>
           <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
           <td>
-            <Link to={Routes.NEXT_ALERTS.DEFINITIONS.show(eventDefinitionContext.id)}>
+            <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
               {eventDefinitionContext.title}
             </Link>
           </td>
