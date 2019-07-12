@@ -127,7 +127,7 @@ class MessageList extends React.Component<Props, State> {
       });
     const selectedFields = this._getSelectedFields();
     const selectedColumns = Immutable.OrderedSet(selectedFields);
-    const { activeQuery, view } = currentView;
+    const { activeQuery } = currentView;
 
     return (
       <span>
@@ -154,8 +154,7 @@ class MessageList extends React.Component<Props, State> {
                             style={this._columnStyle(selectedFieldName)}>
                           <Field type={this._fieldTypeFor(selectedFieldName, fields)}
                                  name={selectedFieldName}
-                                 queryId={activeQuery}
-                                 viewId={view.id} />
+                                 queryId={activeQuery} />
                         </th>
                       );
                     })}
