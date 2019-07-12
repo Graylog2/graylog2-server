@@ -45,7 +45,6 @@ class EmailNotificationForm extends React.Component {
     // Set initial config for this type
     const { config, onChange } = this.props;
     const initialConfig = {
-      // eslint-disable-next-line no-template-curly-in-string
       sender: 'graylog@example.org', // TODO: Default sender should come from the server
       // eslint-disable-next-line no-template-curly-in-string
       subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
