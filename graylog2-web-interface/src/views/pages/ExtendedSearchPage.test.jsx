@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
+import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
@@ -144,8 +144,8 @@ describe('ExtendedSearchPage', () => {
   it('updating search in view triggers search execution', () => {
     mount(<SimpleExtendedSearchPage />);
 
-    const cb = ViewActions.search.completed.listen.mock.calls[0][0];
-    SearchActions.execute.mockClear();
+    const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
+    asMock(SearchActions.execute).mockClear();
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
     return cb({ search: {} })
@@ -161,8 +161,8 @@ describe('ExtendedSearchPage', () => {
   it('refreshes field types upon every search execution', () => {
     mount(<SimpleExtendedSearchPage />);
 
-    FieldTypesActions.all.mockClear();
-    const cb = ViewActions.search.completed.listen.mock.calls[0][0];
+    asMock(FieldTypesActions.all).mockClear();
+    const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
     return cb({ search: {} })
       .then(() => {
         expect(FieldTypesActions.all).toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe('ExtendedSearchPage', () => {
   it('changing current query in view does not trigger search execution', () => {
     mount(<SimpleExtendedSearchPage />);
 
-    SearchActions.execute.mockClear();
+    asMock(SearchActions.execute).mockClear();
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
     return ViewActions.selectQuery('someQuery')

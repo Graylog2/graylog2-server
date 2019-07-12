@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 
+import asMock from 'helpers/mocking/AsMock';
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -35,7 +36,7 @@ describe('XYPlot', () => {
   const chartData = [{ y: [23, 42] }];
 
   beforeEach(() => {
-    QueriesActions.timerange.mockReturnValueOnce(Promise.resolve());
+    asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve());
   });
 
   it('renders generic X/Y-Plot when no timeline config is passed', () => {

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 
 import mockAction from 'helpers/mocking/MockAction';
+import asMock from 'helpers/mocking/AsMock';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
@@ -45,7 +46,7 @@ describe('QueryTitle', () => {
 
       return duplicate().then(() => {
         expect(ViewActions.selectQuery).toHaveBeenCalled();
-        expect(ViewActions.selectQuery.mock.calls[0][0]).not.toBeNull();
+        expect(asMock(ViewActions.selectQuery).mock.calls[0][0]).not.toBeNull();
       });
     });
   });

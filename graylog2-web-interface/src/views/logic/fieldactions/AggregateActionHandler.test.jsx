@@ -1,4 +1,5 @@
 // @flow strict
+import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 
 import { WidgetActions } from 'views/stores/WidgetStore';
@@ -20,7 +21,7 @@ describe('AggregateActionHandler', () => {
     AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), {});
 
     expect(WidgetActions.create).toHaveBeenCalled();
-    const widget: AggregationWidget = WidgetActions.create.mock.calls[0][0];
+    const widget: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
     const { config } = widget;
     expect(config.rowPivots[0]).toEqual(new Pivot('foo', 'values', { limit: 15 }));
   });
@@ -32,7 +33,7 @@ describe('AggregateActionHandler', () => {
     AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), { widget: origWidget });
 
     expect(WidgetActions.create).toHaveBeenCalled();
-    const widget: AggregationWidget = WidgetActions.create.mock.calls[0][0];
+    const widget: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
     expect(widget.filter).toEqual(filter);
   });
 });
