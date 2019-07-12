@@ -4,6 +4,8 @@ import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 
+import EventsContainer from 'components/events/events/EventsContainer';
+
 import Routes from 'routing/Routes';
 
 class EventsPage extends React.Component {
@@ -33,11 +35,7 @@ class EventsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <Row>
-                <Col md={12}>
-                  TBD
-                </Col>
-              </Row>
+              <EventsContainer />
             </Col>
           </Row>
         </span>

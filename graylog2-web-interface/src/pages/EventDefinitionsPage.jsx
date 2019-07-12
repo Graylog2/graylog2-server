@@ -40,11 +40,7 @@ class EventDefinitionsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <Row>
-                <Col md={12}>
-                  <EventDefinitionsContainer />
-                </Col>
-              </Row>
+              <EventDefinitionsContainer />
             </Col>
           </Row>
         </span>

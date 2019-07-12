@@ -66,7 +66,7 @@ const EventDefinitionsStore = Reflux.createStore({
     const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 0 } }));
 
     promise.then((response) => {
-      this.all = response.event_processors;
+      this.all = response.event_definitions;
       this.propagateChanges();
       return response;
     });
@@ -84,7 +84,7 @@ const EventDefinitionsStore = Reflux.createStore({
     }));
 
     promise.then((response) => {
-      this.eventDefinitions = response.event_processors;
+      this.eventDefinitions = response.event_definitions;
       this.query = response.query;
       this.pagination = {
         count: response.count,
