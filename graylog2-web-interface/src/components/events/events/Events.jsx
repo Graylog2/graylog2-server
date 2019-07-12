@@ -14,7 +14,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 
 import styles from './Events.css';
 
-const HEADERS = ['Description', 'Type', 'Event Definition', 'Timestamp'];
+const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
 
 const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 
@@ -176,6 +176,7 @@ class Events extends React.Component {
             &nbsp;
             {event.message}
           </td>
+          <td>{event.key || <em>none</em>}</td>
           <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
           <td>
             {eventDefinitionContext ? (
