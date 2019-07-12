@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-function withPluginEntities<Props, Entities>(
+function withPluginEntities<Props, Entities: {}>(
   Component: React.AbstractComponent<Props>,
   entityMapping: Entities,
   // eslint-disable-next-line no-undef
