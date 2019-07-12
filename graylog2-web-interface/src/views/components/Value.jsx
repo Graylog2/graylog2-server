@@ -8,6 +8,7 @@ import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 
 type Props = {|
+  children: React.Node,
   field: string,
   value: *,
   render?: ValueRenderer,
@@ -17,13 +18,13 @@ type Props = {|
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const Value = ({ field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
+const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
   const RenderComponent: ValueRenderer = render || ((props: ValueRendererProps) => props.value);
   const Component = v => <RenderComponent field={field} value={v.value} type={type} />;
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
-    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
       {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
     </ValueActions>
   );
