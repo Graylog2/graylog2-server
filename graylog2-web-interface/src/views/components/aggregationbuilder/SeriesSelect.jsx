@@ -33,7 +33,7 @@ const _wrapOption = series => ({ label: series.effectiveName, value: series });
 type Props = {
   onChange: (Array<Series>) => boolean,
   series: Array<Series>,
-  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption>, for: (string) => Array<Option> },
+  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions >, for: (string | number, ?(string | number)) => Array<Option> },
 };
 
 type State = {
