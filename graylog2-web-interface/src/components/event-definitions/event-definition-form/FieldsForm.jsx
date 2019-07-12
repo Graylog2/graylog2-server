@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Button, Col, Row } from 'react-bootstrap';
+import uuid from 'uuid/v4';
+import naturalSort from 'javascript-natural-sort';
 
 import FieldForm from './FieldForm';
 
@@ -16,16 +18,57 @@ class FieldsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    const fieldNames = Object.keys(props.eventDefinition.field_spec).sort(naturalSort);
+    const mapping = {};
+    fieldNames.forEach((fieldName) => {
+      mapping[fieldName] = uuid();
+    });
+
+    // We need to assign unique IDs to each field, since none of the data in them
+    // may be unique and may change.
+    this.state = {
+      fieldMapping: mapping,
+      sortedFieldNames: fieldNames,
+    };
+  }
+
+  syncWithState = (nextFieldName, prevFieldName) => {
+    const { fieldMapping, sortedFieldNames } = this.state;
+    const nextFieldMapping = lodash.omit(fieldMapping, prevFieldName);
+    if (nextFieldName !== undefined) {
+      nextFieldMapping[nextFieldName] = prevFieldName === undefined ? uuid() : fieldMapping[prevFieldName];
+    }
+
+    const nextSortedFieldNames = lodash.cloneDeep(sortedFieldNames);
+    if (prevFieldName !== undefined) {
+      if (nextFieldName !== undefined) {
+        const fieldPosition = sortedFieldNames.indexOf(prevFieldName);
+        nextSortedFieldNames[fieldPosition] = nextFieldName;
+      } else {
+        lodash.pull(nextSortedFieldNames, prevFieldName);
+      }
+    } else if (nextFieldName === '' && !nextSortedFieldNames.includes('')) {
+      nextSortedFieldNames.push(nextFieldName);
+    }
+
+    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
+  };
+
   addCustomField = () => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = Object.assign({}, eventDefinition.field_spec, { '': {} });
     onChange('field_spec', nextFieldSpec);
+    this.syncWithState('');
   };
 
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
     onChange('field_spec', nextFieldSpec);
+    this.syncWithState(undefined, fieldName);
   };
 
   handleFieldChange = (fieldName, key, value) => {
@@ -41,7 +84,12 @@ class FieldsForm extends React.Component {
       } else if (key === 'fieldName') {
         const config = eventDefinition.field_spec[fieldName];
         nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
-        nextFieldSpec[value] = config;
+        let effectiveValue = value;
+        while (Object.keys(eventDefinition.field_spec).includes(effectiveValue)) {
+          effectiveValue += '_';
+        }
+        nextFieldSpec[effectiveValue] = config;
+        this.syncWithState(effectiveValue, fieldName);
       }
 
       onChange('field_spec', nextFieldSpec);
@@ -50,6 +98,7 @@ class FieldsForm extends React.Component {
 
   render() {
     const { eventDefinition } = this.props;
+    const { fieldMapping, sortedFieldNames } = this.state;
 
     return (
       <Row>
@@ -60,20 +109,18 @@ class FieldsForm extends React.Component {
             used in Alert Notifications.
           </p>
 
-          {Object.entries(eventDefinition.field_spec)
-            .map(([fieldName, config], idx) => {
-              return (
-                // Cannot use fieldName as key, since changing it will remove focus from the input. For now this was
-                // the easiest way of working around that issue.
-                // eslint-disable-next-line react/no-array-index-key
-                <FieldForm key={`${eventDefinition.title}-field-${idx}`}
-                           fieldName={fieldName}
-                           config={config}
-                           keys={eventDefinition.key_spec}
-                           onChange={this.handleFieldChange}
-                           onRemoveField={this.removeCustomField} />
-              );
-            })}
+          {sortedFieldNames.map((fieldName) => {
+            const config = eventDefinition.field_spec[fieldName];
+            const id = fieldMapping[fieldName];
+            return (
+              <FieldForm key={`field-${id}-form`}
+                         fieldName={fieldName}
+                         config={config}
+                         keys={eventDefinition.key_spec}
+                         onChange={this.handleFieldChange}
+                         onRemoveField={this.removeCustomField} />
+            );
+          })}
 
           <Button bsStyle="success" onClick={this.addCustomField}>Add Custom Field</Button>
         </Col>

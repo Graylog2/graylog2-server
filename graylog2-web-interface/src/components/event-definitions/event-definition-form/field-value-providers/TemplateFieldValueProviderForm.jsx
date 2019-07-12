@@ -3,12 +3,10 @@ import PropTypes from 'prop-types';
 import {
   Col,
   ControlLabel,
-  DropdownButton,
   FormControl,
   FormGroup,
   HelpBlock,
   InputGroup,
-  MenuItem,
   Row,
 } from 'react-bootstrap';
 import lodash from 'lodash';
@@ -27,12 +25,7 @@ class TemplateFieldValueProviderForm extends React.Component {
     const nextProviders = lodash.cloneDeep(config.providers);
     const templateProvider = nextProviders.find(provider => provider.type === TemplateFieldValueProviderForm.type);
     templateProvider.template = nextTemplate;
-    onChange(Object.assign({}, config, { providers: nextProviders }));
-  };
-
-  handleTypeChange = (nextType) => {
-    const { config, onChange } = this.props;
-    onChange(Object.assign({}, config, { data_type: nextType }));
+    onChange(Object.assign({}, config, { data_type: 'string', providers: nextProviders }));
   };
 
   render() {
@@ -46,12 +39,7 @@ class TemplateFieldValueProviderForm extends React.Component {
             <ControlLabel>Value</ControlLabel>
             <InputGroup>
               <FormControl type="text" onChange={this.handleValueChange} value={provider.template || ''} />
-              <DropdownButton componentClass={InputGroup.Button}
-                              id="type"
-                              title={lodash.upperFirst(config.data_type || 'type')}
-                              onSelect={this.handleTypeChange}>
-                <MenuItem eventKey="string" active={config.data_type === 'string'}>String</MenuItem>
-              </DropdownButton>
+              <InputGroup.Addon>String</InputGroup.Addon>
             </InputGroup>
             <HelpBlock>Type a literal text Field Value or use Freemarker syntax to add a dynamic Value.</HelpBlock>
           </FormGroup>
