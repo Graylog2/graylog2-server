@@ -12,8 +12,8 @@ const SortableValueList = SortableContainer(components.ValueContainer);
 
 const arrayMove = (array, from, to) => {
   const result = array.slice();
-  result.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
+  result.splice(to < 0 ? result.length + to : to, 0, result.splice(from, 1)[0]);
+  return result;
 };
 
 const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
