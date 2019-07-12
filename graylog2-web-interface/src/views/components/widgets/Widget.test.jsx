@@ -3,8 +3,8 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import mockComponent from 'helpers/mocking/MockComponent';
+import mockAction from 'helpers/mocking/MockAction';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -97,14 +97,14 @@ describe('<Widget />', () => {
 
     wrapper.find('ActionToggle').simulate('click');
     const duplicate = wrapper.find('a[children="Duplicate"]');
-    WidgetActions.duplicate = jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build()));
-    TitlesActions.set = jest.fn((type, id, title) => {
+    WidgetActions.duplicate = mockAction(jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build())));
+    TitlesActions.set = mockAction(jest.fn((type, id, title) => {
       expect(type).toEqual(TitleTypes.Widget);
       expect(id).toEqual('duplicatedWidgetId');
       expect(title).toEqual('Dummy Widget (copy)');
       done();
       return Promise.resolve();
-    });
+    }));
 
     duplicate.simulate('click');
 
@@ -118,7 +118,7 @@ describe('<Widget />', () => {
   it('does not trigger action when clicking cancel after no changes were made', () => {
     const wrapper = mount(<DummyWidget editing />);
 
-    WidgetActions.updateConfig = jest.fn();
+    WidgetActions.updateConfig = mockAction(jest.fn());
 
     const cancelButton = wrapper.find('Button[children="Cancel"]');
     cancelButton.simulate('click');
@@ -132,7 +132,7 @@ describe('<Widget />', () => {
     const editComponent = wrapper.find('edit-dummy-visualization').at(0);
     const widgetConfigChange = editComponent.props().onChange;
 
-    WidgetActions.updateConfig = jest.fn();
+    WidgetActions.updateConfig = mockAction(jest.fn());
     widgetConfigChange({ foo: 23 });
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
@@ -148,7 +148,7 @@ describe('<Widget />', () => {
     const editComponent = wrapper.find('edit-dummy-visualization').at(0);
     const widgetConfigChange = editComponent.props().onChange;
 
-    WidgetActions.updateConfig = jest.fn();
+    WidgetActions.updateConfig = mockAction(jest.fn());
     widgetConfigChange({ foo: 23 });
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 

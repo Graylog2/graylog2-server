@@ -1,6 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -35,12 +36,12 @@ const viewJson = {
 
 describe('ViewLoader', () => {
   beforeEach(() => {
-    ViewManagementActions.get = jest.fn(() => Promise.resolve(viewJson));
+    ViewManagementActions.get = mockAction(jest.fn(() => Promise.resolve(viewJson)));
     // $FlowFixMe: Return type ignored in test.
     ViewActions.load = jest.fn(() => Promise.resolve());
   });
   it('deserializes a view', () => {
-    SearchActions.get = jest.fn(id => Promise.resolve({ id, queries: [], parameters: [] }));
+    SearchActions.get = mockAction(jest.fn(id => Promise.resolve({ id, queries: [], parameters: [] })));
     return ViewLoader('foo').then((result) => {
       expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
       expect(result).toEqual(

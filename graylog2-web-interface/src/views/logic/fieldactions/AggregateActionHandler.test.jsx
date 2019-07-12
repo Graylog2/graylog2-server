@@ -1,7 +1,9 @@
 // @flow strict
+import mockAction from 'helpers/mocking/MockAction';
+
+import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregateActionHandler from './AggregateActionHandler';
 import FieldType from '../fieldtypes/FieldType';
-import { WidgetActions } from '../../stores/WidgetStore';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import Pivot from '../aggregationbuilder/Pivot';
 import Widget from '../widgets/Widget';
@@ -14,7 +16,7 @@ describe('AggregateActionHandler', () => {
     jest.clearAllMocks();
   });
   it('uses field type when generating widget', () => {
-    WidgetActions.create = jest.fn((widget: Widget) => Promise.resolve(widget));
+    WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
     AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), {});
 
     expect(WidgetActions.create).toHaveBeenCalled();
@@ -24,7 +26,7 @@ describe('AggregateActionHandler', () => {
   });
 
   it('uses field type when generating widget', () => {
-    WidgetActions.create = jest.fn((widget: Widget) => Promise.resolve(widget));
+    WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
     const filter = "author: 'Vanth'";
     const origWidget = Widget.builder().filter(filter).build();
     AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), { widget: origWidget });

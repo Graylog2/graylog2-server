@@ -1,5 +1,7 @@
 // @flow strict
 import { Map } from 'immutable';
+
+import mockAction from 'helpers/mocking/MockAction';
 import Widget from 'views/logic/widgets/Widget';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -27,19 +29,19 @@ describe('RemoveFromAllTablesActionHandler', () => {
       .fields(['timestamp', 'source'])
       .showMessageRow(true)
       .build();
-    const expectdMessageWidget = Widget.builder()
+    const expectedMessageWidget = Widget.builder()
       .id(messageWidget.id)
       .type('MESSAGES')
       .config(expectedMessageWidgetConfig)
       .build();
 
-    const expectedWidgets = Map([[expectdMessageWidget.id, expectdMessageWidget], [pivotWidget.id, pivotWidget]]);
+    const expectedWidgets = Map([[expectedMessageWidget.id, expectedMessageWidget], [pivotWidget.id, pivotWidget]]);
 
     WidgetStore.getInitialState = jest.fn(() => widgets);
-    WidgetActions.updateWidgets = jest.fn((newWidgets) => {
+    WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
       expect(newWidgets).toEqual(expectedWidgets);
       return Promise.resolve();
-    });
+    }));
     RemoveFromAllTablesActionHandler('foo', 'author', FieldTypes.STRING(), {});
     expect(WidgetActions.updateWidgets).toBeCalled();
   });

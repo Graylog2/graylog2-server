@@ -2,6 +2,7 @@
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import mockAction from 'helpers/mocking/MockAction';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import ViewState from 'views/logic/views/ViewState';
@@ -19,11 +20,11 @@ describe('CurrentViewStateStore', () => {
   };
 
   it('should set empty widgets', () => {
-    const updateFn = jest.fn((id, view) => {
+    const updateFn = mockAction(jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(viewState);
       return Promise.resolve(viewState);
-    });
+    }));
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
@@ -43,11 +44,11 @@ describe('CurrentViewStateStore', () => {
       .widgets(widgets)
       .build();
 
-    const updateFn = jest.fn((id, newViewState) => {
+    const updateFn = mockAction(jest.fn((id, newViewState) => {
       expect(id).toEqual(viewId);
       expect(newViewState).toEqual(expectedViewState);
       return Promise.resolve(expectedViewState);
-    });
+    }));
 
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
@@ -89,11 +90,11 @@ describe('CurrentViewStateStore', () => {
       .widgets(expectedWidgets)
       .build();
 
-    const updateFn = jest.fn((id, newViewState) => {
+    const updateFn = mockAction(jest.fn((id, newViewState) => {
       expect(id).toEqual(viewId);
       expect(newViewState).toEqual(expectedViewState);
       return Promise.resolve(expectedViewState);
-    });
+    }));
 
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: oldViewState });

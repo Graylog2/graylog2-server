@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
@@ -12,8 +13,8 @@ jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
 
 describe('QueryTitle', () => {
   beforeEach(() => {
-    QueriesActions.duplicate = jest.fn(() => Promise.resolve(Query.builder().newId().build()));
-    ViewActions.selectQuery = jest.fn(queryId => Promise.resolve(queryId));
+    QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Query.builder().newId().build())));
+    ViewActions.selectQuery = mockAction(jest.fn(queryId => Promise.resolve(queryId)));
   });
   describe('duplicate action', () => {
     const findAction = (wrapper, name) => {

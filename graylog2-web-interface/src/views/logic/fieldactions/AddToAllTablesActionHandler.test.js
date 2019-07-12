@@ -1,5 +1,8 @@
 // @flow strict
 import { Map } from 'immutable';
+
+import mockAction from 'helpers/mocking/MockAction';
+
 import Widget from 'views/logic/widgets/Widget';
 import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -36,10 +39,10 @@ describe('AddToAllTablesActionHandler', () => {
     const expectedWidgets = Map([[expectdMessageWidget.id, expectdMessageWidget], [pivotWidget.id, pivotWidget]]);
 
     WidgetStore.getInitialState = jest.fn(() => widgets);
-    WidgetActions.updateWidgets = jest.fn((newWidgets) => {
+    WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
       expect(newWidgets).toEqual(expectedWidgets);
       return Promise.resolve();
-    });
+    }));
     AddToAllTablesActionHandler('foo', 'author', FieldTypes.STRING(), {});
     expect(WidgetActions.updateWidgets).toBeCalled();
   });
