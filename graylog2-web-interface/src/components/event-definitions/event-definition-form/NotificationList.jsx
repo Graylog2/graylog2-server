@@ -28,11 +28,16 @@ class NotificationList extends React.Component {
   };
 
   notificationFormatter = (notification) => {
-    // Guard in case it is a new Notification, but its information has not been loaded yet
-    if (!notification) {
+    // Guard in case it is a new Notification or the Notification was deleted
+    if (notification.missing) {
       return (
         <tr>
-          <td><Spinner text="Loading Notification information..." /></td>
+          <td colSpan={2}>Could not find information for Notification <em>{notification.title}</em></td>
+          <td className="actions">
+            <Button bsStyle="info" bsSize="xsmall" onClick={this.handleRemoveClick(notification.title)}>
+              Remove from Event
+            </Button>
+          </td>
         </tr>
       );
     }
@@ -55,7 +60,12 @@ class NotificationList extends React.Component {
     const { eventDefinition, notifications, onAddNotificationClick } = this.props;
 
     const definitionNotifications = eventDefinition.notifications
-      .map(edn => notifications.find(n => n.id === edn.notification_id));
+      .map((edn) => {
+        return notifications.find(n => n.id === edn.notification_id) || {
+          title: edn.notification_id,
+          missing: true,
+        };
+      });
 
     if (definitionNotifications.length === 0) {
       return (
