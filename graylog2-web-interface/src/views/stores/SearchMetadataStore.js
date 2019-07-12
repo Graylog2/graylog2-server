@@ -5,14 +5,15 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { RefluxActions } from './StoreTypes';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
 const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);
 
-export type SearchMetadataActionsType = {
+export type SearchMetadataActionsType = RefluxActions<{
   parseSearch: (any) => Promise<SearchMetadata>,
   parseSearchId: (string) => Promise<SearchMetadata>,
-};
+}>;
 
 export const SearchMetadataActions: SearchMetadataActionsType = singletonActions(
   'views.SearchMetadata',

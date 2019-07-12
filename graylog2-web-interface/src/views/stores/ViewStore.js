@@ -16,6 +16,7 @@ import Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewManagementActions } from './ViewManagementStore';
+import type { RefluxActions } from './StoreTypes';
 
 type ViewStoreState = {
   activeQuery: string,
@@ -23,7 +24,7 @@ type ViewStoreState = {
   dirty: boolean,
 };
 
-type ViewActionsType = {
+type ViewActionsType = RefluxActions<{
   create: () => Promise<ViewStoreState>,
   dashboardState: (DashboardState) => Promise<void>,
   description: (string) => Promise<ViewStoreState>,
@@ -34,7 +35,7 @@ type ViewActionsType = {
   state: (ViewState) => Promise<View>,
   summary: (string) => Promise<void>,
   title: (string) => Promise<void>,
-};
+}>;
 
 export const ViewActions: ViewActionsType = singletonActions(
   'views.View',

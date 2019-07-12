@@ -6,17 +6,18 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { RefluxActions } from './StoreTypes';
 
 const defaultExecutionState = SearchExecutionState.empty();
 
 type ParameterMap = Immutable.Map<string, any>;
 
-export type SearchExecutionStateActionsType = {
+export type SearchExecutionStateActionsType = RefluxActions<{
   bindParameterValue: (string, any) => Promise<SearchExecutionState>,
   setParameterValues: (ParameterMap) => Promise<SearchExecutionState>,
   replace: (SearchExecutionState, ?boolean) => Promise<SearchExecutionState>,
   clear: () => Promise<SearchExecutionState>,
-};
+}>;
 
 export const SearchExecutionStateActions: SearchExecutionStateActionsType = singletonActions(
   'views.SearchExecutionState',

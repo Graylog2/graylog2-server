@@ -8,12 +8,13 @@ import URLUtils from 'util/URLUtils';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { QueryFiltersStore } from './QueryFiltersStore';
+import type { RefluxActions } from './StoreTypes';
 
 const fieldTypesUrl = URLUtils.qualifyUrl('/views/fields');
 
-type FieldTypesActionsType = {
+type FieldTypesActionsType = RefluxActions<{
   all: () => Promise<void>,
-};
+}>;
 
 export const FieldTypesActions: FieldTypesActionsType = singletonActions(
   'views.FieldTypes',

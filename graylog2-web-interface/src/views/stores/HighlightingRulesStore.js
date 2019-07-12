@@ -10,12 +10,13 @@ import HighlightingRule from 'views/logic/views/formatting/highlighting/Highligh
 import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
+import type { RefluxActions } from './StoreTypes';
 
-type HighlightingRulesActionsType = {
+type HighlightingRulesActionsType = RefluxActions<{
   add: (HighlightingRule) => Promise<Array<HighlightingRule>>,
   remove: (HighlightingRule) => Promise<Array<HighlightingRule>>,
   update: (HighlightingRule) => Promise<Array<HighlightingRule>>,
-};
+}>;
 
 const HighlightingRulesActions: HighlightingRulesActionsType = singletonActions(
   'views.HighlightingRules',
