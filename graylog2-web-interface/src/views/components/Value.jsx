@@ -8,7 +8,7 @@ import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
 
 type Props = {|
-  children: React.Node,
+  children?: React.Node,
   field: string,
   value: *,
   render?: ValueRenderer,
@@ -32,6 +32,7 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
 
 Value.defaultProps = {
   render: defaultRenderer,
+  children: null,
 };
 
 export default Value;
