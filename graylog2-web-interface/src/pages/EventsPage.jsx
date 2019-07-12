@@ -3,9 +3,10 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-
+import DocumentationLink from 'components/support/DocumentationLink';
 import EventsContainer from 'components/events/events/EventsContainer';
 
+import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
 class EventsPage extends React.Component {
@@ -16,9 +17,16 @@ class EventsPage extends React.Component {
       <DocumentTitle title="Events">
         <span>
           <PageHeader title="Events">
-            <span />
+            <span>
+              Events are generated when Event Definitions you define are satisfied. Alerts also trigger
+              Notifications, being meant to capture relevant Events that may require your attention.
+            </span>
 
-            <span />
+            <span>
+              Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
+              <DocumentationLink page={DocsHelper.PAGES.ALERTS}
+                                 text="documentation" />
+            </span>
 
             <ButtonToolbar>
               <LinkContainer to={Routes.NEXT_ALERTS.LIST}>
