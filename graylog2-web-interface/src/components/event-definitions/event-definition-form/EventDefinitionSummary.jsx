@@ -94,19 +94,30 @@ class EventDefinitionSummary extends React.Component {
   renderNotification = (definitionNotification) => {
     const { notifications } = this.props;
     const notification = notifications.find(n => n.id === definitionNotification.notification_id);
-    const notificationPlugin = this.getPlugin('eventNotificationTypes', notification.config.type);
-    const component = (notificationPlugin.summaryComponent
-      ? React.createElement(notificationPlugin.summaryComponent, {
-        type: notificationPlugin.displayName,
-        notification: notification,
-        definitionNotification: definitionNotification,
-      })
-      : <span>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</span>
-    );
+
+    let content;
+
+    if (notification) {
+      const notificationPlugin = this.getPlugin('eventNotificationTypes', notification.config.type);
+      content = (notificationPlugin.summaryComponent
+        ? React.createElement(notificationPlugin.summaryComponent, {
+          type: notificationPlugin.displayName,
+          notification: notification,
+          definitionNotification: definitionNotification,
+        })
+        : <span>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</span>
+      );
+    } else {
+      content = (
+        <span>
+          Could not find information for Notification <em>{definitionNotification.notification_id}</em>.
+        </span>
+      );
+    }
 
     return (
       <React.Fragment key={definitionNotification.notification_id}>
-        {component}
+        {content}
       </React.Fragment>
     );
   };
