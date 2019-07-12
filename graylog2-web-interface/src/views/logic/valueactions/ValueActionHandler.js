@@ -3,8 +3,6 @@ import type { ActionContexts } from '../ActionContext';
 import FieldType from '../fieldtypes/FieldType';
 
 export type ValuePath = Array<{[string]: any}>;
-export type ValueActionHandler = (string, string, any, FieldType) => Promise<*>;
-export type ValueActionHandlerWithContext = (string, string, any, FieldType, ActionContexts) => Promise<*>;
 
 export type ValueActionHandlerConditionProps = {
   context: ActionContexts,
@@ -12,5 +10,10 @@ export type ValueActionHandlerConditionProps = {
   type: FieldType,
   value: any,
 };
-
 export type ValueActionHandlerCondition = (ValueActionHandlerConditionProps) => boolean;
+
+export type ValueActionHandler = ((string, string, any, FieldType) => Promise<*>) & { condition?: ValueActionHandlerCondition };
+export type Conditions = {
+  isEnabled?: ValueActionHandlerCondition,
+}
+export type ValueActionHandlerWithContext = ((string, string, any, FieldType, ActionContexts) => Promise<*>) & Conditions;
