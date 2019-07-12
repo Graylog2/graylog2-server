@@ -11,7 +11,8 @@ export type ListenableAction<R> = R & {
     // eslint-disable-next-line no-undef
     listen: (($Call<ExtractResultType, R>) => void) => () => void,
   },
-  promise: (Promise<R>) => void,
+  // eslint-disable-next-line no-undef
+  promise: (Promise<$Call<ExtractResultType, R>>) => void,
 };
 // eslint-disable-next-line no-undef
 export type RefluxAction = <Fn>(Fn) => ListenableAction<Fn>;
