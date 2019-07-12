@@ -11,7 +11,7 @@ jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select
 
 describe('AggregationControls', () => {
   // eslint-disable-next-line no-unused-vars, react/prop-types
-  const DummyComponent = ({ onVisualizationConfigChange }) => <div>The spice must flow.</div>;
+  const DummyComponent = () => <div>The spice must flow.</div>;
   const children = <DummyComponent />;
   const config = AggregationWidgetConfig.builder().visualization('table').build();
 
