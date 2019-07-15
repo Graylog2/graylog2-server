@@ -63,10 +63,11 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   handleChange = (key, value) => {
-    const { eventDefinition } = this.state;
-    const nextEventDefinition = lodash.cloneDeep(eventDefinition);
-    nextEventDefinition[key] = value;
-    this.setState({ eventDefinition: nextEventDefinition });
+    this.setState((state) => {
+      const nextEventDefinition = lodash.cloneDeep(state.eventDefinition);
+      nextEventDefinition[key] = value;
+      return { eventDefinition: nextEventDefinition };
+    });
   };
 
   handleCancel = () => {
