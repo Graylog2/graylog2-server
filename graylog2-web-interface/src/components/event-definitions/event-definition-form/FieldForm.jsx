@@ -1,7 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup, Row } from 'react-bootstrap';
+import {
+  Button,
+  ButtonToolbar,
+  Col,
+  ControlLabel,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  InputGroup,
+  Row,
+} from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Input } from 'components/bootstrap';
@@ -9,51 +19,63 @@ import { Select } from 'components/common';
 
 import FormsUtils from 'util/FormsUtils';
 
+import commonStyles from '../common/commonStyles.css';
+
 class FieldForm extends React.Component {
   static propTypes = {
     fieldName: PropTypes.string,
     config: PropTypes.object,
-    keys: PropTypes.array,
+    keys: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
-    onRemoveField: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     fieldName: '',
     config: {},
-    keys: [],
   };
 
-  state = {
-    tempFieldName: undefined,
-  };
+  constructor(props) {
+    super(props);
+    const keyIndex = props.keys.indexOf(props.fieldName);
 
-  handleRemoveField = () => {
-    const { fieldName, onRemoveField } = this.props;
-    onRemoveField(fieldName);
+    this.state = {
+      fieldName: props.fieldName,
+      config: props.config,
+      isKey: keyIndex >= 0,
+      keyPosition: keyIndex >= 0 ? keyIndex + 1 : props.keys.length + 1,
+    };
+  }
+
+  handleSubmit = () => {
+    const { fieldName: prevFieldName, onChange } = this.props;
+    const { fieldName, config, isKey, keyPosition } = this.state;
+    onChange(prevFieldName, fieldName, config, isKey, keyPosition - 1);
   };
 
   handleFieldNameChange = (event) => {
-    const nextValue = FormsUtils.getValueFromInput(event.target);
-    this.setState({ tempFieldName: nextValue });
+    const nextFieldName = FormsUtils.getValueFromInput(event.target);
+    this.setState({ fieldName: nextFieldName });
   };
 
-  handleFieldNameBlur = () => {
-    const { fieldName, onChange } = this.props;
-    const { tempFieldName } = this.state;
-    onChange(fieldName, 'fieldName', tempFieldName);
-    this.setState({ tempFieldName: undefined });
-  };
-
-  propagateConfigChange = (nextConfig) => {
-    const { fieldName, onChange } = this.props;
-    onChange(fieldName, 'config', nextConfig);
+  handleConfigChange = (nextConfig) => {
+    this.setState({ config: nextConfig });
   };
 
   handleProviderTypeChange = (nextProvider) => {
-    const { config } = this.props;
+    const { config } = this.state;
     const nextConfig = Object.assign({}, config, { providers: [{ type: nextProvider }] });
-    this.propagateConfigChange(nextConfig);
+    this.handleConfigChange(nextConfig);
+  };
+
+  handleKeySortChange = (event) => {
+    const nextPosition = FormsUtils.getValueFromInput(event.target);
+    this.setState({ keyPosition: nextPosition });
+  };
+
+  toggleKey = (event) => {
+    const checked = FormsUtils.getValueFromInput(event.target);
+    this.setState({ isKey: checked });
   };
 
   getProviderPlugin = (type) => {
@@ -64,7 +86,7 @@ class FieldForm extends React.Component {
   };
 
   renderFieldValueProviderForm = () => {
-    const { fieldName, config } = this.props;
+    const { fieldName, config } = this.state;
     if (!config.providers || !Array.isArray(config.providers)) {
       return null;
     }
@@ -74,46 +96,9 @@ class FieldForm extends React.Component {
       ? React.createElement(providerPlugin.formComponent, {
         fieldName: fieldName,
         config: config,
-        onChange: this.propagateConfigChange,
+        onChange: this.handleConfigChange,
       })
       : <div>Selected provider is not available.</div>;
-  };
-
-  handleKeySortChange = (event) => {
-    const { fieldName, keys, onChange } = this.props;
-    const nextPosition = FormsUtils.getValueFromInput(event.target) - 1;
-
-    if (nextPosition < 0 || nextPosition >= keys.length) {
-      // TODO: Display an error when this happens
-      return;
-    }
-
-    // Remove fieldName from previous position and add it to the given one
-    let nextKeys = lodash.without(keys, fieldName);
-    if (nextPosition === 0) {
-      nextKeys.unshift(fieldName);
-    } else if (nextPosition >= nextKeys.length) {
-      nextKeys.push(fieldName);
-    } else {
-      nextKeys = [...nextKeys.slice(0, nextPosition), fieldName, ...nextKeys.slice(nextPosition)];
-    }
-
-    onChange(fieldName, 'keys', nextKeys);
-  };
-
-  toggleKey = (event) => {
-    const { fieldName, keys, onChange } = this.props;
-    const checked = FormsUtils.getValueFromInput(event.target);
-
-    let nextKeys;
-    if (checked) {
-      nextKeys = lodash.cloneDeep(keys);
-      nextKeys.push(fieldName);
-    } else {
-      nextKeys = lodash.filter(keys, fieldName);
-    }
-
-    onChange(fieldName, 'keys', nextKeys);
   };
 
   formatFieldValueProviders = () => {
@@ -122,66 +107,66 @@ class FieldForm extends React.Component {
   };
 
   render() {
-    const { fieldName, config, keys } = this.props;
-    const { tempFieldName } = this.state;
-    const isKeyEnabled = keys.includes(fieldName);
-    // Get the sorted position this field in the keys or the next available key
-    const keyValue = (keys.indexOf(fieldName) < 0 ? keys.length : keys.indexOf(fieldName)) + 1;
+    const { fieldName: prevFieldName, onCancel } = this.props;
+    const { fieldName, isKey, keyPosition, config } = this.state;
 
     return (
-      <fieldset>
-        <legend>
-          Custom Field
-          <span className="pull-right">
-            <Button bsSize="xsmall" bsStyle="primary" onClick={this.handleRemoveField}>Remove</Button>
-          </span>
-        </legend>
+      <Row>
+        <Col md={8} lg={6}>
+          <h2 className={commonStyles.title}>
+            {prevFieldName ? `Custom Field "${fieldName}"` : 'New Custom Field'}
+          </h2>
 
-        <Row className="row-sm">
-          <Col md={4}>
-            <Input id="field-name"
-                   name="name"
-                   label="Name"
-                   type="text"
-                   value={tempFieldName || fieldName}
-                   onChange={this.handleFieldNameChange}
-                   onBlur={this.handleFieldNameBlur}
-                   help="Name for this Field."
-                   required />
-          </Col>
-          <Col md={4}>
-            <FormGroup>
-              <ControlLabel>Use as key <span className="fa fa-question-circle" /></ControlLabel>
-              <InputGroup>
-                <InputGroup.Addon>
-                  <input type="checkbox" onChange={this.toggleKey} checked={isKeyEnabled} />
-                </InputGroup.Addon>
-                <FormControl id="field-key"
-                             name="key"
-                             type="number"
-                             value={keyValue}
-                             onChange={this.handleKeySortChange}
-                             disabled={!isKeyEnabled} />
-              </InputGroup>
-              <HelpBlock>Indicates if this Field should be a Key and its order.</HelpBlock>
-            </FormGroup>
-          </Col>
-          <Col md={4}>
-            <FormGroup controlId="event-field-provider">
-              <ControlLabel>Set Value From</ControlLabel>
-              <Select name="event-field-provider"
-                      placeholder="Select Value Source"
-                      onChange={this.handleProviderTypeChange}
-                      options={this.formatFieldValueProviders()}
-                      value={Array.isArray(config.providers) ? config.providers[0].type : ''}
-                      matchProp="label"
-                      required />
-              <HelpBlock>Select a source for the value of this Field.</HelpBlock>
-            </FormGroup>
-          </Col>
-        </Row>
-        {this.renderFieldValueProviderForm()}
-      </fieldset>
+          <Input id="field-name"
+                 name="name"
+                 label="Name"
+                 type="text"
+                 value={fieldName}
+                 onChange={this.handleFieldNameChange}
+                 help="Name for this Field."
+                 required />
+
+          <FormGroup>
+            <ControlLabel>Use as key <span className="fa fa-question-circle" /></ControlLabel>
+            <InputGroup>
+              <InputGroup.Addon>
+                <input type="checkbox" onChange={this.toggleKey} checked={isKey} />
+              </InputGroup.Addon>
+              <FormControl id="field-key"
+                           name="key"
+                           type="number"
+                           value={keyPosition}
+                           onChange={this.handleKeySortChange}
+                           disabled={!isKey} />
+            </InputGroup>
+            <HelpBlock>Indicates if this Field should be a Key and its order.</HelpBlock>
+          </FormGroup>
+
+          <FormGroup>
+            <ControlLabel>Field Data Type</ControlLabel>
+            <FormControl.Static>String</FormControl.Static>
+          </FormGroup>
+
+          <FormGroup controlId="event-field-provider">
+            <ControlLabel>Set Value From</ControlLabel>
+            <Select name="event-field-provider"
+                    placeholder="Select Value Source"
+                    onChange={this.handleProviderTypeChange}
+                    options={this.formatFieldValueProviders()}
+                    value={Array.isArray(config.providers) ? config.providers[0].type : ''}
+                    matchProp="label"
+                    required />
+            <HelpBlock>Select a source for the value of this Field.</HelpBlock>
+          </FormGroup>
+
+          {this.renderFieldValueProviderForm()}
+
+          <ButtonToolbar>
+            <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
+            <Button onClick={onCancel}>Cancel</Button>
+          </ButtonToolbar>
+        </Col>
+      </Row>
     );
   }
 }

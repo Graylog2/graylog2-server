@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
+import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
 
 // Import built-in Field Value Providers
@@ -20,12 +21,6 @@ class FieldsForm extends React.Component {
     showAddFieldForm: false,
   };
 
-  addCustomField = () => {
-    const { eventDefinition, onChange } = this.props;
-    const nextFieldSpec = Object.assign({}, eventDefinition.field_spec, { '': {} });
-    onChange('field_spec', nextFieldSpec);
-  };
-
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
@@ -34,28 +29,24 @@ class FieldsForm extends React.Component {
     onChange('key_spec', nextKeySpec);
   };
 
-  handleFieldChange = (fieldName, key, value) => {
+  addCustomField = (prevFieldName, fieldName, config, isKey, keyPosition) => {
     const { eventDefinition, onChange } = this.props;
-    if (key === 'keys') {
-      onChange('key_spec', value);
-    } else {
-      let nextFieldSpec;
+    const nextFieldSpec = (prevFieldName === fieldName
+      ? lodash.cloneDeep(eventDefinition.field_spec)
+      : lodash.omit(eventDefinition.field_spec, prevFieldName));
+    nextFieldSpec[fieldName] = config;
+    onChange('field_spec', nextFieldSpec);
 
-      if (key === 'config') {
-        nextFieldSpec = lodash.cloneDeep(eventDefinition.field_spec);
-        nextFieldSpec[fieldName] = value;
-      } else if (key === 'fieldName') {
-        const config = eventDefinition.field_spec[fieldName];
-        nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
-        let effectiveValue = value;
-        while (Object.keys(eventDefinition.field_spec).includes(effectiveValue)) {
-          effectiveValue += '_';
-        }
-        nextFieldSpec[effectiveValue] = config;
-      }
-
-      onChange('field_spec', nextFieldSpec);
+    // Filter out all non-existing field names from key_spec and the current field name
+    const fieldNames = Object.keys(nextFieldSpec);
+    let nextKeySpec = eventDefinition.key_spec.filter(key => fieldNames.includes(key) && key !== fieldName);
+    if (isKey) {
+      // Add key to its new position
+      nextKeySpec = [...nextKeySpec.slice(0, keyPosition), fieldName, ...nextKeySpec.slice(keyPosition)];
     }
+    onChange('key_spec', nextKeySpec);
+
+    this.toggleAddFieldForm();
   };
 
   toggleAddFieldForm = () => {
@@ -67,6 +58,13 @@ class FieldsForm extends React.Component {
     const { eventDefinition } = this.props;
     const { showAddFieldForm } = this.state;
 
+    if (showAddFieldForm) {
+      return (
+        <FieldForm keys={eventDefinition.key_spec}
+                   onChange={this.addCustomField}
+                   onCancel={this.toggleAddFieldForm} />
+      );
+    }
 
     return (
       <Row>
