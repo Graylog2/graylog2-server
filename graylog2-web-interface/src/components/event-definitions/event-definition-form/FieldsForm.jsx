@@ -25,7 +25,10 @@ class FieldsForm extends React.Component {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
     onChange('field_spec', nextFieldSpec);
-    const nextKeySpec = lodash.without(eventDefinition.key_spec, fieldName);
+
+    // Filter out all non-existing field names from key_spec
+    const fieldNames = Object.keys(nextFieldSpec);
+    const nextKeySpec = eventDefinition.key_spec.filter(key => fieldNames.includes(key));
     onChange('key_spec', nextKeySpec);
   };
 
