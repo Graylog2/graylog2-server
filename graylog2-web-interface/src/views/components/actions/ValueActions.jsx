@@ -1,3 +1,4 @@
+// @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -6,11 +7,39 @@ import uuid from 'uuid/v4';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
-import OverlayDropdown from './OverlayDropdown';
-import style from './Value.css';
-import CustomPropTypes from './CustomPropTypes';
+import type { QueryId } from 'views/logic/queries/Query';
+import type { ValueActionHandlerWithContext } from 'views/logic/valueactions/ValueActionHandler';
+import OverlayDropdown from '../OverlayDropdown';
+import style from '../Value.css';
+import CustomPropTypes from '../CustomPropTypes';
 
-class ValueActions extends React.Component {
+type Props = {
+  children: React.Node,
+  element: React.Node,
+  field: string,
+  menuContainer: ?HTMLElement,
+  queryId: QueryId,
+  type: FieldType,
+  value: React.Node,
+}
+
+type State = {
+  open: boolean,
+  overflowingComponents: { [string]: React.Node },
+}
+
+type HandlerValueAction = {|
+  handler: ValueActionHandlerWithContext,
+|}
+
+type ComponentValueAction = {|
+  title: string,
+  component: React.AbstractComponent<*>,
+|}
+
+type ValueActionDefinition = HandlerValueAction | ComponentValueAction;
+
+class ValueActions extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.node.isRequired,
     element: PropTypes.node.isRequired,
@@ -28,7 +57,7 @@ class ValueActions extends React.Component {
 
   static contextType = ActionContext;
 
-  constructor(props, context) {
+  constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
     this.state = {
       open: false,
@@ -36,7 +65,7 @@ class ValueActions extends React.Component {
     };
   }
 
-  _createHandlerFor = (action) => {
+  _createHandlerFor = (action: ValueActionDefinition): ValueActionHandlerWithContext => {
     if (action.handler) {
       return action.handler;
     }
@@ -55,36 +84,43 @@ class ValueActions extends React.Component {
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
         });
+        return Promise.resolve();
       };
     }
-    throw new Error(`Invalid binding for action: ${action} - has neither 'handler' nor 'component'.`);
+    throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component'.`);
   };
 
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
   render() {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
-    const overflowingComponents = Object.values(this.state.overflowingComponents);
-    const valueActions = PluginStore.exports('valueActions').map((valueAction) => {
-      const handler = this._createHandlerFor(valueAction);
-      const onSelect = (event) => {
-        this._onMenuToggle();
-        handler(queryId, event.field, event.value, type, this.context);
-      };
+    const { overflowingComponents: overflowingComponents1, open } = this.state;
+    const overflowingComponents = Object.values(overflowingComponents1);
+    const valueActions = PluginStore.exports('valueActions')
+      .filter((action) => {
+        const hide = action.hide || (() => false);
+        return !hide(this.context);
+      })
+      .map((action) => {
+        const handler = this._createHandlerFor(action);
+        const onSelect = (event) => {
+          this._onMenuToggle();
+          handler(queryId, event.field, event.value, type, this.context);
+        };
 
-      const condition = valueAction.condition || (() => true);
-      const actionDisabled = !condition({ field, type, value, context: this.context });
-      return (
-        <MenuItem key={`value-action-${field}-${valueAction.type}`}
-                  disabled={actionDisabled}
-                  eventKey={{ field, value }}
-                  onSelect={onSelect}>{valueAction.title}
-        </MenuItem>
-      );
-    });
+        const condition = action.condition || (() => true);
+        const actionDisabled = !condition({ field, type, value, context: this.context });
+        return (
+          <MenuItem key={`value-action-${field}-${action.type}`}
+                    disabled={actionDisabled}
+                    eventKey={{ field, value }}
+                    onSelect={onSelect}>{action.title}
+          </MenuItem>
+        );
+      });
     return (
       <React.Fragment>
-        <OverlayDropdown show={this.state.open}
+        <OverlayDropdown show={open}
                          toggle={element}
                          placement="right"
                          onToggle={this._onMenuToggle}

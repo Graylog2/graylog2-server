@@ -8,7 +8,7 @@ import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp
 import Value from './Value';
 import EmptyValue from './EmptyValue';
 
-jest.mock('./ValueActions', () => mockComponent('ValueActions'));
+jest.mock('./actions/ValueActions', () => mockComponent('ValueActions'));
 jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
 describe('Value', () => {
