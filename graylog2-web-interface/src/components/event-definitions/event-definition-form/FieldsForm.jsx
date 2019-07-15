@@ -30,6 +30,8 @@ class FieldsForm extends React.Component {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
     onChange('field_spec', nextFieldSpec);
+    const nextKeySpec = lodash.without(eventDefinition.key_spec, fieldName);
+    onChange('key_spec', nextKeySpec);
   };
 
   handleFieldChange = (fieldName, key, value) => {
