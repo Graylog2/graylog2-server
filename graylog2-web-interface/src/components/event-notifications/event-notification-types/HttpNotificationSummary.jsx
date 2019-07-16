@@ -20,8 +20,10 @@ class HttpNotificationSummary extends React.Component {
     return (
       <CommonNotificationSummary {...this.props}>
         <React.Fragment>
-          <dt>URL</dt>
-          <dd><code>{notification.config.url}</code></dd>
+          <tr>
+            <td>URL</td>
+            <td><code>{notification.config.url}</code></td>
+          </tr>
         </React.Fragment>
       </CommonNotificationSummary>
     );

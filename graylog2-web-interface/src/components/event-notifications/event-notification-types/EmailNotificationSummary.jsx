@@ -21,16 +21,32 @@ class EmailNotificationSummary extends React.Component {
     return (
       <CommonNotificationSummary {...this.props}>
         <React.Fragment>
-          <dt>Sender</dt>
-          <dd>{notification.config.sender}</dd>
-          <dt>Subject</dt>
-          <dd>{notification.config.subject}</dd>
-          <dt>User recipients</dt>
-          <dd>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</dd>
-          <dt>Email recipients</dt>
-          <dd>{notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}</dd>
-          <dt>Email Body</dt>
-          <dd><pre className={`${styles.bodyPreview} pre-scrollable`}>{notification.config.body_template}</pre></dd>
+          <tr>
+            <td>Sender</td>
+            <td>{notification.config.sender}</td>
+          </tr>
+          <tr>
+            <td>Subject</td>
+            <td>{notification.config.subject}</td>
+          </tr>
+          <tr>
+            <td>User recipients</td>
+            <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
+          </tr>
+          <tr>
+            <td>Email recipients</td>
+            <td>
+              {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
+            </td>
+          </tr>
+          <tr>
+            <td>Email Body</td>
+            <td>
+              <pre className={`${styles.bodyPreview} pre-scrollable`}>
+                {notification.config.body_template || <em>Empty body</em>}
+              </pre>
+            </td>
+          </tr>
         </React.Fragment>
       </CommonNotificationSummary>
     );
