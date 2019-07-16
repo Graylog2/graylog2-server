@@ -95,14 +95,15 @@ class FieldForm extends React.Component {
     }
 
     const providerPlugin = this.getProviderPlugin(config.providers[0].type);
-    return providerPlugin.formComponent
+    return (providerPlugin && providerPlugin.formComponent
       ? React.createElement(providerPlugin.formComponent, {
         eventFields: fields,
         fieldName: fieldName,
         config: config,
         onChange: this.handleConfigChange,
       })
-      : <div>Selected provider is not available.</div>;
+      : <div>Selected provider is not available.</div>
+    );
   };
 
   formatFieldValueProviders = () => {
