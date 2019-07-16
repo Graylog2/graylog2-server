@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import naturalSort from 'javascript-natural-sort';
-import { Button, ButtonToolbar, OverlayTrigger } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DataTable } from 'components/common';
-import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 
 import styles from './FieldsList.css';
 
@@ -46,20 +45,6 @@ class FieldsList extends React.Component {
     };
   };
 
-  headerFormatter = (header) => {
-    if (header === HEADERS[1]) {
-      return (
-        <th>
-          {header}&emsp;
-          <OverlayTrigger placement="right" trigger="click" overlay={<EventKeyHelpPopover id="key-header-popover" />}>
-            <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
-          </OverlayTrigger>
-        </th>
-      );
-    }
-    return <th>{header}</th>;
-  };
-
   fieldFormatter = (fieldName) => {
     const { fields, keys } = this.props;
     const config = fields[fieldName];
@@ -70,7 +55,7 @@ class FieldsList extends React.Component {
     return (
       <tr key={fieldName}>
         <td>{fieldName}</td>
-        <td>{keyIndex < 0 ? 'No' : `Yes, in position ${keyIndex + 1}`}</td>
+        <td>{keyIndex < 0 ? 'No' : 'Yes'}</td>
         <td>{fieldProviderPlugin.displayName || config.providers[0].type}</td>
         <td>{config.data_type}</td>
         <td className={styles.actions}>
@@ -109,7 +94,6 @@ class FieldsList extends React.Component {
         <DataTable id="event-definition-fields"
                    className="table-striped table-hover"
                    headers={HEADERS}
-                   headerCellFormatter={this.headerFormatter}
                    rows={fieldNames}
                    dataRowFormatter={this.fieldFormatter}
                    filterKeys={[]} />

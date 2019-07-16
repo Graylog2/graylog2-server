@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, OverlayTrigger, Row } from 'react-bootstrap';
 
+import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
 
@@ -77,6 +78,19 @@ class FieldsForm extends React.Component {
       <Row>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Fields</h2>
+          {Object.keys(eventDefinition.field_spec).length > 0 && (
+            <dl>
+              <dt>
+                Keys
+                <OverlayTrigger placement="right"
+                                trigger="click"
+                                overlay={<EventKeyHelpPopover id="key-header-popover" />}>
+                  <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
+                </OverlayTrigger>
+              </dt>
+              <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
+            </dl>
+          )}
           <FieldsList fields={eventDefinition.field_spec}
                       keys={eventDefinition.key_spec}
                       onAddFieldClick={this.toggleFieldForm}
