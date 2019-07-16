@@ -18,7 +18,8 @@ class FieldsForm extends React.Component {
   };
 
   state = {
-    showAddFieldForm: false,
+    editField: undefined,
+    showFieldForm: false,
   };
 
   removeCustomField = (fieldName) => {
@@ -49,23 +50,25 @@ class FieldsForm extends React.Component {
     }
     onChange('key_spec', nextKeySpec);
 
-    this.toggleAddFieldForm();
+    this.toggleFieldForm();
   };
 
-  toggleAddFieldForm = () => {
-    const { showAddFieldForm } = this.state;
-    this.setState({ showAddFieldForm: !showAddFieldForm });
+  toggleFieldForm = (fieldName) => {
+    const { showFieldForm } = this.state;
+    this.setState({ showFieldForm: !showFieldForm, editField: showFieldForm ? undefined : fieldName });
   };
 
   render() {
     const { eventDefinition } = this.props;
-    const { showAddFieldForm } = this.state;
+    const { editField, showFieldForm } = this.state;
 
-    if (showAddFieldForm) {
+    if (showFieldForm) {
       return (
         <FieldForm keys={eventDefinition.key_spec}
+                   fieldName={editField}
+                   config={editField ? eventDefinition.field_spec[editField] : undefined}
                    onChange={this.addCustomField}
-                   onCancel={this.toggleAddFieldForm} />
+                   onCancel={this.toggleFieldForm} />
       );
     }
 
@@ -75,7 +78,8 @@ class FieldsForm extends React.Component {
           <h2 className={commonStyles.title}>Event Fields</h2>
           <FieldsList fields={eventDefinition.field_spec}
                       keys={eventDefinition.key_spec}
-                      onAddFieldClick={this.toggleAddFieldForm}
+                      onAddFieldClick={this.toggleFieldForm}
+                      onEditFieldClick={this.toggleFieldForm}
                       onRemoveFieldClick={this.removeCustomField} />
         </Col>
       </Row>
