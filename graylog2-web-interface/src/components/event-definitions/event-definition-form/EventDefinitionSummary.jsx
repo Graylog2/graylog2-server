@@ -61,19 +61,25 @@ class EventDefinitionSummary extends React.Component {
     }
     const provider = config.providers[0] || {};
     const fieldProviderPlugin = this.getPlugin('fieldValueProviders', provider.type);
-    const component = (fieldProviderPlugin.summaryComponent
+    return (fieldProviderPlugin.summaryComponent
       ? React.createElement(fieldProviderPlugin.summaryComponent, {
         fieldName: fieldName,
         config: config,
         keys: keys,
+        key: fieldName,
       })
-      : <span>Condition plugin <em>{provider.type}</em> does not provide a summary.</span>
+      : <span key={fieldName}>Condition plugin <em>{provider.type}</em> does not provide a summary.</span>
     );
+  };
 
+  renderFieldList = (fieldNames, fields, keys) => {
     return (
-      <React.Fragment key={fieldName}>
-        <h4 className={commonStyles.title}>{fieldName}</h4>
-        {component}
+      <React.Fragment>
+        <dl>
+          <dt>Keys</dt>
+          <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
+        </dl>
+        {fieldNames.map(fieldName => this.renderField(fieldName, fields[fieldName], keys))}
       </React.Fragment>
     );
   };
@@ -85,7 +91,7 @@ class EventDefinitionSummary extends React.Component {
         <h3 className={commonStyles.title}>Fields</h3>
         {fieldNames.length === 0
           ? <p>No Fields configured for Events based on this Definition.</p>
-          : fieldNames.map(fieldName => this.renderField(fieldName, fields[fieldName], keys))
+          : this.renderFieldList(fieldNames, fields, keys)
         }
       </React.Fragment>
     );
