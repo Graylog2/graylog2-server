@@ -24,6 +24,7 @@ import commonStyles from '../common/commonStyles.css';
 
 class FieldForm extends React.Component {
   static propTypes = {
+    fields: PropTypes.object.isRequired,
     fieldName: PropTypes.string,
     config: PropTypes.object,
     keys: PropTypes.array.isRequired,
@@ -87,6 +88,7 @@ class FieldForm extends React.Component {
   };
 
   renderFieldValueProviderForm = () => {
+    const { fields } = this.props;
     const { fieldName, config } = this.state;
     if (!config.providers || !Array.isArray(config.providers)) {
       return null;
@@ -95,6 +97,7 @@ class FieldForm extends React.Component {
     const providerPlugin = this.getProviderPlugin(config.providers[0].type);
     return providerPlugin.formComponent
       ? React.createElement(providerPlugin.formComponent, {
+        eventFields: fields,
         fieldName: fieldName,
         config: config,
         onChange: this.handleConfigChange,

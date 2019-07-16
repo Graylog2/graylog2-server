@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 class LookupTableFieldValueProviderFormContainer extends React.Component {
   static propTypes = {
-    lookupTables: PropTypes.object.isRequired,
     config: PropTypes.object.isRequired,
+    eventFields: PropTypes.object.isRequired,
+    fieldTypes: PropTypes.object.isRequired,
+    lookupTables: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -20,13 +23,21 @@ class LookupTableFieldValueProviderFormContainer extends React.Component {
   }
 
   render() {
-    const { lookupTables, ...otherProps } = this.props;
-    if (!lookupTables.tables) {
-      return <Spinner text="Loading Lookup Tables information..." />;
+    const { lookupTables, fieldTypes, ...otherProps } = this.props;
+    const isLoading = typeof fieldTypes.all !== 'object' || !lookupTables.tables;
+    if (isLoading) {
+      return <Spinner text="Loading Field Provider information..." />;
     }
 
-    return <LookupTableFieldValueProviderForm lookupTables={lookupTables.tables} {...otherProps} />;
+    return (
+      <LookupTableFieldValueProviderForm allFieldTypes={fieldTypes.all.toJS()}
+                                         lookupTables={lookupTables.tables}
+                                         {...otherProps} />
+    );
   }
 }
 
-export default connect(LookupTableFieldValueProviderFormContainer, { lookupTables: LookupTablesStore });
+export default connect(LookupTableFieldValueProviderFormContainer, {
+  fieldTypes: FieldTypesStore,
+  lookupTables: LookupTablesStore,
+});

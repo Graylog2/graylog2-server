@@ -2,19 +2,35 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, ControlLabel, FormGroup, HelpBlock, Radio, Row } from 'react-bootstrap';
 import lodash from 'lodash';
+import naturalSort from 'javascript-natural-sort';
 
-import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 
 class LookupTableFieldValueProviderForm extends React.Component {
   static propTypes = {
+    allFieldTypes: PropTypes.array.isRequired,
     config: PropTypes.object.isRequired,
+    eventFields: PropTypes.object.isRequired,
     lookupTables: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
   static type = 'lookup-v1';
+
+  formatMessageFields = lodash.memoize(
+    (fieldTypes) => {
+      return fieldTypes
+        .sort((ftA, ftB) => naturalSort(ftA.name, ftB.name))
+        .map((fieldType) => {
+          return {
+            label: `${fieldType.name} – ${fieldType.value.type.type}`,
+            value: fieldType.name,
+          };
+        });
+    },
+    fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
+  );
 
   propagateChanges = (key, value) => {
     const { config, onChange } = this.props;
@@ -30,8 +46,22 @@ class LookupTableFieldValueProviderForm extends React.Component {
     this.propagateChanges(name, value);
   };
 
-  handleLookupTableChange = (nextLookupTable) => {
-    this.propagateChanges('table_name', nextLookupTable);
+  handleSelectChange = (key) => {
+    return (nextLookupTable) => {
+      this.propagateChanges(key, nextLookupTable);
+    };
+  };
+
+  formatFields = (context) => {
+    const { allFieldTypes, eventFields } = this.props;
+
+    if (context === 'source') {
+      return this.formatMessageFields(allFieldTypes);
+    }
+
+    return Object.keys(eventFields)
+      .sort(naturalSort)
+      .map(fieldName => ({ label: fieldName, value: fieldName }));
   };
 
   formatLookupTables = (lookupTables) => {
@@ -63,19 +93,28 @@ class LookupTableFieldValueProviderForm extends React.Component {
             </Radio>
           </FormGroup>
 
-          <Input id="lookup-provider-key"
-                 name="key_field"
-                 type="text"
-                 label="Lookup Table Key Field"
-                 onChange={this.handleChange}
-                 value={provider.key_field || ''}
-                 help="Field name whose value will be used as Lookup Table Key." />
+          <FormGroup controlId="lookup-provider-table">
+            <ControlLabel>Lookup Table Key Field</ControlLabel>
+            <Select name="lookup-provider-key"
+                    placeholder="Select Lookup Table"
+                    onChange={this.handleSelectChange('key_field')}
+                    options={provider.key_context ? this.formatFields(provider.key_context) : []}
+                    value={provider.key_field}
+                    matchProp="label"
+                    disabled={provider.key_context === undefined}
+                    allowCreate
+                    required />
+            <HelpBlock>
+              Field name whose value will be used as Lookup Table Key.
+              {provider.key_context === 'event' && ' Please ensure the Event contains the given Field.'}
+            </HelpBlock>
+          </FormGroup>
 
           <FormGroup controlId="lookup-provider-table">
             <ControlLabel>Select Lookup Table</ControlLabel>
             <Select name="event-field-provider"
                     placeholder="Select Lookup Table"
-                    onChange={this.handleLookupTableChange}
+                    onChange={this.handleSelectChange('table_name')}
                     options={this.formatLookupTables(lookupTables)}
                     value={provider.table_name}
                     matchProp="label"
