@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 import {} from 'moment-duration-format';
+import naturalSort from 'javascript-natural-sort';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -79,7 +80,7 @@ class EventDefinitionSummary extends React.Component {
           <dt>Keys</dt>
           <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
         </dl>
-        {fieldNames.map(fieldName => this.renderField(fieldName, fields[fieldName], keys))}
+        {fieldNames.sort(naturalSort).map(fieldName => this.renderField(fieldName, fields[fieldName], keys))}
       </React.Fragment>
     );
   };
