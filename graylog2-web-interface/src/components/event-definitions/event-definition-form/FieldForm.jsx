@@ -42,7 +42,7 @@ class FieldForm extends React.Component {
 
     this.state = {
       fieldName: props.fieldName,
-      config: props.config,
+      config: Object.assign({}, props.config, { data_type: 'string' }),
       isKey: keyIndex >= 0,
       keyPosition: keyIndex >= 0 ? keyIndex + 1 : props.keys.length + 1,
     };
