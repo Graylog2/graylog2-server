@@ -8,6 +8,8 @@ import { ExternalLinkButton, Select } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 
 import StoreProvider from 'injection/StoreProvider';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import history from 'util/History';
 
 import { InputForm } from 'components/inputs';
 
@@ -54,6 +56,14 @@ const CreateInputControl = createReactClass({
 
   _openModal(event) {
     event.preventDefault();
+    const { selectedInput } = this.state;
+
+    const customConfiguration = PluginStore.exports('inputConfiguration').filter(inputConfig => inputConfig.matches(selectedInput));
+
+    if (customConfiguration.length > 0) {
+      history.push(customConfiguration[0].path);
+    }
+
     this.configurationForm.open();
   },
 
