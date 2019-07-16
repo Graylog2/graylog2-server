@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import naturalSort from 'javascript-natural-sort';
-import { Button } from 'react-bootstrap';
+import { Button, OverlayTrigger } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DataTable } from 'components/common';
+import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
+
+const HEADERS = ['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Actions'];
 
 class FieldsList extends React.Component {
   static propTypes = {
@@ -26,6 +29,20 @@ class FieldsList extends React.Component {
       const { onRemoveFieldClick } = this.props;
       onRemoveFieldClick(fieldName);
     };
+  };
+
+  headerFormatter = (header) => {
+    if (header === HEADERS[1]) {
+      return (
+        <th>
+          {header}&emsp;
+          <OverlayTrigger placement="right" trigger="click" overlay={<EventKeyHelpPopover id="key-header-popover" />}>
+            <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
+          </OverlayTrigger>
+        </th>
+      );
+    }
+    return <th>{header}</th>;
   };
 
   fieldFormatter = (fieldName) => {
@@ -71,7 +88,8 @@ class FieldsList extends React.Component {
       <React.Fragment>
         <DataTable id="event-definition-fields"
                    className="table-striped table-hover"
-                   headers={['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Actions']}
+                   headers={HEADERS}
+                   headerCellFormatter={this.headerFormatter}
                    rows={fieldNames}
                    dataRowFormatter={this.fieldFormatter}
                    filterKeys={[]} />

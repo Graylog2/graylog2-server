@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
 import {
   Button,
   ButtonToolbar,
@@ -10,12 +9,14 @@ import {
   FormGroup,
   HelpBlock,
   InputGroup,
+  OverlayTrigger,
   Row,
 } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
+import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 
 import FormsUtils from 'util/FormsUtils';
 
@@ -127,10 +128,15 @@ class FieldForm extends React.Component {
                  required />
 
           <FormGroup>
-            <ControlLabel>Use as key <span className="fa fa-question-circle" /></ControlLabel>
+            <ControlLabel>
+              Use Field as Event Key&emsp;
+              <OverlayTrigger placement="right" trigger="click" overlay={<EventKeyHelpPopover id="key-popover" />}>
+                <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
+              </OverlayTrigger>
+            </ControlLabel>
             <InputGroup>
               <InputGroup.Addon>
-                <input type="checkbox" onChange={this.toggleKey} checked={isKey} />
+                <input id="is-key" name="is-key" type="checkbox" onChange={this.toggleKey} checked={isKey} />
               </InputGroup.Addon>
               <FormControl id="field-key"
                            name="key"
