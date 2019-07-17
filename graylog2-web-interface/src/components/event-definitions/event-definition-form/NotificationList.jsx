@@ -17,7 +17,7 @@ class NotificationList extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventNotificationTypes').find(n => n.type === type);
+    return PluginStore.exports('eventNotificationTypes').find(n => n.type === type) || {};
   };
 
   handleRemoveClick = (notificationId) => {

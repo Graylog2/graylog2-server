@@ -26,7 +26,7 @@ class EventDefinitions extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type);
+    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
   };
 
   renderEmptyContent = () => {

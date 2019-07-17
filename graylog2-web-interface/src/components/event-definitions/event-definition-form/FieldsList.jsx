@@ -23,7 +23,7 @@ class FieldsList extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('fieldValueProviders').find(p => p.type === type);
+    return PluginStore.exports('fieldValueProviders').find(p => p.type === type) || {};
   };
 
   handleAddFieldClick = () => {

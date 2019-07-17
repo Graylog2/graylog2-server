@@ -38,14 +38,14 @@ class EventDefinitionSummary extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports(name).find(edt => edt.type === type);
+    return PluginStore.exports(name).find(edt => edt.type === type) || {};
   };
 
   renderCondition = (config) => {
     const conditionPlugin = this.getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin.summaryComponent
       ? React.createElement(conditionPlugin.summaryComponent, { config: config })
-      : <span>Condition plugin <em>{config.type}</em> does not provide a summary.</span>
+      : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
     );
 
     return (
@@ -69,7 +69,7 @@ class EventDefinitionSummary extends React.Component {
         keys: keys,
         key: fieldName,
       })
-      : <span key={fieldName}>Condition plugin <em>{provider.type}</em> does not provide a summary.</span>
+      : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
     );
   };
 
@@ -112,13 +112,13 @@ class EventDefinitionSummary extends React.Component {
           notification: notification,
           definitionNotification: definitionNotification,
         })
-        : <span>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</span>
+        : <p>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</p>
       );
     } else {
       content = (
-        <span>
+        <p>
           Could not find information for Notification <em>{definitionNotification.notification_id}</em>.
-        </span>
+        </p>
       );
     }
 

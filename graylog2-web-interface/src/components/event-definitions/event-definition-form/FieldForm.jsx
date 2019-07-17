@@ -84,7 +84,7 @@ class FieldForm extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type);
+    return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type) || {};
   };
 
   renderFieldValueProviderForm = () => {
@@ -95,7 +95,7 @@ class FieldForm extends React.Component {
     }
 
     const providerPlugin = this.getProviderPlugin(config.providers[0].type);
-    return (providerPlugin && providerPlugin.formComponent
+    return (providerPlugin.formComponent
       ? React.createElement(providerPlugin.formComponent, {
         eventFields: fields,
         fieldName: fieldName,
