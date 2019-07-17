@@ -8,7 +8,7 @@ import { DataTable } from 'components/common';
 
 import styles from './FieldsList.css';
 
-const HEADERS = ['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Actions'];
+const HEADERS = ['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Configuration', 'Actions'];
 
 class FieldsList extends React.Component {
   static propTypes = {
@@ -45,6 +45,21 @@ class FieldsList extends React.Component {
     };
   };
 
+  providerFormatter = (config) => {
+    const configKeys = Object.keys(config).filter(key => key !== 'type');
+    return (
+      <td>
+        <p>
+          {configKeys.map((key) => {
+            return (
+              <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
+            );
+          })}
+        </p>
+      </td>
+    );
+  };
+
   fieldFormatter = (fieldName) => {
     const { fields, keys } = this.props;
     const config = fields[fieldName];
@@ -58,6 +73,7 @@ class FieldsList extends React.Component {
         <td>{keyIndex < 0 ? 'No' : 'Yes'}</td>
         <td>{fieldProviderPlugin.displayName || config.providers[0].type}</td>
         <td>{config.data_type}</td>
+        <td>{this.providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>
           <ButtonToolbar>
             <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
