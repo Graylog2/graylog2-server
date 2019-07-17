@@ -37,7 +37,7 @@ const _isActive = (requestPath, prefix) => {
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }) => {
-  const link = <NavigationLink key={description} description={description} path={path} />;
+  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} />;
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
   }
