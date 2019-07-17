@@ -24,6 +24,10 @@ class TemplateFieldValueProviderSummary extends React.Component {
             <td>Template</td>
             <td>{config.providers[0].template}</td>
           </tr>
+          <tr>
+            <td>Validate that all Template values are set</td>
+            <td>{JSON.stringify(config.providers[0].require_values)}</td>
+          </tr>
         </React.Fragment>
       </CommonFieldValueProviderSummary>
     );

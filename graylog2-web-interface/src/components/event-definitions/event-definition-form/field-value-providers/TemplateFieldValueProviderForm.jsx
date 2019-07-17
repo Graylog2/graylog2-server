@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Col,
-  Row,
-} from 'react-bootstrap';
+import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { ExternalLink } from 'components/common';
+import FormsUtils from 'util/FormsUtils';
 
 class TemplateFieldValueProviderForm extends React.Component {
   static propTypes = {
@@ -19,10 +17,11 @@ class TemplateFieldValueProviderForm extends React.Component {
 
   handleChange = (event) => {
     const { config, onChange } = this.props;
-    const nextTemplate = event.target.value;
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
     const nextProviders = lodash.cloneDeep(config.providers);
     const templateProvider = nextProviders.find(provider => provider.type === TemplateFieldValueProviderForm.type);
-    templateProvider.template = nextTemplate;
+    templateProvider[name] = value;
     onChange(Object.assign({}, config, { providers: nextProviders }));
   };
 
@@ -50,6 +49,16 @@ class TemplateFieldValueProviderForm extends React.Component {
                  onChange={this.handleChange}
                  value={provider.template || ''}
                  help={helpText} />
+
+          <FormGroup>
+            <Checkbox id="lookup-message-require-values"
+                      name="require_values"
+                      checked={provider.require_values}
+                      onChange={this.handleChange}>
+              Require all template values to be set
+            </Checkbox>
+            <HelpBlock>Check this option to validate that all variables used in the Template have values.</HelpBlock>
+          </FormGroup>
         </Col>
       </Row>
     );
