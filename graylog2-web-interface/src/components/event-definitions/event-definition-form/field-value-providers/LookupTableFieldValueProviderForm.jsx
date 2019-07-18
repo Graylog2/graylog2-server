@@ -34,8 +34,8 @@ class LookupTableFieldValueProviderForm extends React.Component {
   propagateChanges = (key, value) => {
     const { config, onChange } = this.props;
     const nextProviders = lodash.cloneDeep(config.providers);
-    const templateProvider = nextProviders.find(provider => provider.type === LookupTableFieldValueProviderForm.type);
-    templateProvider[key] = value;
+    const lookupProvider = nextProviders.find(provider => provider.type === LookupTableFieldValueProviderForm.type);
+    lookupProvider[key] = value;
     onChange(Object.assign({}, config, { providers: nextProviders }));
   };
 
@@ -64,7 +64,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
         <Col md={12}>
           <FormGroup controlId="lookup-provider-table">
             <ControlLabel>Select Lookup Table</ControlLabel>
-            <Select name="event-field-provider"
+            <Select name="event-field-table-name"
                     placeholder="Select Lookup Table"
                     onChange={this.handleSelectChange('table_name')}
                     options={this.formatLookupTables(lookupTables)}
@@ -77,16 +77,14 @@ class LookupTableFieldValueProviderForm extends React.Component {
           <FormGroup controlId="lookup-provider-table">
             <ControlLabel>Lookup Table Key Field</ControlLabel>
             <Select name="lookup-provider-key"
-                    placeholder="Select Lookup Table"
+                    placeholder="Select Field"
                     onChange={this.handleSelectChange('key_field')}
                     options={this.formatMessageFields(allFieldTypes)}
                     value={provider.key_field}
                     matchProp="label"
                     allowCreate
                     required />
-            <HelpBlock>
-              Message Field name whose value will be used as Lookup Table Key.
-            </HelpBlock>
+            <HelpBlock>Message Field name whose value will be used as Lookup Table Key.</HelpBlock>
           </FormGroup>
         </Col>
       </Row>
