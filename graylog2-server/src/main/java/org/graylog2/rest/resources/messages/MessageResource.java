@@ -40,6 +40,7 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.rest.models.messages.requests.MessageParseRequest;
 import org.graylog2.rest.models.messages.responses.MessageTokens;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -92,17 +93,17 @@ public class MessageResource extends RestResource {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
             @ApiResponse(code = 404, message = "Message does not exist.")
     })
-    public ResultMessage search(@ApiParam(name = "index", value = "The index this message is stored in.", required = true)
-                                @PathParam("index") String index,
-                                @ApiParam(name = "messageId", required = true)
-                                @PathParam("messageId") String messageId) throws IOException {
+    public ResultMessageSummary search(@ApiParam(name = "index", value = "The index this message is stored in.", required = true)
+                                       @PathParam("index") String index,
+                                       @ApiParam(name = "messageId", required = true)
+                                       @PathParam("messageId") String messageId) throws IOException {
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
         try {
             final ResultMessage resultMessage = messages.get(messageId, index);
             final Message message = resultMessage.getMessage();
             checkMessageReadPermission(message);
 
-            return resultMessage;
+            return ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex());
         } catch (DocumentNotFoundException e) {
             final String msg = "Message " + messageId + " does not exist in index " + index;
             LOG.error(msg, e);
@@ -138,7 +139,7 @@ public class MessageResource extends RestResource {
             @ApiResponse(code = 400, message = "Could not decode message.")
     })
     @NoAuditEvent("only used to parse a test message")
-    public ResultMessage parse(@ApiParam(name = "JSON body", required = true) MessageParseRequest request) {
+    public ResultMessageSummary parse(@ApiParam(name = "JSON body", required = true) MessageParseRequest request) {
         Codec codec;
         try {
             final Configuration configuration = new Configuration(request.configuration());
@@ -151,8 +152,9 @@ public class MessageResource extends RestResource {
 
         final RawMessage rawMessage = new RawMessage(0, new UUID(), Tools.nowUTC(), remoteAddress, request.message().getBytes(StandardCharsets.UTF_8));
         final Message message = decodeMessage(codec, remoteAddress, rawMessage);
+        final ResultMessage resultMessage = ResultMessage.createFromMessage(message);
 
-        return ResultMessage.createFromMessage(message);
+        return ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex());
     }
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
