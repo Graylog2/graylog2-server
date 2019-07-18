@@ -48,15 +48,13 @@ class FieldsList extends React.Component {
   providerFormatter = (config) => {
     const configKeys = Object.keys(config).filter(key => key !== 'type');
     return (
-      <td>
-        <p>
-          {configKeys.map((key) => {
-            return (
-              <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
-            );
-          })}
-        </p>
-      </td>
+      <p>
+        {configKeys.map((key) => {
+          return (
+            <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
+          );
+        })}
+      </p>
     );
   };
 
