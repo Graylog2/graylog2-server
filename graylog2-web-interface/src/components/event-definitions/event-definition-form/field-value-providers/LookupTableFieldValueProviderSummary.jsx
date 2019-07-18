@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
-class TemplateFieldValueProviderSummary extends React.Component {
+class LookupTableFieldValueProviderSummary extends React.Component {
   static propTypes = {
     fieldName: PropTypes.string.isRequired,
     config: PropTypes.object.isRequired,
@@ -12,21 +12,22 @@ class TemplateFieldValueProviderSummary extends React.Component {
 
   render() {
     const { config } = this.props;
+    const provider = config.providers[0];
 
     return (
       <CommonFieldValueProviderSummary {...this.props}>
         <React.Fragment>
           <tr>
             <td>Value source</td>
-            <td>Template</td>
+            <td>Lookup Table</td>
           </tr>
           <tr>
-            <td>Template</td>
-            <td>{config.providers[0].template}</td>
+            <td>Lookup Table</td>
+            <td>{provider.table_name}</td>
           </tr>
           <tr>
-            <td>Validate that all Template values are set</td>
-            <td>{config.providers[0].require_values ? 'Yes' : 'No'}</td>
+            <td>Lookup Table Key Field</td>
+            <td>{provider.key_field}</td>
           </tr>
         </React.Fragment>
       </CommonFieldValueProviderSummary>
@@ -34,4 +35,4 @@ class TemplateFieldValueProviderSummary extends React.Component {
   }
 }
 
-export default TemplateFieldValueProviderSummary;
+export default LookupTableFieldValueProviderSummary;

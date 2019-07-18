@@ -5,6 +5,7 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 import {} from 'moment-duration-format';
+import naturalSort from 'javascript-natural-sort';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -37,14 +38,14 @@ class EventDefinitionSummary extends React.Component {
     if (type === undefined) {
       return {};
     }
-    return PluginStore.exports(name).find(edt => edt.type === type);
+    return PluginStore.exports(name).find(edt => edt.type === type) || {};
   };
 
   renderCondition = (config) => {
     const conditionPlugin = this.getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin.summaryComponent
       ? React.createElement(conditionPlugin.summaryComponent, { config: config })
-      : <span>Condition plugin <em>{config.type}</em> does not provide a summary.</span>
+      : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
     );
 
     return (
@@ -61,19 +62,25 @@ class EventDefinitionSummary extends React.Component {
     }
     const provider = config.providers[0] || {};
     const fieldProviderPlugin = this.getPlugin('fieldValueProviders', provider.type);
-    const component = (fieldProviderPlugin.summaryComponent
+    return (fieldProviderPlugin.summaryComponent
       ? React.createElement(fieldProviderPlugin.summaryComponent, {
         fieldName: fieldName,
         config: config,
         keys: keys,
+        key: fieldName,
       })
-      : <span>Condition plugin <em>{provider.type}</em> does not provide a summary.</span>
+      : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
     );
+  };
 
+  renderFieldList = (fieldNames, fields, keys) => {
     return (
-      <React.Fragment key={fieldName}>
-        <h4 className={commonStyles.title}>{fieldName}</h4>
-        {component}
+      <React.Fragment>
+        <dl>
+          <dt>Keys</dt>
+          <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
+        </dl>
+        {fieldNames.sort(naturalSort).map(fieldName => this.renderField(fieldName, fields[fieldName], keys))}
       </React.Fragment>
     );
   };
@@ -85,7 +92,7 @@ class EventDefinitionSummary extends React.Component {
         <h3 className={commonStyles.title}>Fields</h3>
         {fieldNames.length === 0
           ? <p>No Fields configured for Events based on this Definition.</p>
-          : fieldNames.map(fieldName => this.renderField(fieldName, fields[fieldName], keys))
+          : this.renderFieldList(fieldNames, fields, keys)
         }
       </React.Fragment>
     );
@@ -105,13 +112,13 @@ class EventDefinitionSummary extends React.Component {
           notification: notification,
           definitionNotification: definitionNotification,
         })
-        : <span>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</span>
+        : <p>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</p>
       );
     } else {
       content = (
-        <span>
+        <p>
           Could not find information for Notification <em>{definitionNotification.notification_id}</em>.
-        </span>
+        </p>
       );
     }
 
@@ -159,20 +166,22 @@ class EventDefinitionSummary extends React.Component {
   render() {
     const { eventDefinition } = this.props;
     return (
-      <Row>
+      <Row className={styles.eventSummary}>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Summary</h2>
-          <Row className={styles.eventSummary}>
-            <Col md={3}>
+          <Row>
+            <Col md={5}>
               {this.renderDetails(eventDefinition)}
             </Col>
-            <Col md={3}>
+            <Col md={5} mdOffset={1}>
               {this.renderCondition(eventDefinition.config)}
             </Col>
-            <Col md={3}>
+          </Row>
+          <Row>
+            <Col md={5}>
               {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
             </Col>
-            <Col md={3}>
+            <Col md={5} mdOffset={1}>
               {this.renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
             </Col>
           </Row>

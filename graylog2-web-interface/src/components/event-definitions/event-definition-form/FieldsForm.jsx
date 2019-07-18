@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Col, Row } from 'react-bootstrap';
-import uuid from 'uuid/v4';
-import naturalSort from 'javascript-natural-sort';
+import { Button, Col, OverlayTrigger, Row } from 'react-bootstrap';
 
+import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import FieldForm from './FieldForm';
+import FieldsList from './FieldsList';
 
 // Import built-in Field Value Providers
 import {} from './field-value-providers';
@@ -18,111 +18,83 @@ class FieldsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-
-    const fieldNames = Object.keys(props.eventDefinition.field_spec).sort(naturalSort);
-    const mapping = {};
-    fieldNames.forEach((fieldName) => {
-      mapping[fieldName] = uuid();
-    });
-
-    // We need to assign unique IDs to each field, since none of the data in them
-    // may be unique and may change.
-    this.state = {
-      fieldMapping: mapping,
-      sortedFieldNames: fieldNames,
-    };
-  }
-
-  syncWithState = (nextFieldName, prevFieldName) => {
-    const { fieldMapping, sortedFieldNames } = this.state;
-    const nextFieldMapping = lodash.omit(fieldMapping, prevFieldName);
-    if (nextFieldName !== undefined) {
-      nextFieldMapping[nextFieldName] = prevFieldName === undefined ? uuid() : fieldMapping[prevFieldName];
-    }
-
-    const nextSortedFieldNames = lodash.cloneDeep(sortedFieldNames);
-    if (prevFieldName !== undefined) {
-      if (nextFieldName !== undefined) {
-        const fieldPosition = sortedFieldNames.indexOf(prevFieldName);
-        nextSortedFieldNames[fieldPosition] = nextFieldName;
-      } else {
-        lodash.pull(nextSortedFieldNames, prevFieldName);
-      }
-    } else if (nextFieldName === '' && !nextSortedFieldNames.includes('')) {
-      nextSortedFieldNames.push(nextFieldName);
-    }
-
-    this.setState({ fieldMapping: nextFieldMapping, sortedFieldNames: nextSortedFieldNames });
-  };
-
-  addCustomField = () => {
-    const { eventDefinition, onChange } = this.props;
-    const nextFieldSpec = Object.assign({}, eventDefinition.field_spec, { '': {} });
-    onChange('field_spec', nextFieldSpec);
-    this.syncWithState('');
+  state = {
+    editField: undefined,
+    showFieldForm: false,
   };
 
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
     onChange('field_spec', nextFieldSpec);
-    this.syncWithState(undefined, fieldName);
+
+    // Filter out all non-existing field names from key_spec
+    const fieldNames = Object.keys(nextFieldSpec);
+    const nextKeySpec = eventDefinition.key_spec.filter(key => fieldNames.includes(key));
+    onChange('key_spec', nextKeySpec);
   };
 
-  handleFieldChange = (fieldName, key, value) => {
+  addCustomField = (prevFieldName, fieldName, config, isKey, keyPosition) => {
     const { eventDefinition, onChange } = this.props;
-    if (key === 'keys') {
-      onChange('key_spec', value);
-    } else {
-      let nextFieldSpec;
+    const nextFieldSpec = (prevFieldName === fieldName
+      ? lodash.cloneDeep(eventDefinition.field_spec)
+      : lodash.omit(eventDefinition.field_spec, prevFieldName));
+    nextFieldSpec[fieldName] = config;
+    onChange('field_spec', nextFieldSpec);
 
-      if (key === 'config') {
-        nextFieldSpec = lodash.cloneDeep(eventDefinition.field_spec);
-        nextFieldSpec[fieldName] = value;
-      } else if (key === 'fieldName') {
-        const config = eventDefinition.field_spec[fieldName];
-        nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
-        let effectiveValue = value;
-        while (Object.keys(eventDefinition.field_spec).includes(effectiveValue)) {
-          effectiveValue += '_';
-        }
-        nextFieldSpec[effectiveValue] = config;
-        this.syncWithState(effectiveValue, fieldName);
-      }
-
-      onChange('field_spec', nextFieldSpec);
+    // Filter out all non-existing field names from key_spec and the current field name
+    const fieldNames = Object.keys(nextFieldSpec);
+    let nextKeySpec = eventDefinition.key_spec.filter(key => fieldNames.includes(key) && key !== fieldName);
+    if (isKey) {
+      // Add key to its new position
+      nextKeySpec = [...nextKeySpec.slice(0, keyPosition), fieldName, ...nextKeySpec.slice(keyPosition)];
     }
+    onChange('key_spec', nextKeySpec);
+
+    this.toggleFieldForm();
+  };
+
+  toggleFieldForm = (fieldName) => {
+    const { showFieldForm } = this.state;
+    this.setState({ showFieldForm: !showFieldForm, editField: showFieldForm ? undefined : fieldName });
   };
 
   render() {
     const { eventDefinition } = this.props;
-    const { fieldMapping, sortedFieldNames } = this.state;
+    const { editField, showFieldForm } = this.state;
+
+    if (showFieldForm) {
+      return (
+        <FieldForm keys={eventDefinition.key_spec}
+                   fieldName={editField}
+                   config={editField ? eventDefinition.field_spec[editField] : undefined}
+                   onChange={this.addCustomField}
+                   onCancel={this.toggleFieldForm} />
+      );
+    }
 
     return (
       <Row>
-        <Col md={8} lg={6}>
+        <Col md={12}>
           <h2 className={commonStyles.title}>Event Fields</h2>
-          <p>
-            Define Fields that will be stored in Events generated by this Event Definition. Those Fields can also be
-            used in Alert Notifications.
-          </p>
-
-          {sortedFieldNames.map((fieldName) => {
-            const config = eventDefinition.field_spec[fieldName];
-            const id = fieldMapping[fieldName];
-            return (
-              <FieldForm key={`field-${id}-form`}
-                         fieldName={fieldName}
-                         config={config}
-                         keys={eventDefinition.key_spec}
-                         onChange={this.handleFieldChange}
-                         onRemoveField={this.removeCustomField} />
-            );
-          })}
-
-          <Button bsStyle="success" onClick={this.addCustomField}>Add Custom Field</Button>
+          {Object.keys(eventDefinition.field_spec).length > 0 && (
+            <dl>
+              <dt>
+                Keys
+                <OverlayTrigger placement="right"
+                                trigger="click"
+                                overlay={<EventKeyHelpPopover id="key-header-popover" />}>
+                  <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
+                </OverlayTrigger>
+              </dt>
+              <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
+            </dl>
+          )}
+          <FieldsList fields={eventDefinition.field_spec}
+                      keys={eventDefinition.key_spec}
+                      onAddFieldClick={this.toggleFieldForm}
+                      onEditFieldClick={this.toggleFieldForm}
+                      onRemoveFieldClick={this.removeCustomField} />
         </Col>
       </Row>
     );

@@ -1,0 +1,7 @@
+:local(.actions) {
+    width: 150px;
+}
+
+:local(.providerOptions):not(:last-child):after {
+    content: ', ';
+}

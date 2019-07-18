@@ -39,14 +39,14 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
-  searchPaginated(page, perPage, query) {
+  searchPaginated(page, perPage, query, resolve = true) {
     let url;
     if (query) {
       url = this._url(
-        `tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=true`,
+        `tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=${resolve}`,
       );
     } else {
-      url = this._url(`tables?page=${page}&per_page=${perPage}&resolve=true`);
+      url = this._url(`tables?page=${page}&per_page=${perPage}&resolve=${resolve}`);
     }
     const promise = fetch('GET', url);
 
