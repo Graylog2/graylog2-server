@@ -22,16 +22,12 @@ class LookupTableFieldValueProviderSummary extends React.Component {
             <td>Lookup Table</td>
           </tr>
           <tr>
-            <td>Take Lookup Table Key from</td>
-            <td>{provider.key_context === 'source' ? 'Source log message' : 'Generated Event'}</td>
+            <td>Lookup Table</td>
+            <td>{provider.table_name}</td>
           </tr>
           <tr>
             <td>Lookup Table Key Field</td>
             <td>{provider.key_field}</td>
-          </tr>
-          <tr>
-            <td>Lookup Table</td>
-            <td>{provider.table_name}</td>
           </tr>
         </React.Fragment>
       </CommonFieldValueProviderSummary>

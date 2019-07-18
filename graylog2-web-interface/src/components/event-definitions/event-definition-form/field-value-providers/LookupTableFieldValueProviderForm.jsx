@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, ControlLabel, FormGroup, HelpBlock, Radio, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
@@ -11,7 +11,6 @@ class LookupTableFieldValueProviderForm extends React.Component {
   static propTypes = {
     allFieldTypes: PropTypes.array.isRequired,
     config: PropTypes.object.isRequired,
-    eventFields: PropTypes.object.isRequired,
     lookupTables: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
@@ -52,64 +51,17 @@ class LookupTableFieldValueProviderForm extends React.Component {
     };
   };
 
-  formatFields = (context) => {
-    const { allFieldTypes, eventFields } = this.props;
-
-    if (context === 'source') {
-      return this.formatMessageFields(allFieldTypes);
-    }
-
-    return Object.keys(eventFields)
-      .sort(naturalSort)
-      .map(fieldName => ({ label: fieldName, value: fieldName }));
-  };
-
   formatLookupTables = (lookupTables) => {
     return lookupTables.map(table => ({ label: table.title, value: table.name }));
   };
 
   render() {
-    const { config, lookupTables } = this.props;
+    const { allFieldTypes, config, lookupTables } = this.props;
     const provider = config.providers.find(p => p.type === LookupTableFieldValueProviderForm.type);
 
     return (
       <Row className="row-sm">
         <Col md={12}>
-          <FormGroup>
-            <ControlLabel>Take Lookup Table key from...</ControlLabel>
-            <Radio id="lookup-message-key-context"
-                   name="key_context"
-                   value="source"
-                   checked={provider.key_context === 'source'}
-                   onChange={this.handleChange}>
-              Source log message
-            </Radio>
-            <Radio id="lookup-event-key-context"
-                   name="key_context"
-                   value="event"
-                   checked={provider.key_context === 'event'}
-                   onChange={this.handleChange}>
-              Generated Event
-            </Radio>
-          </FormGroup>
-
-          <FormGroup controlId="lookup-provider-table">
-            <ControlLabel>Lookup Table Key Field</ControlLabel>
-            <Select name="lookup-provider-key"
-                    placeholder="Select Lookup Table"
-                    onChange={this.handleSelectChange('key_field')}
-                    options={provider.key_context ? this.formatFields(provider.key_context) : []}
-                    value={provider.key_field}
-                    matchProp="label"
-                    disabled={provider.key_context === undefined}
-                    allowCreate
-                    required />
-            <HelpBlock>
-              Field name whose value will be used as Lookup Table Key.
-              {provider.key_context === 'event' && ' Please ensure the Event contains the given Field.'}
-            </HelpBlock>
-          </FormGroup>
-
           <FormGroup controlId="lookup-provider-table">
             <ControlLabel>Select Lookup Table</ControlLabel>
             <Select name="event-field-provider"
@@ -120,6 +72,21 @@ class LookupTableFieldValueProviderForm extends React.Component {
                     matchProp="label"
                     required />
             <HelpBlock>Select the Lookup Table Graylog should use to get the value.</HelpBlock>
+          </FormGroup>
+
+          <FormGroup controlId="lookup-provider-table">
+            <ControlLabel>Lookup Table Key Field</ControlLabel>
+            <Select name="lookup-provider-key"
+                    placeholder="Select Lookup Table"
+                    onChange={this.handleSelectChange('key_field')}
+                    options={this.formatMessageFields(allFieldTypes)}
+                    value={provider.key_field}
+                    matchProp="label"
+                    allowCreate
+                    required />
+            <HelpBlock>
+              Message Field name whose value will be used as Lookup Table Key.
+            </HelpBlock>
           </FormGroup>
         </Col>
       </Row>

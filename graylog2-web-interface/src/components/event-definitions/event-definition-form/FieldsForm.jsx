@@ -66,7 +66,6 @@ class FieldsForm extends React.Component {
     if (showFieldForm) {
       return (
         <FieldForm keys={eventDefinition.key_spec}
-                   fields={eventDefinition.field_spec}
                    fieldName={editField}
                    config={editField ? eventDefinition.field_spec[editField] : undefined}
                    onChange={this.addCustomField}
