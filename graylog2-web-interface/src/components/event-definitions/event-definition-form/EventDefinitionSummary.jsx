@@ -166,20 +166,22 @@ class EventDefinitionSummary extends React.Component {
   render() {
     const { eventDefinition } = this.props;
     return (
-      <Row>
+      <Row className={styles.eventSummary}>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Summary</h2>
-          <Row className={styles.eventSummary}>
-            <Col md={3}>
+          <Row>
+            <Col md={5}>
               {this.renderDetails(eventDefinition)}
             </Col>
-            <Col md={3}>
+            <Col md={5} mdOffset={1}>
               {this.renderCondition(eventDefinition.config)}
             </Col>
-            <Col md={3}>
+          </Row>
+          <Row>
+            <Col md={5}>
               {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
             </Col>
-            <Col md={3}>
+            <Col md={5} mdOffset={1}>
               {this.renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
             </Col>
           </Row>
