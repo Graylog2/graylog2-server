@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Table } from 'react-bootstrap';
 
+import styles from './CommonNotificationSummary.css';
+
 class CommonNotificationSummary extends React.Component {
   static propTypes = {
     type: PropTypes.string.isRequired,
@@ -33,7 +35,7 @@ class CommonNotificationSummary extends React.Component {
               {displayDetails ? 'Less details' : 'More details'}
             </Button>
             {displayDetails && (
-            <Table condensed hover>
+            <Table condensed hover className={styles.fixedTable}>
               <tbody>
                 <tr>
                   <td>Description</td>

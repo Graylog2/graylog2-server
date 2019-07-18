@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Well } from 'react-bootstrap';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 
@@ -42,9 +43,9 @@ class EmailNotificationSummary extends React.Component {
           <tr>
             <td>Email Body</td>
             <td>
-              <pre className={`${styles.bodyPreview} pre-scrollable`}>
+              <Well bsSize="small" className={styles.bodyPreview}>
                 {notification.config.body_template || <em>Empty body</em>}
-              </pre>
+              </Well>
             </td>
           </tr>
         </React.Fragment>

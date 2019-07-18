@@ -34,7 +34,7 @@ class CommonFieldValueProviderSummary extends React.Component {
             {displayDetails ? 'Less details' : 'More details'}
           </Button>
           {displayDetails && (
-            <Table condensed hover>
+            <Table condensed hover className={styles.fixedTable}>
               <tbody>
                 <tr>
                   <td>Is Key?</td>
