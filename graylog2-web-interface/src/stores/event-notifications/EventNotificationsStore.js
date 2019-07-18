@@ -13,6 +13,7 @@ const EventNotificationsStore = Reflux.createStore({
   listenables: [EventNotificationsActions],
   sourceUrl: '/plugins/org.graylog.events/notifications',
   all: undefined,
+  allLegacyTypes: undefined,
   notifications: undefined,
   query: undefined,
   pagination: {
@@ -34,6 +35,7 @@ const EventNotificationsStore = Reflux.createStore({
   getState() {
     return {
       all: this.all,
+      allLegacyTypes: this.allLegacyTypes,
       notifications: this.notifications,
       query: this.query,
       pagination: this.pagination,
@@ -152,6 +154,19 @@ const EventNotificationsStore = Reflux.createStore({
     );
 
     EventNotificationsActions.delete.promise(promise);
+  },
+
+  listAllLegacyTypes() {
+    const promise = fetch('GET', this.eventNotificationsUrl({ segments: ['legacy', 'types'] }));
+
+    promise.then((response) => {
+      console.log('HERE', response);
+      this.allLegacyTypes = response.types;
+      this.propagateChanges();
+      return response;
+    });
+
+    EventNotificationsActions.listAllLegacyTypes.promise(promise);
   },
 });
 
