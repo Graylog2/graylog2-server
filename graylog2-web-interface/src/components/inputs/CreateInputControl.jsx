@@ -9,7 +9,6 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 import StoreProvider from 'injection/StoreProvider';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import history from 'util/History';
 
 import { InputForm } from 'components/inputs';
 
