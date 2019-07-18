@@ -12,6 +12,7 @@ import {
   NumberField,
   TextField,
   TitleField,
+  ConfigurationFormField,
 } from 'components/configurationforms';
 
 const ConfigurationForm = createReactClass({
@@ -124,64 +125,15 @@ const ConfigurationForm = createReactClass({
   _renderConfigField(configField, key, autoFocus) {
     const value = this.state.values[key];
     const { typeName } = this.props;
-    const elementKey = `${typeName}-${key}`;
 
-    switch (configField.type) {
-      case 'text':
-        return (
-          <TextField key={elementKey}
-                     typeName={typeName}
-                     title={key}
-                     field={configField}
-                     value={value}
-                     onChange={this._handleChange}
-                     autoFocus={autoFocus} />
-        );
-      case 'number':
-        return (
-          <NumberField key={elementKey}
-                       typeName={typeName}
-                       title={key}
-                       field={configField}
-                       value={value}
-                       onChange={this._handleChange}
-                       autoFocus={autoFocus} />
-        );
-      case 'boolean':
-        return (
-          <BooleanField key={elementKey}
-                        typeName={typeName}
-                        title={key}
-                        field={configField}
-                        value={value}
-                        onChange={this._handleChange}
-                        autoFocus={autoFocus} />
-        );
-      case 'dropdown':
-        return (
-          <DropdownField key={elementKey}
-                         typeName={typeName}
-                         title={key}
-                         field={configField}
-                         value={value}
-                         onChange={this._handleChange}
-                         autoFocus={autoFocus}
-                         addPlaceholder />
-        );
-      case 'list':
-        return (
-          <ListField key={elementKey}
-                     typeName={typeName}
-                     title={key}
-                     field={configField}
-                     value={value}
-                     onChange={this._handleChange}
-                     autoFocus={autoFocus}
-                     addPlaceholder />
-        );
-      default:
-        return null;
-    }
+    return (
+      <ConfigurationFormField typeName={typeName}
+                              configField={configField}
+                              configKey={key}
+                              configValue={value}
+                              autoFocus={autoFocus}
+                              onChange={this._handleChange} />
+    );
   },
 
   render() {
