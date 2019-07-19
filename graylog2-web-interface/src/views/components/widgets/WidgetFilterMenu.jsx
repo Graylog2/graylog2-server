@@ -2,9 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
-import connect from 'stores/connect';
-
-import { SearchStore } from 'views/stores/SearchStore';
 import QueryInput from '../searchbar/AsyncQueryInput';
 
 import style from './WidgetFilterMenu.css';
@@ -53,7 +50,7 @@ class WidgetFilterMenu extends React.Component {
           You can limit the results used by this widget by adding a custom filter here.
         </div>
         <div className={style.filterInput}>
-          <QueryInput onChange={value => this.setState({ filter: value })}
+          <QueryInput onChange={value => new Promise(resolve => this.setState({ filter: value }, resolve))}
                       onExecute={this._onUpdate}
                       placeholder="Add new widget filter"
                       maxLines={10}
@@ -79,4 +76,4 @@ class WidgetFilterMenu extends React.Component {
   }
 }
 
-export default connect(WidgetFilterMenu, { search: SearchStore });
+export default WidgetFilterMenu;
