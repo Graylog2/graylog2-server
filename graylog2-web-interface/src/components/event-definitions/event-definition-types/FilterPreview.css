@@ -1,0 +1,14 @@
+:local(.filterPreview) {
+    border: 1px solid #333;
+    border-radius: 2px;
+    padding: 30px 10px;
+}
+
+:local(.filterPreview) h3 {
+    margin-bottom: 5px;
+}
+
+:local(.filterPreview) table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
