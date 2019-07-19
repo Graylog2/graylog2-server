@@ -19,9 +19,11 @@ type Props = {
 
 class WindowLeaveMessage extends React.PureComponent<Props> {
   render() {
-    return this.props.dirty
+    const { dirty, route } = this.props;
+
+    return dirty
       ? (
-        <ConfirmLeaveDialog route={this.props.route}
+        <ConfirmLeaveDialog route={route}
                             question="Are you sure you want to leave the page? Any unsaved changes will be lost." />
       )
       : null;
