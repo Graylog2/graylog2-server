@@ -8,6 +8,7 @@ import { ExternalLinkButton, Select } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 
 import StoreProvider from 'injection/StoreProvider';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { InputForm } from 'components/inputs';
 
@@ -54,6 +55,20 @@ const CreateInputControl = createReactClass({
 
   _openModal(event) {
     event.preventDefault();
+    const { selectedInput } = this.state;
+
+    const customConfiguration = PluginStore.exports('inputConfiguration')
+      .find(inputConfig => inputConfig.type === selectedInput);
+
+    if (customConfiguration) {
+      const onClose = () => this.setState({ customInputsComponent: undefined });
+      const CustomInputsConfiguration = customConfiguration.component;
+
+      this.setState({
+        customInputsComponent: <CustomInputsConfiguration onClose={onClose} />,
+      });
+    }
+
     this.configurationForm.open();
   },
 
@@ -65,8 +80,9 @@ const CreateInputControl = createReactClass({
 
   render() {
     let inputModal;
-    const { selectedInputDefinition, selectedInput, inputTypes } = this.state;
-    if (selectedInputDefinition) {
+    const { selectedInputDefinition, selectedInput, inputTypes, customInputsComponent } = this.state;
+
+    if (selectedInputDefinition && !customInputsComponent) {
       const inputTypeName = inputTypes[selectedInput];
       inputModal = (
         <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
@@ -78,6 +94,7 @@ const CreateInputControl = createReactClass({
                    submitAction={this._createInput} />
       );
     }
+
     return (
       <Row className="content input-new">
         <Col md={12}>
@@ -97,7 +114,7 @@ const CreateInputControl = createReactClass({
               Find more inputs
             </ExternalLinkButton>
           </form>
-          {inputModal}
+          {inputModal || customInputsComponent}
         </Col>
       </Row>
     );
