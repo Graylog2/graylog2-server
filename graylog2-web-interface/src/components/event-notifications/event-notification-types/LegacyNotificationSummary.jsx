@@ -3,16 +3,12 @@ import PropTypes from 'prop-types';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 
-class EmailNotificationSummary extends React.Component {
+class LegacyNotificationSummary extends React.Component {
   static propTypes = {
     type: PropTypes.string.isRequired,
-    notification: PropTypes.object,
+    notification: PropTypes.object.isRequired,
     definitionNotification: PropTypes.object.isRequired,
     legacyTypes: PropTypes.object.isRequired,
-  };
-
-  static defaultProps = {
-    notification: {},
   };
 
   render() {
@@ -21,10 +17,9 @@ class EmailNotificationSummary extends React.Component {
     const callbackType = notification.config.callback_type;
     const typeConfiguration = legacyTypes[callbackType].configuration;
 
-    const summaryFields = Object.entries(typeConfiguration).map((keyAndValue) => {
-      const [key, value] = keyAndValue;
+    const summaryFields = Object.entries(typeConfiguration).map(([key, value]) => {
       return (
-        <tr>
+        <tr key={key}>
           <td>{value.human_name}</td>
           <td>{configurationValues[key]}</td>
         </tr>
@@ -33,10 +28,12 @@ class EmailNotificationSummary extends React.Component {
 
     return (
       <CommonNotificationSummary {...this.props}>
-        {summaryFields}
+        <React.Fragment>
+          {summaryFields}
+        </React.Fragment>
       </CommonNotificationSummary>
     );
   }
 }
 
-export default EmailNotificationSummary;
+export default LegacyNotificationSummary;

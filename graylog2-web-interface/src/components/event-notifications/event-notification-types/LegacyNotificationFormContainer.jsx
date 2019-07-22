@@ -14,15 +14,15 @@ class LegacyNotificationFormContainer extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    notifications: PropTypes.object,
-  };
-
-  static defaultProps = {
-    notifications: undefined,
+    notifications: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
-    EventNotificationsActions.listAllLegacyTypes();
+    const { notifications } = this.props;
+
+    if (!notifications.allLegacyTypes) {
+      EventNotificationsActions.listAllLegacyTypes();
+    }
   }
 
   render() {

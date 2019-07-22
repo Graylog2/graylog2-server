@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
-import lodash from 'lodash';
 
 import { Select } from 'components/common';
 import { ConfigurationFormField } from 'components/configurationforms';
+
+import styles from './LegacyNotificationForm.css';
 
 class LegacyNotificationForm extends React.Component {
   static propTypes = {
@@ -15,20 +16,13 @@ class LegacyNotificationForm extends React.Component {
 
   propagateMultiChange = (newValues) => {
     const { config, onChange } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
-
-    Object.entries(newValues).forEach((keyAndValue) => {
-      const [key, value] = keyAndValue;
-      nextConfig[key] = value;
-    });
-
+    const nextConfig = Object.assign({}, config, newValues);
     onChange(nextConfig);
   };
 
   propagateChange = (key, value) => {
     const { config } = this.props;
-    const nextConfiguration = lodash.cloneDeep(config.configuration);
-    nextConfiguration[key] = value;
+    const nextConfiguration = Object.assign({}, config.configuration, { [key]: value });
     this.propagateMultiChange({ configuration: nextConfiguration });
   };
 
@@ -56,7 +50,8 @@ class LegacyNotificationForm extends React.Component {
       const configValue = config.configuration[configKey] || configField.default_value;
 
       return (
-        <ConfigurationFormField typeName={config.callback_type}
+        <ConfigurationFormField key={configKey}
+                                typeName={config.callback_type}
                                 configField={configField}
                                 configKey={configKey}
                                 configValue={configValue}
@@ -90,7 +85,7 @@ class LegacyNotificationForm extends React.Component {
           </FormGroup>
         </fieldset>
 
-        <Alert bsStyle="danger">
+        <Alert bsStyle="danger" className={styles.legacyNotificationAlert}>
           Legacy alarm callbacks are deprecated. Please switch to the new notification types as soon as possible!
         </Alert>
 

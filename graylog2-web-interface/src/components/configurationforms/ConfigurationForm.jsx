@@ -5,15 +5,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import {
-  BooleanField,
-  DropdownField,
-  ListField,
-  NumberField,
-  TextField,
-  TitleField,
-  ConfigurationFormField,
-} from 'components/configurationforms';
+import { TitleField, ConfigurationFormField } from 'components/configurationforms';
 
 const ConfigurationForm = createReactClass({
   displayName: 'ConfigurationForm',
@@ -127,7 +119,8 @@ const ConfigurationForm = createReactClass({
     const { typeName } = this.props;
 
     return (
-      <ConfigurationFormField typeName={typeName}
+      <ConfigurationFormField key={key}
+                              typeName={typeName}
                               configField={configField}
                               configKey={key}
                               configValue={value}

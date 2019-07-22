@@ -14,13 +14,12 @@ class LegacyNotificationSummaryContainer extends React.Component {
   static propTypes = {
     type: PropTypes.string.isRequired,
     notification: PropTypes.object,
-    notifications: PropTypes.object,
+    notifications: PropTypes.object.isRequired,
     definitionNotification: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
-    notification: undefined,
-    notifications: undefined,
+    notification: {},
   };
 
   componentDidMount() {
