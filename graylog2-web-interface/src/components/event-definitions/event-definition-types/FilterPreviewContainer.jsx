@@ -67,12 +67,20 @@ class FilterPreviewContainer extends React.Component {
     const { queryId, searchTypeId } = this.state;
     const isLoading = !filterPreview.result || !filterPreview.result.forId(queryId);
     let searchResult;
+    let errors;
 
     if (!isLoading) {
       searchResult = filterPreview.result.forId(queryId).searchTypes[searchTypeId];
+      // eslint-disable-next-line prefer-destructuring
+      errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
     }
 
-    return <FilterPreview eventDefinition={eventDefinition} isFetchingData={isLoading} searchResult={searchResult} />;
+    return (
+      <FilterPreview eventDefinition={eventDefinition}
+                     isFetchingData={isLoading}
+                     searchResult={searchResult}
+                     errors={errors} />
+    );
   }
 }
 
