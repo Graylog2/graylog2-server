@@ -68,8 +68,8 @@ const controlSmall = {
 };
 
 const controlNormal = {
-  minHeight: '36px',
-  height: '36px',
+  minHeight: '34px',
+  height: '34px',
 };
 
 const menu = base => ({
@@ -107,12 +107,20 @@ const controlFocus = props => (base, { isFocused }) => {
 
   const controlSize = size === 'small' ? controlSmall : controlNormal;
 
-  return { ...base, ...controlSize, borderColor, borderWidth, outline, boxShadow };
+  return {
+    ...base,
+    ...controlSize,
+    borderColor,
+    borderWidth,
+    outline,
+    boxShadow,
+    alignItems: 'flex-start',
+  };
 };
 
 const valueContainer = base => ({
   ...base,
-  padding: '4px 12px',
+  padding: '2px 12px',
 });
 
 const _components = {
