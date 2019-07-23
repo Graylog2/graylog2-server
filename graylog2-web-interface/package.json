@@ -145,7 +145,7 @@
     "express": "^4.16.4",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^1.1.11",
-    "flow-bin": "^0.98.1",
+    "flow-bin": "0.103.0",
     "glob": "^7.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.8.0",

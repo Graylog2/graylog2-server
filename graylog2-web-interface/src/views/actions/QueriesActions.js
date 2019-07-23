@@ -6,10 +6,11 @@ import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Que
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions } from 'views/logic/singleton';
+import type { RefluxActions } from '../stores/StoreTypes';
 
 type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 
-type QueriesActionsType = {
+type QueriesActionsType = RefluxActions<{
   create: (Query, ViewState) => Promise<QueriesList>,
   duplicate: (QueryId) => Promise<QueriesList>,
   query: (QueryId, string) => Promise<QueriesList>,
@@ -18,7 +19,7 @@ type QueriesActionsType = {
   remove: (QueryId) => Promise<QueriesList>,
   timerange: (QueryId, TimeRange) => Promise<QueriesList>,
   update: (QueryId, Query) => Promise<QueriesList>,
-};
+}>;
 
 // eslint-disable-next-line import/prefer-default-export
 export const QueriesActions: QueriesActionsType = singletonActions(

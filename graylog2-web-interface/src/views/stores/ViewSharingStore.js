@@ -8,15 +8,16 @@ import URLUtils from 'util/URLUtils';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { RefluxActions } from './StoreTypes';
 
 const viewSharingUrl = viewId => URLUtils.qualifyUrl(`/views/${viewId}/share`);
 
-type ViewSharingActionsType = {
+type ViewSharingActionsType = RefluxActions<{
   get: (string) => Promise<ViewSharing>,
   create: (string, ViewSharing) => Promise<ViewSharing>,
   remove: (string) => Promise<ViewSharing>,
   users: (string) => Promise<Array<UserShortSummary>>,
-};
+}>;
 
 export const ViewSharingActions: ViewSharingActionsType = singletonActions(
   'views.ViewSharing',

@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import asMock from 'helpers/mocking/AsMock';
+
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
@@ -124,7 +126,7 @@ describe('ChartActionHandler', () => {
 
       ChartActionHandler('queryId', 'somefield', emptyFieldType, { widget: origWidget });
 
-      const widget = WidgetActions.create.mock.calls[0][0];
+      const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(widget.filter).toEqual(filter);
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
