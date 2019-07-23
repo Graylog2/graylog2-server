@@ -1,6 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
@@ -14,7 +15,7 @@ describe('AddToQueryHandler', () => {
   beforeEach(() => {
     QueriesStore.listen = jest.fn((cb) => { queriesStoreListen = cb; });
     QueriesStore.getInitialState = jest.fn(() => queries);
-    QueriesActions.query = jest.fn(() => Promise.resolve());
+    QueriesActions.query = mockAction(jest.fn(() => Promise.resolve()));
   });
   it('formats date field for ES', () => {
     const query = Query.builder()

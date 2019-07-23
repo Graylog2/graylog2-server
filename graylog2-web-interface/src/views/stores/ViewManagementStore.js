@@ -10,6 +10,7 @@ import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { RefluxActions } from './StoreTypes';
 
 type SortOrder = 'asc' | 'desc';
 
@@ -33,14 +34,14 @@ export type ViewSummary = {
 
 export type ViewSummaries = Array<ViewSummary>;
 
-type ViewManagementActionsType = {
+type ViewManagementActionsType = RefluxActions<{
   create: (View) => Promise<View>,
   delete: (View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
   get: (string) => Promise<ViewJson>,
   search: (string, number, number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
   update: (View) => Promise<View>,
-};
+}>;
 
 const ViewManagementActions: ViewManagementActionsType = singletonActions(
   'views.ViewManagement',

@@ -2,9 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-// $FlowFixMe: imports from core need to be fixed in flow
 import Spinner from 'components/common/Spinner';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';

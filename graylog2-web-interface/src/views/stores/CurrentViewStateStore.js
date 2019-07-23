@@ -12,14 +12,15 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
+import type { RefluxActions } from './StoreTypes';
 
-type CurrentViewStateActionsType = {
+type CurrentViewStateActionsType = RefluxActions<{
   fields: (Immutable.Set<string>) => Promise<*>,
   formatting: (FormattingSettings) => Promise<*>,
   titles: (Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<*>,
   widgets: (Immutable.List<Widget>) => Promise<*>,
   widgetPositions: () => Promise<*>,
-};
+}>;
 
 export const CurrentViewStateActions: CurrentViewStateActionsType = singletonActions(
   'views.CurrentViewState',

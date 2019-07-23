@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
+import mockAction from 'helpers/mocking/MockAction';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule from './HighlightingRule';
@@ -19,7 +20,7 @@ describe('HighlightingRule', () => {
   });
 
   it('should update rule if color was changed', () => {
-    HighlightingRulesActions.update = jest.fn(updatedRule => Promise.resolve([updatedRule]));
+    HighlightingRulesActions.update = mockAction(jest.fn(updatedRule => Promise.resolve([updatedRule])));
     const wrapper = mount(<HighlightingRule rule={rule} />);
 
     const { onChange } = wrapper.find('color-picker-popover').props();
@@ -36,7 +37,7 @@ describe('HighlightingRule', () => {
   });
 
   it('should close popover when color was changed', () => {
-    HighlightingRulesActions.update = jest.fn(updatedRule => Promise.resolve([updatedRule]));
+    HighlightingRulesActions.update = mockAction(jest.fn(updatedRule => Promise.resolve([updatedRule])));
     const wrapper = mount(<HighlightingRule rule={rule} />);
 
     const { onChange } = wrapper.find('color-picker-popover').props();
@@ -53,7 +54,7 @@ describe('HighlightingRule', () => {
       oldConfirm = window.confirm;
       window.confirm = jest.fn(() => false);
 
-      HighlightingRulesActions.remove = jest.fn(() => Promise.resolve([]));
+      HighlightingRulesActions.remove = mockAction(jest.fn(() => Promise.resolve([])));
       const wrapper = mount(<HighlightingRule rule={rule} />);
 
       deleteIcon = wrapper.find('span[title="Remove this Highlighting Rule"]');

@@ -1,10 +1,10 @@
 // @flow strict
-import React from 'react';
-import Immutable from 'immutable';
+import * as React from 'react';
 import { mount } from 'enzyme';
 
-// $FlowFixMe: imports from core need to be fixed in flow
+import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
+import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
@@ -16,6 +16,7 @@ import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
+import SearchMetadata from 'views/logic/search/SearchMetadata';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -30,25 +31,29 @@ jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => x => x);
 
+const mockPromise = (res) => {
+  const promise = Promise.resolve(res);
+  // $FlowFixMe: On purpose for a promise that does not need to be resolved
+  promise.then = x => x(res);
+  return promise;
+};
+
 describe('ExtendedSearchPage', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
     QueryFiltersStore.listen = jest.fn(() => jest.fn());
     // $FlowFixMe: Exact promise type not required for test functionality
-    SearchActions.execute = jest.fn(() => ({ then: fn => fn() }));
+    SearchActions.execute = jest.fn(() => mockPromise());
     StreamsActions.refresh = jest.fn();
     SearchConfigActions.refresh = jest.fn();
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
     ViewStore.getInitialState = jest.fn(() => ({ view: View.create(), dirty: false, activeQuery: 'foobar' }));
-    FieldTypesActions.all = jest.fn();
-    SearchMetadataActions.parseSearch = jest.fn();
+    FieldTypesActions.all = mockAction(jest.fn());
+    SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    SearchActions.refresh = jest.fn(() => Promise.resolve());
-    SearchActions.refresh.listen = jest.fn(() => jest.fn());
-
-    const searchMetadata = { undeclared: Immutable.Set() };
-    SearchMetadataActions.parseSearch.mockReturnValue({ then: x => x(searchMetadata) });
+    // $FlowFixMe: Somehow flow does not see the `listen` property.
+    SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
   });
 
   const SimpleExtendedSearchPage = props => (
@@ -139,8 +144,8 @@ describe('ExtendedSearchPage', () => {
   it('updating search in view triggers search execution', () => {
     mount(<SimpleExtendedSearchPage />);
 
-    const cb = ViewActions.search.completed.listen.mock.calls[0][0];
-    SearchActions.execute.mockClear();
+    const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
+    asMock(SearchActions.execute).mockClear();
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
     return cb({ search: {} })
@@ -156,8 +161,8 @@ describe('ExtendedSearchPage', () => {
   it('refreshes field types upon every search execution', () => {
     mount(<SimpleExtendedSearchPage />);
 
-    FieldTypesActions.all.mockClear();
-    const cb = ViewActions.search.completed.listen.mock.calls[0][0];
+    asMock(FieldTypesActions.all).mockClear();
+    const cb = asMock(ViewActions.search.completed.listen).mock.calls[0][0];
     return cb({ search: {} })
       .then(() => {
         expect(FieldTypesActions.all).toHaveBeenCalled();
@@ -184,7 +189,7 @@ describe('ExtendedSearchPage', () => {
   it('changing current query in view does not trigger search execution', () => {
     mount(<SimpleExtendedSearchPage />);
 
-    SearchActions.execute.mockClear();
+    asMock(SearchActions.execute).mockClear();
     expect(SearchActions.execute).not.toHaveBeenCalled();
 
     return ViewActions.selectQuery('someQuery')

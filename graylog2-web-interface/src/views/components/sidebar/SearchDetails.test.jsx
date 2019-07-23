@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
+import asMock from 'helpers/mocking/AsMock';
+
 const searchResult = {
   effectiveTimerange: {
     from: '2018-12-18T14:34:49.519Z',
@@ -34,7 +36,7 @@ describe('SearchDetails', () => {
   const SearchDetails = require('./SearchDetails');
 
   const updateCurrentUser = (newCurrentUser) => {
-    const cb = CurrentUserStore.listen.mock.calls[0][0];
+    const cb = asMock(CurrentUserStore.listen).mock.calls[0][0];
     cb({ currentUser: newCurrentUser });
   };
 

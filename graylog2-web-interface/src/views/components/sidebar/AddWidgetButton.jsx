@@ -79,8 +79,9 @@ class AddWidgetButton extends React.Component<Props, State> {
       .map(this._createMenuItem);
     const generic = creators.filter(c => (c.type === 'generic'))
       .map(this._createMenuItem);
-    // eslint-disable-next-line react/destructuring-assignment
-    const overflowingComponents = Object.values(this.state.overflowingComponents);
+    const { overflowingComponents } = this.state;
+    // $FlowFixMe: Object.value signature is in the way
+    const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
       <React.Fragment>
         <DropdownButton title={menuTitle} id="add-widget-button-dropdown" bsStyle="info" pullRight>
@@ -88,7 +89,7 @@ class AddWidgetButton extends React.Component<Props, State> {
           <MenuItem divider />
           {generic}
         </DropdownButton>
-        {overflowingComponents}
+        {components}
       </React.Fragment>
     );
   }

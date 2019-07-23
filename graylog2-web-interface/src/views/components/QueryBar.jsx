@@ -67,4 +67,8 @@ QueryBar.propTypes = {
   }).isRequired,
 };
 
+QueryBar.defaultProps = {
+  children: null,
+};
+
 export default withRouter(connect(QueryBar, { queries: QueryIdsStore, queryTitles: QueryTitlesStore, viewMetadata: ViewMetadataStore }));

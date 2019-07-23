@@ -10,7 +10,7 @@ import type {
 } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 
-const RemoveFromTableActionHandler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
+const RemoveFromTableActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
   const { widget } = context;
   const newFields = widget.config.fields.filter(f => (f !== field));
   const newConfig = widget.config.toBuilder()
@@ -33,4 +33,4 @@ RemoveFromTableActionHandler.condition = condition;
 /* Hide RemoveFromTableHandler in the sidebar */
 RemoveFromTableActionHandler.hide = (context: ActionContexts): boolean => !context.widget;
 
-export default RemoveFromTableActionHandler;
+export default (RemoveFromTableActionHandler: FieldActionHandler);
