@@ -142,6 +142,7 @@ type Props = {
   valueKey?: string,
   delimiter?: string,
   options: Array<Option>,
+  components?: Array<React.Node>,
   matchProp?: string,
   value?: string,
   autoFocus?: boolean,
@@ -190,6 +191,10 @@ class Select extends React.Component<Props, State> {
      * (specified in `valueKey`).
      */
     options: PropTypes.array.isRequired,
+    /**
+     * A collection of custom `react-select` components from https://react-select.com/components
+     */
+    components: PropTypes.arrayOf(PropTypes.node),
   };
 
   static defaultProps = {
@@ -205,6 +210,7 @@ class Select extends React.Component<Props, State> {
     disabled: false,
     addLabelText: undefined,
     onReactSelectChange: undefined,
+    components: null,
   };
 
   constructor(props: Props) {
@@ -266,7 +272,15 @@ class Select extends React.Component<Props, State> {
   };
 
   render() {
-    const { allowCreate = false, delimiter, displayKey, size, options, valueKey, onReactSelectChange } = this.props;
+    const {
+      allowCreate = false,
+      delimiter,
+      displayKey,
+      components,
+      options,
+      valueKey,
+      onReactSelectChange,
+    } = this.props;
     const { value } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
@@ -292,6 +306,7 @@ class Select extends React.Component<Props, State> {
                        getOptionValue={option => option[valueKey]}
                        components={{
                          ..._components,
+                         ...components,
                        }}
                        styles={{
                          ..._styles(this.props),
