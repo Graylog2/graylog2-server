@@ -36,6 +36,10 @@
   margin-bottom: 2px;
 }
 
+:local(.total-throughput__content) span i {
+  font-weight: normal;
+}
+
 @media (max-width: 991px) {
   :local(.total-throughput__content),
   :local(.total-throughput) > a {
