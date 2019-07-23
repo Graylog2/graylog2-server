@@ -76,7 +76,7 @@ const menu = base => ({
   ...base,
   zIndex: 5,
   border: '1px solid rgba(102, 175, 233, 0.5)',
-  boxShadow: 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)',
+  boxShadow: '0 0 4px rgba(102, 175, 233, 0.3)',
 });
 
 const singleValueAndPlaceholder = base => ({
@@ -103,7 +103,7 @@ const controlFocus = props => (base, { isFocused }) => {
   const borderColor = isFocused ? '#66afe9' : base.borderColor;
   const borderWidth = isFocused ? 1 : base.borderWidth;
   const outline = isFocused ? 0 : base.outline;
-  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : base.boxShadow;
+  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : 'inset 0 1px 1px rgba(0, 0, 0, 0.075)';
 
   const controlSize = size === 'small' ? controlSmall : controlNormal;
 
