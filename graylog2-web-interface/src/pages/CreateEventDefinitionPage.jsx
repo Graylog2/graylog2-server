@@ -3,18 +3,33 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import EventDefinitionFormContainer
+  from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
 class CreateEventDefinitionPage extends React.Component {
+  state = {
+    eventDefinitionTitle: undefined,
+  };
+
+  handleEventDefinitionChange = (eventDefinition) => {
+    const { eventDefinitionTitle } = this.state;
+    if (eventDefinition.title !== eventDefinitionTitle) {
+      this.setState({ eventDefinitionTitle: eventDefinition.title });
+    }
+  };
+
   render() {
+    const { eventDefinitionTitle } = this.state;
+    const pageTitle = eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition';
+
     return (
-      <DocumentTitle title="New Event Definition">
+      <DocumentTitle title={pageTitle}>
         <span>
-          <PageHeader title="New Event Definition">
+          <PageHeader title={pageTitle}>
             <span>
               Event Definitions allow you to create Alerts from different Conditions and alert on them.
             </span>
@@ -40,7 +55,7 @@ class CreateEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventDefinitionFormContainer action="create" />
+              <EventDefinitionFormContainer action="create" onEventDefinitionChange={this.handleEventDefinitionChange} />
             </Col>
           </Row>
         </span>
