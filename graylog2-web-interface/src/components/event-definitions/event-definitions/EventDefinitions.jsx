@@ -32,7 +32,7 @@ class EventDefinitions extends React.Component {
   renderEmptyContent = () => {
     return (
       <Row>
-        <Col md={4} mdOffset={4}>
+        <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
           <EmptyEntity>
             <p>
               Create Event Definitions that are able to search, aggregate or correlate Messages and other

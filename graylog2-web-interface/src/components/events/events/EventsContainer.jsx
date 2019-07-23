@@ -11,17 +11,20 @@ import Events from './Events';
 import {} from 'components/event-definitions/event-definition-types';
 
 const { EventsStore, EventsActions } = CombinedProvider.get('Events');
+const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
 class EventsContainer extends React.Component {
   static propTypes = {
     events: PropTypes.object.isRequired,
+    eventDefinitions: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
-    this.fetchData({});
+    this.fetchEvents({});
+    this.fetchEventDefinitions();
   }
 
-  fetchData = ({ page, pageSize, query, filter, timerange }) => {
+  fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
     return EventsActions.search({
       query: query,
       page: page,
@@ -31,9 +34,13 @@ class EventsContainer extends React.Component {
     });
   };
 
+  fetchEventDefinitions = () => {
+    return EventDefinitionsActions.listPaginated({});
+  };
+
   handlePageChange = (nextPage, nextPageSize) => {
     const { events } = this.props;
-    this.fetchData({
+    this.fetchEvents({
       page: nextPage,
       pageSize: nextPageSize,
       query: events.parameters.query,
@@ -44,7 +51,7 @@ class EventsContainer extends React.Component {
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { events } = this.props;
-    const promise = this.fetchData({
+    const promise = this.fetchEvents({
       query: nextQuery,
       pageSize: events.parameters.pageSize,
       filter: events.parameters.filter,
@@ -56,7 +63,7 @@ class EventsContainer extends React.Component {
   handleAlertFilterChange = (nextAlertFilter) => {
     return () => {
       const { events } = this.props;
-      this.fetchData({
+      this.fetchEvents({
         query: events.parameters.query,
         pageSize: events.parameters.pageSize,
         filter: { alerts: nextAlertFilter },
@@ -67,7 +74,7 @@ class EventsContainer extends React.Component {
 
   handleTimeRangeChange = (timeRangeType, range) => {
     const { events } = this.props;
-    this.fetchData({
+    this.fetchEvents({
       query: events.parameters.query,
       pageSize: events.parameters.pageSize,
       filter: events.parameters.filter,
@@ -76,9 +83,10 @@ class EventsContainer extends React.Component {
   };
 
   render() {
-    const { events } = this.props;
+    const { events, eventDefinitions } = this.props;
+    const isLoading = !events.events || !eventDefinitions.eventDefinitions;
 
-    if (!events.events) {
+    if (isLoading) {
       return <Spinner text="Loading Events information..." />;
     }
 
@@ -86,6 +94,7 @@ class EventsContainer extends React.Component {
       <Events events={events.events}
               parameters={events.parameters}
               totalEvents={events.totalEvents}
+              totalEventDefinitions={eventDefinitions.pagination.grandTotal}
               context={events.context}
               onQueryChange={this.handleQueryChange}
               onPageChange={this.handlePageChange}
@@ -95,4 +104,7 @@ class EventsContainer extends React.Component {
   }
 }
 
-export default connect(EventsContainer, { events: EventsStore });
+export default connect(EventsContainer, {
+  events: EventsStore,
+  eventDefinitions: EventDefinitionsStore,
+});

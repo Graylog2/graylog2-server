@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Alert, Button, ButtonGroup, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
+import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
-import { PaginatedList, SearchForm, Timestamp, TimeUnitInput } from 'components/common';
+import { EmptyEntity, PaginatedList, SearchForm, Timestamp, TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
@@ -23,6 +24,7 @@ class Events extends React.Component {
     events: PropTypes.array.isRequired,
     parameters: PropTypes.object.isRequired,
     totalEvents: PropTypes.number.isRequired,
+    totalEventDefinitions: PropTypes.number.isRequired,
     context: PropTypes.object.isRequired,
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
@@ -194,13 +196,44 @@ class Events extends React.Component {
     );
   };
 
+  renderEmptyContent = () => {
+    return (
+      <Row>
+        <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
+          <EmptyEntity title="Looks like you didn't define any Events yet">
+            <p>
+              Create Event Definitions that are able to search, aggregate or correlate Messages and other
+              Events, allowing you to record significant Events in Graylog and alert on them.
+            </p>
+            <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
+              <Button bsStyle="success">Get Started!</Button>
+            </LinkContainer>
+          </EmptyEntity>
+        </Col>
+      </Row>
+    );
+  };
+
   render() {
-    const { events, parameters, totalEvents, onPageChange, onQueryChange, onAlertFilterChange } = this.props;
+    const {
+      events,
+      parameters,
+      totalEvents,
+      totalEventDefinitions,
+      onPageChange,
+      onQueryChange,
+      onAlertFilterChange,
+    } = this.props;
 
     const filterAlerts = parameters.filter.alerts;
     const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
 
     const eventList = events.map(e => e.event);
+
+    if (totalEventDefinitions === 0) {
+      return this.renderEmptyContent();
+    }
+
     return (
       <React.Fragment>
         <Row>
