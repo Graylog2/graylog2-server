@@ -4,6 +4,8 @@ import EmailNotificationFormContainer from './EmailNotificationFormContainer';
 import EmailNotificationSummary from './EmailNotificationSummary';
 import HttpNotificationForm from './HttpNotificationForm';
 import HttpNotificationSummary from './HttpNotificationSummary';
+import LegacyNotificationFormContainer from './LegacyNotificationFormContainer';
+import LegacyNotificationSummaryContainer from './LegacyNotificationSummaryContainer';
 
 PluginStore.register(new PluginManifest({}, {
   eventNotificationTypes: [
@@ -18,6 +20,12 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'HTTP Notification',
       formComponent: HttpNotificationForm,
       summaryComponent: HttpNotificationSummary,
+    },
+    {
+      type: 'legacy-alarm-callback-notification-v1',
+      displayName: 'Legacy Alarm Callbacks',
+      formComponent: LegacyNotificationFormContainer,
+      summaryComponent: LegacyNotificationSummaryContainer,
     },
   ],
 }));
