@@ -62,26 +62,57 @@ const multiValueRemove = base => ({
   },
 });
 
-const controlSmall = base => ({
-  ...base,
+const controlSmall = {
   minHeight: '30px',
   height: '30px',
-});
+};
 
-const controlNormal = base => ({
-  ...base,
+const controlNormal = {
   minHeight: '36px',
   height: '36px',
-});
+};
 
 const menu = base => ({
   ...base,
   zIndex: 5,
+  border: '1px solid rgba(102, 175, 233, 0.5)',
+  boxShadow: 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)',
 });
 
 const singleValueAndPlaceholder = base => ({
   ...base,
   lineHeight: '28px',
+  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  fontWeight: 400,
+  color: '#666',
+});
+
+const placeholder = base => ({
+  ...base,
+  lineHeight: '28px',
+  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  fontWeight: 400,
+  color: '#999',
+});
+
+const controlFocus = props => (base, { isFocused }) => {
+  const { size } = props;
+
+  const borderColor = isFocused ? '#66afe9' : base.borderColor;
+  const borderWidth = isFocused ? 1 : base.borderWidth;
+  const outline = isFocused ? 0 : base.outline;
+  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : base.boxShadow;
+
+  const controlSize = size === 'small' ? controlSmall : controlNormal;
+
+  return { ...base, ...controlSize, borderColor, borderWidth, outline, boxShadow };
+};
+
+const valueContainer = base => ({
+  ...base,
+  padding: '4px 12px',
 });
 
 const _components = {
@@ -90,15 +121,17 @@ const _components = {
   IndicatorSeparator,
 };
 
-const _styles = {
+const _styles = props => ({
   dropdownIndicator,
   multiValue,
   multiValueLabel,
   multiValueRemove,
   menu,
   singleValue: singleValueAndPlaceholder,
-  placeholder: singleValueAndPlaceholder,
-};
+  placeholder,
+  control: controlFocus(props),
+  valueContainer,
+});
 
 type Option = { [string]: any };
 type Props = {
@@ -261,8 +294,7 @@ class Select extends React.Component<Props, State> {
                          ..._components,
                        }}
                        styles={{
-                         ..._styles,
-                         control: size === 'small' ? controlSmall : controlNormal,
+                         ..._styles(this.props),
                        }}
                        value={formattedValue} />
     );
