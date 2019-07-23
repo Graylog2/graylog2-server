@@ -2,6 +2,8 @@
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import mockAction from 'helpers/mocking/MockAction';
+import asMock from 'helpers/mocking/AsMock';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import ViewState from 'views/logic/views/ViewState';
@@ -19,17 +21,17 @@ describe('CurrentViewStateStore', () => {
   };
 
   it('should set empty widgets', () => {
-    const updateFn = jest.fn((id, view) => {
+    const updateFn = mockAction(jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(viewState);
       return Promise.resolve(viewState);
-    });
+    }));
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
     CurrentViewStateStore.widgets(Immutable.List());
 
-    expect(updateFn.mock.calls.length).toBe(1);
+    expect(asMock(updateFn).mock.calls.length).toBe(1);
   });
 
   it('should set new widgets', () => {
@@ -43,17 +45,17 @@ describe('CurrentViewStateStore', () => {
       .widgets(widgets)
       .build();
 
-    const updateFn = jest.fn((id, newViewState) => {
+    const updateFn = mockAction(jest.fn((id, newViewState) => {
       expect(id).toEqual(viewId);
       expect(newViewState).toEqual(expectedViewState);
       return Promise.resolve(expectedViewState);
-    });
+    }));
 
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
     CurrentViewStateStore.widgets(widgets);
-    expect(updateFn.mock.calls.length).toBe(1);
+    expect(updateFn).toHaveBeenCalledTimes(1);
   });
 
   it('should add new widgets', () => {
@@ -89,16 +91,16 @@ describe('CurrentViewStateStore', () => {
       .widgets(expectedWidgets)
       .build();
 
-    const updateFn = jest.fn((id, newViewState) => {
+    const updateFn = mockAction(jest.fn((id, newViewState) => {
       expect(id).toEqual(viewId);
       expect(newViewState).toEqual(expectedViewState);
       return Promise.resolve(expectedViewState);
-    });
+    }));
 
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: oldViewState });
     CurrentViewStateStore.onViewStatesStoreChange(sMap);
     CurrentViewStateStore.widgets(expectedWidgets);
-    expect(updateFn.mock.calls.length).toBe(1);
+    expect(updateFn).toHaveBeenCalledTimes(1);
   });
 });

@@ -5,6 +5,7 @@ import { mount } from 'enzyme';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
+import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
 import View from 'views/logic/views/View';
@@ -59,12 +60,12 @@ describe('ShowViewPage', () => {
   });
   it('renders Spinner while loading', () => {
     const promise = () => new Promise<ViewJson>(resolve => setTimeout(resolve, 30000, viewJson));
-    ViewManagementActions.get = jest.fn(promise);
+    ViewManagementActions.get = mockAction(jest.fn(promise));
     const wrapper = mount(<SimpleShowViewPage />);
     expect(wrapper.find('Spinner')).toExist();
   });
   it('loads view with id passed from props', () => {
-    ViewManagementActions.get = jest.fn(() => Promise.reject());
+    ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject()));
     mount(<SimpleShowViewPage />);
     expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
   });
@@ -72,7 +73,7 @@ describe('ShowViewPage', () => {
     const error = new Error('Not found');
     // $FlowFixMe: Assigning to non-existing key on purpose
     error.status = 404;
-    ViewManagementActions.get = jest.fn(() => Promise.reject(error));
+    ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject(error)));
     history.replace = jest.fn();
 
     mount(<SimpleShowViewPage />);
@@ -83,8 +84,8 @@ describe('ShowViewPage', () => {
     });
   });
   it('passes loaded view to ViewDeserializer', (done) => {
-    ViewManagementActions.get = jest.fn(() => Promise.resolve(viewJson));
-    SearchExecutionStateActions.setParameterValues = jest.fn();
+    ViewManagementActions.get = mockAction(jest.fn(() => Promise.resolve(viewJson)));
+    SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
     const search = Search.create().toBuilder().parameters([]).build();
     // $FlowFixMe: Calling mockImplementation on jest.fn()
     ViewDeserializer.mockImplementation((response: ViewJson) => {

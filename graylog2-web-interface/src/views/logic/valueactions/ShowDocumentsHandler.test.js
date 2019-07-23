@@ -1,6 +1,7 @@
 // @flow strict
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
+import asMock from 'helpers/mocking/AsMock';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import ShowDocumentsHandler from './ShowDocumentsHandler';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
@@ -38,7 +39,7 @@ describe('ShowDocumentsHandler', () => {
     return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widget, valuePath: [] })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
-        const newWidget = WidgetActions.create.mock.calls[0][0];
+        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
         expect(newWidget.filter).toEqual('');
       });
   });
@@ -46,7 +47,7 @@ describe('ShowDocumentsHandler', () => {
     return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
-        const newWidget = WidgetActions.create.mock.calls[0][0];
+        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
         expect(newWidget.filter).toEqual('foo:Hello\\! AND bar:42');
       });
   });
@@ -55,7 +56,7 @@ describe('ShowDocumentsHandler', () => {
     return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
-        const newWidget = WidgetActions.create.mock.calls[0][0];
+        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
         expect(newWidget.filter).toEqual('baz:23 AND foo:Hello\\! AND bar:42');
       });
   });
@@ -64,7 +65,7 @@ describe('ShowDocumentsHandler', () => {
     return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
-        const newWidget = WidgetActions.create.mock.calls[0][0];
+        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
         expect(newWidget.filter).toEqual('bar:42 AND foo:Hello\\!');
       });
   });

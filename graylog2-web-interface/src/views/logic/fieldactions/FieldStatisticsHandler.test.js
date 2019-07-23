@@ -1,4 +1,6 @@
 // @flow strict
+import asMock from 'helpers/mocking/AsMock';
+
 import { WidgetActions } from 'views/stores/WidgetStore';
 import Widget from 'views/logic/widgets/Widget';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
@@ -33,7 +35,7 @@ describe('FieldStatisticsHandler', () => {
   it('creates field statistics widget for given numeric field', () => {
     return handler(queryId, fieldName, numericFieldType, {}).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
-      const widget = WidgetActions.create.mock.calls[0][0];
+      const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(widget.config.series.map(s => s.function)).toEqual([
         `count(${fieldName})`,
@@ -51,7 +53,7 @@ describe('FieldStatisticsHandler', () => {
   it('creates field statistics widget for given non-numeric field', () => {
     return handler(queryId, fieldName, nonNumericFieldType, {}).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
-      const widget = WidgetActions.create.mock.calls[0][0];
+      const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(widget.config.series.map(s => s.function)).toEqual([
         `count(${fieldName})`,
@@ -64,14 +66,14 @@ describe('FieldStatisticsHandler', () => {
     const origWidget = Widget.builder().filter(filter).build();
     return handler(queryId, fieldName, nonNumericFieldType, { widget: origWidget }).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
-      const widget = WidgetActions.create.mock.calls[0][0];
+      const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(widget.filter).toEqual(filter);
     });
   });
   it('adds title to generated widget', () => {
     return handler(queryId, fieldName, nonNumericFieldType, {}).then(() => {
-      const widget = WidgetActions.create.mock.calls[0][0];
+      const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, widget.id, `Field Statistics for ${fieldName}`);
     });

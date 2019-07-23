@@ -78,5 +78,13 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
 export default connect(SearchResult, {
   fieldTypes: FieldTypesStore,
   searches: SearchStore,
+  viewMetadata: ViewMetadataStore,
   viewState: CurrentViewStateStore,
-}, props => Object.assign({}, props, { searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping } }));
+}, props => Object.assign(
+  {},
+  props,
+  {
+    searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
+    queryId: props.viewMetadata.activeQuery,
+  },
+));

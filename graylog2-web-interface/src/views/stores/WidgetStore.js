@@ -7,8 +7,9 @@ import { get, isEqual } from 'lodash';
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
+import type { RefluxActions } from './StoreTypes';
 
-type WidgetActionsType = {
+type WidgetActionsType = RefluxActions<{
   create: (Widget) => Promise<Widget>,
   duplicate: (string) => Promise<Widget>,
   filter: (string, string) => Promise<void>,
@@ -16,7 +17,7 @@ type WidgetActionsType = {
   update: (string, Widget) => Promise<void>,
   updateConfig: (string, any) => Promise<void>,
   updateWidgets: (Map<string, Widget>) => Promise<void>,
-};
+}>;
 
 type WidgetStoreState = {
   widgets: Map<string, Widget>,

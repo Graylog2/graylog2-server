@@ -1,9 +1,11 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import { mount } from 'enzyme';
+import * as Immutable from 'immutable';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import { QueriesActions } from 'views/stores/QueriesStore';
+import mockAction from 'helpers/mocking/MockAction';
 import SearchBar from './SearchBar';
 
 jest.mock('stores/sessions/SessionStore', () => MockStore(['isLoggedIn', () => { return true; }], 'getSessionId'));
@@ -73,7 +75,7 @@ describe('SearchBar', () => {
 
     const timeRangeTypeSelector = wrapper.find('TimeRangeTypeSelector');
     const { onSelect } = timeRangeTypeSelector.at(0).props();
-    QueriesActions.rangeType = jest.fn(() => Promise.resolve(42));
+    QueriesActions.rangeType = mockAction(() => Promise.resolve(new Immutable.OrderedMap()));
 
     return onSelect('absolute').then(() => {
       expect(executeFn).toHaveBeenCalled();
@@ -87,7 +89,7 @@ describe('SearchBar', () => {
 
     const timeRangeInput = wrapper.find('TimeRangeInput');
     const { onChange } = timeRangeInput.at(0).props();
-    QueriesActions.rangeParams = jest.fn(() => Promise.resolve());
+    QueriesActions.rangeParams = mockAction(jest.fn(() => Promise.resolve(new Immutable.OrderedMap())));
 
     return onChange({ range: 300 }).then(() => {
       expect(executeFn).toHaveBeenCalled();
