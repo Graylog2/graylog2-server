@@ -1,7 +1,7 @@
 :local(.filterPreview) {
     border: 1px solid #333;
     border-radius: 2px;
-    padding: 30px 10px;
+    padding: 20px 10px;
 }
 
 :local(.filterPreview) h3 {

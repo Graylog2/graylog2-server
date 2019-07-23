@@ -7,6 +7,8 @@ import { Input } from 'components/bootstrap';
 import { ExternalLink } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 
+import TemplateFieldValueProviderPreview from './TemplateFieldValueProviderPreview';
+
 class TemplateFieldValueProviderForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -41,7 +43,7 @@ class TemplateFieldValueProviderForm extends React.Component {
 
     return (
       <Row className="row-sm">
-        <Col md={12}>
+        <Col md={7} lg={6}>
           <Input id="template-provider-template"
                  name="template"
                  type="text"
@@ -59,6 +61,9 @@ class TemplateFieldValueProviderForm extends React.Component {
             </Checkbox>
             <HelpBlock>Check this option to validate that all variables used in the Template have values.</HelpBlock>
           </FormGroup>
+        </Col>
+        <Col md={5} lgOffset={1}>
+          <TemplateFieldValueProviderPreview />
         </Col>
       </Row>
     );

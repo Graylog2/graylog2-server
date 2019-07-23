@@ -114,7 +114,7 @@ class FieldForm extends React.Component {
 
     return (
       <Row>
-        <Col md={8} lg={6}>
+        <Col md={7} lg={6}>
           <h2 className={commonStyles.title}>
             {prevFieldName ? `Custom Field "${fieldName}"` : 'New Custom Field'}
           </h2>
@@ -165,9 +165,13 @@ class FieldForm extends React.Component {
                     required />
             <HelpBlock>Select a source for the value of this Field.</HelpBlock>
           </FormGroup>
+        </Col>
 
+        <Col md={12}>
           {this.renderFieldValueProviderForm()}
+        </Col>
 
+        <Col md={12}>
           <ButtonToolbar>
             <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>
             <Button onClick={onCancel}>Cancel</Button>
