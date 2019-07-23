@@ -336,7 +336,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.eaio.uuid</groupId>
+                <groupId>org.graylog2.repackaged</groupId>
                 <artifactId>uuid</artifactId>
                 <version>${uuid.version}</version>
             </dependency>
@@ -393,6 +393,12 @@
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>${javax.inject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb-api.version}</version>
             </dependency>
 
             <dependency>
