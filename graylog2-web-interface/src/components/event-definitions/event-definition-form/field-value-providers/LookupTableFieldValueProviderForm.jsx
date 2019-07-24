@@ -61,7 +61,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
 
     return (
       <Row className="row-sm">
-        <Col md={12}>
+        <Col md={7} lg={6}>
           <FormGroup controlId="lookup-provider-table">
             <ControlLabel>Select Lookup Table</ControlLabel>
             <Select name="event-field-table-name"

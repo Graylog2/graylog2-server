@@ -5,6 +5,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Radio, Row } from 'react-boots
 
 import FormsUtils from 'util/FormsUtils';
 import FilterForm from './FilterForm';
+import FilterPreviewContainer from './FilterPreviewContainer';
 import AggregationForm from './AggregationForm';
 
 import commonStyles from '../common/commonStyles.css';
@@ -138,6 +139,9 @@ class FilterAggregationForm extends React.Component {
                   Aggregation of results reaches a threshold
                 </Radio>
               </FormGroup>
+            </Col>
+            <Col md={5} lgOffset={1}>
+              <FilterPreviewContainer eventDefinition={eventDefinition} />
             </Col>
           </Row>
           {conditionType === conditionTypes.AGGREGATION && (
