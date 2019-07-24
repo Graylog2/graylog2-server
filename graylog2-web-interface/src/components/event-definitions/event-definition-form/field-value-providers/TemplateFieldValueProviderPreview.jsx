@@ -10,7 +10,7 @@ class TemplateFieldValueProviderPreview extends React.Component {
       <div className={styles.templatePreview}>
         <h3>Available Fields in Template</h3>
         <p>
-          Graylog let you enrich generated Events with dynamic values. You can access Fields from the Event context{' '}
+          Graylog lets you enrich generated Events with dynamic values. You can access Fields from the Event context{' '}
           {/* eslint-disable-next-line no-template-curly-in-string */}
           with <code>{'${source.<fieldName>}'}</code>.
           <br />
