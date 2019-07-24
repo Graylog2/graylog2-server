@@ -150,7 +150,7 @@ type Props = {
   valueKey?: string,
   delimiter?: string,
   options: Array<Option>,
-  components?: Array<React.Node>,
+  components: ?{string: React.Node},
   matchProp?: string,
   value?: string,
   autoFocus?: boolean,
