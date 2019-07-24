@@ -31,8 +31,8 @@ const GlobalThroughput = createReactClass({
       output = (
         <strong className={styles['total-throughput__content']}
                 aria-label={`In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
-          <span>{inputNumeral}</span>
-          <span>{outputNumeral}</span>
+          <span>{inputNumeral} <i>in</i></span>
+          <span>{outputNumeral} <i>out</i></span>
         </strong>
       );
     }
