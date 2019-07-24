@@ -20,6 +20,13 @@ class EventDetailsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
+  getConditionPlugin = (type) => {
+    if (type === undefined) {
+      return {};
+    }
+    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
+  };
+
   handleChange = (event) => {
     const { name } = event.target;
     const { onChange } = this.props;
@@ -33,8 +40,9 @@ class EventDetailsForm extends React.Component {
 
   handleEventDefinitionTypeChange = (nextType) => {
     const { onChange } = this.props;
-    const nextConfig = { type: nextType };
-    onChange('config', nextConfig);
+    const conditionPlugin = this.getConditionPlugin(nextType);
+    const defaultConfig = conditionPlugin.defaultConfig || {};
+    onChange('config', { ...defaultConfig, type: nextType });
   };
 
   formattedEventDefinitionTypes = () => {

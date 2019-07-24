@@ -48,6 +48,13 @@ class FieldForm extends React.Component {
     };
   }
 
+  getProviderPlugin = (type) => {
+    if (type === undefined) {
+      return {};
+    }
+    return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type) || {};
+  };
+
   handleSubmit = () => {
     const { fieldName: prevFieldName, onChange } = this.props;
     const { fieldName, config, isKey, keyPosition } = this.state;
@@ -65,7 +72,14 @@ class FieldForm extends React.Component {
 
   handleProviderTypeChange = (nextProvider) => {
     const { config } = this.state;
-    const nextConfig = Object.assign({}, config, { providers: [{ type: nextProvider }] });
+    const providerPlugin = this.getProviderPlugin(nextProvider);
+    const defaultProviderConfig = providerPlugin.defaultConfig || {};
+    const nextConfig = Object.assign({}, config, {
+      providers: [{
+        ...defaultProviderConfig,
+        type: nextProvider,
+      }],
+    });
     this.handleConfigChange(nextConfig);
   };
 
@@ -77,13 +91,6 @@ class FieldForm extends React.Component {
   toggleKey = (event) => {
     const checked = FormsUtils.getValueFromInput(event.target);
     this.setState({ isKey: checked });
-  };
-
-  getProviderPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-    return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type) || {};
   };
 
   renderFieldValueProviderForm = () => {
