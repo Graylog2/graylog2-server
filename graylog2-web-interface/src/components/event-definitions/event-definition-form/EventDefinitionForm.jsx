@@ -6,6 +6,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Wizard } from 'components/common';
 import EventDetailsForm from './EventDetailsForm';
+import EventConditionForm from './EventConditionForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
@@ -51,10 +52,6 @@ class EventDefinitionForm extends React.Component {
     }
   };
 
-  areStepsDisabled = (eventDefinition) => {
-    return eventDefinition.config.type === undefined;
-  };
-
   getConditionPlugin = (type) => {
     if (type === undefined) {
       return {};
@@ -75,7 +72,6 @@ class EventDefinitionForm extends React.Component {
       );
     }
 
-    const { eventDefinition } = this.props;
     const activeStepIndex = STEP_KEYS.indexOf(activeStep);
     const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
     const nextStep = STEP_KEYS[activeStepIndex + 1];
@@ -89,8 +85,7 @@ class EventDefinitionForm extends React.Component {
         </Button>
         <div className="pull-right">
           <Button bsStyle="info"
-                  onClick={() => this.handleStepChange(nextStep)}
-                  disabled={this.areStepsDisabled(eventDefinition)}>
+                  onClick={() => this.handleStepChange(nextStep)}>
             Next
           </Button>
         </div>
@@ -111,9 +106,6 @@ class EventDefinitionForm extends React.Component {
     };
 
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
-    const eventDefinitionTypeComponent = eventDefinitionType.formComponent
-      ? React.createElement(eventDefinitionType.formComponent, defaultStepProps)
-      : null;
 
     const steps = [
       {
@@ -124,20 +116,17 @@ class EventDefinitionForm extends React.Component {
       {
         key: STEP_KEYS[1],
         title: lodash.defaultTo(eventDefinitionType.displayName, 'Condition'),
-        component: eventDefinitionTypeComponent,
-        disabled: this.areStepsDisabled(eventDefinition),
+        component: <EventConditionForm {...defaultStepProps} />,
       },
       {
         key: STEP_KEYS[2],
         title: 'Fields',
         component: <FieldsForm {...defaultStepProps} />,
-        disabled: this.areStepsDisabled(eventDefinition),
       },
       {
         key: STEP_KEYS[3],
         title: 'Notifications',
         component: <NotificationsForm {...defaultStepProps} notifications={notifications} />,
-        disabled: this.areStepsDisabled(eventDefinition),
       },
       {
         key: STEP_KEYS[4],
@@ -145,7 +134,6 @@ class EventDefinitionForm extends React.Component {
         component: (
           <EventDefinitionSummary action={action} eventDefinition={eventDefinition} notifications={notifications} />
         ),
-        disabled: this.areStepsDisabled(eventDefinition),
       },
     ];
 

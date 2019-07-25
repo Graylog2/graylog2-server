@@ -12,6 +12,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
 import EventDefinitionForm from './EventDefinitionForm';
 // Import built-in plugins
+import {} from 'components/event-definitions/event-definition-types';
+import {} from 'components/event-notifications/event-notification-types';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
