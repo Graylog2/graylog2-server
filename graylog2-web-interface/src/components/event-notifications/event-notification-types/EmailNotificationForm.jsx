@@ -42,7 +42,7 @@ class EmailNotificationForm extends React.Component {
   };
 
   static defaultConfig = {
-    sender: 'graylog@example.org', // TODO: Default sender should come from the server
+    sender: '', // TODO: Default sender should come from the server. The default should be empty or the address configured in the email server settings
     // eslint-disable-next-line no-template-curly-in-string
     subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
     body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
