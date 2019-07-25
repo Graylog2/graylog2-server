@@ -31,10 +31,21 @@ class LegacyNotificationForm extends React.Component {
       .map(typeName => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
   };
 
+  getDefaultConfiguration = (legacyNotificationType) => {
+    const { legacyTypes } = this.props;
+    const { configuration } = legacyTypes[legacyNotificationType];
+    const defaultConfiguration = {};
+    Object.keys(configuration).forEach((configKey) => {
+      defaultConfiguration[configKey] = configuration[configKey].default_value;
+    });
+
+    return defaultConfiguration;
+  };
+
   handleSelectNotificationChange = (nextLegacyNotificationType) => {
     this.propagateMultiChange({
       callback_type: nextLegacyNotificationType,
-      configuration: {},
+      configuration: this.getDefaultConfiguration(nextLegacyNotificationType),
     });
   };
 
@@ -47,7 +58,7 @@ class LegacyNotificationForm extends React.Component {
 
     const configFields = Object.keys(configuration).map((configKey) => {
       const configField = configuration[configKey];
-      const configValue = config.configuration[configKey] || configField.default_value;
+      const configValue = config.configuration[configKey];
 
       return (
         <ConfigurationFormField key={configKey}

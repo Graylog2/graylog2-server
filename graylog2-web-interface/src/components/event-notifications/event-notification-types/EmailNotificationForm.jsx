@@ -41,19 +41,14 @@ class EmailNotificationForm extends React.Component {
     users: PropTypes.array.isRequired,
   };
 
-  componentDidMount() {
-    // Set initial config for this type
-    const { config, onChange } = this.props;
-    const initialConfig = {
-      sender: 'graylog@example.org', // TODO: Default sender should come from the server
-      // eslint-disable-next-line no-template-curly-in-string
-      subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
-      body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
-      user_recipients: [],
-      email_recipients: [],
-    };
-    onChange(Object.assign({}, initialConfig, config));
-  }
+  static defaultConfig = {
+    sender: 'graylog@example.org', // TODO: Default sender should come from the server
+    // eslint-disable-next-line no-template-curly-in-string
+    subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
+    body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
+    user_recipients: [],
+    email_recipients: [],
+  };
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;

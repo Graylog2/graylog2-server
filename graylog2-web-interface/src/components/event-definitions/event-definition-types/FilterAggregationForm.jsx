@@ -33,11 +33,6 @@ const initialAggregationConfig = {
   conditions: {},
 };
 
-const initialConfig = {
-  ...initialFilterConfig,
-  ...initialAggregationConfig,
-};
-
 class FilterAggregationForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']).isRequired,
@@ -46,6 +41,11 @@ class FilterAggregationForm extends React.Component {
     entityTypes: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
+  };
+
+  static defaultConfig = {
+    ...initialFilterConfig,
+    ...initialAggregationConfig,
   };
 
   constructor(props) {
@@ -61,13 +61,6 @@ class FilterAggregationForm extends React.Component {
       dataSource: defaultDataSource,
       conditionType: defaultConditionType,
     };
-  }
-
-  componentDidMount() {
-    // Set initial config for this type
-    const { eventDefinition } = this.props;
-    const defaultConfig = Object.assign({}, initialConfig, eventDefinition.config);
-    this.propagateChange('config', defaultConfig);
   }
 
   propagateChange = (key, value) => {

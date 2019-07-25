@@ -11,14 +11,9 @@ class HttpNotificationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  componentDidMount() {
-    // Set initial config for this type
-    const { config, onChange } = this.props;
-    const initialConfig = {
-      url: '',
-    };
-    onChange(Object.assign({}, initialConfig, config));
-  }
+  static defaultConfig = {
+    url: '',
+  };
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;

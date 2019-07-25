@@ -1,6 +1,7 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import EmailNotificationFormContainer from './EmailNotificationFormContainer';
+import EmailNotificationForm from './EmailNotificationForm';
 import EmailNotificationSummary from './EmailNotificationSummary';
 import HttpNotificationForm from './HttpNotificationForm';
 import HttpNotificationSummary from './HttpNotificationSummary';
@@ -14,12 +15,14 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Email Notification',
       formComponent: EmailNotificationFormContainer,
       summaryComponent: EmailNotificationSummary,
+      defaultConfig: EmailNotificationForm.defaultConfig,
     },
     {
       type: 'http-notification-v1',
       displayName: 'HTTP Notification',
       formComponent: HttpNotificationForm,
       summaryComponent: HttpNotificationSummary,
+      defaultConfig: HttpNotificationForm.defaultConfig,
     },
     {
       type: 'legacy-alarm-callback-notification-v1',

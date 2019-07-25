@@ -42,15 +42,17 @@ class EventNotificationForm extends React.Component {
     onChange('config', nextConfig);
   };
 
-  handleTypeChange = (nextType) => {
-    this.handleConfigChange({ type: nextType });
-  };
-
   getNotificationPlugin = (type) => {
     if (type === undefined) {
       return {};
     }
     return PluginStore.exports('eventNotificationTypes').find(n => n.type === type) || {};
+  };
+
+  handleTypeChange = (nextType) => {
+    const notificationPlugin = this.getNotificationPlugin(nextType);
+    const defaultConfig = notificationPlugin.defaultConfig || {};
+    this.handleConfigChange({ ...defaultConfig, type: nextType });
   };
 
   formattedEventNotificationTypes = () => {
