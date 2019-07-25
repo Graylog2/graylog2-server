@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import lodash from 'lodash';
+import naturalSort from 'javascript-natural-sort';
 
 import { Select } from 'components/common';
 
 import commonStyles from '../common/commonStyles.css';
+import styles from './EventConditionForm.css';
 
 class EventConditionForm extends React.Component {
   static propTypes = {
@@ -20,8 +23,25 @@ class EventConditionForm extends React.Component {
     return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
   };
 
+  sortedEventDefinitionTypes = () => {
+    return PluginStore.exports('eventDefinitionTypes').sort((edt1, edt2) => {
+      // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
+      const edt1Order = edt1.sortOrder;
+      const edt2Order = edt2.sortOrder;
+
+      if (edt1Order !== undefined || edt2Order !== undefined) {
+        const sort = lodash.defaultTo(edt1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(edt2Order, Number.MAX_SAFE_INTEGER);
+        if (sort !== 0) {
+          return sort;
+        }
+      }
+
+      return naturalSort(edt1.displayName, edt2.displayName);
+    });
+  };
+
   formattedEventDefinitionTypes = () => {
-    return PluginStore.exports('eventDefinitionTypes')
+    return this.sortedEventDefinitionTypes()
       .map(type => ({ label: type.displayName, value: type.type }));
   };
 
@@ -30,6 +50,20 @@ class EventConditionForm extends React.Component {
     const conditionPlugin = this.getConditionPlugin(nextType);
     const defaultConfig = conditionPlugin.defaultConfig || {};
     onChange('config', { ...defaultConfig, type: nextType });
+  };
+
+  renderConditionTypeDescriptions = () => {
+    const typeDescriptions = this.sortedEventDefinitionTypes()
+      .map((type) => {
+        return (
+          <React.Fragment key={type.type}>
+            <dt>{type.displayName}</dt>
+            <dd>{type.description || 'No description available.'}</dd>
+          </React.Fragment>
+        );
+      });
+
+    return <dl>{typeDescriptions}</dl>;
   };
 
   render() {
@@ -47,6 +81,12 @@ class EventConditionForm extends React.Component {
       <Row>
         <Col md={7} lg={6}>
           <h2 className={commonStyles.title}>Event Condition</h2>
+
+          <p>
+            Configure how Graylog should create Events of this kind. You can later use those Events as input on other
+            Conditions, making it possible to build powerful Conditions based on others.
+          </p>
+
           <FormGroup controlId="event-definition-priority">
             <ControlLabel>Condition Type</ControlLabel>
             <Select placeholder="Select a Condition Type"
@@ -59,9 +99,23 @@ class EventConditionForm extends React.Component {
           </FormGroup>
         </Col>
 
-        <Col md={12}>
-          {eventDefinitionTypeComponent}
+        <Col md={5} lg={4} lgOffset={1}>
+          <Panel bsStyle="info"
+                 className={styles.conditionTypesInfo}
+                 header={<span><i className="fa fa-info-circle" /> Available Conditions</span>}>
+            {this.renderConditionTypeDescriptions()}
+          </Panel>
         </Col>
+        <Clearfix />
+
+        {eventDefinitionTypeComponent && (
+          <React.Fragment>
+            <hr className={styles.hr} />
+            <Col md={12}>
+              {eventDefinitionTypeComponent}
+            </Col>
+          </React.Fragment>
+        )}
       </Row>
     );
   }
