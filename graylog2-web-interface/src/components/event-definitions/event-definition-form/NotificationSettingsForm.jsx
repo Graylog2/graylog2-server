@@ -4,6 +4,7 @@ import { FormGroup, HelpBlock } from 'react-bootstrap';
 import lodash from 'lodash';
 import moment from 'moment';
 
+import { Input } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 
@@ -19,6 +20,7 @@ class NotificationSettingsForm extends React.Component {
 
   state = {
     lastEnabledGracePeriod: undefined,
+    lastBacklogSize: undefined,
   };
 
   handleGracePeriodChange = (nextValue, nextUnit, enabled) => {
@@ -41,9 +43,17 @@ class NotificationSettingsForm extends React.Component {
     this.setState(stateUpdate);
   };
 
+  handleBacklogSizeChange = (e) => {
+    const { eventDefinition, onSettingsChange } = this.props;
+    const nextNotificationSettings = lodash.cloneDeep(eventDefinition.notification_settings);
+    nextNotificationSettings.backlog_size = e.target.value;
+    onSettingsChange('notification_settings', nextNotificationSettings);
+    this.setState({ lastBacklogSize: e.target.value });
+  };
+
   render() {
     const { eventDefinition } = this.props;
-    const { lastEnabledGracePeriod } = this.state;
+    const { lastEnabledGracePeriod, lastBacklogSize } = this.state;
 
     if (eventDefinition.notifications.length === 0) {
       return null;
@@ -53,6 +63,7 @@ class NotificationSettingsForm extends React.Component {
     const gracePeriod = (lastEnabledGracePeriod === undefined
       ? extractDurationAndUnit(eventDefinition.notification_settings.grace_period_ms, TIME_UNITS)
       : lastEnabledGracePeriod);
+    const backlogSize = (lastBacklogSize === undefined) ? eventDefinition.notification_settings.backlog_size : lastBacklogSize;
 
     return (
       <React.Fragment>
@@ -70,6 +81,15 @@ class NotificationSettingsForm extends React.Component {
               Events with keys have different grace periods for each key.
             </HelpBlock>
           </FormGroup>
+          <Input type="number"
+                 id="backlogsize"
+                 name="backlog_size"
+                 label="Message Backlog"
+                 required
+                 onChange={this.handleBacklogSizeChange}
+                 help="The maximum number of backlog messages to be included in notifications. Use 0 to disable."
+                 value={backlogSize}
+                  />
         </fieldset>
       </React.Fragment>
     );

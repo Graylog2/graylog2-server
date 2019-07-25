@@ -142,6 +142,7 @@ class EventDefinitionSummary extends React.Component {
         <h4>Settings</h4>
         <dl>
           <dd>{formattedGracePeriod}</dd>
+          <dd>Backlog size is {notificationSettings.backlog_size}</dd>
         </dl>
       </React.Fragment>
     );
