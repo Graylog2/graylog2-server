@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table } from 'react-bootstrap';
+import { Panel, Table } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 
@@ -54,15 +54,14 @@ class FilterPreview extends React.Component {
     const { isFetchingData, searchResult, errors } = this.props;
 
     return (
-      <div className={styles.filterPreview}>
-        <h3>Filter preview</h3>
+      <Panel className={styles.filterPreview} header={<h3>Filter Preview</h3>}>
         {errors.length > 0 ? (
           <p className="text-danger">{errors[0].description}</p>
         ) : (
           isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult)
         )
         }
-      </div>
+      </Panel>
     );
   }
 }
