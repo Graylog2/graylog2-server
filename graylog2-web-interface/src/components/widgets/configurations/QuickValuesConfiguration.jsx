@@ -19,15 +19,17 @@ class QuickValuesConfiguration extends React.Component {
 
   render() {
     let dataTableLimitForm;
-    if (!this.props.isHistogram) {
+    const { isHistogram, onChange, config } = this.props;
+
+    if (!isHistogram) {
       dataTableLimitForm = (
         <Input type="number"
                id="data_table_limit"
                name="data_table_limit"
                label="Total table size"
                required
-               onChange={this.props.onChange}
-               value={this.props.config.data_table_limit} />
+               onChange={onChange}
+               value={config.data_table_limit} />
       );
     }
 
@@ -38,8 +40,8 @@ class QuickValuesConfiguration extends React.Component {
                name="limit"
                label="Number of top/bottom values"
                required
-               onChange={this.props.onChange}
-               value={this.props.config.limit} />
+               onChange={onChange}
+               value={config.limit} />
         {dataTableLimitForm}
         <FormGroup>
           <ControlLabel>Sort options</ControlLabel>
@@ -47,21 +49,24 @@ class QuickValuesConfiguration extends React.Component {
                  type="radio"
                  name="sort_order"
                  label="Top values"
-                 checked={this.props.config.sort_order === 'desc'}
+                 checked={config.sort_order === 'desc'}
                  value="desc"
-                 onChange={this.props.onChange} />
+                 onChange={onChange} />
           <Input id="sort-order-asc"
                  type="radio"
                  name="sort_order"
                  label="Bottom values"
-                 checked={this.props.config.sort_order === 'asc'}
+                 checked={config.sort_order === 'asc'}
                  value="asc"
-                 onChange={this.props.onChange} />
+                 onChange={onChange} />
         </FormGroup>
 
         <FormGroup>
           <ControlLabel>Stacked fields</ControlLabel>
-          <MultiSelect allowCreate value={this.props.config.stacked_fields} onChange={this._onStackedFieldChange} />
+          <MultiSelect allowCreate
+                       value={config.stacked_fields}
+                       onChange={this._onStackedFieldChange}
+                       options={[]} />
         </FormGroup>
       </div>
     );
