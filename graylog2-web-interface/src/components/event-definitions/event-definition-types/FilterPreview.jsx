@@ -64,8 +64,13 @@ class FilterPreview extends React.Component {
           </p>
           <ul>
             <li><b>Filter:</b>&emsp;One Event per message matching the filter</li>
-            <li><b>Aggregation without groups:</b>&emsp;One Event every time the Event Definition is executed</li>
-            <li><b>Aggregation with groups:</b>&emsp;One Event per group every time the Event Definition is executed
+            <li>
+              <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies
+              the condition
+            </li>
+            <li>
+              <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies
+              the condition
             </li>
           </ul>
         </HelpPanel>
