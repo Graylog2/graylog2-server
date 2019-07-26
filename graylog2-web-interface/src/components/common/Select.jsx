@@ -62,26 +62,65 @@ const multiValueRemove = base => ({
   },
 });
 
-const controlSmall = base => ({
-  ...base,
+const controlSmall = {
   minHeight: '30px',
   height: '30px',
-});
+};
 
-const controlNormal = base => ({
-  ...base,
-  minHeight: '36px',
-  height: '36px',
-});
+const controlNormal = {
+  minHeight: '34px',
+  height: '34px',
+};
 
 const menu = base => ({
   ...base,
   zIndex: 5,
+  border: '1px solid rgba(102, 175, 233, 0.5)',
+  boxShadow: '0 0 4px rgba(102, 175, 233, 0.3)',
 });
 
 const singleValueAndPlaceholder = base => ({
   ...base,
   lineHeight: '28px',
+  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  fontWeight: 400,
+  color: '#666',
+});
+
+const placeholder = base => ({
+  ...base,
+  lineHeight: '28px',
+  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  fontWeight: 400,
+  color: '#999',
+});
+
+const controlFocus = props => (base, { isFocused }) => {
+  const { size } = props;
+
+  const borderColor = isFocused ? '#66afe9' : base.borderColor;
+  const borderWidth = isFocused ? 1 : base.borderWidth;
+  const outline = isFocused ? 0 : base.outline;
+  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : 'inset 0 1px 1px rgba(0, 0, 0, 0.075)';
+
+  const controlSize = size === 'small' ? controlSmall : controlNormal;
+
+  return {
+    ...base,
+    ...controlSize,
+    borderColor,
+    borderWidth,
+    outline,
+    boxShadow,
+    alignItems: 'flex-start',
+  };
+};
+
+const valueContainer = base => ({
+  ...base,
+  padding: '2px 12px',
 });
 
 const _components = {
@@ -90,15 +129,17 @@ const _components = {
   IndicatorSeparator,
 };
 
-const _styles = {
+const _styles = props => ({
   dropdownIndicator,
   multiValue,
   multiValueLabel,
   multiValueRemove,
   menu,
   singleValue: singleValueAndPlaceholder,
-  placeholder: singleValueAndPlaceholder,
-};
+  placeholder,
+  control: controlFocus(props),
+  valueContainer,
+});
 
 type Option = { [string]: any };
 type Props = {
@@ -109,6 +150,7 @@ type Props = {
   valueKey?: string,
   delimiter?: string,
   options: Array<Option>,
+  components: ?{string: React.Node},
   matchProp?: string,
   value?: string,
   autoFocus?: boolean,
@@ -157,6 +199,10 @@ class Select extends React.Component<Props, State> {
      * (specified in `valueKey`).
      */
     options: PropTypes.array.isRequired,
+    /**
+     * A collection of custom `react-select` components from https://react-select.com/components
+     */
+    components: PropTypes.arrayOf(PropTypes.node),
   };
 
   static defaultProps = {
@@ -172,6 +218,7 @@ class Select extends React.Component<Props, State> {
     disabled: false,
     addLabelText: undefined,
     onReactSelectChange: undefined,
+    components: null,
   };
 
   constructor(props: Props) {
@@ -233,7 +280,15 @@ class Select extends React.Component<Props, State> {
   };
 
   render() {
-    const { allowCreate = false, delimiter, displayKey, size, options, valueKey, onReactSelectChange } = this.props;
+    const {
+      allowCreate = false,
+      delimiter,
+      displayKey,
+      components,
+      options,
+      valueKey,
+      onReactSelectChange,
+    } = this.props;
     const { value } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
@@ -259,10 +314,10 @@ class Select extends React.Component<Props, State> {
                        getOptionValue={option => option[valueKey]}
                        components={{
                          ..._components,
+                         ...components,
                        }}
                        styles={{
-                         ..._styles,
-                         control: size === 'small' ? controlSmall : controlNormal,
+                         ..._styles(this.props),
                        }}
                        value={formattedValue} />
     );
