@@ -17,7 +17,10 @@
 package org.graylog2.system.processing;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,7 @@ import javax.inject.Singleton;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.joda.time.DateTimeZone.UTC;
@@ -43,21 +47,34 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
 
     private final DBProcessingStatusService dbService;
+    private final EventBus eventBus;
     private final Duration persistInterval;
     private final ScheduledExecutorService scheduler;
+    private final AtomicBoolean inShutdown = new AtomicBoolean(false);
     private ScheduledFuture<?> future;
 
     @Inject
     public MongoDBProcessingStatusRecorderService(DBProcessingStatusService dbService,
+                                                  EventBus eventBus,
                                                   @Named(ProcessingStatusConfig.PERSIST_INTERVAL) Duration persistInterval,
                                                   @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.dbService = dbService;
+        this.eventBus = eventBus;
         this.persistInterval = persistInterval;
         this.scheduler = scheduler;
     }
 
+    @Subscribe
+    public void handleServerShutdown(Lifecycle lifecycle) {
+        if (lifecycle == Lifecycle.HALTING) {
+            inShutdown.set(true);
+        }
+    }
+
     @Override
     protected void startUp() {
+        eventBus.register(this);
+
         LOG.debug("Starting processing status recorder service");
         try {
             dbService.get().ifPresent(processingStatus -> {
@@ -81,13 +98,19 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     @Override
     protected void shutDown() {
         LOG.debug("Shutting down processing status recorder service");
+
+        inShutdown.set(true);
+        eventBus.unregister(this);
         if (future != null) {
             future.cancel(true);
         }
-        doPersist();
     }
 
     private void doPersist() {
+        if (inShutdown.get()) {
+            LOG.debug("Not persisting data because server is shutting down");
+            return;
+        }
         try {
             final ProcessingStatusDto dto = dbService.save(this);
             LOG.debug("Persisted processing status: {}", dto);
