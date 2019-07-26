@@ -115,6 +115,10 @@ class AggregationForm extends React.Component {
     return (
       <fieldset>
         <h2 className={commonStyles.title}>Aggregation</h2>
+        <p>
+          Summarize log messages matching the Filter defined above by using a function. You can optionally group the
+          Filter results by identical field values.
+        </p>
         <Row>
           <Col lg={7}>
             <FormGroup controlId="group-by">
@@ -125,7 +129,12 @@ class AggregationForm extends React.Component {
                            options={formattedFields}
                            value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
                            allowCreate />
-              <HelpBlock>Aggregate on groups of identical Field values. Example: count failed login attempts per username.</HelpBlock>
+              <HelpBlock>
+                Select Fields Graylog should use to group messages.{' '}
+                <b>Example:</b> Set <code>username</code> as Group by Field to create groups of messages with
+                identical <code>username</code> values. That way you can set a condition that will be computed for
+                each group with the same <code>username</code>.
+              </HelpBlock>
             </FormGroup>
           </Col>
         </Row>

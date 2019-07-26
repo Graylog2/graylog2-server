@@ -57,6 +57,7 @@ class FilterForm extends React.Component {
     return (
       <fieldset>
         <h2 className={commonStyles.title}>Filter</h2>
+        <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
         <Input id="filter-query"
                name="query"
                label="Search Query"

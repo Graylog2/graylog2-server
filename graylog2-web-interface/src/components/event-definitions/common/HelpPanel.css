@@ -1,0 +1,16 @@
+:local(.helpPanel) .panel-title {
+    font-size: 14px;
+}
+
+:local(.helpPanel) .panel-title > a {
+    cursor: pointer;
+    display: block;
+}
+
+:local(.helpPanel) .panel-body {
+    padding: 10px;
+}
+
+:local(.helpPanel) ul {
+    padding-left: 0;
+}

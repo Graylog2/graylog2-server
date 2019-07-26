@@ -57,7 +57,10 @@ class FilterPreviewContainer extends React.Component {
   componentDidUpdate(prevProps) {
     const { eventDefinition } = this.props;
 
-    if (!lodash.isEqual(prevProps.eventDefinition.config, eventDefinition.config)) {
+    const { query: prevQuery, streams: prevStreams, search_within_ms: prevSearchWithin } = prevProps.eventDefinition.config;
+    const { query, streams, search_within_ms: searchWithin } = eventDefinition.config;
+
+    if (query !== prevQuery || !lodash.isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
       this.fetchSearch(eventDefinition.config);
     }
   }

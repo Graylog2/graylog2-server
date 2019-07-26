@@ -11,7 +11,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 import { Spinner } from 'components/common';
 import EventDefinitionForm from './EventDefinitionForm';
-
 // Import built-in plugins
 import {} from 'components/event-definitions/event-definition-types';
 import {} from 'components/event-notifications/event-notification-types';
@@ -26,6 +25,7 @@ class EventDefinitionFormContainer extends React.Component {
     eventDefinition: PropTypes.object,
     entityTypes: PropTypes.object,
     notifications: PropTypes.object.isRequired,
+    onEventDefinitionChange: PropTypes.func,
   };
 
   static defaultProps = {
@@ -45,6 +45,7 @@ class EventDefinitionFormContainer extends React.Component {
       alert: false,
     },
     entityTypes: undefined,
+    onEventDefinitionChange: () => {},
   };
 
   constructor(props) {
@@ -67,6 +68,8 @@ class EventDefinitionFormContainer extends React.Component {
     this.setState((state) => {
       const nextEventDefinition = lodash.cloneDeep(state.eventDefinition);
       nextEventDefinition[key] = value;
+      const { onEventDefinitionChange } = this.props;
+      onEventDefinitionChange(nextEventDefinition);
       return { eventDefinition: nextEventDefinition };
     });
   };
