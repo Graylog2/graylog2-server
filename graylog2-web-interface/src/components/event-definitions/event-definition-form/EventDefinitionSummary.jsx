@@ -137,11 +137,16 @@ class EventDefinitionSummary extends React.Component {
       ? `Grace Period is set to ${formattedDuration}`
       : 'Grace Period is disabled');
 
+    const formattedBacklogSize = (notificationSettings.backlog_size
+      ? `Notifications will include ${notificationSettings.backlog_size} messages`
+      : 'Notifications will not include any messages.');
+
     return (
       <React.Fragment>
         <h4>Settings</h4>
         <dl>
           <dd>{formattedGracePeriod}</dd>
+          <dd>{formattedBacklogSize}</dd>
         </dl>
       </React.Fragment>
     );
