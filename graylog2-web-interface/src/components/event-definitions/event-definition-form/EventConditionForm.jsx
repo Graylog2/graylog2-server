@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
+import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
 import { Select } from 'components/common';
+import HelpPanel from 'components/event-definitions/common/HelpPanel';
 
 import commonStyles from '../common/commonStyles.css';
 import styles from './EventConditionForm.css';
@@ -95,16 +96,15 @@ class EventConditionForm extends React.Component {
                     onChange={this.handleEventDefinitionTypeChange}
                     clearable={false}
                     required />
-            <HelpBlock>Choose the type of Condition the Event will use.</HelpBlock>
+            <HelpBlock>Choose the type of Condition for this Event.</HelpBlock>
           </FormGroup>
         </Col>
 
         <Col md={5} lg={4} lgOffset={1}>
-          <Panel bsStyle="info"
-                 className={styles.conditionTypesInfo}
-                 header={<span><i className="fa fa-info-circle" /> Available Conditions</span>}>
+          <HelpPanel className={styles.conditionTypesInfo}
+                     title="Available Conditions">
             {this.renderConditionTypeDescriptions()}
-          </Panel>
+          </HelpPanel>
         </Col>
         <Clearfix />
 
