@@ -1,23 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Alert, Button, ButtonGroup, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import { Alert, Button, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import moment from 'moment';
 
-import { EmptyEntity, PaginatedList, SearchForm, Timestamp, TimeUnitInput } from 'components/common';
-import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import { EmptyEntity, PaginatedList, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
+import EventsSearchBar from './EventsSearchBar';
+
 import styles from './Events.css';
 
 const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
-
-const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 
 class Events extends React.Component {
   static propTypes = {
@@ -42,12 +40,6 @@ class Events extends React.Component {
       const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
       this.setState({ expanded: nextExpanded });
     };
-  };
-
-  updateSearchTimeRange = (nextValue, nextUnit) => {
-    const { onTimeRangeChange } = this.props;
-    const durationInSeconds = moment.duration(nextValue, nextUnit).asSeconds();
-    onTimeRangeChange('relative', durationInSeconds);
   };
 
   getConditionPlugin = (type) => {
@@ -223,10 +215,8 @@ class Events extends React.Component {
       onPageChange,
       onQueryChange,
       onAlertFilterChange,
+      onTimeRangeChange,
     } = this.props;
-
-    const filterAlerts = parameters.filter.alerts;
-    const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
 
     const eventList = events.map(e => e.event);
 
@@ -238,37 +228,10 @@ class Events extends React.Component {
       <React.Fragment>
         <Row>
           <Col md={12}>
-            <div className="form-inline">
-              <SearchForm query={parameters.query}
-                          onSearch={onQueryChange}
-                          onReset={onQueryChange}
-                          searchButtonLabel="Find"
-                          placeholder="Find Events"
-                          queryWidth={300}
-                          topMargin={0}
-                          wrapperClass={styles.inline}
-                          useLoadingState />
-
-              <div className="pull-right">
-                <TimeUnitInput id="event-timerange-selector"
-                               update={this.updateSearchTimeRange}
-                               units={TIME_UNITS}
-                               unit={timerangeDuration.unit}
-                               value={timerangeDuration.duration}
-                               label="In the last"
-                               required />
-              </div>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
-            <ButtonGroup>
-              <Button active={filterAlerts === 'only'} onClick={onAlertFilterChange('only')}>Alerts</Button>
-              <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
-              <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>Both</Button>
-            </ButtonGroup>
-
+            <EventsSearchBar parameters={parameters}
+                             onQueryChange={onQueryChange}
+                             onAlertFilterChange={onAlertFilterChange}
+                             onTimeRangeChange={onTimeRangeChange} />
             <PaginatedList activePage={parameters.page}
                            pageSize={parameters.pageSize}
                            pageSizes={[10, 25, 50, 100]}
