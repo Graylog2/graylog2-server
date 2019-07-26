@@ -66,15 +66,20 @@ class NotificationList extends React.Component {
           missing: true,
         };
       });
+    const addNotificationButton = (
+      <Button bsStyle="success" onClick={onAddNotificationClick}>
+        Add Notification
+      </Button>
+    );
 
     if (definitionNotifications.length === 0) {
       return (
-        <p>
-          This Event is not configured to trigger any Notifications yet.{' '}
-          <Button className="btn-text" bsStyle="link" bsSize="small" onClick={onAddNotificationClick}>
-            Get notified
-          </Button>.
-        </p>
+        <React.Fragment>
+          <p>
+            This Event is not configured to trigger any Notifications yet.
+          </p>
+          {addNotificationButton}
+        </React.Fragment>
       );
     }
     return (
@@ -86,9 +91,7 @@ class NotificationList extends React.Component {
                    rows={definitionNotifications}
                    dataRowFormatter={this.notificationFormatter}
                    filterKeys={[]} />
-        <Button bsStyle="success" onClick={onAddNotificationClick}>
-          Add Notification
-        </Button>
+        {addNotificationButton}
       </React.Fragment>
     );
   }
