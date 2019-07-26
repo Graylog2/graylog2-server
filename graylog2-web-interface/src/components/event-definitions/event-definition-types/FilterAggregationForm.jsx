@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, ControlLabel, FormGroup, HelpBlock, Radio, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, Radio, Row } from 'react-bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
 import FilterForm from './FilterForm';
@@ -28,7 +28,6 @@ const initialAggregationConfig = {
 
 class FilterAggregationForm extends React.Component {
   static propTypes = {
-    action: PropTypes.oneOf(['create', 'edit']).isRequired,
     eventDefinition: PropTypes.object.isRequired,
     allFieldTypes: PropTypes.array.isRequired,
     entityTypes: PropTypes.object.isRequired,
