@@ -163,10 +163,10 @@ public class StreamRouterEngine {
      */
     public List<Stream> match(Message message) {
         final Set<Stream> result = Sets.newHashSet();
-        final Set<Stream> blackList = Sets.newHashSet();
+        final Set<String> blackList = Sets.newHashSet();
 
         for (final Rule rule : rulesList) {
-            if (blackList.contains(rule.getStream())) {
+            if (blackList.contains(rule.getStreamId())) {
                 continue;
             }
 
@@ -178,7 +178,7 @@ public class StreamRouterEngine {
                 if (matchingType == Stream.MatchingType.AND) {
                     result.remove(rule.getStream());
                     // blacklist stream because it can't match anymore
-                    blackList.add(rule.getStream());
+                    blackList.add(rule.getStreamId());
                 }
 
                 continue;
@@ -195,13 +195,13 @@ public class StreamRouterEngine {
                 if (matchingType == Stream.MatchingType.AND) {
                     result.remove(rule.getStream());
                     // blacklist stream because it can't match anymore
-                    blackList.add(rule.getStream());
+                    blackList.add(rule.getStreamId());
                 }
             } else {
                 result.add(stream);
                 if (matchingType == Stream.MatchingType.OR) {
                     // blacklist stream because it is already matched
-                    blackList.add(rule.getStream());
+                    blackList.add(rule.getStreamId());
                 }
             }
         }
@@ -327,6 +327,10 @@ public class StreamRouterEngine {
 
         public Stream getStream() {
             return stream;
+        }
+
+        public String getStreamId() {
+            return streamId;
         }
     }
 
