@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup, Col, Row } from 'react-bootstrap';
+import { Button, ButtonGroup, ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import moment from 'moment';
 
 import { SearchForm, TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import FormsUtils from 'util/FormsUtils';
 
 import styles from './EventsSearchBar.css';
 
@@ -13,9 +14,12 @@ const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 class EventsSearchBar extends React.Component {
   static propTypes = {
     parameters: PropTypes.object.isRequired,
+    pageSize: PropTypes.number.isRequired,
+    pageSizes: PropTypes.array.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
+    onPageSizeChange: PropTypes.func.isRequired,
   };
 
   updateSearchTimeRange = (nextValue, nextUnit) => {
@@ -24,8 +28,13 @@ class EventsSearchBar extends React.Component {
     onTimeRangeChange('relative', durationInSeconds);
   };
 
+  handlePageSizeChange = (event) => {
+    const { onPageSizeChange } = this.props;
+    onPageSizeChange(FormsUtils.getValueFromInput(event.target));
+  };
+
   render() {
-    const { parameters, onQueryChange, onAlertFilterChange } = this.props;
+    const { parameters, pageSize, pageSizes, onQueryChange, onAlertFilterChange } = this.props;
 
     const filterAlerts = parameters.filter.alerts;
     const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
@@ -62,6 +71,13 @@ class EventsSearchBar extends React.Component {
             <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
             <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>Both</Button>
           </ButtonGroup>
+
+          <FormGroup className="form-inline">
+            <ControlLabel>Show</ControlLabel>
+            <FormControl componentClass="select" bsSize="small" value={pageSize} onChange={this.handlePageSizeChange}>
+              {pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
+            </FormControl>
+          </FormGroup>
         </Col>
       </Row>
     );

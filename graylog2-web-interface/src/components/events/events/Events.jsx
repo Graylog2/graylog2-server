@@ -34,6 +34,11 @@ class Events extends React.Component {
     expanded: [],
   };
 
+  handlePageSizeChange = (nextPageSize) => {
+    const { onPageChange } = this.props;
+    onPageChange(1, nextPageSize);
+  };
+
   expandRow = (eventId) => {
     return () => {
       const { expanded } = this.state;
@@ -171,10 +176,13 @@ class Events extends React.Component {
             <EventsSearchBar parameters={parameters}
                              onQueryChange={onQueryChange}
                              onAlertFilterChange={onAlertFilterChange}
-                             onTimeRangeChange={onTimeRangeChange} />
+                             onTimeRangeChange={onTimeRangeChange}
+                             onPageSizeChange={this.handlePageSizeChange}
+                             pageSize={parameters.pageSize}
+                             pageSizes={[10, 25, 50, 100]} />
             <PaginatedList activePage={parameters.page}
                            pageSize={parameters.pageSize}
-                           pageSizes={[10, 25, 50, 100]}
+                           showPageSizeSelect={false}
                            totalItems={totalEvents}
                            onChange={onPageChange}>
               {eventList.length === 0 ? (
