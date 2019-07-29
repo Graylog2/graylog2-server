@@ -1,0 +1,11 @@
+{
+  "expr": "==",
+  "left": {
+    "expr": "number-ref",
+    "ref": "foo"
+  },
+  "right": {
+    "expr": "number",
+    "value": 2
+  }
+}

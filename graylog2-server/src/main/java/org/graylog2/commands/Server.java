@@ -24,6 +24,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import org.graylog.events.EventsModule;
+import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -154,7 +156,9 @@ public class Server extends ServerBootstrap {
             new SidecarModule(),
             new ContentPacksModule(),
             new ViewsBindings(),
-            new ESBackendModule()
+            new ESBackendModule(),
+            new JobSchedulerModule(),
+            new EventsModule()
         );
 
         return modules.build();

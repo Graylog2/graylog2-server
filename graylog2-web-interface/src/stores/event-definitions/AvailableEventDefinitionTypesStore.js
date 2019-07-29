@@ -9,7 +9,7 @@ const { AvailableEventDefinitionTypesActions } = CombinedProvider.get('Available
 
 const AvailableEventDefinitionTypesStore = Reflux.createStore({
   listenables: [AvailableEventDefinitionTypesActions],
-  sourceUrl: '/plugins/org.graylog.events/events/entity_types',
+  sourceUrl: '/events/entity_types',
   entityTypes: undefined,
 
   init() {
