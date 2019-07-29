@@ -40,32 +40,30 @@ class EventsSearchBar extends React.Component {
     const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
 
     return (
-      <Row>
-        <Col md={12}>
-          <div className="form-inline">
+      <div className={styles.eventsSearchBar}>
+        <div>
+          <div className={styles.searchForm}>
             <SearchForm query={parameters.query}
                         onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        searchButtonLabel="Find"
+                        searchButtonLabel={<i className="fa fa-search" />}
+                        loadingLabel=""
                         placeholder="Find Events"
-                        queryWidth={300}
+                        queryWidth="100%"
                         topMargin={0}
-                        wrapperClass={styles.inline}
-                        useLoadingState />
-
-            <div className="pull-right">
-              <TimeUnitInput id="event-timerange-selector"
-                             update={this.updateSearchTimeRange}
-                             units={TIME_UNITS}
-                             unit={timerangeDuration.unit}
-                             value={timerangeDuration.duration}
-                             label="In the last"
-                             required />
-            </div>
+                        useLoadingState>
+              <Button><i className="fa fa-refresh" /></Button>
+            </SearchForm>
           </div>
-        </Col>
 
-        <Col md={12}>
+          <TimeUnitInput id="event-timerange-selector"
+                         update={this.updateSearchTimeRange}
+                         units={TIME_UNITS}
+                         unit={timerangeDuration.unit}
+                         value={timerangeDuration.duration}
+                         pullRight
+                         required />
+        </div>
+        <div>
           <ButtonGroup>
             <Button active={filterAlerts === 'only'} onClick={onAlertFilterChange('only')}>Alerts</Button>
             <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
@@ -78,8 +76,8 @@ class EventsSearchBar extends React.Component {
               {pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
             </FormControl>
           </FormGroup>
-        </Col>
-      </Row>
+        </div>
+      </div>
     );
   }
 }
