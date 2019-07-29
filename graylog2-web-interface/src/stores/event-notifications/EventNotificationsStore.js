@@ -11,7 +11,7 @@ const { EventNotificationsActions } = CombinedProvider.get('EventNotifications')
 
 const EventNotificationsStore = Reflux.createStore({
   listenables: [EventNotificationsActions],
-  sourceUrl: '/plugins/org.graylog.events/notifications',
+  sourceUrl: '/events/notifications',
   all: undefined,
   allLegacyTypes: undefined,
   notifications: undefined,

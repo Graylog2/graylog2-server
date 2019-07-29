@@ -1,0 +1,11 @@
+{
+  "expr": "<",
+  "left": {
+    "expr": "number",
+    "value": 1
+  },
+  "right": {
+    "expr": "number",
+    "value": 2
+  }
+}
