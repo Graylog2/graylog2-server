@@ -4,7 +4,6 @@ import lodash from 'lodash';
 import { Alert, Button, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { EmptyEntity, PaginatedList, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
@@ -12,6 +11,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 import EventsSearchBar from './EventsSearchBar';
+import EventDetails from './EventDetails';
 
 import styles from './Events.css';
 
@@ -40,13 +40,6 @@ class Events extends React.Component {
       const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
       this.setState({ expanded: nextExpanded });
     };
-  };
-
-  getConditionPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
   };
 
   priorityFormatter = (eventId, priority) => {
@@ -93,65 +86,6 @@ class Events extends React.Component {
     );
   };
 
-  renderEventDetails = (event, eventDefinitionContext) => {
-    const plugin = this.getConditionPlugin(event.event_definition_type);
-
-    return (
-      <tr className={styles.expandedRow}>
-        <td colSpan={HEADERS.length + 1}>
-          <Row>
-            <Col md={6}>
-              <dl>
-                <dt>ID</dt>
-                <dd>{event.id}</dd>
-                <dt>Priority</dt>
-                <dd>
-                  {lodash.capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
-                </dd>
-                <dt>Timestamp</dt>
-                <dd>
-                  <Timestamp dateTime={event.timestamp} />
-                </dd>
-                <dt>Event Definition</dt>
-                <dd>
-                  {eventDefinitionContext ? (
-                    <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-                      {eventDefinitionContext.title}
-                    </Link>
-                  ) : (
-                    <em>{event.event_definition_id}</em>
-                  )}
-                  &emsp;
-                  ({plugin.displayName || event.event_definition_type})
-                </dd>
-              </dl>
-            </Col>
-            <Col md={6}>
-              <dl>
-                {event.timerange_start && event.timerange_end && (
-                  <React.Fragment>
-                    <dt>Aggregation time range</dt>
-                    <dd>
-                      <Timestamp dateTime={event.timerange_start} />
-                      &ensp;&mdash;&ensp;
-                      <Timestamp dateTime={event.timerange_end} />
-                    </dd>
-                  </React.Fragment>
-                )}
-                <dt>Event Key</dt>
-                <dd>{event.key || 'No Key set for this Event.'}</dd>
-                <dt>Additional Fields</dt>
-                {lodash.isEmpty(event.fields)
-                  ? <dd>No additional Fields added to this Event.</dd>
-                  : this.renderEventFields(event.fields)}
-              </dl>
-            </Col>
-          </Row>
-        </td>
-      </tr>
-    );
-  };
-
   renderEvent = (event) => {
     const { context } = this.props;
     const { expanded } = this.state;
@@ -183,7 +117,13 @@ class Events extends React.Component {
           </td>
           <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
         </tr>
-        {expanded.includes(event.id) && this.renderEventDetails(event, eventDefinitionContext)}
+        {expanded.includes(event.id) && (
+          <tr className={styles.expandedRow}>
+            <td colSpan={HEADERS.length + 1}>
+              <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} />
+            </td>
+          </tr>
+        )}
       </tbody>
     );
   };
