@@ -20,6 +20,11 @@ class EventsSearchBar extends React.Component {
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
     onPageSizeChange: PropTypes.func.isRequired,
+    onSearchReload: PropTypes.func.isRequired,
+  };
+
+  state = {
+    isReloadingResults: false,
   };
 
   updateSearchTimeRange = (nextValue, nextUnit) => {
@@ -33,8 +38,19 @@ class EventsSearchBar extends React.Component {
     onPageSizeChange(FormsUtils.getValueFromInput(event.target));
   };
 
+  resetLoadingState = () => {
+    this.setState({ isReloadingResults: false });
+  };
+
+  handleSearchReload = () => {
+    this.setState({ isReloadingResults: true });
+    const { onSearchReload } = this.props;
+    onSearchReload(this.resetLoadingState);
+  };
+
   render() {
     const { parameters, pageSize, pageSizes, onQueryChange, onAlertFilterChange } = this.props;
+    const { isReloadingResults } = this.state;
 
     const filterAlerts = parameters.filter.alerts;
     const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
@@ -51,7 +67,9 @@ class EventsSearchBar extends React.Component {
                         queryWidth="100%"
                         topMargin={0}
                         useLoadingState>
-              <Button><i className="fa fa-refresh" /></Button>
+              <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>
+                <i className={`fa fa-refresh ${isReloadingResults ? 'fa-spin' : ''}`} />
+              </Button>
             </SearchForm>
           </div>
 

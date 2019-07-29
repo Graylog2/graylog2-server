@@ -28,6 +28,7 @@ class Events extends React.Component {
     onQueryChange: PropTypes.func.isRequired,
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
+    onSearchReload: PropTypes.func.isRequired,
   };
 
   state = {
@@ -161,6 +162,7 @@ class Events extends React.Component {
       onQueryChange,
       onAlertFilterChange,
       onTimeRangeChange,
+      onSearchReload,
     } = this.props;
 
     const eventList = events.map(e => e.event);
@@ -178,6 +180,7 @@ class Events extends React.Component {
                              onAlertFilterChange={onAlertFilterChange}
                              onTimeRangeChange={onTimeRangeChange}
                              onPageSizeChange={this.handlePageSizeChange}
+                             onSearchReload={onSearchReload}
                              pageSize={parameters.pageSize}
                              pageSizes={[10, 25, 50, 100]} />
             <PaginatedList activePage={parameters.page}
