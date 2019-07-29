@@ -77,9 +77,18 @@ class LegacyNotificationForm extends React.Component {
     );
   }
 
+  renderMissingPlugin(pluginType) {
+    return (
+      <Alert bsStyle="danger" className={styles.legacyNotificationAlert}>
+        Unknown legacy alarm callback type: <strong>{pluginType}</strong> Please make sure the plugin is installed.
+      </Alert>
+    );
+  }
+
   render() {
     const { config, legacyTypes } = this.props;
     const callbackType = config.callback_type;
+    const typeData = legacyTypes[callbackType];
 
     return (
       <React.Fragment>
@@ -100,7 +109,7 @@ class LegacyNotificationForm extends React.Component {
           Legacy alarm callbacks are deprecated. Please switch to the new notification types as soon as possible!
         </Alert>
 
-        {callbackType && this.renderNotificationForm(config, legacyTypes[callbackType])}
+        {typeData ? this.renderNotificationForm(config, typeData) : this.renderMissingPlugin(callbackType)}
       </React.Fragment>
     );
   }
