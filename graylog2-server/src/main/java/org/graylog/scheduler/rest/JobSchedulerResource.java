@@ -21,11 +21,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.scheduler.rest.requests.CreateJobTriggerRequest;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
+import org.graylog.scheduler.rest.requests.CreateJobTriggerRequest;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -87,6 +89,7 @@ public class JobSchedulerResource extends RestResource implements PluginRestReso
     @POST
     @Path("/jobs")
     @ApiOperation("Create new job definition")
+    @AuditEvent(type = JobSchedulerAuditEventTypes.SCHEDULER_JOB_CREATE)
     public JobDefinitionDto create(JobDefinitionDto dto) {
         return dbJobDefinitionService.save(dto);
     }
@@ -94,6 +97,7 @@ public class JobSchedulerResource extends RestResource implements PluginRestReso
     @PUT
     @Path("/jobs/{jobDefinitionId}")
     @ApiOperation("Update existing job definition")
+    @AuditEvent(type = JobSchedulerAuditEventTypes.SCHEDULER_JOB_UPDATE)
     public JobDefinitionDto update(@ApiParam(name = "jobDefinitionId") @PathParam("jobDefinitionId") @NotBlank String jobDefinitionId,
                                    JobDefinitionDto dto) {
         dbJobDefinitionService.get(jobDefinitionId)
@@ -109,6 +113,7 @@ public class JobSchedulerResource extends RestResource implements PluginRestReso
     @DELETE
     @Path("/jobs/{jobDefinitionId}")
     @ApiOperation("Delete job definition")
+    @AuditEvent(type = JobSchedulerAuditEventTypes.SCHEDULER_JOB_DELETE)
     public void delete(@ApiParam(name = "jobDefinitionId") @PathParam("jobDefinitionId") @NotBlank String jobDefinitionId) {
         dbJobDefinitionService.delete(jobDefinitionId);
     }
@@ -125,6 +130,7 @@ public class JobSchedulerResource extends RestResource implements PluginRestReso
     @POST
     @Path("/triggers")
     @ApiOperation("Create new job trigger")
+    @AuditEvent(type = JobSchedulerAuditEventTypes.SCHEDULER_TRIGGER_CREATE)
     public JobTriggerDto createTrigger(@Valid CreateJobTriggerRequest request) {
         try {
             return dbJobTriggerService.create(request.toDto());

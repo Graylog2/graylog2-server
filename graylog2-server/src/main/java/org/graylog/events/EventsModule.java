@@ -17,6 +17,7 @@
 package org.graylog.events;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -75,6 +76,7 @@ public class EventsModule extends PluginModule {
         addPeriodical(EventNotificationStatusCleanUp.class);
 
         addMigration(V20190722150700_LegacyAlertConditionMigration.class);
+        addAuditEventTypes(EventsAuditEventTypes.class);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,

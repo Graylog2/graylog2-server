@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
@@ -29,6 +30,7 @@ import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -105,6 +107,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Create new event definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     public Response create(EventDefinitionDto dto) {
         final ValidationResult result = dto.config().validate();
         if (result.failed()) {
@@ -116,6 +119,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @PUT
     @Path("{definitionId}")
     @ApiOperation("Update existing event definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public Response update(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                            EventDefinitionDto dto) {
         dbService.get(definitionId)
@@ -135,6 +139,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @DELETE
     @Path("{definitionId}")
     @ApiOperation("Delete event definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
     public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         eventDefinitionHandler.delete(definitionId);
     }
@@ -142,6 +147,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @POST
     @ApiOperation("Execute event definition")
     @Path("{definitionId}/execute")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_EXECUTE)
     public void execute(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                         @ApiParam(name = "parameters", required = true) @NotNull EventProcessorParameters parameters) {
         if (parameters instanceof EventProcessorParametersWithTimerange.FallbackParameters) {

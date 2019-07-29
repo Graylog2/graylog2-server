@@ -22,6 +22,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.search.EventsSearchParameters;
 import org.graylog.events.search.EventsSearchResult;
 import org.graylog.events.search.EventsSearchService;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -48,6 +49,7 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @POST
     @Path("/search")
     @ApiOperation("Search events")
+    @NoAuditEvent("Doesn't change any data, only searches for events")
     public EventsSearchResult search(EventsSearchParameters request) {
         final EventsSearchResult result = searchService.search(request);
 

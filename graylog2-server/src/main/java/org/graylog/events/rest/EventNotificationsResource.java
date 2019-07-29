@@ -21,10 +21,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -101,6 +103,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
 
     @POST
     @ApiOperation("Create new notification definition")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     public NotificationDto create(NotificationDto dto) {
         return resourceHandler.create(dto);
     }
@@ -108,6 +111,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @PUT
     @Path("/{notificationId}")
     @ApiOperation("Update existing notification")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
     public NotificationDto update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                                   NotificationDto dto) {
         dbNotificationService.get(notificationId)
@@ -123,6 +127,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @DELETE
     @Path("/{notificationId}")
     @ApiOperation("Delete a notification")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
     public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         resourceHandler.delete(notificationId);
     }
