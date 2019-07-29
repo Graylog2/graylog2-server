@@ -22,8 +22,8 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import java.util.Set;
 
 public class EventsAuditEventTypes implements PluginAuditEventTypes {
-    private static final String EVENT_DEFINITON_PREFIX = "event_definition:";
-    private static final String EVENT_NOTIFICATION_PREFIX = "event_notification:";
+    private static final String EVENT_DEFINITON_PREFIX = "events:definition:";
+    private static final String EVENT_NOTIFICATION_PREFIX = "events:notification:";
 
     public static final String EVENT_DEFINITION_CREATE = EVENT_DEFINITON_PREFIX + "create";
     public static final String EVENT_DEFINITION_DELETE = EVENT_DEFINITON_PREFIX + "delete";
