@@ -94,7 +94,7 @@ public class DBJobTriggerServiceTest {
                 .sorted(comparing(jobTriggerDto -> requireNonNull(jobTriggerDto.id())))
                 .collect(ImmutableList.toImmutableList());
 
-        assertThat(all).hasSize(3);
+        assertThat(all).hasSize(4);
 
         assertThat(all.get(0)).satisfies(dto -> {
             assertThat(dto.id()).isEqualTo("54e3deadbeefdeadbeef0000");
@@ -681,4 +681,24 @@ public class DBJobTriggerServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("triggerId");
     }
+
+    @Test
+    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void deleteCompleted() {
+        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(86400000)).isEqualTo(1);
+        assertThat(dbJobTriggerService.get("54e3deadbeefdeadbeef0003").isPresent()).isFalse();
+
+
+    }
+
+    @Test
+    @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void deleteCompletedTooNew() {
+        final JobTriggerDto trigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
+        // sets updated_at to recent timestamp
+        dbJobTriggerService.update(trigger);
+        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(86400000)).isEqualTo(0);
+
+    }
+
 }

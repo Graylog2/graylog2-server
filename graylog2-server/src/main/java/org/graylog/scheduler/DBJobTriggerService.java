@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
@@ -220,6 +221,21 @@ public class DBJobTriggerService {
             throw new IllegalArgumentException("triggerId cannot be null or empty");
         }
         return db.remove(DBQuery.is(FIELD_ID, triggerId)).getN() > 0;
+    }
+
+    /**
+     *
+     * @param olderThan triggers that are older than the current time - olderThan in ms will be removed
+     * @return the number of deleted triggers
+     */
+    public int deleteCompletedOnceSchedulesOlderThan(long olderThan) {
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.is(FIELD_LOCK_OWNER, null),
+                DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
+                DBQuery.is(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
+                DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(olderThan))
+                );
+        return db.remove(query).getN();
     }
 
     /**
