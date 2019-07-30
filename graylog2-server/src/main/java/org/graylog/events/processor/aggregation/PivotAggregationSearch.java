@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog.events.configuration.EventsConfiguration;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -71,19 +73,21 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final String searchOwner;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
-    private final long timeout = 60000; // TODO: Make search timeout configurable
+    private final EventsConfiguration eventsConfiguration;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
                                   @Assisted AggregationEventProcessorParameters parameters,
                                   @Assisted String searchOwner,
                                   SearchJobService searchJobService,
-                                  QueryEngine queryEngine) {
+                                  QueryEngine queryEngine,
+                                  EventsConfigurationProvider configProvider) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
+        this.eventsConfiguration = configProvider.get();
     }
 
     private String metricName(AggregationSeries series) {
@@ -279,7 +283,10 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .build();
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
         try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
+            Uninterruptibles.getUninterruptibly(
+                searchJob.getResultFuture(),
+                eventsConfiguration.eventsSearchTimeout().toStandardDuration().getMillis(),
+                TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             // TODO: Throw EventProcessorExecutionException instead
             throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
