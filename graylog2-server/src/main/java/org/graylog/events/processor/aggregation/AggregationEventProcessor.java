@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.logging.log4j.util.Strings;
@@ -156,10 +157,20 @@ public class AggregationEventProcessor implements EventProcessor {
 
     }
 
+    /**
+     * This returns the actual streams set based on the given parameters and the event definition.
+     * Streams in parameters will override the ones in the config.
+     *
+     * @param parameters aggregation event processor parameters
+     * @return the actual streams
+     */
+    private Set<String> getStreams(AggregationEventProcessorParameters parameters) {
+        return parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+    }
+
     private void filterSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                               EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        // Streams in parameters should override the ones in the config
-        final Set<String> streams = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+        final Set<String> streams = getStreams(parameters);
 
         final MoreSearch.ScrollCallback callback = (messages, continueScrolling) -> {
             final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
@@ -168,6 +179,12 @@ public class AggregationEventProcessor implements EventProcessor {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
+
+                // We don't want source streams in the event which are unrelated to the event definition
+                msg.getStreamIds().stream()
+                    .filter(stream -> config.streams().contains(stream))
+                    .forEach(event::addSourceStream);
+
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
 
@@ -215,6 +232,11 @@ public class AggregationEventProcessor implements EventProcessor {
     ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result) {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
 
+        final Set<String> searchStreams = getStreams(parameters);
+        // We don't want source streams in the event which are unrelated to the event definition.
+        // If the search streams is empty though, we search in all streams and so we include all source streams.
+        final Set<String> sourceStreams = searchStreams.isEmpty() ? result.sourceStreams() : Sets.intersection(searchStreams, result.sourceStreams());
+
         for (final AggregationKeyResult keyResult : result.keyResults()) {
             if (!satisfiesConditions(keyResult)) {
                 LOG.debug("Skipping result <{}> because the conditions <{}> don't match", keyResult, config.conditions());
@@ -229,6 +251,7 @@ public class AggregationEventProcessor implements EventProcessor {
             // TODO: Do we have to set any other event fields here?
             event.setTimerangeStart(parameters.timerange().getFrom());
             event.setTimerangeEnd(parameters.timerange().getTo());
+            sourceStreams.forEach(event::addSourceStream);
 
             final Map<String, Object> fields = new HashMap<>();
 
