@@ -35,7 +35,7 @@ const webpackConfig = {
       name: '__[name]',
     }),
     new AssetsPlugin({
- filename: 'vendor-module.json',
+      filename: 'vendor-module.json',
       path: BUILD_PATH,
       processOutput(assets) {
         const jsfiles = [];
@@ -61,8 +61,8 @@ const webpackConfig = {
             chunks: chunks,
           },
         });
-      } 
-}),
+      },
+    }),
   ],
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
