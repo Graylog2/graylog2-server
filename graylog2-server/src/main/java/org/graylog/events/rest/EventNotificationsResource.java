@@ -35,6 +35,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -89,6 +90,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     public PaginatedResponse<NotificationDto> listNotifications(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ);
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         return PaginatedResponse.create("notifications", dbNotificationService.getAllPaginated(searchQuery, "title", page, perPage), query);
     }
@@ -97,6 +99,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}")
     @ApiOperation("Get a notification")
     public NotificationDto get(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ);
         return dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
     }
@@ -105,6 +108,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     public NotificationDto create(NotificationDto dto) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
         return resourceHandler.create(dto);
     }
 
@@ -114,6 +118,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
     public NotificationDto update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                                   NotificationDto dto) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT);
         dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
 
@@ -129,6 +134,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Delete a notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
     public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE);
         resourceHandler.delete(notificationId);
     }
 
@@ -136,6 +142,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/legacy/types")
     @ApiOperation("List all available legacy alarm callback types")
     public Response legacyTypes() {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ);
         final ImmutableMap.Builder<String, Map<String, Object>> typesBuilder = ImmutableMap.builder();
 
         for (AlarmCallback availableAlarmCallback : availableLegacyAlarmCallbacks) {
