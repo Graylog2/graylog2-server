@@ -109,6 +109,38 @@
           "hello": "world"
         }
       }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "job_definition_id": "54e3deadbeefdeadbeefaff5",
+      "start_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "next_time": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "updated_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "triggered_at": {
+        "$date": "2019-01-01T01:00:00.000Z"
+      },
+      "status": "complete",
+      "lock": {
+        "owner": null,
+        "last_lock_time": null,
+        "clock": 0,
+        "progress": 0
+      },
+      "schedule": {
+        "type": "once"
+      },
+      "data": null
     }
   ]
 }
