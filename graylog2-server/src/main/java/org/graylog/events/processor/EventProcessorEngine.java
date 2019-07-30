@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -44,6 +45,7 @@ public class EventProcessorEngine {
     private final EventNotificationHandler notificationHandler;
     private final EventStorageHandlerEngine storageHandlerEngine;
     private final Provider<EventProcessorEventFactory> eventFactoryProvider;
+    private final EventProcessorExecutionMetrics metrics;
 
     @Inject
     public EventProcessorEngine(Map<String, EventProcessor.Factory> eventProcessorFactories,
@@ -51,13 +53,15 @@ public class EventProcessorEngine {
                                 EventFieldSpecEngine fieldSpecEngine,
                                 EventNotificationHandler notificationHandler,
                                 EventStorageHandlerEngine storageHandlerEngine,
-                                Provider<EventProcessorEventFactory> eventFactoryProvider) {
+                                Provider<EventProcessorEventFactory> eventFactoryProvider,
+                                EventProcessorExecutionMetrics metrics) {
         this.dbService = dbService;
         this.eventProcessorFactories = eventProcessorFactories;
         this.fieldSpecEngine = fieldSpecEngine;
         this.notificationHandler = notificationHandler;
         this.storageHandlerEngine = storageHandlerEngine;
         this.eventFactoryProvider = eventFactoryProvider;
+        this.metrics = metrics;
     }
 
     private EventDefinition getEventDefinition(String id) throws EventProcessorException {
@@ -77,14 +81,23 @@ public class EventProcessorEngine {
         LOG.debug("Executing event processor <{}/{}/{}>", definition.title(), definition.id(), definition.config().type());
 
         final EventProcessor eventProcessor = factory.create(definition);
-        final EventConsumer<List<EventWithContext>> eventConsumer = eventsWithContext -> emitEvents(definition, eventsWithContext);
+        final EventConsumer<List<EventWithContext>> eventConsumer = eventsWithContext -> emitEvents(eventProcessor, definition, eventsWithContext);
 
+        metrics.registerEventProcessor(eventProcessor, definitionId);
         try {
+            metrics.recordExecutions(eventProcessor, definitionId);
+            final long execution_start = System.nanoTime();
+
             eventProcessor.createEvents(eventFactoryProvider.get(), parameters, eventConsumer);
+
+            metrics.recordExecutionTime(eventProcessor, definitionId, System.nanoTime() - execution_start, TimeUnit.NANOSECONDS);
+            metrics.recordSuccess(eventProcessor, definitionId);
         } catch (EventProcessorException e) {
+            metrics.recordException(eventProcessor, definitionId);
             // We can just re-throw the exception because we already got an EventProcessorException
             throw e;
         } catch (Exception e) {
+            metrics.recordException(eventProcessor, definitionId);
             LOG.error("Caught an unhandled exception while executing event processor <{}/{}/{}> - Make sure to modify the event processor to throw only EventProcessorExecutionException so we get more context!",
                     definition.config().type(), definition.title(), definition.id(), e);
             // Since we don't know what kind of error this is, we play safe and make this a temporary error.
@@ -92,10 +105,11 @@ public class EventProcessorEngine {
         }
     }
 
-    private void emitEvents(EventDefinition eventDefinition, List<EventWithContext> eventsWithContext) throws EventProcessorException {
+    private void emitEvents(EventProcessor eventProcessor, EventDefinition eventDefinition, List<EventWithContext> eventsWithContext) throws EventProcessorException {
         if (eventsWithContext.isEmpty()) {
             return;
         }
+        metrics.recordCreatedEvents(eventProcessor, eventDefinition.id(), eventsWithContext.size());
         try {
             // Field spec needs to be executed first to make sure all fields are set before executing the handlers
             fieldSpecEngine.execute(eventsWithContext, eventDefinition.fieldSpec());

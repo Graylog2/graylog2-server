@@ -60,6 +60,7 @@ public class EventNotificationExecutionJob implements Job {
     private final DBNotificationGracePeriodService notificationGracePeriodService;
     private final Map<String, EventNotification.Factory> eventNotificationFactories;
     private final EventsConfigurationProvider configurationProvider;
+    private final EventNotificationExecutionMetrics metrics;
 
     @Inject
     public EventNotificationExecutionJob(@Assisted JobDefinitionDto jobDefinition,
@@ -67,13 +68,14 @@ public class EventNotificationExecutionJob implements Job {
                                          DBEventDefinitionService eventDefinitionService,
                                          DBNotificationGracePeriodService notificationGracePeriodService,
                                          Map<String, EventNotification.Factory> eventNotificationFactories,
-                                         EventsConfigurationProvider configurationProvider) {
+                                         EventsConfigurationProvider configurationProvider, EventNotificationExecutionMetrics metrics) {
         this.jobConfig = (Config) jobDefinition.config();
         this.notificationService = dbNotificationService;
         this.eventDefinitionService = eventDefinitionService;
         this.notificationGracePeriodService = notificationGracePeriodService;
         this.eventNotificationFactories = eventNotificationFactories;
         this.configurationProvider = configurationProvider;
+        this.metrics = metrics;
     }
 
     @Override
@@ -122,13 +124,17 @@ public class EventNotificationExecutionJob implements Job {
         updateTriggerStatus(eventDto, gracePeriodInMS);
         if (inGrace(eventDto, gracePeriodInMS)) {
             LOG.debug("Notification <{}> triggered but it's in grace period.", jobConfig.notificationId());
+            metrics.markInGrace();
             return ctx.jobTriggerUpdates().scheduleNextExecution();
         }
 
         final EventNotification eventNotification = eventNotificationFactory.create();
         try {
+            metrics.markExecution();
             eventNotification.execute(notificationContext);
+            metrics.markSuccess();
         } catch (TemporaryEventNotificationException e) {
+            metrics.markFailedTemporarily();
             final long retryPeriod = configurationProvider.get().eventNotificationsRetry();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed to execute notification, retrying in %d minutes - <%s/%s/%s>",
@@ -139,6 +145,7 @@ public class EventNotificationExecutionJob implements Job {
                     trigger,
                     ctx.jobTriggerUpdates().retryIn(retryPeriod, TimeUnit.MILLISECONDS), e);
         } catch (PermanentEventNotificationException e) {
+            metrics.markFailedPermanently();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed permanently to execute notification, giving up - <%s/%s/%s>",
                             notification.id(),
@@ -148,6 +155,7 @@ public class EventNotificationExecutionJob implements Job {
                     ctx.jobTriggerUpdates().scheduleNextExecution(),
                     e);
         } catch (EventNotificationException e) {
+            metrics.markFailed();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Notification failed to execute - <%s/%s/%s>",
                             notification.id(),

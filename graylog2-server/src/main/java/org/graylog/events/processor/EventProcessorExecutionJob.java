@@ -59,15 +59,18 @@ public class EventProcessorExecutionJob implements Job {
     private final JobSchedulerClock clock;
     private final EventProcessorEngine eventProcessorEngine;
     private final Config config;
+    private final EventProcessorExecutionMetrics metrics;
 
     @Inject
     public EventProcessorExecutionJob(JobScheduleStrategies scheduleStrategies,
                                       JobSchedulerClock clock,
                                       EventProcessorEngine eventProcessorEngine,
+                                      EventProcessorExecutionMetrics metrics,
                                       @Assisted JobDefinitionDto jobDefinition) {
         this.scheduleStrategies = scheduleStrategies;
         this.clock = clock;
         this.eventProcessorEngine = eventProcessorEngine;
+        this.metrics = metrics;
         this.config = (Config) jobDefinition.config();
     }
 
