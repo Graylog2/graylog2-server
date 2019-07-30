@@ -39,6 +39,10 @@ public class ValidationResult {
         errors.putAll(extraErrors);
     }
 
+    public void addAll(ValidationResult validationResult) {
+        errors.putAll(validationResult.errors);
+    }
+
     @JsonProperty("failed")
     public boolean failed() {
         return !errors.isEmpty();

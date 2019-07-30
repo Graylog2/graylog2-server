@@ -26,6 +26,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.plugin.rest.ValidationResult;
 
 import java.util.Map;
 
@@ -51,6 +52,17 @@ public abstract class LegacyAlarmCallbackEventNotificationConfig implements Even
 
     public static Builder builder() {
         return Builder.create();
+    }
+
+    @JsonIgnore
+    public ValidationResult validate() {
+        final ValidationResult validation = new ValidationResult();
+
+        if (callbackType().isEmpty()) {
+            validation.addError(FIELD_CALLBACK_TYPE, "Legacy Notification callback type cannot be empty.");
+        }
+
+        return validation;
     }
 
     @AutoValue.Builder
