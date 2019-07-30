@@ -22,11 +22,12 @@ class NotificationSettingsForm extends React.Component {
     super(props);
 
     const { backlog_size: backlogSize } = props.eventDefinition.notification_settings;
-    const effectiveBacklogSize = lodash.defaultTo(backlogSize, 0);
+    const defaultBacklogSize = props.eventDefinition.notification_settings.default_backlog_size;
+    const effectiveBacklogSize = lodash.defaultTo(backlogSize, defaultBacklogSize);
 
     this.state = {
       lastEnabledGracePeriod: undefined,
-      isBacklogSizeEnabled: effectiveBacklogSize > 0,
+      isBacklogSizeEnabled: (backlogSize === null ? false : (effectiveBacklogSize > 0)),
       backlogSize: effectiveBacklogSize,
     };
   }

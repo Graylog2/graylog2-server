@@ -18,6 +18,7 @@ import {} from 'components/event-notifications/event-notification-types';
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+const { ConfigurationActions } = CombinedProvider.get('Configuration');
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
@@ -39,7 +40,8 @@ class EventDefinitionFormContainer extends React.Component {
       key_spec: [],
       notification_settings: {
         grace_period_ms: 0,
-        backlog_size: 0,
+        // Defaults to system setting for notification backlog size
+        backlog_size: null,
       },
       notifications: [],
       alert: false,
@@ -56,15 +58,21 @@ class EventDefinitionFormContainer extends React.Component {
       validation: {
         errors: {},
       },
+      eventsClusterConfig: undefined,
     };
   }
 
   componentDidMount() {
+    this.fetchClusterConfig();
     this.fetchNotifications();
   }
 
   fetchNotifications = () => {
     EventNotificationsActions.listAll();
+  };
+
+  fetchClusterConfig = () => {
+    ConfigurationActions.listEventsClusterConfig().then(config => this.setState({ eventsClusterConfig: config }));
   };
 
   handleChange = (key, value) => {
@@ -114,12 +122,13 @@ class EventDefinitionFormContainer extends React.Component {
 
   render() {
     const { action, entityTypes, notifications } = this.props;
-    const { eventDefinition, validation } = this.state;
-    const isLoading = !entityTypes || !notifications.all;
+    const { eventDefinition, eventsClusterConfig, validation } = this.state;
+    const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
 
     if (isLoading) {
       return <Spinner text="Loading Event information..." />;
     }
+    eventDefinition.notification_settings.default_backlog_size = eventsClusterConfig.events_notification_default_backlog;
 
     return (
       <EventDefinitionForm action={action}
