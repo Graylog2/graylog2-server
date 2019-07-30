@@ -1,0 +1,53 @@
+{
+  "expr": "&&",
+  "left": {
+    "expr": "&&",
+    "left": {
+      "expr": ">",
+      "left": {
+        "expr": "number",
+        "value": 2
+      },
+      "right": {
+        "expr": "number",
+        "value": 1
+      }
+    },
+    "right": {
+      "expr": "<",
+      "left": {
+        "expr": "number",
+        "value": 1
+      },
+      "right": {
+        "expr": "number",
+        "value": 2
+      }
+    }
+  },
+  "right": {
+    "expr": "&&",
+    "left": {
+      "expr": ">=",
+      "left": {
+        "expr": "number",
+        "value": 5
+      },
+      "right": {
+        "expr": "number",
+        "value": 5
+      }
+    },
+    "right": {
+      "expr": ">=",
+      "left": {
+        "expr": "number",
+        "value": 5
+      },
+      "right": {
+        "expr": "number",
+        "value": 3
+      }
+    }
+  }
+}

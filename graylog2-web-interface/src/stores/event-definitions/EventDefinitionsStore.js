@@ -11,7 +11,7 @@ const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 
 const EventDefinitionsStore = Reflux.createStore({
   listenables: [EventDefinitionsActions],
-  sourceUrl: '/plugins/org.graylog.events/events/definitions',
+  sourceUrl: '/events/definitions',
   all: undefined,
   eventDefinitions: undefined,
   query: undefined,
