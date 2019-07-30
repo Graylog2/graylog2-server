@@ -114,11 +114,6 @@ public class EventProcessorEngine {
                     LOG.warn("Key spec <{}> for event <{}> cannot be fulfilled", eventDefinition.keySpec(), eventWithContext.event());
                 }
 
-                if (eventWithContext.eventContext().isPresent()) {
-                    eventWithContext.event().setStreamSource(eventWithContext.eventContext().get().getSourceStreams());
-                } else { // message
-                    eventWithContext.event().setStreamSource(eventWithContext.messageContext().get().getStreams());
-                }
                 eventWithContext.event().setKeyTuple(keyTuple);
             });
 
