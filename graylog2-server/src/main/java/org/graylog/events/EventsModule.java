@@ -18,6 +18,7 @@ package org.graylog.events;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.events.audit.EventsAuditEventTypes;
+import org.graylog.events.contentpack.facat.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -32,6 +33,7 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotification;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
@@ -74,6 +76,8 @@ public class EventsModule extends PluginModule {
         registerRestControllerPackage(getClass().getPackage().getName());
 
         addPeriodical(EventNotificationStatusCleanUp.class);
+
+        addEntityFacade(EventDefinitionFacade.TYPE, EventDefinitionFacade.class);
 
         addMigration(V20190722150700_LegacyAlertConditionMigration.class);
         addAuditEventTypes(EventsAuditEventTypes.class);
