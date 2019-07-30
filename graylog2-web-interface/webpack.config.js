@@ -4,7 +4,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -68,14 +68,16 @@ const webpackConfig = {
         ],
       },
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
-      { test: /\.css$/,
+      {
+        test: /\.css$/,
         use: [
           'style-loader',
           {
             loader: 'css-loader',
             options: getCssLoaderOptions(),
           },
-        ] },
+        ],
+      },
     ],
   },
   resolve: {
@@ -155,9 +157,9 @@ if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
-      minimizer: [new UglifyJsPlugin({
+      minimizer: [new TerserPlugin({
         sourceMap: true,
-        uglifyOptions: {
+        terserOptions: {
           compress: {
             // Conditionals compression caused issue #5450 so they should be disabled for now.
             // Looking at uglify-js issues, it seems that the latest changes in version 3.4.9 broke conditionals
