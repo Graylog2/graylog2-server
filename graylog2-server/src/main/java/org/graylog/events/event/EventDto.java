@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -111,7 +112,7 @@ public abstract class EventDto {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDto.Builder();
+            return new AutoValue_EventDto.Builder().sourceStreams(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_ID)
