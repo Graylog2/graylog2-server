@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -224,16 +225,17 @@ public class DBJobTriggerService {
     }
 
     /**
-     *
-     * @param olderThan triggers that are older than the current time - olderThan in ms will be removed
+     * Deletes completed {@link OnceJobSchedule} triggers that are older than the provided time
+     * @param timeValue the time range of triggers to be removed
+     * @param unit the unit of the provided timeValue
      * @return the number of deleted triggers
      */
-    public int deleteCompletedOnceSchedulesOlderThan(long olderThan) {
+    public int deleteCompletedOnceSchedulesOlderThan(long timeValue, TimeUnit unit) {
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.is(FIELD_LOCK_OWNER, null),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.COMPLETE),
                 DBQuery.is(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
-                DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(olderThan))
+                DBQuery.lessThan(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
                 );
         return db.remove(query).getN();
     }

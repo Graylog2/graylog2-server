@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.concurrent.TimeUnit;
 
 public class ScheduleTriggerCleanUp extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ScheduleTriggerCleanUp.class);
@@ -29,7 +30,7 @@ public class ScheduleTriggerCleanUp extends Periodical {
     private final DBJobTriggerService dbJobTriggerService;
 
     // Remove completed job triggers after a day
-    private static final long OUTOFDATE_IN_MS = 86400000;
+    private static final long OUTOFDATE_IN_DAYS = 1;
 
     @Inject
     public ScheduleTriggerCleanUp(DBJobTriggerService dbJobTriggerService) {
@@ -78,7 +79,7 @@ public class ScheduleTriggerCleanUp extends Periodical {
 
     @Override
     public void doRun() {
-        int deleted = dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(OUTOFDATE_IN_MS);
+        int deleted = dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS);
         if (deleted > 0) {
             LOG.debug("Deleted {} outdated OnceJobSchedule triggers.", deleted);
         }

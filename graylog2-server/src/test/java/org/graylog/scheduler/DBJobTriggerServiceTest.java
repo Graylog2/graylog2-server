@@ -685,7 +685,7 @@ public class DBJobTriggerServiceTest {
     @Test
     @UsingDataSet(locations = "job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void deleteCompleted() {
-        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(86400000)).isEqualTo(1);
+        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(1);
         assertThat(dbJobTriggerService.get("54e3deadbeefdeadbeef0003").isPresent()).isFalse();
 
 
@@ -697,7 +697,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto trigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
         // sets updated_at to recent timestamp
         dbJobTriggerService.update(trigger);
-        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(86400000)).isEqualTo(0);
+        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(0);
 
     }
 
