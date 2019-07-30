@@ -23,6 +23,21 @@ class EventDetails extends React.Component {
     return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
   };
 
+  renderEventFields = (eventFields) => {
+    const fieldNames = Object.keys(eventFields);
+    return (
+      <ul>
+        {fieldNames.map((fieldName) => {
+          return (
+            <React.Fragment key={fieldName}>
+              <li><b>{fieldName}</b> {eventFields[fieldName]}</li>
+            </React.Fragment>
+          );
+        })}
+      </ul>
+    );
+  };
+
   render() {
     const { event, eventDefinitionContext } = this.props;
     const plugin = this.getConditionPlugin(event.event_definition_type);
