@@ -86,7 +86,7 @@ const webpackConfig = {
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
   },
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
-  devtool: 'source-map',
+  devtool: 'cheap-module-source-map',
   plugins: [
     new UniqueChunkIdPlugin(),
     new webpack.HashedModuleIdsPlugin({
@@ -161,10 +161,6 @@ if (TARGET === 'build') {
         sourceMap: true,
         terserOptions: {
           compress: {
-            // Conditionals compression caused issue #5450 so they should be disabled for now.
-            // Looking at uglify-js issues, it seems that the latest changes in version 3.4.9 broke conditionals
-            // compression. For example: https://github.com/mishoo/UglifyJS2/issues/3269
-            conditionals: false,
             warnings: false,
           },
           mangle: {
