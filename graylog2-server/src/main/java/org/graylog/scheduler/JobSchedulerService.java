@@ -17,9 +17,14 @@
 package org.graylog.scheduler;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.scheduler.eventbus.JobCompletedEvent;
+import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
+import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +32,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 @Singleton
 public class JobSchedulerService extends AbstractExecutionThreadService {
@@ -35,32 +44,53 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     private final JobExecutionEngine jobExecutionEngine;
     private final JobSchedulerConfig schedulerConfig;
     private final JobSchedulerClock clock;
+    private final JobSchedulerEventBus schedulerEventBus;
+    private final ServerStatus serverStatus;
     private final JobWorkerPool workerPool;
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
     private final Duration loopSleepDuration;
+    private final InterruptibleSleeper sleeper = new InterruptibleSleeper();
 
     @Inject
     public JobSchedulerService(JobExecutionEngine.Factory engineFactory,
                                JobWorkerPool.Factory workerPoolFactory,
                                JobSchedulerConfig schedulerConfig,
                                JobSchedulerClock clock,
+                               JobSchedulerEventBus schedulerEventBus,
+                               ServerStatus serverStatus,
                                @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
         this.workerPool = workerPoolFactory.create("system", schedulerConfig.numberOfWorkerThreads());
         this.jobExecutionEngine = engineFactory.create(workerPool);
         this.schedulerConfig = schedulerConfig;
         this.clock = clock;
+        this.schedulerEventBus = schedulerEventBus;
+        this.serverStatus = serverStatus;
         this.loopSleepDuration = loopSleepDuration;
     }
 
     @Override
+    protected void startUp() throws Exception {
+        schedulerEventBus.register(this);
+    }
+
+    @Override
     protected void run() throws Exception {
+        // Safety measure to make sure everything is started before we start job scheduling.
+        LOG.debug("Waiting for server to enter RUNNING status before starting the scheduler loop");
+        serverStatus.awaitRunning(() -> LOG.debug("Server entered RUNNING state, starting scheduler loop"));
+
         if (schedulerConfig.canRun()) {
             while (isRunning()) {
                 LOG.debug("Starting scheduler loop iteration");
                 try {
                     if (!jobExecutionEngine.execute() && isRunning()) {
-                        // We wait because there are either no free worker threads or no runnable triggers
-                        clock.sleepUninterruptibly(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
+                        // When the execution engine returned false, there are either no free worker threads or no
+                        // runnable triggers. To avoid busy spinning we sleep for the configured duration or until
+                        // we receive a job completion event via the scheduler event bus.
+                        if (sleeper.sleep(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit())) {
+                            LOG.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
+                                loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
+                        }
                     }
                 } catch (Exception e) {
                     LOG.error("Error running job execution engine", e);
@@ -73,9 +103,66 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
         }
     }
 
+    @Subscribe
+    public void handleJobCompleted(JobCompletedEvent triggerCompletedEvent) {
+        // The job execution engine has just completed a job so we want to check for runnable triggers immediately.
+        sleeper.interrupt();
+    }
+
     @Override
     protected void triggerShutdown() {
+        // We don't want to process events when shutting down, so do this first
+        schedulerEventBus.unregister(this);
         shutdownLatch.countDown();
         jobExecutionEngine.shutdown();
+    }
+
+    /**
+     * This class provides a sleep method that can be interrupted without interrupting threads.
+     * The same could be achieved by using a {@link CountDownLatch} but that one cannot be reused and we would need
+     * to create new latch objects all the time. This implementation is using a {@link Semaphore} internally which
+     * can be reused.
+     */
+    @VisibleForTesting
+    static class InterruptibleSleeper {
+
+        private final Semaphore semaphore;
+
+        InterruptibleSleeper() {
+            this(new Semaphore(1));
+        }
+
+        @VisibleForTesting
+        InterruptibleSleeper(Semaphore semaphore) {
+            // Semaphores with more than one permit would break the assumptions of the implementation
+            checkArgument(semaphore.availablePermits() == 1, "Semaphore must only have 1 permit");
+            this.semaphore = semaphore;
+        }
+
+        /**
+         * Blocks for the given duration or until interrupted via {@link #interrupt()}.
+         *
+         * @param duration the duration to sleep
+         * @param unit     the duration unit
+         * @return true if slept for the given duration, false if interrupted
+         * @throws InterruptedException if the thread gets interrupted
+         */
+        public boolean sleep(long duration, TimeUnit unit) throws InterruptedException {
+            // First try to acquire the one permit we allow
+            semaphore.tryAcquire();
+            // Now try to acquire another permit. This won't work except #interrupt() got called in the meantime.
+            // It waits for the given duration, basically emulating a sleep.
+            final boolean acquired = semaphore.tryAcquire(duration, unit);
+            // Always release so we can start with a clean slate when sleep is called again
+            semaphore.release();
+            return !acquired;
+        }
+
+        /**
+         * Interrupt a {@link #sleep(long, TimeUnit)} call so it unblocks.
+         */
+        public void interrupt() {
+            semaphore.release();
+        }
     }
 }
