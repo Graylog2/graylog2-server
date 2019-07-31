@@ -182,7 +182,7 @@ public class AggregationEventProcessor implements EventProcessor {
 
                 // We don't want source streams in the event which are unrelated to the event definition
                 msg.getStreamIds().stream()
-                    .filter(stream -> config.streams().contains(stream))
+                    .filter(stream -> getStreams(parameters).contains(stream))
                     .forEach(event::addSourceStream);
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
