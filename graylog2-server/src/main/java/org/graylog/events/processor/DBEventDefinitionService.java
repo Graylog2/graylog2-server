@@ -21,12 +21,11 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.function.Predicate;
 
 public class DBEventDefinitionService extends PaginatedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
@@ -43,12 +42,10 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
         this.stateService = stateService;
     }
 
-    public PaginatedList<EventDefinitionDto> getAllPaginated(String sortByField, int page, int perPage) {
-        return findPaginatedWithQueryAndSort(DBQuery.empty(), DBSort.asc(sortByField), page, perPage);
-    }
-
-    public PaginatedList<EventDefinitionDto> getAllPaginated(SearchQuery query, String sortByField, int page, int perPage) {
-        return findPaginatedWithQueryAndSort(query.toDBQuery(), DBSort.asc(sortByField), page, perPage);
+    public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
+                                                             String sortByField, int page, int perPage) {
+        return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
+                getSortBuilder("asc", sortByField), page, perPage);
     }
 
     @Override

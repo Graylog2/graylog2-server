@@ -263,8 +263,6 @@ public class RestPermissions implements PluginPermissions {
         BUFFERS_READ,
         CLUSTER_CONFIG_ENTRY_READ,
         DECORATORS_READ,
-        EVENT_DEFINITIONS_READ,
-        EVENT_NOTIFICATIONS_READ,
         FIELDNAMES_READ,
         INDEXERCLUSTER_READ,
         INPUTS_READ,
