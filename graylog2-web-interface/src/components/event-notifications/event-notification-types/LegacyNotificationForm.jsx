@@ -85,7 +85,7 @@ class LegacyNotificationForm extends React.Component {
     let content;
     if (typeData) {
       content = this.renderNotificationForm(config, typeData);
-    } else {
+    } else if (callbackType) {
       content = (
         <Alert bsStyle="danger" className={styles.legacyNotificationAlert}>
           Unknown legacy alarm callback type: <strong>{callbackType}</strong> Please make sure the plugin is installed.
