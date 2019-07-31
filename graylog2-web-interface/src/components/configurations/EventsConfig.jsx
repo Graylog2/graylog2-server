@@ -29,8 +29,9 @@ const EventsConfig = createReactClass({
   },
 
   getInitialState() {
+    const { config } = this.props;
     return {
-      config: ObjectUtils.clone(this.props.config),
+      config: ObjectUtils.clone(config),
     };
   },
 
@@ -39,11 +40,11 @@ const EventsConfig = createReactClass({
   },
 
   _openModal() {
-    this.refs.configModal.open();
+    this.modal.open();
   },
 
   _closeModal() {
-    this.refs.configModal.close();
+    this.modal.close();
   },
 
   _resetConfig() {
@@ -52,14 +53,17 @@ const EventsConfig = createReactClass({
   },
 
   _saveConfig() {
-    this.props.updateConfig(this.state.config).then(() => {
+    const { updateConfig } = this.props;
+    const { config } = this.state;
+    updateConfig(config).then(() => {
       this._closeModal();
     });
   },
 
   _onUpdate(field) {
     return (value) => {
-      const update = ObjectUtils.clone(this.state.config);
+      const { config } = this.state;
+      const update = ObjectUtils.clone(config);
       if (typeof value === 'object') {
         update[field] = FormUtils.getValueFromInput(value.target);
       } else {
@@ -78,31 +82,35 @@ const EventsConfig = createReactClass({
   },
 
   render() {
+    const { config } = this.state;
+    const eventsSearchTimeout = config.events_search_timeout;
+    const eventsNotificationRetryPeriod = config.events_notification_retry_period;
+    const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
     return (
       <div>
         <h2>Events System</h2>
 
         <dl className="deflist">
           <dt>Search Timeout:</dt>
-          <dd>{this.state.config.events_search_timeout}</dd>
+          <dd>{eventsSearchTimeout}</dd>
           <dt>Notification Retry:</dt>
-          <dd>{this.state.config.events_notification_retry_period}</dd>
+          <dd>{eventsNotificationRetryPeriod}</dd>
           <dt>Notification Backlog:</dt>
-          <dd>{this.state.config.events_notification_default_backlog}</dd>
+          <dd>{eventsNotificationDefaultBacklog}</dd>
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref="configModal"
+        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                             title="Update Events System Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
             <ISODurationInput id="search-timeout-field"
-                              duration={this.state.config.events_search_timeout}
+                              duration={eventsSearchTimeout}
                               update={this._onUpdate('events_search_timeout')}
                               label="Search Timeout (as ISO8601 Duration)"
                               help="Amount of time after which an Elasticsearch query is interrupted."
@@ -110,7 +118,7 @@ const EventsConfig = createReactClass({
                               errorText="invalid (min: 1 second)"
                               required />
             <ISODurationInput id="notifications-retry-field"
-                              duration={this.state.config.events_notification_retry_period}
+                              duration={eventsNotificationRetryPeriod}
                               update={this._onUpdate('events_notification_retry_period')}
                               label="Notifications retry period (as ISO8601 Duration)"
                               help="Amount of time after which a failed notification is resend."
@@ -122,7 +130,7 @@ const EventsConfig = createReactClass({
                    onChange={this._onUpdate('events_notification_default_backlog')}
                    label="Default notifications backlog size"
                    help="Amount of log messages included in a notification by default."
-                   value={this.state.config.events_notification_default_backlog}
+                   value={eventsNotificationDefaultBacklog}
                    min="0"
                    required />
           </fieldset>
