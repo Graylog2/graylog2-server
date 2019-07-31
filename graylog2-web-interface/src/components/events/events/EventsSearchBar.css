@@ -1,0 +1,41 @@
+:local(.eventsSearchBar) {
+    display: flex;
+    flex-flow: column nowrap;
+    margin-bottom: 15px;
+}
+
+@media all and (max-width: 768px) {
+    :local(.eventsSearchBar) > div {
+        flex-flow: column nowrap;
+    }
+}
+
+:local(.eventsSearchBar) > div {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+:local(.eventsSearchBar) .form-group {
+    margin-bottom: 0;
+}
+
+:local(.searchForm) {
+    flex: 0 1 45%;
+    margin-right: 10px;
+}
+
+:local(.searchForm) .form-inline {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+:local(.searchForm) .form-group:first-child {
+    flex: 1 100%;
+}
+
+:local(.searchForm) .form-group:not(:first-child) {
+    margin-right: 5px;
+}

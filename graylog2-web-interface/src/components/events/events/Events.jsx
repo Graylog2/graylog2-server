@@ -1,23 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Alert, Button, ButtonGroup, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import { Alert, Button, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import moment from 'moment';
 
-import { EmptyEntity, PaginatedList, SearchForm, Timestamp, TimeUnitInput } from 'components/common';
-import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import { EmptyEntity, PaginatedList, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
+import EventsSearchBar from './EventsSearchBar';
+import EventDetails from './EventDetails';
+
 import styles from './Events.css';
 
 const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
-
-const TIME_UNITS = ['DAYS', 'HOURS', 'MINUTES', 'SECONDS'];
 
 class Events extends React.Component {
   static propTypes = {
@@ -30,10 +28,16 @@ class Events extends React.Component {
     onQueryChange: PropTypes.func.isRequired,
     onAlertFilterChange: PropTypes.func.isRequired,
     onTimeRangeChange: PropTypes.func.isRequired,
+    onSearchReload: PropTypes.func.isRequired,
   };
 
   state = {
     expanded: [],
+  };
+
+  handlePageSizeChange = (nextPageSize) => {
+    const { onPageChange } = this.props;
+    onPageChange(1, nextPageSize);
   };
 
   expandRow = (eventId) => {
@@ -42,19 +46,6 @@ class Events extends React.Component {
       const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
       this.setState({ expanded: nextExpanded });
     };
-  };
-
-  updateSearchTimeRange = (nextValue, nextUnit) => {
-    const { onTimeRangeChange } = this.props;
-    const durationInSeconds = moment.duration(nextValue, nextUnit).asSeconds();
-    onTimeRangeChange('relative', durationInSeconds);
-  };
-
-  getConditionPlugin = (type) => {
-    if (type === undefined) {
-      return {};
-    }
-    return PluginStore.exports('eventDefinitionTypes').find(edt => edt.type === type) || {};
   };
 
   priorityFormatter = (eventId, priority) => {
@@ -83,80 +74,6 @@ class Events extends React.Component {
           <i className={`fa fa-fw ${icon} ${style} ${styles.priority}`} />
         </OverlayTrigger>
       </React.Fragment>
-    );
-  };
-
-  renderEventFields = (eventFields) => {
-    const fieldNames = Object.keys(eventFields);
-    return (
-      <ul>
-        {fieldNames.map((fieldName) => {
-          return (
-            <React.Fragment key={fieldName}>
-              <li><b>{fieldName}</b> {eventFields[fieldName]}</li>
-            </React.Fragment>
-          );
-        })}
-      </ul>
-    );
-  };
-
-  renderEventDetails = (event, eventDefinitionContext) => {
-    const plugin = this.getConditionPlugin(event.event_definition_type);
-
-    return (
-      <tr className={styles.expandedRow}>
-        <td colSpan={HEADERS.length + 1}>
-          <Row>
-            <Col md={6}>
-              <dl>
-                <dt>ID</dt>
-                <dd>{event.id}</dd>
-                <dt>Priority</dt>
-                <dd>
-                  {lodash.capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
-                </dd>
-                <dt>Timestamp</dt>
-                <dd>
-                  <Timestamp dateTime={event.timestamp} />
-                </dd>
-                <dt>Event Definition</dt>
-                <dd>
-                  {eventDefinitionContext ? (
-                    <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-                      {eventDefinitionContext.title}
-                    </Link>
-                  ) : (
-                    <em>{event.event_definition_id}</em>
-                  )}
-                  &emsp;
-                  ({plugin.displayName || event.event_definition_type})
-                </dd>
-              </dl>
-            </Col>
-            <Col md={6}>
-              <dl>
-                {event.timerange_start && event.timerange_end && (
-                  <React.Fragment>
-                    <dt>Aggregation time range</dt>
-                    <dd>
-                      <Timestamp dateTime={event.timerange_start} />
-                      &ensp;&mdash;&ensp;
-                      <Timestamp dateTime={event.timerange_end} />
-                    </dd>
-                  </React.Fragment>
-                )}
-                <dt>Event Key</dt>
-                <dd>{event.key || 'No Key set for this Event.'}</dd>
-                <dt>Additional Fields</dt>
-                {lodash.isEmpty(event.fields)
-                  ? <dd>No additional Fields added to this Event.</dd>
-                  : this.renderEventFields(event.fields)}
-              </dl>
-            </Col>
-          </Row>
-        </td>
-      </tr>
     );
   };
 
@@ -191,7 +108,13 @@ class Events extends React.Component {
           </td>
           <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
         </tr>
-        {expanded.includes(event.id) && this.renderEventDetails(event, eventDefinitionContext)}
+        {expanded.includes(event.id) && (
+          <tr className={styles.expandedRow}>
+            <td colSpan={HEADERS.length + 1}>
+              <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} />
+            </td>
+          </tr>
+        )}
       </tbody>
     );
   };
@@ -223,10 +146,9 @@ class Events extends React.Component {
       onPageChange,
       onQueryChange,
       onAlertFilterChange,
+      onTimeRangeChange,
+      onSearchReload,
     } = this.props;
-
-    const filterAlerts = parameters.filter.alerts;
-    const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
 
     const eventList = events.map(e => e.event);
 
@@ -238,40 +160,17 @@ class Events extends React.Component {
       <React.Fragment>
         <Row>
           <Col md={12}>
-            <div className="form-inline">
-              <SearchForm query={parameters.query}
-                          onSearch={onQueryChange}
-                          onReset={onQueryChange}
-                          searchButtonLabel="Find"
-                          placeholder="Find Events"
-                          queryWidth={300}
-                          topMargin={0}
-                          wrapperClass={styles.inline}
-                          useLoadingState />
-
-              <div className="pull-right">
-                <TimeUnitInput id="event-timerange-selector"
-                               update={this.updateSearchTimeRange}
-                               units={TIME_UNITS}
-                               unit={timerangeDuration.unit}
-                               value={timerangeDuration.duration}
-                               label="In the last"
-                               required />
-              </div>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
-            <ButtonGroup>
-              <Button active={filterAlerts === 'only'} onClick={onAlertFilterChange('only')}>Alerts</Button>
-              <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
-              <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>Both</Button>
-            </ButtonGroup>
-
+            <EventsSearchBar parameters={parameters}
+                             onQueryChange={onQueryChange}
+                             onAlertFilterChange={onAlertFilterChange}
+                             onTimeRangeChange={onTimeRangeChange}
+                             onPageSizeChange={this.handlePageSizeChange}
+                             onSearchReload={onSearchReload}
+                             pageSize={parameters.pageSize}
+                             pageSizes={[10, 25, 50, 100]} />
             <PaginatedList activePage={parameters.page}
                            pageSize={parameters.pageSize}
-                           pageSizes={[10, 25, 50, 100]}
+                           showPageSizeSelect={false}
                            totalItems={totalEvents}
                            onChange={onPageChange}>
               {eventList.length === 0 ? (

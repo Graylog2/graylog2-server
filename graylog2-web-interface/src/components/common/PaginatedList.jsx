@@ -46,8 +46,13 @@ class PaginatedList extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.activePage !== nextProps.activePage) {
+    const { pageSize, activePage } = this.props;
+
+    if (activePage !== nextProps.activePage) {
       this.setState({ currentPage: nextProps.activePage });
+    }
+    if (pageSize !== nextProps.pageSize) {
+      this.setState({ pageSize: nextProps.pageSize });
     }
   }
 
